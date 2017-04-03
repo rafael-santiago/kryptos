@@ -1,0 +1,7 @@
+#ifndef KRYPTOS_TYPES_H
+#define KRYPTOS_TYPES_H 1
+
+#undef KRYPTOS_KERNEL_MODE
+#define KRYPTOS_USER_MODE
+
+#endif

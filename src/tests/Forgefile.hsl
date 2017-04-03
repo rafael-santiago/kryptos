@@ -1,0 +1,73 @@
+#
+#                                Copyright (C) 2017 by Rafael Santiago
+#
+# This is a free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+#
+
+include ~/toolsets/gcc/gcc-app.hsl
+include ~/fsutil.hsl
+
+local var sources type list;
+local var includes type list;
+local var cflags type list;
+local var libraries type list;
+local var ldflags type list;
+
+project kryptos-tests : toolset "gcc-c-app" : $sources, $includes, $cflags, $libraries, $ldflags, "kryptos-tests";
+
+kryptos-tests.prologue() {
+    forge_cutest();
+
+    $sources.ls(".*\\.c$");
+
+    $includes = hefesto.sys.get_option("includes");
+    $cflags = hefesto.sys.get_option("cflags");
+    $libraries = hefesto.sys.get_option("libraries");
+    $ldflags = hefesto.sys.get_option("ldflags");
+
+    $ldflags.add_item("-lpthread");
+    $ldflags.add_item("-ldl");
+
+    if (hefesto.sys.os_name() == "freebsd") {
+        $ldflags.add_item("-lexecinfo");
+    }
+
+    if (isdir("/usr/local/include")) {
+        $includes.add_item("/usr/local/include");
+    }
+
+    if (isdir("/usr/local/lib")) {
+        $libraries.add_item("/usr/local/lib");
+    }
+}
+
+kryptos-tests.epilogue() {
+    if (hefesto.sys.last_forge_result() == 0) {
+        var exit_code type int;
+        $exit_code = hefesto.sys.run(hefesto.sys.make_path("bin", "kryptos-tests"));
+        if ($exit_code != 0) {
+            hefesto.sys.echo("~~~ TESTS FAILURE.\n");
+            hefesto.project.abort($exit_code);
+        }
+    }
+}
+
+local function forge_cutest() : result type none {
+    var oldcwd type string;
+
+    $oldcwd = hefesto.sys.pwd();
+
+    if (hefesto.sys.cd("cutest/src")) {
+        hefesto.sys.forge("cutest", "Forgefile.hsl", "--forgefiles=Forgefile.hsl --Forgefile-projects=cutest --obj-output-dir=obj --bin-output-dir=lib");
+        if (hefesto.sys.last_forge_result() != 0) {
+            hefesto.sys.echo("~~~ UNABLE TO BUILD LIBCUTEST.\n");
+            hefesto.project.abort(1);
+        }
+        hefesto.sys.cd($oldcwd);
+    } else {
+        hefesto.sys.echo("~~~ UNABLE TO BUILD LIBCUTEST.\n");
+        hefesto.project.abort(1);
+    }
+}

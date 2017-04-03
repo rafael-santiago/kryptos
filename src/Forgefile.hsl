@@ -1,0 +1,51 @@
+#
+#                                Copyright (C) 2017 by Rafael Santiago
+#
+# This is a free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+#
+
+include ~/toolsets/gcc/gcc-lib.hsl
+include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
+
+local var sources type list;
+local var includes type list;
+local var cflags type list;
+local var libraries type list;
+local var ldflags type list;
+local var deps type string;
+
+project kryptos : toolset "gcc-c-lib" : dependencies $deps : $sources, $includes, $cflags, $libraries, $ldflags, "libkryptos.a";
+
+kryptos.prologue() {
+    $deps = get_c_cpp_deps();
+    $sources.ls(".*\\.c$");
+}
+
+kryptos.epilogue() {
+    if (hefesto.sys.last_forge_result() == 0) {
+        var oldcwd type string;
+
+        $oldcwd = hefesto.sys.pwd();
+
+        if (hefesto.sys.cd("tests") == 0) {
+            hefesto.sys.echo("~~~ TESTS DIRECTORY NOT FOUND!\n");
+            hefesto.project.abort(1);
+        }
+
+        hefesto.sys.forge("kryptos-tests", "Forgefile.hsl", "--forgefiles=Forgefile.hsl " +
+                                                            "--Forgefile-projects=kryptos-tests " +
+                                                            "--bin-output-dir=bin --obj-output-dir=o " +
+                                                            "--libraries=../../lib,cutest/src/lib " +
+                                                            "--ldflags=-lkryptos,-lcutest --includes=../,cutest/src");
+        var exit_code type int;
+        $exit_code = hefesto.sys.last_forge_result();
+
+        if ($exit_code != 0) {
+            hefesto.project.abort($exit_code);
+        }
+
+        hefesto.sys.cd($oldcwd);
+    }
+}
