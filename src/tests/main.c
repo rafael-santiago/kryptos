@@ -6,7 +6,9 @@
  *
  */
 #include <cutest.h>
-#include <padding.h>
+#include <kryptos_padding.h>
+#include <kryptos_memory.h>
+#include <kryptos_random.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -44,14 +46,28 @@ CUTE_TEST_CASE(kryptos_padding_tests)
 
         CUTE_ASSERT(memcmp(pad, tests[t].pad, tests[t].buffer_size) == 0);
 
-        free(pad);
+        kryptos_freeseg(pad);
 
         t++;
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_get_random_block_tests)
+    void *block = NULL;
+    size_t b = 0;
+
+    CUTE_ASSERT(kryptos_get_random_block(0) == NULL);
+
+    for (b = 1; b < 101; b++) {
+        block = kryptos_get_random_block(b);
+        CUTE_ASSERT(block != NULL);
+        kryptos_freeseg(block);
+    }
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_padding_tests);
+    CUTE_RUN_TEST(kryptos_get_random_block_tests);
 CUTE_TEST_CASE_END
 
 CUTE_MAIN(kryptos_test_monkey);

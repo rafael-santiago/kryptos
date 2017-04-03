@@ -5,7 +5,7 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#include "memory.h"
+#include <kryptos_memory.h>
 
 #ifdef KRYPTOS_USER_MODE
 #include <stdio.h>
@@ -21,4 +21,13 @@ void *kryptos_newseg(const size_t ssize) {
         exit(1);
     }
 #endif
+}
+
+void kryptos_freeseg(void *seg) {
+    if (seg != NULL) {
+#if defined(KRYPTOS_USER_MODE)
+        free(seg);
+#elif defined(KRYPTOS_KERNEL_MODE)
+#endif
+    }
 }

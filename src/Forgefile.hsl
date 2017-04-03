@@ -19,6 +19,7 @@ local var deps type string;
 project kryptos : toolset "gcc-c-lib" : dependencies $deps : $sources, $includes, $cflags, $libraries, $ldflags, "libkryptos.a";
 
 kryptos.prologue() {
+    $includes = hefesto.sys.get_option("includes");
     $deps = get_c_cpp_deps();
     $sources.ls(".*\\.c$");
 }

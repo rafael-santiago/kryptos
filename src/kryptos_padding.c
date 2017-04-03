@@ -5,9 +5,9 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#include "padding.h"
-#include "types.h"
-#include "memory.h"
+#include <kryptos_padding.h>
+#include <kryptos_types.h>
+#include <kryptos_memory.h>
 #ifdef KRYPTOS_USER_MODE
 #include <string.h>
 #endif
