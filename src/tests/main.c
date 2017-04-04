@@ -9,16 +9,17 @@
 #include <kryptos_padding.h>
 #include <kryptos_memory.h>
 #include <kryptos_random.h>
+#include <kryptos_task_check.h>
 #include <stdlib.h>
 #include <string.h>
 
 CUTE_TEST_CASE(kryptos_padding_tests)
     struct padding_tests_ctx {
-        const unsigned char *buffer;
+        const kryptos_u8_t *buffer;
         size_t buffer_size;
         const size_t block_size;
         size_t expected_buffer_size;
-        const unsigned char *pad;
+        const kryptos_u8_t *pad;
     };
     struct padding_tests_ctx tests[] = {
         { "XXXXXXXXXXXXXXXXXXXXXXXXXXXX", 28, 8, 32, "XXXXXXXXXXXXXXXXXXXXXXXXXXXX\x0\x0\x0\x4" },
@@ -27,7 +28,7 @@ CUTE_TEST_CASE(kryptos_padding_tests)
         { "A",                             1, 8,  8, "A\x0\x0\x0\x0\x0\x0\x7"                   }
     };
     size_t tests_nr = sizeof(tests) / sizeof(tests[0]), t = 0;
-    unsigned char *pad = NULL;
+    kryptos_u8_t *pad = NULL;
 //    size_t old_size;
 
     while (t < tests_nr) {
@@ -65,9 +66,99 @@ CUTE_TEST_CASE(kryptos_get_random_block_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_task_check_tests)
+    kryptos_u8_t *key = "blah";
+    kryptos_u8_t *in = "bleh";
+    kryptos_u8_t *iv = "bluh";
+    kryptos_task_ctx t;
+    kryptos_task_ctx *ktask = &t;
+
+    t.cipher = -1;
+    t.mode = kKryptosECB;
+    t.key = key;
+    t.key_size = 4;
+    t.iv = in;
+    t.iv_size = 4;
+    t.in = in;
+    t.out = NULL;
+    t.out_size = 0;
+
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidCipher);
+    CUTE_ASSERT(strcmp(t.result_verbose, "Invalid cipher.") == 0);
+
+    t.cipher = kKryptosCipherARC4;
+    t.key = NULL;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+    CUTE_ASSERT(strcmp(t.result_verbose, "Invalid key data.") == 0);
+
+    t.key = key;
+    t.key_size = 0;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+    CUTE_ASSERT(strcmp(t.result_verbose, "Invalid key data.") == 0);
+
+    t.cipher = kKryptosCipherAES;
+    t.key_size = 4;
+    t.mode = kKryptosCBC;
+    t.iv = NULL;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+    CUTE_ASSERT(strcmp(t.result_verbose, "Invalid iv data.") == 0);
+
+    t.iv = iv;
+    t.iv_size = 0;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+    CUTE_ASSERT(strcmp(t.result_verbose, "Invalid iv data.") == 0);
+
+    t.iv_size = 4;
+    t.in = NULL;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+    CUTE_ASSERT(strcmp(t.result_verbose, "No input.") == 0);
+
+    t.in = in;
+    t.in_size = 0;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+    CUTE_ASSERT(strcmp(t.result_verbose, "No input.") == 0);
+
+    t.in_size = 4;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    CUTE_ASSERT(t.result == kKryptosSuccess);
+    CUTE_ASSERT(t.result_verbose == NULL);
+
+    t.cipher = kKryptosCipherARC4;
+    t.iv = NULL;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    CUTE_ASSERT(t.result == kKryptosSuccess);
+    CUTE_ASSERT(t.result_verbose == NULL);
+
+    t.cipher = kKryptosCipherSEAL;
+    t.iv = NULL;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    CUTE_ASSERT(t.result == kKryptosSuccess);
+    CUTE_ASSERT(t.result_verbose == NULL);
+
+    t.cipher = kKryptosCipherARC4;
+    t.iv_size = 0;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    CUTE_ASSERT(t.result == kKryptosSuccess);
+    CUTE_ASSERT(t.result_verbose == NULL);
+
+    t.cipher = kKryptosCipherSEAL;
+    t.iv_size = 0;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    CUTE_ASSERT(t.result == kKryptosSuccess);
+    CUTE_ASSERT(t.result_verbose == NULL);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_padding_tests);
     CUTE_RUN_TEST(kryptos_get_random_block_tests);
+    CUTE_RUN_TEST(kryptos_task_check_tests);
 CUTE_TEST_CASE_END
 
 CUTE_MAIN(kryptos_test_monkey);

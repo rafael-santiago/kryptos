@@ -5,12 +5,11 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#ifndef KRYPTOS_KRYPTOS_PADDING_H
-#define KRYPTOS_KRYPTOS_PADDING_H 1
+#ifndef KRYPTOS_KRYPTOS_TASK_CHECK_H
+#define KRYPTOS_KRYPTOS_TASK_CHECK_H 1
 
 #include <kryptos_types.h>
 
-kryptos_u8_t *kryptos_ansi_x923_padding(const kryptos_u8_t *buffer, size_t *buffer_size,
-                                        const size_t block_size_in_bytes);
+int kryptos_task_check(kryptos_task_ctx **ktask);
 
 #endif

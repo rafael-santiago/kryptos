@@ -8,7 +8,7 @@
 #ifndef KRYPTOS_KRYPTOS_RANDOM_H
 #define KRYPTOS_KRYPTOS_RANDOM_H 1
 
-#include <stdlib.h>
+#include <kryptos_types.h>
 
 void *kryptos_get_random_block(const size_t size_in_bytes);
 

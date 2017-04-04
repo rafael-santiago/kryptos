@@ -7,7 +7,6 @@
  */
 #include <kryptos_random.h>
 #include <kryptos_memory.h>
-#include <kryptos_types.h>
 #include <fcntl.h>
 #include <unistd.h>
 
