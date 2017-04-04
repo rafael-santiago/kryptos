@@ -31,6 +31,15 @@ typedef enum {
     kKryptosCipherARC4 = 0,
     kKryptosCipherSEAL,
     kKryptosCipherAES,
+    kKryptosCipherDES,
+    kKryptosCipher3DES,
+    kKryptosCipherIDEA,
+    kKryptosCipherRC2,
+    kKryptosCipherFEAL,
+    kKryptosCipherCAST5,
+    kKryptosCipherCAMELLIA,
+    kKryptosCipherSAFER,
+    kKryptosCipherBLOWFISH,
     kKryptosCipherNr
 }kryptos_cipher_t;
 
