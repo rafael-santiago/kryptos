@@ -313,6 +313,7 @@ CUTE_TEST_CASE(kryptos_arc4_tests)
         }
     };
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), ct;
+    kryptos_u8_t *temp = NULL;
 
     t.cipher = kKryptosCipherARC4;
 
@@ -326,6 +327,14 @@ CUTE_TEST_CASE(kryptos_arc4_tests)
         CUTE_ASSERT(t.out != NULL);
         CUTE_ASSERT(t.out_size == test_vector[ct].out_size);
         CUTE_ASSERT(memcmp(t.out, test_vector[ct].out, t.out_size) == 0);
+        temp = t.in;
+        t.in = t.out;
+        kryptos_arc4_stream(&ktask);
+        CUTE_ASSERT(t.result == kKryptosSuccess);
+        CUTE_ASSERT(t.out != NULL);
+        CUTE_ASSERT(t.out_size == test_vector[ct].in_size);
+        CUTE_ASSERT(memcmp(t.out, temp, t.out_size) == 0);
+        kryptos_freeseg(t.in);
         kryptos_freeseg(t.out);
     }
 

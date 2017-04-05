@@ -46,7 +46,7 @@ kryptos-tests.prologue() {
 kryptos-tests.epilogue() {
     if (hefesto.sys.last_forge_result() == 0) {
         var exit_code type int;
-        $exit_code = hefesto.sys.run(hefesto.sys.make_path("bin", "kryptos-tests"));
+        $exit_code = hefesto.sys.run(hefesto.sys.make_path("bin", "kryptos-tests --cutest-leak-check"));
         if ($exit_code != 0) {
             hefesto.sys.echo("~~~ TESTS FAILURE.\n");
             hefesto.project.abort($exit_code);

@@ -6,6 +6,7 @@
  *
  */
 #include <kryptos_memory.h>
+#include <kryptos_types.h>
 
 #ifdef KRYPTOS_USER_MODE
 #include <stdio.h>
