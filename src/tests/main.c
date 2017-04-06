@@ -11,6 +11,7 @@
 #include <kryptos_random.h>
 #include <kryptos_task_check.h>
 #include <kryptos_arc4.h>
+#include <kryptos_seal.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -340,11 +341,81 @@ CUTE_TEST_CASE(kryptos_arc4_tests)
 
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_seal_tests)
+    // WARN(Rafael): The original SEAL spec does not provide any kind of test based on inputs -> outputs.
+    //               In SEAL spec there is only a test vector of the whole generated keystream using a
+    //               specific parameters configuration. I have tested my implementation over that data
+    //               and then I generated these two following "oracle" test vectors. The configuration
+    //               used here comes from the original SEAL paper.
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_seal_version_t v = kKryptosSEAL20;
+    kryptos_u8_t *in = "The covers of this book are too far apart. -- Ambrose Pierce (Book Review).";
+    kryptos_u8_t *expected_out_v20 = "\x63\xc8\x60\xb5\xf8\xeb\xb2\xf9\xd6\xcd\x3e\x6a\x60\x53\x27\x67\x63\xbb\x18"
+                                     "\xff\xaa\xe8\xe5\xe8\xbb\x14\x03\xf0\x19\xc8\x7c\x08\x72\x78\xcf\xd2\xb3\x28"
+                                     "\xdf\xc9\xc2\x8a\x0a\x60\xa7\x11\x5b\x1f\x14\xd4\x52\x88\x85\x4e\xb5\x1f\x13"
+                                     "\xfa\xd4\xff\xcf\x3f\xcc\xc6\x6e\x5c\xff\x5d\x10\x29\x8a\x2b\x0d\x67\x39";
+    kryptos_u8_t *expected_out_v30 = "\x63\xc8\x60\xb5\xf8\xeb\xb2\xf9\xd6\xcd\x3e\x6a\x60\x53\x27\x67\x36\xc3\xb7"
+                                     "\x9f\x99\xce\x54\x9d\x0d\x5e\xbb\xed\xf5\x92\x81\x5c\x4c\xdc\xb1\xc7\x05\x50"
+                                     "\xfb\x8d\x74\x8f\x02\xae\xc2\x47\x11\xe8\xa3\x11\x24\x20\x4d\xb0\x09\x8f\xc2"
+                                     "\xd9\x3d\xbc\x68\x24\x43\x84\x23\x0f\x76\xc8\xe8\xb8\x43\x46\x89\xc4\x20";
+    size_t n = 0x013577af;
+    size_t l = 1024;
+
+    t.cipher = kKryptosCipherSEAL;
+    t.key = "\x67\x45\x23\x01\xef\xcd\xab\x89\x98\xba\xdc\xfe\x10\x32\x54\x76\xc3\xd2\xe1\xf0";
+    t.key_size = 20;
+    t.arg[0] = &v;
+    t.arg[1] = &l;
+    t.arg[2] = &n;
+    t.in = in;
+    t.in_size = strlen(t.in);
+
+    // INFO(Rafael): Testing SEAL 2.0 processing.
+
+    kryptos_seal_stream(&ktask);
+
+    CUTE_ASSERT(t.out != NULL);
+    CUTE_ASSERT(t.out_size == t.in_size);
+    CUTE_ASSERT(memcmp(t.out, expected_out_v20, t.out_size) == 0);
+
+    t.in = t.out;
+    kryptos_seal_stream(&ktask);
+
+    CUTE_ASSERT(t.out != NULL);
+    CUTE_ASSERT(t.out_size == t.in_size);
+    CUTE_ASSERT(memcmp(t.out, in, t.out_size) == 0);
+
+    kryptos_freeseg(t.out);
+    kryptos_freeseg(t.in);
+
+    //  INFO(Rafael): Testing SEAL 3.0 processing.
+
+    v = kKryptosSEAL30;
+    t.in = in;
+
+    kryptos_seal_stream(&ktask);
+
+    CUTE_ASSERT(t.out != NULL);
+    CUTE_ASSERT(t.out_size == t.in_size);
+    CUTE_ASSERT(memcmp(t.out, expected_out_v30, t.out_size) == 0);
+
+    t.in = t.out;
+    kryptos_seal_stream(&ktask);
+
+    CUTE_ASSERT(t.out != NULL);
+    CUTE_ASSERT(t.out_size == t.in_size);
+    CUTE_ASSERT(memcmp(t.out, in, t.out_size) == 0);
+
+    kryptos_freeseg(t.out);
+    kryptos_freeseg(t.in);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_padding_tests);
     CUTE_RUN_TEST(kryptos_get_random_block_tests);
     CUTE_RUN_TEST(kryptos_task_check_tests);
     CUTE_RUN_TEST(kryptos_arc4_tests);
+    CUTE_RUN_TEST(kryptos_seal_tests);
 CUTE_TEST_CASE_END
 
 CUTE_MAIN(kryptos_test_monkey);

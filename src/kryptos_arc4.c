@@ -1,5 +1,5 @@
 /*
- *                                Copyright (C) 2017 by Rafael Santiago
+ *                          Copyright (C) 2006, 2017 by Rafael Santiago
  *
  * This is a free software. You can redistribute it and/or modify under
  * the terms of the GNU General Public License version 2.
@@ -34,9 +34,11 @@ static void kryptos_arc4_key_setup(const kryptos_u8_t *userkey, const size_t use
     kryptos_u8_t S2[256];
     kryptos_u8_t temp;
 
-    for (sk->i = 0; sk->i < 256; sk->S[sk->i] = sk->i++);
+    for (sk->i = 0; sk->i < 256; sk->S[sk->i] = sk->i++)
+        ;
 
-    for (sk->i = 0; sk->i < 256; S2[sk->i] = userkey[sk->i % userkey_size], sk->i++);
+    for (sk->i = 0; sk->i < 256; S2[sk->i] = userkey[sk->i % userkey_size], sk->i++)
+        ;
 
     for(sk->i = 0, sk->j = 0; sk->i < 256; sk->i++) {
         sk->j = (sk->j + sk->S[sk->i] + S2[sk->i]) % 256;

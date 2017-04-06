@@ -58,6 +58,8 @@ typedef enum {
     kKryptosTaskResultNr
 }kryptos_task_result_t;
 
+#define KRYPTOS_KRYPTO_TASK_ARG_NR 10
+
 typedef struct kryptos_task {
     kryptos_cipher_t cipher;
     kryptos_cipher_mode_t mode;
@@ -71,6 +73,8 @@ typedef struct kryptos_task {
     size_t in_size;
     kryptos_u8_t *out;
     size_t out_size;
+
+    void *arg[KRYPTOS_KRYPTO_TASK_ARG_NR];
 
     kryptos_task_result_t result;
     char *result_verbose;
