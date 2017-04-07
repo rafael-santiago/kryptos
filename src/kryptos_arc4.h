@@ -12,6 +12,6 @@
 
 void kryptos_arc4(kryptos_task_ctx **ktask);
 
-void kryptos_arc4_set_key(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size);
+void kryptos_arc4_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size);
 
 #endif

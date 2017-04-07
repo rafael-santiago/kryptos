@@ -23,9 +23,9 @@
 #define kryptos_seal_safe_inc(i, m, r) ( ( (i) = ( (i) + (m) ) % (r) ) )
 #define kryptos_seal_initialize(n, l, A, B, C, D, n1, n2, n3, n4, R, T) (\
  ( (A) =  (n) ^ (R)[( (l) << 2 )] ),\
- ( (B) = (kryptos_seal_rolr(n,8))  ^ (R)[( (l) << 2 ) + 1] ),\
- ( (C) = (kryptos_seal_rolr(n,16)) ^ (R)[( (l) << 2 ) + 2] ),\
- ( (D) = (kryptos_seal_rolr(n,24)) ^ (R)[( (l) << 2 ) + 3] ),\
+ ( (B) = (kryptos_seal_rolr(n,  8)) ^ (R)[( (l) << 2 ) + 1] ),\
+ ( (C) = (kryptos_seal_rolr(n, 16)) ^ (R)[( (l) << 2 ) + 2] ),\
+ ( (D) = (kryptos_seal_rolr(n, 24)) ^ (R)[( (l) << 2 ) + 3] ),\
  ( (B) = (B) + (T)[( (A) & 0x000007fc ) >> 2], (A) = kryptos_seal_rolr(A, 9) ),\
  ( (C) = (C) + (T)[( (B) & 0x000007fc ) >> 2], (B) = kryptos_seal_rolr(B, 9) ),\
  ( (D) = (D) + (T)[( (C) & 0x000007fc ) >> 2], (C) = kryptos_seal_rolr(C, 9) ),\
@@ -135,7 +135,8 @@ static void kryptos_seal_ga(kryptos_u32_t a[5], int i, kryptos_u32_t o[5]) {
     memset(X, 0, sizeof(X));
 }
 
-static void kryptos_seal_ld_userkey(kryptos_u32_t *state, const size_t state_size, const kryptos_u8_t *key, const size_t key_size) {
+static void kryptos_seal_ld_userkey(kryptos_u32_t *state, const size_t state_size,
+                                    const kryptos_u8_t *key, const size_t key_size) {
     size_t s, k;
 
     memset(state, 0, sizeof(kryptos_u32_t) * state_size);
@@ -492,8 +493,8 @@ kryptos_seal_stream_epilogue:
     memset(&kstream, 0, sizeof(kstream));
 }
 
-void kryptos_seal_set_key(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size,
-                          kryptos_seal_version_t *algo_version, size_t *L, size_t *n) {
+void kryptos_seal_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size,
+                        kryptos_seal_version_t *algo_version, size_t *L, size_t *n) {
     if (ktask == NULL) {
         return;
     }
