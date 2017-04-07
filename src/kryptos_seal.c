@@ -316,8 +316,8 @@ static int kryptos_seal_keystream(const kryptos_u8_t *userkey, const size_t user
     // #               provided a value that denotes all words of the final keystream xored.               #
     // #                                                                                                   #
     // #               If you have made some changes exactly here or in any other critical component of    #
-    // #               this implementation, you must be sure that using the setup described in SEAL spec   #
-    // #               The xoring of all final keystream words on SEAL 2.0 is "0x098045fc" and             #
+    // #               this implementation, you must be sure that using the setup described in SEAL spec,  #
+    // #               the xoring of all final keystream words on SEAL 2.0 is "0x098045fc" and             #
     // #               SEAL 3.0 is "0x3e0fe99f".                                                           #
     // #                                                                                                   #
     // #               Happy coding! ;)                                                                    #
@@ -490,4 +490,18 @@ kryptos_seal_stream_epilogue:
     in_p = in_end = NULL;
     out_p = NULL;
     memset(&kstream, 0, sizeof(kstream));
+}
+
+void kryptos_seal_set_key(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size,
+                          kryptos_seal_version_t *algo_version, size_t *L, size_t *n) {
+    if (ktask == NULL) {
+        return;
+    }
+
+    ktask->cipher = kKryptosCipherSEAL;
+    ktask->key = key;
+    ktask->key_size = key_size;
+    ktask->arg[0] = algo_version;
+    ktask->arg[1] = L;
+    ktask->arg[2] = n;
 }

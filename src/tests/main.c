@@ -321,8 +321,7 @@ CUTE_TEST_CASE(kryptos_arc4_tests)
     for (ct = 0; ct < test_vector_nr; ct++) {
         t.in = test_vector[ct].in;
         t.in_size = test_vector[ct].in_size;
-        t.key = test_vector[ct].key;
-        t.key_size = test_vector[ct].key_size;
+        kryptos_arc4_set_key(ktask, test_vector[ct].key, test_vector[ct].key_size);
         kryptos_arc4_stream(&ktask);
         CUTE_ASSERT(t.result == kKryptosSuccess);
         CUTE_ASSERT(t.out != NULL);
@@ -361,12 +360,9 @@ CUTE_TEST_CASE(kryptos_seal_tests)
     size_t n = 0x013577af;
     size_t l = 1024;
 
-    t.cipher = kKryptosCipherSEAL;
-    t.key = "\x67\x45\x23\x01\xef\xcd\xab\x89\x98\xba\xdc\xfe\x10\x32\x54\x76\xc3\xd2\xe1\xf0";
-    t.key_size = 20;
-    t.arg[0] = &v;
-    t.arg[1] = &l;
-    t.arg[2] = &n;
+    kryptos_seal_set_key(ktask,
+                         "\x67\x45\x23\x01\xef\xcd\xab\x89\x98\xba\xdc\xfe\x10\x32\x54\x76\xc3\xd2\xe1\xf0",
+                         20, &v, &l, &n);
     t.in = in;
     t.in_size = strlen(t.in);
 

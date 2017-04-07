@@ -108,3 +108,13 @@ kryptos_arc4_stream_epilogue:
     in_end = NULL;
     kryptos_arc4_clear_and_go(&sk);
 }
+
+void kryptos_arc4_set_key(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size) {
+    if (ktask == NULL) {
+        return;
+    }
+
+    ktask->cipher = kKryptosCipherARC4;
+    ktask->key = key;
+    ktask->key_size = key_size;
+}

@@ -17,4 +17,7 @@ typedef enum kryptos_sealknds {
 
 void kryptos_seal_stream(kryptos_task_ctx **ktask);
 
+void kryptos_seal_set_key(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size,
+                          kryptos_seal_version_t *algo_version, size_t *L, size_t *n);
+
 #endif
