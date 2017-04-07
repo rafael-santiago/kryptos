@@ -10,6 +10,16 @@
 
 #include <stdlib.h>
 
+#ifndef NO_KRYPTOS_C99_SUPPORT
+
+#ifdef __STDC_VERSION__
+#if __STDC_VERSION__ >= 19901L
+#define KRYPTOS_C99     1
+#endif // __STDC_VERSION__ >= 19901L
+#endif // __STDC_VERSION__
+
+#endif // NO_KRYPTOS_C99_SUPPORT
+
 #undef KRYPTOS_KERNEL_MODE
 #define KRYPTOS_USER_MODE 1
 
@@ -61,6 +71,7 @@ typedef enum {
 #define KRYPTOS_KRYPTO_TASK_ARG_NR 10
 
 typedef struct kryptos_task {
+    kryptos_action_t action;
     kryptos_cipher_t cipher;
     kryptos_cipher_mode_t mode;
 

@@ -12,6 +12,7 @@
 #include <kryptos_task_check.h>
 #include <kryptos_arc4.h>
 #include <kryptos_seal.h>
+#include <kryptos.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -322,14 +323,14 @@ CUTE_TEST_CASE(kryptos_arc4_tests)
         t.in = test_vector[ct].in;
         t.in_size = test_vector[ct].in_size;
         kryptos_arc4_setup(ktask, test_vector[ct].key, test_vector[ct].key_size);
-        kryptos_arc4(&ktask);
+        kryptos_arc4_cipher(&ktask);
         CUTE_ASSERT(t.result == kKryptosSuccess);
         CUTE_ASSERT(t.out != NULL);
         CUTE_ASSERT(t.out_size == test_vector[ct].out_size);
         CUTE_ASSERT(memcmp(t.out, test_vector[ct].out, t.out_size) == 0);
         temp = t.in;
         t.in = t.out;
-        kryptos_arc4(&ktask);
+        kryptos_arc4_cipher(&ktask);
         CUTE_ASSERT(t.result == kKryptosSuccess);
         CUTE_ASSERT(t.out != NULL);
         CUTE_ASSERT(t.out_size == test_vector[ct].in_size);
@@ -368,14 +369,14 @@ CUTE_TEST_CASE(kryptos_seal_tests)
 
     // INFO(Rafael): Testing SEAL 2.0 processing.
 
-    kryptos_seal(&ktask);
+    kryptos_seal_cipher(&ktask);
 
     CUTE_ASSERT(t.out != NULL);
     CUTE_ASSERT(t.out_size == t.in_size);
     CUTE_ASSERT(memcmp(t.out, expected_out_v20, t.out_size) == 0);
 
     t.in = t.out;
-    kryptos_seal(&ktask);
+    kryptos_seal_cipher(&ktask);
 
     CUTE_ASSERT(t.out != NULL);
     CUTE_ASSERT(t.out_size == t.in_size);
@@ -389,14 +390,14 @@ CUTE_TEST_CASE(kryptos_seal_tests)
     v = kKryptosSEAL30;
     t.in = in;
 
-    kryptos_seal(&ktask);
+    kryptos_seal_cipher(&ktask);
 
     CUTE_ASSERT(t.out != NULL);
     CUTE_ASSERT(t.out_size == t.in_size);
     CUTE_ASSERT(memcmp(t.out, expected_out_v30, t.out_size) == 0);
 
     t.in = t.out;
-    kryptos_seal(&ktask);
+    kryptos_seal_cipher(&ktask);
 
     CUTE_ASSERT(t.out != NULL);
     CUTE_ASSERT(t.out_size == t.in_size);
@@ -406,12 +407,154 @@ CUTE_TEST_CASE(kryptos_seal_tests)
     kryptos_freeseg(t.in);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_dsl_tests)
+    // WARN(Rafael): The correctness of each available cipher must not be tested here. It
+    //               should be done within a dedicated test case. Here only the mechanics about
+    //               using these ciphers indirectly is tested (when C99 support is present).
+    //               For testing it is used only one fixed plaintext and short keys.
+    kryptos_task_ctx task;
+    kryptos_u8_t *data = "IDIOT, n. A member of a large and powerful tribe whose influence in "
+                         "human affairs has always been dominant and controlling. The Idiot's "
+                         "activity is not confined to any special field of throught or action, but "
+                         "'pervades and regulates the whole'. He has the last word in everything; his "
+                         "decision is unappealable. He sets the fashions of opinion and taste, dictates "
+                         "the limitations of speech and circumscribes conduct with a dead-line.";
+    size_t data_size = strlen(data);
+    kryptos_seal_version_t seal_version;
+    size_t seal_n, seal_l;
+
+    kryptos_task_set_ecb_mode(&task);
+    CUTE_ASSERT(task.mode == kKryptosECB);
+
+    kryptos_task_set_cbc_mode(&task);
+    CUTE_ASSERT(task.mode == kKryptosCBC);
+
+    kryptos_task_set_encrypt_action(&task);
+    CUTE_ASSERT(task.action == kKryptosEncrypt);
+
+    kryptos_task_set_decrypt_action(&task);
+    CUTE_ASSERT(task.action == kKryptosDecrypt);
+
+    task.result = kKryptosSuccess;
+    CUTE_ASSERT(kryptos_last_task_succeed(&task) == 1);
+
+    task.result = kKryptosKeyError;
+    CUTE_ASSERT(kryptos_last_task_succeed(&task) == 0);
+
+    task.result = kKryptosProcessError;
+    CUTE_ASSERT(kryptos_last_task_succeed(&task) == 0);
+
+    task.result = kKryptosInvalidParams;
+    CUTE_ASSERT(kryptos_last_task_succeed(&task) == 0);
+
+    task.result = kKryptosInvalidCipher;
+    CUTE_ASSERT(kryptos_last_task_succeed(&task) == 0);
+
+    task.result = kKryptosTaskResultNr;
+    CUTE_ASSERT(kryptos_last_task_succeed(&task) == 0);
+
+    kryptos_task_set_in(&task, data, data_size);
+    CUTE_ASSERT(task.in == data);
+    CUTE_ASSERT(task.in_size == data_size);
+
+    task.in = NULL;
+    task.in_size = 0;
+    task.out = data;
+    task.out_size = data_size;
+    CUTE_ASSERT(kryptos_task_get_out(&task) == data);
+    CUTE_ASSERT(kryptos_task_get_out_size(&task) == data_size);
+
+    if (g_cute_leak_check == 1) {
+        task.out = (kryptos_u8_t *) kryptos_newseg(0x10);
+        task.out_size = 0x10;
+        kryptos_task_free(&task, 0);
+        CUTE_ASSERT(task.out == NULL);
+        CUTE_ASSERT(task.out_size == 0);
+
+        task.in = (kryptos_u8_t *) kryptos_newseg(0x10);
+        task.in_size = 0x10;
+        task.out = (kryptos_u8_t *) kryptos_newseg(0x10);
+        task.out_size = 0x10;
+        kryptos_task_free(&task, 1);
+        CUTE_ASSERT(task.in == NULL);
+        CUTE_ASSERT(task.in_size == 0);
+        CUTE_ASSERT(task.out == NULL);
+        CUTE_ASSERT(task.out_size == 0);
+        // WARN(Rafael): If the out block was not actually freed, the cutest leak check system will complain.
+    } else {
+        printf("=== WARN: The leak check system is deactivated, due to it was not possible test the kryptos_task_free() macro. It was SKIPPED.\n===\n");
+    }
+
+#ifdef KRYPTOS_C99
+    // INFO(Rafael): The cipher indirect calling tests. Let's test the variadic macro kryptos_run_cipher() variations.
+
+    // INFO(Rafael): Stream ciphers.
+
+    kryptos_task_set_in(&task, data, data_size);
+
+    // ARC4
+    kryptos_run_cipher(arc4, &task, "arc4", 4);
+    CUTE_ASSERT(kryptos_last_task_succeed(&task) == 1);
+
+    kryptos_task_set_in(&task, kryptos_task_get_out(&task), kryptos_task_get_out_size(&task));
+
+    kryptos_run_cipher(arc4, &task, "arc4", 4);
+    CUTE_ASSERT(kryptos_last_task_succeed(&task) == 1);
+
+    CUTE_ASSERT(task.out_size == data_size);
+    CUTE_ASSERT(task.out != NULL);
+    CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, 1);
+
+    // SEAL 2.0
+    kryptos_task_set_in(&task, data, data_size);
+
+    seal_version = kKryptosSEAL20;
+    seal_l = 1024;
+    seal_n = 0;
+    kryptos_run_cipher(seal, &task, "seal", 4, &seal_version, &seal_l, &seal_n);
+    CUTE_ASSERT(kryptos_last_task_succeed(&task) == 1);
+
+    kryptos_task_set_in(&task, kryptos_task_get_out(&task), kryptos_task_get_out_size(&task));
+
+    kryptos_run_cipher(seal, &task, "seal", 4, &seal_version, &seal_l, &seal_n);
+    CUTE_ASSERT(kryptos_last_task_succeed(&task) == 1);
+
+    CUTE_ASSERT(task.out_size == data_size);
+    CUTE_ASSERT(task.out != NULL);
+    CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, 1);
+
+    // SEAL 3.0
+    kryptos_task_set_in(&task, data, data_size);
+
+    seal_version = kKryptosSEAL30;
+    seal_l = 2048;
+    seal_n = 0;
+    kryptos_run_cipher(seal, &task, "seal", 4, &seal_version, &seal_l, &seal_n);
+    CUTE_ASSERT(kryptos_last_task_succeed(&task) == 1);
+
+    kryptos_task_set_in(&task, kryptos_task_get_out(&task), kryptos_task_get_out_size(&task));
+
+    kryptos_run_cipher(seal, &task, "seal", 4, &seal_version, &seal_l, &seal_n);
+    CUTE_ASSERT(kryptos_last_task_succeed(&task) == 1);
+
+    CUTE_ASSERT(task.out_size == data_size);
+    CUTE_ASSERT(task.out != NULL);
+    CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, 1);
+
+    // INFO(Rafael): Block ciphers.
+#endif
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_padding_tests);
     CUTE_RUN_TEST(kryptos_get_random_block_tests);
     CUTE_RUN_TEST(kryptos_task_check_tests);
     CUTE_RUN_TEST(kryptos_arc4_tests);
     CUTE_RUN_TEST(kryptos_seal_tests);
+    CUTE_RUN_TEST(kryptos_dsl_tests);
 CUTE_TEST_CASE_END
 
 CUTE_MAIN(kryptos_test_monkey);

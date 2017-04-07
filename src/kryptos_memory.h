@@ -8,6 +8,7 @@
 #ifndef KRYPTOS_KRYPTOS_MEMORY_H
 #define KRYPTOS_KRYPTOS_MEMORY_H 1
 
+#include <kryptos_types.h>
 #include <stdlib.h>
 
 void *kryptos_newseg(const size_t ssize);

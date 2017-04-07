@@ -6,7 +6,6 @@
  *
  */
 #include <kryptos_memory.h>
-#include <kryptos_types.h>
 
 #ifdef KRYPTOS_USER_MODE
 #include <stdio.h>
@@ -22,6 +21,7 @@ void *kryptos_newseg(const size_t ssize) {
         exit(1);
     }
 #endif
+    return segment;
 }
 
 void kryptos_freeseg(void *seg) {

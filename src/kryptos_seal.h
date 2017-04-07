@@ -15,7 +15,7 @@ typedef enum kryptos_sealknds {
     kKryptosSEAL20 = 2, kKryptosSEAL30
 }kryptos_seal_version_t;
 
-void kryptos_seal(kryptos_task_ctx **ktask);
+void kryptos_seal_cipher(kryptos_task_ctx **ktask);
 
 void kryptos_seal_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size,
                         kryptos_seal_version_t *algo_version, size_t *L, size_t *n);
