@@ -337,7 +337,7 @@ static void kryptos_seal_xor(const kryptos_u32_t *in,
         ;
 }
 
-void kryptos_seal_stream(kryptos_task_ctx **ktask) {
+void kryptos_seal(kryptos_task_ctx **ktask) {
     size_t wordsize = 0, w, wt;
     struct kryptos_seal_keystream_ctx kstream;
     const kryptos_u8_t *in_p, *in_end;

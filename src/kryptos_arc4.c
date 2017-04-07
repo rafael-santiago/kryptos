@@ -72,7 +72,7 @@ static void kryptos_arc4_clear_and_go(struct kryptos_arc4_subkey *sk) {
     memset(sk->S, 0, sizeof(sk->S));
 }
 
-void kryptos_arc4_stream(kryptos_task_ctx **ktask) {
+void kryptos_arc4(kryptos_task_ctx **ktask) {
     kryptos_u8_t *in_end, *in_p;
     kryptos_u8_t *out_p;
     struct kryptos_arc4_subkey sk;

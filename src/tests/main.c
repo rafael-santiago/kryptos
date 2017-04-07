@@ -322,14 +322,14 @@ CUTE_TEST_CASE(kryptos_arc4_tests)
         t.in = test_vector[ct].in;
         t.in_size = test_vector[ct].in_size;
         kryptos_arc4_set_key(ktask, test_vector[ct].key, test_vector[ct].key_size);
-        kryptos_arc4_stream(&ktask);
+        kryptos_arc4(&ktask);
         CUTE_ASSERT(t.result == kKryptosSuccess);
         CUTE_ASSERT(t.out != NULL);
         CUTE_ASSERT(t.out_size == test_vector[ct].out_size);
         CUTE_ASSERT(memcmp(t.out, test_vector[ct].out, t.out_size) == 0);
         temp = t.in;
         t.in = t.out;
-        kryptos_arc4_stream(&ktask);
+        kryptos_arc4(&ktask);
         CUTE_ASSERT(t.result == kKryptosSuccess);
         CUTE_ASSERT(t.out != NULL);
         CUTE_ASSERT(t.out_size == test_vector[ct].in_size);
@@ -368,14 +368,14 @@ CUTE_TEST_CASE(kryptos_seal_tests)
 
     // INFO(Rafael): Testing SEAL 2.0 processing.
 
-    kryptos_seal_stream(&ktask);
+    kryptos_seal(&ktask);
 
     CUTE_ASSERT(t.out != NULL);
     CUTE_ASSERT(t.out_size == t.in_size);
     CUTE_ASSERT(memcmp(t.out, expected_out_v20, t.out_size) == 0);
 
     t.in = t.out;
-    kryptos_seal_stream(&ktask);
+    kryptos_seal(&ktask);
 
     CUTE_ASSERT(t.out != NULL);
     CUTE_ASSERT(t.out_size == t.in_size);
@@ -389,14 +389,14 @@ CUTE_TEST_CASE(kryptos_seal_tests)
     v = kKryptosSEAL30;
     t.in = in;
 
-    kryptos_seal_stream(&ktask);
+    kryptos_seal(&ktask);
 
     CUTE_ASSERT(t.out != NULL);
     CUTE_ASSERT(t.out_size == t.in_size);
     CUTE_ASSERT(memcmp(t.out, expected_out_v30, t.out_size) == 0);
 
     t.in = t.out;
-    kryptos_seal_stream(&ktask);
+    kryptos_seal(&ktask);
 
     CUTE_ASSERT(t.out != NULL);
     CUTE_ASSERT(t.out_size == t.in_size);
