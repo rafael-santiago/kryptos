@@ -9,6 +9,8 @@
 #define KRYPTOS_KRYPTOS_H 1
 
 #include <kryptos_types.h>
+#include <kryptos_memory.h>
+#include <kryptos_block_parser.h>
 
 #include <kryptos_arc4.h>
 #include <kryptos_seal.h>
@@ -40,6 +42,23 @@
         kryptos_freeseg((ktask)->in);\
         (ktask)->in = NULL;\
         (ktask)->in_size = 0;\
+    }\
+}
+
+#define kryptos_meta_block_processing_ecb(block_size_in_bytes, in, in_p, in_end, in_size, out, out_p, iblk, oblk, epilogue, block_processor_call_scheme) {\
+    in_p = kryptos_ansi_x923_padding(in, in_size, block_size_in_bytes);\
+    in_end = in_p + *in_size;\
+    iblk = in_p;\
+    out = (kryptos_u8_t *) kryptos_newseg(*in_size);\
+    if (out == NULL) {\
+        goto kryptos_ ## epilogue;\
+    }\
+    out_p = out;\
+    oblk = kryptos_block_parser(oblk, block_size_in_bytes, iblk, in_end, &iblk);\
+    while (oblk != NULL) {\
+        block_processor_call_scheme ;\
+        out_p += block_size_in_bytes;\
+        oblk = kryptos_block_parser(oblk, block_size_in_bytes, iblk, in_end, &iblk);\
     }\
 }
 

@@ -25,10 +25,25 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
     }
 
     if (( (*ktask)->cipher != kKryptosCipherARC4 &&
+          (*ktask)->cipher != kKryptosCipherSEAL ) && (*ktask)->mode != kKryptosECB && (*ktask)->mode != kKryptosCBC) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Invalid operation mode.";
+        goto kryptos_task_check_error;
+    }
+
+    if (( (*ktask)->cipher != kKryptosCipherARC4 &&
           (*ktask)->cipher != kKryptosCipherSEAL ) && (*ktask)->mode == kKryptosCBC && ( (*ktask)->iv == NULL ||
                                                                                          (*ktask)->iv_size == 0 ) ) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Invalid iv data.";
+        goto kryptos_task_check_error;
+    }
+
+    if (( (*ktask)->cipher != kKryptosCipherARC4 &&
+          (*ktask)->cipher != kKryptosCipherSEAL ) &&
+        (*ktask)->action != kKryptosEncrypt && (*ktask)->action != kKryptosDecrypt) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Invalid task action.";
         goto kryptos_task_check_error;
     }
 

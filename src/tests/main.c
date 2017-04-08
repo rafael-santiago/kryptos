@@ -10,6 +10,8 @@
 #include <kryptos_memory.h>
 #include <kryptos_random.h>
 #include <kryptos_task_check.h>
+#include <kryptos_block_parser.h>
+#include <kryptos_endianess_utils.h>
 #include <kryptos_arc4.h>
 #include <kryptos_seal.h>
 #include <kryptos.h>
@@ -103,6 +105,7 @@ CUTE_TEST_CASE(kryptos_task_check_tests)
     CUTE_ASSERT(strcmp(t.result_verbose, "Invalid key data.") == 0);
 
     t.cipher = kKryptosCipherAES;
+    t.action = kKryptosEncrypt;
     t.key_size = 4;
     t.mode = kKryptosCBC;
     t.iv = NULL;
@@ -132,6 +135,17 @@ CUTE_TEST_CASE(kryptos_task_check_tests)
     CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
     CUTE_ASSERT(t.result == kKryptosSuccess);
     CUTE_ASSERT(t.result_verbose == NULL);
+
+    t.mode = kKryptosCipherModeNr;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+    CUTE_ASSERT(strcmp(t.result_verbose, "Invalid operation mode.") == 0);
+
+    t.mode = kKryptosCBC;
+    t.action = kKryptosActionNr;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+    CUTE_ASSERT(strcmp(t.result_verbose, "Invalid task action.") == 0);
 
     t.cipher = kKryptosCipherARC4;
     t.iv = NULL;
@@ -548,12 +562,123 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
 #endif
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_block_parser_tests)
+    kryptos_u8_t *in = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f", *in_p;
+    kryptos_u8_t *in_end = NULL;
+    kryptos_u8_t *out = NULL;
+
+    in_p = in;
+    in_end = in_p + 16;
+
+    out = (kryptos_u8_t *) kryptos_newseg(16);
+    CUTE_ASSERT(out != NULL);
+    memset(out, 0, 16);
+
+    // INFO(Rafael): 16-bit block parsing.
+
+    out = kryptos_block_parser(out, 2, in_p, in_end, &in_p);
+    CUTE_ASSERT(out != NULL);
+    CUTE_ASSERT(memcmp(out, "\x00\x01", 2) == 0);
+
+    out = kryptos_block_parser(out, 2, in_p, in_end, &in_p);
+    CUTE_ASSERT(out != NULL);
+    CUTE_ASSERT(memcmp(out, "\x02\x03", 2) == 0);
+
+    out = kryptos_block_parser(out, 2, in_p, in_end, &in_p);
+    CUTE_ASSERT(out != NULL);
+    CUTE_ASSERT(memcmp(out, "\x04\x05", 2) == 0);
+
+    out = kryptos_block_parser(out, 2, in_p, in_end, &in_p);
+    CUTE_ASSERT(out != NULL);
+    CUTE_ASSERT(memcmp(out, "\x06\x07", 2) == 0);
+
+    out = kryptos_block_parser(out, 2, in_p, in_end, &in_p);
+    CUTE_ASSERT(out != NULL);
+    CUTE_ASSERT(memcmp(out, "\x08\x09", 2) == 0);
+
+    out = kryptos_block_parser(out, 2, in_p, in_end, &in_p);
+    CUTE_ASSERT(out != NULL);
+    CUTE_ASSERT(memcmp(out, "\x0a\x0b", 2) == 0);
+
+    out = kryptos_block_parser(out, 2, in_p, in_end, &in_p);
+    CUTE_ASSERT(out != NULL);
+    CUTE_ASSERT(memcmp(out, "\x0c\x0d", 2) == 0);
+
+    out = kryptos_block_parser(out, 2, in_p, in_end, &in_p);
+    CUTE_ASSERT(out != NULL);
+    CUTE_ASSERT(memcmp(out, "\x0e\x0f", 2) == 0);
+
+    CUTE_ASSERT(kryptos_block_parser(out, 2, in_p, in_end, &in_p) == NULL);
+
+    in_p = in;
+    in_end = in_p + 16;
+
+    // INFO(Rafael): 32-bit block parsing.
+
+    out = kryptos_block_parser(out, 4, in_p, in_end, &in_p);
+    CUTE_ASSERT(out != NULL);
+    CUTE_ASSERT(memcmp(out, "\x00\x01\x02\x03", 4) == 0);
+
+    out = kryptos_block_parser(out, 4, in_p, in_end, &in_p);
+    CUTE_ASSERT(out != NULL);
+    CUTE_ASSERT(memcmp(out, "\x04\x05\x06\x07", 4) == 0);
+
+    out = kryptos_block_parser(out, 4, in_p, in_end, &in_p);
+    CUTE_ASSERT(out != NULL);
+    CUTE_ASSERT(memcmp(out, "\x08\x09\x0a\x0b", 4) == 0);
+
+    out = kryptos_block_parser(out, 4, in_p, in_end, &in_p);
+    CUTE_ASSERT(out != NULL);
+    CUTE_ASSERT(memcmp(out, "\x0c\x0d\x0e\x0f", 4) == 0);
+
+    CUTE_ASSERT(kryptos_block_parser(out, 4, in_p, in_end, &in_p) == NULL);
+
+    in_p = in;
+    in_end = in_p + 16;
+
+    // INFO(Rafael): 64-bit block parsing.
+
+    out = kryptos_block_parser(out, 8, in_p, in_end, &in_p);
+    CUTE_ASSERT(out != NULL);
+    CUTE_ASSERT(memcmp(out, "\x00\x01\x02\x03\x04\x05\x06\x07", 8) == 0);
+
+    out = kryptos_block_parser(out, 8, in_p, in_end, &in_p);
+    CUTE_ASSERT(out != NULL);
+    CUTE_ASSERT(memcmp(out, "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f", 8) == 0);
+
+    CUTE_ASSERT(kryptos_block_parser(out, 8, in_p, in_end, &in_p) == NULL);
+
+    kryptos_freeseg(out);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_endianess_utils_tests)
+    kryptos_u8_t *data = NULL;
+    kryptos_u32_t deadbeef = 0L;
+    data = (kryptos_u8_t *)kryptos_newseg(4);
+    CUTE_ASSERT(data != NULL);
+    memcpy(data, "\xde\xad\xbe\xef", 4);
+    memcpy(&deadbeef, data, 4);
+    deadbeef = kryptos_get_u32_as_big_endian(data, 4);
+    CUTE_ASSERT(deadbeef == 0xdeadbeef);
+    memset(data, 0, 4);
+    data = kryptos_cpy_u32_as_big_endian(data, 4, deadbeef);
+    CUTE_ASSERT(data != NULL);
+    CUTE_ASSERT(*data == 0xde && *(data + 1) == 0xad && *(data + 2) == 0xbe && *(data + 3) == 0xef);
+    kryptos_freeseg(data);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_des_tests)
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_padding_tests);
     CUTE_RUN_TEST(kryptos_get_random_block_tests);
+    CUTE_RUN_TEST(kryptos_block_parser_tests);
+    CUTE_RUN_TEST(kryptos_endianess_utils_tests);
     CUTE_RUN_TEST(kryptos_task_check_tests);
     CUTE_RUN_TEST(kryptos_arc4_tests);
     CUTE_RUN_TEST(kryptos_seal_tests);
+    CUTE_RUN_TEST(kryptos_des_tests);
     CUTE_RUN_TEST(kryptos_dsl_tests);
 CUTE_TEST_CASE_END
 
