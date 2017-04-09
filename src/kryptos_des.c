@@ -12,10 +12,11 @@
 #include <kryptos.h>
 #include <string.h>
 
-#define kryptos_des_SHL(x,s) ( (x) << (s) | (x) >> ( ( sizeof( (x) ) << 3) - (s) ) )
+#define kryptos_des_SHL(x, s)  (x) << (s) | (x) >> ( ( sizeof( (x) ) << 3) - (s) ) // WARN(Rafael): The lack of ( ... ) was planned, do not mess.
+
 #define KRYPTOS_DES_MASTER_SIZE 70
 
-// WARN(Rafael): The shifts are over 28-bit values but here I am using 32-bit values, due to it the
+// WARN(Rafael): The shifts are done on 28-bit values but here I am using 32-bit values, due to it the
 //               shift levels were increased by 4.
 static int kryptos_des_SH[] = { 0, 5, 5, 6, 6, 6, 6, 6, 6, 5, 6, 6, 6, 6, 6, 6, 5 };
 
@@ -95,15 +96,15 @@ static int kryptos_des_S7[4][16] = {
 };
 
 static int kryptos_des_S8[4][16] = {
-    13,  2,  8,  4,  6, 15, 11,  1, 10,  9,  3, 14,  5,  0, 12,  7,
-     1, 15, 13,  8, 10,  3,  7,  4, 12,  5,  6, 11,  0, 14,  9,  2,
-     7, 11,  4,  1,  9, 12, 14,  2,  0,  6, 10, 13, 15,  3,  5,  8,
+    13,  2,  8,  4,  6, 15, 11,  1, 10,  9,  3, 14,  5,  0, 12, 7,
+     1, 15, 13,  8, 10,  3,  7,  4, 12,  5,  6, 11,  0, 14,  9, 2,
+     7, 11,  4,  1,  9, 12, 14,  2,  0,  6, 10, 13, 15,  3,  5, 8,
      2,  1, 14,  7,  4, 10,  8, 13, 15, 12,  9,  0,  3,  5,  6, 11
 };
 
 // INFO(Rafael): IP table.
 static int kryptos_des_IP[] = {
-    57, 49, 41, 33, 25, 17, 9,  1,
+    57, 49, 41, 33, 25, 17,  9, 1,
     59, 51, 43, 35, 27, 19, 11, 3,
     61, 53, 45, 37, 29, 21, 13, 5,
     63, 55, 47, 39, 31, 23, 15, 7,
@@ -505,9 +506,9 @@ static void kryptos_des_expand_user_key(struct kryptos_des_subkeys *sks, const k
     // INFO(Rafael): Stripping the parity bits.
     for (i = 0; i < 64; i++) {
         if (i < 32) {
-            bits[i] = kryptos_des_getbit_from_u32(key[0], i);
+            bits[i] = kryptos_des_getbit_from_u32(user_key[0], i);
         } else {
-            bits[i] = kryptos_des_getbit_from_u32(key[1], i - 32);
+            bits[i] = kryptos_des_getbit_from_u32(user_key[1], i - 32);
         }
     }
 
@@ -532,7 +533,6 @@ static void kryptos_des_expand_user_key(struct kryptos_des_subkeys *sks, const k
     D[0] = kryptos_des_bitseq_to_u32(bits);
 
     // INFO(Rafael): Shift stuff.
-
     for (i = 1; i < 17; i++) {
         C[i] = (kryptos_des_SHL(C[i-1], kryptos_des_SH[i]) << 4) >> 4;
         D[i] = (kryptos_des_SHL(D[i-1], kryptos_des_SH[i]) << 4) >> 4;
@@ -541,18 +541,23 @@ static void kryptos_des_expand_user_key(struct kryptos_des_subkeys *sks, const k
     // INFO(Rafael): Final permutation.
     for(i = 1; i < 17; i++) {
         memset(bits, 0, sizeof(bits));
+
         for (j = 0; j < 56; j++) {
-            if(j<28) {
+            if(j < 28) {
                 bits[j] = kryptos_des_getbit_from_u32(C[i], j + 4);
             } else {
                 bits[j] = kryptos_des_getbit_from_u32(D[i], (j - 28) + 4);
             }
         }
+
         memset(key_perm, 0, sizeof(key_perm));
+
         for(j = 0; j < 48; j++) {
             key_perm[j] = bits[kryptos_des_PC_2[j]];
         }
+
         memset(bits, 0, sizeof(bits));
+
         // INFO(Rafael): Adding the current expanded key halve to the related struct.
         for (j = 0; j < 24; j++) {
             bits[j] = key_perm[j];
@@ -590,7 +595,7 @@ void kryptos_des_cipher(kryptos_task_ctx **ktask) {
     struct kryptos_des_subkeys sks;
     kryptos_des_block_processor des_block_processor;
     kryptos_u8_t *in_p, *in_end, *out_p;
-    kryptos_u8_t *outblock, *inblock;
+    kryptos_u8_t *outblock, *outblock_p, *inblock, *inblock_p;
     size_t in_size;
 
     if (kryptos_task_check(ktask) == 0) {
@@ -607,27 +612,31 @@ void kryptos_des_cipher(kryptos_task_ctx **ktask) {
 
 
     inblock = (kryptos_u8_t *) kryptos_newseg(8);
+    inblock_p = inblock;
     outblock = (kryptos_u8_t *) kryptos_newseg(8);
+    outblock_p = outblock;
+    in_size = (*ktask)->in_size;
 
-    kryptos_meta_block_processing_ecb(64,
+    kryptos_meta_block_processing_ecb(8,
+                                      (*ktask)->action,
                                       (*ktask)->in,
                                       in_p, in_end,
                                       &in_size,
                                       (*ktask)->out,
+                                      &(*ktask)->out_size,
                                       out_p,
-                                      inblock,
-                                      outblock,
+                                      inblock_p,
+                                      outblock_p,
                                       des_cipher_epilogue, des_block_processor(outblock, sks));
 
-    // TODO(Rafael): CBC/ECB.
+    // TODO(Rafael): CBC.
 
-    // TODO(Rafael): Consume the input buffer and process.
 kryptos_des_cipher_epilogue:
     memset(inblock, 0, 8);
     memset(outblock, 0, 8);
     kryptos_freeseg(inblock);
     kryptos_freeseg(outblock);
-    in_p = in_end = out_p = NULL;
+    inblock_p = outblock_p = in_p = in_end = out_p = NULL;
     memset(&sks, 0, sizeof(sks));
     in_size = 0;
     des_block_processor = NULL;

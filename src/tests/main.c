@@ -668,6 +668,32 @@ CUTE_TEST_CASE(kryptos_endianess_utils_tests)
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_des_tests)
+    kryptos_task_ctx t, *ktask = &t;
+
+    kryptos_des_setup(&t, "\x80\x00\x00\x00\x00\x00\x00\x00", 8, kKryptosECB);
+
+    t.in = "\x00\x00\x00\x00\x00\x00\x00\x00";
+    t.in_size = 8;
+    kryptos_task_set_encrypt_action(&t);
+
+    kryptos_des_cipher(&ktask);
+
+    CUTE_ASSERT(t.out != NULL);
+    CUTE_ASSERT(t.out_size == (t.in_size << 1)); // INFO(Rafael): We always pad.
+    CUTE_ASSERT(memcmp(t.out, "\x95\xa8\xd7\x28\x13\xda\xa9\x4d", 8) == 0);
+
+    t.in = t.out;
+    t.in_size = t.out_size;
+    kryptos_task_set_decrypt_action(&t);
+
+    kryptos_des_cipher(&ktask);
+
+    CUTE_ASSERT(t.out != NULL);
+    CUTE_ASSERT(t.out_size == 8);
+    CUTE_ASSERT(memcmp(t.out, "\x00\x00\x00\x00\x00\x00\x00\x00", 8) == 0);
+
+    kryptos_freeseg(t.out);
+    kryptos_freeseg(t.in);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_test_monkey)
