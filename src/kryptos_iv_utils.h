@@ -5,8 +5,8 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#ifndef KRYPTOS_IV_UTILS_H
-#define KRYPTOS_IV_UTILS_H 1
+#ifndef KRYPTOS_KRYPTOS_IV_UTILS_H
+#define KRYPTOS_KRYPTOS_IV_UTILS_H 1
 
 #include <kryptos_types.h>
 

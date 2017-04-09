@@ -83,9 +83,12 @@
     }\
 }
 
-#define kryptos_meta_block_processing_epilogue(inblock, inblock_p, in_p, in_end,\
+
+#define kryptos_meta_block_processing_epilogue(label_name,\
+                                               inblock, inblock_p, in_p, in_end,\
                                                outblock, outblock_p, out_p,\
                                                in_size, sks, ktask) {\
+kryptos_ ## label_name:\
     if ((*ktask)->out == NULL) {\
         (*ktask)->result = kKryptosProcessError;\
         (*ktask)->result_verbose = "No memory to get a valid output.";\

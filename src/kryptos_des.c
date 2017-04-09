@@ -625,9 +625,9 @@ void kryptos_des_cipher(kryptos_task_ctx **ktask) {
                                   inblock_p,
                                   outblock_p,
                                   des_cipher_epilogue, des_block_processor(outblock, sks));
-kryptos_des_cipher_epilogue:
 
-    kryptos_meta_block_processing_epilogue(inblock, inblock_p, in_p, in_end, outblock, outblock_p, out_p, in_size, sks, ktask);
+    kryptos_meta_block_processing_epilogue(des_cipher_epilogue,
+                                           inblock, inblock_p, in_p, in_end, outblock, outblock_p, out_p, in_size, sks, ktask);
 
     des_block_processor = NULL;
 }
