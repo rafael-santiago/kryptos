@@ -15,6 +15,7 @@
 #include <kryptos_arc4.h>
 #include <kryptos_seal.h>
 #include <kryptos.h>
+#include <kryptos_iv_utils.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -696,11 +697,32 @@ CUTE_TEST_CASE(kryptos_des_tests)
     kryptos_freeseg(t.in);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_apply_iv_tests)
+    kryptos_u8_t *iv = "rofginkoolerautahtsdiordeht";
+    kryptos_u8_t *block = "thedroidsthatuarelookingfor";
+    size_t s = 27;
+    CUTE_ASSERT(kryptos_apply_iv(block, iv, s) == block);
+    CUTE_ASSERT(kryptos_apply_iv(block, iv, s) == block);
+    CUTE_ASSERT(memcmp(block, "thedroidsthatuarelookingfor", 27) == 0);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_iv_data_flush_tests)
+    kryptos_u8_t *y = "hellyeah!";
+    kryptos_u8_t *iv = kryptos_newseg(9);
+    size_t s = 9;
+    CUTE_ASSERT(iv != NULL);
+    kryptos_iv_data_flush(iv, y, s);
+    CUTE_ASSERT(memcmp(iv, "hellyeah!", s) == 0);
+    kryptos_freeseg(iv);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_padding_tests);
     CUTE_RUN_TEST(kryptos_get_random_block_tests);
     CUTE_RUN_TEST(kryptos_block_parser_tests);
     CUTE_RUN_TEST(kryptos_endianess_utils_tests);
+    CUTE_RUN_TEST(kryptos_apply_iv_tests);
+    CUTE_RUN_TEST(kryptos_iv_data_flush_tests);
     CUTE_RUN_TEST(kryptos_task_check_tests);
     CUTE_RUN_TEST(kryptos_arc4_tests);
     CUTE_RUN_TEST(kryptos_seal_tests);

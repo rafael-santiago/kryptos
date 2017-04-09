@@ -558,7 +558,7 @@ static void kryptos_des_expand_user_key(struct kryptos_des_subkeys *sks, const k
 
         memset(bits, 0, sizeof(bits));
 
-        // INFO(Rafael): Adding the current expanded key halve to the related struct.
+        // INFO(Rafael): Adding the current halve of the expanded key to the related struct.
         for (j = 0; j < 24; j++) {
             bits[j] = key_perm[j];
         }
@@ -610,34 +610,24 @@ void kryptos_des_cipher(kryptos_task_ctx **ktask) {
         des_block_processor = kryptos_des_block_decrypt;
     }
 
+    kryptos_meta_block_processing_prologue(8, inblock, inblock_p, outblock, outblock_p, in_size, (*ktask)->in_size);
 
-    inblock = (kryptos_u8_t *) kryptos_newseg(8);
-    inblock_p = inblock;
-    outblock = (kryptos_u8_t *) kryptos_newseg(8);
-    outblock_p = outblock;
-    in_size = (*ktask)->in_size;
-
-    kryptos_meta_block_processing_ecb(8,
-                                      (*ktask)->action,
-                                      (*ktask)->in,
-                                      in_p, in_end,
-                                      &in_size,
-                                      (*ktask)->out,
-                                      out_p,
-                                      &(*ktask)->out_size,
-                                      inblock_p,
-                                      outblock_p,
-                                      des_cipher_epilogue, des_block_processor(outblock, sks));
-
-    // TODO(Rafael): CBC.
-
+    kryptos_meta_block_processing(8,
+                                  (*ktask)->action,
+                                  (*ktask)->mode,
+                                  (*ktask)->iv,
+                                  (*ktask)->in,
+                                  in_p, in_end,
+                                  &in_size,
+                                  (*ktask)->out,
+                                  out_p,
+                                  &(*ktask)->out_size,
+                                  inblock_p,
+                                  outblock_p,
+                                  des_cipher_epilogue, des_block_processor(outblock, sks));
 kryptos_des_cipher_epilogue:
-    memset(inblock, 0, 8);
-    memset(outblock, 0, 8);
-    kryptos_freeseg(inblock);
-    kryptos_freeseg(outblock);
-    inblock_p = outblock_p = in_p = in_end = out_p = NULL;
-    memset(&sks, 0, sizeof(sks));
-    in_size = 0;
+
+    kryptos_meta_block_processing_epilogue(inblock, inblock_p, in_p, in_end, outblock, outblock_p, out_p, in_size, sks, ktask);
+
     des_block_processor = NULL;
 }
