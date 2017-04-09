@@ -623,8 +623,8 @@ void kryptos_des_cipher(kryptos_task_ctx **ktask) {
                                       in_p, in_end,
                                       &in_size,
                                       (*ktask)->out,
-                                      &(*ktask)->out_size,
                                       out_p,
+                                      &(*ktask)->out_size,
                                       inblock_p,
                                       outblock_p,
                                       des_cipher_epilogue, des_block_processor(outblock, sks));

@@ -48,7 +48,7 @@
 #define kryptos_meta_block_processing_ecb(block_size_in_bytes,\
                                           action,\
                                           in, in_p, in_end, in_size,\
-                                          out, out_size, out_p,\
+                                          out, out_p, out_size,\
                                           in_block, out_block,\
                                           epilogue, block_processor_call_scheme) {\
     if (action == kKryptosEncrypt) {\
