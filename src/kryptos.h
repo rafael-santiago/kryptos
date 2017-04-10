@@ -17,6 +17,10 @@
 #include <kryptos_seal.h>
 #include <kryptos_des.h>
 
+// TODO(Rafael): Verify the iv block size based on the chosen block cipher.
+// TODO(Rafael): Add more ECB tests for DES.
+// TODO(Rafael): Test the CBC mode on DES.
+
 #define kryptos_task_set_ecb_mode(ktask) ( (ktask)->mode = kKryptosECB )
 
 #define kryptos_task_set_cbc_mode(ktask) ( (ktask)->mode = kKryptosCBC )
@@ -33,17 +37,56 @@
 
 #define kryptos_task_get_out_size(ktask) ( (ktask)->out_size )
 
-#define kryptos_task_free(ktask, also_in) {\
-    if ((ktask)->out != NULL) {\
+#define KRYPTOS_TASK_FREEALL (KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_KEY | KRYPTOS_TASK_IV)
+
+#define kryptos_task_init_as_null(ktask) {\
+    (ktask)->out = NULL;\
+    (ktask)->out_size = 0;\
+    (ktask)->in = NULL;\
+    (ktask)->in_size = 0;\
+    (ktask)->key = NULL;\
+    (ktask)->key_size = 0;\
+    (ktask)->iv = NULL;\
+    (ktask)->iv_size = 0;\
+    (ktask)->cipher = kKryptosCipherNr;\
+    (ktask)->action = kKryptosActionNr;\
+    (ktask)->mode = kKryptosCipherModeNr;\
+    (ktask)->result = kKryptosTaskResultNr;\
+    (ktask)->result_verbose = NULL;\
+    memset((ktask)->arg, 0, sizeof((ktask)->arg));\
+}
+
+#define kryptos_task_free(ktask, freemask) {\
+    if ((ktask)->out != NULL && ((freemask) & KRYPTOS_TASK_OUT) ) {\
+        memset((ktask)->out, 0, (ktask)->out_size);\
         kryptos_freeseg((ktask)->out);\
         (ktask)->out = NULL;\
         (ktask)->out_size = 0;\
     }\
-    if (also_in && (ktask)->in != NULL) {\
+    if ((ktask)->in != NULL && ((freemask) & KRYPTOS_TASK_IN) ) {\
+        memset((ktask)->in, 0, (ktask)->in_size);\
         kryptos_freeseg((ktask)->in);\
         (ktask)->in = NULL;\
         (ktask)->in_size = 0;\
     }\
+    if ((ktask)->key != NULL && ((freemask) & KRYPTOS_TASK_KEY) ) {\
+        memset((ktask)->key, 0, (ktask)->key_size);\
+        kryptos_freeseg((ktask)->key);\
+        (ktask)->key = NULL;\
+        (ktask)->key_size = 0;\
+    }\
+    if ((ktask)->iv != NULL && ((freemask) & KRYPTOS_TASK_IV) ) {\
+        memset((ktask)->iv, 0, (ktask)->iv_size);\
+        kryptos_freeseg((ktask)->iv);\
+        (ktask)->iv = NULL;\
+        (ktask)->iv_size = 0;\
+    }\
+    (ktask)->cipher = kKryptosCipherNr;\
+    (ktask)->action = kKryptosActionNr;\
+    (ktask)->mode = kKryptosCipherModeNr;\
+    (ktask)->result = kKryptosTaskResultNr;\
+    (ktask)->result_verbose = NULL;\
+    memset((ktask)->arg, 0, sizeof((ktask)->arg));\
 }
 
 #define kryptos_meta_block_processing_prologue(block_size_in_bytes,\

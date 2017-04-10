@@ -472,6 +472,8 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     CUTE_ASSERT(task.in == data);
     CUTE_ASSERT(task.in_size == data_size);
 
+    kryptos_task_init_as_null(&task);
+
     task.in = NULL;
     task.in_size = 0;
     task.out = data;
@@ -482,7 +484,7 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     if (g_cute_leak_check == 1) {
         task.out = (kryptos_u8_t *) kryptos_newseg(0x10);
         task.out_size = 0x10;
-        kryptos_task_free(&task, 0);
+        kryptos_task_free(&task, KRYPTOS_TASK_OUT);
         CUTE_ASSERT(task.out == NULL);
         CUTE_ASSERT(task.out_size == 0);
 
@@ -490,7 +492,7 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
         task.in_size = 0x10;
         task.out = (kryptos_u8_t *) kryptos_newseg(0x10);
         task.out_size = 0x10;
-        kryptos_task_free(&task, 1);
+        kryptos_task_free(&task, KRYPTOS_TASK_OUT|KRYPTOS_TASK_IN);
         CUTE_ASSERT(task.in == NULL);
         CUTE_ASSERT(task.in_size == 0);
         CUTE_ASSERT(task.out == NULL);
@@ -504,6 +506,7 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     // INFO(Rafael): The cipher indirect calling tests. Let's test the variadic macro kryptos_run_cipher() variations.
 
     // INFO(Rafael): Stream ciphers.
+    kryptos_task_init_as_null(&task);
 
     kryptos_task_set_in(&task, data, data_size);
 
@@ -519,7 +522,7 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     CUTE_ASSERT(task.out_size == data_size);
     CUTE_ASSERT(task.out != NULL);
     CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
-    kryptos_task_free(&task, 1);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
 
     // SEAL 2.0
     kryptos_task_set_in(&task, data, data_size);
@@ -538,7 +541,7 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     CUTE_ASSERT(task.out_size == data_size);
     CUTE_ASSERT(task.out != NULL);
     CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
-    kryptos_task_free(&task, 1);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
 
     // SEAL 3.0
     kryptos_task_set_in(&task, data, data_size);
@@ -557,9 +560,10 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     CUTE_ASSERT(task.out_size == data_size);
     CUTE_ASSERT(task.out != NULL);
     CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
-    kryptos_task_free(&task, 1);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
 
     // INFO(Rafael): Block ciphers.
+    kryptos_task_init_as_null(&task);
 #endif
 CUTE_TEST_CASE_END
 

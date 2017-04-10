@@ -11,17 +11,21 @@
 #include <stdlib.h>
 
 #ifndef NO_KRYPTOS_C99_SUPPORT
-
-#ifdef __STDC_VERSION__
-#if __STDC_VERSION__ >= 19901L
-#define KRYPTOS_C99     1
-#endif // __STDC_VERSION__ >= 19901L
-#endif // __STDC_VERSION__
-
+# ifdef __STDC_VERSION__
+#  if __STDC_VERSION__ >= 19901L
+#   define KRYPTOS_C99     1
+#  endif // __STDC_VERSION__ >= 19901L
+# endif // __STDC_VERSION__
 #endif // NO_KRYPTOS_C99_SUPPORT
 
-#undef KRYPTOS_KERNEL_MODE
-#define KRYPTOS_USER_MODE 1
+#ifndef KRYPTOS_KERNEL_MODE
+# define KRYPTOS_USER_MODE 1
+#endif // KRYPTOS_KERNEL_MODE
+
+#define KRYPTOS_TASK_IN  1
+#define KRYPTOS_TASK_OUT 2
+#define KRYPTOS_TASK_KEY 4
+#define KRYPTOS_TASK_IV  8
 
 typedef unsigned char kryptos_u8_t;
 
