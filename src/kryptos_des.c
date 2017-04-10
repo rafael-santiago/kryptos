@@ -486,9 +486,7 @@ static void kryptos_des_ld_user_key(kryptos_u32_t key[2], const kryptos_u8_t *us
 
 kryptos_des_ld_user_key_epilogue:
 
-    if (b > 0) {
-        key[w] = key[w] << (sizeof(kryptos_u32_t) - b);
-    }
+    key[w] = key[w] << (b * sizeof(kryptos_u8_t));
 
     b = w = 0;
     kp = NULL;
