@@ -120,6 +120,7 @@ CUTE_TEST_CASE(kryptos_task_check_tests)
     CUTE_ASSERT(t.result == kKryptosInvalidParams);
     CUTE_ASSERT(strcmp(t.result_verbose, "Invalid iv data.") == 0);
 
+    t.mode = kKryptosECB;
     t.iv_size = 4;
     t.in = NULL;
     CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
@@ -142,7 +143,7 @@ CUTE_TEST_CASE(kryptos_task_check_tests)
     CUTE_ASSERT(t.result == kKryptosInvalidParams);
     CUTE_ASSERT(strcmp(t.result_verbose, "Invalid operation mode.") == 0);
 
-    t.mode = kKryptosCBC;
+    t.mode = kKryptosECB;
     t.action = kKryptosActionNr;
     CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     CUTE_ASSERT(t.result == kKryptosInvalidParams);

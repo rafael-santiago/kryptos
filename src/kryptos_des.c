@@ -8,6 +8,7 @@
 #include <kryptos_des.h>
 #include <kryptos_endianess_utils.h>
 #include <kryptos_task_check.h>
+#include <kryptos_random.h>
 #include <kryptos_padding.h>
 #include <kryptos.h>
 #include <string.h>
@@ -589,6 +590,11 @@ void kryptos_des_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t 
     ktask->mode = mode;
     ktask->key = key;
     ktask->key_size = key_size;
+
+    if (ktask->mode == kKryptosCBC && ktask->iv == NULL) {
+        ktask->iv = kryptos_get_random_block(KRYPTOS_DES_BLOCKSIZE);
+        ktask->iv_size = KRYPTOS_DES_BLOCKSIZE;
+    }
 }
 
 void kryptos_des_cipher(kryptos_task_ctx **ktask) {
@@ -610,24 +616,29 @@ void kryptos_des_cipher(kryptos_task_ctx **ktask) {
         des_block_processor = kryptos_des_block_decrypt;
     }
 
-    kryptos_meta_block_processing_prologue(8, inblock, inblock_p, outblock, outblock_p, in_size, (*ktask)->in_size);
+    kryptos_meta_block_processing_prologue(KRYPTOS_DES_BLOCKSIZE,
+                                           inblock, inblock_p,
+                                           outblock, outblock_p,
+                                           in_size, (*ktask)->in_size);
 
-    kryptos_meta_block_processing(8,
+    kryptos_meta_block_processing(KRYPTOS_DES_BLOCKSIZE,
                                   (*ktask)->action,
                                   (*ktask)->mode,
                                   (*ktask)->iv,
                                   (*ktask)->in,
                                   in_p, in_end,
                                   &in_size,
-                                  (*ktask)->out,
-                                  out_p,
+                                  (*ktask)->out, out_p,
                                   &(*ktask)->out_size,
                                   inblock_p,
                                   outblock_p,
                                   des_cipher_epilogue, des_block_processor(outblock, sks));
 
     kryptos_meta_block_processing_epilogue(des_cipher_epilogue,
-                                           inblock, inblock_p, in_p, in_end, outblock, outblock_p, out_p, in_size, sks, ktask);
+                                           inblock, inblock_p, in_p, in_end,
+                                           outblock, outblock_p, out_p,
+                                           in_size,
+                                           sks, ktask);
 
     des_block_processor = NULL;
 }

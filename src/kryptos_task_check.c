@@ -6,6 +6,9 @@
  *
  */
 #include <kryptos_task_check.h>
+#include <kryptos_des.h>
+
+static int kryptos_task_check_cbc_params(kryptos_task_ctx **ktask);
 
 int kryptos_task_check(kryptos_task_ctx **ktask) {
     if (ktask == NULL || *ktask == NULL) {
@@ -32,8 +35,8 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
     }
 
     if (( (*ktask)->cipher != kKryptosCipherARC4 &&
-          (*ktask)->cipher != kKryptosCipherSEAL ) && (*ktask)->mode == kKryptosCBC && ( (*ktask)->iv == NULL ||
-                                                                                         (*ktask)->iv_size == 0 ) ) {
+          (*ktask)->cipher != kKryptosCipherSEAL ) && (*ktask)->mode == kKryptosCBC &&
+        kryptos_task_check_cbc_params(ktask) == 0) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Invalid iv data.";
         goto kryptos_task_check_error;
@@ -59,5 +62,19 @@ kryptos_task_check_success:
     return 1;
 
 kryptos_task_check_error:
+    return 0;
+}
+
+static int kryptos_task_check_cbc_params(kryptos_task_ctx **ktask) {
+    if ((*ktask)->iv == NULL || (*ktask)->iv_size == 0) {
+        return 0;
+    }
+
+    switch ((*ktask)->cipher) {
+        case kKryptosCipherDES:
+            return ((*ktask)->iv_size == KRYPTOS_DES_BLOCKSIZE);
+            break;
+    }
+
     return 0;
 }

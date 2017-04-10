@@ -17,7 +17,7 @@
 #include <kryptos_seal.h>
 #include <kryptos_des.h>
 
-// TODO(Rafael): Verify the iv block size based on the chosen block cipher.
+// DONE(Rafael): Verify the iv block size based on the chosen block cipher.
 // TODO(Rafael): Add more ECB tests for DES.
 // TODO(Rafael): Test the CBC mode on DES.
 

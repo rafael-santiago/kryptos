@@ -10,6 +10,8 @@
 
 #include <kryptos_types.h>
 
+#define KRYPTOS_DES_BLOCKSIZE 8
+
 void kryptos_des_cipher(kryptos_task_ctx **ktask);
 
 void kryptos_des_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size,
