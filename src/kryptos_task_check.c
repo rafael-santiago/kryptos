@@ -7,6 +7,7 @@
  */
 #include <kryptos_task_check.h>
 #include <kryptos_des.h>
+#include <kryptos_idea.h>
 
 static int kryptos_task_check_cbc_params(kryptos_task_ctx **ktask);
 
@@ -73,6 +74,10 @@ static int kryptos_task_check_cbc_params(kryptos_task_ctx **ktask) {
     switch ((*ktask)->cipher) {
         case kKryptosCipherDES:
             return ((*ktask)->iv_size == KRYPTOS_DES_BLOCKSIZE);
+            break;
+
+        case kKryptosCipherIDEA:
+            return ((*ktask)->iv_size == KRYPTOS_IDEA_BLOCKSIZE);
             break;
     }
 

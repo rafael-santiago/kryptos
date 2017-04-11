@@ -660,6 +660,8 @@ CUTE_TEST_CASE_END
 CUTE_TEST_CASE(kryptos_endianess_utils_tests)
     kryptos_u8_t *data = NULL;
     kryptos_u32_t deadbeef = 0L;
+    kryptos_u16_t beef = 0L;
+
     data = (kryptos_u8_t *)kryptos_newseg(4);
     CUTE_ASSERT(data != NULL);
     memcpy(data, "\xde\xad\xbe\xef", 4);
@@ -670,6 +672,18 @@ CUTE_TEST_CASE(kryptos_endianess_utils_tests)
     data = kryptos_cpy_u32_as_big_endian(data, 4, deadbeef);
     CUTE_ASSERT(data != NULL);
     CUTE_ASSERT(*data == 0xde && *(data + 1) == 0xad && *(data + 2) == 0xbe && *(data + 3) == 0xef);
+    kryptos_freeseg(data);
+
+    data = (kryptos_u8_t *)kryptos_newseg(2);
+    CUTE_ASSERT(data != NULL);
+    memcpy(data, "\xbe\xef", 2);
+    memcpy(&beef, data, 2);
+    beef = kryptos_get_u16_as_big_endian(data, 2);
+    CUTE_ASSERT(beef == 0xbeef);
+    memset(data, 0, 2);
+    data = kryptos_cpy_u16_as_big_endian(data, 2, beef);
+    CUTE_ASSERT(data != NULL);
+    CUTE_ASSERT(*data == 0xbe && *(data + 1) == 0xef);
     kryptos_freeseg(data);
 CUTE_TEST_CASE_END
 

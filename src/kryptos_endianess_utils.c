@@ -30,7 +30,7 @@ kryptos_u32_t kryptos_get_u32_as_big_endian(const kryptos_u8_t *data, const size
                 (kryptos_u32_t)(*(data + 2)) <<  8 |
                 (kryptos_u32_t)(*(data + 3));
     } else {
-        value = *(kryptos_u32_t *)value;
+        value = *(kryptos_u32_t *)data;
     }
 
     return value;
@@ -48,6 +48,38 @@ kryptos_u8_t *kryptos_cpy_u32_as_big_endian(kryptos_u8_t *dest, const size_t des
         *(dest + 3) = value;
     } else {
         memcpy(dest, &value, sizeof(kryptos_u32_t));
+    }
+
+    return dest;
+}
+
+kryptos_u16_t kryptos_get_u16_as_big_endian(const kryptos_u8_t *data, const size_t data_size) {
+    kryptos_u16_t value = 0;
+
+    if ((data + sizeof(kryptos_u16_t)) > data + data_size) {
+        return 0;
+    }
+
+    if (kryptos_little_endian_cpu()) {
+        value = (kryptos_u16_t)(*(data)) <<  8 |
+                (kryptos_u16_t)(*(data + 1));
+    } else {
+        value = *(kryptos_u16_t *)data;
+    }
+
+    return value;
+}
+
+kryptos_u8_t *kryptos_cpy_u16_as_big_endian(kryptos_u8_t *dest, const size_t dest_size, const kryptos_u16_t value) {
+    if ((dest + sizeof(kryptos_u16_t)) > dest + dest_size) {
+        return NULL;
+    }
+
+    if (kryptos_little_endian_cpu()) {
+        *(dest) = (value >> 8);
+        *(dest + 1) = value;
+    } else {
+        memcpy(dest, &value, sizeof(kryptos_u16_t));
     }
 
     return dest;
