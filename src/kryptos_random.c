@@ -51,3 +51,31 @@ kryptos_get_random_block_epilogue:
 #endif
     return NULL;
 }
+
+kryptos_u8_t kryptos_get_random_byte(void) {
+    kryptos_u8_t b = 0;
+#if defined(KRYPTOS_USER_MODE)
+    int fd = -1;
+
+    fd = open("/dev/urandom", O_RDONLY);
+
+    if (fd == -1) {
+        fd = open("/dev/random", O_NONBLOCK | O_RDONLY);
+    }
+
+    if (fd == -1) {
+        goto kryptos_get_random_byte_epilogue;
+    }
+
+    read(fd, &b, 1);
+
+kryptos_get_random_byte_epilogue:
+    if (fd != -1) {
+        close(fd);
+    }
+#elif  defined(KRYPTOS_KERNEL_MODE)
+    // TODO(Rafael): Use get_random_bytes(). [Do not read from /dev/urandom or /dev/random it would be nasty!!!]
+#endif
+
+    return b;
+}

@@ -11,6 +11,6 @@
 #include <kryptos_types.h>
 
 kryptos_u8_t *kryptos_ansi_x923_padding(const kryptos_u8_t *buffer, size_t *buffer_size,
-                                        const size_t block_size_in_bytes);
+                                        const size_t block_size_in_bytes, const int randomize);
 
 #endif

@@ -7,15 +7,15 @@
  */
 #include <kryptos_padding.h>
 #include <kryptos_memory.h>
+#include <kryptos_random.h>
 #ifdef KRYPTOS_USER_MODE
 #include <string.h>
 #endif
 
 kryptos_u8_t *kryptos_ansi_x923_padding(const kryptos_u8_t *buffer, size_t *buffer_size,
-                                        const size_t block_size_in_bytes) {
+                                        const size_t block_size_in_bytes, const int randomize) {
     kryptos_u8_t *bpad = NULL;
-    size_t pad_nr = 0;
-    size_t padded_size = 0;
+    size_t padded_size = 0, p, p_nr;
 
     if (buffer_size == NULL || block_size_in_bytes == 0 || *buffer_size == 0) {
         return (kryptos_u8_t *)buffer;
@@ -26,10 +26,10 @@ kryptos_u8_t *kryptos_ansi_x923_padding(const kryptos_u8_t *buffer, size_t *buff
     //  INFO(Rafael): We will always pad.
     if ((padded_size % block_size_in_bytes) == 0) {
         padded_size++;
+
     }
 
     while ((padded_size % block_size_in_bytes) != 0) {
-        pad_nr++;
         padded_size++;
     }
 
@@ -37,7 +37,14 @@ kryptos_u8_t *kryptos_ansi_x923_padding(const kryptos_u8_t *buffer, size_t *buff
 
 #ifdef KRYPTOS_USER_MODE
     memcpy(bpad, buffer, *buffer_size);
-    memset(bpad + (*buffer_size) + 1, 0, padded_size - *buffer_size - 1);
+    if (randomize == 0) {
+        memset(bpad + (*buffer_size) + 1, 0, padded_size - *buffer_size - 1);
+    } else {
+        p_nr = padded_size - *buffer_size - 1;
+        for (p = (*buffer_size) + 1; p < p_nr; p++) {
+            bpad[p] = kryptos_get_random_byte();
+        }
+    }
     bpad[padded_size - 1] = (kryptos_u8_t)(padded_size - *buffer_size); // INFO(Rafael): duh!
     *buffer_size = padded_size;
 #else

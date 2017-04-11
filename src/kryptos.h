@@ -154,7 +154,7 @@ kryptos_ ## label_name:\
                                           in_block, out_block,\
                                           epilogue, block_processor_call_scheme) {\
     if (action == kKryptosEncrypt) {\
-        in_p = kryptos_ansi_x923_padding(in, in_size, block_size_in_bytes);\
+        in_p = kryptos_ansi_x923_padding(in, in_size, block_size_in_bytes, 1);\
         out = (kryptos_u8_t *) kryptos_newseg(*in_size + block_size_in_bytes);\
         if (out == NULL) {\
             goto kryptos_ ## epilogue;\
@@ -212,7 +212,7 @@ kryptos_ ## label_name:\
                                           in_block, out_block,\
                                           epilogue, block_processor_call_scheme) {\
     if (action == kKryptosEncrypt) {\
-        in_p = kryptos_ansi_x923_padding(in, in_size, block_size_in_bytes);\
+        in_p = kryptos_ansi_x923_padding(in, in_size, block_size_in_bytes, 1);\
     } else {\
         in_p = in;\
     }\

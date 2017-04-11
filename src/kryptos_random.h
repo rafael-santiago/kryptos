@@ -12,4 +12,6 @@
 
 void *kryptos_get_random_block(const size_t size_in_bytes);
 
+kryptos_u8_t kryptos_get_random_byte(void);
+
 #endif

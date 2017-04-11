@@ -35,23 +35,36 @@ CUTE_TEST_CASE(kryptos_padding_tests)
     };
     size_t tests_nr = sizeof(tests) / sizeof(tests[0]), t = 0;
     kryptos_u8_t *pad = NULL;
+    size_t buffer_size;
 //    size_t old_size;
 
     while (t < tests_nr) {
-
+        buffer_size = tests[t].buffer_size;
         pad = kryptos_ansi_x923_padding(tests[t].buffer,
-                                        &tests[t].buffer_size,
-                                        tests[t].block_size);
+                                        &buffer_size,
+                                        tests[t].block_size, 0);
         CUTE_ASSERT(pad != NULL);
-
-        CUTE_ASSERT(tests[t].buffer_size == tests[t].expected_buffer_size);
+        CUTE_ASSERT(buffer_size == tests[t].expected_buffer_size);
 
 //        for (old_size = 0; old_size < tests[t].buffer_size; old_size++) {
 //            printf(" %.2x ", pad[old_size]);
 //        }
 //        printf("\n");
 
-        CUTE_ASSERT(memcmp(pad, tests[t].pad, tests[t].buffer_size) == 0);
+        CUTE_ASSERT(memcmp(pad, tests[t].pad, buffer_size) == 0);
+
+        kryptos_freeseg(pad);
+
+        buffer_size = tests[t].buffer_size;
+        pad = kryptos_ansi_x923_padding(tests[t].buffer,
+                                        &buffer_size,
+                                        tests[t].block_size, 1);
+
+        CUTE_ASSERT(pad != NULL);
+
+        CUTE_ASSERT(buffer_size == tests[t].expected_buffer_size);
+
+        CUTE_ASSERT(pad[buffer_size - 1] == tests[t].pad[tests[t].expected_buffer_size - 1]);
 
         kryptos_freeseg(pad);
 
