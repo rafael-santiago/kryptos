@@ -2879,9 +2879,69 @@ CUTE_TEST_CASE(kryptos_des_tests)
     };
 #undef add_new_des_test_data
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
-    kryptos_u8_t *data = "PEACE, n.In international affairs, a period of cheating "
-                         "between two periods of fighting. -- Ambrose Pierce, The Devil's Dictionary";
-    size_t data_size = strlen(data);
+    kryptos_u8_t *cbc_test_data[] = {
+        "PEACE, n.In international affairs, a period of cheating "
+            "between two periods of fighting. -- Ambrose Pierce, The Devil's Dictionary",
+        "PAST, n.That part of Eternity with some small fraction of which we "
+            "have a slight and regrettable acquaintance. A moving line called the "
+            "Present parts it from an imaginary period known as the Future. These "
+            "two grand divisions of Eternity, of which the one is continually "
+            "effacing the other, are entirely unlike. The one is dark with sorrow "
+            "and disappointment, the other bright with prosperity and joy. The "
+            "Past is the region of sobs, the Future is the realm of song. In the one "
+            "crouches Memory, clad in sackcloth and ashes, mumbling penitential prayer; "
+            "in the sunshine of the other Hope flies with a free wing, beckoning to temples "
+            "of success and bowers of ease. Yet the Past is the Future of yesterday, the Future "
+            "is the Past of tomorrow. They are one -- the knowledge and the dream. -- Ambrose Pierce, The Devil's Dictionary",
+        "PAGAN, n.A benighted person who prefers home-made deities and indigenous religious "
+            "rites. -- Ambrose Pierce, The Devil's Dictionary",
+        "PASSPORT, n.A document treacherously inflicted upon a citizen "
+            "going abroad, exposing him as an alien and pointing him out for "
+            "special reprobation and outrage. -- Ambrose Pierce, The Devil's Dictionary",
+        "PARDON, v.To remit a penalty and restore to a life of crime. To add to the lure "
+            "of crime the temptation of ingratitude. -- Ambrose Pierce, The Devil's Dictionary",
+        "PLEASE, v.To lay the foundation for a superstructure of imposition. "
+            "-- Ambrose Pierce, The Devil's Dictionary",
+        "PAINTING, n.The art of protecting flat surfaces from the weather and exposing "
+            "them to the critic. -- Ambrose Pierce, The Devil's Dictionary",
+        "QUOTIENT, n.A number showing how many times a sum of money "
+            "belonging to one person is contained in the pocket of another -- "
+            "usually about as many times as it can got there. -- Ambrose Pierce, The Devil's Dictionary",
+        "VIRTUES, n.pl.Certain abstentions. -- Ambrose Pierce, The Devil's Dictionary",
+        "BED, n.A rack for the torture of the wicked; a citadel unfortified against remorse. "
+            " -- Ambrose Pierce, The Devil's Dictionary",
+        "BAYONET, n.An instrument for pricking the bubble of a nation's conceit. "
+            " -- Ambrose Pierce, The Devil's Dictionary",
+        "BELLADONNA, n.In Italian a beautiful lady; In English a deadly poison. "
+            "A striking example of the essential identity of the two tongues."
+            " -- Ambrose Pierce, The Devil's Dictionary",
+        "BORE, n.A person who talks when you wish him to listen. -- Ambrose Pierce, The Devil's Dictionary",
+        "BRIDE, n.A Woman with a fine prospect of happiness behind her. -- Ambrose Pierce, The Devil's Dictionary",
+        "BRUTE, n.See HUSBAND. -- Ambrose Pierce, The Devil's Dictionary",
+        "HUSBAND, n.One who, having dined, is charged with the care of the plate. -- Ambrose Pierce, The Devil's Dictionary",
+        "WEDDING, n.A ceremony at which two persons undertake to become one, one undertakes to become nothing, "
+            "and nothing undertakes to become supportable. -- Ambrose Pierce, The Devil's Dictionary",
+        "WITCH, n.[1.] An ugly and repulsive old woman, in a wicked league with the devil. "
+            "[2] A beautiful and attractive young woman, in wickedness a league beyond the devil."
+            " -- Ambrose Pierce, The Devil's Dictionary",
+        "\"When you have learned to snatch the error code from the trap frame, it will be time for you to leave.\"\n\n"
+            "-- The Tao of Programming BOOK 1.",
+        "A program should be light and agile, its subroutines connected like a string of pearls. "
+            "The spirit and intent of the program should be retained throughout. There should be neither too "
+            "little nor too much. Neither needless loops nor useless variables; neither lack of structure nor "
+            "overwhelming rigidity.\n"
+            "A program should follow the \"Law of Least Astonishment\". What is this law? It is simply that the "
+            "program should always respond to the users in the way that least astonishes them. "
+            "A program, no matter how complex, should act as a single unit. The program should be directed by the "
+            "logic within rather than by outward appearances.\n"
+            "If the program fails in these requirements, it will be in a state of disorder and confusion. "
+            "The only way to correct this is to rewrite the program. -- The Tao of Programming [BOOK 4]"
+        "Epilogue\n"
+            "Thus spake the Master Programmer:\n"
+            "\t\t\"Time for you to leave.\" -- The Tao of Programming"
+    };
+    size_t cbc_test_data_nr = sizeof(cbc_test_data) / sizeof(cbc_test_data[0]);
+    size_t data_size = 0;
     kryptos_u8_t *key = "beetlejuice";
     size_t key_size = 11;
 
@@ -2919,9 +2979,10 @@ CUTE_TEST_CASE(kryptos_des_tests)
 
     // INFO(Rafael): CBC mode tests.
 
-    for (tv = 0; tv < 255; tv++) {
+    for (tv = 0; tv < cbc_test_data_nr; tv++) {
+        data_size = strlen(cbc_test_data[tv]);
         kryptos_des_setup(&t, key, KRYPTOS_DES_BLOCKSIZE, kKryptosCBC);
-        t.in = data;
+        t.in = cbc_test_data[tv];
         t.in_size = data_size;
         kryptos_task_set_encrypt_action(&t);
 
@@ -2937,7 +2998,7 @@ CUTE_TEST_CASE(kryptos_des_tests)
 
         CUTE_ASSERT(t.out != NULL);
         CUTE_ASSERT(t.out_size == data_size);
-        CUTE_ASSERT(memcmp(t.out, data, t.out_size) == 0);
+        CUTE_ASSERT(memcmp(t.out, cbc_test_data[tv], t.out_size) == 0);
 
         kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
     }
