@@ -12,8 +12,6 @@
 #include <kryptos_task_check.h>
 #include <kryptos_block_parser.h>
 #include <kryptos_endianess_utils.h>
-#include <kryptos_arc4.h>
-#include <kryptos_seal.h>
 #include <kryptos.h>
 #include <kryptos_iv_utils.h>
 #include <stdlib.h>
@@ -3031,6 +3029,58 @@ CUTE_TEST_CASE(kryptos_iv_data_flush_tests)
     kryptos_freeseg(iv);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_idea_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    struct idea_test_vector_ctx {
+        kryptos_u8_t *key;
+        kryptos_u8_t key_size;
+        kryptos_u8_t *plain;
+        kryptos_u8_t *cipher;
+        kryptos_u8_t *decrypted;
+        size_t block_size;
+    };
+#define add_new_idea_test_data(k, s, p, c, d, b) { (k), (s), (p), (c), (d), (b) }
+    struct idea_test_vector_ctx test_vector[] = {
+        add_new_idea_test_data("\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+                               16,
+                               "\x00\x00\x00\x00\x00\x00\x00\x00",
+                               "\xB1\xF5\xF7\xF8\x79\x01\x37\x0F",
+                               "\x00\x00\x00\x00\x00\x00\x00\x00",
+                                8)
+    };
+#undef add_new_idea_test_data
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+
+    kryptos_task_init_as_null(&t);
+
+    for (tv = 0; tv < test_vector_nr; tv++) {
+        kryptos_idea_setup(&t, test_vector[tv].key, test_vector[tv].key_size, kKryptosECB);
+
+        t.in = test_vector[tv].plain;
+        t.in_size = test_vector[tv].block_size;
+        kryptos_task_set_encrypt_action(&t);
+
+        kryptos_idea_cipher(&ktask);
+
+        CUTE_ASSERT(t.out != NULL);
+        CUTE_ASSERT(t.out_size == (t.in_size << 1)); // INFO(Rafael): We always pad.
+        CUTE_ASSERT(memcmp(t.out, test_vector[tv].cipher, test_vector[tv].block_size) == 0);
+
+        t.in = t.out;
+        t.in_size = t.out_size;
+        kryptos_task_set_decrypt_action(&t);
+
+        kryptos_idea_cipher(&ktask);
+
+        CUTE_ASSERT(t.out != NULL);
+
+        CUTE_ASSERT(t.out_size == test_vector[tv].block_size);
+        CUTE_ASSERT(memcmp(t.out, test_vector[tv].decrypted, test_vector[tv].block_size) == 0);
+
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+    }
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_test_monkey)
     // CLUE(Rafael): Before adding a new test try to find out the best place for putting it here.
     //               At first glance you should consider the utility that it implements into the library.
@@ -3048,7 +3098,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_arc4_tests);
     CUTE_RUN_TEST(kryptos_seal_tests);
     CUTE_RUN_TEST(kryptos_des_tests);
-
+    CUTE_RUN_TEST(kryptos_idea_tests);
     //  -=-=-=-=- If you have just added a new cipher take a look in "kryptos_dsl_tests" case, there is some work to
     //                                               be done there too! -=-=-=-=-=-=-
 

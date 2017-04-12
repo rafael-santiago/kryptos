@@ -66,7 +66,7 @@ static void kryptos_idea_ld_user_key(kryptos_u32_t key[4], const kryptos_u8_t *u
     size_t b;
     size_t w;
 
-    memset(key, 0, sizeof(kryptos_u32_t) << 1);
+    memset(key, 0, sizeof(kryptos_u32_t) * 4);
 
     if (user_key == NULL || user_key_size == 0) {
         return;
@@ -91,14 +91,17 @@ static void kryptos_idea_ld_user_key(kryptos_u32_t key[4], const kryptos_u8_t *u
     kryptos_idea_ld_user_key_byte(key[w], kp, kp_end, epilogue);
     kryptos_idea_ld_user_key_byte(key[w], kp, kp_end, epilogue);
     kryptos_idea_ld_user_key_byte(key[w], kp, kp_end, epilogue);
+
     kryptos_idea_ld_user_key_byte(key[w], kp, kp_end, epilogue);
     kryptos_idea_ld_user_key_byte(key[w], kp, kp_end, epilogue);
     kryptos_idea_ld_user_key_byte(key[w], kp, kp_end, epilogue);
     kryptos_idea_ld_user_key_byte(key[w], kp, kp_end, epilogue);
+
     kryptos_idea_ld_user_key_byte(key[w], kp, kp_end, epilogue);
     kryptos_idea_ld_user_key_byte(key[w], kp, kp_end, epilogue);
     kryptos_idea_ld_user_key_byte(key[w], kp, kp_end, epilogue);
     kryptos_idea_ld_user_key_byte(key[w], kp, kp_end, epilogue);
+
     kryptos_idea_ld_user_key_byte(key[w], kp, kp_end, epilogue);
     kryptos_idea_ld_user_key_byte(key[w], kp, kp_end, epilogue);
     kryptos_idea_ld_user_key_byte(key[w], kp, kp_end, epilogue);
@@ -230,16 +233,23 @@ kryptos_idea_get_inv_mul_epilogue:
 
 static void kryptos_idea_inv_subkeys(struct kryptos_idea_subkeys *sks) {
     size_t w;
+
     for (w = 0; w < 52; w += 6) {
-        sks->K[  w  ] = kryptos_idea_get_inv_multiplier(sks->K[   w  ]);
-        sks->K[w + 3] = kryptos_idea_get_inv_multiplier(sks->K[ w + 3]);
+        sks->K[  w  ] = kryptos_idea_get_inv_multiplier(sks->K[w]);
+        sks->K[w + 3] = kryptos_idea_get_inv_multiplier(sks->K[w + 3]);
     }
 }
 
 static void kryptos_idea_block_decrypt(kryptos_u8_t *block, struct kryptos_idea_subkeys sks) {
+    //  INFO(Rafael): The IDEA was designed to use the same ciphering circuit both on encryption and decryption.
+    //                In this case, the subkeys are permutated when performing the decryption.
+    //                Here, I am not doing this. My deciphering implementation traverses inversely the subkeys and
+    //                only pre calculates the inverses of SK_{w} and SK_{w + 3}. We do not need the inverses of
+    //                SK_{w + 4} and SK_{w + 5} and each addition's inverse is applied directly through subtractions.
+
     kryptos_u16_t y1, y2, z1, z2;
     kryptos_u16_t out[4];
-    size_t r;
+    int r;
 
     out[0] = kryptos_get_u16_as_big_endian(block, 2);
     out[1] = kryptos_get_u16_as_big_endian(block + 2, 2);
@@ -290,7 +300,7 @@ static void kryptos_idea_block_decrypt(kryptos_u8_t *block, struct kryptos_idea_
 
 void kryptos_idea_cipher(kryptos_task_ctx **ktask) {
     struct kryptos_idea_subkeys sks;
-    kryptos_idea_block_processor idea_block_processor;
+    kryptos_idea_block_processor idea_block_processor = NULL;
     kryptos_u8_t *in_p, *in_end, *out_p;
     kryptos_u8_t *outblock, *outblock_p, *inblock, *inblock_p;
     size_t in_size;
@@ -331,7 +341,6 @@ void kryptos_idea_cipher(kryptos_task_ctx **ktask) {
                                            outblock, outblock_p, out_p,
                                            in_size,
                                            sks, ktask);
-
     idea_block_processor = NULL;
 }
 

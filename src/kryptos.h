@@ -16,6 +16,7 @@
 #include <kryptos_arc4.h>
 #include <kryptos_seal.h>
 #include <kryptos_des.h>
+#include <kryptos_idea.h>
 
 // DONE(Rafael): Verify the iv block size based on the chosen block cipher.
 // TODO(Rafael): Add more ECB tests for DES.
