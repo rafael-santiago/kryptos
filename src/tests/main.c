@@ -2879,6 +2879,11 @@ CUTE_TEST_CASE(kryptos_des_tests)
     };
 #undef add_new_des_test_data
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_u8_t *data = "PEACE, n.In international affairs, a period of cheating "
+                         "between two periods of fighting. -- Ambrose Pierce, The Devil's Dictionary";
+    size_t data_size = strlen(data);
+    kryptos_u8_t *key = "beetlejuice";
+    size_t key_size = 11;
 
     // INFO(Rafael): ECB mode tests.
 
@@ -2913,15 +2918,46 @@ CUTE_TEST_CASE(kryptos_des_tests)
     }
 
     // INFO(Rafael): CBC mode tests.
+
+    for (tv = 0; tv < 255; tv++) {
+        kryptos_des_setup(&t, key, KRYPTOS_DES_BLOCKSIZE, kKryptosCBC);
+        t.in = data;
+        t.in_size = data_size;
+        kryptos_task_set_encrypt_action(&t);
+
+        kryptos_des_cipher(&ktask);
+
+        CUTE_ASSERT(t.out != NULL);
+
+        t.in = t.out;
+        t.in_size = t.out_size;
+        kryptos_task_set_decrypt_action(&t);
+
+        kryptos_des_cipher(&ktask);
+
+        CUTE_ASSERT(t.out != NULL);
+        CUTE_ASSERT(t.out_size == data_size);
+        CUTE_ASSERT(memcmp(t.out, data, t.out_size) == 0);
+
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+    }
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_apply_iv_tests)
-    kryptos_u8_t *iv = "rofginkoolerautahtsdiordeht";
-    kryptos_u8_t *block = "thedroidsthatuarelookingfor";
+    kryptos_u8_t *iv = NULL;
+    kryptos_u8_t *block = NULL;
     size_t s = 27;
+    iv = (kryptos_u8_t *) kryptos_newseg(s + 1);
+    CUTE_ASSERT(iv != NULL);
+    strncpy(iv, "rofginkoolerautahtsdiordeht", s);
+    block = (kryptos_u8_t *) kryptos_newseg(s);
+    CUTE_ASSERT(block != NULL);
+    strncpy(block, "thedroidsthatuarelookingfor", s);
     CUTE_ASSERT(kryptos_apply_iv(block, iv, s) == block);
     CUTE_ASSERT(kryptos_apply_iv(block, iv, s) == block);
     CUTE_ASSERT(memcmp(block, "thedroidsthatuarelookingfor", 27) == 0);
+    kryptos_freeseg(iv);
+    kryptos_freeseg(block);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_iv_data_flush_tests)

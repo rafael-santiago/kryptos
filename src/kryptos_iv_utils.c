@@ -16,8 +16,8 @@ kryptos_u8_t *kryptos_apply_iv(kryptos_u8_t *block, const kryptos_u8_t *iv, cons
 
     block_p = block;
 
-    while (iv != iv_p) {
-        *block_p ^= *iv_p;
+    while (iv_p != iv_end) {
+        *block_p = *block_p ^ *iv_p;
         iv_p++;
         block_p++;
     }

@@ -188,22 +188,22 @@ kryptos_ ## label_name:\
         }\
         memcpy(out_p, out_block, block_size_in_bytes);\
         out_p += block_size_in_bytes;\
-        if (action == kKryptosEncrypt) {\
+        if (action == kKryptosEncrypt && in_block != in_end) {\
             kryptos_iv_data_flush(iv, out_block, block_size_in_bytes);\
+            kryptos_apply_iv(in_block, iv, block_size_in_bytes);\
         } else {\
             kryptos_iv_data_flush(iv, in_block - block_size_in_bytes, block_size_in_bytes);\
         }\
         out_block = kryptos_block_parser(out_block, block_size_in_bytes, in_block, in_end, &in_block);\
     }\
     if (action == kKryptosDecrypt) {\
-        *out_size = *(out + (*in_size) + block_size_in_bytes - 1);\
-        *(out + (*in_size) + block_size_in_bytes - 1) = 0;\
+        (*out_size) = (*in_size) - block_size_in_bytes - *(out + (*in_size) - block_size_in_bytes - 1);\
+        *(out + (*in_size) - block_size_in_bytes - 1) = 0;\
     } else {\
         kryptos_freeseg(in_p);\
     }\
     memset(iv, 0, block_size_in_bytes);\
 }
-
 
 #define kryptos_meta_block_processing_ecb(block_size_in_bytes,\
                                           action,\
@@ -232,7 +232,7 @@ kryptos_ ## label_name:\
         out_block = kryptos_block_parser(out_block, block_size_in_bytes, in_block, in_end, &in_block);\
     }\
     if (action == kKryptosDecrypt) {\
-        *out_size = *(out + (*in_size) - 1);\
+        *out_size = (*in_size) - *(out + (*in_size) - 1);\
         *(out + (*in_size) - 1) = 0;\
     } else {\
         kryptos_freeseg(in_p);\
