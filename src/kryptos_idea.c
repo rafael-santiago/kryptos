@@ -195,9 +195,8 @@ static void kryptos_idea_block_encrypt(kryptos_u8_t *block, struct kryptos_idea_
     r = 0;
 }
 
-static kryptos_u16_t kryptos_idea_get_inv_multiplier(kryptos_u16_t value) {
+static kryptos_u16_t kryptos_idea_get_inv_multiplier(kryptos_u16_t *inv, kryptos_u16_t value) {
     kryptos_u16_t t0, t1, q, y;
-    kryptos_u16_t inv = 0;
 
     if (value <= 1) {
         return value;
@@ -206,7 +205,7 @@ static kryptos_u16_t kryptos_idea_get_inv_multiplier(kryptos_u16_t value) {
     t1 = 0x10001 / value;
     y = 0x10001 % value;
     if (y == 1) {
-        inv = ((1 - t1) & 0xffff);
+        *inv = ((1 - t1) & 0xffff);
         goto kryptos_idea_get_inv_mul_epilogue;
     }
 
@@ -217,26 +216,27 @@ static kryptos_u16_t kryptos_idea_get_inv_multiplier(kryptos_u16_t value) {
         value = value % y;
         t0 += q * t1;
         if (value == 1) {
-            inv = t0;
+            *inv = t0;
             goto kryptos_idea_get_inv_mul_epilogue;
         }
         q = y / value;
         y = y % value;
         t1 += q * t0;
     } while (y != 1);
-    inv = ((1 - t1) & 0xffff);
+    *inv = ((1 - t1) & 0xffff);
 
 kryptos_idea_get_inv_mul_epilogue:
     t0 = t1 = q = y = 0;
-    return inv;
 }
 
 static void kryptos_idea_inv_subkeys(struct kryptos_idea_subkeys *sks) {
     size_t w;
 
     for (w = 0; w < 52; w += 6) {
-        sks->K[  w  ] = kryptos_idea_get_inv_multiplier(sks->K[w]);
-        sks->K[w + 3] = kryptos_idea_get_inv_multiplier(sks->K[w + 3]);
+        // CLUE(Rafael): Why return by reference instead of return the value?
+        //               "Finished with my woman 'cause she couldn't help me with my mind...", what is the song name???
+        kryptos_idea_get_inv_multiplier(&sks->K[w], sks->K[w]);
+        kryptos_idea_get_inv_multiplier(&sks->K[w + 3], sks->K[w + 3]);
     }
 }
 
