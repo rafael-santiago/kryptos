@@ -59,7 +59,7 @@ static void kryptos_idea_128bit_roll(kryptos_u32_t x[4], int degree) {
 
 static void kryptos_idea_ld_user_key(kryptos_u32_t key[4], const kryptos_u8_t *user_key, const size_t user_key_size) {
     //  TIP(Rafael): Let's make a cipher implementation the most self-contained possible. So is easier to
-    //               apply improvements here without screw up the implementation of other ciphers that maybe
+    //               apply improvements here without screwing up the implementation of other ciphers that maybe
     //               we do not have any idea about.
 
     const kryptos_u8_t *kp, *kp_end;
@@ -83,7 +83,7 @@ static void kryptos_idea_ld_user_key(kryptos_u32_t key[4], const kryptos_u8_t *u
     kp++;\
     b = (b + 1) % sizeof(kryptos_u32_t);\
     if (b == 0) {\
-        w = 1;\
+        w++;\
     }\
 }
 
@@ -199,7 +199,8 @@ static void kryptos_idea_get_inv_multiplier(kryptos_u16_t *inv, kryptos_u16_t va
     kryptos_u16_t t0, t1, q, y;
 
     if (value <= 1) {
-        return value;
+        //*inv = value;
+        return;
     }
 
     t1 = 0x10001 / value;
@@ -233,7 +234,7 @@ static void kryptos_idea_inv_subkeys(struct kryptos_idea_subkeys *sks) {
     size_t w;
 
     for (w = 0; w < 52; w += 6) {
-        // CLUE(Rafael): Why return by reference instead of return the value?
+        // CLUE(Rafael): Why return by reference instead of returning the value?
         //               "Finished with my woman 'cause she couldn't help me with my mind...", what is the song name???
         kryptos_idea_get_inv_multiplier(&sks->K[w], sks->K[w]);
         kryptos_idea_get_inv_multiplier(&sks->K[w + 3], sks->K[w + 3]);

@@ -89,6 +89,7 @@ static kryptos_u8_t *cbc_test_data[] = {
         kryptos_ ## cipher_name  ## _cipher(&ktask);\
         CUTE_ASSERT(t.out != NULL);\
         CUTE_ASSERT(t.out_size == (t.in_size << 1));\
+        /*printf("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n", *(t.out), *(t.out+1), *(t.out+2), *(t.out+3), *(t.out+4), *(t.out+5), *(t.out+6), *(t.out+7));*/\
         CUTE_ASSERT(memcmp(t.out, cipher_name ## _test_vector[tv].cipher, cipher_name ## _test_vector[tv].block_size) == 0);\
         t.in = t.out;\
         t.in_size = t.out_size;\
