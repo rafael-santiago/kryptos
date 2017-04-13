@@ -176,6 +176,22 @@ static void kryptos_des_block_encrypt(kryptos_u8_t *block, struct kryptos_des_su
 
 static void kryptos_des_block_decrypt(kryptos_u8_t *block, struct kryptos_des_subkeys sks);
 
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(des, kKryptosCipherDES, KRYPTOS_DES_BLOCKSIZE)
+
+KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(des,
+                                    ktask,
+                                    kryptos_des_subkeys,
+                                    sks,
+                                    kryptos_des_block_processor,
+                                    des_block_processor,
+                                    kryptos_des_expand_user_key(&sks, (*ktask)->key, (*ktask)->key_size),
+                                    kryptos_des_block_encrypt, /*No additional steps before encrypting*/,
+                                    kryptos_des_block_decrypt, /*No additional steps before decrypting*/,
+                                    KRYPTOS_DES_BLOCKSIZE,
+                                    des_cipher_epilogue,
+                                    outblock,
+                                    des_block_processor(outblock, sks))
+
 static kryptos_u32_t kryptos_des_bitseq_to_u32(kryptos_u8_t bitseq[KRYPTOS_DES_MASTER_SIZE]) {
     kryptos_u32_t value = 0L;
     size_t i;
@@ -552,66 +568,4 @@ static void kryptos_des_expand_user_key(struct kryptos_des_subkeys *sks, const k
     memset(bits, 0, sizeof(bits));
     memset(user_key, 0, sizeof(user_key));
     i = j = 0;
-}
-
-void kryptos_des_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size, const kryptos_cipher_mode_t mode) {
-    if (ktask == NULL) {
-        return;
-    }
-
-    ktask->cipher = kKryptosCipherDES;
-    ktask->mode = mode;
-    ktask->key = key;
-    ktask->key_size = key_size;
-
-    if (ktask->mode == kKryptosCBC && ktask->iv == NULL) {
-        ktask->iv = kryptos_get_random_block(KRYPTOS_DES_BLOCKSIZE);
-        ktask->iv_size = KRYPTOS_DES_BLOCKSIZE;
-    }
-}
-
-void kryptos_des_cipher(kryptos_task_ctx **ktask) {
-    struct kryptos_des_subkeys sks;
-    kryptos_des_block_processor des_block_processor;
-    kryptos_u8_t *in_p, *in_end, *out_p;
-    kryptos_u8_t *outblock, *outblock_p, *inblock, *inblock_p;
-    size_t in_size;
-
-    if (kryptos_task_check(ktask) == 0) {
-        return;
-    }
-
-    kryptos_des_expand_user_key(&sks, (*ktask)->key, (*ktask)->key_size);
-
-    if ((*ktask)->action == kKryptosEncrypt) {
-        des_block_processor = kryptos_des_block_encrypt;
-    } else {
-        des_block_processor = kryptos_des_block_decrypt;
-    }
-
-    kryptos_meta_block_processing_prologue(KRYPTOS_DES_BLOCKSIZE,
-                                           inblock, inblock_p,
-                                           outblock, outblock_p,
-                                           in_size, (*ktask)->in_size);
-
-    kryptos_meta_block_processing(KRYPTOS_DES_BLOCKSIZE,
-                                  (*ktask)->action,
-                                  (*ktask)->mode,
-                                  (*ktask)->iv,
-                                  (*ktask)->in,
-                                  in_p, in_end,
-                                  &in_size,
-                                  (*ktask)->out, out_p,
-                                  &(*ktask)->out_size,
-                                  inblock_p,
-                                  outblock_p,
-                                  des_cipher_epilogue, des_block_processor(outblock, sks));
-
-    kryptos_meta_block_processing_epilogue(des_cipher_epilogue,
-                                           inblock, inblock_p, in_p, in_end,
-                                           outblock, outblock_p, out_p,
-                                           in_size,
-                                           sks, ktask);
-
-    des_block_processor = NULL;
 }

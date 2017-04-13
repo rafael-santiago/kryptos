@@ -95,4 +95,86 @@ typedef struct kryptos_task {
     char *result_verbose;
 }kryptos_task_ctx;
 
+#define KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(cipher_name)\
+void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
+                                       kryptos_u8_t *key,\
+                                       const size_t key_size,\
+                                       const kryptos_cipher_mode_t mode);
+
+#define KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(cipher_name, kCipher, cipher_block_size) \
+void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
+                                       kryptos_u8_t *key,\
+                                       const size_t key_size,\
+                                       const kryptos_cipher_mode_t mode) {\
+    if (ktask == NULL) {\
+        return;\
+    }\
+    ktask->cipher = kCipher;\
+    ktask->mode = mode;\
+    ktask->key = key;\
+    ktask->key_size = key_size;\
+    if (ktask->mode == kKryptosCBC && ktask->iv == NULL) {\
+        ktask->iv = kryptos_get_random_block(cipher_block_size);\
+        ktask->iv_size = cipher_block_size;\
+    }\
+}
+
+#define KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR(cipher_name) void kryptos_## cipher_name ##_cipher(kryptos_task_ctx **);
+
+#define KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(cipher_name,\
+                                            ktask,\
+                                            cipher_subkeys_struct,\
+                                            cipher_subkeys_struct_var,\
+                                            cipher_block_processor_t,\
+                                            cipher_block_processor,\
+                                            cipher_key_expansion_stmt,\
+                                            cipher_block_encrypt,\
+                                            cipher_additional_stmts_before_encrypting,\
+                                            cipher_block_decrypt,\
+                                            cipher_additional_stmts_before_decrypting,\
+                                            cipher_block_size,\
+                                            cipher_epilogue,\
+                                            outblock,\
+                                            cipher_block_processor_stmt)\
+void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
+    struct cipher_subkeys_struct cipher_subkeys_struct_var;\
+    cipher_block_processor_t cipher_block_processor;\
+    kryptos_u8_t *in_p, *in_end, *out_p;\
+    kryptos_u8_t *outblock, *outblock_p, *inblock, *inblock_p;\
+    size_t in_size;\
+    if (kryptos_task_check(ktask) == 0) {\
+        return;\
+    }\
+    cipher_key_expansion_stmt;\
+    if ((*ktask)->action == kKryptosEncrypt) {\
+        cipher_block_processor = cipher_block_encrypt;\
+        cipher_additional_stmts_before_encrypting;\
+    } else {\
+        cipher_block_processor = cipher_block_decrypt;\
+        cipher_additional_stmts_before_decrypting;\
+    }\
+    kryptos_meta_block_processing_prologue(cipher_block_size,\
+                                           inblock, inblock_p,\
+                                           outblock, outblock_p,\
+                                           in_size, (*ktask)->in_size);\
+    kryptos_meta_block_processing(cipher_block_size,\
+                                  (*ktask)->action,\
+                                  (*ktask)->mode,\
+                                  (*ktask)->iv,\
+                                  (*ktask)->in,\
+                                  in_p, in_end,\
+                                  &in_size,\
+                                  (*ktask)->out, out_p,\
+                                  &(*ktask)->out_size,\
+                                  inblock_p,\
+                                  outblock_p,\
+                                  cipher_epilogue, cipher_block_processor_stmt);\
+    kryptos_meta_block_processing_epilogue(cipher_epilogue,\
+                                           inblock, inblock_p, in_p, in_end,\
+                                           outblock, outblock_p, out_p,\
+                                           in_size,\
+                                           cipher_subkeys_struct_var, ktask);\
+    cipher_block_processor = NULL;\
+}
+
 #endif

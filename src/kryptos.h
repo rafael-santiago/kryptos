@@ -19,8 +19,8 @@
 #include <kryptos_idea.h>
 
 // DONE(Rafael): Verify the iv block size based on the chosen block cipher.
-// TODO(Rafael): Add more ECB tests for DES.
-// TODO(Rafael): Test the CBC mode on DES.
+// DONE(Rafael): Add more ECB tests for DES.
+// DONE(Rafael): Test the CBC mode on DES.
 
 #define kryptos_task_set_ecb_mode(ktask) ( (ktask)->mode = kKryptosECB )
 

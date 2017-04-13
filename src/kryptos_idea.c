@@ -39,6 +39,22 @@ static void kryptos_idea_inv_subkeys(struct kryptos_idea_subkeys *sks);
 
 static void kryptos_idea_block_decrypt(kryptos_u8_t *block, struct kryptos_idea_subkeys sks);
 
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(idea, kKryptosCipherIDEA, KRYPTOS_IDEA_BLOCKSIZE)
+
+KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(idea,
+                                    ktask,
+                                    kryptos_idea_subkeys,
+                                    sks,
+                                    kryptos_idea_block_processor,
+                                    idea_block_processor,
+                                    kryptos_idea_key_expander((*ktask)->key, (*ktask)->key_size, &sks),
+                                    kryptos_idea_block_encrypt, /*No additional steps before encrypting*/,
+                                    kryptos_idea_block_decrypt, kryptos_idea_inv_subkeys(&sks),
+                                    KRYPTOS_IDEA_BLOCKSIZE,
+                                    idea_cipher_epilogue,
+                                    outblock,
+                                    idea_block_processor(outblock, sks))
+
 static void kryptos_idea_128bit_roll(kryptos_u32_t x[4], int degree) {
     kryptos_u32_t xx[4];
 
@@ -269,67 +285,4 @@ static void kryptos_idea_block_decrypt(kryptos_u8_t *block, struct kryptos_idea_
     memset(out, 0, sizeof(out));
     y1 = y2 = z1 = z2 = 0;
     r = 0;
-}
-
-void kryptos_idea_cipher(kryptos_task_ctx **ktask) {
-    struct kryptos_idea_subkeys sks;
-    kryptos_idea_block_processor idea_block_processor = NULL;
-    kryptos_u8_t *in_p, *in_end, *out_p;
-    kryptos_u8_t *outblock, *outblock_p, *inblock, *inblock_p;
-    size_t in_size;
-
-    if (kryptos_task_check(ktask) == 0) {
-        return;
-    }
-
-    kryptos_idea_key_expander((*ktask)->key, (*ktask)->key_size, &sks);
-
-    if ((*ktask)->action == kKryptosDecrypt) {
-        idea_block_processor = kryptos_idea_block_decrypt;
-        kryptos_idea_inv_subkeys(&sks);
-    } else {
-        idea_block_processor = kryptos_idea_block_encrypt;
-    }
-
-    kryptos_meta_block_processing_prologue(KRYPTOS_IDEA_BLOCKSIZE,
-                                           inblock, inblock_p,
-                                           outblock, outblock_p,
-                                           in_size, (*ktask)->in_size);
-
-    kryptos_meta_block_processing(KRYPTOS_IDEA_BLOCKSIZE,
-                                  (*ktask)->action,
-                                  (*ktask)->mode,
-                                  (*ktask)->iv,
-                                  (*ktask)->in,
-                                  in_p, in_end,
-                                  &in_size,
-                                  (*ktask)->out, out_p,
-                                  &(*ktask)->out_size,
-                                  inblock_p,
-                                  outblock_p,
-                                  idea_cipher_epilogue, idea_block_processor(outblock, sks));
-
-    kryptos_meta_block_processing_epilogue(idea_cipher_epilogue,
-                                           inblock, inblock_p, in_p, in_end,
-                                           outblock, outblock_p, out_p,
-                                           in_size,
-                                           sks, ktask);
-    idea_block_processor = NULL;
-}
-
-void kryptos_idea_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size,
-                       const kryptos_cipher_mode_t mode) {
-    if (ktask == NULL) {
-        return;
-    }
-
-    ktask->cipher = kKryptosCipherIDEA;
-    ktask->mode = mode;
-    ktask->key = key;
-    ktask->key_size = key_size;
-
-    if (mode == kKryptosCBC && ktask->iv == NULL) {
-        ktask->iv = kryptos_get_random_block(KRYPTOS_IDEA_BLOCKSIZE);
-        ktask->iv_size = KRYPTOS_IDEA_BLOCKSIZE;
-    }
 }

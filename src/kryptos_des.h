@@ -12,9 +12,8 @@
 
 #define KRYPTOS_DES_BLOCKSIZE 8
 
-void kryptos_des_cipher(kryptos_task_ctx **ktask);
+KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(des)
 
-void kryptos_des_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size,
-                       const kryptos_cipher_mode_t mode);
+KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR(des)
 
 #endif
