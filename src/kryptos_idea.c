@@ -33,7 +33,7 @@ static void kryptos_idea_ld_user_key(kryptos_u32_t key[4], const kryptos_u8_t *u
 
 static void kryptos_idea_block_encrypt(kryptos_u8_t *block, struct kryptos_idea_subkeys sks);
 
-static kryptos_u16_t kryptos_idea_get_inv_multiplier(kryptos_u16_t value);
+static void kryptos_idea_get_inv_multiplier(kryptos_u16_t *inv, kryptos_u16_t value);
 
 static void kryptos_idea_inv_subkeys(struct kryptos_idea_subkeys *sks);
 
@@ -195,7 +195,7 @@ static void kryptos_idea_block_encrypt(kryptos_u8_t *block, struct kryptos_idea_
     r = 0;
 }
 
-static kryptos_u16_t kryptos_idea_get_inv_multiplier(kryptos_u16_t *inv, kryptos_u16_t value) {
+static void kryptos_idea_get_inv_multiplier(kryptos_u16_t *inv, kryptos_u16_t value) {
     kryptos_u16_t t0, t1, q, y;
 
     if (value <= 1) {
