@@ -452,45 +452,18 @@ static void kryptos_des_ld_user_key(kryptos_u32_t key[2], const kryptos_u8_t *us
     size_t b;
     size_t w;
 
-    memset(key, 0, sizeof(kryptos_u32_t) << 1);
+    kryptos_ld_user_key_prologue(key, 2, user_key, user_key_size, kp, kp_end, w, b, return);
 
-    if (user_key == NULL || user_key_size == 0) {
-        return;
-    }
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_des_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_des_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_des_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_des_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_des_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_des_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_des_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_des_ld_user_key_epilogue);
 
-    kp = user_key;
-    kp_end = kp + user_key_size;
-    b = 0;
-    w = 0;
-
-#define kryptos_des_ld_user_key_byte(state, kp, kp_end, label) {\
-    if (kp == kp_end) goto kryptos_des_ld_user_key_ ## label;\
-    state = (state << 8) | (kryptos_u32_t)*kp;\
-    kp++;\
-    b = (b + 1) % sizeof(kryptos_u32_t);\
-    if (b == 0) {\
-        w = 1;\
-    }\
-}
-
-    kryptos_des_ld_user_key_byte(key[w], kp, kp_end, epilogue);
-    kryptos_des_ld_user_key_byte(key[w], kp, kp_end, epilogue);
-    kryptos_des_ld_user_key_byte(key[w], kp, kp_end, epilogue);
-    kryptos_des_ld_user_key_byte(key[w], kp, kp_end, epilogue);
-    kryptos_des_ld_user_key_byte(key[w], kp, kp_end, epilogue);
-    kryptos_des_ld_user_key_byte(key[w], kp, kp_end, epilogue);
-    kryptos_des_ld_user_key_byte(key[w], kp, kp_end, epilogue);
-    kryptos_des_ld_user_key_byte(key[w], kp, kp_end, epilogue);
-
-#undef kryptos_des_ld_user_key_byte
-
-kryptos_des_ld_user_key_epilogue:
-
-    key[w] = key[w] << (b * sizeof(kryptos_u8_t));
-
-    b = w = 0;
-    kp = NULL;
-    kp_end = NULL;
+    kryptos_ld_user_key_epilogue(kryptos_des_ld_user_key_epilogue, key, w, b, kp, kp_end);
 }
 
 static void kryptos_des_expand_user_key(struct kryptos_des_subkeys *sks, const kryptos_u8_t *key, const size_t key_size) {

@@ -40,6 +40,35 @@
 
 #define KRYPTOS_TASK_FREEALL (KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_KEY | KRYPTOS_TASK_IV)
 
+#define kryptos_ld_user_key_prologue(state, state_nr, user_key, user_key_size, kp, kp_end, w, b, statement) {\
+    memset(state, 0, sizeof(state[0]) * state_nr);\
+    if (user_key == NULL || user_key_size == 0) {\
+        statement;\
+    }\
+    kp = user_key;\
+    kp_end = kp + user_key_size;\
+    b = 0;\
+    w = 0;\
+}
+
+#define kryptos_ld_user_key_byte(state, kp, kp_end, epilogue) {\
+    if (kp == kp_end) goto epilogue;\
+    state = (state << 8) | *kp;\
+    kp++;\
+    b = (b + 1) % sizeof(state);\
+    if (b == 0) {\
+        w++;\
+    }\
+}
+
+#define kryptos_ld_user_key_epilogue(epilogue, state, w, b, kp, kp_end) {\
+epilogue:\
+    state[w] = state[w] << (b * sizeof(kryptos_u8_t));\
+    b = w = 0;\
+    kp = NULL;\
+    kp_end = NULL;\
+}
+
 #define kryptos_task_init_as_null(ktask) {\
     (ktask)->out = NULL;\
     (ktask)->out_size = 0;\
