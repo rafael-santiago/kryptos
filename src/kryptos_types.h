@@ -119,6 +119,32 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
     }\
 }
 
+#define KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_SETUP(cipher_name, ktask, additional_args)\
+void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
+                                       kryptos_u8_t *key,\
+                                       const size_t key_size,\
+                                       const kryptos_cipher_mode_t mode, additional_args);
+
+#define KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(cipher_name, ktask, kCipher, cipher_block_size, additional_args, additional_setup_stmt) \
+void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
+                                       kryptos_u8_t *key,\
+                                       const size_t key_size,\
+                                       const kryptos_cipher_mode_t mode,\
+                                       additional_args) {\
+    if (ktask == NULL) {\
+        return;\
+    }\
+    ktask->cipher = kCipher;\
+    ktask->mode = mode;\
+    ktask->key = key;\
+    ktask->key_size = key_size;\
+    if (ktask->mode == kKryptosCBC && ktask->iv == NULL) {\
+        ktask->iv = kryptos_get_random_block(cipher_block_size);\
+        ktask->iv_size = cipher_block_size;\
+    }\
+    additional_setup_stmt;\
+}
+
 #define KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR(cipher_name) void kryptos_## cipher_name ##_cipher(kryptos_task_ctx **);
 
 #define KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(cipher_name,\

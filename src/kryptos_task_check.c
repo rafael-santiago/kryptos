@@ -8,6 +8,8 @@
 #include <kryptos_task_check.h>
 #include <kryptos_des.h>
 #include <kryptos_idea.h>
+#include <kryptos_blowfish.h>
+#include <kryptos_feal.h>
 
 static int kryptos_task_check_cbc_params(kryptos_task_ctx **ktask);
 
@@ -78,6 +80,14 @@ static int kryptos_task_check_cbc_params(kryptos_task_ctx **ktask) {
 
         case kKryptosCipherIDEA:
             return ((*ktask)->iv_size == KRYPTOS_IDEA_BLOCKSIZE);
+            break;
+
+        case kKryptosCipherBLOWFISH:
+            return ((*ktask)->iv_size == KRYPTOS_BLOWFISH_BLOCKSIZE);
+            break;
+
+        case kKryptosCipherFEAL:
+            return ((*ktask)->iv_size == KRYPTOS_FEAL_BLOCKSIZE);
             break;
     }
 
