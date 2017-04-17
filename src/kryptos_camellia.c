@@ -175,7 +175,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(camellia,
                                             (*ktask)->result_verbose = "CAMELLIA unknown key size.";
                                             goto kryptos_camellia_cipher_epilogue;
                                         }
-                                        // INFO(Rafael): Depending on the key size, we must to redirect the
+                                        // INFO(Rafael): Depending on the key size, we must redirect the
                                         //               processing flow to the desired key expansion algorithm.
                                         if (sks.keysize == kKryptosCAMELLIA128) {
                                             kryptos_camellia_keyexp_128((*ktask)->key, (*ktask)->key_size, &sks);
@@ -1112,11 +1112,11 @@ static void kryptos_camellia_block_decrypt_192_256(kryptos_u8_t *block, struct k
 }
 
 static void kryptos_camellia_FL(kryptos_u32_t data[2], const kryptos_u32_t kl, const kryptos_u32_t kr) {
- data[1] = data[1] ^ kryptos_camellia_rotl((data[0] & kl), 1);
- data[0] = data[0] ^ (data[1] | kr);
+    data[1] = data[1] ^ kryptos_camellia_rotl((data[0] & kl), 1);
+    data[0] = data[0] ^ (data[1] | kr);
 }
 
 static void kryptos_camellia_FL_1(kryptos_u32_t data[2], const kryptos_u32_t kl, const kryptos_u32_t kr) {
- data[0] = data[0] ^ (data[1] | kr);
- data[1] = data[1] ^ kryptos_camellia_rotl((data[0] & kl), 1);
+    data[0] = data[0] ^ (data[1] | kr);
+    data[1] = data[1] ^ kryptos_camellia_rotl((data[0] & kl), 1);
 }
