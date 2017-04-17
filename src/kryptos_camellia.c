@@ -179,7 +179,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(camellia,
                                         //               processing flow to the desired key expansion algorithm.
                                         if (sks.keysize == kKryptosCAMELLIA128) {
                                             kryptos_camellia_keyexp_128((*ktask)->key, (*ktask)->key_size, &sks);
-                                        } else {
+                                        } else if (sks.keysize == kKryptosCAMELLIA192 ||
+                                                   sks.keysize == kKryptosCAMELLIA256) {
                                             kryptos_camellia_keyexp_192_256((*ktask)->key, (*ktask)->key_size, &sks);
                                         }
                                     },
