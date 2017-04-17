@@ -128,8 +128,6 @@ static void kryptos_camellia_keyexp_128(const kryptos_u8_t *key, const size_t ke
 static void kryptos_camellia_keyexp_192_256(const kryptos_u8_t *key, const size_t key_size,
                                             struct kryptos_camellia_subkeys *sks);
 
-static void kryptos_camellia_keyexp(const kryptos_u8_t *key, const size_t key_size, struct kryptos_camellia_subkeys *sks);
-
 static void kryptos_camellia_F(kryptos_u32_t data[2], kryptos_u32_t kl, kryptos_u32_t kr, kryptos_u32_t out[2]);
 
 static void kryptos_camellia_block_encrypt_128(kryptos_u8_t *block, struct kryptos_camellia_subkeys sks);
@@ -686,19 +684,6 @@ static void kryptos_camellia_keyexp_192_256(const kryptos_u8_t *key, const size_
     KR[0]   = KR[1]   = KR[2] = KR[3] = KA[0] = KA[1] =
     KA[2]   = KA[3]   = KB[0] = KB[1] = KB[2] = KB[3] =
     fout[0] = fout[1] = 0L;
-}
-
-static void kryptos_camellia_keyexp(const kryptos_u8_t *key, const size_t key_size, struct kryptos_camellia_subkeys *sks) {
-    switch (sks->keysize){
-        case kKryptosCAMELLIA128:
-            kryptos_camellia_keyexp_128(key, key_size, sks);
-            break;
-
-        case kKryptosCAMELLIA192:
-        case kKryptosCAMELLIA256:
-            kryptos_camellia_keyexp_192_256(key, key_size, sks);
-            break;
-    }
 }
 
 static void kryptos_camellia_F(kryptos_u32_t data[2], kryptos_u32_t kl, kryptos_u32_t kr, kryptos_u32_t out[2]) {
