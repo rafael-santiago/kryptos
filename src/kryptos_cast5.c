@@ -300,9 +300,9 @@ static kryptos_u32_t kryptos_cast5_sbox8[] = {
 };
 
 struct kryptos_cast5_subkeys {
- kryptos_u32_t Km[16]; // INFO(Rafael): the masking keys.
- kryptos_u8_t Kr[16];  // INFO(Rafael): the rotation keys.
- kryptos_u8_t rounds;  // INFO(Rafael): the rounds total.
+    kryptos_u32_t Km[16]; // INFO(Rafael): the masking keys.
+    kryptos_u8_t Kr[16];  // INFO(Rafael): the rotation keys.
+    kryptos_u8_t rounds;  // INFO(Rafael): the rounds total.
 };
 
 typedef void (*kryptos_cast5_block_processor)(kryptos_u8_t *block, struct kryptos_cast5_subkeys sks);
@@ -796,7 +796,7 @@ static kryptos_u32_t kryptos_cast5_f(const kryptos_u32_t D, const kryptos_u32_t 
             value = ((kryptos_cast5_sbox1[kryptos_cast5_get_u8_from_u32(I, 0)]  -
                       kryptos_cast5_sbox2[kryptos_cast5_get_u8_from_u32(I, 1)]) +
                       kryptos_cast5_sbox3[kryptos_cast5_get_u8_from_u32(I, 2)]) ^
-                      kryptos_cast5_sbox4[kryptos_cast5_get_u8_from_u32(I,3)];
+                      kryptos_cast5_sbox4[kryptos_cast5_get_u8_from_u32(I, 3)];
             break;
 
         case  3: // INFO(Rafael): Type three.
@@ -806,9 +806,9 @@ static kryptos_u32_t kryptos_cast5_f(const kryptos_u32_t D, const kryptos_u32_t 
         case 15:
             I = kryptos_cast5_shl((Kmi - D), Kri);
             value = ((kryptos_cast5_sbox1[kryptos_cast5_get_u8_from_u32(I, 0)] +
-                      kryptos_cast5_sbox2[kryptos_cast5_get_u8_from_u32(I,1)]) ^
-                      kryptos_cast5_sbox3[kryptos_cast5_get_u8_from_u32(I,2)]) -
-                      kryptos_cast5_sbox4[kryptos_cast5_get_u8_from_u32(I,3)];
+                      kryptos_cast5_sbox2[kryptos_cast5_get_u8_from_u32(I, 1)]) ^
+                      kryptos_cast5_sbox3[kryptos_cast5_get_u8_from_u32(I, 2)]) -
+                      kryptos_cast5_sbox4[kryptos_cast5_get_u8_from_u32(I, 3)];
             break;
     }
 
