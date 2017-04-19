@@ -10,9 +10,9 @@
 #include <kryptos_random.h>
 #include <kryptos_padding.h>
 #include <kryptos_task_check.h>
+#include <kryptos_pw2.h>
 #include <kryptos.h>
 #include <string.h>
-#include <math.h>
 
 #define kryptos_rc2_get_byte(x, b)  (kryptos_u16_t) ( ( (x)  >> (8 - (b << 3)) ) & 0xff )
 
@@ -300,7 +300,8 @@ static void kryptos_rc2_inflate_key(const kryptos_u8_t *key, const size_t key_si
     // INFO(Rafael): Evaluating TM.
 
     Tn = (sks->T1 + 7) / 8;
-    TM = fmod(255, pow(2, (8 + sks->T1) - (8 * Tn))); // TODO(Rafael): Even being done once it could be improved.
+    //TM = fmod(255, pow(2, (8 + sks->T1) - (8 * Tn))); // TODO(Rafael): Even being done once it could be improved.
+    TM = 255 % kryptos_pw2((8 + sks->T1) - (Tn << 3));
 
     // INFO(Rafael): start of the expansion.
 

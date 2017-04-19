@@ -197,7 +197,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(camellia,
                                     camellia_block_processor(outblock, sks))
 
 static void kryptos_camellia_roll128b(kryptos_u32_t x[4], int s) {
-    kryptos_u32_t t0,t1,t2,t3;
+    kryptos_u32_t t0, t1, t2, t3;
     kryptos_u32_t tt0, tt1, tt2, tt3;
     if (s > 0) {
         t0 = kryptos_camellia_rotl(x[0], 1);
