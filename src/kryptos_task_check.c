@@ -11,6 +11,10 @@
 #include <kryptos_blowfish.h>
 #include <kryptos_feal.h>
 #include <kryptos_camellia.h>
+#include <kryptos_cast5.h>
+#include <kryptos_rc2.h>
+#include <kryptos_saferk64.h>
+#include <kryptos_aes.h>
 
 static int kryptos_task_check_cbc_params(kryptos_task_ctx **ktask);
 
@@ -93,6 +97,22 @@ static int kryptos_task_check_cbc_params(kryptos_task_ctx **ktask) {
 
         case kKryptosCipherCAMELLIA:
             return ((*ktask)->iv_size == KRYPTOS_CAMELLIA_BLOCKSIZE);
+            break;
+
+        case kKryptosCipherCAST5:
+            return ((*ktask)->iv_size == KRYPTOS_CAST5_BLOCKSIZE);
+            break;
+
+        case kKryptosCipherRC2:
+            return ((*ktask)->iv_size == KRYPTOS_RC2_BLOCKSIZE);
+            break;
+
+        case kKryptosCipherSAFERK64:
+            return ((*ktask)->iv_size == KRYPTOS_SAFERK64_BLOCKSIZE);
+            break;
+
+        case kKryptosCipherAES:
+            return ((*ktask)->iv_size == KRYPTOS_AES_BLOCKSIZE);
             break;
     }
 
