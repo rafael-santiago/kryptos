@@ -192,17 +192,7 @@ static void kryptos_saferk64_make_key(const kryptos_u8_t *key, const size_t key_
     kryptos_u8_t b0, b1, b2, b3, b4, b5, b6, b7;
     kryptos_u8_t e0, e1, e2, e3, e4, e5, e6, e7;
 
-/* if(saferk64subkeys->rounds<1){
-  printf("crash: safer k-64 round underflow!!!\n");
-  return(0);
- }
- else
-  if(saferk64subkeys->rounds>800){
-   printf("crash: safer k-64 round overflow!!!\n");
-   return(0);
-  }*/
-    //memset(saferk64subkeys->K,0L,sizeof(saferk64subkeys->K));
-    // hexToWORD(key,saferk64subkeys->K[0].side);/*transferindo a chave do usuario para a estrutura das subchaves*/ 
+    kryptos_saferk64_ld_user_key(sks->K[0].side, key, key_size);
 
     i_nr = sks->rounds << 1;
 
