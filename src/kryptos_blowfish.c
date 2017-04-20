@@ -246,12 +246,6 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(blowfish,
                                     outblock,
                                     blowfish_block_processor(outblock, sks))
 
-/*static kryptos_u32_t kryptos_blowfish_F(kryptos_u32_t xl, struct kryptos_blowfish_subkeys sks) {
-    return ( ( ( sks.S1[kryptos_blowfish_get_byte_from_u32(xl, 0)] +
-                 sks.S2[kryptos_blowfish_get_byte_from_u32(xl, 1)] ) ^ sks.S3[kryptos_blowfish_get_byte_from_u32(xl, 2)] ) +
-               sks.S4[kryptos_blowfish_get_byte_from_u32(xl, 3)] );
-}*/
-
 static void kryptos_blowfish_block_encrypt(kryptos_u8_t *block, struct kryptos_blowfish_subkeys sks) {
     size_t i;
     kryptos_u32_t xl, xr, t;
