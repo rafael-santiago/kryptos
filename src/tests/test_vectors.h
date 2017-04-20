@@ -8,8 +8,10 @@
 #ifndef KRYPTOS_TESTS_TEST_VECTORS_H
 #define KRYPTOS_TESTS_TEST_VECTORS_H 1
 
+#include <kryptos_types.h>
 #include "des_test_vector.h"
 #include "idea_test_vector.h"
+#include "blowfish_test_vector.h"
 
 static kryptos_u8_t *cbc_test_data[] = {
     "PEACE, n.In international affairs, a period of cheating "

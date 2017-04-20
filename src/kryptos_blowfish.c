@@ -216,11 +216,17 @@ typedef void (*kryptos_blowfish_block_processor)(kryptos_u8_t *block, struct kry
 
 #define kryptos_blowfish_get_byte_from_u32(w, n) ((w) >> (24 - ((n) << 3)) & 0xff)
 
-static kryptos_u32_t kryptos_blowfish_F(kryptos_u32_t xl, struct kryptos_blowfish_subkeys sks);
+#define kryptos_blowfish_F(xl, sks) ( ( ( (sks).S1[kryptos_blowfish_get_byte_from_u32(xl, 0)] +\
+                                               (sks).S2[kryptos_blowfish_get_byte_from_u32(xl, 1)] ) ^\
+                                           (sks).S3[kryptos_blowfish_get_byte_from_u32(xl, 2)] ) +\
+                                             (sks).S4[kryptos_blowfish_get_byte_from_u32(xl, 3)] )
 
 static void kryptos_blowfish_block_encrypt(kryptos_u8_t *block, struct kryptos_blowfish_subkeys sks);
 
 static void kryptos_blowfish_block_decrypt(kryptos_u8_t *block, struct kryptos_blowfish_subkeys sks);
+
+static void kryptos_blowfish_ld_user_key(kryptos_u32_t key[KRYPTOS_BLOWFISH_MAX_KEY_NR],
+                                         const kryptos_u8_t *user_key, const size_t user_key_size);
 
 static void kryptos_blowfish_puff_up(const kryptos_u8_t *key, size_t key_size, struct kryptos_blowfish_subkeys *sks);
 
@@ -240,22 +246,22 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(blowfish,
                                     outblock,
                                     blowfish_block_processor(outblock, sks))
 
-static kryptos_u32_t kryptos_blowfish_F(kryptos_u32_t xl, struct kryptos_blowfish_subkeys sks) {
+/*static kryptos_u32_t kryptos_blowfish_F(kryptos_u32_t xl, struct kryptos_blowfish_subkeys sks) {
     return ( ( ( sks.S1[kryptos_blowfish_get_byte_from_u32(xl, 0)] +
                  sks.S2[kryptos_blowfish_get_byte_from_u32(xl, 1)] ) ^ sks.S3[kryptos_blowfish_get_byte_from_u32(xl, 2)] ) +
                sks.S4[kryptos_blowfish_get_byte_from_u32(xl, 3)] );
-}
+}*/
 
 static void kryptos_blowfish_block_encrypt(kryptos_u8_t *block, struct kryptos_blowfish_subkeys sks) {
     size_t i;
-    kryptos_u8_t xl, xr, t;
+    kryptos_u32_t xl, xr, t;
 
     xl = kryptos_get_u32_as_big_endian(block, 4);
     xr = kryptos_get_u32_as_big_endian(block + 4, 4);
 
     for (i = 0; i < 16; i++) {
         xl = xl ^ sks.P[i];
-        xl = kryptos_blowfish_F(xl, sks) ^ xr;
+        xr = kryptos_blowfish_F(xl, sks) ^ xr;
         t  = xr;
         xr = xl;
         xl = t;
@@ -269,7 +275,7 @@ static void kryptos_blowfish_block_encrypt(kryptos_u8_t *block, struct kryptos_b
     xl = xl ^ sks.P[17];
 
     kryptos_cpy_u32_as_big_endian(block, 8, xl);
-    kryptos_cpy_u32_as_big_endian(block + 8, 4, xr);
+    kryptos_cpy_u32_as_big_endian(block + 4, 4, xr);
 
     xl = xr = t  = 0;
 }
@@ -297,7 +303,7 @@ static void kryptos_blowfish_block_decrypt(kryptos_u8_t *block, struct kryptos_b
     xl = xl ^ sks.P[0];
 
     kryptos_cpy_u32_as_big_endian(block, 8, xl);
-    kryptos_cpy_u32_as_big_endian(block + 8, 4, xr);
+    kryptos_cpy_u32_as_big_endian(block + 4, 4, xr);
 
     xl = xr = t  = 0;
 }
@@ -376,6 +382,14 @@ static void kryptos_blowfish_puff_up(const kryptos_u8_t *key, size_t key_size, s
     size_t i, j , w_size = 0;
     kryptos_u8_t pl[8];
 
+    w_size = key_size / sizeof(kryptos_u32_t);
+
+    while ((w_size % 4) != 0) {
+        w_size++;
+    }
+
+    w_size /= sizeof(kryptos_u32_t);
+
     kryptos_blowfish_ld_user_key(w_key, key, key_size);
 
     for (i = 0, j = 0; i < 18; i++, j++) {
@@ -397,20 +411,20 @@ static void kryptos_blowfish_puff_up(const kryptos_u8_t *key, size_t key_size, s
     for (i = 0; i < 521; i++) {
         kryptos_blowfish_block_encrypt(pl, *sks);
         if (i < 9) {
-            xl = &sks->P[i * 2];
-            xr = &sks->P[(i * 2) + 1];
+            xl = &sks->P[i << 1];
+            xr = &sks->P[(i << 1) + 1];
         } else if (i < 137) {
-            xl = &sks->S1[((i - 9) * 2)];
-            xr = &sks->S1[((i - 9) * 2) + 1];
+            xl = &sks->S1[((i - 9) << 1)];
+            xr = &sks->S1[((i - 9) << 1) + 1];
         } else if (i < 265) {
-            xl = &sks->S2[((i - 137) * 2)];
-            xr = &sks->S2[((i - 137) * 2) + 1];
+            xl = &sks->S2[((i - 137) << 1)];
+            xr = &sks->S2[((i - 137) << 1) + 1];
         } else if (i < 393) {
-            xl = &sks->S3[((i - 265) * 2)];
-            xr = &sks->S3[((i - 265) * 2) + 1];
+            xl = &sks->S3[((i - 265) << 1)];
+            xr = &sks->S3[((i - 265) << 1) + 1];
         } else if (i < 521) {
-            xl = &sks->S4[((i - 393) * 2)];
-            xr = &sks->S4[((i - 393) * 2) + 1];
+            xl = &sks->S4[((i - 393) << 1)];
+            xr = &sks->S4[((i - 393) << 1) + 1];
         }
         *xl = kryptos_get_u32_as_big_endian(pl, 4);
         *xr = kryptos_get_u32_as_big_endian(pl + 4, 4);

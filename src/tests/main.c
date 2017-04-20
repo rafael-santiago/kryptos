@@ -711,6 +711,10 @@ CUTE_TEST_CASE(kryptos_idea_tests)
     kryptos_run_block_cipher_tests(idea, KRYPTOS_IDEA_BLOCKSIZE);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_blowfish_tests)
+    kryptos_run_block_cipher_tests(blowfish, KRYPTOS_BLOWFISH_BLOCKSIZE);
+CUTE_TEST_CASE_END
+
 // INFO(Rafael): End of the block cipher testing area.
 
 CUTE_TEST_CASE(kryptos_apply_iv_tests)
@@ -758,6 +762,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_seal_tests);
     CUTE_RUN_TEST(kryptos_des_tests);
     CUTE_RUN_TEST(kryptos_idea_tests);
+    CUTE_RUN_TEST(kryptos_blowfish_tests);
     //  -=-=-=-=- If you have just added a new cipher take a look in "kryptos_dsl_tests" case, there is some work to
     //                                               be done there too! -=-=-=-=-=-=-
 

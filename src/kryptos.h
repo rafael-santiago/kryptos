@@ -17,6 +17,13 @@
 #include <kryptos_seal.h>
 #include <kryptos_des.h>
 #include <kryptos_idea.h>
+#include <kryptos_blowfish.h>
+#include <kryptos_feal.h>
+#include <kryptos_camellia.h>
+#include <kryptos_cast5.h>
+#include <kryptos_rc2.h>
+#include <kryptos_saferk64.h>
+#include <kryptos_aes.h>
 
 // DONE(Rafael): Verify the iv block size based on the chosen block cipher.
 // DONE(Rafael): Add more ECB tests for DES.
@@ -68,6 +75,16 @@ epilogue:\
     kp = NULL;\
     kp_end = NULL;\
 }
+
+#define kryptos_custom_ld_user_key_epilogue(epilogue, state, w, b, kp, kp_end, stmt) {\
+epilogue:\
+    state[w] = state[w] << (b * sizeof(kryptos_u8_t));\
+    stmt;\
+    b = w = 0;\
+    kp = NULL;\
+    kp_end = NULL;\
+}
+
 
 #define kryptos_task_init_as_null(ktask) {\
     (ktask)->out = NULL;\
