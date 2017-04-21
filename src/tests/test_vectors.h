@@ -127,8 +127,6 @@ static kryptos_u8_t *cbc_test_data[] = {
     kryptos_task_ctx *ktask = &t;\
     size_t cbc_test_data_nr = sizeof(cbc_test_data) / sizeof(cbc_test_data[0]);\
     size_t data_size = 0;\
-    kryptos_u8_t *key = "beetlejuice";\
-    size_t key_size = 11;\
     size_t test_vector_nr = sizeof(cipher_name ## _test_vector) / sizeof(cipher_name ## _test_vector[0]), tv;\
     kryptos_task_init_as_null(&t);\
     for (tv = 0; tv < test_vector_nr; tv++) {\
