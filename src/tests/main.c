@@ -715,6 +715,61 @@ CUTE_TEST_CASE(kryptos_blowfish_tests)
     kryptos_run_block_cipher_tests(blowfish, KRYPTOS_BLOWFISH_BLOCKSIZE);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_feal_tests)
+    // INFO(Rafael): To test a block cipher with a custom setup is a little bit tricky.
+    //               A custom setup means that the user needs to pass additional parameters besides the key and the key size.
+    //
+    //               1. In this case is necessary to create a struct array that gathers these additional parameters.
+    //
+    //               2. Initialize the array and evaluate the count of elements of this array.
+    //                  Each item cell inside this array belongs to a specific test iteration (0..n).
+    //                  The count of elements is our "n".
+    //
+    //               3. Declare a kryptos_task_ctx. Do not worry about initialize it.
+    //
+    //               4. Declare a counter (it will be used as the master index of the test loop).
+    //
+    //               5. Use the macro kryptos_run_block_cipher_tests_with_custom_setup().
+
+    // INFO(Rafael): 1.
+    struct feal_rounds_per_test {
+        int rounds;
+    };
+    // INFO(Rafael): 2.
+    struct feal_rounds_per_test feal_rounds[] = {
+        { 8 }, { 16 }, { 32 }
+    };
+    size_t feal_rounds_nr = sizeof(feal_rounds) / sizeof(feal_rounds[0]);
+    // INFO(Rafael): 3.
+    kryptos_task_ctx t;
+    // INFO(Rafael): 4.
+    size_t tv;
+    // INFO(Rafael): 5.
+    kryptos_run_block_cipher_tests_with_custom_setup(feal,
+                                                     KRYPTOS_FEAL_BLOCKSIZE,
+                                                     t,
+                                                     tv,
+                                                     feal_rounds, feal_rounds_nr,
+                                                     kryptos_feal_setup(&t,
+                                                                        feal_test_vector[tv % feal_rounds_nr].key,
+                                                                        feal_test_vector[tv % feal_rounds_nr].key_size,
+                                                                        kKryptosECB,
+                                                                        &feal_rounds[tv % feal_rounds_nr].rounds),
+                                                     kryptos_feal_setup(&t,
+                                                                        feal_test_vector[tv % feal_rounds_nr].key,
+                                                                        feal_test_vector[tv % feal_rounds_nr].key_size,
+                                                                        kKryptosCBC,
+                                                                        &feal_rounds[tv % feal_rounds_nr].rounds));
+    // INFO(Rafael): The last two parameters of kryptos_run_block_cipher_test_with_custom_setup()
+    //               are related with the exact cipher setup call that must be executed on the test step.
+    //               One is used on the ECB tests and another is used on the CBC tests.
+    //
+    //               The "feal_test_vector" is declared into "feal_test_vector.h". Yes, tricky but works!
+    //
+    //  Tip: Always use (tv % feal_rounds_nr) to index the test vector and your parameter structure.
+    //
+CUTE_TEST_CASE_END
+
 // INFO(Rafael): End of the block cipher testing area.
 
 CUTE_TEST_CASE(kryptos_apply_iv_tests)
@@ -763,6 +818,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_des_tests);
     CUTE_RUN_TEST(kryptos_idea_tests);
     CUTE_RUN_TEST(kryptos_blowfish_tests);
+    CUTE_RUN_TEST(kryptos_feal_tests);
     //  -=-=-=-=- If you have just added a new cipher take a look in "kryptos_dsl_tests" case, there is some work to
     //                                               be done there too! -=-=-=-=-=-=-
 

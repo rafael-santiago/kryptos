@@ -12,6 +12,7 @@
 #include "des_test_vector.h"
 #include "idea_test_vector.h"
 #include "blowfish_test_vector.h"
+#include "feal_test_vector.h"
 
 static kryptos_u8_t *cbc_test_data[] = {
     "PEACE, n.In international affairs, a period of cheating "
@@ -104,7 +105,54 @@ static kryptos_u8_t *cbc_test_data[] = {
     }\
     for (tv = 0; tv < cbc_test_data_nr; tv++) {\
         data_size = strlen(cbc_test_data[tv]);\
-        kryptos_des_setup(&t, key, blocksize, kKryptosCBC);\
+        kryptos_ ## cipher_name ## _setup(&t, key, 11, kKryptosCBC);\
+        t.in = cbc_test_data[tv];\
+        t.in_size = data_size;\
+        kryptos_task_set_encrypt_action(&t);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(t.out != NULL);\
+        t.in = t.out;\
+        t.in_size = t.out_size;\
+        kryptos_task_set_decrypt_action(&t);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size == data_size);\
+        CUTE_ASSERT(memcmp(t.out, cbc_test_data[tv], t.out_size) == 0);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+    }\
+}
+
+#define kryptos_run_block_cipher_tests_with_custom_setup(cipher_name, blocksize, t, tv, args, args_nr,\
+                                                         cipher_setup_ecb_stmt, cipher_setup_cbc_stmt) {\
+    kryptos_task_ctx *ktask = &t;\
+    size_t cbc_test_data_nr = sizeof(cbc_test_data) / sizeof(cbc_test_data[0]);\
+    size_t data_size = 0;\
+    kryptos_u8_t *key = "beetlejuice";\
+    size_t key_size = 11;\
+    size_t test_vector_nr = sizeof(cipher_name ## _test_vector) / sizeof(cipher_name ## _test_vector[0]), tv;\
+    kryptos_task_init_as_null(&t);\
+    for (tv = 0; tv < test_vector_nr; tv++) {\
+        cipher_setup_ecb_stmt;\
+        t.in = cipher_name ## _test_vector[tv].plain;\
+        t.in_size = cipher_name ## _test_vector[tv].block_size;\
+        kryptos_task_set_encrypt_action(&t);\
+        kryptos_ ## cipher_name  ## _cipher(&ktask);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size == (t.in_size << 1));\
+        /*printf("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n", *(t.out), *(t.out+1), *(t.out+2), *(t.out+3), *(t.out+4), *(t.out+5), *(t.out+6), *(t.out+7));*/\
+        CUTE_ASSERT(memcmp(t.out, cipher_name ## _test_vector[tv].cipher, cipher_name ## _test_vector[tv].block_size) == 0);\
+        t.in = t.out;\
+        t.in_size = t.out_size;\
+        kryptos_task_set_decrypt_action(&t);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size == cipher_name ## _test_vector[tv].block_size);\
+        CUTE_ASSERT(memcmp(t.out, cipher_name ## _test_vector[tv].decrypted, cipher_name ## _test_vector[tv].block_size) == 0);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+    }\
+    for (tv = 0; tv < cbc_test_data_nr; tv++) {\
+        data_size = strlen(cbc_test_data[tv]);\
+        cipher_setup_cbc_stmt;\
         t.in = cbc_test_data[tv];\
         t.in_size = data_size;\
         kryptos_task_set_encrypt_action(&t);\
