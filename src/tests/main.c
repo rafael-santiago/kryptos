@@ -770,6 +770,34 @@ CUTE_TEST_CASE(kryptos_feal_tests)
     //
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_rc2_tests)
+    struct rc2_T1 {
+        int T1;
+    };
+    struct rc2_T1 rc2_key_bits[] = {
+        { 63 }, { 64 }, { 64 }, { 64 }, { 64 }, { 64 }, { 128 }, { 129 }
+    };
+    size_t rc2_key_bits_nr = sizeof(rc2_key_bits) / sizeof(rc2_key_bits[0]);
+    kryptos_task_ctx t;
+    size_t tv;
+    kryptos_run_block_cipher_tests_with_custom_setup(rc2,
+                                                     KRYPTOS_RC2_BLOCKSIZE,
+                                                     t,
+                                                     tv,
+                                                     rc2_key_bits, rc2_key_bits_nr,
+                                                     kryptos_feal_setup(&t,
+                                                                        rc2_test_vector[tv % rc2_key_bits_nr].key,
+                                                                        rc2_test_vector[tv % rc2_key_bits_nr].key_size,
+                                                                        kKryptosECB,
+                                                                        &rc2_key_bits[tv % rc2_key_bits_nr].T1),
+                                                     kryptos_feal_setup(&t,
+                                                                        rc2_test_vector[tv % rc2_key_bits_nr].key,
+                                                                        rc2_test_vector[tv % rc2_key_bits_nr].key_size,
+                                                                        kKryptosCBC,
+                                                                        &rc2_key_bits[tv % rc2_key_bits_nr].T1));
+
+CUTE_TEST_CASE_END
+
 // INFO(Rafael): End of the block cipher testing area.
 
 CUTE_TEST_CASE(kryptos_apply_iv_tests)
@@ -819,6 +847,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_idea_tests);
     CUTE_RUN_TEST(kryptos_blowfish_tests);
     CUTE_RUN_TEST(kryptos_feal_tests);
+    CUTE_RUN_TEST(kryptos_rc2_tests);
+
     //  -=-=-=-=- If you have just added a new cipher take a look in "kryptos_dsl_tests" case, there is some work to
     //                                               be done there too! -=-=-=-=-=-=-
 

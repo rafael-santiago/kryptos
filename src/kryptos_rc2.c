@@ -14,7 +14,7 @@
 #include <kryptos.h>
 #include <string.h>
 
-#define kryptos_rc2_get_byte(x, b)  (kryptos_u16_t) ( ( (x)  >> (8 - (b << 3)) ) & 0xff )
+#define kryptos_rc2_get_byte(x, b) (kryptos_u16_t) ( ( (x)  >> (8 - (b << 3)) ) & 0xff )
 
 #define kryptos_rc2_rol(x, s) (kryptos_u16_t) ( (x) << (s) | (x) >> (sizeof(x) << 3) - (s) )
 
@@ -28,7 +28,7 @@
 #define kryptos_rc2_mashr(r, i, k) ( (r)[(i)] = (r)[(i)] + (k)[(r)[((i) + 3) % 4] & 63] )
 
 #define kryptos_rc2_mixinground(r, k, j) ( kryptos_rc2_mixupr(r, 0, k, j),\
-                                           kryptos_rc2_mixupr(r,1,k,j),\
+                                           kryptos_rc2_mixupr(r, 1, k, j),\
                                            kryptos_rc2_mixupr(r, 2, k, j),\
                                            kryptos_rc2_mixupr(r, 3, k, j) )
 
@@ -282,7 +282,8 @@ static void kryptos_rc2_ld_user_key(kryptos_u16_t key[64], const kryptos_u8_t *u
 }
 
 static void kryptos_rc2_inflate_key(const kryptos_u8_t *key, const size_t key_size, struct kryptos_rc2_subkeys *sks) {
-    size_t i, j, TM, Tn;
+    ssize_t i;
+    size_t j, TM, Tn;
     kryptos_u16_t K[64];
     kryptos_u8_t L[128];
     size_t T = key_size;
@@ -300,7 +301,6 @@ static void kryptos_rc2_inflate_key(const kryptos_u8_t *key, const size_t key_si
     // INFO(Rafael): Evaluating TM.
 
     Tn = (sks->T1 + 7) / 8;
-    //TM = fmod(255, pow(2, (8 + sks->T1) - (8 * Tn))); // TODO(Rafael): Even being done once it could be improved.
     TM = 255 % kryptos_pw2((8 + sks->T1) - (Tn << 3));
 
     // INFO(Rafael): start of the expansion.
