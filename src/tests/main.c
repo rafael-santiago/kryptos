@@ -805,7 +805,12 @@ CUTE_TEST_CASE(kryptos_camellia_tests)
     };
     struct camellia_key_size key_size[] = {
         { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 },
-        { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 }
+        { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 },
+        { kKryptosCAMELLIA192 }, { kKryptosCAMELLIA192 }, { kKryptosCAMELLIA192 }, { kKryptosCAMELLIA192 },
+        { kKryptosCAMELLIA192 }, { kKryptosCAMELLIA192 }, { kKryptosCAMELLIA192 }, { kKryptosCAMELLIA192 },
+        { kKryptosCAMELLIA192 }, { kKryptosCAMELLIA256 }, { kKryptosCAMELLIA256 }, { kKryptosCAMELLIA256 },
+        { kKryptosCAMELLIA256 }, { kKryptosCAMELLIA256 }, { kKryptosCAMELLIA256 }, { kKryptosCAMELLIA256 },
+        { kKryptosCAMELLIA256 }, { kKryptosCAMELLIA256 }
     };
     size_t key_size_nr = sizeof(key_size) / sizeof(key_size[0]);
     kryptos_task_ctx t;
