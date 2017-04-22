@@ -76,6 +76,5 @@ kryptos_get_random_byte_epilogue:
 #elif  defined(KRYPTOS_KERNEL_MODE)
     // TODO(Rafael): Use get_random_bytes(). [Do not read from /dev/urandom or /dev/random it would be nasty!!!]
 #endif
-
     return b;
 }

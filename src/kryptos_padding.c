@@ -14,8 +14,8 @@
 
 kryptos_u8_t *kryptos_ansi_x923_padding(const kryptos_u8_t *buffer, size_t *buffer_size,
                                         const size_t block_size_in_bytes, const int randomize) {
-    kryptos_u8_t *bpad = NULL;
-    size_t padded_size = 0, p, p_nr;
+    kryptos_u8_t *bpad = NULL, byte;
+    size_t padded_size = 0, p;
 
     if (buffer_size == NULL || block_size_in_bytes == 0 || *buffer_size == 0) {
         return (kryptos_u8_t *)buffer;
@@ -40,9 +40,9 @@ kryptos_u8_t *kryptos_ansi_x923_padding(const kryptos_u8_t *buffer, size_t *buff
     if (randomize == 0) {
         memset(bpad + (*buffer_size) + 1, 0, padded_size - *buffer_size - 1);
     } else {
-        p_nr = padded_size - *buffer_size - 1;
-        for (p = (*buffer_size) + 1; p < p_nr; p++) {
-            bpad[p] = kryptos_get_random_byte();
+        for (p = (*buffer_size); p < padded_size; p++) {
+            byte = kryptos_get_random_byte();
+            bpad[p] = byte;
         }
     }
     bpad[padded_size - 1] = (kryptos_u8_t)(padded_size - *buffer_size); // INFO(Rafael): duh!

@@ -53,6 +53,7 @@ CUTE_TEST_CASE(kryptos_padding_tests)
         CUTE_ASSERT(memcmp(pad, tests[t].pad, buffer_size) == 0);
 
         kryptos_freeseg(pad);
+        pad = NULL;
 
         buffer_size = tests[t].buffer_size;
         pad = kryptos_ansi_x923_padding(tests[t].buffer,
