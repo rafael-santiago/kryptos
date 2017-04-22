@@ -799,6 +799,36 @@ CUTE_TEST_CASE(kryptos_rc2_tests)
 
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_camellia_tests)
+    struct camellia_key_size {
+        kryptos_camellia_keysize_t size;
+    };
+    struct camellia_key_size key_size[] = {
+        { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 },
+        { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 }
+    };
+    size_t key_size_nr = sizeof(key_size) / sizeof(key_size[0]);
+    kryptos_task_ctx t;
+    size_t tv;
+    kryptos_run_block_cipher_tests_with_custom_setup(camellia,
+                                                     KRYPTOS_CAMELLIA_BLOCKSIZE,
+                                                     t,
+                                                     tv,
+                                                     key_size, key_size_nr,
+                                                     kryptos_camellia_setup(&t,
+                                                                       camellia_test_vector[tv % key_size_nr].key,
+                                                                       camellia_test_vector[tv % key_size_nr].key_size,
+                                                                       kKryptosECB,
+                                                                       &key_size[tv % key_size_nr].size),
+                                                     kryptos_camellia_setup(&t,
+                                                                       camellia_test_vector[tv % key_size_nr].key,
+                                                                       camellia_test_vector[tv % key_size_nr].key_size,
+                                                                       kKryptosCBC,
+                                                                       &key_size[tv % key_size_nr].size));
+
+CUTE_TEST_CASE_END
+
+
 // INFO(Rafael): End of the block cipher testing area.
 
 CUTE_TEST_CASE(kryptos_apply_iv_tests)
@@ -849,6 +879,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_blowfish_tests);
     CUTE_RUN_TEST(kryptos_feal_tests);
     CUTE_RUN_TEST(kryptos_rc2_tests);
+    CUTE_RUN_TEST(kryptos_camellia_tests);
 
     //  -=-=-=-=- If you have just added a new cipher take a look in "kryptos_dsl_tests" case, there is some work to
     //                                               be done there too! -=-=-=-=-=-=-
