@@ -70,7 +70,7 @@
 
 #define kryptos_ld_user_key_epilogue(epilogue, state, w, b, kp, kp_end) {\
 epilogue:\
-    state[w] = state[w] << (b * 8);\
+    state[w] = state[w] << (b << 3);\
     b = w = 0;\
     kp = NULL;\
     kp_end = NULL;\
@@ -78,7 +78,7 @@ epilogue:\
 
 #define kryptos_custom_ld_user_key_epilogue(epilogue, state, w, b, kp, kp_end, stmt) {\
 epilogue:\
-    state[w] = state[w] << (b * 8);\
+    state[w] = state[w] << (b << 3);\
     stmt;\
     b = w = 0;\
     kp = NULL;\

@@ -785,16 +785,16 @@ CUTE_TEST_CASE(kryptos_rc2_tests)
                                                      t,
                                                      tv,
                                                      rc2_key_bits, rc2_key_bits_nr,
-                                                     kryptos_feal_setup(&t,
-                                                                        rc2_test_vector[tv % rc2_key_bits_nr].key,
-                                                                        rc2_test_vector[tv % rc2_key_bits_nr].key_size,
-                                                                        kKryptosECB,
-                                                                        &rc2_key_bits[tv % rc2_key_bits_nr].T1),
-                                                     kryptos_feal_setup(&t,
-                                                                        rc2_test_vector[tv % rc2_key_bits_nr].key,
-                                                                        rc2_test_vector[tv % rc2_key_bits_nr].key_size,
-                                                                        kKryptosCBC,
-                                                                        &rc2_key_bits[tv % rc2_key_bits_nr].T1));
+                                                     kryptos_rc2_setup(&t,
+                                                                       rc2_test_vector[tv % rc2_key_bits_nr].key,
+                                                                       rc2_test_vector[tv % rc2_key_bits_nr].key_size,
+                                                                       kKryptosECB,
+                                                                       &rc2_key_bits[tv % rc2_key_bits_nr].T1),
+                                                     kryptos_rc2_setup(&t,
+                                                                       rc2_test_vector[tv % rc2_key_bits_nr].key,
+                                                                       rc2_test_vector[tv % rc2_key_bits_nr].key_size,
+                                                                       kKryptosCBC,
+                                                                       &rc2_key_bits[tv % rc2_key_bits_nr].T1));
 
 CUTE_TEST_CASE_END
 
