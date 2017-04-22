@@ -40,7 +40,7 @@ kryptos_u8_t *kryptos_ansi_x923_padding(const kryptos_u8_t *buffer, size_t *buff
     if (randomize == 0) {
         memset(bpad + (*buffer_size) + 1, 0, padded_size - *buffer_size - 1);
     } else {
-        for (p = (*buffer_size); p < padded_size; p++) {
+        for (p = (*buffer_size); p < padded_size - 1; p++) {
             byte = kryptos_get_random_byte();
             bpad[p] = byte;
         }
