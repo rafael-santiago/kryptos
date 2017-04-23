@@ -15,6 +15,7 @@
 #include "feal_test_vector.h"
 #include "rc2_test_vector.h"
 #include "camellia_test_vector.h"
+#include "cast5_test_vector.h"
 
 static kryptos_u8_t *cbc_test_data[] = {
     "PEACE, n.In international affairs, a period of cheating "
