@@ -899,14 +899,14 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
 
-    kryptos_run_cipher(feal, &task, "rc2", 3, kKryptosCBC, &feal_rounds);
+    kryptos_run_cipher(rc2, &task, "rc2", 3, kKryptosCBC, &rc2_t1);
 
     CUTE_ASSERT(task.out != NULL);
 
     kryptos_task_set_in(&task, task.out, task.out_size);
     kryptos_task_set_decrypt_action(&task);
 
-    kryptos_run_cipher(feal, &task, "rc2", 3, kKryptosCBC, &feal_rounds);
+    kryptos_run_cipher(rc2, &task, "rc2", 3, kKryptosCBC, &rc2_t1);
 
     CUTE_ASSERT(task.out_size == data_size);
     CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
