@@ -865,6 +865,9 @@ CUTE_TEST_CASE(kryptos_saferk64_tests)
 
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_aes_tests)
+    kryptos_run_block_cipher_tests(aes, KRYPTOS_AES_BLOCKSIZE);
+CUTE_TEST_CASE_END
 
 // INFO(Rafael): End of the block cipher testing area.
 
@@ -919,6 +922,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_camellia_tests);
     CUTE_RUN_TEST(kryptos_cast5_tests);
     CUTE_RUN_TEST(kryptos_saferk64_tests);
+    CUTE_RUN_TEST(kryptos_aes_tests);
 
     //  -=-=-=-=- If you have just added a new cipher take a look in "kryptos_dsl_tests" case, there is some work to
     //                                               be done there too! -=-=-=-=-=-=-

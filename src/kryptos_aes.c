@@ -173,13 +173,11 @@ static void kryptos_aes_sto_u32_into_byte_matrix(const kryptos_u32_t word[4], st
 }
 
 static kryptos_u8_t kryptos_aes_subbytes(const kryptos_u32_t value, const size_t byte, const kryptos_u8_t sbox[16][16]) {
-    kryptos_u8_t r, c;
+    kryptos_u8_t b;
     kryptos_u8_t eval;
-    r = c = kryptos_aes_get_u8_from_u32(value, byte);
-    r = r >> 4;
-    c = c & 0xff;
-    eval = sbox[r][c];
-    r = c = 0;
+    b = kryptos_aes_get_u8_from_u32(value, byte);
+    eval = sbox[b >> 4][b & 0x0f];
+    b = 0;
     return eval;
 }
 
@@ -214,6 +212,7 @@ static void kryptos_aes_eval_skeys(const kryptos_u8_t *key, const size_t key_siz
 
     // INFO(Rafael): Storing the 128-bits of the user key.
     kryptos_aes_sto_u32_into_byte_matrix(wkey, &sks->round[0]);
+
     for (curr = 0, next = 1; curr < 10; curr++, next++) {
         // INFO(Rafael): Handling the last matrix column
         wkey[0] = 0;
@@ -373,20 +372,20 @@ static void kryptos_aes_block_encrypt(kryptos_u8_t *block, struct kryptos_aes_su
     kryptos_u32_t wblock[4];
 
     state.data[0][0] = *block;
-    state.data[0][1] = *(block +  1);
-    state.data[0][2] = *(block +  2);
-    state.data[0][3] = *(block +  3);
-    state.data[1][0] = *(block +  4);
+    state.data[1][0] = *(block +  1);
+    state.data[2][0] = *(block +  2);
+    state.data[3][0] = *(block +  3);
+    state.data[0][1] = *(block +  4);
     state.data[1][1] = *(block +  5);
-    state.data[1][2] = *(block +  6);
-    state.data[1][3] = *(block +  7);
-    state.data[2][0] = *(block +  8);
-    state.data[2][1] = *(block +  9);
+    state.data[2][1] = *(block +  6);
+    state.data[3][1] = *(block +  7);
+    state.data[0][2] = *(block +  8);
+    state.data[1][2] = *(block +  9);
     state.data[2][2] = *(block + 10);
-    state.data[2][3] = *(block + 11);
-    state.data[3][0] = *(block + 12);
-    state.data[3][1] = *(block + 13);
-    state.data[3][2] = *(block + 14);
+    state.data[3][2] = *(block + 11);
+    state.data[0][3] = *(block + 12);
+    state.data[1][3] = *(block + 13);
+    state.data[2][3] = *(block + 14);
     state.data[3][3] = *(block + 15);
 
     // INFO(Rafael): AddRoundKey.
@@ -454,20 +453,20 @@ static void kryptos_aes_block_encrypt(kryptos_u8_t *block, struct kryptos_aes_su
     }
 
            *block = state.data[0][0];
-    *(block +  1) = state.data[0][1];
-    *(block +  2) = state.data[0][2];
-    *(block +  3) = state.data[0][3];
-    *(block +  4) = state.data[1][0];
+    *(block +  1) = state.data[1][0];
+    *(block +  2) = state.data[2][0];
+    *(block +  3) = state.data[3][0];
+    *(block +  4) = state.data[0][1];
     *(block +  5) = state.data[1][1];
-    *(block +  6) = state.data[1][2];
-    *(block +  7) = state.data[1][3];
-    *(block +  8) = state.data[2][0];
-    *(block +  9) = state.data[2][1];
+    *(block +  6) = state.data[2][1];
+    *(block +  7) = state.data[3][1];
+    *(block +  8) = state.data[0][2];
+    *(block +  9) = state.data[1][2];
     *(block + 10) = state.data[2][2];
-    *(block + 11) = state.data[2][3];
-    *(block + 12) = state.data[3][0];
-    *(block + 13) = state.data[3][1];
-    *(block + 14) = state.data[3][2];
+    *(block + 11) = state.data[3][2];
+    *(block + 12) = state.data[0][3];
+    *(block + 13) = state.data[1][3];
+    *(block + 14) = state.data[2][3];
     *(block + 15) = state.data[3][3];
 
     memset(state.data, 0, sizeof(state.data));
@@ -482,20 +481,20 @@ static void kryptos_aes_block_decrypt(kryptos_u8_t *block, struct kryptos_aes_su
     kryptos_u32_t wblock[4];
 
     state.data[0][0] = *block;
-    state.data[0][1] = *(block +  1);
-    state.data[0][2] = *(block +  2);
-    state.data[0][3] = *(block +  3);
-    state.data[1][0] = *(block +  4);
+    state.data[1][0] = *(block +  1);
+    state.data[2][0] = *(block +  2);
+    state.data[3][0] = *(block +  3);
+    state.data[0][1] = *(block +  4);
     state.data[1][1] = *(block +  5);
-    state.data[1][2] = *(block +  6);
-    state.data[1][3] = *(block +  7);
-    state.data[2][0] = *(block +  8);
-    state.data[2][1] = *(block +  9);
+    state.data[2][1] = *(block +  6);
+    state.data[3][1] = *(block +  7);
+    state.data[0][2] = *(block +  8);
+    state.data[1][2] = *(block +  9);
     state.data[2][2] = *(block + 10);
-    state.data[2][3] = *(block + 11);
-    state.data[3][0] = *(block + 12);
-    state.data[3][1] = *(block + 13);
-    state.data[3][2] = *(block + 14);
+    state.data[3][2] = *(block + 11);
+    state.data[0][3] = *(block + 12);
+    state.data[1][3] = *(block + 13);
+    state.data[2][3] = *(block + 14);
     state.data[3][3] = *(block + 15);
 
     for (r = 10; r > 0; r--) {
@@ -569,20 +568,20 @@ static void kryptos_aes_block_decrypt(kryptos_u8_t *block, struct kryptos_aes_su
     }
 
            *block = state.data[0][0];
-    *(block +  1) = state.data[0][1];
-    *(block +  2) = state.data[0][2];
-    *(block +  3) = state.data[0][3];
-    *(block +  4) = state.data[1][0];
+    *(block +  1) = state.data[1][0];
+    *(block +  2) = state.data[2][0];
+    *(block +  3) = state.data[3][0];
+    *(block +  4) = state.data[0][1];
     *(block +  5) = state.data[1][1];
-    *(block +  6) = state.data[1][2];
-    *(block +  7) = state.data[1][3];
-    *(block +  8) = state.data[2][0];
-    *(block +  9) = state.data[2][1];
+    *(block +  6) = state.data[2][1];
+    *(block +  7) = state.data[3][1];
+    *(block +  8) = state.data[0][2];
+    *(block +  9) = state.data[1][2];
     *(block + 10) = state.data[2][2];
-    *(block + 11) = state.data[2][3];
-    *(block + 12) = state.data[3][0];
-    *(block + 13) = state.data[3][1];
-    *(block + 14) = state.data[3][2];
+    *(block + 11) = state.data[3][2];
+    *(block + 12) = state.data[0][3];
+    *(block + 13) = state.data[1][3];
+    *(block + 14) = state.data[2][3];
     *(block + 15) = state.data[3][3];
 
     memset(state.data, 0, sizeof(state.data));
