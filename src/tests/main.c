@@ -821,21 +821,50 @@ CUTE_TEST_CASE(kryptos_camellia_tests)
                                                      tv,
                                                      key_size, key_size_nr,
                                                      kryptos_camellia_setup(&t,
-                                                                       camellia_test_vector[tv % key_size_nr].key,
-                                                                       camellia_test_vector[tv % key_size_nr].key_size,
-                                                                       kKryptosECB,
-                                                                       &key_size[tv % key_size_nr].size),
+                                                                            camellia_test_vector[tv % key_size_nr].key,
+                                                                            camellia_test_vector[tv % key_size_nr].key_size,
+                                                                            kKryptosECB,
+                                                                            &key_size[tv % key_size_nr].size),
                                                      kryptos_camellia_setup(&t,
-                                                                       camellia_test_vector[tv % key_size_nr].key,
-                                                                       camellia_test_vector[tv % key_size_nr].key_size,
-                                                                       kKryptosCBC,
-                                                                       &key_size[tv % key_size_nr].size));
+                                                                            camellia_test_vector[tv % key_size_nr].key,
+                                                                            camellia_test_vector[tv % key_size_nr].key_size,
+                                                                            kKryptosCBC,
+                                                                            &key_size[tv % key_size_nr].size));
 
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_cast5_tests)
     kryptos_run_block_cipher_tests(cast5, KRYPTOS_CAST5_BLOCKSIZE);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_saferk64_tests)
+    struct saferk64_rounds {
+        int n;
+    };
+    struct saferk64_rounds rounds[] = {
+        { 6 }, { 6 }, { 6 }, { 6 }
+    };
+    size_t rounds_nr = sizeof(rounds) / sizeof(rounds[0]);
+    kryptos_task_ctx t;
+    size_t tv;
+    kryptos_run_block_cipher_tests_with_custom_setup(saferk64,
+                                                     KRYPTOS_SAFERK64_BLOCKSIZE,
+                                                     t,
+                                                     tv,
+                                                     rounds, rounds_nr,
+                                                     kryptos_saferk64_setup(&t,
+                                                                            saferk64_test_vector[tv % rounds_nr].key,
+                                                                            saferk64_test_vector[tv % rounds_nr].key_size,
+                                                                            kKryptosECB,
+                                                                            &rounds[tv % rounds_nr].n),
+                                                     kryptos_saferk64_setup(&t,
+                                                                            saferk64_test_vector[tv % rounds_nr].key,
+                                                                            saferk64_test_vector[tv % rounds_nr].key_size,
+                                                                            kKryptosCBC,
+                                                                            &rounds[tv % rounds_nr].n));
+
+CUTE_TEST_CASE_END
+
 
 // INFO(Rafael): End of the block cipher testing area.
 
@@ -889,6 +918,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_rc2_tests);
     CUTE_RUN_TEST(kryptos_camellia_tests);
     CUTE_RUN_TEST(kryptos_cast5_tests);
+    CUTE_RUN_TEST(kryptos_saferk64_tests);
 
     //  -=-=-=-=- If you have just added a new cipher take a look in "kryptos_dsl_tests" case, there is some work to
     //                                               be done there too! -=-=-=-=-=-=-
