@@ -54,6 +54,7 @@ typedef enum {
     kKryptosCipherCAMELLIA,
     kKryptosCipherSAFERK64,
     kKryptosCipherBLOWFISH,
+    kKryptosCipherSERPENT,
     kKryptosCipherNr
 }kryptos_cipher_t;
 
