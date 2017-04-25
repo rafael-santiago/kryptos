@@ -18,6 +18,7 @@
 #include "cast5_test_vector.h"
 #include "saferk64_test_vector.h"
 #include "aes_test_vector.h"
+#include "serpent_test_vector.h"
 
 static kryptos_u8_t *cbc_test_data[] = {
     "PEACE, n.In international affairs, a period of cheating "

@@ -15,6 +15,7 @@
 #include <kryptos_rc2.h>
 #include <kryptos_saferk64.h>
 #include <kryptos_aes.h>
+#include <kryptos_serpent.h>
 
 static int kryptos_task_check_cbc_params(kryptos_task_ctx **ktask);
 
@@ -113,6 +114,10 @@ static int kryptos_task_check_cbc_params(kryptos_task_ctx **ktask) {
 
         case kKryptosCipherAES:
             return ((*ktask)->iv_size == KRYPTOS_AES_BLOCKSIZE);
+            break;
+
+        case kKryptosCipherSERPENT:
+            return ((*ktask)->iv_size == KRYPTOS_SERPENT_BLOCKSIZE);
             break;
     }
 

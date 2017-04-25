@@ -24,6 +24,7 @@
 #include <kryptos_rc2.h>
 #include <kryptos_saferk64.h>
 #include <kryptos_aes.h>
+#include <kryptos_serpent.h>
 
 // DONE(Rafael): Verify the iv block size based on the chosen block cipher.
 // DONE(Rafael): Add more ECB tests for DES.

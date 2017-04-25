@@ -447,7 +447,8 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
                          "activity is not confined to any special field of throught or action, but "
                          "'pervades and regulates the whole'. He has the last word in everything; his "
                          "decision is unappealable. He sets the fashions of opinion and taste, dictates "
-                         "the limitations of speech and circumscribes conduct with a dead-line.";
+                         "the limitations of speech and circumscribes conduct with a dead-line."; 
+                         //... Everyone can point at least one.
     size_t data_size = strlen(data);
     kryptos_seal_version_t seal_version;
     size_t seal_n, seal_l;
@@ -1275,6 +1276,10 @@ CUTE_TEST_CASE(kryptos_aes_tests)
     kryptos_run_block_cipher_tests(aes, KRYPTOS_AES_BLOCKSIZE);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_serpent_tests)
+    kryptos_run_block_cipher_tests(serpent, KRYPTOS_SERPENT_BLOCKSIZE);
+CUTE_TEST_CASE_END
+
 // INFO(Rafael): End of the block cipher testing area.
 
 CUTE_TEST_CASE(kryptos_apply_iv_tests)
@@ -1329,6 +1334,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_cast5_tests);
     CUTE_RUN_TEST(kryptos_saferk64_tests);
     CUTE_RUN_TEST(kryptos_aes_tests);
+    CUTE_RUN_TEST(kryptos_serpent_tests);
 
     //  -=-=-=-=- If you have just added a new cipher take a look in "kryptos_dsl_tests" case, there is some work to
     //                                               be done there too! -=-=-=-=-=-=-
