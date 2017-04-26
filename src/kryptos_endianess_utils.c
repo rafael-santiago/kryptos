@@ -8,6 +8,8 @@
 #include <kryptos_endianess_utils.h>
 #include <string.h>
 
+#define kryptos_u32_rev(w) ( ((w) << 24) | (((w) & 0x0000ff00) << 8) | (((w) & 0x00ff0000) >> 8) | ((w) >> 24) )
+
 int kryptos_little_endian_cpu(void) {
     static int kryptos_little_endian = -1;
     static kryptos_u8_t *kryptos_test_seg = "\x01\x00\x00\x00";
@@ -36,6 +38,10 @@ kryptos_u32_t kryptos_get_u32_as_big_endian(const kryptos_u8_t *data, const size
     return value;
 }
 
+kryptos_u32_t kryptos_get_u32_as_little_endian(const kryptos_u8_t *data, const size_t data_size) {
+    return kryptos_u32_rev(kryptos_get_u32_as_big_endian(data, data_size));
+}
+
 kryptos_u8_t *kryptos_cpy_u32_as_big_endian(kryptos_u8_t *dest, const size_t dest_size, const kryptos_u32_t value) {
     if ((dest + sizeof(kryptos_u32_t)) > dest + dest_size) {
         return NULL;
@@ -51,6 +57,10 @@ kryptos_u8_t *kryptos_cpy_u32_as_big_endian(kryptos_u8_t *dest, const size_t des
     }
 
     return dest;
+}
+
+kryptos_u8_t *kryptos_cpy_u32_as_little_endian(kryptos_u8_t *dest, const size_t dest_size, const kryptos_u32_t value) {
+    return kryptos_cpy_u32_as_big_endian(dest, dest_size, kryptos_u32_rev(value));
 }
 
 kryptos_u16_t kryptos_get_u16_as_big_endian(const kryptos_u8_t *data, const size_t data_size) {
@@ -84,3 +94,4 @@ kryptos_u8_t *kryptos_cpy_u16_as_big_endian(kryptos_u8_t *dest, const size_t des
 
     return dest;
 }
+
