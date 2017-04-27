@@ -26,10 +26,6 @@
 #include <kryptos_aes.h>
 #include <kryptos_serpent.h>
 
-// DONE(Rafael): Verify the iv block size based on the chosen block cipher.
-// DONE(Rafael): Add more ECB tests for DES.
-// DONE(Rafael): Test the CBC mode on DES.
-
 #define kryptos_task_set_ecb_mode(ktask) ( (ktask)->mode = kKryptosECB )
 
 #define kryptos_task_set_cbc_mode(ktask) ( (ktask)->mode = kKryptosCBC )
@@ -45,6 +41,10 @@
 #define kryptos_task_get_out(ktask) ( (ktask)->out )
 
 #define kryptos_task_get_out_size(ktask) ( (ktask)->out_size )
+
+#define kryptos_task_set_encode_action(ktask) ( (ktask)->action = kKryptosEncode )
+
+#define kryptos_task_set_decode_action(ktask) ( (ktask)->action = kKryptosDecode )
 
 #define KRYPTOS_TASK_FREEALL (KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_KEY | KRYPTOS_TASK_IV)
 
@@ -86,7 +86,6 @@ epilogue:\
     kp_end = NULL;\
 }
 
-
 #define kryptos_task_init_as_null(ktask) {\
     (ktask)->out = NULL;\
     (ktask)->out_size = 0;\
@@ -97,6 +96,7 @@ epilogue:\
     (ktask)->iv = NULL;\
     (ktask)->iv_size = 0;\
     (ktask)->cipher = kKryptosCipherNr;\
+    (ktask)->encoder = kKryptosEncodingNr;\
     (ktask)->action = kKryptosActionNr;\
     (ktask)->mode = kKryptosCipherModeNr;\
     (ktask)->result = kKryptosTaskResultNr;\

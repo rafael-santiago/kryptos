@@ -14,6 +14,7 @@
 #include <kryptos_endianess_utils.h>
 #include <kryptos.h>
 #include <kryptos_iv_utils.h>
+#include <kryptos_base64.h>
 #include "test_vectors.h"
 #include <stdlib.h>
 #include <string.h>
@@ -1345,6 +1346,48 @@ CUTE_TEST_CASE(kryptos_iv_data_flush_tests)
     kryptos_freeseg(iv);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_base64_tests)
+    kryptos_task_ctx t, *ktask = &t;
+
+    struct base64_test {
+        kryptos_u8_t *in;
+        size_t in_size;
+        kryptos_u8_t *out;
+        size_t out_size;
+    };
+
+    struct base64_test test_vector[] = {
+        {      "f", 1,     "Zg==", 4 },
+        {     "fo", 2,     "Zm8=", 4 },
+        {    "foo", 3,     "Zm9v", 4 },
+        {   "foob", 4, "Zm9vYg==", 8 },
+        {  "fooba", 5, "Zm9vYmE=", 8 },
+        { "foobar", 6, "Zm9vYmFy", 8 }
+    }; // INFO(Rafael): Test data from RFC-4648.
+
+    size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        t.in = test_vector[tv].in;
+        t.in_size = test_vector[tv].in_size;
+        t.encoder = kKryptosEncodingBASE64;
+        kryptos_task_set_encode_action(ktask);
+        kryptos_base64_processor(&ktask);
+        CUTE_ASSERT(t.out != NULL);
+        CUTE_ASSERT(t.out_size == test_vector[tv].out_size);
+        CUTE_ASSERT(memcmp(t.out, test_vector[tv].out, t.out_size) == 0);
+
+        t.in = t.out;
+        t.in_size = t.out_size;
+        kryptos_task_set_decode_action(ktask);
+        kryptos_base64_processor(&ktask);
+        CUTE_ASSERT(t.out != NULL);
+        CUTE_ASSERT(t.out_size == test_vector[tv].in_size);
+        CUTE_ASSERT(memcmp(t.out, test_vector[tv].in, t.out_size) == 0);
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+    }
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_test_monkey)
     // CLUE(Rafael): Before adding a new test try to find out the best place that it fits.
     //               At first glance you should consider the utility that it implements into the library.
@@ -1377,6 +1420,11 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     // INFO(Rafael): Internal DSL stuff.
     CUTE_RUN_TEST(kryptos_dsl_tests);
+
+
+    // INFO(Rafael): Encoding stuff.
+    CUTE_RUN_TEST(kryptos_base64_tests);
+
 CUTE_TEST_CASE_END
 
 CUTE_MAIN(kryptos_test_monkey);

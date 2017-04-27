@@ -59,8 +59,16 @@ typedef enum {
 }kryptos_cipher_t;
 
 typedef enum {
+    kKryptosEncodingBASE64,
+    kKryptosEncodingUUENCODE,
+    kKryptosEncodingNr
+}kryptos_encoding_t;
+
+typedef enum {
     kKryptosEncrypt = 0,
     kKryptosDecrypt,
+    kKryptosEncode,
+    kKryptosDecode,
     kKryptosActionNr
 }kryptos_action_t;
 
@@ -79,6 +87,8 @@ typedef struct kryptos_task {
     kryptos_action_t action;
     kryptos_cipher_t cipher;
     kryptos_cipher_mode_t mode;
+
+    kryptos_encoding_t encoder;
 
     kryptos_u8_t *key;
     size_t key_size;
@@ -202,6 +212,49 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
                                            in_size,\
                                            cipher_subkeys_struct_var, ktask);\
     cipher_block_processor = NULL;\
+}
+
+#define KRYPTOS_DECL_ENCODING_PROCESSOR(encoding_name, ktask)\
+void kryptos_ ## encoding_name ## _processor(kryptos_task_ctx **ktask);
+
+#define KRYPTOS_IMPL_ENCODING_PROCESSOR(encoding_name,\
+                                        kEncoding,\
+                                        ktask,\
+                                        buffer_processor_t,\
+                                        buffer_processor, buff_encoder, buff_decoder,\
+                                        buffer_processor_stmt) \
+void kryptos_ ## encoding_name ## _processor(kryptos_task_ctx **ktask) {\
+    buffer_processor_t buffer_processor;\
+    if ((*ktask)->encoder != kEncoding) {\
+        (*ktask)->result = kKryptosInvalidParams;\
+        (*ktask)->result_verbose = "Wrong encoder.";\
+        goto kryptos_ ## encoding_name ## _processor_epilogue;\
+    }\
+    if ((*ktask)->in == NULL || (*ktask)->in_size == 0) {\
+        (*ktask)->result = kKryptosInvalidParams;\
+        (*ktask)->result_verbose = "Null input buffer.";\
+        goto kryptos_ ## encoding_name ## _processor_epilogue;\
+    }\
+    if ((*ktask)->action != kKryptosEncode && (*ktask)->action != kKryptosDecode) {\
+        (*ktask)->result = kKryptosInvalidParams;\
+        (*ktask)->result_verbose = "Invalid action.";\
+        goto kryptos_ ## encoding_name ## _processor_epilogue;\
+    }\
+    if ((*ktask)->action == kKryptosEncode) {\
+        buffer_processor = buff_encoder;\
+    } else {\
+        buffer_processor = buff_decoder;\
+    }\
+    buffer_processor_stmt;\
+    if ((*ktask)->out == NULL) {\
+        (*ktask)->out_size = 0;\
+        (*ktask)->result = kKryptosProcessError;\
+        (*ktask)->result_verbose = "An error has occurred while processing.";\
+        goto kryptos_ ## encoding_name ## _processor_epilogue;\
+    }\
+    (*ktask)->result = kKryptosSuccess;\
+kryptos_ ## encoding_name ## _processor_epilogue:\
+    buffer_processor = NULL;\
 }
 
 #endif
