@@ -32,7 +32,21 @@ static kryptos_u8_t kryptos_base64_state_1 [] = {
       0,   0,   0,   0,   0,   0,
      26,  27,  28,  29,  30,  31,  32,  33,  34,  35,
      36,  37,  38,  39,  40,  41,  42,  43,  44,  45,
-     46,  47,  48,  49,  50,  51                      // INFO(Rafael): 'a'..'z'.
+     46,  47,  48,  49,  50,  51,                     // INFO(Rafael): 'a'..'z'.
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255
 };
 
 #define kryptos_base64_get_encoded_byte(b) ( (b) != '=' ? (b) : 0 )
@@ -56,6 +70,11 @@ static kryptos_u8_t *kryptos_base64_encode_buffer(const kryptos_u8_t *buffer, co
     kryptos_u8_t *out, *out_p;
     kryptos_u32_t block;
     size_t block_size, pad_size;
+
+    if (buffer == NULL || buffer_size == 0) {
+        *out_size = 0;
+        return NULL;
+    }
 
     bp = buffer;
     bp_end = bp + buffer_size;
@@ -113,6 +132,11 @@ static kryptos_u8_t *kryptos_base64_decode_buffer(const kryptos_u8_t *buffer, co
     kryptos_u32_t block;
     size_t block_size, pad_size = 0;
 
+    if (buffer == NULL || buffer_size == 0) {
+        *out_size = 0;
+        return NULL;
+    }
+
     bp_end = buffer + buffer_size;
     bp = bp_end - 1;
 
@@ -163,3 +187,5 @@ static kryptos_u8_t *kryptos_base64_decode_buffer(const kryptos_u8_t *buffer, co
 
     return out;
 }
+
+#undef kryptos_base64_get_encoded_byte

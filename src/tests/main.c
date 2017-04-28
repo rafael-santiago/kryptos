@@ -1367,10 +1367,53 @@ CUTE_TEST_CASE(kryptos_base64_tests)
 
     size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
 
+    // INFO(Rafael): NULL input (encode).
+
+    t.encoder = kKryptosEncodingBASE64;
+    t.in = NULL;
+    t.in_size = 0;
+    kryptos_task_set_encode_action(ktask);
+    kryptos_base64_processor(&ktask);
+
+    CUTE_ASSERT(t.out == NULL);
+    CUTE_ASSERT(t.out_size == 0);
+
+    // INFO(Rafael): Zeroed input (encode).
+
+    t.encoder = kKryptosEncodingBASE64;
+    t.in = "";
+    t.in_size = 0;
+    kryptos_task_set_encode_action(ktask);
+    kryptos_base64_processor(&ktask);
+
+    CUTE_ASSERT(t.out == NULL);
+    CUTE_ASSERT(t.out_size == 0);
+
+    // INFO(Rafael): NULL input (decode).
+
+    t.encoder = kKryptosEncodingBASE64;
+    t.in = NULL;
+    t.in_size = 0;
+    kryptos_task_set_decode_action(ktask);
+    kryptos_base64_processor(&ktask);
+
+    CUTE_ASSERT(t.out == NULL);
+    CUTE_ASSERT(t.out_size == 0);
+
+    // INFO(Rafael): Zeroed input (decode).
+
+    t.encoder = kKryptosEncodingBASE64;
+    t.in = "";
+    t.in_size = 0;
+    kryptos_task_set_decode_action(ktask);
+    kryptos_base64_processor(&ktask);
+
+    CUTE_ASSERT(t.out == NULL);
+    CUTE_ASSERT(t.out_size == 0);
+
     for (tv = 0; tv < tv_nr; tv++) {
         t.in = test_vector[tv].in;
         t.in_size = test_vector[tv].in_size;
-        t.encoder = kKryptosEncodingBASE64;
         kryptos_task_set_encode_action(ktask);
         kryptos_base64_processor(&ktask);
         CUTE_ASSERT(t.out != NULL);
