@@ -99,11 +99,9 @@ static kryptos_u8_t *kryptos_base64_encode_buffer(const kryptos_u8_t *buffer, co
             bp++;
         }
 
-        pad_size = (3 - block_size);
+        pad_size = 3 - block_size;
 
-        if (pad_size > 0) {
-            block = block << (pad_size << 3);
-        }
+        block = block << (pad_size << 3);
 
         *out_p       = kryptos_base64_state[(block & 0x00FC0000) >> 18];
         *(out_p + 1) = kryptos_base64_state[(block & 0x0003F000) >> 12];

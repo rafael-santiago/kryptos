@@ -15,6 +15,7 @@
 #include <kryptos.h>
 #include <kryptos_iv_utils.h>
 #include <kryptos_base64.h>
+#include <kryptos_uuencode.h>
 #include "test_vectors.h"
 #include <stdlib.h>
 #include <string.h>
@@ -1367,49 +1368,7 @@ CUTE_TEST_CASE(kryptos_base64_tests)
 
     size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
 
-    // INFO(Rafael): NULL input (encode).
-
     t.encoder = kKryptosEncodingBASE64;
-    t.in = NULL;
-    t.in_size = 0;
-    kryptos_task_set_encode_action(ktask);
-    kryptos_base64_processor(&ktask);
-
-    CUTE_ASSERT(t.out == NULL);
-    CUTE_ASSERT(t.out_size == 0);
-
-    // INFO(Rafael): Zeroed input (encode).
-
-    t.encoder = kKryptosEncodingBASE64;
-    t.in = "";
-    t.in_size = 0;
-    kryptos_task_set_encode_action(ktask);
-    kryptos_base64_processor(&ktask);
-
-    CUTE_ASSERT(t.out == NULL);
-    CUTE_ASSERT(t.out_size == 0);
-
-    // INFO(Rafael): NULL input (decode).
-
-    t.encoder = kKryptosEncodingBASE64;
-    t.in = NULL;
-    t.in_size = 0;
-    kryptos_task_set_decode_action(ktask);
-    kryptos_base64_processor(&ktask);
-
-    CUTE_ASSERT(t.out == NULL);
-    CUTE_ASSERT(t.out_size == 0);
-
-    // INFO(Rafael): Zeroed input (decode).
-
-    t.encoder = kKryptosEncodingBASE64;
-    t.in = "";
-    t.in_size = 0;
-    kryptos_task_set_decode_action(ktask);
-    kryptos_base64_processor(&ktask);
-
-    CUTE_ASSERT(t.out == NULL);
-    CUTE_ASSERT(t.out_size == 0);
 
     for (tv = 0; tv < tv_nr; tv++) {
         t.in = test_vector[tv].in;
@@ -1427,6 +1386,50 @@ CUTE_TEST_CASE(kryptos_base64_tests)
         CUTE_ASSERT(t.out != NULL);
         CUTE_ASSERT(t.out_size == test_vector[tv].in_size);
         CUTE_ASSERT(memcmp(t.out, test_vector[tv].in, t.out_size) == 0);
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_uuencode_tests)
+    kryptos_task_ctx t, *ktask = &t;
+
+    struct uuencode_test {
+        kryptos_u8_t *in;
+        kryptos_u8_t in_size;
+        kryptos_u8_t *out;
+        kryptos_u8_t out_size;
+    };
+
+    struct uuencode_test test_vector[] = {
+        { "ABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABC", 60,
+          "M04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#\n"
+          "/04)#04)#04)#04)#04)#\n"
+          "`\n", 86 }
+    };
+
+    size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+    kryptos_u8_t *out;
+    size_t out_size;
+
+    t.encoder = kKryptosEncodingUUENCODE;
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        t.in = test_vector[tv].in;
+        t.in_size = test_vector[tv].in_size;
+        kryptos_task_set_encode_action(ktask);
+        kryptos_uuencode_processor(&ktask);
+        CUTE_ASSERT(t.out != NULL);
+        CUTE_ASSERT(t.out_size == test_vector[tv].out_size);
+        CUTE_ASSERT(memcmp(t.out, test_vector[tv].out, t.out_size) == 0);
+
+        t.in = t.out;
+        t.in_size = t.out_size;
+        kryptos_task_set_decode_action(ktask);
+        kryptos_uuencode_processor(&ktask);
+        CUTE_ASSERT(t.out != NULL);
+        CUTE_ASSERT(t.out_size == test_vector[tv].in_size);
+        CUTE_ASSERT(memcmp(t.out, test_vector[tv].in, t.out_size) == 0);
+
         kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
     }
 CUTE_TEST_CASE_END
@@ -1467,6 +1470,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     // INFO(Rafael): Encoding stuff.
     CUTE_RUN_TEST(kryptos_base64_tests);
+    CUTE_RUN_TEST(kryptos_uuencode_tests);
 
 CUTE_TEST_CASE_END
 
