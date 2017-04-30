@@ -10,7 +10,7 @@
 
 #include "test_types.h"
 
-test_vector(des) = {
+test_vector(des, block_cipher) = {
     add_test_vector_data("\x80\x00\x00\x00\x00\x00\x00\x00", 8,
                           "\x00\x00\x00\x00\x00\x00\x00\x00",
                           "\x95\xA8\xD7\x28\x13\xDA\xA9\x4D",

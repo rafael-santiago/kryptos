@@ -17,6 +17,7 @@
 #include <kryptos_base64.h>
 #include <kryptos_uuencode.h>
 #include <kryptos_hex.h>
+#include <kryptos_sha1.h>
 #include "test_vectors.h"
 #include <stdlib.h>
 #include <string.h>
@@ -1511,6 +1512,20 @@ CUTE_TEST_CASE(kryptos_hex_tests)
     }
 CUTE_TEST_CASE_END
 
+// INFO(Rafael): Hash validation area.
+
+CUTE_TEST_CASE(kryptos_sha1_tests)
+    struct kryptos_task t, *ktask = &t;
+    t.in = "abc";
+    t.in_size = 3;
+    kryptos_sha1_hash(&ktask, 1);
+    CUTE_ASSERT(t.out != NULL);
+    CUTE_ASSERT(t.out_size == 40);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
+
+// INFO(Rafael): End of hash validation area.
+
 CUTE_TEST_CASE(kryptos_test_monkey)
     // CLUE(Rafael): Before adding a new test try to find out the best place that it fits.
     //               At first glance you should consider the utility that it implements into the library.
@@ -1538,6 +1553,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_saferk64_tests);
     CUTE_RUN_TEST(kryptos_aes_tests);
     CUTE_RUN_TEST(kryptos_serpent_tests);
+
+    // INFO(Rafael): Hash validation.
+    CUTE_RUN_TEST(kryptos_sha1_tests);
 
     //  -=-=-=-=- If you have just added a new cipher take a look in "kryptos_dsl_tests" case, there is some work to
     //                                               be done there too! -=-=-=-=-=-=-

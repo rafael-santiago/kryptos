@@ -173,4 +173,6 @@ static kryptos_u8_t *cbc_test_data[] = {
     }\
 }
 
+// TODO(Rafael): Implement the hash test runner.
+
 #endif // KRYPTOS_TESTS_TEST_VECTORS_H

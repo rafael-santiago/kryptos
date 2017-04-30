@@ -12,7 +12,7 @@
 
 // INFO(Rafael): Well, the endian convention on RC2 Spec is a little "bit" confuse.
 
-test_vector(rc2) = {
+test_vector(rc2, block_cipher) = {
     add_test_vector_data("\x00\x00\x00\x00\x00\x00\x00\x00",
                          8,
                          "\x00\x00\x00\x00\x00\x00\x00\x00",

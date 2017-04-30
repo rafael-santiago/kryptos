@@ -19,9 +19,17 @@ struct block_cipher_test_vector_ctx {
     size_t block_size;
 };
 
-#define test_vector(cipher) static struct block_cipher_test_vector_ctx cipher ##_test_vector[]
+struct hash_test_vector_ctx {
+    kryptos_u8_t *message;
+    size_t message_size;
+    kryptos_u8_t *hex_hash;
+    size_t hex_hash_size;
+    kryptos_u8_t *raw_hash;
+    size_t raw_hash_size;
+};
+
+#define test_vector(cipher, type) static struct type ## _test_vector_ctx cipher ##_test_vector[]
 
 #define add_test_vector_data(k, s, p, c, d, b) { (k), (s), (p), (c), (d), (b) }
 
 #endif // KRYPTOS_TESTS_TEST_TYPES_H
-

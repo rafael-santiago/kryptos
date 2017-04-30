@@ -10,7 +10,7 @@
 
 #include "test_types.h"
 
-test_vector(idea) = {
+test_vector(idea, block_cipher) = {
     add_test_vector_data("\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
                          16,
                          "\x00\x00\x00\x00\x00\x00\x00\x00",

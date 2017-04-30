@@ -10,7 +10,7 @@
 
 #include "test_types.h"
 
-test_vector(feal) = {
+test_vector(feal, block_cipher) = {
     add_test_vector_data("\x01\x23\x45\x67\x89\xab\xcd\xef",
                          8,
                          "\x00\x00\x00\x00\x00\x00\x00\x00",

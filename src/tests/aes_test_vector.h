@@ -10,7 +10,7 @@
 
 #include "test_types.h"
 
-test_vector(aes) = {
+test_vector(aes, block_cipher) = {
     add_test_vector_data("\x2B\x7E\x15\x16\x28\xAE\xD2\xA6\xAB\xF7\x15\x88\x09\xCF\x4F\x3C",
                          16,
                          "\x6B\xC1\xBE\xE2\x2E\x40\x9F\x96\xE9\x3D\x7E\x11\x73\x93\x17\x2A",

@@ -10,7 +10,7 @@
 
 #include "test_types.h"
 
-test_vector(saferk64) = {
+test_vector(saferk64, block_cipher) = {
     add_test_vector_data("\x00\x00\x00\x00\x00\x00\x00\x00",
                          8,
                          "\x01\x02\x03\x04\x05\x06\x07\x08",

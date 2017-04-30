@@ -10,7 +10,7 @@
 
 #include "test_types.h"
 
-test_vector(blowfish) = {
+test_vector(blowfish, block_cipher) = {
     add_test_vector_data("\x00\x00\x00\x00\x00\x00\x00\x00",
                          8,
                          "\x00\x00\x00\x00\x00\x00\x00\x00",
