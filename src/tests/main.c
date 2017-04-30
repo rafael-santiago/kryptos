@@ -16,6 +16,7 @@
 #include <kryptos_iv_utils.h>
 #include <kryptos_base64.h>
 #include <kryptos_uuencode.h>
+#include <kryptos_hex.h>
 #include "test_vectors.h"
 #include <stdlib.h>
 #include <string.h>
@@ -1434,6 +1435,82 @@ CUTE_TEST_CASE(kryptos_uuencode_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_hex_tests)
+    struct test_ctx {
+        kryptos_u32_t value;
+        kryptos_u8_t *expected;
+    };
+    struct test_ctx tv[] = {
+        { 0x00000000, "00000000" },
+        { 0x11000000, "11000000" },
+        { 0x22000000, "22000000" },
+        { 0x33000000, "33000000" },
+        { 0x44000000, "44000000" },
+        { 0x55000000, "55000000" },
+        { 0x66000000, "66000000" },
+        { 0x77000000, "77000000" },
+        { 0x88000000, "88000000" },
+        { 0x99000000, "99000000" },
+        { 0xAA000000, "AA000000" },
+        { 0xBB000000, "BB000000" },
+        { 0xCC000000, "CC000000" },
+        { 0xDD000000, "DD000000" },
+        { 0xEE000000, "EE000000" },
+        { 0xFF000000, "FF000000" },
+        { 0x00110000, "00110000" },
+        { 0x00220000, "00220000" },
+        { 0x00330000, "00330000" },
+        { 0x00440000, "00440000" },
+        { 0x00550000, "00550000" },
+        { 0x00660000, "00660000" },
+        { 0x00770000, "00770000" },
+        { 0x00880000, "00880000" },
+        { 0x00990000, "00990000" },
+        { 0x00AA0000, "00AA0000" },
+        { 0x00BB0000, "00BB0000" },
+        { 0x00CC0000, "00CC0000" },
+        { 0x00DD0000, "00DD0000" },
+        { 0x00EE0000, "00EE0000" },
+        { 0x00FF0000, "00FF0000" },
+        { 0x00001100, "00001100" },
+        { 0x00002200, "00002200" },
+        { 0x00003300, "00003300" },
+        { 0x00004400, "00004400" },
+        { 0x00005500, "00005500" },
+        { 0x00006600, "00006600" },
+        { 0x00007700, "00007700" },
+        { 0x00008800, "00008800" },
+        { 0x00009900, "00009900" },
+        { 0x0000AA00, "0000AA00" },
+        { 0x0000BB00, "0000BB00" },
+        { 0x0000CC00, "0000CC00" },
+        { 0x0000DD00, "0000DD00" },
+        { 0x0000EE00, "0000EE00" },
+        { 0x0000FF00, "0000FF00" },
+        { 0x00000011, "00000011" },
+        { 0x00000022, "00000022" },
+        { 0x00000033, "00000033" },
+        { 0x00000044, "00000044" },
+        { 0x00000055, "00000055" },
+        { 0x00000066, "00000066" },
+        { 0x00000077, "00000077" },
+        { 0x00000088, "00000088" },
+        { 0x00000099, "00000099" },
+        { 0x000000AA, "000000AA" },
+        { 0x000000BB, "000000BB" },
+        { 0x000000CC, "000000CC" },
+        { 0x000000DD, "000000DD" },
+        { 0x000000EE, "000000EE" },
+        { 0x000000FF, "000000FF" }
+    };
+    size_t tv_nr = sizeof(tv) / sizeof(tv[0]), t;
+    kryptos_u8_t buf[9];
+    for (t = 0; t < tv_nr; t++) {
+        kryptos_u32_to_hex(buf, sizeof(buf), tv[t].value);
+        CUTE_ASSERT(strcmp(buf, tv[t].expected) == 0);
+    }
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_test_monkey)
     // CLUE(Rafael): Before adding a new test try to find out the best place that it fits.
     //               At first glance you should consider the utility that it implements into the library.
@@ -1446,6 +1523,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_apply_iv_tests);
     CUTE_RUN_TEST(kryptos_iv_data_flush_tests);
     CUTE_RUN_TEST(kryptos_task_check_tests);
+    CUTE_RUN_TEST(kryptos_hex_tests);
 
     // INFO(Rafael): Cipher validation using official test vectors.
     CUTE_RUN_TEST(kryptos_arc4_tests);
