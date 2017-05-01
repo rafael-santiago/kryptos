@@ -81,7 +81,7 @@ static void kryptos_sha1_process_message(struct kryptos_sha1_ctx *ctx);
 KRYPTOS_IMPL_HASH_PROCESSOR(sha1, ktask, kryptos_sha1_ctx, ctx,
                             {
                                 ctx.message = (*ktask)->in;
-                                ctx.total_len = (*ktask)->in_size * 8; // INFO(Rafael): Should be expressed in bits.
+                                ctx.total_len = (*ktask)->in_size << 3; // INFO(Rafael): Should be expressed in bits.
                             },
                             kryptos_sha1_process_message(&ctx),
                             {
@@ -96,7 +96,7 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha1, ktask, kryptos_sha1_ctx, ctx,
                             {
                                 (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(41);
                                 (*ktask)->out_size = 40;
-                                kryptos_u32_to_hex(     (*ktask)->out, 40, ctx.state[0]);
+                                kryptos_u32_to_hex(     (*ktask)->out, 41, ctx.state[0]);
                                 kryptos_u32_to_hex((*ktask)->out  + 8, 33, ctx.state[1]);
                                 kryptos_u32_to_hex((*ktask)->out + 16, 25, ctx.state[2]);
                                 kryptos_u32_to_hex((*ktask)->out + 24, 17, ctx.state[3]);
@@ -166,6 +166,7 @@ static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx) {
     ctx->state[4] += E;
 
     A = B = C = D = E = TEMP = Fx = Kx = 0;
+    memset(W, 0, sizeof(W));
 
     if (ctx->paddin2times) {
         kryptos_sha1_ld_u8buf_into_input("", 0, ctx->input.block);
