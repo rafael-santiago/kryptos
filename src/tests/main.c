@@ -1515,13 +1515,7 @@ CUTE_TEST_CASE_END
 // INFO(Rafael): Hash validation area.
 
 CUTE_TEST_CASE(kryptos_sha1_tests)
-    struct kryptos_task t, *ktask = &t;
-    t.in = "abc";
-    t.in_size = 3;
-    kryptos_sha1_hash(&ktask, 1);
-    CUTE_ASSERT(t.out != NULL);
-    CUTE_ASSERT(t.out_size == 40);
-    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+    kryptos_run_hash_tests(sha1);
 CUTE_TEST_CASE_END
 
 // INFO(Rafael): End of hash validation area.

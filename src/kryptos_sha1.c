@@ -87,11 +87,11 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha1, ktask, kryptos_sha1_ctx, ctx,
                             {
                                 (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(20);
                                 (*ktask)->out_size = 20;
-                                kryptos_cpy_u32_as_big_endian((*ktask)->out, 20, ctx.state[0]);
-                                kryptos_cpy_u32_as_big_endian((*ktask)->out, 16, ctx.state[1]);
-                                kryptos_cpy_u32_as_big_endian((*ktask)->out, 12, ctx.state[2]);
-                                kryptos_cpy_u32_as_big_endian((*ktask)->out,  8, ctx.state[3]);
-                                kryptos_cpy_u32_as_big_endian((*ktask)->out,  4, ctx.state[4]);
+                                kryptos_cpy_u32_as_big_endian(     (*ktask)->out, 20, ctx.state[0]);
+                                kryptos_cpy_u32_as_big_endian((*ktask)->out +  4, 16, ctx.state[1]);
+                                kryptos_cpy_u32_as_big_endian((*ktask)->out +  8, 12, ctx.state[2]);
+                                kryptos_cpy_u32_as_big_endian((*ktask)->out + 12,  8, ctx.state[3]);
+                                kryptos_cpy_u32_as_big_endian((*ktask)->out + 16,  4, ctx.state[4]);
                             },
                             {
                                 (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(41);

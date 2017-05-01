@@ -19,6 +19,7 @@
 #include "saferk64_test_vector.h"
 #include "aes_test_vector.h"
 #include "serpent_test_vector.h"
+#include "sha1_test_vector.h"
 
 static kryptos_u8_t *cbc_test_data[] = {
     "PEACE, n.In international affairs, a period of cheating "
@@ -174,5 +175,24 @@ static kryptos_u8_t *cbc_test_data[] = {
 }
 
 // TODO(Rafael): Implement the hash test runner.
+
+#define kryptos_run_hash_tests(hash) {\
+    kryptos_task_ctx t, *ktask = &t;\
+    size_t tv, tv_nr = sizeof(hash ## _test_vector) / sizeof(hash ## _test_vector[0]);\
+    for (tv = 0; tv < tv_nr; tv++) {\
+        t.in = hash ## _test_vector[tv].message;\
+        t.in_size = hash ## _test_vector[tv].message_size;\
+        kryptos_ ## hash ## _hash(&ktask, 0);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size == hash ## _test_vector[tv].raw_hash_size);\
+        CUTE_ASSERT(memcmp(t.out, hash ## _test_vector[tv].raw_hash, t.out_size) == 0);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
+        kryptos_ ## hash ## _hash(&ktask, 1);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size == hash## _test_vector[tv].hex_hash_size);\
+        CUTE_ASSERT(memcmp(t.out, hash ## _test_vector[tv].hex_hash, t.out_size) == 0);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
+    }\
+}
 
 #endif // KRYPTOS_TESTS_TEST_VECTORS_H

@@ -17,7 +17,7 @@ test_vector(sha1, hash) = {
     add_test_vector_data("a", 1,
                          "86F7E437FAA5A7FCE15D1DDCB9EAEAEA377667B8", 40,
                          "\x86\xF7\xE4\x37\xFA\xA5\xA7\xFC\xE1\x5D\x1D\xDC\xB9\xEA\xEA\xEA\x37\x76\x67\xB8", 20),
-    add_test_vector_data("abc", 0,
+    add_test_vector_data("abc", 3,
                          "A9993E364706816ABA3E25717850C26C9CD0D89D", 40,
                          "\xA9\x99\x3E\x36\x47\x06\x81\x6A\xBA\x3E\x25\x71\x78\x50\xC2\x6C\x9C\xD0\xD8\x9D", 20),
     add_test_vector_data("message digest", 14,
@@ -29,6 +29,6 @@ test_vector(sha1, hash) = {
     add_test_vector_data("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", 56,
                          "84983E441C3BD26EBAAE4AA1F95129E5E54670F1", 40,
                          "\x84\x98\x3E\x44\x1C\x3B\xD2\x6E\xBA\xAE\x4A\xA1\xF9\x51\x29\xE5\xE5\x46\x70\xF1", 20)
-}
+};
 
 #endif
