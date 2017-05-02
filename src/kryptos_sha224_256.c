@@ -63,7 +63,7 @@ typedef enum {
     k224Bits = 0,
     k256Bits,
     kBitsNr
-}kryptos_sha_bitsize_t;
+}kryptos_sha224_256_bitsize_t;
 
 struct kryptos_sha224_256_input_message {
     kryptos_u32_t block[16];
@@ -76,7 +76,7 @@ struct kryptos_sha224_256_ctx {
     kryptos_u32_t curr_len;
     kryptos_u32_t total_len;
     int paddin2times;
-    kryptos_sha_bitsize_t bitsize;
+    kryptos_sha224_256_bitsize_t bitsize;
 };
 
 static void kryptos_sha224_init(struct kryptos_sha224_256_ctx *ctx);
@@ -89,8 +89,27 @@ static void kryptos_sha224_256_process_message(struct kryptos_sha224_256_ctx *ct
 
 typedef void (*kryptos_sha224_256_init_func)(struct kryptos_sha224_256_ctx *ctx);
 
-static kryptos_sha224_256_init_func kryptos_sha224_256_init[2] = {
+static kryptos_sha224_256_init_func kryptos_sha224_256_init[kBitsNr] = {
     kryptos_sha224_init, kryptos_sha256_init
+};
+
+static size_t kryptos_sha224_256_block_index_decision_table[64] = {
+     0,  0,  0,  0,
+     1,  1,  1,  1,
+     2,  2,  2,  2,
+     3,  3,  3,  3,
+     4,  4,  4,  4,
+     5,  5,  5,  5,
+     6,  6,  6,  6,
+     7,  7,  7,  7,
+     8,  8,  8,  8,
+     9,  9,  9,  9,
+    10, 10, 10, 10,
+    11, 11, 11, 11,
+    12, 12, 12, 12,
+    13, 13, 13, 13,
+    14, 14, 14, 14,
+    15, 15, 15, 15,
 };
 
 KRYPTOS_IMPL_HASH_PROCESSOR(sha224, ktask, kryptos_sha224_256_ctx, ctx,
@@ -155,25 +174,6 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha256, ktask, kryptos_sha224_256_ctx, ctx,
                                 kryptos_u32_to_hex((*ktask)->out + 56,  9, ctx.state[7]);
                             })
 
-static size_t kryptos_sha224_256_block_index_decision_table[64] = {
-     0,  0,  0,  0,
-     1,  1,  1,  1,
-     2,  2,  2,  2,
-     3,  3,  3,  3,
-     4,  4,  4,  4,
-     5,  5,  5,  5,
-     6,  6,  6,  6,
-     7,  7,  7,  7,
-     8,  8,  8,  8,
-     9,  9,  9,  9,
-    10, 10, 10, 10,
-    11, 11, 11, 11,
-    12, 12, 12, 12,
-    13, 13, 13, 13,
-    14, 14, 14, 14,
-    15, 15, 15, 15,
-};
-
 static void kryptos_sha224_init(struct kryptos_sha224_256_ctx *ctx) {
     ctx->state[0] = 0xC1059ED8;
     ctx->state[1] = 0x367CD507;
@@ -203,10 +203,10 @@ static void kryptos_sha224_256_do_block(struct kryptos_sha224_256_ctx *ctx) {
     size_t t;
 
     if (ctx->curr_len < 64) {
-        kryptos_hash_apply_pad(ctx->input.block, 16,
-                               kryptos_sha224_256_block_index_decision_table,
-                               ctx->curr_len, ctx->total_len, &ctx->paddin2times,
-                               KRYPTOS_SHA224_256_LEN_BLOCK_OFFSET);
+        kryptos_hash_apply_pad_on_u32_block(ctx->input.block, 16,
+                                            kryptos_sha224_256_block_index_decision_table,
+                                            ctx->curr_len, ctx->total_len, &ctx->paddin2times,
+                                            KRYPTOS_SHA224_256_LEN_BLOCK_OFFSET);
     }
 
     W[ 0] = ctx->input.block[ 0];
@@ -267,9 +267,9 @@ static void kryptos_sha224_256_do_block(struct kryptos_sha224_256_ctx *ctx) {
     t = 0;
 
     if (ctx->paddin2times) {
-        kryptos_hash_ld_u8buf_into_input("", 0,
-                                         ctx->input.block, 16,
-                                         kryptos_sha224_256_block_index_decision_table);
+        kryptos_hash_ld_u8buf_as_u32_blocks("", 0,
+                                            ctx->input.block, 16,
+                                            kryptos_sha224_256_block_index_decision_table);
         kryptos_sha224_256_do_block(ctx);
     }
 }
@@ -290,9 +290,9 @@ static void kryptos_sha224_256_process_message(struct kryptos_sha224_256_ctx *ct
             if (ctx->curr_len < 64 && i != l) {
                 buffer[ctx->curr_len++] = ctx->message[i];
             } else {
-                kryptos_hash_ld_u8buf_into_input(buffer, ctx->curr_len,
-                                                 ctx->input.block, 16,
-                                                 kryptos_sha224_256_block_index_decision_table);
+                kryptos_hash_ld_u8buf_as_u32_blocks(buffer, ctx->curr_len,
+                                                    ctx->input.block, 16,
+                                                    kryptos_sha224_256_block_index_decision_table);
                 kryptos_sha224_256_do_block(ctx);
                 ctx->curr_len = 0;
                 memset(buffer, 0, sizeof(buffer));
@@ -303,9 +303,9 @@ static void kryptos_sha224_256_process_message(struct kryptos_sha224_256_ctx *ct
         }
         i = l = 0;
     } else {
-        kryptos_hash_ld_u8buf_into_input("", 0,
-                                         ctx->input.block, 16,
-                                         kryptos_sha224_256_block_index_decision_table);
+        kryptos_hash_ld_u8buf_as_u32_blocks("", 0,
+                                            ctx->input.block, 16,
+                                            kryptos_sha224_256_block_index_decision_table);
         kryptos_sha224_256_do_block(ctx);
     }
 }

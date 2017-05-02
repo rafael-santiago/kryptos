@@ -33,7 +33,15 @@ typedef unsigned short kryptos_u16_t;
 
 typedef unsigned int kryptos_u32_t;
 
+#if __WORDSIZE == 32
+
 typedef unsigned long long kryptos_u64_t;
+
+#else
+
+typedef unsigned long kryptos_u64_t;
+
+#endif //  __WORDSIZE == 64
 
 typedef enum {
     kKryptosECB = 0,

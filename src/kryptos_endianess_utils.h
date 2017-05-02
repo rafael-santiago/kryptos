@@ -24,5 +24,6 @@ kryptos_u16_t kryptos_get_u16_as_big_endian(const kryptos_u8_t *data, const size
 
 kryptos_u8_t *kryptos_cpy_u16_as_big_endian(kryptos_u8_t *dest, const size_t dest_size, const kryptos_u16_t value);
 
+kryptos_u8_t *kryptos_cpy_u64_as_big_endian(kryptos_u8_t *dest, const size_t dest_size, const kryptos_u64_t value);
 
 #endif

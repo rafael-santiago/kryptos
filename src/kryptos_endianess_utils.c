@@ -95,3 +95,23 @@ kryptos_u8_t *kryptos_cpy_u16_as_big_endian(kryptos_u8_t *dest, const size_t des
     return dest;
 }
 
+kryptos_u8_t *kryptos_cpy_u64_as_big_endian(kryptos_u8_t *dest, const size_t dest_size, const kryptos_u64_t value) {
+    if ((dest + sizeof(kryptos_u64_t)) > dest + dest_size) {
+        return NULL;
+    }
+
+    if (kryptos_little_endian_cpu()) {
+        *(dest) = value >> 56;
+        *(dest + 1) = (value >> 48);
+        *(dest + 2) = (value >> 40);
+        *(dest + 3) = (value >> 32);
+        *(dest + 4) = (value >> 24);
+        *(dest + 5) = (value >> 16);
+        *(dest + 6) = (value >>  8);
+        *(dest + 7) = value;
+    } else {
+        memcpy(dest, &value, sizeof(kryptos_u64_t));
+    }
+
+    return dest;
+}

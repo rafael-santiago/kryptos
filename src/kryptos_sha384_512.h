@@ -5,13 +5,13 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#ifndef KRYPTOS_KRYPTOS_HEX_H
-#define KRYPTOS_KRYPTOS_HEX_H 1
+#ifndef KRYPTOS_KRYPTOS_SHA384_512_H
+#define KRYPTOS_KRYPTOS_SHA384_512_H 1
 
 #include <kryptos_types.h>
 
-void kryptos_u32_to_hex(kryptos_u8_t *buf, const size_t buf_size, const kryptos_u32_t u32);
+KRYPTOS_DECL_HASH_PROCESSOR(sha384, ktask)
 
-void kryptos_u64_to_hex(kryptos_u8_t *buf, const size_t buf_size, const kryptos_u64_t u64);
+KRYPTOS_DECL_HASH_PROCESSOR(sha512, ktask)
 
 #endif
