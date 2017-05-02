@@ -26,6 +26,9 @@
 #include <kryptos_aes.h>
 #include <kryptos_serpent.h>
 
+#include <kryptos_sha1.h>
+#include <kryptos_sha224_256.h>
+
 #define kryptos_task_set_ecb_mode(ktask) ( (ktask)->mode = kKryptosECB )
 
 #define kryptos_task_set_cbc_mode(ktask) ( (ktask)->mode = kKryptosCBC )

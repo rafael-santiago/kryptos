@@ -225,6 +225,9 @@ static void kryptos_sha1_process_message(struct kryptos_sha1_ctx *ctx) {
                 kryptos_sha1_do_block(ctx);
                 ctx->curr_len = 0;
                 memset(buffer, 0, sizeof(buffer));
+                if (i != l) {
+                    buffer[ctx->curr_len++] = ctx->message[i];
+                }
             }
         }
         i = l = 0;
