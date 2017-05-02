@@ -6,7 +6,7 @@
  *
  */
 #include <kryptos_sha224_256.h>
-#include <kryptos_sha_common.h>
+#include <kryptos_hash_common.h>
 #include <kryptos_endianess_utils.h>
 #include <kryptos_memory.h>
 #include <kryptos_hex.h>
@@ -55,7 +55,7 @@ static kryptos_u32_t kryptos_sha224_256_K[] = {
     0x90BEFFFA, 0xA4506CEB, 0xBEF9A3F7, 0xC67178F2
 };
 
-// INFO(Rafael): These structs and enums could be shared into <kryptos_sha_common.h>, however my main intention
+// INFO(Rafael): These structs and enums could be shared into something like "kryptos_sha_common.h", however my main intention
 //               in this library is to make the things (i.e. the algorithms) more self-contained.
 //               Also bad changes will screw up less ;)
 
@@ -201,10 +201,10 @@ static void kryptos_sha224_256_do_block(struct kryptos_sha224_256_ctx *ctx) {
     size_t t;
 
     if (ctx->curr_len < 64) {
-        kryptos_sha_apply_pad(ctx->input.block, 16,
-                              kryptos_sha224_256_block_index_decision_table,
-                              ctx->curr_len, ctx->total_len, &ctx->paddin2times,
-                              KRYPTOS_SHA224_256_LEN_BLOCK_OFFSET);
+        kryptos_hash_apply_pad(ctx->input.block, 16,
+                               kryptos_sha224_256_block_index_decision_table,
+                               ctx->curr_len, ctx->total_len, &ctx->paddin2times,
+                               KRYPTOS_SHA224_256_LEN_BLOCK_OFFSET);
     }
 
     W[ 0] = ctx->input.block[ 0];
@@ -265,9 +265,9 @@ static void kryptos_sha224_256_do_block(struct kryptos_sha224_256_ctx *ctx) {
     t = 0;
 
     if (ctx->paddin2times) {
-        kryptos_sha_ld_u8buf_into_input("", 0,
-                                        ctx->input.block, 16,
-                                        kryptos_sha224_256_block_index_decision_table);
+        kryptos_hash_ld_u8buf_into_input("", 0,
+                                         ctx->input.block, 16,
+                                         kryptos_sha224_256_block_index_decision_table);
         kryptos_sha224_256_do_block(ctx);
     }
 }
@@ -288,9 +288,9 @@ static void kryptos_sha224_256_process_message(struct kryptos_sha224_256_ctx *ct
             if (ctx->curr_len < 64 && i != l) {
                 buffer[ctx->curr_len++] = ctx->message[i];
             } else {
-                kryptos_sha_ld_u8buf_into_input(buffer, ctx->curr_len,
-                                                ctx->input.block, 16,
-                                                kryptos_sha224_256_block_index_decision_table);
+                kryptos_hash_ld_u8buf_into_input(buffer, ctx->curr_len,
+                                                 ctx->input.block, 16,
+                                                 kryptos_sha224_256_block_index_decision_table);
                 kryptos_sha224_256_do_block(ctx);
                 ctx->curr_len = 0;
                 memset(buffer, 0, sizeof(buffer));
@@ -301,9 +301,9 @@ static void kryptos_sha224_256_process_message(struct kryptos_sha224_256_ctx *ct
         }
         i = l = 0;
     } else {
-        kryptos_sha_ld_u8buf_into_input("", 0,
-                                        ctx->input.block, 16,
-                                        kryptos_sha224_256_block_index_decision_table);
+        kryptos_hash_ld_u8buf_into_input("", 0,
+                                         ctx->input.block, 16,
+                                         kryptos_sha224_256_block_index_decision_table);
         kryptos_sha224_256_do_block(ctx);
     }
 }
