@@ -183,6 +183,7 @@ static void kryptos_sha224_init(struct kryptos_sha224_256_ctx *ctx) {
     ctx->state[5] = 0x68581511;
     ctx->state[6] = 0x64F98FA7;
     ctx->state[7] = 0xBEFA4FA4;
+    ctx->paddin2times = 0;
 }
 
 static void kryptos_sha256_init(struct kryptos_sha224_256_ctx *ctx) {
@@ -194,6 +195,7 @@ static void kryptos_sha256_init(struct kryptos_sha224_256_ctx *ctx) {
     ctx->state[5] = 0x9B05688C;
     ctx->state[6] = 0x1F83D9AB;
     ctx->state[7] = 0x5BE0CD19;
+    ctx->paddin2times = 0;
 }
 
 static void kryptos_sha224_256_do_block(struct kryptos_sha224_256_ctx *ctx) {

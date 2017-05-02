@@ -6,6 +6,7 @@
  *
  */
 #include <kryptos_sha1.h>
+#include <kryptos_hash_common.h>
 #include <kryptos_memory.h>
 #include <kryptos_endianess_utils.h>
 #include <kryptos_hex.h>
@@ -35,6 +36,8 @@
         Kx = 0xCA62C1D6;\
     }\
 }
+
+#define KRYPTOS_SHA1_LEN_BLOCK_OFFSET 56
 
 static size_t kryptos_sha1_block_index_decision_table[64] = {
      0,  0,  0,  0,
@@ -71,10 +74,6 @@ struct kryptos_sha1_ctx {
 static void kryptos_sha1_init(struct kryptos_sha1_ctx *ctx);
 
 static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx);
-
-static void kryptos_sha1_apply_pad(struct kryptos_sha1_ctx *ctx);
-
-static void kryptos_sha1_ld_u8buf_into_input(kryptos_u8_t *buffer, const int buffer_size, kryptos_u32_t input[16]);
 
 static void kryptos_sha1_process_message(struct kryptos_sha1_ctx *ctx);
 
@@ -115,10 +114,13 @@ static void kryptos_sha1_init(struct kryptos_sha1_ctx *ctx) {
 static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx) {
     kryptos_u32_t A, B, C, D, E, TEMP, Fx, Kx;
     kryptos_u32_t W[80];
-    size_t t, i;
+    size_t t;
 
     if (ctx->curr_len < 64) {
-        kryptos_sha1_apply_pad(ctx);
+        kryptos_hash_apply_pad(ctx->input.block, 16,
+                               kryptos_sha1_block_index_decision_table,
+                               ctx->curr_len, ctx->total_len, &ctx->paddin2times,
+                               KRYPTOS_SHA1_LEN_BLOCK_OFFSET);
     }
 
     W[ 0] = ctx->input.block[ 0];
@@ -167,43 +169,11 @@ static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx) {
 
     A = B = C = D = E = TEMP = Fx = Kx = 0;
     memset(W, 0, sizeof(W));
+    t = 0;
 
     if (ctx->paddin2times) {
-        kryptos_sha1_ld_u8buf_into_input("", 0, ctx->input.block);
+        kryptos_hash_ld_u8buf_into_input("", 0, ctx->input.block, 16, kryptos_sha1_block_index_decision_table);
         kryptos_sha1_do_block(ctx);
-    }
-}
-
-static void kryptos_sha1_apply_pad(struct kryptos_sha1_ctx *ctx) {
-    size_t i, b = kryptos_sha1_block_index_decision_table[ctx->curr_len], shlv;
-
-    if (ctx->paddin2times == 0) {
-        shlv = 24 - ((ctx->curr_len % 4) << 3);
-        ctx->input.block[b] = (ctx->input.block[b] << 8 | 0x80) << shlv;
-    }
-
-    if (ctx->curr_len < 56 || ctx->paddin2times) {
-        ctx->input.block[15] = ctx->total_len;
-        if (ctx->paddin2times) {
-            ctx->paddin2times = 0;
-        }
-    } else {
-        ctx->paddin2times = 1;
-    }
-}
-
-static void kryptos_sha1_ld_u8buf_into_input(kryptos_u8_t *buffer, const int buffer_size, kryptos_u32_t input[16]) {
-    size_t b, i;
-    if (buffer_size > 64) {
-        // INFO(Rafael): Let's skip it. It should never happen in normal conditions.
-        return;
-    }
-
-    memset(input, 0, sizeof(input[0]) * 16);
-
-    for (b = 0; b < buffer_size; b++) {
-        i = kryptos_sha1_block_index_decision_table[b];
-        input[i] = input[i] << 8 | buffer[b];
     }
 }
 
@@ -221,7 +191,8 @@ static void kryptos_sha1_process_message(struct kryptos_sha1_ctx *ctx) {
             if (ctx->curr_len < 64 && i != l) {
                 buffer[ctx->curr_len++] = ctx->message[i];
             } else {
-                kryptos_sha1_ld_u8buf_into_input(buffer, ctx->curr_len, ctx->input.block);
+                kryptos_hash_ld_u8buf_into_input(buffer, ctx->curr_len, ctx->input.block, 16,
+                                                 kryptos_sha1_block_index_decision_table);
                 kryptos_sha1_do_block(ctx);
                 ctx->curr_len = 0;
                 memset(buffer, 0, sizeof(buffer));
@@ -232,7 +203,7 @@ static void kryptos_sha1_process_message(struct kryptos_sha1_ctx *ctx) {
         }
         i = l = 0;
     } else {
-        kryptos_sha1_ld_u8buf_into_input("", 0, ctx->input.block);
+        kryptos_hash_ld_u8buf_into_input("", 0, ctx->input.block, 16, kryptos_sha1_block_index_decision_table);
         kryptos_sha1_do_block(ctx);
     }
 }
