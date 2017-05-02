@@ -1521,6 +1521,10 @@ CUTE_TEST_CASE(kryptos_sha224_tests)
     kryptos_run_hash_tests(sha224);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_sha256_tests)
+    kryptos_run_hash_tests(sha256);
+CUTE_TEST_CASE_END
+
 // INFO(Rafael): End of hash validation area.
 
 CUTE_TEST_CASE(kryptos_test_monkey)
@@ -1554,6 +1558,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     // INFO(Rafael): Hash validation.
     CUTE_RUN_TEST(kryptos_sha1_tests);
     CUTE_RUN_TEST(kryptos_sha224_tests);
+    CUTE_RUN_TEST(kryptos_sha256_tests);
 
     //  -=-=-=-=- If you have just added a new cipher take a look in "kryptos_dsl_tests" case, there is some work to
     //                                               be done there too! -=-=-=-=-=-=-
