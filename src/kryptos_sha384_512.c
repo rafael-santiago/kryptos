@@ -141,7 +141,7 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha384, ktask, kryptos_sha384_512_ctx, ctx,
 
 KRYPTOS_IMPL_HASH_PROCESSOR(sha512, ktask, kryptos_sha384_512_ctx, ctx,
                             {
-                                ctx.bitsize = k512Bits; // INFO(Rafael): Let's request a 384-bit output.
+                                ctx.bitsize = k512Bits; // INFO(Rafael): Let's request a 512-bit output.
                                 ctx.message = (*ktask)->in;
                                 ctx.total_len = (*ktask)->in_size << 3; // INFO(Rafael): The length should be always in bits.
                             },
@@ -184,13 +184,13 @@ static void kryptos_sha384_init(struct kryptos_sha384_512_ctx *ctx) {
 
 static void kryptos_sha512_init(struct kryptos_sha384_512_ctx *ctx) {
     ctx->state[0] = 0x6A09E667F3BCC908;
-    ctx->state[0] = 0xBB67AE8584CAA73B;
-    ctx->state[0] = 0x3C6EF372FE94F82B;
-    ctx->state[0] = 0xA54FF53A5F1D36F1;
-    ctx->state[0] = 0x510E527FADE682D1;
-    ctx->state[0] = 0x9B05688C2B3E6C1F;
-    ctx->state[0] = 0x1F83D9ABFB41BD6B;
-    ctx->state[0] = 0x5BE0CD19137E2179;
+    ctx->state[1] = 0xBB67AE8584CAA73B;
+    ctx->state[2] = 0x3C6EF372FE94F82B;
+    ctx->state[3] = 0xA54FF53A5F1D36F1;
+    ctx->state[4] = 0x510E527FADE682D1;
+    ctx->state[5] = 0x9B05688C2B3E6C1F;
+    ctx->state[6] = 0x1F83D9ABFB41BD6B;
+    ctx->state[7] = 0x5BE0CD19137E2179;
 }
 
 static void kryptos_sha384_512_do_block(struct kryptos_sha384_512_ctx *ctx) {
@@ -205,9 +205,22 @@ static void kryptos_sha384_512_do_block(struct kryptos_sha384_512_ctx *ctx) {
                                             KRYPTOS_SHA384_512_LEN_BLOCK_OFFSET);
     }
 
-    for (t = 0; t < 16; t++) {
-        W[t] = ctx->input.block[t];
-    }
+    W[ 0] = ctx->input.block[ 0];
+    W[ 1] = ctx->input.block[ 1];
+    W[ 2] = ctx->input.block[ 2];
+    W[ 3] = ctx->input.block[ 3];
+    W[ 4] = ctx->input.block[ 4];
+    W[ 5] = ctx->input.block[ 5];
+    W[ 6] = ctx->input.block[ 6];
+    W[ 7] = ctx->input.block[ 7];
+    W[ 8] = ctx->input.block[ 8];
+    W[ 9] = ctx->input.block[ 9];
+    W[10] = ctx->input.block[10];
+    W[11] = ctx->input.block[11];
+    W[12] = ctx->input.block[12];
+    W[13] = ctx->input.block[13];
+    W[14] = ctx->input.block[14];
+    W[15] = ctx->input.block[15];
 
     for (t = 16; t < 80; t++) {
         W[t] = kryptos_sha384_512_SSIG1(W[t -  2]) + W[t -  7] +
@@ -290,7 +303,6 @@ static void kryptos_sha384_512_process_message(struct kryptos_sha384_512_ctx *ct
         kryptos_sha384_512_do_block(ctx);
     }
 }
-
 
 #undef kryptos_sha384_512_CH
 
