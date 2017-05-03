@@ -180,6 +180,7 @@ static void kryptos_sha384_init(struct kryptos_sha384_512_ctx *ctx) {
     ctx->state[5] = 0x8EB44A8768581511;
     ctx->state[6] = 0xDB0C2E0D64F98FA7;
     ctx->state[7] = 0x47B5481DBEFA4FA4;
+    ctx->paddin2times = 0;
 }
 
 static void kryptos_sha512_init(struct kryptos_sha384_512_ctx *ctx) {
@@ -191,6 +192,7 @@ static void kryptos_sha512_init(struct kryptos_sha384_512_ctx *ctx) {
     ctx->state[5] = 0x9B05688C2B3E6C1F;
     ctx->state[6] = 0x1F83D9ABFB41BD6B;
     ctx->state[7] = 0x5BE0CD19137E2179;
+    ctx->paddin2times = 0;
 }
 
 static void kryptos_sha384_512_do_block(struct kryptos_sha384_512_ctx *ctx) {
