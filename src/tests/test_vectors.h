@@ -23,6 +23,7 @@
 #include "sha224_test_vector.h"
 #include "sha256_test_vector.h"
 #include "sha384_test_vector.h"
+#include "sha512_test_vector.h"
 
 static kryptos_u8_t *cbc_test_data[] = {
     "PEACE, n.In international affairs, a period of cheating "
