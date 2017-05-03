@@ -77,7 +77,7 @@ static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx);
 
 static void kryptos_sha1_process_message(struct kryptos_sha1_ctx *ctx);
 
-KRYPTOS_IMPL_HASH_PROCESSOR(sha1, ktask, kryptos_sha1_ctx, ctx,
+KRYPTOS_IMPL_HASH_PROCESSOR(sha1, ktask, kryptos_sha1_ctx, ctx, sha1_hash_epilogue,
                             {
                                 ctx.message = (*ktask)->in;
                                 ctx.total_len = (*ktask)->in_size << 3; // INFO(Rafael): Should be expressed in bits.
@@ -85,6 +85,12 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha1, ktask, kryptos_sha1_ctx, ctx,
                             kryptos_sha1_process_message(&ctx),
                             {
                                 (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(20);
+                                if ((*ktask)->out == NULL) {
+                                    (*ktask)->out_size = 0;
+                                    (*ktask)->result = kKryptosProcessError;
+                                    (*ktask)->result_verbose = "No memory to get a valid output.";
+                                    goto kryptos_sha1_hash_epilogue;
+                                }
                                 (*ktask)->out_size = 20;
                                 kryptos_cpy_u32_as_big_endian(     (*ktask)->out, 20, ctx.state[0]);
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out +  4, 16, ctx.state[1]);
@@ -94,6 +100,12 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha1, ktask, kryptos_sha1_ctx, ctx,
                             },
                             {
                                 (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(41);
+                                if ((*ktask)->out == NULL) {
+                                    (*ktask)->out_size = 0;
+                                    (*ktask)->result = kKryptosProcessError;
+                                    (*ktask)->result_verbose = "No memory to get a valid output.";
+                                    goto kryptos_sha1_hash_epilogue;
+                                }
                                 (*ktask)->out_size = 40;
                                 kryptos_u32_to_hex(     (*ktask)->out, 41, ctx.state[0]);
                                 kryptos_u32_to_hex((*ktask)->out  + 8, 33, ctx.state[1]);

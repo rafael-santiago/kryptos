@@ -271,6 +271,7 @@ void kryptos_ ## hash_name ## _hash(kryptos_task_ctx **ktask, const int to_hex);
 #define KRYPTOS_IMPL_HASH_PROCESSOR(hash_name,\
                                     ktask,\
                                     hash_ctx_struct, hash_ctx,\
+                                    hash_epilogue,\
                                     hash_setup, hash_stmt,\
                                     to_raw_stmt, to_hex_stmt)\
 void kryptos_ ## hash_name ## _hash(kryptos_task_ctx **ktask, const int to_hex) {\
@@ -281,7 +282,7 @@ void kryptos_ ## hash_name ## _hash(kryptos_task_ctx **ktask, const int to_hex) 
     if ((*ktask)->in == NULL) {\
         (*ktask)->result = kKryptosInvalidParams;\
         (*ktask)->result_verbose = "No input was supplied.";\
-        goto kryptos_ ## hash_name ## _hash_epilogue;\
+        goto kryptos_ ## hash_epilogue;\
     }\
     hash_setup;\
     hash_stmt;\
@@ -292,7 +293,7 @@ void kryptos_ ## hash_name ## _hash(kryptos_task_ctx **ktask, const int to_hex) 
     } else {\
         to_hex_stmt;\
     }\
-kryptos_ ## hash_name ## _hash_epilogue:\
+kryptos_ ## hash_epilogue:\
     memset(&hash_ctx, 0, sizeof(hash_ctx));\
 }
 
