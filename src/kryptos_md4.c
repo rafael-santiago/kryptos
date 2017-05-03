@@ -35,6 +35,8 @@
 
 #define kryptos_md4_step(a, b, c, d, f, x, delta, s) ( (a) = kryptos_md4_rotl(a + f(b, c, d) + x + delta, s) )
 
+#define kryptos_md4_u32_rev(x) ( ((x) >> 24) | (((x) & 0x00ff0000) >> 8) | (((x) & 0x0000ff00) << 8 ) | ( (x) << 24 ) )
+
 #define KRYPTOS_MD4_LEN_BLOCK_OFFSET 56
 
 #define KRYPTOS_MD4_BYTES_PER_BLOCK 64
@@ -91,7 +93,7 @@ KRYPTOS_IMPL_HASH_PROCESSOR(md4, ktask, kryptos_md4_ctx, ctx, md4_hash_epilogue,
                             },
                             kryptos_md4_process_message(&ctx),
                             {
-                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(20);
+                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(16);
                                 if ((*ktask)->out == NULL) {
                                     (*ktask)->out_size = 0;
                                     (*ktask)->result = kKryptosProcessError;
@@ -99,10 +101,10 @@ KRYPTOS_IMPL_HASH_PROCESSOR(md4, ktask, kryptos_md4_ctx, ctx, md4_hash_epilogue,
                                     goto kryptos_md4_hash_epilogue;
                                 }
                                 (*ktask)->out_size = 16;
-                                kryptos_cpy_u32_as_big_endian(     (*ktask)->out, 16, ctx.state[0]);
-                                kryptos_cpy_u32_as_big_endian((*ktask)->out +  4, 12, ctx.state[1]);
-                                kryptos_cpy_u32_as_big_endian((*ktask)->out +  8,  8, ctx.state[2]);
-                                kryptos_cpy_u32_as_big_endian((*ktask)->out + 12,  4, ctx.state[3]);
+                                kryptos_cpy_u32_as_big_endian(     (*ktask)->out, 16, kryptos_md4_u32_rev(ctx.state[0]));
+                                kryptos_cpy_u32_as_big_endian((*ktask)->out +  4, 12, kryptos_md4_u32_rev(ctx.state[1]));
+                                kryptos_cpy_u32_as_big_endian((*ktask)->out +  8,  8, kryptos_md4_u32_rev(ctx.state[2]));
+                                kryptos_cpy_u32_as_big_endian((*ktask)->out + 12,  4, kryptos_md4_u32_rev(ctx.state[3]));
                             },
                             {
                                 (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(33);
@@ -113,10 +115,10 @@ KRYPTOS_IMPL_HASH_PROCESSOR(md4, ktask, kryptos_md4_ctx, ctx, md4_hash_epilogue,
                                     goto kryptos_md4_hash_epilogue;
                                 }
                                 (*ktask)->out_size = 32;
-                                kryptos_u32_to_hex(     (*ktask)->out, 33, ctx.state[0]);
-                                kryptos_u32_to_hex((*ktask)->out  + 8, 25, ctx.state[1]);
-                                kryptos_u32_to_hex((*ktask)->out + 16, 17, ctx.state[2]);
-                                kryptos_u32_to_hex((*ktask)->out + 24,  9, ctx.state[3]);
+                                kryptos_u32_to_hex(     (*ktask)->out, 33, kryptos_md4_u32_rev(ctx.state[0]));
+                                kryptos_u32_to_hex((*ktask)->out +  8, 25, kryptos_md4_u32_rev(ctx.state[1]));
+                                kryptos_u32_to_hex((*ktask)->out + 16, 17, kryptos_md4_u32_rev(ctx.state[2]));
+                                kryptos_u32_to_hex((*ktask)->out + 24,  9, kryptos_md4_u32_rev(ctx.state[3]));
                             })
 
 
@@ -129,10 +131,7 @@ static void kryptos_md4_init(struct kryptos_md4_ctx *ctx) {
 }
 
 static void kryptos_md4_do_block(struct kryptos_md4_ctx *ctx) {
-    kryptos_u32_t AA = ctx->state[0];
-    kryptos_u32_t BB = ctx->state[1];
-    kryptos_u32_t CC = ctx->state[2];
-    kryptos_u32_t DD = ctx->state[3];
+    kryptos_u32_t AA, BB, CC, DD;
 
     if (ctx->curr_len < KRYPTOS_MD4_BYTES_PER_BLOCK) {
         kryptos_hash_apply_pad_on_u32_block(ctx->input.block, 16,
@@ -140,7 +139,36 @@ static void kryptos_md4_do_block(struct kryptos_md4_ctx *ctx) {
                                             ctx->curr_len, ctx->total_len,
                                             &ctx->paddin2times,
                                             KRYPTOS_MD4_LEN_BLOCK_OFFSET);
+        if (!ctx->paddin2times) {
+            AA = ctx->input.block[14];
+            // INFO(Rafael): This is pretty damn crazy. Errr.. Sorry!
+            //               I will save your sanity from any explanation. 8S
+            ctx->input.block[14] = kryptos_md4_u32_rev(ctx->input.block[15]);
+            ctx->input.block[15] = kryptos_md4_u32_rev(AA);
+        }
     }
+
+    AA = ctx->state[0];
+    BB = ctx->state[1];
+    CC = ctx->state[2];
+    DD = ctx->state[3];
+
+    ctx->input.block[ 0] = kryptos_md4_u32_rev(ctx->input.block[ 0]);
+    ctx->input.block[ 1] = kryptos_md4_u32_rev(ctx->input.block[ 1]);
+    ctx->input.block[ 2] = kryptos_md4_u32_rev(ctx->input.block[ 2]);
+    ctx->input.block[ 3] = kryptos_md4_u32_rev(ctx->input.block[ 3]);
+    ctx->input.block[ 4] = kryptos_md4_u32_rev(ctx->input.block[ 4]);
+    ctx->input.block[ 5] = kryptos_md4_u32_rev(ctx->input.block[ 5]);
+    ctx->input.block[ 6] = kryptos_md4_u32_rev(ctx->input.block[ 6]);
+    ctx->input.block[ 7] = kryptos_md4_u32_rev(ctx->input.block[ 7]);
+    ctx->input.block[ 8] = kryptos_md4_u32_rev(ctx->input.block[ 8]);
+    ctx->input.block[ 9] = kryptos_md4_u32_rev(ctx->input.block[ 9]);
+    ctx->input.block[10] = kryptos_md4_u32_rev(ctx->input.block[10]);
+    ctx->input.block[11] = kryptos_md4_u32_rev(ctx->input.block[11]);
+    ctx->input.block[12] = kryptos_md4_u32_rev(ctx->input.block[12]);
+    ctx->input.block[13] = kryptos_md4_u32_rev(ctx->input.block[13]);
+    ctx->input.block[14] = kryptos_md4_u32_rev(ctx->input.block[14]);
+    ctx->input.block[15] = kryptos_md4_u32_rev(ctx->input.block[15]);
 
     // INFO(Rafael): The following is only about the main block processing loop
     //               "unrolled" as three main "acts", ugly but fast.
@@ -228,6 +256,8 @@ static void kryptos_md4_do_block(struct kryptos_md4_ctx *ctx) {
 #undef kryptos_md4_rotl
 
 #undef kryptos_md4_step
+
+#undef kryptos_md4_u32_rev
 
 #undef KRYPTOS_MD4_LEN_BLOCK_OFFSET
 
