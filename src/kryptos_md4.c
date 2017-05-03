@@ -37,6 +37,8 @@
 
 #define KRYPTOS_MD4_LEN_BLOCK_OFFSET 56
 
+#define KRYPTOS_MD4_BYTES_PER_BLOCK 64
+
 struct kryptos_md4_input_message {
     kryptos_u32_t block[16];
 };
@@ -125,7 +127,7 @@ static void kryptos_md4_do_block(struct kryptos_md4_ctx *ctx) {
     kryptos_u32_t CC = ctx->state[2];
     kryptos_u32_t DD = ctx->state[3];
 
-    if (ctx->curr_len < 64) {
+    if (ctx->curr_len < KRYPTOS_MD4_BYTES_PER_BLOCK) {
         kryptos_hash_apply_pad_on_u32_block(ctx->input.block, 16,
                                             kryptos_md4_block_index_decision_table,
                                             ctx->curr_len, ctx->total_len,
@@ -204,6 +206,7 @@ static void kryptos_md4_do_block(struct kryptos_md4_ctx *ctx) {
     }
 }
 
+// TODO(Rafael): Handle this with DECL/IMPL macros.
 static void kryptos_md4_process_message(struct kryptos_md4_ctx *ctx) {
     kryptos_u64_t i, l = ctx->total_len >> 3;
     kryptos_u8_t buffer[65];
@@ -234,3 +237,23 @@ static void kryptos_md4_process_message(struct kryptos_md4_ctx *ctx) {
         kryptos_md4_do_block(ctx);
     }
 }
+
+#undef kryptos_md4_F
+
+#undef kryptos_md4_G
+
+#undef kryptos_md4_H
+
+#undef KRYPTOS_MD4DELTA0
+
+#undef KRYPTOS_MD4DELTA1
+
+#undef KRYPTOS_MD4DELTA2
+
+#undef kryptos_md4_rotl
+
+#undef kryptos_md4_step
+
+#undef KRYPTOS_MD4_LEN_BLOCK_OFFSET
+
+#undef KRYPTOS_MD4_BYTES_PER_BLOCK
