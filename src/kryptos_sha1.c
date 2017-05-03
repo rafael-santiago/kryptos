@@ -47,8 +47,8 @@ struct kryptos_sha1_ctx {
     kryptos_u32_t state[5];
     struct kryptos_sha1_input_message input;
     kryptos_u8_t *message;
-    kryptos_u32_t curr_len;
-    kryptos_u32_t total_len;
+    kryptos_u64_t curr_len;
+    kryptos_u64_t total_len;
     int paddin2times;
 };
 

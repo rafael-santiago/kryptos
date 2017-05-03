@@ -10,7 +10,7 @@
 
 void kryptos_hash_apply_pad_on_u32_block(kryptos_u32_t *input, size_t const input_nr,
                                          const size_t *block_index_decision_table,
-                                         const kryptos_u32_t curr_len, const kryptos_u32_t total_len,
+                                         const kryptos_u64_t curr_len, const kryptos_u64_t total_len,
                                          int *paddin2times, kryptos_u32_t len_block_offset) {
     size_t b = block_index_decision_table[curr_len], shlv;
     if (*paddin2times == 0) {
@@ -19,7 +19,8 @@ void kryptos_hash_apply_pad_on_u32_block(kryptos_u32_t *input, size_t const inpu
     }
 
     if (curr_len < len_block_offset || *paddin2times) {
-        input[input_nr - 1] = total_len;
+        input[input_nr - 2] = total_len >> 32;
+        input[input_nr - 1] = total_len & 0x00000000ffffffff;
         if (*paddin2times) {
             *paddin2times = 0;
         }
