@@ -297,7 +297,7 @@ static void kryptos_sha384_512_do_block(struct kryptos_sha384_512_ctx *ctx) {
 }
 
 static void kryptos_sha384_512_process_message(struct kryptos_sha384_512_ctx *ctx) {
-    kryptos_u32_t i, l = ctx->total_len >> 3;
+    kryptos_u64_t i, l = ctx->total_len >> 3;
     kryptos_u8_t buffer[128];
 
     kryptos_sha384_512_init[ctx->bitsize](ctx);

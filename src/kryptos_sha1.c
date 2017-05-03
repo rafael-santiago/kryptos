@@ -11,7 +11,6 @@
 #include <kryptos_endianess_utils.h>
 #include <kryptos_hex.h>
 #include <string.h>
-#include <stdio.h>
 
 #define kryptos_sha1_Sn(x, n) ( (x) << (n) | (x) >> ((sizeof((x)) << 3) - (n)) )
 
@@ -190,7 +189,7 @@ static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx) {
 }
 
 static void kryptos_sha1_process_message(struct kryptos_sha1_ctx *ctx) {
-    kryptos_u32_t i, l = ctx->total_len >> 3;
+    kryptos_u64_t i, l = ctx->total_len >> 3;
     kryptos_u8_t buffer[65];
 
     kryptos_sha1_init(ctx);

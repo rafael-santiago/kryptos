@@ -521,7 +521,10 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
         CUTE_ASSERT(task.out_size == 0);
         // WARN(Rafael): If the out block was not actually freed, the cutest leak check system will complain.
     } else {
-        printf("=== WARN: The leak check system is deactivated, due to it was not possible test the kryptos_task_free() macro. It was SKIPPED.\n===\n");
+        // WARN(Rafael): This is bad. Avoid it. If you have freed every single trinket that you alloc'd,
+        //               you should have no fear. ;) The Leak System is your friend or supposed to be...
+        printf("=== WARN: The leak check system is deactivated, due to it was not possible test the kryptos_task_free() macro."
+               " It was SKIPPED.\n===\n");
     }
 
 #ifdef KRYPTOS_C99
@@ -1563,7 +1566,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_aes_tests);
     CUTE_RUN_TEST(kryptos_serpent_tests);
 
-    // INFO(Rafael): Hash validation.
+    // INFO(Rafael): Hash validation (also official data).
     CUTE_RUN_TEST(kryptos_sha1_tests);
     CUTE_RUN_TEST(kryptos_sha224_tests);
     CUTE_RUN_TEST(kryptos_sha256_tests);

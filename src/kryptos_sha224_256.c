@@ -299,7 +299,7 @@ static void kryptos_sha224_256_do_block(struct kryptos_sha224_256_ctx *ctx) {
 }
 
 static void kryptos_sha224_256_process_message(struct kryptos_sha224_256_ctx *ctx) {
-    kryptos_u32_t i, l = ctx->total_len >> 3;
+    kryptos_u64_t i, l = ctx->total_len >> 3;
     kryptos_u8_t buffer[65];
 
     // INFO(Rafael): Actually this the only difference between sha-224 and sha-256
