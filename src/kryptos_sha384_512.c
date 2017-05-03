@@ -34,6 +34,8 @@
                                       kryptos_sha384_512_ROTR(x, 61) ^\
                                       ( (x) >> 6 ) )
 
+#define KRYPTOS_SHA384_512_BYTES_PER_BLOCK 128
+
 #define KRYPTOS_SHA384_512_LEN_BLOCK_OFFSET 120
 
 static kryptos_u64_t kryptos_sha384_512_K[] = {
@@ -84,8 +86,6 @@ static void kryptos_sha512_init(struct kryptos_sha384_512_ctx *ctx);
 
 static void kryptos_sha384_512_do_block(struct kryptos_sha384_512_ctx *ctx);
 
-static void kryptos_sha384_512_process_message(struct kryptos_sha384_512_ctx *ctx);
-
 typedef void (*kryptos_sha384_512_init_func)(struct kryptos_sha384_512_ctx *ctx);
 
 static kryptos_sha384_512_init_func kryptos_sha384_512_init[kBitsNr] = {
@@ -110,6 +110,15 @@ static size_t kryptos_sha384_512_block_index_decision_table[128] = {
     14, 14, 14, 14, 14, 14, 14, 14,
     15, 15, 15, 15, 15, 15, 15, 15
 };
+
+KRYPTOS_DECL_HASH_MESSAGE_PROCESSOR(sha384_512, kryptos_sha384_512_ctx, ctx)
+
+KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(sha384_512, kryptos_sha384_512_ctx, ctx,
+                                    KRYPTOS_SHA384_512_BYTES_PER_BLOCK,
+                                    16, 64,
+                                    kryptos_sha384_512_init[ctx->bitsize](ctx),
+                                    kryptos_sha384_512_do_block(ctx),
+                                    kryptos_sha384_512_block_index_decision_table)
 
 KRYPTOS_IMPL_HASH_PROCESSOR(sha384, ktask, kryptos_sha384_512_ctx, ctx, sha384_hash_epilogue,
                             {
@@ -289,40 +298,6 @@ static void kryptos_sha384_512_do_block(struct kryptos_sha384_512_ctx *ctx) {
     memset(W, 0, sizeof(W));
 
     if (ctx->paddin2times) {
-        kryptos_hash_ld_u8buf_as_u64_blocks("", 0,
-                                            ctx->input.block, 16,
-                                            kryptos_sha384_512_block_index_decision_table);
-        kryptos_sha384_512_do_block(ctx);
-    }
-}
-
-static void kryptos_sha384_512_process_message(struct kryptos_sha384_512_ctx *ctx) {
-    kryptos_u64_t i, l = ctx->total_len >> 3;
-    kryptos_u8_t buffer[128];
-
-    kryptos_sha384_512_init[ctx->bitsize](ctx);
-
-    ctx->curr_len = 0;
-
-    if (l > 0) {
-        memset(buffer, 0, sizeof(buffer));
-        for (i = 0; i <= l; i++) {
-            if (ctx->curr_len < 128 && i != l) {
-                buffer[ctx->curr_len++] = ctx->message[i];
-            } else {
-                kryptos_hash_ld_u8buf_as_u64_blocks(buffer, ctx->curr_len,
-                                                    ctx->input.block, 16,
-                                                    kryptos_sha384_512_block_index_decision_table);
-                kryptos_sha384_512_do_block(ctx);
-                ctx->curr_len = 0;
-                memset(buffer, 0, sizeof(buffer));
-                if (i != l) {
-                    buffer[ctx->curr_len++] = ctx->message[i];
-                }
-            }
-        }
-        i = l = 0;
-    } else {
         kryptos_hash_ld_u8buf_as_u64_blocks("", 0,
                                             ctx->input.block, 16,
                                             kryptos_sha384_512_block_index_decision_table);

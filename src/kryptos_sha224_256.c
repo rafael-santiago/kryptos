@@ -34,6 +34,8 @@
                                       kryptos_sha224_256_ROTR(x, 19) ^\
                                       ( (x) >> 10 ) )
 
+#define KRYPTOS_SHA224_256_BYTES_PER_BLOCK 64
+
 #define KRYPTOS_SHA224_256_LEN_BLOCK_OFFSET 56
 
 static kryptos_u32_t kryptos_sha224_256_K[] = {
@@ -85,7 +87,7 @@ static void kryptos_sha256_init(struct kryptos_sha224_256_ctx *ctx);
 
 static void kryptos_sha224_256_do_block(struct kryptos_sha224_256_ctx *ctx);
 
-static void kryptos_sha224_256_process_message(struct kryptos_sha224_256_ctx *ctx);
+KRYPTOS_DECL_HASH_MESSAGE_PROCESSOR(sha224_256, kryptos_sha224_256_ctx, ctx)
 
 typedef void (*kryptos_sha224_256_init_func)(struct kryptos_sha224_256_ctx *ctx);
 
@@ -111,6 +113,15 @@ static size_t kryptos_sha224_256_block_index_decision_table[64] = {
     14, 14, 14, 14,
     15, 15, 15, 15,
 };
+
+KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(sha224_256, kryptos_sha224_256_ctx, ctx,
+                                    KRYPTOS_SHA224_256_BYTES_PER_BLOCK,
+                                    16, 32,
+                                    // INFO(Rafael): Actually this the only difference between sha-224 and sha-256
+                                    //               besides the length of the output, of course.
+                                    kryptos_sha224_256_init[ctx->bitsize](ctx),
+                                    kryptos_sha224_256_do_block(ctx),
+                                    kryptos_sha224_256_block_index_decision_table)
 
 KRYPTOS_IMPL_HASH_PROCESSOR(sha224, ktask, kryptos_sha224_256_ctx, ctx, sha224_hash_epilogue,
                             {
@@ -291,42 +302,6 @@ static void kryptos_sha224_256_do_block(struct kryptos_sha224_256_ctx *ctx) {
     t = 0;
 
     if (ctx->paddin2times) {
-        kryptos_hash_ld_u8buf_as_u32_blocks("", 0,
-                                            ctx->input.block, 16,
-                                            kryptos_sha224_256_block_index_decision_table);
-        kryptos_sha224_256_do_block(ctx);
-    }
-}
-
-static void kryptos_sha224_256_process_message(struct kryptos_sha224_256_ctx *ctx) {
-    kryptos_u64_t i, l = ctx->total_len >> 3;
-    kryptos_u8_t buffer[65];
-
-    // INFO(Rafael): Actually this the only difference between sha-224 and sha-256
-    //               besides the length of the output, of course.
-    kryptos_sha224_256_init[ctx->bitsize](ctx);
-
-    ctx->curr_len = 0;
-
-    if (l > 0) {
-        memset(buffer, 0, sizeof(buffer));
-        for (i = 0; i <= l; i++) {
-            if (ctx->curr_len < 64 && i != l) {
-                buffer[ctx->curr_len++] = ctx->message[i];
-            } else {
-                kryptos_hash_ld_u8buf_as_u32_blocks(buffer, ctx->curr_len,
-                                                    ctx->input.block, 16,
-                                                    kryptos_sha224_256_block_index_decision_table);
-                kryptos_sha224_256_do_block(ctx);
-                ctx->curr_len = 0;
-                memset(buffer, 0, sizeof(buffer));
-                if (i != l) {
-                    buffer[ctx->curr_len++] = ctx->message[i];
-                }
-            }
-        }
-        i = l = 0;
-    } else {
         kryptos_hash_ld_u8buf_as_u32_blocks("", 0,
                                             ctx->input.block, 16,
                                             kryptos_sha224_256_block_index_decision_table);

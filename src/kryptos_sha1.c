@@ -36,6 +36,8 @@
     }\
 }
 
+#define KRYPTOS_SHA1_BYTES_PER_BLOCK 64
+
 #define KRYPTOS_SHA1_LEN_BLOCK_OFFSET 56
 
 struct kryptos_sha1_input_message {
@@ -74,7 +76,14 @@ static void kryptos_sha1_init(struct kryptos_sha1_ctx *ctx);
 
 static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx);
 
-static void kryptos_sha1_process_message(struct kryptos_sha1_ctx *ctx);
+KRYPTOS_DECL_HASH_MESSAGE_PROCESSOR(sha1, kryptos_sha1_ctx, ctx)
+
+KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(sha1, kryptos_sha1_ctx, ctx,
+                                    KRYPTOS_SHA1_BYTES_PER_BLOCK,
+                                    16, 32,
+                                    kryptos_sha1_init(ctx),
+                                    kryptos_sha1_do_block(ctx),
+                                    kryptos_sha1_block_index_decision_table)
 
 KRYPTOS_IMPL_HASH_PROCESSOR(sha1, ktask, kryptos_sha1_ctx, ctx, sha1_hash_epilogue,
                             {
@@ -183,37 +192,6 @@ static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx) {
     t = 0;
 
     if (ctx->paddin2times) {
-        kryptos_hash_ld_u8buf_as_u32_blocks("", 0, ctx->input.block, 16, kryptos_sha1_block_index_decision_table);
-        kryptos_sha1_do_block(ctx);
-    }
-}
-
-static void kryptos_sha1_process_message(struct kryptos_sha1_ctx *ctx) {
-    kryptos_u64_t i, l = ctx->total_len >> 3;
-    kryptos_u8_t buffer[65];
-
-    kryptos_sha1_init(ctx);
-
-    ctx->curr_len = 0;
-
-    if (l > 0) {
-        memset(buffer, 0, sizeof(buffer));
-        for(i = 0; i <= l; i++) {
-            if (ctx->curr_len < 64 && i != l) {
-                buffer[ctx->curr_len++] = ctx->message[i];
-            } else {
-                kryptos_hash_ld_u8buf_as_u32_blocks(buffer, ctx->curr_len, ctx->input.block, 16,
-                                                    kryptos_sha1_block_index_decision_table);
-                kryptos_sha1_do_block(ctx);
-                ctx->curr_len = 0;
-                memset(buffer, 0, sizeof(buffer));
-                if (i != l) {
-                    buffer[ctx->curr_len++] = ctx->message[i];
-                }
-            }
-        }
-        i = l = 0;
-    } else {
         kryptos_hash_ld_u8buf_as_u32_blocks("", 0, ctx->input.block, 16, kryptos_sha1_block_index_decision_table);
         kryptos_sha1_do_block(ctx);
     }

@@ -298,4 +298,42 @@ kryptos_ ## hash_epilogue:\
     memset(&hash_ctx, 0, sizeof(hash_ctx));\
 }
 
+#define KRYPTOS_DECL_HASH_MESSAGE_PROCESSOR(hash_name, struct_name, struct_var)\
+static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct_var);
+
+#define KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(hash_name,\
+                                            struct_name, struct_var,\
+                                            buffer_size, input_block_size, bits_per_block,\
+                                            hash_init_stmt, hash_do_block_stmt, block_index_decision_table)\
+static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct_var) {\
+    kryptos_u64_t i, l = ctx->total_len >> 3;\
+    kryptos_u8_t buffer[buffer_size];\
+    hash_init_stmt;\
+    ctx->curr_len = 0;\
+    if (l > 0) {\
+        memset(buffer, 0, sizeof(buffer));\
+        for (i = 0; i <= l; i++) {\
+            if (ctx->curr_len < buffer_size && i != l) {\
+                buffer[ctx->curr_len++] = ctx->message[i];\
+            } else {\
+                kryptos_hash_ld_u8buf_as_u ## bits_per_block  ## _blocks(buffer, ctx->curr_len,\
+                                                    ctx->input.block, input_block_size,\
+                                                    block_index_decision_table);\
+                hash_do_block_stmt;\
+                ctx->curr_len = 0;\
+                memset(buffer, 0, sizeof(buffer));\
+                if (i != l) {\
+                    buffer[ctx->curr_len++] = ctx->message[i];\
+                }\
+            }\
+        }\
+        i = l = 0;\
+    } else {\
+        kryptos_hash_ld_u8buf_as_u ## bits_per_block ## _blocks("", 0,\
+                                            ctx->input.block, input_block_size,\
+                                            block_index_decision_table);\
+        hash_do_block_stmt;\
+    }\
+}\
+
 #endif

@@ -12,8 +12,8 @@
 #include <kryptos_hex.h>
 #include <string.h>
 
-// INFO(Rafael): MD4 round functions. Maybe some of them could be simplified a little. If speed is really, really, really,
-//               a critical issue to your state of things.
+// INFO(Rafael): MD4 round functions. Maybe some of them could be simplified a little. If speed is a really, really, really,
+//               critical issue to your state of things.
 
 #define kryptos_md4_F(x, y, z) ( ( (x) & (y) ) | ( (~(x)) & (z) ) )
 
@@ -49,7 +49,7 @@ struct kryptos_md4_ctx {
     kryptos_u8_t *message;
     kryptos_u64_t curr_len, total_len;
     int paddin2times; // CLUE(Rafael): A long long time ago I was listening to The Doors and then I named this memory chunk.
-                      //               This also guided the idea behind this flag. :)
+                      //               This also guided the idea behind this flag. :P
 };
 
 static size_t kryptos_md4_block_index_decision_table[] = {
@@ -75,7 +75,14 @@ static void kryptos_md4_init(struct kryptos_md4_ctx *ctx);
 
 static void kryptos_md4_do_block(struct kryptos_md4_ctx *ctx);
 
-static void kryptos_md4_process_message(struct kryptos_md4_ctx *ctx);
+KRYPTOS_DECL_HASH_MESSAGE_PROCESSOR(md4, kryptos_md4_ctx, ctx)
+
+KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(md4, kryptos_md4_ctx, ctx,
+                                    KRYPTOS_MD4_BYTES_PER_BLOCK,
+                                    16, 32,
+                                    kryptos_md4_init(ctx),
+                                    kryptos_md4_do_block(ctx),
+                                    kryptos_md4_block_index_decision_table)
 
 KRYPTOS_IMPL_HASH_PROCESSOR(md4, ktask, kryptos_md4_ctx, ctx, md4_hash_epilogue,
                             {
@@ -201,38 +208,6 @@ static void kryptos_md4_do_block(struct kryptos_md4_ctx *ctx) {
     AA = BB = CC = DD = 0;
 
     if (ctx->paddin2times) {
-        kryptos_hash_ld_u8buf_as_u32_blocks("", 0, ctx->input.block, 16, kryptos_md4_block_index_decision_table);
-        kryptos_md4_do_block(ctx);
-    }
-}
-
-// TODO(Rafael): Handle this with DECL/IMPL macros.
-static void kryptos_md4_process_message(struct kryptos_md4_ctx *ctx) {
-    kryptos_u64_t i, l = ctx->total_len >> 3;
-    kryptos_u8_t buffer[65];
-
-    kryptos_md4_init(ctx);
-
-    ctx->curr_len = 0;
-
-    if (l > 0) {
-        memset(buffer, 0, sizeof(buffer));
-        for(i = 0; i <= l; i++) {
-            if (ctx->curr_len < 64 && i != l) {
-                buffer[ctx->curr_len++] = ctx->message[i];
-            } else {
-                kryptos_hash_ld_u8buf_as_u32_blocks(buffer, ctx->curr_len, ctx->input.block, 16,
-                                                    kryptos_md4_block_index_decision_table);
-                kryptos_md4_do_block(ctx);
-                ctx->curr_len = 0;
-                memset(buffer, 0, sizeof(buffer));
-                if (i != l) {
-                    buffer[ctx->curr_len++] = ctx->message[i];
-                }
-            }
-        }
-        i = l = 0;
-    } else {
         kryptos_hash_ld_u8buf_as_u32_blocks("", 0, ctx->input.block, 16, kryptos_md4_block_index_decision_table);
         kryptos_md4_do_block(ctx);
     }
