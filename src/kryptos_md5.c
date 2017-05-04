@@ -32,6 +32,8 @@
 
 #define KRYPTOS_MD5_LEN_BLOCK_OFFSET 56 // INFO(Rafael): BYTES_PER_BLOCK - 8...
 
+#define KRYPTOS_MD5_HASH_SIZE 16
+
 struct kryptos_md5_input_message {
     kryptos_u32_t block[16];
 };
@@ -72,6 +74,8 @@ KRYPTOS_DECL_HASH_MESSAGE_PROCESSOR(md5, kryptos_md5_ctx, ctx);
 KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(md5, kryptos_md5_ctx, ctx, KRYPTOS_MD5_BYTES_PER_BLOCK, 16, 32,
                                     kryptos_md5_init(ctx), kryptos_md5_do_block(ctx), kryptos_md5_block_index_decision_table)
 
+KRYPTOS_IMPL_HASH_SIZE(md5, KRYPTOS_MD5_HASH_SIZE)
+
 KRYPTOS_IMPL_HASH_PROCESSOR(md5, ktask, kryptos_md5_ctx, ctx, md5_hash_epilogue,
                             {
                                 ctx.message = (*ktask)->in;
@@ -79,28 +83,28 @@ KRYPTOS_IMPL_HASH_PROCESSOR(md5, ktask, kryptos_md5_ctx, ctx, md5_hash_epilogue,
                             },
                             kryptos_md5_process_message(&ctx),
                             {
-                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(16);
+                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(KRYPTOS_MD5_HASH_SIZE);
                                 if ((*ktask)->out == NULL) {
                                     (*ktask)->out_size = 0;
                                     (*ktask)->result = kKryptosProcessError;
                                     (*ktask)->result_verbose = "No memory to get a valid output.";
                                     goto kryptos_md5_hash_epilogue;
                                 }
-                                (*ktask)->out_size = 16;
+                                (*ktask)->out_size = KRYPTOS_MD5_HASH_SIZE;
                                 kryptos_cpy_u32_as_big_endian(     (*ktask)->out, 16, kryptos_md5_u32_rev(ctx.state[0]));
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out +  4, 12, kryptos_md5_u32_rev(ctx.state[1]));
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out +  8,  8, kryptos_md5_u32_rev(ctx.state[2]));
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out + 12,  4, kryptos_md5_u32_rev(ctx.state[3]));
                             },
                             {
-                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(33);
+                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg((KRYPTOS_MD5_HASH_SIZE << 1) + 1);
                                 if ((*ktask)->out == NULL) {
                                     (*ktask)->out_size = 0;
                                     (*ktask)->result = kKryptosProcessError;
                                     (*ktask)->result_verbose = "No memory to get a valid output.";
                                     goto kryptos_md5_hash_epilogue;
                                 }
-                                (*ktask)->out_size = 32;
+                                (*ktask)->out_size = KRYPTOS_MD5_HASH_SIZE << 1;
                                 kryptos_u32_to_hex(     (*ktask)->out, 33, kryptos_md5_u32_rev(ctx.state[0]));
                                 kryptos_u32_to_hex((*ktask)->out +  8, 25, kryptos_md5_u32_rev(ctx.state[1]));
                                 kryptos_u32_to_hex((*ktask)->out + 16, 17, kryptos_md5_u32_rev(ctx.state[2]));

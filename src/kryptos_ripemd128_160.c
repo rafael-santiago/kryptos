@@ -48,6 +48,10 @@
 
 #define KRYPTOS_RIPEMD_LEN_BLOCK_OFFSET 56
 
+#define KRYPTOS_RIPEMD128_HASH_SIZE 16
+
+#define KRYPTOS_RIPEMD160_HASH_SIZE 20
+
 struct kryptos_ripemd_input {
     kryptos_u32_t block[16];
 };
@@ -105,6 +109,8 @@ KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(ripemd, kryptos_ripemd_ctx, ctx, KRYPTOS_RIP
                                     kryptos_ripemd_do_block[ctx->bits](ctx),
                                     kryptos_ripemd_block_index_decision_table)
 
+KRYPTOS_IMPL_HASH_SIZE(ripemd128, KRYPTOS_RIPEMD128_HASH_SIZE)
+
 KRYPTOS_IMPL_HASH_PROCESSOR(ripemd128, ktask, kryptos_ripemd_ctx, ctx, ripemd128_hash_epilogue,
                             {
                                 ctx.message = (*ktask)->in;
@@ -113,33 +119,35 @@ KRYPTOS_IMPL_HASH_PROCESSOR(ripemd128, ktask, kryptos_ripemd_ctx, ctx, ripemd128
                             },
                             kryptos_ripemd_process_message(&ctx),
                             {
-                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(16);
+                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(KRYPTOS_RIPEMD128_HASH_SIZE);
                                 if ((*ktask)->out == NULL) {
                                     (*ktask)->out_size = 0;
                                     (*ktask)->result = kKryptosProcessError;
                                     (*ktask)->result_verbose = "No memory to get a valid output.";
                                     goto kryptos_ripemd128_hash_epilogue;
                                 }
-                                (*ktask)->out_size = 16;
+                                (*ktask)->out_size = KRYPTOS_RIPEMD128_HASH_SIZE;
                                 kryptos_cpy_u32_as_big_endian(     (*ktask)->out, 16, kryptos_ripemd_u32_rev(ctx.state[0]));
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out +  4, 12, kryptos_ripemd_u32_rev(ctx.state[1]));
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out +  8,  8, kryptos_ripemd_u32_rev(ctx.state[2]));
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out + 12,  4, kryptos_ripemd_u32_rev(ctx.state[3]));
                             },
                             {
-                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(33);
+                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg((KRYPTOS_RIPEMD128_HASH_SIZE << 1) + 1);
                                 if ((*ktask)->out == NULL) {
                                     (*ktask)->out_size = 0;
                                     (*ktask)->result = kKryptosProcessError;
                                     (*ktask)->result_verbose = "No memory to get a valid output.";
                                     goto kryptos_ripemd128_hash_epilogue;
                                 }
-                                (*ktask)->out_size = 32;
+                                (*ktask)->out_size = KRYPTOS_RIPEMD128_HASH_SIZE << 1;
                                 kryptos_u32_to_hex(     (*ktask)->out, 33, kryptos_ripemd_u32_rev(ctx.state[0]));
                                 kryptos_u32_to_hex((*ktask)->out +  8, 25, kryptos_ripemd_u32_rev(ctx.state[1]));
                                 kryptos_u32_to_hex((*ktask)->out + 16, 17, kryptos_ripemd_u32_rev(ctx.state[2]));
                                 kryptos_u32_to_hex((*ktask)->out + 24,  9, kryptos_ripemd_u32_rev(ctx.state[3]));
                             })
+
+KRYPTOS_IMPL_HASH_SIZE(ripemd160, KRYPTOS_RIPEMD160_HASH_SIZE)
 
 KRYPTOS_IMPL_HASH_PROCESSOR(ripemd160, ktask, kryptos_ripemd_ctx, ctx, ripemd160_hash_epilogue,
                             {
@@ -149,14 +157,14 @@ KRYPTOS_IMPL_HASH_PROCESSOR(ripemd160, ktask, kryptos_ripemd_ctx, ctx, ripemd160
                             },
                             kryptos_ripemd_process_message(&ctx),
                             {
-                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(20);
+                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(KRYPTOS_RIPEMD160_HASH_SIZE);
                                 if ((*ktask)->out == NULL) {
                                     (*ktask)->out_size = 0;
                                     (*ktask)->result = kKryptosProcessError;
                                     (*ktask)->result_verbose = "No memory to get a valid output.";
                                     goto kryptos_ripemd160_hash_epilogue;
                                 }
-                                (*ktask)->out_size = 20;
+                                (*ktask)->out_size = KRYPTOS_RIPEMD160_HASH_SIZE;
                                 kryptos_cpy_u32_as_big_endian(     (*ktask)->out, 20, kryptos_ripemd_u32_rev(ctx.state[0]));
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out +  4, 16, kryptos_ripemd_u32_rev(ctx.state[1]));
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out +  8, 12, kryptos_ripemd_u32_rev(ctx.state[2]));
@@ -164,14 +172,14 @@ KRYPTOS_IMPL_HASH_PROCESSOR(ripemd160, ktask, kryptos_ripemd_ctx, ctx, ripemd160
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out + 16,  4, kryptos_ripemd_u32_rev(ctx.state[4]));
                             },
                             {
-                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(41);
+                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg((KRYPTOS_RIPEMD160_HASH_SIZE << 1) + 1);
                                 if ((*ktask)->out == NULL) {
                                     (*ktask)->out_size = 0;
                                     (*ktask)->result = kKryptosProcessError;
                                     (*ktask)->result_verbose = "No memory to get a valid output.";
                                     goto kryptos_ripemd160_hash_epilogue;
                                 }
-                                (*ktask)->out_size = 40;
+                                (*ktask)->out_size = KRYPTOS_RIPEMD160_HASH_SIZE << 1;
                                 kryptos_u32_to_hex(     (*ktask)->out, 41, kryptos_ripemd_u32_rev(ctx.state[0]));
                                 kryptos_u32_to_hex((*ktask)->out  + 8, 33, kryptos_ripemd_u32_rev(ctx.state[1]));
                                 kryptos_u32_to_hex((*ktask)->out + 16, 25, kryptos_ripemd_u32_rev(ctx.state[2]));

@@ -38,6 +38,10 @@
 
 #define KRYPTOS_SHA224_256_LEN_BLOCK_OFFSET 56
 
+#define KRYPTOS_SHA224_HASH_SIZE 28
+
+#define KRYPTOS_SHA256_HASH_SIZE 32
+
 static kryptos_u32_t kryptos_sha224_256_K[] = {
     0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5,
     0x3956C25b, 0x59F111F1, 0x923F82A4, 0xAB1C5ED5,
@@ -123,6 +127,8 @@ KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(sha224_256, kryptos_sha224_256_ctx, ctx,
                                     kryptos_sha224_256_do_block(ctx),
                                     kryptos_sha224_256_block_index_decision_table)
 
+KRYPTOS_IMPL_HASH_SIZE(sha224, KRYPTOS_SHA224_HASH_SIZE)
+
 KRYPTOS_IMPL_HASH_PROCESSOR(sha224, ktask, kryptos_sha224_256_ctx, ctx, sha224_hash_epilogue,
                             {
                                 ctx.bitsize = k224Bits; // INFO(Rafael): Let's request a 224-bit output.
@@ -131,14 +137,14 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha224, ktask, kryptos_sha224_256_ctx, ctx, sha224_h
                             },
                             kryptos_sha224_256_process_message(&ctx),
                             {
-                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(28);
+                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(KRYPTOS_SHA224_HASH_SIZE);
                                 if ((*ktask)->out == NULL) {
                                     (*ktask)->out_size = 0;
                                     (*ktask)->result = kKryptosProcessError;
                                     (*ktask)->result_verbose = "No memory to get a valid output.";
                                     goto kryptos_sha224_hash_epilogue;
                                 }
-                                (*ktask)->out_size = 28;
+                                (*ktask)->out_size = KRYPTOS_SHA224_HASH_SIZE;
                                 kryptos_cpy_u32_as_big_endian(     (*ktask)->out, 28, ctx.state[0]);
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out +  4, 24, ctx.state[1]);
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out +  8, 20, ctx.state[2]);
@@ -148,14 +154,14 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha224, ktask, kryptos_sha224_256_ctx, ctx, sha224_h
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out + 24,  4, ctx.state[6]);
                             },
                             {
-                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(57);
+                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg((KRYPTOS_SHA224_HASH_SIZE << 1) + 1);
                                 if ((*ktask)->out == NULL) {
                                     (*ktask)->out_size = 0;
                                     (*ktask)->result = kKryptosProcessError;
                                     (*ktask)->result_verbose = "No memory to get a valid output.";
                                     goto kryptos_sha224_hash_epilogue;
                                 }
-                                (*ktask)->out_size = 56;
+                                (*ktask)->out_size = KRYPTOS_SHA224_HASH_SIZE << 1;
                                 kryptos_u32_to_hex(     (*ktask)->out, 57, ctx.state[0]);
                                 kryptos_u32_to_hex((*ktask)->out +  8, 49, ctx.state[1]);
                                 kryptos_u32_to_hex((*ktask)->out + 16, 41, ctx.state[2]);
@@ -165,6 +171,8 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha224, ktask, kryptos_sha224_256_ctx, ctx, sha224_h
                                 kryptos_u32_to_hex((*ktask)->out + 48,  9, ctx.state[6]);
                             })
 
+KRYPTOS_IMPL_HASH_SIZE(sha256, KRYPTOS_SHA256_HASH_SIZE)
+
 KRYPTOS_IMPL_HASH_PROCESSOR(sha256, ktask, kryptos_sha224_256_ctx, ctx, sha256_hash_epilogue,
                             {
                                 ctx.bitsize = k256Bits; // INFO(Rafael): Let's request a 256-bit output.
@@ -173,14 +181,14 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha256, ktask, kryptos_sha224_256_ctx, ctx, sha256_h
                             },
                             kryptos_sha224_256_process_message(&ctx),
                             {
-                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(32);
+                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(KRYPTOS_SHA256_HASH_SIZE);
                                 if ((*ktask)->out == NULL) {
                                     (*ktask)->out_size = 0;
                                     (*ktask)->result = kKryptosProcessError;
                                     (*ktask)->result_verbose = "No memory to get a valid output.";
                                     goto kryptos_sha256_hash_epilogue;
                                 }
-                                (*ktask)->out_size = 32;
+                                (*ktask)->out_size = KRYPTOS_SHA256_HASH_SIZE;
                                 kryptos_cpy_u32_as_big_endian(     (*ktask)->out, 32, ctx.state[0]);
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out +  4, 28, ctx.state[1]);
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out +  8, 24, ctx.state[2]);
@@ -191,14 +199,14 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha256, ktask, kryptos_sha224_256_ctx, ctx, sha256_h
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out + 28,  4, ctx.state[7]);
                             },
                             {
-                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(65);
+                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg((KRYPTOS_SHA256_HASH_SIZE << 1) + 1);
                                 if ((*ktask)->out == NULL) {
                                     (*ktask)->out_size = 0;
                                     (*ktask)->result = kKryptosProcessError;
                                     (*ktask)->result_verbose = "No memory to get a valid output.";
                                     goto kryptos_sha256_hash_epilogue;
                                 }
-                                (*ktask)->out_size = 64;
+                                (*ktask)->out_size = KRYPTOS_SHA256_HASH_SIZE << 1;
                                 kryptos_u32_to_hex(     (*ktask)->out, 65, ctx.state[0]);
                                 kryptos_u32_to_hex((*ktask)->out +  8, 57, ctx.state[1]);
                                 kryptos_u32_to_hex((*ktask)->out + 16, 49, ctx.state[2]);

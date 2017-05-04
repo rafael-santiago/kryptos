@@ -12,4 +12,6 @@
 
 KRYPTOS_DECL_HASH_PROCESSOR(sha1, ktask)
 
+KRYPTOS_DECL_HASH_SIZE(sha1)
+
 #endif

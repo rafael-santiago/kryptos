@@ -41,6 +41,8 @@
 
 #define KRYPTOS_MD4_BYTES_PER_BLOCK 64
 
+#define KRYPTOS_MD4_HASH_SIZE 16
+
 struct kryptos_md4_input_message {
     kryptos_u32_t block[16];
 };
@@ -86,6 +88,8 @@ KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(md4, kryptos_md4_ctx, ctx,
                                     kryptos_md4_do_block(ctx),
                                     kryptos_md4_block_index_decision_table)
 
+KRYPTOS_IMPL_HASH_SIZE(md4, KRYPTOS_MD4_HASH_SIZE)
+
 KRYPTOS_IMPL_HASH_PROCESSOR(md4, ktask, kryptos_md4_ctx, ctx, md4_hash_epilogue,
                             {
                                 ctx.message = (*ktask)->in;
@@ -93,28 +97,28 @@ KRYPTOS_IMPL_HASH_PROCESSOR(md4, ktask, kryptos_md4_ctx, ctx, md4_hash_epilogue,
                             },
                             kryptos_md4_process_message(&ctx),
                             {
-                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(16);
+                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(KRYPTOS_MD4_HASH_SIZE);
                                 if ((*ktask)->out == NULL) {
                                     (*ktask)->out_size = 0;
                                     (*ktask)->result = kKryptosProcessError;
                                     (*ktask)->result_verbose = "No memory to get a valid output.";
                                     goto kryptos_md4_hash_epilogue;
                                 }
-                                (*ktask)->out_size = 16;
+                                (*ktask)->out_size = KRYPTOS_MD4_HASH_SIZE;
                                 kryptos_cpy_u32_as_big_endian(     (*ktask)->out, 16, kryptos_md4_u32_rev(ctx.state[0]));
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out +  4, 12, kryptos_md4_u32_rev(ctx.state[1]));
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out +  8,  8, kryptos_md4_u32_rev(ctx.state[2]));
                                 kryptos_cpy_u32_as_big_endian((*ktask)->out + 12,  4, kryptos_md4_u32_rev(ctx.state[3]));
                             },
                             {
-                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(33);
+                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg((KRYPTOS_MD4_HASH_SIZE << 1) + 1);
                                 if ((*ktask)->out == NULL) {
                                     (*ktask)->out_size = 0;
                                     (*ktask)->result = kKryptosProcessError;
                                     (*ktask)->result_verbose = "No memory to get a valid output.";
                                     goto kryptos_md4_hash_epilogue;
                                 }
-                                (*ktask)->out_size = 32;
+                                (*ktask)->out_size = KRYPTOS_MD4_HASH_SIZE << 1;
                                 kryptos_u32_to_hex(     (*ktask)->out, 33, kryptos_md4_u32_rev(ctx.state[0]));
                                 kryptos_u32_to_hex((*ktask)->out +  8, 25, kryptos_md4_u32_rev(ctx.state[1]));
                                 kryptos_u32_to_hex((*ktask)->out + 16, 17, kryptos_md4_u32_rev(ctx.state[2]));

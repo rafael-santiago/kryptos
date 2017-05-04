@@ -22,10 +22,12 @@
 # define KRYPTOS_USER_MODE 1
 #endif // KRYPTOS_KERNEL_MODE
 
-#define KRYPTOS_TASK_IN  1
-#define KRYPTOS_TASK_OUT 2
-#define KRYPTOS_TASK_KEY 4
-#define KRYPTOS_TASK_IV  8
+#define KRYPTOS_TASK_IN        0x01
+#define KRYPTOS_TASK_OUT       0x02
+#define KRYPTOS_TASK_KEY       0x04
+#define KRYPTOS_TASK_IV        0x08
+#define KRYPTOS_TASK_AUX_BUF0  0x10
+#define KRYPTOS_TASK_AUX_BUF1  0x20
 
 typedef unsigned char kryptos_u8_t;
 
@@ -86,10 +88,16 @@ typedef enum {
     kKryptosProcessError,
     kKryptosInvalidParams,
     kKryptosInvalidCipher,
+    kKryptosHMACError,
     kKryptosTaskResultNr
 }kryptos_task_result_t;
 
 #define KRYPTOS_KRYPTO_TASK_ARG_NR 10
+
+struct kryptos_task_aux_buffers_ctx {
+    kryptos_u8_t *buf0, *buf1, *buf2, *buf3;
+    size_t buf0_size, buf1_size, buf2_size, buf3_size;
+};
 
 typedef struct kryptos_task {
     kryptos_action_t action;
@@ -112,6 +120,10 @@ typedef struct kryptos_task {
 
     kryptos_task_result_t result;
     char *result_verbose;
+
+    struct kryptos_task *mirror_p;
+
+    struct kryptos_task_aux_buffers_ctx aux_buffers;
 }kryptos_task_ctx;
 
 #define KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(cipher_name)\
@@ -335,5 +347,13 @@ static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct
         hash_do_block_stmt;\
     }\
 }\
+
+#define KRYPTOS_DECL_HASH_SIZE(hash_name)\
+size_t kryptos_ ## hash_name ## _hash_size(void);
+
+#define KRYPTOS_IMPL_HASH_SIZE(hash_name, size)\
+size_t kryptos_ ## hash_name ## _hash_size(void) {\
+    return size;\
+}
 
 #endif
