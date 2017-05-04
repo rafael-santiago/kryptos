@@ -12,8 +12,8 @@
 #include <kryptos_hex.h>
 #include <string.h>
 
-// INFO(Rafael): MD4 round functions. Maybe some of them could be simplified a little. If speed is a really, really, really,
-//               critical issue to your state of things.
+// INFO(Rafael): MD4 round functions. Maybe some of them could be simplified a little. If speed is a real critical
+//               issue to your state of things.
 
 #define kryptos_md4_F(x, y, z) ( ( (x) & (y) ) | ( (~(x)) & (z) ) )
 
