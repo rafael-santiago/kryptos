@@ -31,6 +31,7 @@
 #include <kryptos_sha384_512.h>
 #include <kryptos_md4.h>
 #include <kryptos_md5.h>
+#include <kryptos_ripemd128_160.h>
 
 #define kryptos_task_set_ecb_mode(ktask) ( (ktask)->mode = kKryptosECB )
 
