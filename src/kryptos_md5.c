@@ -153,22 +153,22 @@ static void kryptos_md5_do_block(struct kryptos_md5_ctx *ctx) {
     ctx->input.block[15] = kryptos_md5_u32_rev(ctx->input.block[15]);
 
     // INFO(Rafael): Step 1.
-    kryptos_md5_step(AA, BB, CC, DD, kryptos_md5_F, ctx->input.block[ 0],0xD76AA478,  7);
-    kryptos_md5_step(DD, AA, BB, CC, kryptos_md5_F, ctx->input.block[ 1],0xE8C7B756, 12);
-    kryptos_md5_step(CC, DD, AA, BB, kryptos_md5_F, ctx->input.block[ 2],0x242070DB, 17);
-    kryptos_md5_step(BB, CC, DD, AA, kryptos_md5_F, ctx->input.block[ 3],0xC1BDCEEE, 22);
-    kryptos_md5_step(AA, BB, CC, DD, kryptos_md5_F, ctx->input.block[ 4],0xF57C0FAF,  7);
-    kryptos_md5_step(DD, AA, BB, CC, kryptos_md5_F, ctx->input.block[ 5],0x4787C62A, 12);
-    kryptos_md5_step(CC, DD, AA, BB, kryptos_md5_F, ctx->input.block[ 6],0xA8304613, 17);
-    kryptos_md5_step(BB, CC, DD, AA, kryptos_md5_F, ctx->input.block[ 7],0xFD469501, 22);
-    kryptos_md5_step(AA, BB, CC, DD, kryptos_md5_F, ctx->input.block[ 8],0x698098d8, 7);
-    kryptos_md5_step(DD, AA, BB, CC, kryptos_md5_F, ctx->input.block[ 9],0x8B44F7AF, 12);
-    kryptos_md5_step(CC, DD, AA, BB, kryptos_md5_F, ctx->input.block[10],0xFFFF5BB1, 17);
-    kryptos_md5_step(BB, CC, DD, AA, kryptos_md5_F, ctx->input.block[11],0x895CD7BE, 22);
-    kryptos_md5_step(AA, BB, CC, DD, kryptos_md5_F, ctx->input.block[12],0x6B901122, 7);
-    kryptos_md5_step(DD, AA, BB, CC, kryptos_md5_F, ctx->input.block[13],0xFD987193, 12);
-    kryptos_md5_step(CC, DD, AA, BB, kryptos_md5_F, ctx->input.block[14],0xA679438E, 17);
-    kryptos_md5_step(BB, CC, DD, AA, kryptos_md5_F, ctx->input.block[15],0x49B40821, 22);
+    kryptos_md5_step(AA, BB, CC, DD, kryptos_md5_F, ctx->input.block[ 0], 0xD76AA478,  7);
+    kryptos_md5_step(DD, AA, BB, CC, kryptos_md5_F, ctx->input.block[ 1], 0xE8C7B756, 12);
+    kryptos_md5_step(CC, DD, AA, BB, kryptos_md5_F, ctx->input.block[ 2], 0x242070DB, 17);
+    kryptos_md5_step(BB, CC, DD, AA, kryptos_md5_F, ctx->input.block[ 3], 0xC1BDCEEE, 22);
+    kryptos_md5_step(AA, BB, CC, DD, kryptos_md5_F, ctx->input.block[ 4], 0xF57C0FAF,  7);
+    kryptos_md5_step(DD, AA, BB, CC, kryptos_md5_F, ctx->input.block[ 5], 0x4787C62A, 12);
+    kryptos_md5_step(CC, DD, AA, BB, kryptos_md5_F, ctx->input.block[ 6], 0xA8304613, 17);
+    kryptos_md5_step(BB, CC, DD, AA, kryptos_md5_F, ctx->input.block[ 7], 0xFD469501, 22);
+    kryptos_md5_step(AA, BB, CC, DD, kryptos_md5_F, ctx->input.block[ 8], 0x698098d8, 7);
+    kryptos_md5_step(DD, AA, BB, CC, kryptos_md5_F, ctx->input.block[ 9], 0x8B44F7AF, 12);
+    kryptos_md5_step(CC, DD, AA, BB, kryptos_md5_F, ctx->input.block[10], 0xFFFF5BB1, 17);
+    kryptos_md5_step(BB, CC, DD, AA, kryptos_md5_F, ctx->input.block[11], 0x895CD7BE, 22);
+    kryptos_md5_step(AA, BB, CC, DD, kryptos_md5_F, ctx->input.block[12], 0x6B901122, 7);
+    kryptos_md5_step(DD, AA, BB, CC, kryptos_md5_F, ctx->input.block[13], 0xFD987193, 12);
+    kryptos_md5_step(CC, DD, AA, BB, kryptos_md5_F, ctx->input.block[14], 0xA679438E, 17);
+    kryptos_md5_step(BB, CC, DD, AA, kryptos_md5_F, ctx->input.block[15], 0x49B40821, 22);
 
     // INFO(Rafael): Step 2.
     kryptos_md5_step(AA, BB, CC, DD, kryptos_md5_G, ctx->input.block[ 1], 0xF61E2562,  5);
