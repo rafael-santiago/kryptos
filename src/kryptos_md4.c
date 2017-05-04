@@ -35,7 +35,7 @@
 
 #define kryptos_md4_step(a, b, c, d, f, x, delta, s) ( (a) = kryptos_md4_rotl(a + f(b, c, d) + x + delta, s) )
 
-#define kryptos_md4_u32_rev(x) ( ((x) >> 24) | (((x) & 0x00ff0000) >> 8) | (((x) & 0x0000ff00) << 8 ) | ( (x) << 24 ) )
+#define kryptos_md4_u32_rev(x) ( ((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8 ) | ( (x) << 24 ) )
 
 #define KRYPTOS_MD4_LEN_BLOCK_OFFSET 56
 
