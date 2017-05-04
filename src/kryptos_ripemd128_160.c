@@ -402,6 +402,23 @@ static void kryptos_ripemd160_do_block(struct kryptos_ripemd_ctx *ctx) {
     D = D_ = ctx->state[3];
     E = E_ = ctx->state[4];
 
+    ctx->input.block[ 0] = kryptos_ripemd_u32_rev(ctx->input.block[ 0]);
+    ctx->input.block[ 1] = kryptos_ripemd_u32_rev(ctx->input.block[ 1]);
+    ctx->input.block[ 2] = kryptos_ripemd_u32_rev(ctx->input.block[ 2]);
+    ctx->input.block[ 3] = kryptos_ripemd_u32_rev(ctx->input.block[ 3]);
+    ctx->input.block[ 4] = kryptos_ripemd_u32_rev(ctx->input.block[ 4]);
+    ctx->input.block[ 5] = kryptos_ripemd_u32_rev(ctx->input.block[ 5]);
+    ctx->input.block[ 6] = kryptos_ripemd_u32_rev(ctx->input.block[ 6]);
+    ctx->input.block[ 7] = kryptos_ripemd_u32_rev(ctx->input.block[ 7]);
+    ctx->input.block[ 8] = kryptos_ripemd_u32_rev(ctx->input.block[ 8]);
+    ctx->input.block[ 9] = kryptos_ripemd_u32_rev(ctx->input.block[ 9]);
+    ctx->input.block[10] = kryptos_ripemd_u32_rev(ctx->input.block[10]);
+    ctx->input.block[11] = kryptos_ripemd_u32_rev(ctx->input.block[11]);
+    ctx->input.block[12] = kryptos_ripemd_u32_rev(ctx->input.block[12]);
+    ctx->input.block[13] = kryptos_ripemd_u32_rev(ctx->input.block[13]);
+    ctx->input.block[14] = kryptos_ripemd_u32_rev(ctx->input.block[14]);
+    ctx->input.block[15] = kryptos_ripemd_u32_rev(ctx->input.block[15]);
+
     kryptos_ripemd160_line_proc(A, B, C, D, kryptos_ripemd_f0, ctx->input.block[ 0], KRYPTOS_RIPEMD_K0, 11, E);
     kryptos_ripemd160_line_proc(E, A, B, C, kryptos_ripemd_f0, ctx->input.block[ 1], KRYPTOS_RIPEMD_K0, 14, D);
     kryptos_ripemd160_line_proc(D, E, A, B, kryptos_ripemd_f0, ctx->input.block[ 2], KRYPTOS_RIPEMD_K0, 15, C);
