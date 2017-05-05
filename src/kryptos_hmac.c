@@ -11,12 +11,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define KRYPTOS_HMAC_IPAD 0x36
+
+#define KRYPTOS_HMAC_OPAD 0x5C
+
 static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_size,
                                       kryptos_u8_t *x, const size_t x_size,
                                       kryptos_hash_func h,
                                       kryptos_hash_size_func h_input_size,
                                       kryptos_hash_size_func h_size,
-                                      size_t *out_size, kryptos_task_result_t *result, kryptos_u8_t *result_verbose);
+                                      size_t *out_size, kryptos_task_result_t *result, char **result_verbose);
 
 static void kryptos_hmac_check(kryptos_task_ctx **ktask,
                                kryptos_hash_func h,
@@ -24,15 +28,97 @@ static void kryptos_hmac_check(kryptos_task_ctx **ktask,
                                kryptos_hash_size_func h_size);
 
 void kryptos_hmac(kryptos_task_ctx **ktask,
-                  kryptos_hash_func h, kryptos_hash_size_func h_input_size, kryptos_hash_size_func h_size) {
-    // TODO(Rafael): Handle both contexts (encryption, decryption).
+                  kryptos_hash_func h,
+                  kryptos_hash_size_func h_input_size,
+                  kryptos_hash_size_func h_size) {
+
+    if (ktask == NULL) {
+        return;
+    }
+
+    if ((*ktask)->key == NULL || (*ktask)->key_size == 0) {
+        (*ktask)->result = kKryptosHMACError;
+        (*ktask)->result_verbose = "Null key.";
+        return;
+    }
+
+    switch ((*ktask)->action) {
+        case kKryptosEncrypt:
+
+            // INFO(Rafael): The "in" was previously encrypted into "out".
+
+            if ((*ktask)->out == NULL || (*ktask)->out_size == 0) {
+                (*ktask)->result = kKryptosHMACError;
+                (*ktask)->result_verbose = "Null output.";
+                return;
+            }
+
+            (*ktask)->out = kryptos_hmac_gen((*ktask)->key, (*ktask)->key_size,
+                                             (*ktask)->out, (*ktask)->out_size,
+                                             h, h_input_size, h_size, &(*ktask)->out_size,
+                                             &(*ktask)->result, &(*ktask)->result_verbose);
+
+            break;
+
+        case kKryptosDecrypt:
+
+            // INFO(Rafael): The "in" is a HMAC output. If it is ok, the "x" will be extracted
+            //               and placed into "in" buffer. The "in" buffer changes its allocation.
+
+            if ((*ktask)->in == NULL || (*ktask)->in_size == 0) {
+                (*ktask)->result = kKryptosHMACError;
+                (*ktask)->result_verbose = "Null input.";
+                return;
+            }
+
+            kryptos_hmac_check(ktask, h, h_input_size, h_size);
+
+            break;
+
+        default:
+
+            (*ktask)->result = kKryptosHMACError;
+            (*ktask)->result_verbose = "Invalid action.";
+
+            break;
+    }
 }
 
 static void kryptos_hmac_check(kryptos_task_ctx **ktask,
                                kryptos_hash_func h,
                                kryptos_hash_size_func h_input_size,
                                kryptos_hash_size_func h_size) {
-    // TODO(Rafael): Implement the checking code.
+    kryptos_u8_t *hmac = NULL;
+    size_t hmac_size = h_size();
+
+    hmac = kryptos_hmac_gen((*ktask)->key, (*ktask)->key_size,
+                            (*ktask)->in + hmac_size, (*ktask)->in_size - hmac_size,
+                            h, h_input_size, h_size, &hmac_size, &(*ktask)->result, &(*ktask)->result_verbose);
+
+    if (kryptos_last_task_succeed((*ktask))) {
+        if (hmac == NULL || memcmp(hmac, (*ktask)->in, hmac_size) != 0) {
+            (*ktask)->result = kKryptosHMACError;
+            (*ktask)->result_verbose = NULL;
+        } else {
+            // INFO(Rafael): The input is not corrupted. We will extract the x from the current input.
+            //               Making it our new input.
+            kryptos_freeseg(hmac);
+            (*ktask)->in_size -= hmac_size;
+            hmac = (kryptos_u8_t *) kryptos_newseg(hmac_size);
+            memcpy(hmac, (*ktask)->in + hmac_size, (*ktask)->in_size);
+            memset((*ktask)->in, 0, hmac_size + (*ktask)->in_size);
+            kryptos_freeseg((*ktask)->in);
+            (*ktask)->in = hmac;
+            hmac = NULL;
+        }
+    }
+
+    if (hmac != NULL) {
+        memset(hmac, 0, hmac_size);
+        kryptos_freeseg(hmac);
+    }
+
+    hmac_size = 0;
 }
 
 static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_size,
@@ -40,14 +126,12 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
                                       kryptos_hash_func h,
                                       kryptos_hash_size_func h_input_size,
                                       kryptos_hash_size_func h_size,
-                                      size_t *out_size, kryptos_task_result_t *result, kryptos_u8_t *result_verbose) {
+                                      size_t *out_size, kryptos_task_result_t *result, char **result_verbose) {
     //
-    //  INFO(Rafael): This function will free x if the HMAC is successfully generated returning back what should be
+    //  INFO(Rafael): This function will free x when the HMAC is successfully generated returning back what should be
     //                our new x and so the out_size will be the new x_size.
     //
 
-    static kryptos_u8_t ipad = 0x36;
-    static kryptos_u8_t opad = 0x5C;
     kryptos_u8_t *k_xor_ipad = NULL, *k_xor_opad = NULL, *kp = NULL, *kp_end = NULL;
     size_t hash_input_size = 0, hash_size = 0, input_key_delta = 0, k_xor_size = 0;
     kryptos_task_ctx iktask, oktask;
@@ -62,19 +146,19 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
 
     if (h == NULL) {
         *result = kKryptosHMACError;
-        result_verbose = "Null hash function.";
+        *result_verbose = "Null hash function.";
         goto kryptos_hmac_gen_epilogue;
     }
 
     if (h_input_size == NULL) {
         *result = kKryptosHMACError;
-        result_verbose = "Null hash_input_size function.";
+        *result_verbose = "Null hash_input_size function.";
         goto kryptos_hmac_gen_epilogue;
     }
 
     if (h_size == NULL) {
         *result = kKryptosHMACError;
-        result_verbose = "Null hash_size function.";
+        *result_verbose = "Null hash_size function.";
         goto kryptos_hmac_gen_epilogue;
     }
 
@@ -87,14 +171,14 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
     k_xor_ipad = (kryptos_u8_t *) kryptos_newseg(k_xor_size);
     if (k_xor_ipad == NULL) {
         *result = kKryptosHMACError;
-        result_verbose = "No memory when getting k_xor_ipad.";
+        *result_verbose = "No memory when getting k_xor_ipad.";
         goto kryptos_hmac_gen_epilogue;
     }
 
     k_xor_opad = (kryptos_u8_t *) kryptos_newseg(k_xor_size);
     if (k_xor_opad == NULL) {
         *result = kKryptosHMACError;
-        result_verbose = "No memory when getting k_xor_opad.";
+        *result_verbose = "No memory when getting k_xor_opad.";
         goto kryptos_hmac_gen_epilogue;
     }
 
@@ -112,7 +196,7 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
     kp_end = kp + k_xor_size;
 
     while (kp != kp_end) {
-        *kp = *kp ^ ipad;
+        *kp = *kp ^ KRYPTOS_HMAC_IPAD;
         kp++;
     }
 
@@ -120,7 +204,7 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
     kp_end = kp + k_xor_size;
 
     while (kp != kp_end) {
-        *kp = *kp ^ opad;
+        *kp = *kp ^ KRYPTOS_HMAC_OPAD;
         kp++;
     }
 
@@ -132,7 +216,7 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
     iktask.in = (kryptos_u8_t *) kryptos_newseg(k_xor_size + x_size);
     if (iktask.in == NULL) {
         *result = kKryptosHMACError;
-        result_verbose = "No memory when getting iktask->in.";
+        *result_verbose = "No memory when getting iktask->in.";
         goto kryptos_hmac_gen_epilogue;
     }
 
@@ -143,7 +227,7 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
 
     if (!kryptos_last_task_succeed(&iktask)) {
         *result = kKryptosHMACError;
-        result_verbose = iktask.result_verbose;
+        *result_verbose = iktask.result_verbose;
         goto kryptos_hmac_gen_epilogue;
     }
 
@@ -152,7 +236,7 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
     oktask.in = (kryptos_u8_t *) kryptos_newseg(k_xor_size + iktask.out_size);
     if (oktask.in == NULL) {
         *result = kKryptosHMACError;
-        result_verbose = "No memory when getting oktask->in.";
+        *result_verbose = "No memory when getting oktask->in.";
         goto kryptos_hmac_gen_epilogue;
     }
 
@@ -163,7 +247,7 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
 
     if (!kryptos_last_task_succeed(&oktask)) {
         *result = kKryptosHMACError;
-        result_verbose = oktask.result_verbose;
+        *result_verbose = oktask.result_verbose;
         goto kryptos_hmac_gen_epilogue;
     }
 
@@ -176,7 +260,7 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
     out = (kryptos_u8_t *) kryptos_newseg(*out_size);
     if (out == NULL) {
         *result = kKryptosHMACError;
-        result_verbose = "No memory to produce the final HMAC output.";
+        *result_verbose = "No memory to produce the final HMAC output.";
         out = temp_data;
         *out_size = temp_size;
         temp_data = NULL;
@@ -186,6 +270,9 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
 
     memcpy(out, oktask.out, oktask.out_size);
     memcpy(out + oktask.out_size, temp_data, temp_size); // and so we done!
+
+    *result = kKryptosSuccess;
+    *result_verbose = NULL;
 
 kryptos_hmac_gen_epilogue:
 
@@ -219,3 +306,7 @@ kryptos_hmac_gen_epilogue:
 
     return out;
 }
+
+#undef KRYPTOS_HMAC_IPAD
+
+#undef KRYPTOS_HMAC_OPAD

@@ -318,7 +318,23 @@ kryptos_ ## label_name:\
 }
 
 #define kryptos_run_cipher_hmac(cname, hname, ktask, cipher_args...) {\
-    /*TODO(Rafael): Call the HMAC incantition here.*/\
+    if ((*ktask)->action == kKryptosEncrypt) {\
+        kryptos_run_cipher(cname, ktask, cipher_args);\
+        if (kryptos_last_task_succeed(ktask)) {\
+            kryptos_hmac(ktask,\
+                         kryptos_ ## hname ## _hash,\
+                         kryptos_ ## hname ## _hash_input_size,\
+                         kryptos_ ## hname ## _hash_size);\
+        }\
+    } else if ((*ktask)->action == kKryptosDecrypt) {\
+            kryptos_hmac(ktask,\
+                         kryptos_ ## hname ## _hash,\
+                         kryptos_ ## hname ## _hash_input_size,\
+                         kryptos_ ## hname ## _hash_size);\
+            if (kryptos_last_task_succeed(ktask)) {\
+                kryptos_run_cipher(cname, ktask, cipher_args);\
+            }\
+    }\
 }
 
 #endif // KRYPTOS_C99
