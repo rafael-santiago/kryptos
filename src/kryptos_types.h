@@ -356,4 +356,12 @@ size_t kryptos_ ## hash_name ## _hash_size(void) {\
     return size;\
 }
 
+#define KRYPTOS_DECL_HASH_INPUT_SIZE(hash_name)\
+size_t kryptos_  ## hash_name ## _hash_input_size(void);
+
+#define KRYPTOS_IMPL_HASH_INPUT_SIZE(hash_name, size)\
+size_t kryptos_ ## hash_name ## _hash_input_size(void) {\
+    return size;\
+}
+
 #endif

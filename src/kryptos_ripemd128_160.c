@@ -111,6 +111,8 @@ KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(ripemd, kryptos_ripemd_ctx, ctx, KRYPTOS_RIP
 
 KRYPTOS_IMPL_HASH_SIZE(ripemd128, KRYPTOS_RIPEMD128_HASH_SIZE)
 
+KRYPTOS_IMPL_HASH_INPUT_SIZE(ripemd128, KRYPTOS_RIPEMD_BYTES_PER_BLOCK)
+
 KRYPTOS_IMPL_HASH_PROCESSOR(ripemd128, ktask, kryptos_ripemd_ctx, ctx, ripemd128_hash_epilogue,
                             {
                                 ctx.message = (*ktask)->in;
@@ -148,6 +150,8 @@ KRYPTOS_IMPL_HASH_PROCESSOR(ripemd128, ktask, kryptos_ripemd_ctx, ctx, ripemd128
                             })
 
 KRYPTOS_IMPL_HASH_SIZE(ripemd160, KRYPTOS_RIPEMD160_HASH_SIZE)
+
+KRYPTOS_IMPL_HASH_INPUT_SIZE(ripemd160, KRYPTOS_RIPEMD_BYTES_PER_BLOCK)
 
 KRYPTOS_IMPL_HASH_PROCESSOR(ripemd160, ktask, kryptos_ripemd_ctx, ctx, ripemd160_hash_epilogue,
                             {

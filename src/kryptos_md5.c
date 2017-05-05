@@ -76,6 +76,8 @@ KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(md5, kryptos_md5_ctx, ctx, KRYPTOS_MD5_BYTES
 
 KRYPTOS_IMPL_HASH_SIZE(md5, KRYPTOS_MD5_HASH_SIZE)
 
+KRYPTOS_IMPL_HASH_INPUT_SIZE(md5, KRYPTOS_MD5_BYTES_PER_BLOCK)
+
 KRYPTOS_IMPL_HASH_PROCESSOR(md5, ktask, kryptos_md5_ctx, ctx, md5_hash_epilogue,
                             {
                                 ctx.message = (*ktask)->in;

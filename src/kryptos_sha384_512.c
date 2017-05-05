@@ -126,6 +126,8 @@ KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(sha384_512, kryptos_sha384_512_ctx, ctx,
 
 KRYPTOS_IMPL_HASH_SIZE(sha384, KRYPTOS_SHA384_HASH_SIZE)
 
+KRYPTOS_IMPL_HASH_INPUT_SIZE(sha384, KRYPTOS_SHA384_512_BYTES_PER_BLOCK)
+
 KRYPTOS_IMPL_HASH_PROCESSOR(sha384, ktask, kryptos_sha384_512_ctx, ctx, sha384_hash_epilogue,
                             {
                                 ctx.bitsize = k384Bits; // INFO(Rafael): Let's request a 384-bit output.
@@ -167,6 +169,8 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha384, ktask, kryptos_sha384_512_ctx, ctx, sha384_h
                             })
 
 KRYPTOS_IMPL_HASH_SIZE(sha512, KRYPTOS_SHA512_HASH_SIZE)
+
+KRYPTOS_IMPL_HASH_INPUT_SIZE(sha512, KRYPTOS_SHA384_512_BYTES_PER_BLOCK)
 
 KRYPTOS_IMPL_HASH_PROCESSOR(sha512, ktask, kryptos_sha384_512_ctx, ctx, sha512_hash_epilogue,
                             {

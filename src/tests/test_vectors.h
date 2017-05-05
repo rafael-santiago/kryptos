@@ -184,9 +184,10 @@ static kryptos_u8_t *cbc_test_data[] = {
 
 // TODO(Rafael): Implement the hash test runner.
 
-#define kryptos_run_hash_tests(hash, size) {\
+#define kryptos_run_hash_tests(hash, input_size, size) {\
     kryptos_task_ctx t, *ktask = &t;\
     size_t tv, tv_nr = sizeof(hash ## _test_vector) / sizeof(hash ## _test_vector[0]);\
+    CUTE_ASSERT(kryptos_ ## hash ## _hash_input_size() == input_size);\
     CUTE_ASSERT(kryptos_ ## hash ## _hash_size() == size);\
     for (tv = 0; tv < tv_nr; tv++) {\
         t.in = hash ## _test_vector[tv].message;\

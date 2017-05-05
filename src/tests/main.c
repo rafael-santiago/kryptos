@@ -1517,39 +1517,39 @@ CUTE_TEST_CASE_END
 // INFO(Rafael): Hash validation area.
 
 CUTE_TEST_CASE(kryptos_sha1_tests)
-    kryptos_run_hash_tests(sha1, 20);
+    kryptos_run_hash_tests(sha1, 64, 20);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha224_tests)
-    kryptos_run_hash_tests(sha224, 28);
+    kryptos_run_hash_tests(sha224, 64, 28);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha256_tests)
-    kryptos_run_hash_tests(sha256, 32);
+    kryptos_run_hash_tests(sha256, 64, 32);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha384_tests)
-    kryptos_run_hash_tests(sha384, 48);
+    kryptos_run_hash_tests(sha384, 128, 48);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha512_tests)
-    kryptos_run_hash_tests(sha512, 64);
+    kryptos_run_hash_tests(sha512, 128, 64);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_md4_tests)
-    kryptos_run_hash_tests(md4, 16);
+    kryptos_run_hash_tests(md4, 64, 16);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_md5_tests)
-    kryptos_run_hash_tests(md5, 16);
+    kryptos_run_hash_tests(md5, 64, 16);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_ripemd128_tests)
-    kryptos_run_hash_tests(ripemd128, 16);
+    kryptos_run_hash_tests(ripemd128, 64, 16);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_ripemd160_tests)
-    kryptos_run_hash_tests(ripemd160, 20);
+    kryptos_run_hash_tests(ripemd160, 64, 20);
 CUTE_TEST_CASE_END
 
 // INFO(Rafael): End of hash validation area.

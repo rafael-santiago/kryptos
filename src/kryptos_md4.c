@@ -90,6 +90,8 @@ KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(md4, kryptos_md4_ctx, ctx,
 
 KRYPTOS_IMPL_HASH_SIZE(md4, KRYPTOS_MD4_HASH_SIZE)
 
+KRYPTOS_IMPL_HASH_INPUT_SIZE(md4, KRYPTOS_MD4_BYTES_PER_BLOCK)
+
 KRYPTOS_IMPL_HASH_PROCESSOR(md4, ktask, kryptos_md4_ctx, ctx, md4_hash_epilogue,
                             {
                                 ctx.message = (*ktask)->in;

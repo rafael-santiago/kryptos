@@ -89,6 +89,8 @@ KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(sha1, kryptos_sha1_ctx, ctx,
 
 KRYPTOS_IMPL_HASH_SIZE(sha1, KRYPTOS_SHA1_HASH_SIZE)
 
+KRYPTOS_IMPL_HASH_INPUT_SIZE(sha1, KRYPTOS_SHA1_BYTES_PER_BLOCK)
+
 KRYPTOS_IMPL_HASH_PROCESSOR(sha1, ktask, kryptos_sha1_ctx, ctx, sha1_hash_epilogue,
                             {
                                 ctx.message = (*ktask)->in;
