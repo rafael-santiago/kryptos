@@ -126,6 +126,10 @@ typedef struct kryptos_task {
     struct kryptos_task_aux_buffers_ctx aux_buffers;
 }kryptos_task_ctx;
 
+typedef void (*kryptos_hash_func)(kryptos_task_ctx **ktask);
+
+typedef size_t (*kryptos_hash_size_func)(void);
+
 #define KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(cipher_name)\
 void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
                                        kryptos_u8_t *key,\

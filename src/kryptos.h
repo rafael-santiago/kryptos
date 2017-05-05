@@ -318,46 +318,7 @@ kryptos_ ## label_name:\
 }
 
 #define kryptos_run_cipher_hmac(cname, hname, ktask, cipher_args...) {\
-    if ((ktask)->action == kKryptosEncrypt) {\
-        kryptos_run_cipher(cname, ktask, cipher_args);\
-        if (kryptos_last_task_succeed(ktask)) {\
-            (ktask)->aux_buffers.buf0 = (ktask)->in;\
-            (ktask)->aux_buffers.buf0_size = (ktask)->in_size;\
-            (ktask)->aux_buffers.buf1 = NULL;\
-            (ktask)->aux_buffers.buf1_size = 0;\
-            (ktask)->aux_buffers.buf2 = (ktask)->out;\
-            (ktask)->aux_buffers.buf2_size = (ktask)->out_size;\
-            (ktask)->in_size = (ktask)->key_size + (ktask)->out_size;\
-            (ktask)->in = (kryptos_u8_t *) kryptos_newseg((ktask)->in_size);\
-            memcpy((ktask)->in, (ktask)->key, (ktask)->key_size);\
-            memcpy((ktask)->in + (ktask)->key_size, (ktask)->out, (ktask)->out_size);\
-            (ktask)->mirror_p = (ktask);\
-            kryptos_ ## hname ## _hash((ktask)->mirror_p, 0);\
-            (ktask)->mirror_p = NULL;\
-            kryptos_freeseg((ktask)->in);\
-            (ktask)->in = (ktask)->aux_buffers.buf0;\
-            (ktask)->in_size = (ktask)->aux_buffers.buf0_size;\
-            (ktask)->aux_buffers.buf0 = NULL;\
-            (ktask)->aux_buffers.buf0_size = 0;\
-            if (kryptos_last_task_succeed(ktask)) {\
-                (ktask)->aux_buffers.buf0 = (ktask)->out;\
-                (ktask)->aux_buffers.buf0_size = (ktask)->out_size;\
-                (ktask)->aux_buffers.buf1_size = (ktask)->out_size + (ktask)->aux_buffers.buf2_size;\
-                (ktask)->aux_buffers.buf1 = (kryptos_u8_t *) kryptos_newseg((ktask)->aux_buffers.buf1_size);\
-                memcpy((ktask)->aux_buffers.buf1, (ktask)->aux_buffers.buf0, (ktask)->aux_buffers.buf0_size);\
-                memcpy((ktask)->aux_buffers.buf1 + (ktask)->aux_buffers.buf0_size, (ktask)->aux_buffers.buf2, (ktask)->aux_buffers.buf2_size);\
-            }\
-            (ktask)->out = (ktask)->aux_buffers.buf1;\
-            (ktask)->out_size = (ktask)->aux_buffers.buf1_size;\
-            (ktask)->aux_buffers.buf1 = NULL;\
-            (ktask)->aux_buffers.buf1_size = 0;\
-            kryptos_freeseg((ktask)->aux_buffers.buf2);\
-            (ktask)->aux_buffers.buf2 = NULL;\
-            (ktask)->aux_buffers.buf2_size = 0;\
-        }\
-    } else if ((ktask)->action == kKryptosDecrypt) {\
-        /*TODO(Rafael): Finishing up the HMAC decryption.*/\
-    }\
+    /*TODO(Rafael): Call the HMAC incantition here.*/\
 }
 
 #endif // KRYPTOS_C99
