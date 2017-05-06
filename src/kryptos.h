@@ -33,6 +33,8 @@
 #include <kryptos_md5.h>
 #include <kryptos_ripemd128_160.h>
 
+#include <kryptos_hmac.h>
+
 #define kryptos_task_set_ecb_mode(ktask) ( (ktask)->mode = kKryptosECB )
 
 #define kryptos_task_set_cbc_mode(ktask) ( (ktask)->mode = kKryptosCBC )
@@ -318,22 +320,26 @@ kryptos_ ## label_name:\
 }
 
 #define kryptos_run_cipher_hmac(cname, hname, ktask, cipher_args...) {\
-    if ((*ktask)->action == kKryptosEncrypt) {\
+    if ((ktask)->action == kKryptosEncrypt) {\
         kryptos_run_cipher(cname, ktask, cipher_args);\
         if (kryptos_last_task_succeed(ktask)) {\
-            kryptos_hmac(ktask,\
+            (ktask)->mirror_p = (ktask);\
+            kryptos_hmac(&(ktask)->mirror_p,\
                          kryptos_ ## hname ## _hash,\
                          kryptos_ ## hname ## _hash_input_size,\
                          kryptos_ ## hname ## _hash_size);\
+            (ktask)->mirror_p = NULL;\
         }\
-    } else if ((*ktask)->action == kKryptosDecrypt) {\
-            kryptos_hmac(ktask,\
+    } else if ((ktask)->action == kKryptosDecrypt) {\
+            (ktask)->mirror_p = (ktask);\
+            kryptos_hmac(&(ktask)->mirror_p,\
                          kryptos_ ## hname ## _hash,\
                          kryptos_ ## hname ## _hash_input_size,\
                          kryptos_ ## hname ## _hash_size);\
             if (kryptos_last_task_succeed(ktask)) {\
                 kryptos_run_cipher(cname, ktask, cipher_args);\
             }\
+            (ktask)->mirror_p = NULL;\
     }\
 }
 

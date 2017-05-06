@@ -88,12 +88,22 @@ static void kryptos_hmac_check(kryptos_task_ctx **ktask,
                                kryptos_hash_func h,
                                kryptos_hash_size_func h_input_size,
                                kryptos_hash_size_func h_size) {
-    kryptos_u8_t *hmac = NULL;
-    size_t hmac_size = h_size();
+    kryptos_u8_t *hmac = NULL, *x = NULL;
+    size_t hmac_size = h_size(), x_size = (*ktask)->in_size - hmac_size, temp_size;
 
-    hmac = kryptos_hmac_gen((*ktask)->key, (*ktask)->key_size,
-                            (*ktask)->in + hmac_size, (*ktask)->in_size - hmac_size,
-                            h, h_input_size, h_size, &hmac_size, &(*ktask)->result, &(*ktask)->result_verbose);
+    x = (kryptos_u8_t *) kryptos_newseg(x_size);
+
+    if (x != NULL) {
+        // WARN(Rafael): We need to copy the following bytes from the original input because x is always freed when the
+        //               HMAC extraction succeeds.
+        memcpy(x, (*ktask)->in + hmac_size, x_size);
+        hmac = kryptos_hmac_gen((*ktask)->key, (*ktask)->key_size,
+                                x, x_size,
+                                h, h_input_size, h_size, &temp_size, &(*ktask)->result, &(*ktask)->result_verbose);
+    } else {
+        (*ktask)->result = kKryptosHMACError;
+        (*ktask)->result_verbose = "No memory to copy x.";
+    }
 
     if (kryptos_last_task_succeed((*ktask))) {
         if (hmac == NULL || memcmp(hmac, (*ktask)->in, hmac_size) != 0) {
@@ -102,15 +112,23 @@ static void kryptos_hmac_check(kryptos_task_ctx **ktask,
         } else {
             // INFO(Rafael): The input is not corrupted. We will extract the x from the current input.
             //               Making it our new input.
-            kryptos_freeseg(hmac);
-            (*ktask)->in_size -= hmac_size;
-            hmac = (kryptos_u8_t *) kryptos_newseg(hmac_size);
-            memcpy(hmac, (*ktask)->in + hmac_size, (*ktask)->in_size);
-            memset((*ktask)->in, 0, hmac_size + (*ktask)->in_size);
-            kryptos_freeseg((*ktask)->in);
-            (*ktask)->in = hmac;
-            hmac = NULL;
+            x = (kryptos_u8_t *) kryptos_newseg(x_size);
+            if (x != NULL) {
+                memcpy(x, (*ktask)->in + hmac_size, x_size);
+                memset((*ktask)->in, 0, (*ktask)->in_size);
+                kryptos_freeseg((*ktask)->in);
+                (*ktask)->in_size = x_size;
+                (*ktask)->in = x;
+                x = NULL;
+            } else {
+                (*ktask)->result = kKryptosHMACError;
+                (*ktask)->result_verbose = "No memory to extract x.";
+            }
         }
+    } else if (x != NULL) {
+        // INFO(Rafael): If the task is not completed x has a strong probability of leaking.
+        memset(x, 0, x_size);
+        kryptos_freeseg(x);
     }
 
     if (hmac != NULL) {
@@ -119,6 +137,10 @@ static void kryptos_hmac_check(kryptos_task_ctx **ktask,
     }
 
     hmac_size = 0;
+
+    x_size = 0;
+
+    temp_size = 0;
 }
 
 static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_size,
@@ -223,7 +245,7 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
     memcpy(iktask.in, k_xor_ipad, k_xor_size);
     memcpy(iktask.in + k_xor_size, x, x_size);
 
-    h(&iktask.mirror_p);
+    h(&iktask.mirror_p, 0);
 
     if (!kryptos_last_task_succeed(&iktask)) {
         *result = kKryptosHMACError;
@@ -243,7 +265,7 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
     memcpy(oktask.in, k_xor_opad, k_xor_size);
     memcpy(oktask.in + k_xor_size, iktask.out, iktask.out_size);
 
-    h(&oktask.mirror_p);
+    h(&oktask.mirror_p, 0);
 
     if (!kryptos_last_task_succeed(&oktask)) {
         *result = kKryptosHMACError;

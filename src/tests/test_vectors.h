@@ -91,6 +91,32 @@ static kryptos_u8_t *cbc_test_data[] = {
         "\t\t\"Time for you to leave.\" -- The Tao of Programming"
 };
 
+static kryptos_u8_t *hmac_test_data[] = {
+    "'There once was a Master Programmer who wrote unstructured programs. A novice programmer, seeking to imitate him, "
+    "also began to write unstructured programs. When the novice asked the Master to evaluate his progress, the Master "
+    "criticized him for writing unstructured programs, saying, 'What is appropriate for the Master is not appropriate "
+    "for the novice. You must understand Tao before transcending structure.'",
+
+    "There was once a programmer who was attached to the court of the warlord of Wu. The warlord asked the programmer: "
+    "'Which is easier to design: an accounting package or an operating system?' 'An operating system,' replied the programmer."
+    "The warlord uttered an exclamation of disbelief. 'Surely an accounting package is trivial next to the complexity of an "
+    "operating system,' he said. 'Not so,' said the programmer, 'When designing an accounting package, the programmer "
+    "operates as a mediator between people having different ideas: how it must operate, how its reports must appear, and "
+    "how it must conform to the tax laws. By contrast, an operating system is not limited by outside appearances. When "
+    "designing an operating system, the programmer seeks the simplest harmony between machine and ideas. This is why an "
+    "operating system is easier to design.' The warlord of Wu nodded and smiled. 'That is all good and well, but which "
+    "is easier to debug?' The programmer made no reply.",
+
+    "'A well-written program is its own Heaven; a poorly-written program is its own Hell.'",
+
+    "Does a good farmer neglect a crop he has planted? "
+    "Does a good teacher overlook even the most humble student? "
+    "Does a good father allow a single child to starve? "
+    "Does a good programmer refuse to maintain his code?",
+
+    "'Without the wind, the grass does not move. Without software hardware is useless.'"
+};
+
 #define kryptos_run_block_cipher_tests(cipher_name, blocksize) {\
     kryptos_task_ctx t, *ktask = &t;\
     size_t cbc_test_data_nr = sizeof(cbc_test_data) / sizeof(cbc_test_data[0]);\
@@ -204,5 +230,35 @@ static kryptos_u8_t *cbc_test_data[] = {
         kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
     }\
 }
+
+#ifdef KRYPTOS_C99
+
+#define kryptos_run_hmac_tests(t, tv, tv_nr, data_size, cname, hname, cipher_args...) {\
+    tv_nr = sizeof(hmac_test_data) / sizeof(hmac_test_data[0]);\
+    for (tv = 0; tv < tv_nr; tv++) {\
+        data_size = strlen(hmac_test_data[tv]);\
+        t.iv = NULL;\
+        kryptos_task_set_in(&t, hmac_test_data[tv], data_size);\
+        kryptos_task_set_encrypt_action(&t);\
+        kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
+        CUTE_ASSERT(t.in != NULL);\
+        CUTE_ASSERT(t.out != NULL);\
+        kryptos_task_set_in(&t, t.out, t.out_size);\
+        kryptos_task_set_decrypt_action(&t);\
+        kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
+        CUTE_ASSERT(t.in != NULL);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size == data_size);\
+        CUTE_ASSERT(memcmp(t.out, hmac_test_data[tv], t.out_size) == 0);\
+        if (t.mode == kKryptosECB) {\
+            kryptos_task_free(&t, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+        } else {\
+            kryptos_task_free(&t, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+        }\
+        /*TODO(Rafael): Test with corrupted cryptograms.*/\
+    }\
+}
+
+#endif
 
 #endif // KRYPTOS_TESTS_TEST_VECTORS_H
