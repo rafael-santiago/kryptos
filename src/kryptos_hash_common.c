@@ -8,6 +8,8 @@
 #include <kryptos_hash_common.h>
 #include <string.h>
 
+// INFO(Rafael): The following functions are useful for hash algorithms that use Merkle-Damgard construction.
+
 void kryptos_hash_apply_pad_on_u32_block(kryptos_u32_t *input, size_t const input_nr,
                                          const size_t *block_index_decision_table,
                                          const kryptos_u64_t curr_len, const kryptos_u64_t total_len,

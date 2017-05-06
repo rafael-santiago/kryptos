@@ -236,6 +236,7 @@ static kryptos_u8_t *hmac_test_data[] = {
 #define kryptos_run_hmac_tests(t, tv, tv_nr, data_size, cname, hname, cipher_args...) {\
     tv_nr = sizeof(hmac_test_data) / sizeof(hmac_test_data[0]);\
     for (tv = 0; tv < tv_nr; tv++) {\
+        kryptos_task_init_as_null(&t);\
         data_size = strlen(hmac_test_data[tv]);\
         t.iv = NULL;\
         kryptos_task_set_in(&t, hmac_test_data[tv], data_size);\
@@ -255,7 +256,24 @@ static kryptos_u8_t *hmac_test_data[] = {
         } else {\
             kryptos_task_free(&t, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
         }\
-        /*TODO(Rafael): Test with corrupted cryptograms.*/\
+        /*INFO(Rafael): Corrupting the cryptograms.*/\
+        t.iv = NULL;\
+        kryptos_task_set_in(&t, hmac_test_data[tv], data_size);\
+        kryptos_task_set_encrypt_action(&t);\
+        kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
+        CUTE_ASSERT(t.in != NULL);\
+        CUTE_ASSERT(t.out != NULL);\
+        kryptos_task_set_in(&t, t.out, t.out_size);\
+        t.in[t.in_size >> 1] = ~t.in[t.in_size >> 1];\
+        kryptos_task_set_decrypt_action(&t);\
+        kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
+        CUTE_ASSERT(kryptos_last_task_succeed(&t) == 0);\
+        CUTE_ASSERT(t.result == kKryptosHMACError);\
+        if (t.mode == kKryptosECB) {\
+            kryptos_task_free(&t, KRYPTOS_TASK_IN);\
+        } else {\
+            kryptos_task_free(&t, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+        }\
     }\
 }
 
