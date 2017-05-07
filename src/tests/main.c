@@ -2064,6 +2064,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_hex_tests);
     CUTE_RUN_TEST(kryptos_hash_common_tests);
 
+    //  -=-=-=-=- If you have just added a new cipher take a look in "kryptos_dsl_tests" case, there is some work to
+    //                                               be done there too! -=-=-=-=-=-=-
+
     // INFO(Rafael): Internal DSL stuff.
     CUTE_RUN_TEST(kryptos_dsl_tests);
 
@@ -2092,8 +2095,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_ripemd128_tests);
     CUTE_RUN_TEST(kryptos_ripemd160_tests);
 
-    //  -=-=-=-=- If you have just added a new cipher take a look in "kryptos_dsl_tests" case, there is some work to
-    //                                               be done there too! -=-=-=-=-=-=-
+    //  -=-=-=-=-=-=- New block ciphers should be added to HMAC tests. -=-=-=-=-=-=-=-
 
     // INFO(Rafael): HMAC tests.
     CUTE_RUN_TEST(kryptos_hmac_tests);
