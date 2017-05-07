@@ -72,7 +72,7 @@ void kryptos_hash_ld_u8buf_as_u64_blocks(kryptos_u8_t *buffer, const int buffer_
                                          kryptos_u64_t *input, const size_t input_nr,
                                          const size_t *block_index_decision_table) {
     size_t b, i;
-    if (buffer_size > (input_nr << 2)) {
+    if (buffer_size > (input_nr << 3)) {
         // INFO(Rafael): Let's skip it. It should never happen in normal conditions.
         return;
     }

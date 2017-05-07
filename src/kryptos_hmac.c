@@ -199,7 +199,7 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
     hash_size = h_size();
 
     input_key_delta = abs(hash_input_size - key_size);
-    k_xor_size = input_key_delta + key_size;
+    k_xor_size = hash_input_size;
 
     k_xor_ipad = (kryptos_u8_t *) kryptos_newseg(k_xor_size);
     if (k_xor_ipad == NULL) {
