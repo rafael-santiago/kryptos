@@ -18,6 +18,7 @@
 #include <kryptos_uuencode.h>
 #include <kryptos_hex.h>
 #include <kryptos_hash_common.h>
+#include <kryptos_huffman.h>
 #include "test_vectors.h"
 #include <stdlib.h>
 #include <string.h>
@@ -1788,7 +1789,7 @@ CUTE_TEST_CASE(kryptos_ripemd160_tests)
 CUTE_TEST_CASE_END
 
 // INFO(Rafael): End of hash validation area.
-
+/*
 CUTE_TEST_CASE(kryptos_hmac_tests)
 #ifdef KRYPTOS_C99
     kryptos_u8_t *key = "nooneknows";
@@ -2050,6 +2051,12 @@ CUTE_TEST_CASE(kryptos_hmac_tests)
 #endif // KRYPTOS_C99
 
 CUTE_TEST_CASE_END
+*/
+CUTE_TEST_CASE(kryptos_huffman_tests)
+    kryptos_u8_t *in = "AAAAAAAAAABBBBBCCDEEEEEFFFGGGGZZZZYYXXXXXXXX";
+    size_t in_size = strlen(in);
+    kryptos_u8_t *deflated_buffer = kryptos_huffman_deflate(in, in_size);
+CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_test_monkey)
     // CLUE(Rafael): Before adding a new test try to find out the best place that it fits.
@@ -2100,11 +2107,13 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     //  -=-=-=-=-=-=- New block ciphers/hash functions should be added to HMAC tests. -=-=-=-=-=-=-=-
 
     // INFO(Rafael): HMAC tests.
-    CUTE_RUN_TEST(kryptos_hmac_tests);
+    //CUTE_RUN_TEST(kryptos_hmac_tests);
 
     // INFO(Rafael): Encoding stuff.
     CUTE_RUN_TEST(kryptos_base64_tests);
     CUTE_RUN_TEST(kryptos_uuencode_tests);
+
+    CUTE_RUN_TEST(kryptos_huffman_tests);
 
 CUTE_TEST_CASE_END
 
