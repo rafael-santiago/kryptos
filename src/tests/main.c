@@ -2056,6 +2056,9 @@ CUTE_TEST_CASE(kryptos_huffman_tests)
     kryptos_u8_t *in = "AAAAAAAAAABBBBBCCDEEEEEFFFGGGGZZZZYYXXXXXXXX";
     size_t in_size = strlen(in), deflated_buffer_size;
     kryptos_u8_t *deflated_buffer = kryptos_huffman_deflate(in, in_size, &deflated_buffer_size);
+    CUTE_ASSERT(deflated_buffer != NULL);
+    //printf("%s\n", deflated_buffer);
+    kryptos_freeseg(deflated_buffer);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_test_monkey)

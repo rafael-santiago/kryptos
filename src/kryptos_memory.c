@@ -32,3 +32,7 @@ void kryptos_freeseg(void *seg) {
 #endif
     }
 }
+
+void *kryptos_realloc(void *addr, const size_t ssize) {
+    return realloc(addr, ssize);
+}
