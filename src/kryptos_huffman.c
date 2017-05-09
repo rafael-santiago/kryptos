@@ -245,7 +245,7 @@ static void kryptos_huffman_scan_codes(kryptos_u8_t *path_buff,
         memset(code->data, 0, sizeof(code->data));
         memcpy(code->data, path_buff, path_index);
         code->data_size = path_index;
-        //printf("%c %s\n", branch->byte, code);
+//        printf("%c %s\n", branch->byte, code);
         return;
     }
 
@@ -261,7 +261,7 @@ static void kryptos_huffman_scan_codes(kryptos_u8_t *path_buff,
 }
 
 static size_t kryptos_huffman_eval_deflated_out_size(const kryptos_u8_t *in, const size_t in_size) {
-    size_t total_size = 0;
+    size_t total_size = 2;
     size_t n;
 
     // WARN(Rafael): This function will request more than is really needed.
@@ -299,6 +299,94 @@ static kryptos_u8_t *kryptos_huffman_dump_tree(kryptos_u8_t *out, const kryptos_
             out++;
         }
     }
+    *out = 0;
+    *(out + 1) = 0;
+    out += 2;
+    return out;
+}
+
+static const kryptos_u8_t *kryptos_huffman_add_node(struct kryptos_huffman_tree_ctx **tree,
+                                                    const kryptos_u8_t *in, const kryptos_u8_t *in_end) {
+
+    if ((*in == 0 && *(in + 1) == 0) || (in == in_end)) {
+        return in;
+    }
+
+    if (*tree == NULL) {
+        kryptos_huffman_new_tree((*tree));
+    }
+
+    if (*in == '0') {
+        return kryptos_huffman_add_node(&(*tree)->l, in + 1, in_end);
+    } else if (*in == '1') {
+        return kryptos_huffman_add_node(&(*tree)->r, in + 1, in_end);
+    } else {
+        (*tree)->byte = *in;
+    }
+
+    return in + 1;
+}
+
+static const kryptos_u8_t *kryptos_huffman_rebuild_tree(const kryptos_u8_t *in, const size_t in_size) {
+    const kryptos_u8_t *in_p, *in_p_end;
+    in_p = in;
+    in_p_end = in_p + in_size;
+
+    while (in_p < in_p_end && !(*in_p == 0 && *(in_p + 1) == 0)) {
+        in_p = kryptos_huffman_add_node(&htree, in_p, in_p_end);
+    }
+
+    return in_p + 2;
+}
+
+kryptos_u8_t *kryptos_huffman_inflate(const kryptos_u8_t *in, const size_t in_size, size_t *out_size) {
+    kryptos_u8_t *out = NULL, *out_p;
+    const kryptos_u8_t *in_p, *in_p_end;
+    struct kryptos_huffman_tree_ctx *tp;
+    ssize_t bit;
+
+    in_p_end = in + in_size;
+    in_p = kryptos_huffman_rebuild_tree(in, in_size);
+    tp = htree;
+
+    out = (kryptos_u8_t *) kryptos_newseg(in_size);
+
+    if (out == NULL) {
+        *out_size = 0;
+        goto kryptos_huffman_inflate_epilogue;
+    }
+
+    memset(out, 0, in_size);
+
+    out_p = out;
+
+    while (in_p < in_p_end) {
+        for (bit = 7; bit >= 0; bit--) {
+            if (((*in_p & (0x1 << bit)) >> bit) == 0) {
+                tp = tp->l;
+            } else {
+                tp = tp->r;
+            }
+
+            if (tp->l == NULL && tp->r == NULL) {
+                *out_p = tp->byte;
+                out_p++;
+                tp = htree;
+            }
+        }
+        in_p++;
+    }
+
+    // TODO(Rafael): Handle the padding bits.
+
+    *out_size = (out_p - out);
+
+    out = kryptos_realloc(out, *out_size);
+
+kryptos_huffman_inflate_epilogue:
+
+    kryptos_huffman_del_tree(htree);
+
     return out;
 }
 
@@ -339,14 +427,14 @@ kryptos_u8_t *kryptos_huffman_deflate(const kryptos_u8_t *in, const size_t in_si
         if ((bitbuf_p + kryptos_huffman_get_code_size(*in_p)) >= bitbuf_p_end) {
             bitbuf_p = &bitbuf[0];
             while (bitbuf_p < bitbuf_p_end) {
-                *out_p = (kryptos_huffman_get_code_bit(*bitbuf_p    ) << 7) |
-                         (kryptos_huffman_get_code_bit(*bitbuf_p + 1) << 6) |
-                         (kryptos_huffman_get_code_bit(*bitbuf_p + 2) << 5) |
-                         (kryptos_huffman_get_code_bit(*bitbuf_p + 3) << 4) |
-                         (kryptos_huffman_get_code_bit(*bitbuf_p + 4) << 3) |
-                         (kryptos_huffman_get_code_bit(*bitbuf_p + 5) << 2) |
-                         (kryptos_huffman_get_code_bit(*bitbuf_p + 6) << 1) |
-                         kryptos_huffman_get_code_bit(*bitbuf_p  + 7);
+                *out_p = (kryptos_huffman_get_code_bit(bitbuf_p[0]) << 7) |
+                         (kryptos_huffman_get_code_bit(bitbuf_p[1]) << 6) |
+                         (kryptos_huffman_get_code_bit(bitbuf_p[2]) << 5) |
+                         (kryptos_huffman_get_code_bit(bitbuf_p[3]) << 4) |
+                         (kryptos_huffman_get_code_bit(bitbuf_p[4]) << 3) |
+                         (kryptos_huffman_get_code_bit(bitbuf_p[5]) << 2) |
+                         (kryptos_huffman_get_code_bit(bitbuf_p[6]) << 1) |
+                         kryptos_huffman_get_code_bit(bitbuf_p[7]);
                 bitbuf_p += 8;
                 out_p++;
             }
@@ -359,29 +447,30 @@ kryptos_u8_t *kryptos_huffman_deflate(const kryptos_u8_t *in, const size_t in_si
     }
 
     if (bitbuf_p != &bitbuf[0]) {
+        // TODO(Rafael): Handle the padding bits.
         bitbuf_p_end = bitbuf_p + 1;
         bitbuf_p = &bitbuf[0];
         while (bitbuf_p < bitbuf_p_end) {
-            *out_p = (kryptos_huffman_get_code_bit(*bitbuf_p    ) << 7) |
-                     (kryptos_huffman_get_code_bit(*bitbuf_p + 1) << 6) |
-                     (kryptos_huffman_get_code_bit(*bitbuf_p + 2) << 5) |
-                     (kryptos_huffman_get_code_bit(*bitbuf_p + 3) << 4) |
-                     (kryptos_huffman_get_code_bit(*bitbuf_p + 4) << 3) |
-                     (kryptos_huffman_get_code_bit(*bitbuf_p + 5) << 2) |
-                     (kryptos_huffman_get_code_bit(*bitbuf_p + 6) << 1) |
-                     kryptos_huffman_get_code_bit(*bitbuf_p  + 7);
+            *out_p = (kryptos_huffman_get_code_bit(bitbuf_p[0]) << 7) |
+                     (kryptos_huffman_get_code_bit(bitbuf_p[1]) << 6) |
+                     (kryptos_huffman_get_code_bit(bitbuf_p[2]) << 5) |
+                     (kryptos_huffman_get_code_bit(bitbuf_p[3]) << 4) |
+                     (kryptos_huffman_get_code_bit(bitbuf_p[4]) << 3) |
+                     (kryptos_huffman_get_code_bit(bitbuf_p[5]) << 2) |
+                     (kryptos_huffman_get_code_bit(bitbuf_p[6]) << 1) |
+                     kryptos_huffman_get_code_bit(bitbuf_p[7]);
             bitbuf_p += 8;
             out_p++;
         }
     }
-
-    kryptos_huffman_del_tree(htree);
 
     *out_size = out_p - out;
 
     out = kryptos_realloc(out, *out_size);
 
 kryptos_huffman_deflate_epilogue:
+
+    kryptos_huffman_del_tree(htree);
 
     return out;
 }

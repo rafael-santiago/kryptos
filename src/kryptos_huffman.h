@@ -12,4 +12,6 @@
 
 kryptos_u8_t *kryptos_huffman_deflate(const kryptos_u8_t *in, const size_t in_size, size_t *out_size);
 
+kryptos_u8_t *kryptos_huffman_inflate(const kryptos_u8_t *in, const size_t in_size, size_t *out_size);
+
 #endif
