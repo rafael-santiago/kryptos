@@ -220,10 +220,17 @@ static void kryptos_huffman_scan_codes(kryptos_u8_t *path_buff, const size_t pat
     }
 }
 
-kryptos_u8_t *kryptos_huffman_deflate(const kryptos_u8_t *in, const size_t in_size) {
+kryptos_u8_t *kryptos_huffman_deflate(const kryptos_u8_t *in, const size_t in_size, size_t *out_size) {
     // INFO(Rafael): Huffman coding evaluation.
     kryptos_huffman_eval_byte_freq(in, in_size);
     kryptos_huffman_mktree();
     kryptos_huffman_get_codes();
+    // TODO(Rafael): Compress the input buffer.
     kryptos_huffman_del_tree(htree);
 }
+
+#undef kryptos_huffman_new_tree
+
+#undef kryptos_huffman_del_tree
+
+#undef KRYPTOS_HUFFMAN_MAX_CODE_SIZE
