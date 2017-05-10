@@ -1789,8 +1789,9 @@ CUTE_TEST_CASE(kryptos_ripemd160_tests)
 CUTE_TEST_CASE_END
 
 // INFO(Rafael): End of hash validation area.
-/*
+
 CUTE_TEST_CASE(kryptos_hmac_tests)
+
 #ifdef KRYPTOS_C99
     kryptos_u8_t *key = "nooneknows";
     size_t key_size = 10;
@@ -2051,16 +2052,131 @@ CUTE_TEST_CASE(kryptos_hmac_tests)
 #endif // KRYPTOS_C99
 
 CUTE_TEST_CASE_END
-*/
+
 CUTE_TEST_CASE(kryptos_huffman_tests)
-    kryptos_u8_t *in = "AAAAAAAAAABBBBBCCDEEEEEFFFGGGGZZZZYYXXXXXXXX";
-    size_t in_size = strlen(in), deflated_buffer_size, inflated_buffer_size;
-    kryptos_u8_t *deflated_buffer = kryptos_huffman_deflate(in, in_size, &deflated_buffer_size), *inflated_buffer = NULL;
-    CUTE_ASSERT(deflated_buffer != NULL);
-    //printf("%s\n", deflated_buffer);
-    inflated_buffer = kryptos_huffman_inflate(deflated_buffer, deflated_buffer_size, &inflated_buffer_size);
-    kryptos_freeseg(deflated_buffer);
-    kryptos_freeseg(inflated_buffer);
+    kryptos_u8_t *test_vector[] = {
+        "AAAAAAAAAABBBBBCCDEEEEEFFFGGGGZZZZYYXXXXXXXX",
+
+        "ACAAGATGCCATTGTCCCCCGGCCTCCTGCTGCTGCTGCTCTCCGGGGCCACGGCCACCGCTGCCCTGCC"
+        "CCTGGAGGGTGGCCCCACCGGCCGAGACAGCGAGCATATGCAGGAAGCGGCAGGAATAAGGAAAAGCAGC"
+        "CTCCTGACTTTCCTCGCTTGGTGGTTTGAGTGGACCTCCCAGGCCAGTGCCGGGCCCCTCATAGGAGAGG"
+        "AAGCTCGGGAGGTGGCCAGGCGGCAGGAAGGCGCACCCCCCCAGCAATCCGCGCGCCGGGACAGAATGCC"
+        "CTGCAGGAACTTCTTCTGGAAGACCTTCTCCTCCTGCAAATAAAACCTCACCCATGAATGCTCACGCAAG"
+        "TTTAATTACAGACCTGAA",
+
+        "E como eu palmilhasse vagamente\n"
+        "uma estrada de Minas, pedregosa,\n"
+        "e no fecho da tarde um sino rouco\n\n"
+        "se misturasse ao som de meus sapatos\n"
+        "que era pausado e seco; e aves pairassem\n"
+        "no céu de chumbo, e suas formas pretas\n\n"
+        "lentamente se fossem diluindo\n"
+        "na escuridão maior, vinda dos montes\n"
+        "e de meu próprio ser desenganado,\n\n"
+        "a máquina do mundo se entreabriu\n"
+        "para quem de a romper já se esquivava\n"
+        "e só de o ter pensado se carpia.\n\n"
+        "Abriu-se majestosa e circunspecta,\n"
+        "sem emitir um som que fosse impuro\n"
+        "nem um clarão maior que o tolerável\n\n"
+        "pelas pupilas gastas na inspeção\n"
+        "contínua e dolorosa do deserto,\n"
+        "e pela mente exausta de mentar\n\n"
+        "toda uma realidade que transcende\n"
+        "a própria imagem sua debuxada\n"
+        "no rosto do mistério, nos abismos.\n\n"
+        "Abriu-se em calma pura, e convidando\n"
+        "quantos sentidos e intuições restavam\n"
+        "a quem de os ter usado os já perdera\n\n"
+        "e nem desejaria recobrá-los,\n"
+        "se em vão e para sempre repetimos\n"
+        "os mesmos sem roteiro tristes périplos,\n\n"
+        "convidando-os a todos, em coorte,\n"
+        "a se aplicarem sobre o pasto inédito\n"
+        "da natureza mítica das coisas,\n\n"
+        "assim me disse, embora voz alguma\n"
+        "ou sopro ou eco ou simples percussão\n"
+        "atestasse que alguém, sobre a montanha,\n\n"
+        "a outro alguém, noturno e miserável,\n"
+        "em colóquio se estava dirigindo:\n"
+        "O que procuraste em ti ou fora de\n\n"
+        "teu ser restrito e nunca se mostrou,\n"
+        "mesmo afetando dar-se ou se rendendo,\n"
+        "e a cada instante mais se retraindo,\n\n"
+        "olha, repara, ausculta: essa riqueza\n"
+        "sobrante a toda pérola, essa ciência\n"
+        "sublime e formidável, mas hermética,\n\n"
+        "essa total explicação da vida,\n"
+        "esse nexo primeiro e singular,\n"
+        "que nem concebes mais, pois tão esquivo\n\n"
+        "se revelou ante a pesquisa ardente\n"
+        "em que te consumiste... vê, contempla,\n"
+        "abre teu peito para agasalhá-lo.\n\n"
+        "As mais soberbas pontes e edifícios,\n"
+        "o que nas oficinas se elabora,\n"
+        "o que pensado foi e logo atinge\n\n"
+        "distância superior ao pensamento,\n"
+        "os recursos da terra dominados,\n"
+        "e as paixões e os impulsos e os tormentos\n\n"
+        "e tudo que define o ser terrestre\n"
+        "ou se prolonga até nos animais\n"
+        "e chega às plantas para se embeber\n\n"
+        "no sono rancoroso dos minérios,\n"
+        "dá volta ao mundo e torna a se engolfar,\n"
+        "na estranha ordem geométrica de tudo,\n\n"
+        "e o absurdo original e seus enigmas,\n"
+        "suas verdades altas mais que todos\n"
+        "monumentos erguidos à verdade:\n\n"
+        "e a memória dos deuses, e o solene\n"
+        "sentimento de morte, que floresce\n"
+        "no caule da existência mais gloriosa,\n\n"
+        "tudo se apresentou nesse relance\n"
+        "e me chamou para seu reino augusto,\n"
+        "afinal submetido à vista humana.\n\n"
+        "Mas, como eu relutasse em responder\n"
+        "a tal apelo assim maravilhoso,\n"
+        "pois a fé se abrandara, e mesmo o anseio,\n\n"
+        "a esperança mais mínima — esse anelo\n"
+        "de ver desvanecida a treva espessa\n"
+        "que entre os raios do sol inda se filtra;\n\n"
+        "como defuntas crenças convocadas\n"
+        "presto e fremente não se produzissem\n"
+        "a de novo tingir a neutra face\n\n"
+        "que vou pelos caminhos demonstrando,\n"
+        "e como se outro ser, não mais aquele\n"
+        "habitante de mim há tantos anos,\n\n"
+        "passasse a comandar minha vontade\n"
+        "que, já de si volúvel, se cerrava\n"
+        "semelhante a essas flores reticentes\n\n"
+        "em si mesmas abertas e fechadas;\n"
+        "como se um dom tardio já não fora\n"
+        "apetecível, antes despiciendo,\n\n"
+        "baixei os olhos, incurioso, lasso,\n"
+        "desdenhando colher a coisa oferta\n"
+        "que se abria gratuita a meu engenho.\n\n"
+        "A treva mais estrita já pousara\n"
+        "sobre a estrada de Minas, pedregosa,\n"
+        "e a máquina do mundo, repelida,\n\n"
+        "se foi miudamente recompondo,\n"
+        "enquanto eu, avaliando o que perdera,\n"
+        "seguia vagaroso, de mãos pensas.\n\n\n\n"
+        "-- A Máquina do Mundo - Carlos Drummond de Andrade"
+    };
+    size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+    size_t in_size, deflated_buffer_size, inflated_buffer_size;
+    kryptos_u8_t *deflated_buffer = NULL, *inflated_buffer = NULL;
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        in_size = strlen(test_vector[tv]);
+        deflated_buffer = kryptos_huffman_deflate(test_vector[tv], in_size, &deflated_buffer_size);
+        CUTE_ASSERT(deflated_buffer != NULL);
+        inflated_buffer = kryptos_huffman_inflate(deflated_buffer, deflated_buffer_size, &inflated_buffer_size);
+        CUTE_ASSERT(inflated_buffer != NULL);
+        CUTE_ASSERT(inflated_buffer_size == in_size);
+        CUTE_ASSERT(memcmp(inflated_buffer, test_vector[tv], inflated_buffer_size) == 0);
+        kryptos_freeseg(deflated_buffer);
+        kryptos_freeseg(inflated_buffer);
+    }
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_test_monkey)
@@ -2111,14 +2227,17 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     //  -=-=-=-=-=-=- New block ciphers/hash functions should be added to HMAC tests. -=-=-=-=-=-=-=-
 
-    // INFO(Rafael): HMAC tests.
-    //CUTE_RUN_TEST(kryptos_hmac_tests);
-
     // INFO(Rafael): Encoding stuff.
     CUTE_RUN_TEST(kryptos_base64_tests);
     CUTE_RUN_TEST(kryptos_uuencode_tests);
 
     CUTE_RUN_TEST(kryptos_huffman_tests);
+
+    // INFO(Rafael): HMAC tests.
+
+    // TODO(Rafael): This is kind of slow due to the C pre-processor. Skip the pre-processing of those macros through a
+    //               build option.
+    CUTE_RUN_TEST(kryptos_hmac_tests);
 
 CUTE_TEST_CASE_END
 
