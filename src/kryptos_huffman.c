@@ -31,9 +31,9 @@
     (t) = NULL;\
 }
 
-#define kryptos_huffman_get_code(b) ( hcodes[(b)].data )
+#define kryptos_huffman_get_code(hcodes, b) ( (hcodes)[(b)].data )
 
-#define kryptos_huffman_get_code_size(b) ( hcodes[(b)].data_size )
+#define kryptos_huffman_get_code_size(hcodes, b) ( (hcodes)[(b)].data_size )
 
 #define kryptos_huffman_get_code_bit(c) ( ((c) - 48) & 0x1 )
 
@@ -177,8 +177,8 @@ kryptos_u8_t *kryptos_huffman_deflate(const kryptos_u8_t *in, const size_t in_si
     bitbuf_p_end = bitbuf_p + sizeof(bitbuf);
 
     while (in_p < in_p_end) {
-        if ((bitbuf_p + kryptos_huffman_get_code_size(*in_p)) >= bitbuf_p_end) {
-            code_p = kryptos_huffman_get_code(*in_p);
+        if ((bitbuf_p + kryptos_huffman_get_code_size(hcodes, *in_p)) >= bitbuf_p_end) {
+            code_p = kryptos_huffman_get_code(hcodes, *in_p);
 
             while (bitbuf_p != bitbuf_p_end && *code_p != 0) {
                 *bitbuf_p = *code_p;
@@ -218,8 +218,8 @@ kryptos_u8_t *kryptos_huffman_deflate(const kryptos_u8_t *in, const size_t in_si
             }
 
         }
-        memcpy(bitbuf_p, kryptos_huffman_get_code(*in_p), kryptos_huffman_get_code_size(*in_p));
-        bitbuf_p += kryptos_huffman_get_code_size(*in_p);
+        memcpy(bitbuf_p, kryptos_huffman_get_code(hcodes, *in_p), kryptos_huffman_get_code_size(hcodes, *in_p));
+        bitbuf_p += kryptos_huffman_get_code_size(hcodes, *in_p);
         in_p++;
     }
 
@@ -250,7 +250,6 @@ kryptos_huffman_deflate_epilogue:
 
     return out;
 }
-
 
 static void kryptos_huffman_eval_byte_freq(struct kryptos_huffman_freq_ctx freq_table[256], size_t raw_freq[256],
                                            const kryptos_u8_t *in, const size_t in_size) {
