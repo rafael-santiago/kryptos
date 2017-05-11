@@ -17,7 +17,7 @@
 #include <kryptos_aes.h>
 #include <kryptos_serpent.h>
 
-static int kryptos_task_check_cbc_params(kryptos_task_ctx **ktask);
+static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask);
 
 int kryptos_task_check(kryptos_task_ctx **ktask) {
     if (ktask == NULL || *ktask == NULL) {
@@ -37,15 +37,17 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
     }
 
     if (( (*ktask)->cipher != kKryptosCipherARC4 &&
-          (*ktask)->cipher != kKryptosCipherSEAL ) && (*ktask)->mode != kKryptosECB && (*ktask)->mode != kKryptosCBC) {
+          (*ktask)->cipher != kKryptosCipherSEAL ) && (*ktask)->mode != kKryptosECB &&
+                                                      (*ktask)->mode != kKryptosCBC &&
+                                                      (*ktask)->mode != kKryptosOFB) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Invalid operation mode.";
         goto kryptos_task_check_error;
     }
 
     if (( (*ktask)->cipher != kKryptosCipherARC4 &&
-          (*ktask)->cipher != kKryptosCipherSEAL ) && (*ktask)->mode == kKryptosCBC &&
-        kryptos_task_check_cbc_params(ktask) == 0) {
+          (*ktask)->cipher != kKryptosCipherSEAL ) && ((*ktask)->mode == kKryptosCBC || (*ktask)->mode == kKryptosOFB) &&
+                                                                            kryptos_task_check_iv_data(ktask) == 0) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Invalid iv data.";
         goto kryptos_task_check_error;
@@ -74,7 +76,7 @@ kryptos_task_check_error:
     return 0;
 }
 
-static int kryptos_task_check_cbc_params(kryptos_task_ctx **ktask) {
+static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
     if ((*ktask)->iv == NULL || (*ktask)->iv_size == 0) {
         return 0;
     }

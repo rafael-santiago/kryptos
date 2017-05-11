@@ -48,6 +48,7 @@ typedef unsigned long kryptos_u64_t;
 typedef enum {
     kKryptosECB = 0,
     kKryptosCBC,
+    kKryptosOFB,
     kKryptosCipherModeNr
 }kryptos_cipher_mode_t;
 
@@ -148,7 +149,7 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
     ktask->mode = mode;\
     ktask->key = key;\
     ktask->key_size = key_size;\
-    if (ktask->mode == kKryptosCBC && ktask->iv == NULL) {\
+    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB) && ktask->iv == NULL) {\
         ktask->iv = kryptos_get_random_block(cipher_block_size);\
         ktask->iv_size = cipher_block_size;\
     }\
@@ -174,7 +175,7 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
     ktask->mode = mode;\
     ktask->key = key;\
     ktask->key_size = key_size;\
-    if (ktask->mode == kKryptosCBC && ktask->iv == NULL) {\
+    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB) && ktask->iv == NULL) {\
         ktask->iv = kryptos_get_random_block(cipher_block_size);\
         ktask->iv_size = cipher_block_size;\
     }\
@@ -208,7 +209,7 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
         return;\
     }\
     cipher_key_expansion_stmt;\
-    if ((*ktask)->action == kKryptosEncrypt) {\
+    if ((*ktask)->action == kKryptosEncrypt || (*ktask)->mode == kKryptosOFB) {\
         cipher_block_processor = cipher_block_encrypt;\
         cipher_additional_stmts_before_encrypting;\
     } else {\
