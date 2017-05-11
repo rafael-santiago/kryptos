@@ -125,15 +125,19 @@ static kryptos_u8_t *hmac_test_data[] = {
     size_t key_size = 11;\
     size_t test_vector_nr = sizeof(cipher_name ## _test_vector) / sizeof(cipher_name ## _test_vector[0]), tv;\
     kryptos_task_init_as_null(&t);\
+    /*INFO(Rafael): ECB tests.*/\
     for (tv = 0; tv < test_vector_nr; tv++) {\
-        kryptos_ ## cipher_name ## _setup(&t, cipher_name ## _test_vector[tv].key, cipher_name ## _test_vector[tv].key_size, kKryptosECB);\
+        kryptos_ ## cipher_name ## _setup(&t,\
+                                          cipher_name ## _test_vector[tv].key,\
+                                          cipher_name ## _test_vector[tv].key_size, kKryptosECB);\
         t.in = cipher_name ## _test_vector[tv].plain;\
         t.in_size = cipher_name ## _test_vector[tv].block_size;\
         kryptos_task_set_encrypt_action(&t);\
         kryptos_ ## cipher_name  ## _cipher(&ktask);\
         CUTE_ASSERT(t.out != NULL);\
         CUTE_ASSERT(t.out_size == (t.in_size << 1));\
-        /*printf("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n", *(t.out), *(t.out+1), *(t.out+2), *(t.out+3), *(t.out+4), *(t.out+5), *(t.out+6), *(t.out+7));*/\
+        /*printf("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n",\
+                 *(t.out), *(t.out+1), *(t.out+2), *(t.out+3), *(t.out+4), *(t.out+5), *(t.out+6), *(t.out+7));*/\
         CUTE_ASSERT(memcmp(t.out, cipher_name ## _test_vector[tv].cipher, cipher_name ## _test_vector[tv].block_size) == 0);\
         t.in = t.out;\
         t.in_size = t.out_size;\
@@ -144,9 +148,30 @@ static kryptos_u8_t *hmac_test_data[] = {
         CUTE_ASSERT(memcmp(t.out, cipher_name ## _test_vector[tv].decrypted, cipher_name ## _test_vector[tv].block_size) == 0);\
         kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
     }\
+    /*INFO(Rafael): CBC tests.*/\
     for (tv = 0; tv < cbc_test_data_nr; tv++) {\
+        t.iv = NULL;\
         data_size = strlen(cbc_test_data[tv]);\
         kryptos_ ## cipher_name ## _setup(&t, key, 11, kKryptosCBC);\
+        t.in = cbc_test_data[tv];\
+        t.in_size = data_size;\
+        kryptos_task_set_encrypt_action(&t);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(t.out != NULL);\
+        t.in = t.out;\
+        t.in_size = t.out_size;\
+        kryptos_task_set_decrypt_action(&t);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size == data_size);\
+        CUTE_ASSERT(memcmp(t.out, cbc_test_data[tv], t.out_size) == 0);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+    }\
+    /*INFO(Rafael): OFB tests.*/\
+    for (tv = 0; tv < cbc_test_data_nr; tv++) {\
+        t.iv = NULL;\
+        data_size = strlen(cbc_test_data[tv]);\
+        kryptos_ ## cipher_name ## _setup(&t, key, 11, kKryptosOFB);\
         t.in = cbc_test_data[tv];\
         t.in_size = data_size;\
         kryptos_task_set_encrypt_action(&t);\
@@ -164,12 +189,15 @@ static kryptos_u8_t *hmac_test_data[] = {
 }
 
 #define kryptos_run_block_cipher_tests_with_custom_setup(cipher_name, blocksize, t, tv, args, args_nr,\
-                                                         cipher_setup_ecb_stmt, cipher_setup_cbc_stmt) {\
+                                                         cipher_setup_ecb_stmt,\
+                                                         cipher_setup_cbc_stmt,\
+                                                         cipher_setup_ofb_stmt) {\
     kryptos_task_ctx *ktask = &t;\
     size_t cbc_test_data_nr = sizeof(cbc_test_data) / sizeof(cbc_test_data[0]);\
     size_t data_size = 0;\
     size_t test_vector_nr = sizeof(cipher_name ## _test_vector) / sizeof(cipher_name ## _test_vector[0]), tv;\
     kryptos_task_init_as_null(&t);\
+    /*INFO(Rafael): ECB tests.*/\
     for (tv = 0; tv < test_vector_nr; tv++) {\
         cipher_setup_ecb_stmt;\
         t.in = cipher_name ## _test_vector[tv].plain;\
@@ -178,7 +206,8 @@ static kryptos_u8_t *hmac_test_data[] = {
         kryptos_ ## cipher_name  ## _cipher(&ktask);\
         CUTE_ASSERT(t.out != NULL);\
         CUTE_ASSERT(t.out_size == (t.in_size << 1));\
-        /*printf("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n", *(t.out), *(t.out+1), *(t.out+2), *(t.out+3), *(t.out+4), *(t.out+5), *(t.out+6), *(t.out+7));*/\
+        /*printf("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n",\
+                 *(t.out), *(t.out+1), *(t.out+2), *(t.out+3), *(t.out+4), *(t.out+5), *(t.out+6), *(t.out+7));*/\
         CUTE_ASSERT(memcmp(t.out, cipher_name ## _test_vector[tv].cipher, cipher_name ## _test_vector[tv].block_size) == 0);\
         t.in = t.out;\
         t.in_size = t.out_size;\
@@ -189,7 +218,9 @@ static kryptos_u8_t *hmac_test_data[] = {
         CUTE_ASSERT(memcmp(t.out, cipher_name ## _test_vector[tv].decrypted, cipher_name ## _test_vector[tv].block_size) == 0);\
         kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
     }\
+    /*INFO(Rafael): CBC tests.*/\
     for (tv = 0; tv < cbc_test_data_nr; tv++) {\
+        t.iv = NULL;\
         data_size = strlen(cbc_test_data[tv]);\
         cipher_setup_cbc_stmt;\
         t.in = cbc_test_data[tv];\
@@ -206,9 +237,26 @@ static kryptos_u8_t *hmac_test_data[] = {
         CUTE_ASSERT(memcmp(t.out, cbc_test_data[tv], t.out_size) == 0);\
         kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
     }\
+    /*INFO(Rafael): OFB tests.*/\
+    for (tv = 0; tv < cbc_test_data_nr; tv++) {\
+        t.iv = NULL;\
+        data_size = strlen(cbc_test_data[tv]);\
+        cipher_setup_ofb_stmt;\
+        t.in = cbc_test_data[tv];\
+        t.in_size = data_size;\
+        kryptos_task_set_encrypt_action(&t);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(t.out != NULL);\
+        t.in = t.out;\
+        t.in_size = t.out_size;\
+        kryptos_task_set_decrypt_action(&t);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size == data_size);\
+        CUTE_ASSERT(memcmp(t.out, cbc_test_data[tv], t.out_size) == 0);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+    }\
 }
-
-// TODO(Rafael): Implement the hash test runner.
 
 #define kryptos_run_hash_tests(hash, input_size, size) {\
     kryptos_task_ctx t, *ktask = &t;\

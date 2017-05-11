@@ -260,6 +260,9 @@ kryptos_ ## label_name:\
         block_processor_call_scheme;\
         kryptos_iv_data_flush(iv, out_block, block_size_in_bytes);\
         out_block = kryptos_block_parser(out_block, block_size_in_bytes, in_block, in_end, &in_block);\
+        if (out_block == NULL) {\
+            break;\
+        }\
         kryptos_apply_iv(out_block, iv, block_size_in_bytes);\
         memcpy(out_p, out_block, block_size_in_bytes);\
         out_p += block_size_in_bytes;\

@@ -1222,10 +1222,15 @@ CUTE_TEST_CASE(kryptos_feal_tests)
                                                                         feal_test_vector[tv % feal_rounds_nr].key,
                                                                         feal_test_vector[tv % feal_rounds_nr].key_size,
                                                                         kKryptosCBC,
+                                                                        &feal_rounds[tv % feal_rounds_nr].rounds),
+                                                     kryptos_feal_setup(&t,
+                                                                        feal_test_vector[tv % feal_rounds_nr].key,
+                                                                        feal_test_vector[tv % feal_rounds_nr].key_size,
+                                                                        kKryptosOFB,
                                                                         &feal_rounds[tv % feal_rounds_nr].rounds));
-    // INFO(Rafael): The last two parameters of kryptos_run_block_cipher_test_with_custom_setup()
+    // INFO(Rafael): The last three parameters of kryptos_run_block_cipher_test_with_custom_setup()
     //               are related with the exact cipher setup call that must be executed on the test step.
-    //               One is used on the ECB tests and another is used on the CBC tests.
+    //               ECB, CBC and OFB tests respectively.
     //
     //               The "feal_test_vector" is declared into "feal_test_vector.h". Yes, tricky but works!
     //
@@ -1257,6 +1262,11 @@ CUTE_TEST_CASE(kryptos_rc2_tests)
                                                                        rc2_test_vector[tv % rc2_key_bits_nr].key,
                                                                        rc2_test_vector[tv % rc2_key_bits_nr].key_size,
                                                                        kKryptosCBC,
+                                                                       &rc2_key_bits[tv % rc2_key_bits_nr].T1),
+                                                     kryptos_rc2_setup(&t,
+                                                                       rc2_test_vector[tv % rc2_key_bits_nr].key,
+                                                                       rc2_test_vector[tv % rc2_key_bits_nr].key_size,
+                                                                       kKryptosOFB,
                                                                        &rc2_key_bits[tv % rc2_key_bits_nr].T1));
 
 CUTE_TEST_CASE_END
@@ -1291,6 +1301,11 @@ CUTE_TEST_CASE(kryptos_camellia_tests)
                                                                             camellia_test_vector[tv % key_size_nr].key,
                                                                             camellia_test_vector[tv % key_size_nr].key_size,
                                                                             kKryptosCBC,
+                                                                            &key_size[tv % key_size_nr].size),
+                                                     kryptos_camellia_setup(&t,
+                                                                            camellia_test_vector[tv % key_size_nr].key,
+                                                                            camellia_test_vector[tv % key_size_nr].key_size,
+                                                                            kKryptosOFB,
                                                                             &key_size[tv % key_size_nr].size));
 
 CUTE_TEST_CASE_END
@@ -1323,6 +1338,11 @@ CUTE_TEST_CASE(kryptos_saferk64_tests)
                                                                             saferk64_test_vector[tv % rounds_nr].key,
                                                                             saferk64_test_vector[tv % rounds_nr].key_size,
                                                                             kKryptosCBC,
+                                                                            &rounds[tv % rounds_nr].n),
+                                                     kryptos_saferk64_setup(&t,
+                                                                            saferk64_test_vector[tv % rounds_nr].key,
+                                                                            saferk64_test_vector[tv % rounds_nr].key_size,
+                                                                            kKryptosOFB,
                                                                             &rounds[tv % rounds_nr].n));
 
 CUTE_TEST_CASE_END
