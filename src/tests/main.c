@@ -2229,10 +2229,10 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_ripemd128_tests);
     CUTE_RUN_TEST(kryptos_ripemd160_tests);
 
+    //  -=-=-=-=-=-=- New block ciphers/hash functions should be added to HMAC tests. -=-=-=-=-=-=-=-
+
     // INFO(Rafael): HMAC tests.
     CUTE_RUN_TEST(kryptos_hmac_tests);
-
-    //  -=-=-=-=-=-=- New block ciphers/hash functions should be added to HMAC tests. -=-=-=-=-=-=-=-
 
     // INFO(Rafael): Encoding stuff.
     CUTE_RUN_TEST(kryptos_base64_tests);
