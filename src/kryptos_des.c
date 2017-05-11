@@ -239,6 +239,9 @@ void kryptos_3des_setup(kryptos_task_ctx *ktask,
     if (key3 != NULL && key3_size != NULL) {
         ktask->arg[2] = key3;
         ktask->arg[3] = key3_size;
+    } else {
+        ktask->arg[2] = NULL;
+        ktask->arg[3] = NULL;
     }
 }
 
@@ -250,6 +253,18 @@ void kryptos_3des_cipher(kryptos_task_ctx **ktask) {
     size_t in_size;
 
     if (kryptos_task_check(ktask) == 0) {
+        return;
+    }
+
+    if ((*ktask)->arg[0] == NULL || (*ktask)->arg[1] == NULL) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "3DES second key has invalid data.";
+        return;
+    }
+
+    if ((*ktask)->arg[2] == NULL || (*ktask)->arg[3] == NULL) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "3DES third key has invalid data.";
         return;
     }
 
