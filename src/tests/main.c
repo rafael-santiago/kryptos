@@ -1792,7 +1792,7 @@ CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_hmac_tests)
 
-#ifdef KRYPTOS_C99
+#if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)
     kryptos_u8_t *key = "nooneknows";
     size_t key_size = 10;
     int feal_rounds = 8, rc2_T1 = 64, saferk64_rounds = 6;
@@ -2046,10 +2046,14 @@ CUTE_TEST_CASE(kryptos_hmac_tests)
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, serpent, ripemd128, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, serpent, ripemd160, key, key_size, kKryptosCBC);
 #else
+# if !defined(KRYPTOS_NO_HMAC_TESTS)
     // TODO(Rafael): When there is no C99 support add a simple bare bone test with at least one block cipher and all
     //               available hash functions.
     printf("WARN: This test runs only when libkryptos is compiled with C99 support. It will be skipped.\n");
-#endif // KRYPTOS_C99
+# else
+    printf("WARN: You have requested build this binary without the HMAC tests.\n");
+# endif // !defined(KRYPTOS_SKIP_HMAC_TESTS)
+#endif // defined(KRYPTOS_C99) && !defined(KRYPTOS_SKIP_HMAC_TESTS)
 
 CUTE_TEST_CASE_END
 
@@ -2225,6 +2229,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_ripemd128_tests);
     CUTE_RUN_TEST(kryptos_ripemd160_tests);
 
+    // INFO(Rafael): HMAC tests.
+    CUTE_RUN_TEST(kryptos_hmac_tests);
+
     //  -=-=-=-=-=-=- New block ciphers/hash functions should be added to HMAC tests. -=-=-=-=-=-=-=-
 
     // INFO(Rafael): Encoding stuff.
@@ -2232,12 +2239,6 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_uuencode_tests);
 
     CUTE_RUN_TEST(kryptos_huffman_tests);
-
-    // INFO(Rafael): HMAC tests.
-
-    // TODO(Rafael): This is kind of slow due to the C pre-processor. Skip the pre-processing of those macros through a
-    //               build option.
-    CUTE_RUN_TEST(kryptos_hmac_tests);
 
 CUTE_TEST_CASE_END
 

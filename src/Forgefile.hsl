@@ -39,7 +39,8 @@ kryptos.epilogue() {
                                                             "--Forgefile-projects=kryptos-tests " +
                                                             "--bin-output-dir=bin --obj-output-dir=o " +
                                                             "--libraries=../../lib,cutest/src/lib " +
-                                                            "--ldflags=-lkryptos,-lcutest --includes=../,cutest/src");
+                                                            "--ldflags=-lkryptos,-lcutest --includes=../,cutest/src " +
+                                                            hefesto.project.cmdline());
         var exit_code type int;
         $exit_code = hefesto.sys.last_forge_result();
 
