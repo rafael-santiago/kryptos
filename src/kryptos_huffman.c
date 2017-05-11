@@ -126,13 +126,17 @@ kryptos_u8_t *kryptos_huffman_inflate(const kryptos_u8_t *in, const size_t in_si
 kryptos_huffman_inflate_epilogue:
 
     kryptos_huffman_del_tree(htree);
+    out_p = out_p_end = NULL;
+    tp = htree = NULL;
+    in_p = in_p_end = NULL;
+    bit = 0;
 
     return out;
 }
 
 kryptos_u8_t *kryptos_huffman_deflate(const kryptos_u8_t *in, const size_t in_size, size_t *out_size) {
     const kryptos_u8_t *in_p, *in_p_end;
-    kryptos_u8_t *out, *out_p, *out_p_end;
+    kryptos_u8_t *out = NULL, *out_p, *out_p_end;
     kryptos_u8_t bitbuf[1024], *bitbuf_p, *bitbuf_p_end, *code_p;
     struct kryptos_huffman_freq_ctx freq_table[256];
     size_t raw_freq[256];
@@ -149,7 +153,7 @@ kryptos_u8_t *kryptos_huffman_deflate(const kryptos_u8_t *in, const size_t in_si
     htree = kryptos_huffman_mk_tree(freq_table);
 
     if (htree == NULL) {
-        return NULL;
+        goto kryptos_huffman_deflate_epilogue;
     }
 
     kryptos_huffman_get_codes(hcodes, htree);
@@ -246,7 +250,17 @@ kryptos_u8_t *kryptos_huffman_deflate(const kryptos_u8_t *in, const size_t in_si
 
 kryptos_huffman_deflate_epilogue:
 
-    kryptos_huffman_del_tree(htree);
+    if (htree != NULL) {
+        kryptos_huffman_del_tree(htree);
+        htree = NULL;
+    }
+
+    memset(hcodes, 0, sizeof(hcodes));
+    memset(freq_table, 0, sizeof(freq_table));
+    memset(raw_freq, 0, sizeof(raw_freq));
+    memset(bitbuf, 0, sizeof(bitbuf));
+    in_p = in_p_end = NULL;
+    out_p = out_p_end = bitbuf_p = bitbuf_p_end = code_p = NULL;
 
     return out;
 }
@@ -385,6 +399,8 @@ static void kryptos_huffman_deltree_recurr(struct kryptos_huffman_tree_ctx *htre
 
     kryptos_huffman_deltree_recurr(htree->r);
 
+    htree->byte = 0;
+
     if (htree->l != NULL) {
         kryptos_freeseg(htree->l);
         htree->l = NULL;
@@ -403,6 +419,7 @@ static void kryptos_huffman_get_codes(struct kryptos_huffman_code_ctx hcodes[256
         hcodes[c].data_size = 0;
     }
     kryptos_huffman_scan_codes(hcodes, path_buff, 0, KRYPTOS_HUFFMAN_MAX_CODE_SIZE, htree);
+    memset(path_buff, 0, sizeof(path_buff));
 }
 
 static void kryptos_huffman_scan_codes(struct kryptos_huffman_code_ctx hcodes[256],
