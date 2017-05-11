@@ -155,19 +155,19 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
     }\
 }
 
-#define KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_SETUP(cipher_name, ktask, additional_args)\
+#define KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_SETUP(cipher_name, ktask, additional_args...)\
 void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
                                        kryptos_u8_t *key,\
                                        const size_t key_size,\
                                        const kryptos_cipher_mode_t mode, additional_args);
 
 #define KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(cipher_name, ktask, kCipher, cipher_block_size,\
-                                               additional_args, additional_setup_stmt)\
+                                                additional_arg, additional_setup_stmt)\
 void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
                                        kryptos_u8_t *key,\
                                        const size_t key_size,\
                                        const kryptos_cipher_mode_t mode,\
-                                       additional_args) {\
+                                       additional_arg) {\
     if (ktask == NULL) {\
         return;\
     }\

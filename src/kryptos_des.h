@@ -16,4 +16,10 @@ KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(des)
 
 KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR(des)
 
+KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_SETUP(3des, ktask,
+                                       kryptos_u8_t *key2, size_t *key2_size,
+                                       kryptos_u8_t *key3, size_t *key3_size)
+
+KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR(3des)
+
 #endif

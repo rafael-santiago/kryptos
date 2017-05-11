@@ -92,13 +92,13 @@ static void kryptos_rc2_block_encrypt(kryptos_u8_t *block, struct kryptos_rc2_su
 static void kryptos_rc2_block_decrypt(kryptos_u8_t *block, struct kryptos_rc2_subkeys sks);
 
 KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(rc2, ktask, kKryptosCipherRC2, KRYPTOS_RC2_BLOCKSIZE, int *T1,
-                                      {
+                                       {
                                             if (T1 != NULL) {
                                                 ktask->arg[0] = T1;
                                             } else {
                                                 ktask->arg[0] = NULL;
                                             }
-                                      })
+                                       })
 
 KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(rc2,
                                     ktask,
