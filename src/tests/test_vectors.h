@@ -20,6 +20,7 @@
 #include "aes_test_vector.h"
 #include "serpent_test_vector.h"
 #include "triple_des_test_vector.h"
+#include "triple_des_ede_test_vector.h"
 #include "sha1_test_vector.h"
 #include "sha224_test_vector.h"
 #include "sha256_test_vector.h"

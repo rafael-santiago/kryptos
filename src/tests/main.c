@@ -1079,6 +1079,54 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     CUTE_ASSERT(task.out_size == data_size);
     CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
+    // TRIPLE-DES EDE ECB
+
+    kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_encrypt_action(&task);
+
+    triple_des_key2 = "noel";
+    triple_des_key2_size = 4;
+    triple_des_key3 = "mitch";
+    triple_des_key3_size = 5;
+    kryptos_run_cipher(triple_des_ede, &task, "jimi", 4, kKryptosECB,
+                       triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    CUTE_ASSERT(task.out != NULL);
+
+    kryptos_task_set_in(&task, task.out, task.out_size);
+    kryptos_task_set_decrypt_action(&task);
+
+    kryptos_run_cipher(triple_des_ede, &task, "jimi", 4, kKryptosECB,
+                       triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    CUTE_ASSERT(task.out_size == data_size);
+    CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+
+    // TRIPLE-DES EDE CBC
+
+    kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_encrypt_action(&task);
+
+    triple_des_key2 = "buddy";
+    triple_des_key2_size = 5;
+    triple_des_key3 = "billy";
+    triple_des_key3_size = 5;
+    kryptos_run_cipher(triple_des_ede, &task, "jimi", 4, kKryptosCBC,
+                       triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    CUTE_ASSERT(task.out != NULL);
+
+    kryptos_task_set_in(&task, task.out, task.out_size);
+    kryptos_task_set_decrypt_action(&task);
+
+    kryptos_run_cipher(triple_des_ede, &task, "jimi", 4, kKryptosCBC,
+                       triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    CUTE_ASSERT(task.out_size == data_size);
+    CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 #endif
 CUTE_TEST_CASE_END
 
@@ -1416,7 +1464,7 @@ CUTE_TEST_CASE(kryptos_triple_des_tests)
         { "\x00\x00\x00\x00\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 },
         { "\x00\x00\x00\x00\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 },
         { "\x00\x00\x00\x00\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 },
-        { "\x00\x00\x00\x00\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 },
+        { "\x00\x00\x00\x00\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 }
     };
     size_t addkeys_nr = sizeof(addkeys) / sizeof(addkeys[0]);
     kryptos_task_ctx t;
@@ -1452,6 +1500,62 @@ CUTE_TEST_CASE(kryptos_triple_des_tests)
                                                                               &addkeys[tv % addkeys_nr].key3_size));
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_triple_des_ede_tests)
+    struct triple_des_additional_keys {
+        kryptos_u8_t *key2;
+        size_t key2_size;
+        kryptos_u8_t *key3;
+        size_t key3_size;
+    };
+    struct triple_des_additional_keys addkeys[] = {
+        { "\x00\x00\x00\x00\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 },
+        { "\x00\x00\x00\x00\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 },
+        { "\x00\x00\x00\x00\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 },
+        { "\x00\x00\x00\x00\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 },
+        { "\x00\x00\x00\x80\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 },
+        { "\x00\x00\x00\x40\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 },
+        { "\x00\x00\x00\x20\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 },
+        { "\x00\x00\x00\x10\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 },
+        { "\x00\x00\x00\x00\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 },
+        { "\x00\x00\x00\x00\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 },
+        { "\x00\x00\x00\x00\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 },
+        { "\x00\x00\x00\x00\x00\x00\x00\x00", 8, "\x00\x00\x00\x00\x00\x00\x00\x00", 8 },
+        { "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F", 8, "\x10\x11\x12\x13\x14\x15\x16\x17", 8 },
+        { "\x95\x2C\x49\x10\x48\x81\xFF\x48", 8, "\x2B\xD6\x45\x9F\x82\xC5\xB3\x00", 8 },
+    };
+    size_t addkeys_nr = sizeof(addkeys) / sizeof(addkeys[0]);
+    kryptos_task_ctx t;
+    size_t tv;
+    kryptos_run_block_cipher_tests_with_custom_setup(triple_des_ede,
+                                                     KRYPTOS_DES_BLOCKSIZE,
+                                                     t,
+                                                     tv,
+                                                     key_size, key_size_nr,
+                                                     kryptos_triple_des_ede_setup(&t,
+                                                                          triple_des_ede_test_vector[tv % addkeys_nr].key,
+                                                                          triple_des_ede_test_vector[tv % addkeys_nr].key_size,
+                                                                          kKryptosECB,
+                                                                          addkeys[tv % addkeys_nr].key2,
+                                                                          &addkeys[tv % addkeys_nr].key2_size,
+                                                                          addkeys[tv % addkeys_nr].key3,
+                                                                          &addkeys[tv % addkeys_nr].key3_size),
+                                                     kryptos_triple_des_ede_setup(&t,
+                                                                          triple_des_ede_test_vector[tv % addkeys_nr].key,
+                                                                          triple_des_ede_test_vector[tv % addkeys_nr].key_size,
+                                                                          kKryptosCBC,
+                                                                          addkeys[tv % addkeys_nr].key2,
+                                                                          &addkeys[tv % addkeys_nr].key2_size,
+                                                                          addkeys[tv % addkeys_nr].key3,
+                                                                          &addkeys[tv % addkeys_nr].key3_size),
+                                                     kryptos_triple_des_ede_setup(&t,
+                                                                          triple_des_ede_test_vector[tv % addkeys_nr].key,
+                                                                          triple_des_ede_test_vector[tv % addkeys_nr].key_size,
+                                                                          kKryptosOFB,
+                                                                          addkeys[tv % addkeys_nr].key2,
+                                                                          &addkeys[tv % addkeys_nr].key2_size,
+                                                                          addkeys[tv % addkeys_nr].key3,
+                                                                          &addkeys[tv % addkeys_nr].key3_size));
+CUTE_TEST_CASE_END
 
 // INFO(Rafael): End of the block cipher testing area.
 
@@ -2207,6 +2311,48 @@ CUTE_TEST_CASE(kryptos_hmac_tests)
                            triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des, ripemd160, key, key_size, kKryptosCBC,
                            triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    triple_des_key2 = "gowithflow";
+    triple_des_key2_size = 10;
+    triple_des_key3 = "hangintree";
+    triple_des_key3_size = 10;
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, sha1, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, sha224, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, sha256, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, sha384, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, sha512, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, md4, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, md5, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, ripemd128, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, ripemd160, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, sha1, key, key_size, kKryptosCBC,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, sha224, key, key_size, kKryptosCBC,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, sha256, key, key_size, kKryptosCBC,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, sha384, key, key_size, kKryptosCBC,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, sha512, key, key_size, kKryptosCBC,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, md4, key, key_size, kKryptosCBC,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, md5, key, key_size, kKryptosCBC,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, ripemd128, key, key_size, kKryptosCBC,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, triple_des_ede, ripemd160, key, key_size, kKryptosCBC,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 #else
 # if !defined(KRYPTOS_NO_HMAC_TESTS)
     // TODO(Rafael): When there is no C99 support add a simple bare bone test with at least one block cipher and all
@@ -2218,6 +2364,8 @@ CUTE_TEST_CASE(kryptos_hmac_tests)
 #endif // defined(KRYPTOS_C99) && !defined(KRYPTOS_SKIP_HMAC_TESTS)
 
 CUTE_TEST_CASE_END
+
+// INFO(Rafael): End of hash validation area.
 
 CUTE_TEST_CASE(kryptos_huffman_tests)
     kryptos_u8_t *test_vector[] = {
@@ -2380,6 +2528,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_aes_tests);
     CUTE_RUN_TEST(kryptos_serpent_tests);
     CUTE_RUN_TEST(kryptos_triple_des_tests);
+    CUTE_RUN_TEST(kryptos_triple_des_ede_tests);
 
     // INFO(Rafael): Hash validation (also official data).
     CUTE_RUN_TEST(kryptos_sha1_tests);
@@ -2400,7 +2549,6 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     // INFO(Rafael): Encoding stuff.
     CUTE_RUN_TEST(kryptos_base64_tests);
     CUTE_RUN_TEST(kryptos_uuencode_tests);
-
     CUTE_RUN_TEST(kryptos_huffman_tests);
 
 CUTE_TEST_CASE_END

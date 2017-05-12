@@ -84,6 +84,7 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
     switch ((*ktask)->cipher) {
         case kKryptosCipherDES:
         case kKryptosCipher3DES:
+        case kKryptosCipher3DESEDE:
             return ((*ktask)->iv_size == KRYPTOS_DES_BLOCKSIZE);
             break;
 
