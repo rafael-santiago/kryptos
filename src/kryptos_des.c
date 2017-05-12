@@ -13,7 +13,8 @@
 #include <kryptos.h>
 #include <string.h>
 
-#define kryptos_des_SHL(x, s)  (x) << (s) | (x) >> ( ( sizeof( (x) ) << 3) - (s) ) // WARN(Rafael): The lack of ( ... ) was planned, do not mess.
+// WARN(Rafael): The lack of ( ... ) was planned, do not mess.
+#define kryptos_des_SHL(x, s)  (x) << (s) | (x) >> ( ( sizeof( (x) ) << 3) - (s) )
 
 #define KRYPTOS_DES_MASTER_SIZE 70
 
@@ -191,6 +192,15 @@ static void kryptos_triple_des_block_decrypt(kryptos_u8_t *block,
                                              struct kryptos_des_subkeys sks2,
                                              struct kryptos_des_subkeys sks3);
 
+static void kryptos_triple_des_ede_block_encrypt(kryptos_u8_t *block,
+                                                 struct kryptos_des_subkeys sks1,
+                                                 struct kryptos_des_subkeys sks2,
+                                                 struct kryptos_des_subkeys sks3);
+
+static void kryptos_triple_des_ede_block_decrypt(kryptos_u8_t *block,
+                                                 struct kryptos_des_subkeys sks1,
+                                                 struct kryptos_des_subkeys sks2,
+                                                 struct kryptos_des_subkeys sks3);
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(des, kKryptosCipherDES, KRYPTOS_DES_BLOCKSIZE)
 
@@ -207,6 +217,24 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(des,
                                     des_cipher_epilogue,
                                     outblock,
                                     des_block_processor(outblock, sks))
+
+void kryptos_triple_des_ede_setup(kryptos_task_ctx *ktask,
+                                  kryptos_u8_t *key1,
+                                  const size_t key1_size,
+                                  const kryptos_cipher_mode_t mode,
+                                  kryptos_u8_t *key2, size_t *key2_size, kryptos_u8_t *key3, size_t *key3_size) {
+    if (ktask == NULL) {
+        return;
+    }
+
+    kryptos_triple_des_setup(ktask, key1, key1_size, mode, key2, key2_size, key3, key3_size);
+
+    ktask->cipher = kKryptosCipher3DESEDE;
+}
+
+void kryptos_triple_des_ede_cipher(kryptos_task_ctx **ktask) {
+    kryptos_triple_des_cipher(ktask);
+}
 
 void kryptos_triple_des_setup(kryptos_task_ctx *ktask,
                               kryptos_u8_t *key1,
@@ -248,6 +276,8 @@ void kryptos_triple_des_setup(kryptos_task_ctx *ktask,
 void kryptos_triple_des_cipher(kryptos_task_ctx **ktask) {
     struct kryptos_des_subkeys sks1, sks2, sks3;
     kryptos_triple_des_block_processor block_processor;
+    kryptos_triple_des_block_processor encrypt_processor = kryptos_triple_des_block_encrypt;
+    kryptos_triple_des_block_processor decrypt_processor = kryptos_triple_des_block_decrypt;
     kryptos_u8_t *in_p, *in_end, *out_p;
     kryptos_u8_t *outblock, *outblock_p, *inblock, *inblock_p;
     size_t in_size;
@@ -268,6 +298,29 @@ void kryptos_triple_des_cipher(kryptos_task_ctx **ktask) {
         return;
     }
 
+    if ((*ktask)->cipher == kKryptosCipher3DESEDE) {
+        if ((*ktask)->arg[0] == NULL || (*ktask)->arg[1] == NULL) {
+            (*ktask)->result = kKryptosInvalidParams;
+            (*ktask)->result_verbose = "3DES second key has invalid data.";
+            return;
+        }
+
+        if ((*ktask)->arg[2] == NULL || (*ktask)->arg[3] == NULL) {
+            (*ktask)->result = kKryptosInvalidParams;
+            (*ktask)->result_verbose = "3DES third key has invalid data.";
+            return;
+        }
+
+        if ((*ktask)->key_size == *(size_t *)(*ktask)->arg[1] &&
+            memcmp((*ktask)->key, (*ktask)->arg[0], (*ktask)->key_size) == 0) {
+            (*ktask)->result = kKryptosInvalidParams;
+            (*ktask)->result_verbose = "3DES first and second key are the same.";
+            return;
+        }
+        encrypt_processor = kryptos_triple_des_ede_block_encrypt;
+        decrypt_processor = kryptos_triple_des_ede_block_decrypt;
+    }
+
     kryptos_des_expand_user_key(&sks1, (*ktask)->key, (*ktask)->key_size);
 
     kryptos_des_expand_user_key(&sks2, (kryptos_u8_t *)(*ktask)->arg[0], *(size_t *)(*ktask)->arg[1]);
@@ -275,9 +328,9 @@ void kryptos_triple_des_cipher(kryptos_task_ctx **ktask) {
     kryptos_des_expand_user_key(&sks3, (kryptos_u8_t *)(*ktask)->arg[2], *(size_t *)(*ktask)->arg[3]);
 
     if ((*ktask)->action == kKryptosEncrypt || (*ktask)->mode == kKryptosOFB) {
-        block_processor = kryptos_triple_des_block_encrypt;
+        block_processor = encrypt_processor;
     } else {
-        block_processor = kryptos_triple_des_block_decrypt;
+        block_processor = decrypt_processor;
     }
 
     kryptos_meta_block_processing_prologue(KRYPTOS_DES_BLOCKSIZE,
@@ -305,7 +358,7 @@ void kryptos_triple_des_cipher(kryptos_task_ctx **ktask) {
                                            sks1, ktask);
     memset(&sks2, 0, sizeof(sks2));
     memset(&sks3, 0, sizeof(sks3));
-    block_processor = NULL;
+    encrypt_processor = decrypt_processor = block_processor = NULL;
 }
 
 static kryptos_u32_t kryptos_des_bitseq_to_u32(kryptos_u8_t bitseq[KRYPTOS_DES_MASTER_SIZE]) {
@@ -597,6 +650,24 @@ static void kryptos_triple_des_block_decrypt(kryptos_u8_t *block,
     kryptos_des_block_decrypt(block, sks1);
 }
 
+static void kryptos_triple_des_ede_block_encrypt(kryptos_u8_t *block,
+                                                 struct kryptos_des_subkeys sks1,
+                                                 struct kryptos_des_subkeys sks2,
+                                                 struct kryptos_des_subkeys sks3) {
+    kryptos_des_block_encrypt(block, sks1);
+    kryptos_des_block_decrypt(block, sks2);
+    kryptos_des_block_encrypt(block, sks3);
+}
+
+static void kryptos_triple_des_ede_block_decrypt(kryptos_u8_t *block,
+                                                 struct kryptos_des_subkeys sks1,
+                                                 struct kryptos_des_subkeys sks2,
+                                                 struct kryptos_des_subkeys sks3) {
+    kryptos_des_block_decrypt(block, sks3);
+    kryptos_des_block_encrypt(block, sks2);
+    kryptos_des_block_decrypt(block, sks1);
+}
+
 static void kryptos_des_ld_user_key(kryptos_u32_t key[2], const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
     size_t b;
@@ -703,3 +774,9 @@ static void kryptos_des_expand_user_key(struct kryptos_des_subkeys *sks, const k
     memset(user_key, 0, sizeof(user_key));
     i = j = 0;
 }
+
+#undef kryptos_des_SHL
+
+#undef KRYPTOS_DES_MASTER_SIZE
+
+#undef kryptos_des_getbit_from_u32
