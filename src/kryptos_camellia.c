@@ -214,11 +214,6 @@ static void kryptos_camellia_roll128b(kryptos_u32_t x[4], int s) {
         tt3 = t3 << 31;
         tt3 = kryptos_camellia_rotl(tt3, 1);
 
-        t0 = t0 >> 1 << 1;
-        t1 = t1 >> 1 << 1;
-        t2 = t2 >> 1 << 1;
-        t3 = t3 >> 1 << 1;
-
         x[3] = x[3] << 1 | tt0;
         x[2] = x[2] << 1 | tt3;
         x[1] = x[1] << 1 | tt2;

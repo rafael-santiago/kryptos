@@ -12,8 +12,8 @@
 // WARN(Rafael): The aim of this module is to provide a way of increasing the entropy. Common worries such as not bloat
 //               the deflated output with the encoding tree is not a real issue here.
 //
-//               Moreover use compression to "increase" the entropy is not a silver bullet. Depending on your
-//               communication channel/data, compress could be harmful because it could leak information about the
+//               Moreover use the compression to "increase" the entropy is not a silver bullet. Depending on your
+//               communication channel/data, compressing could be harmful because it could leak information about the
 //               data. If the attacker can make assumptions about the type of the data you should use it with care.
 
 #define KRYPTOS_HUFFMAN_MAX_CODE_SIZE 255
@@ -453,7 +453,7 @@ static size_t kryptos_huffman_eval_deflated_out_size(size_t raw_freq[256], struc
     size_t total_size = 2 + sizeof(size_t);
     size_t n;
 
-    // WARN(Rafael): This function will request more than is really needed.
+    // WARN(Rafael): This function will request more than the enough.
 
     for (n = 0; n < 255; n++) {
         if (raw_freq[n] > 0) {
