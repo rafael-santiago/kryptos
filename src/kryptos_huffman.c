@@ -328,7 +328,6 @@ static void kryptos_huffman_sort_nodes(struct kryptos_huffman_freq_ctx freq_tabl
 
 static struct kryptos_huffman_tree_ctx *kryptos_huffman_mk_tree(struct kryptos_huffman_freq_ctx freq_table[256]) {
     size_t n;
-    int has_merged = 1;
     struct kryptos_huffman_tree_ctx *subtree = NULL, *htree = NULL;
 
     for (n = 0; n < 255; n++) {
@@ -339,51 +338,48 @@ static struct kryptos_huffman_tree_ctx *kryptos_huffman_mk_tree(struct kryptos_h
         }
     }
 
-    while (has_merged) {
-        has_merged = 0;
-        for (n = 0; n < 254; n++) {
-            if (freq_table[n].freq > 0 && freq_table[n + 1].freq > 0) {
-                if (freq_table[n].subtree->r == NULL) {
-                    // INFO(Rafael): freq_table[n].subtree->r points.
-                    freq_table[n].subtree->r = (freq_table[n + 1].subtree->r == NULL) ?
-                                                    freq_table[n + 1].subtree->l :
-                                                    freq_table[n + 1].subtree;
-                    freq_table[n].freq += freq_table[n + 1].freq;
-                    freq_table[n].byte = 0;
-                    freq_table[n + 1].byte = 0;
-                    freq_table[n + 1].freq = 0;
-                    if (freq_table[n + 1].subtree->r == NULL) {
-                        kryptos_freeseg(freq_table[n + 1].subtree);
-                    }
-                    freq_table[n + 1].subtree = NULL;
-                    htree = freq_table[n].subtree;
-                } else if (freq_table[n + 1].subtree->r == NULL) {
-                    // INFO(Rafael): freq_table[n + 1].subtree->r points.
-                    freq_table[n + 1].subtree->r = (freq_table[n].subtree->r == NULL) ?
-                                                        freq_table[n].subtree->l :
-                                                        freq_table[n].subtree;
-                    freq_table[n + 1].freq += freq_table[n].freq;
-                    freq_table[n + 1].byte = 0;
-                    freq_table[n].byte = 0;
-                    freq_table[n].freq = 0;
-                    if (freq_table[n].subtree->r == NULL) {
-                        kryptos_freeseg(freq_table[n].subtree);
-                    }
-                    freq_table[n].subtree = NULL;
-                    htree = freq_table[n + 1].subtree;
-                } else {
-                    // INFO(Rafael): A new subtree points (L: freq_table[n].subtree / R: freq_table[n+1].subtree).
-                    subtree = freq_table[n].subtree;
-                    freq_table[n].freq += freq_table[n + 1].freq;
-                    kryptos_huffman_new_tree(freq_table[n].subtree);
-                    freq_table[n].subtree->l = subtree;
-                    freq_table[n].subtree->r = freq_table[n + 1].subtree;
-                    freq_table[n + 1].subtree = NULL;
-                    freq_table[n + 1].freq = 0;
-                    htree = freq_table[n].subtree;
+    for (n = 0; n < 254; n++) {
+        if (freq_table[n].freq > 0 && freq_table[n + 1].freq > 0) {
+            if (freq_table[n].subtree->r == NULL) {
+                // INFO(Rafael): freq_table[n].subtree->r points.
+                freq_table[n].subtree->r = (freq_table[n + 1].subtree->r == NULL) ?
+                                                freq_table[n + 1].subtree->l :
+                                                freq_table[n + 1].subtree;
+                freq_table[n].freq += freq_table[n + 1].freq;
+                freq_table[n].byte = 0;
+                freq_table[n + 1].byte = 0;
+                freq_table[n + 1].freq = 0;
+                if (freq_table[n + 1].subtree->r == NULL) {
+                    kryptos_freeseg(freq_table[n + 1].subtree);
                 }
-                kryptos_huffman_sort_nodes(freq_table);
+                freq_table[n + 1].subtree = NULL;
+                htree = freq_table[n].subtree;
+            } else if (freq_table[n + 1].subtree->r == NULL) {
+                // INFO(Rafael): freq_table[n + 1].subtree->r points.
+                freq_table[n + 1].subtree->r = (freq_table[n].subtree->r == NULL) ?
+                                                    freq_table[n].subtree->l :
+                                                    freq_table[n].subtree;
+                freq_table[n + 1].freq += freq_table[n].freq;
+                freq_table[n + 1].byte = 0;
+                freq_table[n].byte = 0;
+                freq_table[n].freq = 0;
+                if (freq_table[n].subtree->r == NULL) {
+                    kryptos_freeseg(freq_table[n].subtree);
+                }
+                freq_table[n].subtree = NULL;
+                htree = freq_table[n + 1].subtree;
+            } else {
+                // INFO(Rafael): A new subtree points (L: freq_table[n].subtree / R: freq_table[n+1].subtree).
+                subtree = freq_table[n].subtree;
+                freq_table[n].freq += freq_table[n + 1].freq;
+                kryptos_huffman_new_tree(freq_table[n].subtree);
+                freq_table[n].subtree->l = subtree;
+                freq_table[n].subtree->r = freq_table[n + 1].subtree;
+                freq_table[n + 1].subtree = NULL;
+                freq_table[n + 1].freq = 0;
+                htree = freq_table[n].subtree;
             }
+            kryptos_huffman_sort_nodes(freq_table);
         }
     }
 
