@@ -19,6 +19,7 @@
 #include <kryptos_hex.h>
 #include <kryptos_hash_common.h>
 #include <kryptos_huffman.h>
+#include <kryptos_mp.h>
 #include "test_vectors.h"
 #include <stdlib.h>
 #include <string.h>
@@ -2493,6 +2494,158 @@ CUTE_TEST_CASE(kryptos_huffman_tests)
     }
 CUTE_TEST_CASE_END
 
+// INFO(Rafael): Multiprecision testing area.
+
+CUTE_TEST_CASE(kryptos_mp_new_value_tests)
+    // INFO(Rafael): This test also includes kryptos_del_mp_value(). Assuming the leak-check system is enabled, of course.
+    kryptos_mp_value_t *mp;
+    size_t d;
+    mp = kryptos_new_mp_value(1024);
+    CUTE_ASSERT(mp != NULL);
+    CUTE_ASSERT(mp->data != NULL);
+    CUTE_ASSERT(mp->data_size == 128);
+    for (d = 0; d < mp->data_size; d++) {
+        CUTE_ASSERT(mp->data[d] == 0);
+    }
+    kryptos_del_mp_value(mp);
+    // INFO(Rafael): If something is still wrong the leak system should complain.
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_hex_value_as_mp_tests)
+    kryptos_mp_value_t *mp;
+    mp = kryptos_hex_value_as_mp("FFEEDDCCBBAA00112233445566778899", 32);
+    CUTE_ASSERT(mp != NULL);
+    CUTE_ASSERT(mp->data_size == 16);
+    CUTE_ASSERT(mp->data[ 0] == 0x99);
+    CUTE_ASSERT(mp->data[ 1] == 0x88);
+    CUTE_ASSERT(mp->data[ 2] == 0x77);
+    CUTE_ASSERT(mp->data[ 3] == 0x66);
+    CUTE_ASSERT(mp->data[ 4] == 0x55);
+    CUTE_ASSERT(mp->data[ 5] == 0x44);
+    CUTE_ASSERT(mp->data[ 6] == 0x33);
+    CUTE_ASSERT(mp->data[ 7] == 0x22);
+    CUTE_ASSERT(mp->data[ 8] == 0x11);
+    CUTE_ASSERT(mp->data[ 9] == 0x00);
+    CUTE_ASSERT(mp->data[10] == 0xAA);
+    CUTE_ASSERT(mp->data[11] == 0xBB);
+    CUTE_ASSERT(mp->data[12] == 0xCC);
+    CUTE_ASSERT(mp->data[13] == 0xDD);
+    CUTE_ASSERT(mp->data[14] == 0xEE);
+    CUTE_ASSERT(mp->data[15] == 0xFF);
+    kryptos_del_mp_value(mp);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_value_as_hex_tests)
+    kryptos_mp_value_t *mp;
+    kryptos_u8_t *x;
+    size_t x_size;
+    mp = kryptos_hex_value_as_mp("FFEEDDCCBBAA00112233445566778899", 32);
+    CUTE_ASSERT(mp != NULL);
+    x = kryptos_mp_value_as_hex(mp, &x_size);
+    CUTE_ASSERT(x != NULL);
+    CUTE_ASSERT(x_size == 32);
+    CUTE_ASSERT(memcmp(x, "FFEEDDCCBBAA00112233445566778899", x_size) == 0);
+    kryptos_del_mp_value(mp);
+    kryptos_freeseg(x);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_assign_mp_value_tests)
+    kryptos_mp_value_t *a = NULL, *b;
+    size_t d;
+
+    // INFO(Rafael): with a equals to NULL.
+    b = kryptos_hex_value_as_mp("FFEEDDCCBBAA00112233445566778899", 32);
+    CUTE_ASSERT(b != NULL);
+
+    a = kryptos_assign_mp_value(&a, b);
+    CUTE_ASSERT(a != NULL);
+
+    CUTE_ASSERT(a->data_size == b->data_size);
+
+    CUTE_ASSERT(memcmp(a->data, b->data, a->data_size) == 0);
+
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+
+    // INFO(Rafael): with a->data_size < b->data_size.
+    b = kryptos_hex_value_as_mp("FFEEDDCCBBAA00112233445566778899", 32);
+    CUTE_ASSERT(b != NULL);
+
+    a = kryptos_new_mp_value(16);
+    CUTE_ASSERT(a != NULL);
+
+    a = kryptos_assign_mp_value(&a, b);
+    CUTE_ASSERT(a != NULL);
+
+    CUTE_ASSERT(a->data_size == b->data_size);
+
+    CUTE_ASSERT(memcmp(a->data, b->data, a->data_size) == 0);
+
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+
+    // INFO(Rafael): with a->data_size > b->data_size.
+    b = kryptos_hex_value_as_mp("FFEEDDCCBBAA00112233445566778899", 32);
+    CUTE_ASSERT(b != NULL);
+
+    a = kryptos_new_mp_value(160);
+    CUTE_ASSERT(a != NULL);
+
+    memset(a->data, 0xf, a->data_size);
+    a = kryptos_assign_mp_value(&a, b);
+    CUTE_ASSERT(a != NULL);
+
+    CUTE_ASSERT(a->data_size == 20);
+
+    CUTE_ASSERT(memcmp(a->data, b->data, b->data_size) == 0);
+    for (d = b->data_size; d < a->data_size; d++) {
+        CUTE_ASSERT(a->data[d] == 0);
+    }
+
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_assign_hex_value_to_mp_tests)
+    kryptos_mp_value_t *mp = NULL;
+    // INFO(Rafael): mp == NULL.
+    mp = kryptos_assign_hex_value_to_mp(&mp, "DEADBEEF", 8);
+    CUTE_ASSERT(mp != NULL);
+    CUTE_ASSERT(mp->data_size == 4);
+    CUTE_ASSERT(mp->data[0] == 0xEF);
+    CUTE_ASSERT(mp->data[1] == 0xBE);
+    CUTE_ASSERT(mp->data[2] == 0xAD);
+    CUTE_ASSERT(mp->data[3] == 0xDE);
+
+    kryptos_del_mp_value(mp);
+
+    // INFO(Rafael): mp != NULL && mp->data_size < hex-value-bitsize
+    mp = kryptos_new_mp_value(16);
+    CUTE_ASSERT(mp != NULL);
+    CUTE_ASSERT(mp->data_size == 2);
+    mp = kryptos_assign_hex_value_to_mp(&mp, "DEADBEEF", 8);
+    CUTE_ASSERT(mp->data[0] == 0xAD);
+    CUTE_ASSERT(mp->data[1] == 0xDE);
+    kryptos_del_mp_value(mp);
+
+    // INFO(Rafael): mp != NULL && mp->data_size > hex-value-bitsize
+    mp = kryptos_new_mp_value(64);
+    CUTE_ASSERT(mp != NULL);
+    CUTE_ASSERT(mp->data_size == 8);
+    mp = kryptos_assign_hex_value_to_mp(&mp, "DEADBEEF", 8);
+    CUTE_ASSERT(mp->data[0] == 0xEF);
+    CUTE_ASSERT(mp->data[1] == 0xBE);
+    CUTE_ASSERT(mp->data[2] == 0xAD);
+    CUTE_ASSERT(mp->data[3] == 0xDE);
+    CUTE_ASSERT(mp->data[4] == 0x00);
+    CUTE_ASSERT(mp->data[5] == 0x00);
+    CUTE_ASSERT(mp->data[6] == 0x00);
+    CUTE_ASSERT(mp->data[7] == 0x00);
+    kryptos_del_mp_value(mp);
+CUTE_TEST_CASE_END
+
+// INFO(Rafael): End of multiprecision testing area.
+
 CUTE_TEST_CASE(kryptos_test_monkey)
     // CLUE(Rafael): Before adding a new test try to find out the best place that it fits.
     //               At first glance you should consider the utility that it implements into the library.
@@ -2550,6 +2703,13 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_base64_tests);
     CUTE_RUN_TEST(kryptos_uuencode_tests);
     CUTE_RUN_TEST(kryptos_huffman_tests);
+
+    // INFO(Rafael): Multiprecision stuff.
+    CUTE_RUN_TEST(kryptos_mp_new_value_tests);
+    CUTE_RUN_TEST(kryptos_mp_hex_value_as_mp_tests);
+    CUTE_RUN_TEST(kryptos_mp_value_as_hex_tests);
+    CUTE_RUN_TEST(kryptos_assign_mp_value_tests);
+    CUTE_RUN_TEST(kryptos_assign_hex_value_to_mp_tests);
 
 CUTE_TEST_CASE_END
 
