@@ -21,6 +21,16 @@ static kryptos_u8_t nbxlt[] = {
 
 #define kryptos_mp_nbx(x) ( nbxlt[(x)] )
 
+#define kryptos_mp_max_min(aa, bb, a, b) {\
+    if ((a)->data_size >= (b)->data_size) {\
+        (aa) = (a);\
+        (bb) = (b);\
+    } else {\
+        (aa) = (b);\
+        (bb) = (a);\
+    }\
+}
+
 kryptos_mp_value_t *kryptos_new_mp_value(const size_t bitsize) {
     kryptos_mp_value_t *mp;
 
@@ -343,6 +353,85 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
     return (*dest);
 }
 
+int kryptos_mp_eq(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b) {
+    size_t d;
+    const kryptos_mp_value_t *aa, *bb;
+
+    if (a == NULL || b == NULL) {
+        return 0;
+    }
+
+    if (a->data_size == b->data_size) {
+        return (memcmp(a->data, b->data, a->data_size) == 0);
+    }
+
+    kryptos_mp_max_min(aa, bb, a, b);
+
+    if (aa->data_size != bb->data_size) {
+        for (d = bb->data_size; d < aa->data_size; d++) {
+            if (aa->data[d] != 0) {
+                return 0;
+            }
+        }
+    }
+
+    for (d = 0; d < bb->data_size; d++) {
+        if (aa->data[d] != bb->data[d]) {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b) {
+    ssize_t d;
+    const kryptos_mp_value_t *aa, *bb;
+    kryptos_u8_t x, y;
+
+    if (a == NULL || b == NULL) {
+        return NULL;
+    }
+
+    kryptos_mp_max_min(aa, bb, a, b);
+
+    if (aa->data_size != bb->data_size) {
+        for (d = bb->data_size; d < aa->data_size; d++) {
+            if (aa->data[d] != 0) {
+                return aa;
+            }
+        }
+    }
+
+#define kryptos_mp_get_gt_bitcmp(aa, bb, n, b, ax, bx) {\
+    (ax) = ((aa)->data[n] & (1 << (b))) >> (b);\
+    (bx) = ((bb)->data[n] & (1 << (b))) >> (b);\
+    if ((ax) && !(bx)) {\
+        return (aa);\
+    }\
+    if ((bx) && !(ax)) {\
+        return (bb);\
+    }\
+}
+
+    for (d = bb->data_size - 1; d >= 0; d--) {
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 7, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 6, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 5, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 4, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 3, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 2, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 1, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 0, x, y);
+    }
+
+#undef kryptos_mp_get_gt_bitcmp
+
+    return NULL;
+}
+
 #undef kryptos_mp_xnb
 
 #undef kryptos_mp_nbx
+
+#undef kryptos_mp_max_min

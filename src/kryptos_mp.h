@@ -30,4 +30,18 @@ kryptos_mp_value_t *kryptos_assign_hex_value_to_mp(kryptos_mp_value_t **dest,
 
 kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src);
 
+int kryptos_mp_eq(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
+
+const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
+
+#define kryptos_mp_ne(a, b) ( kryptos_mp_eq((a), (b)) == 0 )
+
+#define kryptos_mp_gt(a, b) ( kryptos_mp_ne((a), (b)) && kryptos_mp_get_gt((a), (b)) == (a) )
+
+#define kryptos_mp_lt(a, b) ( kryptos_mp_gt((b), (a)) )
+
+#define kryptos_mp_ge(a, b) ( kryptos_mp_eq((a), (b)) || kryptos_mp_get_gt((a), (b)) == (a) )
+
+#define kryptos_mp_le(a, b) ( kryptos_mp_eq((a), (b)) || kryptos_mp_get_gt((a), (b)) == (b) )
+
 #endif

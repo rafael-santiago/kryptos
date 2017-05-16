@@ -2644,6 +2644,554 @@ CUTE_TEST_CASE(kryptos_assign_hex_value_to_mp_tests)
     kryptos_del_mp_value(mp);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_eq_tests)
+    char *values[] = {
+        "01010100",
+
+        "0202020202020200",
+
+        "030303030303030303030303030A0A00",
+
+        "0B0C0D000000A000010010000000000000000000000000000920000000000001",
+
+        "FFFFFFFFFFDEABCD514272388123881293192378129319238129312312312300"
+        "0000000128381238172387123102301023012030120310239192399231200000",
+
+        "018239128381293192381283129319293982834872377283487238748239ABC0"
+        "CBCBCBCBCBDBEDBDBEDBDBC7C7363817BCBE2123162631723712371236162631"
+        "1111111111111111111111111111111111111111111111111112231231231231"
+        "9999992391293912931923919239129319239129391231231626316236126362"
+    };
+    char *same_values[] = {
+        "DEADBEEF",
+        "00000000DEADBEEF",
+        "0000000000000000DEADBEEF",
+        "000000000000000000000000DEADBEEF",
+        "00000000000000000000000000000000DEADBEEF",
+        "0000000000000000000000000000000000000000DEADBEEF",
+        "000000000000000000000000000000000000000000000000DEADBEEF",
+        "00000000000000000000000000000000000000000000000000000000DEADBEEF",
+        "0000000000000000000000000000000000000000000000000000000000000000DEADBEEF",
+        "000000000000000000000000000000000000000000000000000000000000000000000000DEADBEEF",
+        "00000000000000000000000000000000000000000000000000000000000000000000000000000000DEADBEEF",
+        "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000DEADBEEF",
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000DEADBEEF",
+        "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000DEADBEEF"
+    };
+    char *almost_same_values[] = {
+        "DEADBEEF",
+        "80000000DEADBEEF",
+        "0000000000000000DEADBEE1",
+        "000000000000000000000000DEADBEE2",
+        "00000000000000000000000000000000DEADBEE3",
+        "0000000000000000000000000000000000000000DEADBEE4",
+        "000000000008000000000000000000000000000000000000DEADBEEF",
+        "00000000000000000000000000000000000000000000000000000000DEADBEE6",
+        "0000000000000000000000000000000000000000000000000000000000000000DEADBEE7",
+        "000000000000000000000000000000000000000000000000000000000000000000000000DEADBEE8",
+        "00000000000000000000000000000000000000000000000000000000000000000000000000000000DEADBEE9",
+        "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000DEADBEEA",
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000DEADBEEB",
+        "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000DEADBEEC"
+    };
+    struct eq_tests_ctx {
+        kryptos_u8_t *a, *b;
+        int expected;
+    };
+    struct eq_tests_ctx test_vector[] = {
+        {values[0], values[0], 1}, {values[0], values[1], 0}, {values[0], values[2], 0}, {values[0], values[3], 0},
+        {values[0], values[4], 0}, {values[0], values[5], 0}, {values[1], values[0], 0}, {values[1], values[1], 1},
+        {values[1], values[2], 0}, {values[1], values[3], 0}, {values[1], values[4], 0}, {values[1], values[5], 0},
+        {values[2], values[0], 0}, {values[2], values[1], 0}, {values[2], values[2], 1}, {values[2], values[3], 0},
+        {values[2], values[4], 0}, {values[2], values[5], 0}, {values[3], values[0], 0}, {values[3], values[1], 0},
+        {values[3], values[2], 0}, {values[3], values[3], 1}, {values[3], values[4], 0}, {values[3], values[5], 0},
+        {values[4], values[0], 0}, {values[4], values[1], 0}, {values[4], values[2], 0}, {values[4], values[3], 0},
+        {values[4], values[4], 1}, {values[4], values[5], 0}, {values[5], values[0], 0}, {values[5], values[1], 0},
+        {values[5], values[2], 0}, {values[5], values[3], 0}, {values[5], values[4], 0}, {values[5], values[5], 1},
+
+        {same_values[ 0], same_values[ 0], 1}, {same_values[ 0], same_values[ 1], 1}, {same_values[ 0], same_values[ 2], 1},
+        {same_values[ 0], same_values[ 3], 1}, {same_values[ 0], same_values[ 4], 1}, {same_values[ 0], same_values[ 5], 1},
+        {same_values[ 0], same_values[ 6], 1}, {same_values[ 0], same_values[ 7], 1}, {same_values[ 0], same_values[ 8], 1},
+        {same_values[ 0], same_values[ 9], 1}, {same_values[ 0], same_values[10], 1}, {same_values[ 0], same_values[11], 1},
+        {same_values[ 0], same_values[12], 1}, {same_values[ 0], same_values[13], 1}, {same_values[ 1], same_values[ 0], 1},
+        {same_values[ 1], same_values[ 1], 1}, {same_values[ 1], same_values[ 2], 1}, {same_values[ 1], same_values[ 3], 1},
+        {same_values[ 1], same_values[ 4], 1}, {same_values[ 1], same_values[ 5], 1}, {same_values[ 1], same_values[ 6], 1},
+        {same_values[ 1], same_values[ 7], 1}, {same_values[ 1], same_values[ 8], 1}, {same_values[ 1], same_values[ 9], 1},
+        {same_values[ 1], same_values[10], 1}, {same_values[ 1], same_values[11], 1}, {same_values[ 1], same_values[12], 1},
+        {same_values[ 1], same_values[13], 1}, {same_values[ 2], same_values[ 0], 1}, {same_values[ 2], same_values[ 1], 1},
+        {same_values[ 2], same_values[ 2], 1}, {same_values[ 2], same_values[ 3], 1}, {same_values[ 2], same_values[ 4], 1},
+        {same_values[ 2], same_values[ 5], 1}, {same_values[ 2], same_values[ 6], 1}, {same_values[ 2], same_values[ 7], 1},
+        {same_values[ 2], same_values[ 8], 1}, {same_values[ 2], same_values[ 9], 1}, {same_values[ 2], same_values[10], 1},
+        {same_values[ 2], same_values[11], 1}, {same_values[ 2], same_values[12], 1}, {same_values[ 2], same_values[13], 1},
+        {same_values[ 3], same_values[ 0], 1}, {same_values[ 3], same_values[ 1], 1}, {same_values[ 3], same_values[ 2], 1},
+        {same_values[ 3], same_values[ 3], 1}, {same_values[ 3], same_values[ 4], 1}, {same_values[ 3], same_values[ 5], 1},
+        {same_values[ 3], same_values[ 6], 1}, {same_values[ 3], same_values[ 7], 1}, {same_values[ 3], same_values[ 8], 1},
+        {same_values[ 3], same_values[ 9], 1}, {same_values[ 3], same_values[10], 1}, {same_values[ 3], same_values[11], 1},
+        {same_values[ 3], same_values[12], 1}, {same_values[ 3], same_values[13], 1}, {same_values[ 4], same_values[ 0], 1},
+        {same_values[ 4], same_values[ 1], 1}, {same_values[ 4], same_values[ 2], 1}, {same_values[ 4], same_values[ 3], 1},
+        {same_values[ 4], same_values[ 4], 1}, {same_values[ 4], same_values[ 5], 1}, {same_values[ 4], same_values[ 6], 1},
+        {same_values[ 4], same_values[ 7], 1}, {same_values[ 4], same_values[ 8], 1}, {same_values[ 4], same_values[ 9], 1},
+        {same_values[ 4], same_values[10], 1}, {same_values[ 4], same_values[11], 1}, {same_values[ 4], same_values[12], 1},
+        {same_values[ 4], same_values[13], 1}, {same_values[ 5], same_values[ 0], 1}, {same_values[ 5], same_values[ 1], 1},
+        {same_values[ 5], same_values[ 2], 1}, {same_values[ 5], same_values[ 3], 1}, {same_values[ 5], same_values[ 4], 1},
+        {same_values[ 5], same_values[ 5], 1}, {same_values[ 5], same_values[ 6], 1}, {same_values[ 5], same_values[ 7], 1},
+        {same_values[ 5], same_values[ 8], 1}, {same_values[ 5], same_values[ 9], 1}, {same_values[ 5], same_values[10], 1},
+        {same_values[ 5], same_values[11], 1}, {same_values[ 5], same_values[12], 1}, {same_values[ 5], same_values[13], 1},
+        {same_values[ 6], same_values[ 0], 1}, {same_values[ 6], same_values[ 1], 1}, {same_values[ 6], same_values[ 2], 1},
+        {same_values[ 6], same_values[ 3], 1}, {same_values[ 6], same_values[ 4], 1}, {same_values[ 6], same_values[ 5], 1},
+        {same_values[ 6], same_values[ 6], 1}, {same_values[ 6], same_values[ 7], 1}, {same_values[ 6], same_values[ 8], 1},
+        {same_values[ 6], same_values[ 9], 1}, {same_values[ 6], same_values[10], 1}, {same_values[ 6], same_values[11], 1},
+        {same_values[ 6], same_values[12], 1}, {same_values[ 6], same_values[13], 1}, {same_values[ 7], same_values[ 0], 1},
+        {same_values[ 7], same_values[ 1], 1}, {same_values[ 7], same_values[ 2], 1}, {same_values[ 7], same_values[ 3], 1},
+        {same_values[ 7], same_values[ 4], 1}, {same_values[ 7], same_values[ 5], 1}, {same_values[ 7], same_values[ 6], 1},
+        {same_values[ 7], same_values[ 7], 1}, {same_values[ 7], same_values[ 8], 1}, {same_values[ 7], same_values[ 9], 1},
+        {same_values[ 7], same_values[10], 1}, {same_values[ 7], same_values[11], 1}, {same_values[ 7], same_values[12], 1},
+        {same_values[ 7], same_values[13], 1}, {same_values[ 8], same_values[ 0], 1}, {same_values[ 8], same_values[ 1], 1},
+        {same_values[ 8], same_values[ 2], 1}, {same_values[ 8], same_values[ 3], 1}, {same_values[ 8], same_values[ 4], 1},
+        {same_values[ 8], same_values[ 5], 1}, {same_values[ 8], same_values[ 6], 1}, {same_values[ 8], same_values[ 7], 1},
+        {same_values[ 8], same_values[ 8], 1}, {same_values[ 8], same_values[ 9], 1}, {same_values[ 8], same_values[10], 1},
+        {same_values[ 8], same_values[11], 1}, {same_values[ 8], same_values[12], 1}, {same_values[ 8], same_values[13], 1},
+        {same_values[ 9], same_values[ 0], 1}, {same_values[ 9], same_values[ 1], 1}, {same_values[ 9], same_values[ 2], 1},
+        {same_values[ 9], same_values[ 3], 1}, {same_values[ 9], same_values[ 4], 1}, {same_values[ 9], same_values[ 5], 1},
+        {same_values[ 9], same_values[ 6], 1}, {same_values[ 9], same_values[ 7], 1}, {same_values[ 9], same_values[ 8], 1},
+        {same_values[ 9], same_values[ 9], 1}, {same_values[ 9], same_values[10], 1}, {same_values[ 9], same_values[11], 1},
+        {same_values[ 9], same_values[12], 1}, {same_values[ 9], same_values[13], 1}, {same_values[10], same_values[ 0], 1},
+        {same_values[10], same_values[ 1], 1}, {same_values[10], same_values[ 2], 1}, {same_values[10], same_values[ 3], 1},
+        {same_values[10], same_values[ 4], 1}, {same_values[10], same_values[ 5], 1}, {same_values[10], same_values[ 6], 1},
+        {same_values[10], same_values[ 7], 1}, {same_values[10], same_values[ 8], 1}, {same_values[10], same_values[ 9], 1},
+        {same_values[10], same_values[10], 1}, {same_values[10], same_values[11], 1}, {same_values[10], same_values[12], 1},
+        {same_values[10], same_values[13], 1}, {same_values[11], same_values[ 0], 1}, {same_values[11], same_values[ 1], 1},
+        {same_values[11], same_values[ 2], 1}, {same_values[11], same_values[ 3], 1}, {same_values[11], same_values[ 4], 1},
+        {same_values[11], same_values[ 5], 1}, {same_values[11], same_values[ 6], 1}, {same_values[11], same_values[ 7], 1},
+        {same_values[11], same_values[ 8], 1}, {same_values[11], same_values[ 9], 1}, {same_values[11], same_values[10], 1},
+        {same_values[11], same_values[11], 1}, {same_values[11], same_values[12], 1}, {same_values[11], same_values[13], 1},
+        {same_values[12], same_values[ 0], 1}, {same_values[12], same_values[ 1], 1}, {same_values[12], same_values[ 2], 1},
+        {same_values[12], same_values[ 3], 1}, {same_values[12], same_values[ 4], 1}, {same_values[12], same_values[ 5], 1},
+        {same_values[12], same_values[ 6], 1}, {same_values[12], same_values[ 7], 1}, {same_values[12], same_values[ 8], 1},
+        {same_values[12], same_values[ 9], 1}, {same_values[12], same_values[10], 1}, {same_values[12], same_values[11], 1},
+        {same_values[12], same_values[12], 1}, {same_values[12], same_values[13], 1}, {same_values[13], same_values[ 0], 1},
+        {same_values[13], same_values[ 1], 1}, {same_values[13], same_values[ 2], 1}, {same_values[13], same_values[ 3], 1},
+        {same_values[13], same_values[ 4], 1}, {same_values[13], same_values[ 5], 1}, {same_values[13], same_values[ 6], 1},
+        {same_values[13], same_values[ 7], 1}, {same_values[13], same_values[ 8], 1}, {same_values[13], same_values[ 9], 1},
+        {same_values[13], same_values[10], 1}, {same_values[13], same_values[11], 1}, {same_values[13], same_values[12], 1},
+        {same_values[13], same_values[13], 1},
+
+        {almost_same_values[ 0], almost_same_values[ 1], 0}, {almost_same_values[ 0], almost_same_values[ 2], 0},
+        {almost_same_values[ 0], almost_same_values[ 3], 0}, {almost_same_values[ 0], almost_same_values[ 4], 0},
+        {almost_same_values[ 0], almost_same_values[ 5], 0}, {almost_same_values[ 0], almost_same_values[ 6], 0},
+        {almost_same_values[ 0], almost_same_values[ 7], 0}, {almost_same_values[ 0], almost_same_values[ 8], 0},
+        {almost_same_values[ 0], almost_same_values[ 9], 0}, {almost_same_values[ 0], almost_same_values[10], 0},
+        {almost_same_values[ 0], almost_same_values[11], 0}, {almost_same_values[ 0], almost_same_values[12], 0},
+        {almost_same_values[ 0], almost_same_values[13], 0}, {almost_same_values[ 1], almost_same_values[ 0], 0},
+        {almost_same_values[ 1], almost_same_values[ 2], 0}, {almost_same_values[ 1], almost_same_values[ 3], 0},
+        {almost_same_values[ 1], almost_same_values[ 4], 0}, {almost_same_values[ 1], almost_same_values[ 5], 0},
+        {almost_same_values[ 1], almost_same_values[ 6], 0}, {almost_same_values[ 1], almost_same_values[ 7], 0},
+        {almost_same_values[ 1], almost_same_values[ 8], 0}, {almost_same_values[ 1], almost_same_values[ 9], 0},
+        {almost_same_values[ 1], almost_same_values[10], 0}, {almost_same_values[ 1], almost_same_values[11], 0},
+        {almost_same_values[ 1], almost_same_values[12], 0}, {almost_same_values[ 1], almost_same_values[13], 0},
+        {almost_same_values[ 2], almost_same_values[ 0], 0}, {almost_same_values[ 2], almost_same_values[ 1], 0},
+        {almost_same_values[ 2], almost_same_values[ 3], 0}, {almost_same_values[ 2], almost_same_values[ 4], 0},
+        {almost_same_values[ 2], almost_same_values[ 5], 0}, {almost_same_values[ 2], almost_same_values[ 6], 0},
+        {almost_same_values[ 2], almost_same_values[ 7], 0}, {almost_same_values[ 2], almost_same_values[ 8], 0},
+        {almost_same_values[ 2], almost_same_values[ 9], 0}, {almost_same_values[ 2], almost_same_values[10], 0},
+        {almost_same_values[ 2], almost_same_values[11], 0}, {almost_same_values[ 2], almost_same_values[12], 0},
+        {almost_same_values[ 2], almost_same_values[13], 0}, {almost_same_values[ 3], almost_same_values[ 0], 0},
+        {almost_same_values[ 3], almost_same_values[ 1], 0}, {almost_same_values[ 3], almost_same_values[ 2], 0},
+        {almost_same_values[ 3], almost_same_values[ 4], 0}, {almost_same_values[ 3], almost_same_values[ 5], 0},
+        {almost_same_values[ 3], almost_same_values[ 6], 0}, {almost_same_values[ 3], almost_same_values[ 7], 0},
+        {almost_same_values[ 3], almost_same_values[ 8], 0}, {almost_same_values[ 3], almost_same_values[ 9], 0},
+        {almost_same_values[ 3], almost_same_values[10], 0}, {almost_same_values[ 3], almost_same_values[11], 0},
+        {almost_same_values[ 3], almost_same_values[12], 0}, {almost_same_values[ 3], almost_same_values[13], 0},
+        {almost_same_values[ 4], almost_same_values[ 0], 0}, {almost_same_values[ 4], almost_same_values[ 1], 0},
+        {almost_same_values[ 4], almost_same_values[ 2], 0}, {almost_same_values[ 4], almost_same_values[ 3], 0},
+        {almost_same_values[ 4], almost_same_values[ 5], 0}, {almost_same_values[ 4], almost_same_values[ 6], 0},
+        {almost_same_values[ 4], almost_same_values[ 7], 0}, {almost_same_values[ 4], almost_same_values[ 8], 0},
+        {almost_same_values[ 4], almost_same_values[ 9], 0}, {almost_same_values[ 4], almost_same_values[10], 0},
+        {almost_same_values[ 4], almost_same_values[11], 0}, {almost_same_values[ 4], almost_same_values[12], 0},
+        {almost_same_values[ 4], almost_same_values[13], 0}, {almost_same_values[ 5], almost_same_values[ 0], 0},
+        {almost_same_values[ 5], almost_same_values[ 1], 0}, {almost_same_values[ 5], almost_same_values[ 2], 0},
+        {almost_same_values[ 5], almost_same_values[ 3], 0}, {almost_same_values[ 5], almost_same_values[ 4], 0},
+        {almost_same_values[ 5], almost_same_values[ 6], 0}, {almost_same_values[ 5], almost_same_values[ 7], 0},
+        {almost_same_values[ 5], almost_same_values[ 8], 0}, {almost_same_values[ 5], almost_same_values[ 9], 0},
+        {almost_same_values[ 5], almost_same_values[10], 0}, {almost_same_values[ 5], almost_same_values[11], 0},
+        {almost_same_values[ 5], almost_same_values[12], 0}, {almost_same_values[ 5], almost_same_values[13], 0},
+        {almost_same_values[ 6], almost_same_values[ 0], 0}, {almost_same_values[ 6], almost_same_values[ 1], 0},
+        {almost_same_values[ 6], almost_same_values[ 2], 0}, {almost_same_values[ 6], almost_same_values[ 3], 0},
+        {almost_same_values[ 6], almost_same_values[ 4], 0}, {almost_same_values[ 6], almost_same_values[ 5], 0},
+        {almost_same_values[ 6], almost_same_values[ 7], 0}, {almost_same_values[ 6], almost_same_values[ 8], 0},
+        {almost_same_values[ 6], almost_same_values[ 9], 0}, {almost_same_values[ 6], almost_same_values[10], 0},
+        {almost_same_values[ 6], almost_same_values[11], 0}, {almost_same_values[ 6], almost_same_values[12], 0},
+        {almost_same_values[ 6], almost_same_values[13], 0}, {almost_same_values[ 7], almost_same_values[ 0], 0},
+        {almost_same_values[ 7], almost_same_values[ 1], 0}, {almost_same_values[ 7], almost_same_values[ 2], 0},
+        {almost_same_values[ 7], almost_same_values[ 3], 0}, {almost_same_values[ 7], almost_same_values[ 4], 0},
+        {almost_same_values[ 7], almost_same_values[ 5], 0}, {almost_same_values[ 7], almost_same_values[ 6], 0},
+        {almost_same_values[ 7], almost_same_values[ 8], 0}, {almost_same_values[ 7], almost_same_values[ 9], 0},
+        {almost_same_values[ 7], almost_same_values[10], 0}, {almost_same_values[ 7], almost_same_values[11], 0},
+        {almost_same_values[ 7], almost_same_values[12], 0}, {almost_same_values[ 7], almost_same_values[13], 0},
+        {almost_same_values[ 8], almost_same_values[ 0], 0}, {almost_same_values[ 8], almost_same_values[ 1], 0},
+        {almost_same_values[ 8], almost_same_values[ 2], 0}, {almost_same_values[ 8], almost_same_values[ 3], 0},
+        {almost_same_values[ 8], almost_same_values[ 4], 0}, {almost_same_values[ 8], almost_same_values[ 5], 0},
+        {almost_same_values[ 8], almost_same_values[ 6], 0}, {almost_same_values[ 8], almost_same_values[ 7], 0},
+        {almost_same_values[ 8], almost_same_values[ 9], 0}, {almost_same_values[ 8], almost_same_values[10], 0},
+        {almost_same_values[ 8], almost_same_values[11], 0}, {almost_same_values[ 8], almost_same_values[12], 0},
+        {almost_same_values[ 8], almost_same_values[13], 0}, {almost_same_values[ 9], almost_same_values[ 0], 0},
+        {almost_same_values[ 9], almost_same_values[ 1], 0}, {almost_same_values[ 9], almost_same_values[ 2], 0},
+        {almost_same_values[ 9], almost_same_values[ 3], 0}, {almost_same_values[ 9], almost_same_values[ 4], 0},
+        {almost_same_values[ 9], almost_same_values[ 5], 0}, {almost_same_values[ 9], almost_same_values[ 6], 0},
+        {almost_same_values[ 9], almost_same_values[ 7], 0}, {almost_same_values[ 9], almost_same_values[ 8], 0},
+        {almost_same_values[ 9], almost_same_values[10], 0}, {almost_same_values[ 9], almost_same_values[11], 0},
+        {almost_same_values[ 9], almost_same_values[12], 0}, {almost_same_values[ 9], almost_same_values[13], 0},
+        {almost_same_values[10], almost_same_values[ 0], 0}, {almost_same_values[10], almost_same_values[ 1], 0},
+        {almost_same_values[10], almost_same_values[ 2], 0}, {almost_same_values[10], almost_same_values[ 3], 0},
+        {almost_same_values[10], almost_same_values[ 4], 0}, {almost_same_values[10], almost_same_values[ 5], 0},
+        {almost_same_values[10], almost_same_values[ 6], 0}, {almost_same_values[10], almost_same_values[ 7], 0},
+        {almost_same_values[10], almost_same_values[ 8], 0}, {almost_same_values[10], almost_same_values[ 9], 0},
+        {almost_same_values[10], almost_same_values[11], 0}, {almost_same_values[10], almost_same_values[12], 0},
+        {almost_same_values[10], almost_same_values[13], 0}, {almost_same_values[11], almost_same_values[ 0], 0},
+        {almost_same_values[11], almost_same_values[ 1], 0}, {almost_same_values[11], almost_same_values[ 2], 0},
+        {almost_same_values[11], almost_same_values[ 3], 0}, {almost_same_values[11], almost_same_values[ 4], 0},
+        {almost_same_values[11], almost_same_values[ 5], 0}, {almost_same_values[11], almost_same_values[ 6], 0},
+        {almost_same_values[11], almost_same_values[ 7], 0}, {almost_same_values[11], almost_same_values[ 8], 0},
+        {almost_same_values[11], almost_same_values[ 9], 0}, {almost_same_values[11], almost_same_values[10], 0},
+        {almost_same_values[11], almost_same_values[12], 0}, {almost_same_values[11], almost_same_values[13], 0},
+        {almost_same_values[12], almost_same_values[ 0], 0}, {almost_same_values[12], almost_same_values[ 1], 0},
+        {almost_same_values[12], almost_same_values[ 2], 0}, {almost_same_values[12], almost_same_values[ 3], 0},
+        {almost_same_values[12], almost_same_values[ 4], 0}, {almost_same_values[12], almost_same_values[ 5], 0},
+        {almost_same_values[12], almost_same_values[ 6], 0}, {almost_same_values[12], almost_same_values[ 7], 0},
+        {almost_same_values[12], almost_same_values[ 8], 0}, {almost_same_values[12], almost_same_values[ 9], 0},
+        {almost_same_values[12], almost_same_values[10], 0}, {almost_same_values[12], almost_same_values[11], 0},
+        {almost_same_values[12], almost_same_values[13], 0}, {almost_same_values[13], almost_same_values[ 0], 0},
+        {almost_same_values[13], almost_same_values[ 1], 0}, {almost_same_values[13], almost_same_values[ 2], 0},
+        {almost_same_values[13], almost_same_values[ 3], 0}, {almost_same_values[13], almost_same_values[ 4], 0},
+        {almost_same_values[13], almost_same_values[ 5], 0}, {almost_same_values[13], almost_same_values[ 6], 0},
+        {almost_same_values[13], almost_same_values[ 7], 0}, {almost_same_values[13], almost_same_values[ 8], 0},
+        {almost_same_values[13], almost_same_values[ 9], 0}, {almost_same_values[13], almost_same_values[10], 0},
+        {almost_same_values[13], almost_same_values[11], 0}, {almost_same_values[13], almost_same_values[12], 0}
+    };
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;
+    kryptos_mp_value_t *a, *b;
+
+    for (t = 0; t < test_vector_nr; t++) {
+        a = kryptos_hex_value_as_mp(test_vector[t].a, strlen(test_vector[t].a));
+        CUTE_ASSERT(a != NULL);
+        b = kryptos_hex_value_as_mp(test_vector[t].b, strlen(test_vector[t].b));
+        CUTE_ASSERT(b != NULL);
+        CUTE_ASSERT(kryptos_mp_eq(a, b) == test_vector[t].expected);
+        kryptos_del_mp_value(a);
+        kryptos_del_mp_value(b);
+    }
+
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_get_gt_tests)
+    char *values[] = {
+        "00000002",
+        "0000000000000001",
+        "000000000000000000000000000000000000000000000000000000A",
+        "FF"
+    };
+    kryptos_mp_value_t *a, *b;
+
+    a = kryptos_hex_value_as_mp(values[0], strlen(values[0]));
+    b = kryptos_hex_value_as_mp(values[1], strlen(values[1]));
+    CUTE_ASSERT(a != NULL && b != NULL);
+    CUTE_ASSERT(kryptos_mp_get_gt(a, b) == a);
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+
+    a = kryptos_hex_value_as_mp(values[0], strlen(values[0]));
+    b = kryptos_hex_value_as_mp(values[2], strlen(values[2]));
+    CUTE_ASSERT(a != NULL && b != NULL);
+    CUTE_ASSERT(kryptos_mp_get_gt(a, b) == b);
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+
+    a = kryptos_hex_value_as_mp(values[0], strlen(values[0]));
+    b = kryptos_hex_value_as_mp(values[3], strlen(values[3]));
+    CUTE_ASSERT(a != NULL && b != NULL);
+    CUTE_ASSERT(kryptos_mp_get_gt(a, b) == b);
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+
+    a = kryptos_hex_value_as_mp(values[1], strlen(values[1]));
+    b = kryptos_hex_value_as_mp(values[0], strlen(values[0]));
+    CUTE_ASSERT(a != NULL && b != NULL);
+    CUTE_ASSERT(kryptos_mp_get_gt(a, b) == b);
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+
+    a = kryptos_hex_value_as_mp(values[1], strlen(values[1]));
+    b = kryptos_hex_value_as_mp(values[2], strlen(values[2]));
+    CUTE_ASSERT(a != NULL && b != NULL);
+    CUTE_ASSERT(kryptos_mp_get_gt(a, b) == b);
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+
+    a = kryptos_hex_value_as_mp(values[1], strlen(values[1]));
+    b = kryptos_hex_value_as_mp(values[3], strlen(values[3]));
+    CUTE_ASSERT(a != NULL && b != NULL);
+    CUTE_ASSERT(kryptos_mp_get_gt(a, b) == b);
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+
+    a = kryptos_hex_value_as_mp(values[2], strlen(values[2]));
+    b = kryptos_hex_value_as_mp(values[1], strlen(values[1]));
+    CUTE_ASSERT(a != NULL && b != NULL);
+    CUTE_ASSERT(kryptos_mp_get_gt(a, b) == a);
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+
+    a = kryptos_hex_value_as_mp(values[2], strlen(values[2]));
+    b = kryptos_hex_value_as_mp(values[0], strlen(values[0]));
+    CUTE_ASSERT(a != NULL && b != NULL);
+    CUTE_ASSERT(kryptos_mp_get_gt(a, b) == a);
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+
+    a = kryptos_hex_value_as_mp(values[2], strlen(values[2]));
+    b = kryptos_hex_value_as_mp(values[3], strlen(values[3]));
+    CUTE_ASSERT(a != NULL && b != NULL);
+    CUTE_ASSERT(kryptos_mp_get_gt(a, b) == b);
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+
+    a = kryptos_hex_value_as_mp(values[3], strlen(values[3]));
+    b = kryptos_hex_value_as_mp(values[1], strlen(values[1]));
+    CUTE_ASSERT(a != NULL && b != NULL);
+    CUTE_ASSERT(kryptos_mp_get_gt(a, b) == a);
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+
+    a = kryptos_hex_value_as_mp(values[3], strlen(values[3]));
+    b = kryptos_hex_value_as_mp(values[2], strlen(values[2]));
+    CUTE_ASSERT(a != NULL && b != NULL);
+    CUTE_ASSERT(kryptos_mp_get_gt(a, b) == a);
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+
+    a = kryptos_hex_value_as_mp(values[3], strlen(values[3]));
+    b = kryptos_hex_value_as_mp(values[0], strlen(values[0]));
+    CUTE_ASSERT(a != NULL && b != NULL);
+    CUTE_ASSERT(kryptos_mp_get_gt(a, b) == a);
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_ne_tests)
+    char *values[] = {
+        "0000000000000000018",
+        "0000000000000000029",
+        "0000000000000000039",
+        "0000001000001000010"
+    };
+    struct ne_tests_ctx {
+        kryptos_u8_t *a, *b;
+        int expected;
+    };
+    struct ne_tests_ctx test_vector[] = {
+        {values[0], values[0], 0},
+        {values[0], values[1], 1},
+        {values[0], values[2], 1},
+        {values[0], values[3], 1},
+        {values[1], values[0], 1},
+        {values[1], values[1], 0},
+        {values[1], values[2], 1},
+        {values[1], values[3], 1},
+        {values[2], values[0], 1},
+        {values[2], values[1], 1},
+        {values[2], values[2], 0},
+        {values[2], values[3], 1},
+        {values[3], values[0], 1},
+        {values[3], values[1], 1},
+        {values[3], values[2], 1},
+        {values[3], values[3], 0}
+    };
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *a, *b;
+
+    for (tv = 0; tv < test_vector_nr; tv++) {
+        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
+        CUTE_ASSERT(a != NULL);
+        b = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));
+        CUTE_ASSERT(b != NULL);
+        CUTE_ASSERT(kryptos_mp_ne(a, b) == test_vector[tv].expected);
+        kryptos_del_mp_value(a);
+        kryptos_del_mp_value(b);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_gt_tests)
+    char *values[] = {
+        "0000000000000000018",
+        "0000000000000000029",
+        "0000000000000000039",
+        "0000001000001000010"
+    };
+    struct gt_tests_ctx {
+        kryptos_u8_t *a, *b;
+        int expected;
+    };
+    struct gt_tests_ctx test_vector[] = {
+        {values[0], values[0], 0},
+        {values[0], values[1], 0},
+        {values[0], values[2], 0},
+        {values[0], values[3], 0},
+        {values[1], values[0], 1},
+        {values[1], values[1], 0},
+        {values[1], values[2], 0},
+        {values[1], values[3], 0},
+        {values[2], values[0], 1},
+        {values[2], values[1], 1},
+        {values[2], values[2], 0},
+        {values[2], values[3], 0},
+        {values[3], values[0], 1},
+        {values[3], values[1], 1},
+        {values[3], values[2], 1},
+        {values[3], values[3], 0}
+    };
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *a, *b;
+
+    for (tv = 0; tv < test_vector_nr; tv++) {
+        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
+        CUTE_ASSERT(a != NULL);
+        b = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));
+        CUTE_ASSERT(b != NULL);
+        CUTE_ASSERT(kryptos_mp_gt(a, b) == test_vector[tv].expected);
+        kryptos_del_mp_value(a);
+        kryptos_del_mp_value(b);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_lt_tests)
+    char *values[] = {
+        "0000000000000000018",
+        "0000000000000000029",
+        "0000000000000000039",
+        "0000001000001000010"
+    };
+    struct lt_tests_ctx {
+        kryptos_u8_t *a, *b;
+        int expected;
+    };
+    struct lt_tests_ctx test_vector[] = {
+        {values[0], values[0], 0},
+        {values[0], values[1], 1},
+        {values[0], values[2], 1},
+        {values[0], values[3], 1},
+        {values[1], values[0], 0},
+        {values[1], values[1], 0},
+        {values[1], values[2], 1},
+        {values[1], values[3], 1},
+        {values[2], values[0], 0},
+        {values[2], values[1], 0},
+        {values[2], values[2], 0},
+        {values[2], values[3], 1},
+        {values[3], values[0], 0},
+        {values[3], values[1], 0},
+        {values[3], values[2], 0},
+        {values[3], values[3], 0}
+    };
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *a, *b;
+
+    for (tv = 0; tv < test_vector_nr; tv++) {
+        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
+        CUTE_ASSERT(a != NULL);
+        b = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));
+        CUTE_ASSERT(b != NULL);
+        CUTE_ASSERT(kryptos_mp_lt(a, b) == test_vector[tv].expected);
+        kryptos_del_mp_value(a);
+        kryptos_del_mp_value(b);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_ge_tests)
+    char *values[] = {
+        "0000000000000000018",
+        "0000000000000000029",
+        "0000000000000000039",
+        "0000001000001000010"
+    };
+    struct ge_tests_ctx {
+        kryptos_u8_t *a, *b;
+        int expected;
+    };
+    struct ge_tests_ctx test_vector[] = {
+        {values[0], values[0], 1},
+        {values[0], values[1], 0},
+        {values[0], values[2], 0},
+        {values[0], values[3], 0},
+        {values[1], values[0], 1},
+        {values[1], values[1], 1},
+        {values[1], values[2], 0},
+        {values[1], values[3], 0},
+        {values[2], values[0], 1},
+        {values[2], values[1], 1},
+        {values[2], values[2], 1},
+        {values[2], values[3], 0},
+        {values[3], values[0], 1},
+        {values[3], values[1], 1},
+        {values[3], values[2], 1},
+        {values[3], values[3], 1}
+    };
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *a, *b;
+
+    for (tv = 0; tv < test_vector_nr; tv++) {
+        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
+        CUTE_ASSERT(a != NULL);
+        b = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));
+        CUTE_ASSERT(b != NULL);
+        CUTE_ASSERT(kryptos_mp_ge(a, b) == test_vector[tv].expected);
+        kryptos_del_mp_value(a);
+        kryptos_del_mp_value(b);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_le_tests)
+    char *values[] = {
+        "0000000000000000018",
+        "0000000000000000029",
+        "0000000000000000039",
+        "0000001000001000010"
+    };
+    struct le_tests_ctx {
+        kryptos_u8_t *a, *b;
+        int expected;
+    };
+    struct le_tests_ctx test_vector[] = {
+        {values[0], values[0], 1},
+        {values[0], values[1], 1},
+        {values[0], values[2], 1},
+        {values[0], values[3], 1},
+        {values[1], values[0], 0},
+        {values[1], values[1], 1},
+        {values[1], values[2], 1},
+        {values[1], values[3], 1},
+        {values[2], values[0], 0},
+        {values[2], values[1], 0},
+        {values[2], values[2], 1},
+        {values[2], values[3], 1},
+        {values[3], values[0], 0},
+        {values[3], values[1], 0},
+        {values[3], values[2], 0},
+        {values[3], values[3], 1}
+    };
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *a, *b;
+
+    for (tv = 0; tv < test_vector_nr; tv++) {
+        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
+        CUTE_ASSERT(a != NULL);
+        b = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));
+        CUTE_ASSERT(b != NULL);
+        CUTE_ASSERT(kryptos_mp_le(a, b) == test_vector[tv].expected);
+        kryptos_del_mp_value(a);
+        kryptos_del_mp_value(b);
+    }
+CUTE_TEST_CASE_END
+
 // INFO(Rafael): End of multiprecision testing area.
 
 CUTE_TEST_CASE(kryptos_test_monkey)
@@ -2710,6 +3258,13 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_value_as_hex_tests);
     CUTE_RUN_TEST(kryptos_assign_mp_value_tests);
     CUTE_RUN_TEST(kryptos_assign_hex_value_to_mp_tests);
+    CUTE_RUN_TEST(kryptos_mp_eq_tests);
+    CUTE_RUN_TEST(kryptos_mp_ne_tests);
+    CUTE_RUN_TEST(kryptos_mp_get_gt_tests);
+    CUTE_RUN_TEST(kryptos_mp_gt_tests);
+    CUTE_RUN_TEST(kryptos_mp_ge_tests);
+    CUTE_RUN_TEST(kryptos_mp_lt_tests);
+    CUTE_RUN_TEST(kryptos_mp_le_tests);
 
 CUTE_TEST_CASE_END
 
