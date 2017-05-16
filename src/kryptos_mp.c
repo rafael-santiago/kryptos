@@ -123,6 +123,12 @@ kryptos_mp_value_t *kryptos_hex_value_as_mp(const kryptos_u8_t *value, const siz
 
     d = mp->data_size - 1;
 
+    if ((value_size % 2) != 0) {
+        mp->data[d] = kryptos_mp_xnb(*vp);
+        d--;
+        vp++;
+    }
+
     while (vp < vp_end) {
         nb = 0;
         if (vp + 1 != vp_end) {
@@ -174,9 +180,11 @@ kryptos_u8_t *kryptos_mp_value_as_hex(const kryptos_mp_value_t *value, size_t *h
 }
 
 kryptos_mp_value_t *kryptos_mp_add(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
-    ssize_t d;
+    ssize_t d, s, sn;
     kryptos_u16_t bsum;
     kryptos_u8_t c;
+    kryptos_mp_value_t *sum;
+    const kryptos_mp_value_t *a, *b;
 
     if (dest == NULL || src == NULL) {
         return NULL;
@@ -184,25 +192,60 @@ kryptos_mp_value_t *kryptos_mp_add(kryptos_mp_value_t **dest, const kryptos_mp_v
 
     if ((*dest) == NULL) {
         (*dest) = kryptos_new_mp_value(src->data_size << 3);
+        memcpy((*dest)->data, src->data, src->data_size);
+        return (*dest);
     }
 
-    d = (*dest)->data_size;
+    sum = kryptos_new_mp_value((src->data_size + (*dest)->data_size) << 3);
+
+    if (sum == NULL) {
+        return NULL;
+    }
+
+    kryptos_mp_max_min(a, b, (*dest), src);
+
+    d = s = 0;
     c = 0;
 
-    while (d >= 0) {
-        bsum = (*dest)->data[d] + src->data[d] + c;
+    while (d < a->data_size) {
+        bsum = (*dest)->data[d] + ( (d < src->data_size) ? src->data[d] : 0 ) + c;
         c = (bsum > 0xFF);
-        (*dest)->data[d] = bsum & 0xFF;
-        d--;
+        sum->data[s] = bsum & 0xFF;
+        s++;
+        d++;
     }
+
+    if (c > 0 && s < sum->data_size) {
+        sum->data[s] = c;
+    }
+
+    for (sn = sum->data_size - 1; sn >= 0 && sum->data[sn] == 0; sn--)
+        ;
+
+    (*dest)->data_size = (sn < sum->data_size) ? sn + 1 : sum->data_size;
+    kryptos_freeseg((*dest)->data);
+
+    (*dest)->data = (kryptos_u8_t *) kryptos_newseg((*dest)->data_size);
+    if ((*dest)->data != NULL) {
+        for (s = sn; s >= 0; s--) {
+            (*dest)->data[s] = sum->data[s];
+        }
+    } else {
+        (*dest)->data = sum->data;
+        sum->data = NULL;
+    }
+
+    kryptos_del_mp_value(sum);
 
     return (*dest);
 }
 
 kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
-    ssize_t d;
-    short bsub;
-    short c;
+    ssize_t d, s, sn;
+    kryptos_u16_t bsub;
+    kryptos_u8_t c;
+    kryptos_mp_value_t *delta;
+    const kryptos_mp_value_t *a, *b;
 
     if (dest == NULL || src == NULL) {
         return NULL;
@@ -210,17 +253,50 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
 
     if ((*dest) == NULL) {
         (*dest) = kryptos_new_mp_value(src->data_size << 3);
+        memcpy((*dest)->data, src->data, src->data_size);
+        return (*dest);
     }
 
-    d = (*dest)->data_size;
+    delta = kryptos_new_mp_value((src->data_size + (*dest)->data_size) << 3);
+
+    if (delta == NULL) {
+        return NULL;
+    }
+
+    kryptos_mp_max_min(a, b, (*dest), src);
+
+    d = s = 0;
     c = 0;
 
-    while (d >= 0) {
-        bsub = ((*dest)->data[d] - src->data[d] + c);
+    while (d < a->data_size) {
+        bsub = (*dest)->data[d] - ( (d < src->data_size) ? src->data[d] : 0 ) + c;
         c = (bsub < 0) ? -1 : 0;
-        (*dest)->data[d] = (bsub & 0xFF);
-        d--;
+        delta->data[s] = bsub & 0xFF;
+        s++;
+        d++;
     }
+
+    if (c > 0 && s < delta->data_size) {
+        delta->data[s] = c;
+    }
+
+    for (sn = delta->data_size - 1; sn >= 0 && delta->data[sn] == 0; sn--)
+        ;
+
+    (*dest)->data_size = (sn < delta->data_size) ? sn + 1 : delta->data_size;
+    kryptos_freeseg((*dest)->data);
+
+    (*dest)->data = (kryptos_u8_t *) kryptos_newseg((*dest)->data_size);
+    if ((*dest)->data != NULL) {
+        for (s = sn; s >= 0; s--) {
+            (*dest)->data[s] = delta->data[s];
+        }
+    } else {
+        (*dest)->data = delta->data;
+        delta->data = NULL;
+    }
+
+    kryptos_del_mp_value(delta);
 
     return (*dest);
 }
