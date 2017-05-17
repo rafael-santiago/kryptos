@@ -34,9 +34,9 @@ static kryptos_u8_t nbxlt[] = {
 kryptos_mp_value_t *kryptos_new_mp_value(const size_t bitsize) {
     kryptos_mp_value_t *mp;
 
-    if (bitsize < 8) {
-        return NULL;
-    }
+//    if (bitsize < 8) {
+//        return NULL;
+//    }
 
     mp = (kryptos_mp_value_t *) kryptos_newseg(sizeof(kryptos_mp_value_t));
 
@@ -45,6 +45,10 @@ kryptos_mp_value_t *kryptos_new_mp_value(const size_t bitsize) {
     }
 
     mp->data_size = bitsize;
+
+    while (mp->data_size < 8) {
+        mp->data_size++;
+    }
 
     while ((mp->data_size % 8) != 0) {
         mp->data_size++;
@@ -241,11 +245,10 @@ kryptos_mp_value_t *kryptos_mp_add(kryptos_mp_value_t **dest, const kryptos_mp_v
 }
 
 kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
-    ssize_t d, s, sn;
+    ssize_t d, s, sn, dn;
     kryptos_u16_t bsub;
     kryptos_u8_t c;
     kryptos_mp_value_t *delta;
-    const kryptos_mp_value_t *a, *b;
 
     if (dest == NULL || src == NULL) {
         return NULL;
@@ -263,21 +266,23 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
         return NULL;
     }
 
-    kryptos_mp_max_min(a, b, (*dest), src);
-
     d = s = 0;
     c = 0;
+    dn = ((*dest)->data_size > src->data_size) ? (*dest)->data_size : src->data_size;
 
-    while (d < a->data_size) {
-        bsub = (*dest)->data[d] - ( (d < src->data_size) ? src->data[d] : 0 ) + c;
-        c = (bsub < 0) ? -1 : 0;
+    while (d < dn) {
+        bsub = ( (d < (*dest)->data_size) ? (*dest)->data[d] : 0 ) - ( (d < src->data_size) ? src->data[d] : 0 ) + c;
+        //printf("X = %x / Y = %x / c = %x / BSUB = %x / BYTE-SUB = %x\n", (*dest)->data[d], src->data[d], c, bsub, bsub & 0xFF);
+        c += bsub >> 8;
         delta->data[s] = bsub & 0xFF;
         s++;
         d++;
     }
 
-    if (c > 0 && s < delta->data_size) {
-        delta->data[s] = c;
+    if (c == 0xFF && s < delta->data_size) {
+        // INFO(Rafael): Here in this code I am not really concerned about signals, the numbers are expressed with 2^b bits.
+        //               However, we will sign that the src was greater than dest by setting the most significant nibble to 0xF.
+        delta->data[s] = 0x0F;
     }
 
     for (sn = delta->data_size - 1; sn >= 0 && delta->data[sn] == 0; sn--)
