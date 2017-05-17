@@ -349,14 +349,22 @@ kryptos_mp_value_t *kryptos_assign_hex_value_to_mp(kryptos_mp_value_t **dest,
 }
 
 kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
-    size_t bitsize, r;
-    kryptos_mp_value_t *a[2];
-    ssize_t d, s, rd;
+    size_t bitsize, r, rn;
+    kryptos_mp_value_t **a;
+    const kryptos_mp_value_t *x, *y;
+    ssize_t xd, yd;
     short bmul;
     kryptos_u8_t c;
+//    ssize_t rd;
 
-    if (dest == NULL || src == NULL) {
+    if (src == NULL || dest == NULL) {
         return NULL;
+    }
+
+    if ((*dest) == NULL) {
+        (*dest) = kryptos_new_mp_value(src->data_size << 3);
+        memcpy((*dest)->data, src->data, src->data_size);
+        return (*dest);
     }
 
     // CLUE(Rafael): Encantamentos baseados em algumas propriedades que talvez a tia Tetéia não quis te contar.
@@ -367,67 +375,56 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
         bitsize = (src->data_size + 1) << 4;
     }
 
-    a[0] = kryptos_new_mp_value(bitsize);
+    kryptos_mp_max_min(x, y, (*dest), src);
 
-    a[1] = kryptos_new_mp_value(bitsize);
+    a = (kryptos_mp_value_t **) kryptos_newseg(sizeof(kryptos_mp_value_t **) * y->data_size);
 
-    r = 0;
+    for (r = 0; r < y->data_size; r++) {
+        a[r] = kryptos_new_mp_value(bitsize);
+    }
 
     // CLUE(Rafael): Multiplicando igual na aula da tia Tetéia.
-
-    while (r < 2) {
-        d = (*dest)->data_size - 1;
-        s = src->data_size - 1;
-        rd = a[r]->data_size - 1;
+    for (yd = 0, r = 0; yd < y->data_size; yd++, r++) {
         c = 0;
-
-        while (s >= 0) {
-            bmul = (*dest)->data[d] * src->data[s] + c;
-            a[r]->data[rd + r] = bmul & 0xFF;
-            c = bmul >> 8;
-            rd--;
-            d--;
-            s--;
+        for (xd = 0; xd < x->data_size; xd++) {
+            bmul = y->data[yd] * x->data[xd] + c;
+            c = (bmul >> 8);
+            a[r]->data[xd + r] = (bmul & 0xFF);
+//            printf("X = %x / Y = %x / c = %x / BMUL = %x / BYTE-SUB = %x\n", x->data[xd], y->data[yd], c, bmul, bmul & 0xFF);
         }
 
-        if ((rd + r) < a[r]->data_size) {
-            a[r]->data[rd + r] = c;
+        if ((xd + r) < a[r]->data_size) {
+            a[r]->data[xd + r] += c;
         }
-
-        r++;
     }
-
-    // CLUE(Rafael): Somando as multiplicações igual na aula da tia Tetéia.
-
-    // INFO(Rafael): Maybe it should be done inside the inner loop. In the first bmul expr. A tia Tetéia nos daria zero, pois é
-    //               ofuscado pra cacete. O tio Pressman teria um treco, pois não estariamos reutilizando a callstack Hahah.
-    //               Eita maldade, the zueira never ends.
-    a[0] = kryptos_mp_add(&a[0], a[1]);
-
-    // INFO(Rafael): Seeking the "best" bit size for the result copy.
-
-    r = src->data_size - 1;
-    while (r >= 0 && a[0]->data[r] != 0) {
-        r--;
+/*
+    for (r = 0; r < y->data_size; r++) {
+        printf("A[%2d] = ", r);
+        for (rd = a[r]->data_size - 1; rd >= 0; rd--) printf("%.2X ", a[r]->data[rd]);
+        printf("\n");
     }
-
+*/
     kryptos_del_mp_value((*dest));
-    (*dest) = kryptos_new_mp_value(r << 3);
+    (*dest) = NULL;
 
-    d = (*dest)->data_size - 1;
-    s = a[0]->data_size - 1;
-    while (d < r) {
-        (*dest)->data[d] = a[0]->data[s];
-        d--;
-        s--;
+    for (r = 0; r < y->data_size; r++) {
+        // CLUE(Rafael): Somando as multiplicações igual na aula da tia Tetéia.
+
+        // INFO(Rafael): Maybe it should be done inside the inner loop. In the first bmul expr. A tia Tetéia nos daria zero, pois é
+        //               ofuscado pra cacete. O tio Pressman teria um treco, pois não estariamos reutilizando a callstack Hahah.
+        //               Eita maldade, the zueira never ends.
+        (*dest) = kryptos_mp_add(dest, a[r]);
     }
 
     // INFO(Rafael): Housekeeping.
 
-    kryptos_del_mp_value(a[0]);
-    kryptos_del_mp_value(a[1]);
-    bitsize = r = 0;
-    s = d = rd = 0;
+    for (r = 0; r < y->data_size; r++) {
+        kryptos_del_mp_value(a[r]);
+    }
+
+    kryptos_freeseg(a);
+
+    bitsize = r = rn = 0;
     bmul = 0;
     c = 0;
 

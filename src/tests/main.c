@@ -3286,6 +3286,59 @@ CUTE_TEST_CASE(kryptos_mp_sub_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_mul_tests)
+    kryptos_mp_value_t *a, *b, *e;
+    struct mul_tests_ctx {
+        kryptos_u8_t *a, *b, *e;
+    };
+    struct mul_tests_ctx test_vector[] = {
+        {    "2",    "4",        "8" },
+        {    "2",   "44",       "88" },
+        {   "22",   "44",      "908" },
+        {  "101", "1001",   "101101" },
+        { "DEAD", "BEEF", "A6144983" },
+        { "BEEF", "DEAD", "A6144983" }
+    };
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+//    ssize_t d;
+
+    a = NULL;
+    b = kryptos_hex_value_as_mp("2", 1);
+    CUTE_ASSERT(b != NULL);
+    a = kryptos_mp_mul(&a, b);
+    CUTE_ASSERT(a != NULL);
+    CUTE_ASSERT(kryptos_mp_eq(a, b) == 1);
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+
+    for (tv = 0; tv < test_vector_nr; tv++) {
+        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
+        b = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));
+        e = kryptos_hex_value_as_mp(test_vector[tv].e, strlen(test_vector[tv].e));
+
+        CUTE_ASSERT(a != NULL && b != NULL && e != NULL);
+
+        a = kryptos_mp_mul(&a, b);
+/*
+        printf("A = ");
+        for (d = a->data_size - 1; d >= 0; d--) printf("%.2X ", a->data[d]);
+        printf("\n");
+
+        printf("E = ");
+        for (d = e->data_size - 1; d >= 0; d--) printf("%.2X ", e->data[d]);
+        printf("\n--\n");
+*/
+        CUTE_ASSERT(a != NULL);
+
+        CUTE_ASSERT(kryptos_mp_eq(a, e) == 1);
+
+        kryptos_del_mp_value(a);
+        kryptos_del_mp_value(b);
+        kryptos_del_mp_value(e);
+    }
+
+CUTE_TEST_CASE_END
+
 // INFO(Rafael): End of multiprecision testing area.
 
 CUTE_TEST_CASE(kryptos_test_monkey)
@@ -3361,6 +3414,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_le_tests);
     CUTE_RUN_TEST(kryptos_mp_add_tests);
     CUTE_RUN_TEST(kryptos_mp_sub_tests);
+    CUTE_RUN_TEST(kryptos_mp_mul_tests);
 
 CUTE_TEST_CASE_END
 
