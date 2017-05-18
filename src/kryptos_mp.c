@@ -374,8 +374,8 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
     m = kryptos_new_mp_value(((*dest)->data_size + src->data_size + 1) << 3);
 
     if (m == NULL) {
-        // WARN(Rafael): 'Não deu.' -- Quico
-        return (*dest);
+        // WARN(Rafael): It is better leak than return a wrong result.
+        return NULL;
     }
 
     kryptos_mp_max_min(x, y, (*dest), src);
@@ -403,7 +403,7 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
             //               A CPU não se importa se vai bufferizar cada multiplicação ou executá-las de forma "paralela".
             //               Mas tem uma forma (um tanto peculiar) de protestar, executando mais lentamente, a forma menos
             //               indicada segundo ela. E programamos acima de tudo para ela, pois é ela quem executa o que está
-            //               abstraido aqui em prol de usuários seres Humanos. ;)
+            //               abstraído aqui em prol de usuários seres Humanos. ;)
             bsum = (m->data[xd + r] + (bmul & 0xFF)) + ac;
             ac = (bsum > 0xFF);
             m->data[xd + r] = (bsum & 0xFF);
