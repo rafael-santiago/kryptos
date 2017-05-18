@@ -404,7 +404,7 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
             //               Mas tem uma forma (um tanto peculiar) de protestar, executando mais lentamente, a forma menos
             //               indicada segundo ela. E programamos acima de tudo para ela, pois é ela quem executa o que está
             //               abstraído aqui em prol de usuários seres Humanos. ;)
-            bsum = (m->data[xd + r] + (bmul & 0xFF)) + ac;
+            bsum = m->data[xd + r] + (bmul & 0xFF) + ac;
             ac = (bsum > 0xFF);
             m->data[xd + r] = (bsum & 0xFF);
         }
