@@ -374,7 +374,7 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
     m = kryptos_new_mp_value(((*dest)->data_size + src->data_size + 1) << 3);
 
     if (m == NULL) {
-        // WARN(Rafael): It is better leak than return a wrong result.
+        // WARN(Rafael): Better let a memory leak than return a wrong result.
         return NULL;
     }
 

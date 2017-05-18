@@ -3292,15 +3292,19 @@ CUTE_TEST_CASE(kryptos_mp_mul_tests)
         kryptos_u8_t *a, *b, *e;
     };
     struct mul_tests_ctx test_vector[] = {
-        {    "2",    "4",        "8" },
-        {    "2",   "44",       "88" },
-        {   "22",   "44",      "908" },
-        {  "101", "1001",   "101101" },
-        { "DEAD", "BEEF", "A6144983" },
-        { "BEEF", "DEAD", "A6144983" }
+        {                "2",        "4",                        "8" },
+        {                "2",       "44",                       "88" },
+        {               "22",       "44",                      "908" },
+        {              "101",     "1001",                   "101101" },
+        {             "DEAD",     "BEEF",                 "A6144983" },
+        {             "BEEF",     "DEAD",                 "A6144983" },
+        {               "FF",       "FF",                     "FE01" },
+        {             "FFFF",     "FFFF",                 "FFFE0001" },
+        {         "FFFFFFFF", "FFFFFFFF",         "FFFFFFFE00000001" },
+        {         "DEADBEEF",     "DEAD",             "C1B126FD4983" },
+        { "DEADBEEFDEADBEEF", "DEADBEEF", "C1B1CD12E31F7033216DA321" }
     };
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
-//    ssize_t d;
 
     a = NULL;
     b = kryptos_hex_value_as_mp("2", 1);
@@ -3319,15 +3323,7 @@ CUTE_TEST_CASE(kryptos_mp_mul_tests)
         CUTE_ASSERT(a != NULL && b != NULL && e != NULL);
 
         a = kryptos_mp_mul(&a, b);
-/*
-        printf("A = ");
-        for (d = a->data_size - 1; d >= 0; d--) printf("%.2X ", a->data[d]);
-        printf("\n");
 
-        printf("E = ");
-        for (d = e->data_size - 1; d >= 0; d--) printf("%.2X ", e->data[d]);
-        printf("\n--\n");
-*/
         CUTE_ASSERT(a != NULL);
 
         CUTE_ASSERT(kryptos_mp_eq(a, e) == 1);
