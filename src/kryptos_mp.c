@@ -5,13 +5,14 @@
  * the terms of the GNU General Public License version 2.
  *
  */
+
+// 'Hexadecimals. Hexadecimals to the rescue.'
+//              -- Mark Watney (The Martian)
+
 #include <kryptos_mp.h>
 #include <kryptos_memory.h>
 #include <string.h>
 #include <ctype.h>
-
-// 'Hexadecimals. Hexadecimals to the rescue.'
-//              -- Mark Watney (The Martian)
 
 #define kryptos_mp_xnb(n) ( isdigit((n)) ? ( (n) - 48 ) : ( toupper((n)) - 55 )  )
 
@@ -349,12 +350,13 @@ kryptos_mp_value_t *kryptos_assign_hex_value_to_mp(kryptos_mp_value_t **dest,
 }
 
 kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
-    size_t bitsize, r, rn;
-    kryptos_mp_value_t **a;
+    size_t r;
+    kryptos_mp_value_t *m;
     const kryptos_mp_value_t *x, *y;
     ssize_t xd, yd;
     short bmul;
-    kryptos_u8_t c;
+    kryptos_u16_t bsum;
+    kryptos_u8_t mc, ac;
 //    ssize_t rd;
 
     if (src == NULL || dest == NULL) {
@@ -369,64 +371,69 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
 
     // CLUE(Rafael): Encantamentos baseados em algumas propriedades que talvez a tia Tetéia não quis te contar.
 
-    if ((*dest) != NULL) {
-        bitsize = ((*dest)->data_size + src->data_size + 1) << 3;
-    } else {
-        bitsize = (src->data_size + 1) << 4;
+    m = kryptos_new_mp_value(((*dest)->data_size + src->data_size + 1) << 3);
+
+    if (m == NULL) {
+        // WARN(Rafael): 'Não deu.' -- Quico
+        return (*dest);
     }
 
     kryptos_mp_max_min(x, y, (*dest), src);
 
-    a = (kryptos_mp_value_t **) kryptos_newseg(sizeof(kryptos_mp_value_t **) * y->data_size);
-
-    for (r = 0; r < y->data_size; r++) {
-        a[r] = kryptos_new_mp_value(bitsize);
-    }
-
     // CLUE(Rafael): Multiplicando igual na aula da tia Tetéia.
+
     for (yd = 0, r = 0; yd < y->data_size; yd++, r++) {
-        c = 0;
+        mc = 0;
+        ac = 0;
+
         for (xd = 0; xd < x->data_size; xd++) {
-            bmul = y->data[yd] * x->data[xd] + c;
-            c = (bmul >> 8);
-            a[r]->data[xd + r] = (bmul & 0xFF);
-//            printf("X = %x / Y = %x / c = %x / BMUL = %x / BYTE-SUB = %x\n", x->data[xd], y->data[yd], c, bmul, bmul & 0xFF);
+            bmul = y->data[yd] * x->data[xd] + mc;
+            mc = (bmul >> 8);
+            // INFO(Rafael): "Parallelizing" the multiplications sum in order to not call kryptos_mp_add() x->data_size times.
+            //               Besides time it will also save memory.
+            //
+            //               Somando as multiplicações igual na aula da tia Tetéia, mas de uma forma não usual para Humanos.
+            //               A tia Tetéia vai nos dar um zero, pois é ofuscado pra cacete. O tio Pressman já teve um treco,
+            //               pois não estamos Re-u-ti-li-zan-do a... callstack, chamando kryptos_mp_add() x->data_size vezes.
+            //               Hahah!! The zueira never ends.
+            //
+            //               Mas sério: uma coisa é fazer algo fácil de entender quando dá para fazer, outra coisa é subutilizar
+            //               o Hardware em prol de gente preguiçosa que não consegue pensar fora da caixa. Um programa
+            //               tem acima de tudo que fazer de forma mais eficiente o que se presta, código é para ser executado.
+            //               A CPU não se importa se vai bufferizar cada multiplicação ou executá-las de forma "paralela".
+            //               Mas tem uma forma (um tanto peculiar) de protestar, executando mais lentamente, a forma menos
+            //               indicada segundo ela. E programamos acima de tudo para ela, pois é ela quem executa o que está
+            //               abstraido aqui em prol de usuários seres Humanos. ;)
+            bsum = (m->data[xd + r] + (bmul & 0xFF)) + ac;
+            ac = (bsum > 0xFF);
+            m->data[xd + r] = (bsum & 0xFF);
         }
 
-        if ((xd + r) < a[r]->data_size) {
-            a[r]->data[xd + r] += c;
+        if ((xd + r) < m->data_size) {
+            m->data[xd + r] = (m->data[xd + r] + mc + ac) & 0xFF;
         }
     }
-/*
-    for (r = 0; r < y->data_size; r++) {
-        printf("A[%2d] = ", r);
-        for (rd = a[r]->data_size - 1; rd >= 0; rd--) printf("%.2X ", a[r]->data[rd]);
-        printf("\n");
-    }
-*/
+
+    for (xd = m->data_size - 1; xd >= 0 && x->data[xd] == 0; xd--)
+        ;
+
     kryptos_del_mp_value((*dest));
     (*dest) = NULL;
 
-    for (r = 0; r < y->data_size; r++) {
-        // CLUE(Rafael): Somando as multiplicações igual na aula da tia Tetéia.
+    (*dest) = kryptos_new_mp_value(xd << 3);
 
-        // INFO(Rafael): Maybe it should be done inside the inner loop. In the first bmul expr. A tia Tetéia nos daria zero, pois é
-        //               ofuscado pra cacete. O tio Pressman teria um treco, pois não estariamos reutilizando a callstack Hahah.
-        //               Eita maldade, the zueira never ends.
-        (*dest) = kryptos_mp_add(dest, a[r]);
+    for (yd = xd - 1; yd >= 0; yd--) {
+        (*dest)->data[yd] = m->data[yd];
     }
 
     // INFO(Rafael): Housekeeping.
 
-    for (r = 0; r < y->data_size; r++) {
-        kryptos_del_mp_value(a[r]);
-    }
-
-    kryptos_freeseg(a);
-
-    bitsize = r = rn = 0;
+    kryptos_del_mp_value(m);
+    r = 0;
     bmul = 0;
-    c = 0;
+    ac = mc = 0;
+    bmul = 0;
+    bsum = 0;
 
     return (*dest);
 }
