@@ -3302,7 +3302,8 @@ CUTE_TEST_CASE(kryptos_mp_mul_tests)
         {             "FFFF",     "FFFF",                 "FFFE0001" },
         {         "FFFFFFFF", "FFFFFFFF",         "FFFFFFFE00000001" },
         {         "DEADBEEF",     "DEAD",             "C1B126FD4983" },
-        { "DEADBEEFDEADBEEF", "DEADBEEF", "C1B1CD12E31F7033216DA321" }
+        { "DEADBEEFDEADBEEF", "DEADBEEF", "C1B1CD12E31F7033216DA321" },
+        {           "FD02FF",       "FF",                 "FC05FC01" }
     };
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
 
@@ -3335,6 +3336,41 @@ CUTE_TEST_CASE(kryptos_mp_mul_tests)
 
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_pow_tests)
+    kryptos_mp_value_t *b, *e, *pe, *p;
+    struct pow_tests_ctx {
+        kryptos_u8_t *b, *e, *pe;
+    };
+    struct pow_tests_ctx test_vector[] = {
+        {  "2",  "8",                  "100" },
+        {  "2",  "2",                    "4" },
+        {  "2",  "0",                    "1" },
+        {  "2",  "1",                    "2" },
+        { "FF",  "3",               "FD02FF" },
+        { "FF",  "5",           "FB09F604FF" },
+        { "FF", "0A", "F62C88D104D1882CF601" }
+    };
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+
+    for (tv = 0; tv < test_vector_nr; tv++) {
+        b  = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));
+        e  = kryptos_hex_value_as_mp(test_vector[tv].e, strlen(test_vector[tv].e));
+        pe = kryptos_hex_value_as_mp(test_vector[tv].pe, strlen(test_vector[tv].pe));
+
+        CUTE_ASSERT(b != NULL && e != NULL && pe != NULL);
+
+        p = kryptos_mp_pow(b, e);
+
+        CUTE_ASSERT(kryptos_mp_eq(p, pe) == 1);
+
+        kryptos_del_mp_value(b);
+        kryptos_del_mp_value(e);
+        kryptos_del_mp_value(pe);
+        kryptos_del_mp_value(p);
+    }
+CUTE_TEST_CASE_END
+
+/*
 CUTE_TEST_CASE(kryptos_mp_div_tests)
     kryptos_mp_value_t *a, *b, *eq, *er, *q, *r;
     struct div_tests_ctx {
@@ -3394,6 +3430,7 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
         kryptos_del_mp_value(r);
     }
 CUTE_TEST_CASE_END
+*/
 
 // INFO(Rafael): End of multiprecision testing area.
 
@@ -3471,7 +3508,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_add_tests);
     CUTE_RUN_TEST(kryptos_mp_sub_tests);
     CUTE_RUN_TEST(kryptos_mp_mul_tests);
-    CUTE_RUN_TEST(kryptos_mp_div_tests);
+    CUTE_RUN_TEST(kryptos_mp_pow_tests);
+    //CUTE_RUN_TEST(kryptos_mp_div_tests);
 
 CUTE_TEST_CASE_END
 

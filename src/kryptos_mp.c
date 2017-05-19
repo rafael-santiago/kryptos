@@ -357,7 +357,6 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
     short bmul;
     kryptos_u16_t bsum;
     kryptos_u8_t mc, ac;
-//    ssize_t rd;
 
     if (src == NULL || dest == NULL) {
         return NULL;
@@ -414,15 +413,15 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
         }
     }
 
-    for (xd = m->data_size - 1; xd >= 0 && x->data[xd] == 0; xd--)
+    for (xd = m->data_size - 1; xd >= 0 && m->data[xd] == 0; xd--)
         ;
 
     kryptos_del_mp_value((*dest));
     (*dest) = NULL;
 
-    (*dest) = kryptos_new_mp_value(xd << 3);
+    (*dest) = kryptos_new_mp_value((xd + 1) << 3);
 
-    for (yd = xd - 1; yd >= 0; yd--) {
+    for (yd = xd; yd >= 0; yd--) {
         (*dest)->data[yd] = m->data[yd];
     }
 
@@ -515,7 +514,7 @@ const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const k
     return NULL;
 }
 
-kryptos_mp_value_t *kryptos_mp_div(kryptos_mp_value_t *dest, const kryptos_mp_value_t *src, kryptos_mp_value_t **remainder) {
+kryptos_mp_value_t *kryptos_mp_div_slow(kryptos_mp_value_t *dest, const kryptos_mp_value_t *src, kryptos_mp_value_t **remainder) {
     kryptos_mp_value_t *q, *r, *one;
 
     // TODO(Rafael): This is pretty slow. Optimize it.
@@ -554,6 +553,56 @@ kryptos_mp_value_t *kryptos_mp_div(kryptos_mp_value_t *dest, const kryptos_mp_va
 
     return q;
 }
+
+kryptos_mp_value_t *kryptos_mp_pow(kryptos_mp_value_t *b, const kryptos_mp_value_t *e) {
+    kryptos_mp_value_t *ee = NULL, *one = NULL, *pow = NULL, *zero = NULL;
+
+    if (b == NULL || e == NULL) {
+        return NULL;
+    }
+
+    one = kryptos_hex_value_as_mp("1", 1);
+    zero = kryptos_new_mp_value(e->data_size << 3);
+
+    ee = kryptos_assign_mp_value(&ee, e);
+
+    // INFO(Rafael): Seeking more precision.
+    pow = kryptos_new_mp_value(b->data_size << 3);
+    pow->data[0] = 1;
+
+    while (kryptos_mp_ne(ee, zero)) {
+        pow = kryptos_mp_mul(&pow, b);
+
+        ee = kryptos_mp_sub(&ee, one);
+    }
+
+    if (one != NULL) {
+        kryptos_del_mp_value(one);
+    }
+
+    if (zero != NULL) {
+        kryptos_del_mp_value(zero);
+    }
+
+    if (ee != NULL) {
+        kryptos_del_mp_value(ee);
+    }
+
+    return pow;
+}
+
+kryptos_mp_value_t *kryptos_mp_div(kryptos_mp_value_t *x, const kryptos_mp_value_t *y, kryptos_mp_value_t **remainder) {
+    kryptos_mp_value_t *q, *r;
+    size_t bitsize;
+
+    q = kryptos_new_mp_value(x->data_size << 3);
+    bitsize = ((x->data_size > y->data_size) ? x->data_size - y->data_size :
+                                              y->data_size - x->data_size) << 3;
+    r = kryptos_new_mp_value(bitsize);
+
+    return NULL;
+}
+
 
 #undef kryptos_mp_xnb
 

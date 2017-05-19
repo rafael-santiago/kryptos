@@ -46,4 +46,8 @@ const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const k
 
 kryptos_mp_value_t *kryptos_mp_div(kryptos_mp_value_t *dest, const kryptos_mp_value_t *src, kryptos_mp_value_t **remainder);
 
+kryptos_mp_value_t *kryptos_mp_exp(kryptos_mp_value_t *b, const kryptos_mp_value_t *e);
+
+kryptos_mp_value_t *kryptos_mp_pow(kryptos_mp_value_t *b, const kryptos_mp_value_t *e);
+
 #endif
