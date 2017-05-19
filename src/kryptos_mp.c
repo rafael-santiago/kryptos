@@ -515,6 +515,46 @@ const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const k
     return NULL;
 }
 
+kryptos_mp_value_t *kryptos_mp_div(kryptos_mp_value_t *dest, const kryptos_mp_value_t *src, kryptos_mp_value_t **remainder) {
+    kryptos_mp_value_t *q, *r, *one;
+
+    // TODO(Rafael): This is pretty slow. Optimize it.
+
+    if (dest == NULL || src == NULL) {
+        return NULL;
+    }
+
+    if (kryptos_mp_lt(dest, src)) {
+        if (remainder != NULL) {
+            (*remainder) = NULL;
+        }
+
+        return kryptos_hex_value_as_mp("0", 1);
+    }
+
+    one = kryptos_hex_value_as_mp("1", 1);
+
+    r = NULL;
+    r = kryptos_assign_mp_value(&r, dest);
+
+    q = NULL;
+
+    while (kryptos_mp_ge(r, src)) {
+        r = kryptos_mp_sub(&r, src);
+        q = kryptos_mp_add(&q, one);
+    }
+
+    kryptos_del_mp_value(one);
+
+    if (remainder != NULL) {
+        (*remainder) = r;
+    } else {
+        kryptos_del_mp_value(r);
+    }
+
+    return q;
+}
+
 #undef kryptos_mp_xnb
 
 #undef kryptos_mp_nbx
