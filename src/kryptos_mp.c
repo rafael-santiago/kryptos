@@ -514,7 +514,46 @@ const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const k
     return NULL;
 }
 
-kryptos_mp_value_t *kryptos_mp_div_slow(kryptos_mp_value_t *dest, const kryptos_mp_value_t *src, kryptos_mp_value_t **remainder) {
+kryptos_mp_value_t *kryptos_mp_pow(kryptos_mp_value_t *b, const kryptos_mp_value_t *e) {
+    kryptos_mp_value_t *ee = NULL, *one = NULL, *pow = NULL, *zero = NULL;
+
+    if (b == NULL || e == NULL) {
+        return NULL;
+    }
+
+    one = kryptos_hex_value_as_mp("1", 1);
+    zero = kryptos_new_mp_value(e->data_size << 3);
+
+    ee = kryptos_assign_mp_value(&ee, e);
+
+    // INFO(Rafael): Seeking more precision.
+    pow = kryptos_new_mp_value(b->data_size << 3);
+    pow->data[0] = 1;
+
+    while (kryptos_mp_ne(ee, zero)) {
+        pow = kryptos_mp_mul(&pow, b);
+
+        ee = kryptos_mp_sub(&ee, one);
+    }
+
+    if (one != NULL) {
+        kryptos_del_mp_value(one);
+    }
+
+    if (zero != NULL) {
+        kryptos_del_mp_value(zero);
+    }
+
+    if (ee != NULL) {
+        kryptos_del_mp_value(ee);
+    }
+
+    return pow;
+}
+
+/*
+kryptos_mp_value_t *kryptos_mp_div_slow(kryptos_mp_value_t *dest,
+                                        const kryptos_mp_value_t *src, kryptos_mp_value_t **remainder) {
     kryptos_mp_value_t *q, *r, *one;
 
     // TODO(Rafael): This is pretty slow. Optimize it.
@@ -553,56 +592,296 @@ kryptos_mp_value_t *kryptos_mp_div_slow(kryptos_mp_value_t *dest, const kryptos_
 
     return q;
 }
+*/
 
-kryptos_mp_value_t *kryptos_mp_pow(kryptos_mp_value_t *b, const kryptos_mp_value_t *e) {
-    kryptos_mp_value_t *ee = NULL, *one = NULL, *pow = NULL, *zero = NULL;
+kryptos_mp_value_t *kryptos_mp_div(kryptos_mp_value_t *x, const kryptos_mp_value_t *y, kryptos_mp_value_t **r) {
+    // WARN(Rafael): This algorithm is expensive. However, less expensive than sucessive subtractions. If you really
+    //               need to use standard divisions you should find a better solution. Standard division is not
+    //               a relevant thing for the library's scope.
 
-    if (b == NULL || e == NULL) {
+    kryptos_mp_value_t *p = NULL, *qd = NULL, *qu = NULL, *_1 = NULL, *q = NULL;
+    ssize_t qi, xi;
+    kryptos_u8_t msb;
+    int q_found = 0;
+
+    if (x == NULL || y == NULL) {
         return NULL;
     }
 
-    one = kryptos_hex_value_as_mp("1", 1);
-    zero = kryptos_new_mp_value(e->data_size << 3);
-
-    ee = kryptos_assign_mp_value(&ee, e);
-
-    // INFO(Rafael): Seeking more precision.
-    pow = kryptos_new_mp_value(b->data_size << 3);
-    pow->data[0] = 1;
-
-    while (kryptos_mp_ne(ee, zero)) {
-        pow = kryptos_mp_mul(&pow, b);
-
-        ee = kryptos_mp_sub(&ee, one);
+    q_found = 1;
+    for (xi = y->data_size - 1; xi >= 0 && q_found; xi--) {
+        q_found = (y->data[xi] == 0);
     }
 
-    if (one != NULL) {
-        kryptos_del_mp_value(one);
+    if (q_found) {
+        // WARN(Rafael): Division by zero.
+        return NULL;
     }
 
-    if (zero != NULL) {
-        kryptos_del_mp_value(zero);
+    q_found = 1;
+    for (xi = x->data_size - 1; xi >= 0 && q_found; xi--) {
+        q_found = (x->data[xi] == 0);
     }
 
-    if (ee != NULL) {
-        kryptos_del_mp_value(ee);
+    if (q_found) {
+        // WARN(Rafael): 0 / (y > 0).
+        if (r != NULL) {
+            (*r) = kryptos_new_mp_value(x->data_size << 3);
+        }
+        return kryptos_new_mp_value(x->data_size << 3);
     }
 
-    return pow;
+    // CLUE(Rafael): My approach here is based on finding the bit-size of the quotient and its first byte.
+    //               Having this info, I use two search windows. One is decreased (down window) and another
+    //               is increased (up window).
+    //
+    //               For each search step, all that should be done is multiply the divisior by the window and check
+    //               if it is less than or greater than (depending on the window type [i.e.: up, down]).
+    //
+    //               Once one of these stop criterias satisfied. The remainder is denoted by |x - p|. Where "p" denotes the
+    //               last multiplication calculated into the search loop.
+    //
+    //               Well, formalizing a little my craziness:
+    //
+    //               The n is given by: n = number of digits of X - (number of digits of Y - 1). Since we are dividing X by Y.
+    //
+    //               The first byte of the quotient is denoted by:
+    //
+    //                          Q_n = { |X_n - Y_nb| | |X_n - Y_nb| & 1 = 0 }
+    //                          Q_n = { |X_n - Y_nb| & 0xF | |X_n - Y_nb| & 1 <> 0 }
+    //                          Y_nb = (Y_n & 0xF0) | (Y_n >> 4)
+    //
+    //                The down window is given by: Q_n, X_n - 1 ... X_0
+    //
+    //                The up window is given by: Q_n, 0, 0, 0, ... 0_0
+
+    // INFO(Rafael): Setting up the "quotient window down".
+
+    qd = kryptos_new_mp_value((x->data_size - (y->data_size - 1)) << 3);
+
+    if (qd == NULL) {
+        goto kryptos_mp_div_epilogue;
+    }
+
+    _1 = kryptos_hex_value_as_mp("1", 1);
+
+    if (_1 == NULL) {
+        goto kryptos_mp_div_epilogue;
+    }
+
+    xi = x->data_size - 1;
+    qi = qd->data_size - 1;
+
+    while (qi >= 0) {
+        qd->data[qi] = x->data[xi];
+        qi--;
+        xi--;
+    }
+
+    // INFO(Rafael): Setting up the "quotient window up".
+
+    qu = kryptos_new_mp_value(qd->data_size << 3);
+
+    if (qu == NULL) {
+        goto kryptos_mp_div_epilogue;
+    }
+
+    // INFO(Rafael): Applying the window down reduction.
+
+    if (y->data_size != x->data_size) {
+        msb = (y->data[y->data_size - 1] & 0xF0) | (y->data[y->data_size - 1] >> 4);
+        if (msb > x->data[x->data_size - 1]) {
+            msb = msb - x->data[x->data_size - 1];
+        } else {
+            msb = x->data[x->data_size - 1] - msb;
+        }
+        if (msb & 1) {
+            msb = msb & 0xF;
+        }
+        qd->data[qd->data_size - 1] = msb;
+    }
+
+    // INFO(Rafael): Applying the window up reduction.
+
+    qu->data[qu->data_size - 1] = qd->data[qd->data_size - 1];
+
+    xi = qi = 0;
+
+    // INFO(Rafael): Looping over the reduced search spaces (backward and forward).
+
+    q = qd;
+    p = kryptos_assign_mp_value(&p, qd);
+    p = kryptos_mp_mul(&p, y);
+    q_found = kryptos_mp_lt(p, x);
+
+    while (!q_found) {
+        q = qu;
+
+        p = kryptos_assign_mp_value(&p, qu);
+        p = kryptos_mp_mul(&p, y);
+        q_found = kryptos_mp_gt(p, x) == 0;
+
+        if (q_found) {
+            continue;
+        }
+
+        qu = kryptos_mp_add(&qu, _1);
+
+        q = qd;
+        qd = kryptos_mp_sub(&qd, _1);
+
+        p = kryptos_assign_mp_value(&p, qd);
+        p = kryptos_mp_mul(&p, y);
+
+        q_found = kryptos_mp_le(p, x);
+    }
+
+    if (r != NULL) {
+        (*r) = NULL;
+        (*r) = kryptos_assign_mp_value(r, x);
+        (*r) = kryptos_mp_sub(r, p);
+    }
+
+kryptos_mp_div_epilogue:
+
+    if (p != NULL) {
+        kryptos_del_mp_value(p);
+    }
+
+    if (_1 != NULL) {
+        kryptos_del_mp_value(_1);
+    }
+
+    if (qd != NULL && q != qd) {
+        kryptos_del_mp_value(qd);
+    }
+
+    if (qu != NULL && q != qu) {
+        kryptos_del_mp_value(qu);
+    }
+
+    return q;
 }
 
-kryptos_mp_value_t *kryptos_mp_div(kryptos_mp_value_t *x, const kryptos_mp_value_t *y, kryptos_mp_value_t **remainder) {
-    kryptos_mp_value_t *q, *r;
-    size_t bitsize;
-
-    q = kryptos_new_mp_value(x->data_size << 3);
-    bitsize = ((x->data_size > y->data_size) ? x->data_size - y->data_size :
-                                              y->data_size - x->data_size) << 3;
-    r = kryptos_new_mp_value(bitsize);
-
-    return NULL;
-}
-
+//kryptos_mp_value_t *kryptos_mp_div_crazy(kryptos_mp_value_t *x, const kryptos_mp_value_t *y, kryptos_mp_value_t **remainder) {
+//    kryptos_mp_value_t *q = NULL, *r = NULL, *yb_nt = NULL, *yb = NULL, *xx = NULL, *yy = NULL, *b = NULL, *nt = NULL, *q_it_1 = NULL, *yb_it_1 = NULL, *it_1 = NULL;
+//    size_t bitsize = 0;
+//    kryptos_u8_t xb[255];
+//    ssize_t i, t;
+//
+//    if (x == NULL || y == NULL) {
+//        return NULL;
+//    }
+//
+//    xx = kryptos_assign_mp_value(&xx, x);
+//    yy = kryptos_assign_mp_value(&yy, y);
+//
+//    bitsize = ((xx->data_size > yy->data_size) ? xx->data_size - yy->data_size :
+//                                                 yy->data_size - xx->data_size) << 3;
+//    //r = kryptos_new_mp_value(bitsize);
+//    b = kryptos_hex_value_as_mp("FF", 2);
+//
+//    yb_nt = kryptos_assign_mp_value(&yb_nt, y);
+//    yb_nt = kryptos_assign_mp_value(&yb_nt, b);
+//    yb = kryptos_assign_mp_value(&yb, yb_nt);
+//
+//    kryptos_u64_to_hex(xb, sizeof(xb) - 1, (kryptos_u64_t) (bitsize >> 3) /*INFO(Rafael): Size in bytes (sic).*/);
+//    nt = kryptos_hex_value_as_mp(xb, strlen(xb));
+//
+//    yb_nt = kryptos_mp_pow(yb_nt, nt);
+//
+//    if (xx == NULL || yy == NULL || b == NULL) {
+//        goto kryptos_mp_div_epilogue;
+//    }
+//
+//    q = kryptos_new_mp_value(xx->data_size << 3);
+//
+//    while (kryptos_mp_ge(xx, yb_nt)) {
+//        q->data[q->data_size - 1] += 1;
+//        xx = kryptos_mp_sub(&xx, yb_nt);
+//    }
+//
+//    i = xx->data_size - 1;
+//    t = yy->data_size - 1;
+//
+//    while (i >= (t + 1)) {
+//        if (xx->data[i] == yy->data[t]) {
+//            q->data[i - t - 1] = 0xFE;
+//        } else {
+//            q->data[i - t - 1] = (xx->data[i] * 0xFF + xx->data[i - 1]) / yy->data[t];
+//        }
+//
+//        while (xx->data[i - t - 1] * (yy->data[t] * 0xFF + yy->data[t - 1]) >
+//                    xx->data[i] * 0xFE01 + xx->data[i - 1] * 0xFF + xx->data[i - 2]) {
+//            q->data[i - t - 1] -= 1;
+//        }
+//
+//        kryptos_u64_to_hex(xb, sizeof(xb) - 1, (kryptos_u64_t) q->data[i - t - 1]);
+//        q_it_1 = kryptos_hex_value_as_mp(xb, strlen(xb));
+//
+//        kryptos_u64_to_hex(xb, sizeof(xb) - 1, (kryptos_u64_t) i - t - 1);
+//        it_1 = kryptos_hex_value_as_mp(xb, strlen(xb));
+//
+//        yb_it_1 = kryptos_mp_pow(yb, it_1);
+//
+//        q_it_1 = kryptos_mp_mul(&q_it_1, yb_it_1);
+//
+//        xx = kryptos_mp_sub(&xx, q_it_1);
+//
+//        if ((xx->data[xx->data_size - 1] >> 4) == 0xF) { // x < 0
+//            xx = kryptos_mp_add(&xx, yb_it_1);
+//            q->data[i - t - 1] -= 1;
+//        }
+//
+//        kryptos_del_mp_value(q_it_1);
+//        kryptos_del_mp_value(it_1);
+//        kryptos_del_mp_value(yb_it_1);
+//        q_it_1 = it_1 = yb_it_1 = NULL;
+//
+//        i--;
+//        t--;
+//    }
+//
+//    r = kryptos_assign_mp_value(&r, xx);
+//
+//kryptos_mp_div_epilogue:
+//
+//    // INFO(Rafael): Housekeeping.
+//
+//    if (xx != NULL) {
+//        kryptos_del_mp_value(xx);
+//    }
+//
+//    if (yy != NULL) {
+//        kryptos_del_mp_value(yy);
+//    }
+//
+//    if (r != NULL) {
+//        if (q != NULL && remainder != NULL) {
+//            (*remainder) = r;
+//        } else {
+//            kryptos_del_mp_value(r);
+//        }
+//    }
+//
+//    if (b != NULL) {
+//        kryptos_del_mp_value(b);
+//    }
+//
+//    if (yb_nt != NULL) {
+//        kryptos_del_mp_value(yb_nt);
+//    }
+//
+//    if (yb != NULL) {
+//        kryptos_del_mp_value(yb);
+//    }
+//
+//    if (nt != NULL) {
+//        kryptos_del_mp_value(nt);
+//    }
+//
+//    return q;
+//}
 
 #undef kryptos_mp_xnb
 
