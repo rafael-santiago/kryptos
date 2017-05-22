@@ -3231,7 +3231,6 @@ CUTE_TEST_CASE(kryptos_mp_add_tests)
         kryptos_del_mp_value(b);
         kryptos_del_mp_value(e);
     }
-
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_mp_sub_tests)
@@ -3334,6 +3333,91 @@ CUTE_TEST_CASE(kryptos_mp_mul_tests)
         kryptos_del_mp_value(e);
     }
 
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_div_tests)
+    kryptos_mp_value_t *x, *y, *q, *r, *eq, *er;
+    struct div_tests_ctx {
+        kryptos_u8_t *x, *y, *eq, *er;
+    };
+    struct div_tests_ctx test_vector[] = {
+        {            "2",                "1",     "2",           "0" },
+        {            "2",                "2",     "1",           "0" },
+        {            "3",                "2",     "1",           "1" },
+        {            "4",                "2",     "2",           "0" },
+        {            "7",                "2",     "3",           "1" },
+        {            "8",                "2",     "4",           "0" },
+        {          "ABC",              "BAD",     "0",         "ABC" },
+        {          "BAD",              "ABC",     "1",          "F1" },
+        {         "DEAD",             "BEEF",     "1",        "1FBE" },
+        {          "100",               "50",     "3",          "10" },
+        {     "DEADBEEF",            "DEADB",  "1000",         "EEF" },
+        { "DEADBEEFDEAD",         "DEADBEEF", "10000",        "DEAD" },
+        {        "10001",              "100",   "100",           "1" },
+        { "BABACABABACA",     "252525252525",     "5", "10111010111" },
+        {  "ABCDEF01023",      "32010FEDCBA",     "3", "15CABF379F5" }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+
+    x = NULL;
+    y = NULL;
+    r = NULL;
+
+    CUTE_ASSERT(kryptos_mp_div(x, y, &r) == NULL);
+
+    // INFO(Rafael): Division by zero.
+
+    x = kryptos_hex_value_as_mp("2", 1);
+    y = kryptos_hex_value_as_mp("0", 1);
+    CUTE_ASSERT(x != NULL && y != NULL);
+    CUTE_ASSERT(kryptos_mp_div(x, y, &r) == NULL);
+    CUTE_ASSERT(r == NULL);
+    kryptos_del_mp_value(x);
+    kryptos_del_mp_value(y);
+
+    // INFO(Rafael): 0 / y.
+
+    x = kryptos_hex_value_as_mp("0", 1);
+    y = kryptos_hex_value_as_mp("2", 1);
+    CUTE_ASSERT(x != NULL && y != NULL);
+    eq = kryptos_hex_value_as_mp("0", 1);
+    er = kryptos_hex_value_as_mp("0", 1);
+    CUTE_ASSERT(eq != NULL && er != NULL);
+    q = kryptos_mp_div(x, y, &r);
+    CUTE_ASSERT(q != NULL);
+    CUTE_ASSERT(r != NULL);
+    CUTE_ASSERT(kryptos_mp_eq(q, eq) == 1);
+    CUTE_ASSERT(kryptos_mp_eq(r, er) == 1);
+    kryptos_del_mp_value(x);
+    kryptos_del_mp_value(y);
+    kryptos_del_mp_value(r);
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(eq);
+    kryptos_del_mp_value(er);
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        x = kryptos_hex_value_as_mp(test_vector[tv].x, strlen(test_vector[tv].x));
+        y = kryptos_hex_value_as_mp(test_vector[tv].y, strlen(test_vector[tv].y));
+        eq = kryptos_hex_value_as_mp(test_vector[tv].eq, strlen(test_vector[tv].eq));
+        er = kryptos_hex_value_as_mp(test_vector[tv].er, strlen(test_vector[tv].er));
+
+        CUTE_ASSERT(x != NULL && y != NULL && eq != NULL && er != NULL);
+
+        q = kryptos_mp_div(x, y, &r);
+
+        CUTE_ASSERT(q != NULL);
+        CUTE_ASSERT(r != NULL);
+
+        CUTE_ASSERT(kryptos_mp_eq(q, eq) == 1);
+        CUTE_ASSERT(kryptos_mp_eq(r, er) == 1);
+
+        kryptos_del_mp_value(r);
+        kryptos_del_mp_value(q);
+        kryptos_del_mp_value(er);
+        kryptos_del_mp_value(eq);
+        kryptos_del_mp_value(y);
+        kryptos_del_mp_value(x);
+    }
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_mp_pow_tests)
@@ -3446,6 +3530,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_add_tests);
     CUTE_RUN_TEST(kryptos_mp_sub_tests);
     CUTE_RUN_TEST(kryptos_mp_mul_tests);
+    CUTE_RUN_TEST(kryptos_mp_div_tests);
     CUTE_RUN_TEST(kryptos_mp_pow_tests);
 
 CUTE_TEST_CASE_END

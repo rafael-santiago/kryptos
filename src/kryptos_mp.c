@@ -551,6 +551,103 @@ kryptos_mp_value_t *kryptos_mp_pow(kryptos_mp_value_t *b, const kryptos_mp_value
     return pow;
 }
 
+kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp_value_t *y, kryptos_mp_value_t **r) {
+    kryptos_mp_value_t *temp, *q, *_1;
+    ssize_t yi;
+    int is_zero;
+
+    if (x == NULL || y == NULL) {
+        return NULL;
+    }
+
+    is_zero = 1;
+
+    for (yi = y->data_size - 1; yi >= 0 && is_zero; yi--) {
+        is_zero = (y->data[yi] == 0);
+    }
+
+    if (is_zero) {
+         // INFO(Rafael): Division by zero.
+        if (r != NULL) {
+            (*r) = NULL;
+        }
+        return NULL;
+    }
+
+    if (r != NULL) {
+        (*r) = NULL;
+    }
+
+    if (kryptos_mp_lt(x, y)) {
+        if (r != NULL) {
+            (*r) = kryptos_assign_mp_value(r, x);
+        }
+        return kryptos_new_mp_value(x->data_size << 3);
+    } else if (kryptos_mp_eq(x, y)) {
+        if (r != NULL) {
+            (*r) = kryptos_new_mp_value(x->data_size << 3);
+        }
+        return kryptos_hex_value_as_mp("1", 1);
+    }
+
+    temp = NULL;
+    q = NULL;
+    _1 = NULL;
+
+    temp = kryptos_assign_mp_value(&temp, x);
+
+    if (temp == NULL) {
+        goto kryptos_mp_div_epilogue;
+    }
+
+    _1 = kryptos_hex_value_as_mp("1", 1);
+
+    if (_1 == NULL) {
+        goto kryptos_mp_div_epilogue;
+    }
+
+    q = kryptos_new_mp_value(x->data_size << 3);
+
+    if (q == NULL) {
+        goto kryptos_mp_div_epilogue;
+    }
+
+    if (kryptos_mp_eq(y, _1)) {
+        // INFO(Rafael): If y == 1, q = 1 and r = 0 and then return.
+        q = kryptos_assign_mp_value(&q, x);
+
+        if (r != NULL) {
+            (*r) = kryptos_new_mp_value(q->data_size << 3);
+        }
+
+        goto kryptos_mp_div_epilogue;
+    }
+
+    // INFO(Rafael): We can divide.
+
+    while (kryptos_mp_ge(temp, y)) {
+        temp = kryptos_mp_sub(&temp, y);
+        q = kryptos_mp_add(&q, _1);
+    }
+
+    if (r != NULL) {
+        (*r) = temp;
+        temp = NULL;
+    }
+
+kryptos_mp_div_epilogue:
+
+    if (temp != NULL) {
+        kryptos_del_mp_value(temp);
+    }
+
+    if (_1 != NULL) {
+        kryptos_del_mp_value(_1);
+    }
+
+    return q;
+}
+
 #undef kryptos_mp_xnb
 
 #undef kryptos_mp_nbx
