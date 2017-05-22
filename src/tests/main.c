@@ -3370,78 +3370,6 @@ CUTE_TEST_CASE(kryptos_mp_pow_tests)
     }
 CUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_mp_div_tests)
-    kryptos_mp_value_t *a, *b, *eq, *er, *q, *r;
-    struct div_tests_ctx {
-        kryptos_u8_t *a, *b, *eq, *er;
-    };
-    struct div_tests_ctx test_vector[] = {
-        { "2", "2", "1", "0" },
-        { "100", "10", "10", "0" },
-        { "DEADBEEF", "DEAD", "10000", "BEEF" },
-        //{ "DEADBEEF", "FF", "DF8D4C", "3B" }
-        //{ "DEADBEEFDEADBEEF", "DEADBEEF", "FFFFFFFFD9B14A9C", "FFFFFFFF595D4F4B" }
-    };
-    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
-    ssize_t d;
-
-    CUTE_ASSERT(kryptos_mp_div(NULL, NULL, NULL) == NULL);
-/*
-    a = kryptos_hex_value_as_mp("1", 1);
-
-    CUTE_ASSERT(a != NULL);
-
-    CUTE_ASSERT(kryptos_mp_div(a, NULL, NULL) == NULL);
-
-    CUTE_ASSERT(kryptos_mp_div(a, NULL, &a) == NULL);
-
-    b = kryptos_mp_div(a, a, NULL);
-
-    CUTE_ASSERT(b != NULL);
-
-    CUTE_ASSERT(kryptos_mp_eq(b, a) == 1);
-
-    kryptos_del_mp_value(a);
-    kryptos_del_mp_value(b);
-*/
-    for (tv = 0; tv < test_vector_nr; tv++) {
-        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
-        b = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));
-        eq = kryptos_hex_value_as_mp(test_vector[tv].eq, strlen(test_vector[tv].eq));
-        er = kryptos_hex_value_as_mp(test_vector[tv].er,  strlen(test_vector[tv].er));
-
-        CUTE_ASSERT(a != NULL && b != NULL & eq != NULL && er != NULL);
-
-/*
-        printf("QE = ");
-        for (d = eq->data_size - 1; d >= 0; d--) printf("%.2X ", eq->data[d]);
-        printf("\n");
-*/
-        q = kryptos_mp_div(a, b, &r);
-
-        CUTE_ASSERT(q != NULL);
-
-        CUTE_ASSERT(r != NULL);
-
-/*
-        printf("Q  = ");
-        for (d = q->data_size - 1; d >= 0; d--) printf("%.2X ", q->data[d]);
-        printf("\n--\n");
-*/
-
-        CUTE_ASSERT(kryptos_mp_eq(q, eq) == 1);
-
-        CUTE_ASSERT(kryptos_mp_eq(r, er) == 1);
-
-        kryptos_del_mp_value(a);
-        kryptos_del_mp_value(b);
-        kryptos_del_mp_value(eq);
-        kryptos_del_mp_value(er);
-        kryptos_del_mp_value(q);
-        kryptos_del_mp_value(r);
-    }
-CUTE_TEST_CASE_END
-
 // INFO(Rafael): End of multiprecision testing area.
 
 CUTE_TEST_CASE(kryptos_test_monkey)
@@ -3518,7 +3446,6 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_add_tests);
     CUTE_RUN_TEST(kryptos_mp_sub_tests);
     CUTE_RUN_TEST(kryptos_mp_mul_tests);
-    CUTE_RUN_TEST(kryptos_mp_div_tests);
     CUTE_RUN_TEST(kryptos_mp_pow_tests);
 
 CUTE_TEST_CASE_END
