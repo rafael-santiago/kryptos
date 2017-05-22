@@ -44,10 +44,16 @@ const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const k
 
 #define kryptos_mp_le(a, b) ( kryptos_mp_eq((a), (b)) || kryptos_mp_get_gt((a), (b)) == (b) )
 
+#define kryptos_mp_is_odd(a) ( ( (a)->data[0] & 1 ) )
+
+#define kryptos_mp_is_even(a) ( kryptos_mp_is_odd(a) == 0 )
+
 kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp_value_t *y, kryptos_mp_value_t **r);
 
 kryptos_mp_value_t *kryptos_mp_exp(kryptos_mp_value_t *b, const kryptos_mp_value_t *e);
 
 kryptos_mp_value_t *kryptos_mp_pow(kryptos_mp_value_t *b, const kryptos_mp_value_t *e);
+
+kryptos_mp_value_t *kryptos_ge_mod_m(const kryptos_mp_value_t *g, const kryptos_mp_value_t *e, const kryptos_mp_value_t *m);
 
 #endif

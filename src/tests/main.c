@@ -3454,6 +3454,74 @@ CUTE_TEST_CASE(kryptos_mp_pow_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_is_odd_tests)
+    kryptos_mp_value_t *a;
+    struct odd_tests_ctx {
+        kryptos_u8_t *a;
+        int e;
+    };
+    struct odd_tests_ctx test_vector[] = {
+        { "0", 0 },
+        { "1", 1 },
+        { "2", 0 },
+        { "3", 1 },
+        { "4", 0 },
+        { "5", 1 },
+        { "6", 0 },
+        { "7", 1 },
+        { "8", 0 },
+        { "9", 1 },
+        { "A", 0 },
+        { "B", 1 },
+        { "C", 0 },
+        { "D", 1 },
+        { "E", 0 },
+        { "F", 1 }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
+        CUTE_ASSERT(a != NULL);
+        CUTE_ASSERT(kryptos_mp_is_odd(a) == test_vector[tv].e);
+        kryptos_del_mp_value(a);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_is_even_tests)
+    kryptos_mp_value_t *a;
+    struct odd_tests_ctx {
+        kryptos_u8_t *a;
+        int e;
+    };
+    struct odd_tests_ctx test_vector[] = {
+        { "0", 1 },
+        { "1", 0 },
+        { "2", 1 },
+        { "3", 0 },
+        { "4", 1 },
+        { "5", 0 },
+        { "6", 1 },
+        { "7", 0 },
+        { "8", 1 },
+        { "9", 0 },
+        { "A", 1 },
+        { "B", 0 },
+        { "C", 1 },
+        { "D", 0 },
+        { "E", 1 },
+        { "F", 0 }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
+        CUTE_ASSERT(a != NULL);
+        CUTE_ASSERT(kryptos_mp_is_even(a) == test_vector[tv].e);
+        kryptos_del_mp_value(a);
+    }
+CUTE_TEST_CASE_END
+
 // INFO(Rafael): End of multiprecision testing area.
 
 CUTE_TEST_CASE(kryptos_test_monkey)
@@ -3532,6 +3600,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_mul_tests);
     CUTE_RUN_TEST(kryptos_mp_div_tests);
     CUTE_RUN_TEST(kryptos_mp_pow_tests);
+    CUTE_RUN_TEST(kryptos_mp_is_odd_tests);
+    CUTE_RUN_TEST(kryptos_mp_is_even_tests);
 
 CUTE_TEST_CASE_END
 

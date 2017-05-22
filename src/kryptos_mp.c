@@ -648,6 +648,10 @@ kryptos_mp_div_epilogue:
     return q;
 }
 
+kryptos_mp_value_t *kryptos_ge_mod_m(const kryptos_mp_value_t *g, const kryptos_mp_value_t *e, const kryptos_mp_value_t *m) {
+    return NULL;
+}
+
 #undef kryptos_mp_xnb
 
 #undef kryptos_mp_nbx
