@@ -516,7 +516,7 @@ const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const k
 
 kryptos_mp_value_t *kryptos_mp_pow(const kryptos_mp_value_t *g, const kryptos_mp_value_t *e) {
     kryptos_mp_value_t *A = NULL;
-    ssize_t t, d;
+    ssize_t t;
 
     if (g == NULL || e == NULL) {
         return NULL;
