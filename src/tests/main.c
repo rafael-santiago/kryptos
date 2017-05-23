@@ -3426,6 +3426,7 @@ CUTE_TEST_CASE(kryptos_mp_pow_tests)
         kryptos_u8_t *b, *e, *pe;
     };
     struct pow_tests_ctx test_vector[] = {
+        {  "2",  "0",                    "1" },
         {  "2",  "8",                  "100" },
         {  "2",  "2",                    "4" },
         {  "2",  "0",                    "1" },
@@ -3435,6 +3436,7 @@ CUTE_TEST_CASE(kryptos_mp_pow_tests)
         { "FF", "0A", "F62C88D104D1882CF601" }
     };
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    ssize_t d;
 
     for (tv = 0; tv < test_vector_nr; tv++) {
         b  = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));

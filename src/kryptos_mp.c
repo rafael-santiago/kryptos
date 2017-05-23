@@ -514,41 +514,37 @@ const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const k
     return NULL;
 }
 
-kryptos_mp_value_t *kryptos_mp_pow(kryptos_mp_value_t *b, const kryptos_mp_value_t *e) {
-    kryptos_mp_value_t *ee = NULL, *one = NULL, *pow = NULL, *zero = NULL;
+kryptos_mp_value_t *kryptos_mp_pow(const kryptos_mp_value_t *g, const kryptos_mp_value_t *e) {
+    kryptos_mp_value_t *A = NULL;
+    ssize_t t, d;
 
-    if (b == NULL || e == NULL) {
+    if (g == NULL || e == NULL) {
         return NULL;
     }
 
-    one = kryptos_hex_value_as_mp("1", 1);
-    zero = kryptos_new_mp_value(e->data_size << 3);
+    A = kryptos_hex_value_as_mp("1", 1);
 
-    ee = kryptos_assign_mp_value(&ee, e);
+#define kryptos_mp_pow_step(e, t, bn, A, g) {\
+    A = kryptos_mp_mul(&A, A);\
+    if ( ( ((e)->data[t] & (1 << (bn))) >> (bn) ) ) {\
+        A = kryptos_mp_mul(&A, g);\
+    }\
+}
 
-    // INFO(Rafael): Seeking more precision.
-    pow = kryptos_new_mp_value(b->data_size << 3);
-    pow->data[0] = 1;
-
-    while (kryptos_mp_ne(ee, zero)) {
-        pow = kryptos_mp_mul(&pow, b);
-
-        ee = kryptos_mp_sub(&ee, one);
+    for (t = e->data_size - 1; t >= 0; t--) {
+        kryptos_mp_pow_step(e, t, 7, A, g);
+        kryptos_mp_pow_step(e, t, 6, A, g);
+        kryptos_mp_pow_step(e, t, 5, A, g);
+        kryptos_mp_pow_step(e, t, 4, A, g);
+        kryptos_mp_pow_step(e, t, 3, A, g);
+        kryptos_mp_pow_step(e, t, 2, A, g);
+        kryptos_mp_pow_step(e, t, 1, A, g);
+        kryptos_mp_pow_step(e, t, 0, A, g);
     }
 
-    if (one != NULL) {
-        kryptos_del_mp_value(one);
-    }
+#undef kryptos_mp_pow_step
 
-    if (zero != NULL) {
-        kryptos_del_mp_value(zero);
-    }
-
-    if (ee != NULL) {
-        kryptos_del_mp_value(ee);
-    }
-
-    return pow;
+    return A;
 }
 
 kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp_value_t *y, kryptos_mp_value_t **r) {
