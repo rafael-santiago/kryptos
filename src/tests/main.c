@@ -3524,6 +3524,43 @@ CUTE_TEST_CASE(kryptos_mp_is_even_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_me_mod_n_tests)
+    struct mp_me_mod_n_tests_ctx {
+        kryptos_u8_t *m, *e, *n, *exp;
+    };
+    struct mp_me_mod_n_tests_ctx test_vector[] = {
+        {  "5", "2",   "D",  "C" },
+        {  "9", "2",   "5",  "1" },
+        {  "3", "4",  "15", "12" },
+        {  "4", "8",  "3B", "2E" },
+        {  "5", "3",   "2",  "1" },
+        { "28", "2", "190",  "0" }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *m, *e, *n, *exp, *me_mod_n;
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        m = kryptos_hex_value_as_mp(test_vector[tv].m, strlen(test_vector[tv].m));
+        e = kryptos_hex_value_as_mp(test_vector[tv].e, strlen(test_vector[tv].e));
+        n = kryptos_hex_value_as_mp(test_vector[tv].n, strlen(test_vector[tv].n));
+        exp = kryptos_hex_value_as_mp(test_vector[tv].exp, strlen(test_vector[tv].exp));
+
+        CUTE_ASSERT(m != NULL && e != NULL && n != NULL && exp != NULL);
+
+        me_mod_n = kryptos_mp_me_mod_n(m, e, n);
+
+        CUTE_ASSERT(me_mod_n != NULL);
+
+        CUTE_ASSERT(kryptos_mp_eq(me_mod_n, exp) == 1);
+
+        kryptos_del_mp_value(m);
+        kryptos_del_mp_value(e);
+        kryptos_del_mp_value(n);
+        kryptos_del_mp_value(exp);
+        kryptos_del_mp_value(me_mod_n);
+    }
+CUTE_TEST_CASE_END
+
 // INFO(Rafael): End of multiprecision testing area.
 
 CUTE_TEST_CASE(kryptos_test_monkey)
@@ -3604,6 +3641,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_pow_tests);
     CUTE_RUN_TEST(kryptos_mp_is_odd_tests);
     CUTE_RUN_TEST(kryptos_mp_is_even_tests);
+    CUTE_RUN_TEST(kryptos_mp_me_mod_n_tests);
 
 CUTE_TEST_CASE_END
 

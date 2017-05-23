@@ -54,6 +54,6 @@ kryptos_mp_value_t *kryptos_mp_exp(kryptos_mp_value_t *b, const kryptos_mp_value
 
 kryptos_mp_value_t *kryptos_mp_pow(const kryptos_mp_value_t *g, const kryptos_mp_value_t *e);
 
-kryptos_mp_value_t *kryptos_ge_mod_m(const kryptos_mp_value_t *g, const kryptos_mp_value_t *e, const kryptos_mp_value_t *m);
+kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const kryptos_mp_value_t *e, const kryptos_mp_value_t *n);
 
 #endif

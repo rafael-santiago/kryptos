@@ -644,8 +644,26 @@ kryptos_mp_div_epilogue:
     return q;
 }
 
-kryptos_mp_value_t *kryptos_ge_mod_m(const kryptos_mp_value_t *g, const kryptos_mp_value_t *e, const kryptos_mp_value_t *m) {
-    return NULL;
+kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const kryptos_mp_value_t *e, const kryptos_mp_value_t *n) {
+    kryptos_mp_value_t *me = NULL, *mod_n = NULL, *div = NULL;
+
+    me = kryptos_mp_pow(m, e);
+
+    if (me == NULL) {
+        return NULL;
+    }
+
+    div = kryptos_mp_div(me, n, &mod_n);
+
+    kryptos_del_mp_value(me);
+
+    if (div == NULL) {
+        return NULL;
+    }
+
+    kryptos_del_mp_value(div);
+
+    return mod_n;
 }
 
 #undef kryptos_mp_xnb
