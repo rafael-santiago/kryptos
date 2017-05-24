@@ -3341,23 +3341,23 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
         kryptos_u8_t *x, *y, *eq, *er;
     };
     struct div_tests_ctx test_vector[] = {
-        {            "2",                "1",     "2",           "0" },
-        {            "2",                "2",     "1",           "0" },
-        {            "3",                "2",     "1",           "1" },
-        {            "4",                "2",     "2",           "0" },
-        {            "7",                "2",     "3",           "1" },
-        {            "8",                "2",     "4",           "0" },
-        {          "ABC",              "BAD",     "0",         "ABC" },
-        {          "BAD",              "ABC",     "1",          "F1" },
-        {         "DEAD",             "BEEF",     "1",        "1FBE" },
-        {          "100",               "50",     "3",          "10" },
-        {     "DEADBEEF",            "DEADB",  "1000",         "EEF" },
-        { "DEADBEEFDEAD",         "DEADBEEF", "10000",        "DEAD" },
-        {        "10001",              "100",   "100",           "1" },
-        { "BABACABABACA",     "252525252525",     "5", "10111010111" },
-        {  "ABCDEF01023",      "32010FEDCBA",     "3", "15CABF379F5" },
-        {  "9876546", "6671", "17D0", "276" },
-        { "9876546", "2", "4C3B2A3", "0" }
+        {            "2",                "1",       "2",           "0" },
+        {            "2",                "2",       "1",           "0" },
+        {            "3",                "2",       "1",           "1" },
+        {            "4",                "2",       "2",           "0" },
+        {            "7",                "2",       "3",           "1" },
+        {            "8",                "2",       "4",           "0" },
+        {          "ABC",              "BAD",       "0",         "ABC" },
+        {          "BAD",              "ABC",       "1",          "F1" },
+        {         "DEAD",             "BEEF",       "1",        "1FBE" },
+        {          "100",               "50",       "3",          "10" },
+        {     "DEADBEEF",            "DEADB",    "1000",         "EEF" },
+        { "DEADBEEFDEAD",         "DEADBEEF",   "10000",        "DEAD" },
+        {        "10001",              "100",     "100",           "1" },
+        { "BABACABABACA",     "252525252525",       "5", "10111010111" },
+        {  "ABCDEF01023",      "32010FEDCBA",       "3", "15CABF379F5" },
+        {      "9876546",             "6671",    "17D0",         "276" },
+        {      "9876546",                "2", "4C3B2A3",           "0" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
 //    ssize_t d;
@@ -3660,7 +3660,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_pow_tests);
     CUTE_RUN_TEST(kryptos_mp_is_odd_tests);
     CUTE_RUN_TEST(kryptos_mp_is_even_tests);
-    //CUTE_RUN_TEST(kryptos_mp_me_mod_n_tests);
+    CUTE_RUN_TEST(kryptos_mp_me_mod_n_tests);
 
 CUTE_TEST_CASE_END
 
