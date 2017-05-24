@@ -580,10 +580,10 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
         if (r != NULL) {
             (*r) = kryptos_assign_mp_value(r, x);
         }
-        return kryptos_new_mp_value(x->data_size << 3);
+        return kryptos_new_mp_value(8);
     } else if (kryptos_mp_eq(x, y)) {
         if (r != NULL) {
-            (*r) = kryptos_new_mp_value(x->data_size << 3);
+            (*r) = kryptos_new_mp_value(8);
         }
         return kryptos_hex_value_as_mp("1", 1);
     }
@@ -746,9 +746,53 @@ kryptos_mp_div_epilogue:
     }
 
     if (r != NULL) {
-        (*r) = xt;
-    } else {
+        // INFO(Rafael): Cutting out unused bytes in the remainder.
+
+        is_zero = 1;
+        for (cn = xt->data_size - 1; cn >= 0 && is_zero; cn--) {
+            is_zero = (xt->data[cn] == 0);
+        }
+
+        if (!is_zero) {
+            for (cn = xt->data_size - 1; cn >= 0 && xt->data[cn] == 0; cn--)
+                ;
+
+            if (cn >= 0) {
+                (*r) = kryptos_new_mp_value((cn + 1) << 3);
+
+                for (c = cn; c >= 0; c--) {
+                    (*r)->data[c] = xt->data[c];
+                }
+            } else {
+                (*r) = xt;
+                xt = NULL;
+            }
+        } else {
+            (*r) = kryptos_new_mp_value(8);
+        }
+    }
+
+    if (xt != NULL) {
         kryptos_del_mp_value(xt);
+    }
+
+    if (q != NULL) {
+        // INFO(Rafael): Cutting out unused bytes in the quotient.
+
+        xt = q;
+
+        for (cn = q->data_size - 1; cn >= 0 && q->data[cn] == 0; cn--)
+            ;
+
+        if (cn >= 0) {
+            q = kryptos_new_mp_value((cn + 1) << 3);
+
+            for (c = cn; c >= 0; c--) {
+                q->data[c] = xt->data[c];
+            }
+
+            kryptos_del_mp_value(xt);
+        }
     }
 
     return q;

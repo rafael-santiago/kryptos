@@ -3360,7 +3360,7 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
         { "9876546", "2", "4C3B2A3", "0" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
-    ssize_t d;
+//    ssize_t d;
 
     x = NULL;
     y = NULL;
@@ -3410,7 +3410,7 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
 
         CUTE_ASSERT(q != NULL);
         CUTE_ASSERT(r != NULL);
-
+/*
 printf("Q  = ");
 for (d = q->data_size - 1; d >= 0; d--) printf("%.2X ", q->data[d]);
 printf("\n");
@@ -3426,7 +3426,7 @@ printf("\n");
 printf("ER = ");
 for (d = er->data_size - 1; d >= 0; d--) printf("%.2X ", er->data[d]);
 printf("\n--\n");
-
+*/
         CUTE_ASSERT(kryptos_mp_eq(q, eq) == 1);
         CUTE_ASSERT(kryptos_mp_eq(r, er) == 1);
 
