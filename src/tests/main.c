@@ -3355,9 +3355,12 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
         { "DEADBEEFDEAD",         "DEADBEEF", "10000",        "DEAD" },
         {        "10001",              "100",   "100",           "1" },
         { "BABACABABACA",     "252525252525",     "5", "10111010111" },
-        {  "ABCDEF01023",      "32010FEDCBA",     "3", "15CABF379F5" }
+        {  "ABCDEF01023",      "32010FEDCBA",     "3", "15CABF379F5" },
+        {  "9876546", "6671", "17D0", "276" },
+        { "9876546", "2", "4C3B2A3", "0" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    ssize_t d;
 
     x = NULL;
     y = NULL;
@@ -3407,6 +3410,22 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
 
         CUTE_ASSERT(q != NULL);
         CUTE_ASSERT(r != NULL);
+
+printf("Q  = ");
+for (d = q->data_size - 1; d >= 0; d--) printf("%.2X ", q->data[d]);
+printf("\n");
+
+printf("EQ = ");
+for (d = eq->data_size - 1; d >= 0; d--) printf("%.2X ", eq->data[d]);
+printf("\n");
+
+printf("R  = ");
+for (d = r->data_size - 1; d >= 0; d--) printf("%.2X ", r->data[d]);
+printf("\n");
+
+printf("ER = ");
+for (d = er->data_size - 1; d >= 0; d--) printf("%.2X ", er->data[d]);
+printf("\n--\n");
 
         CUTE_ASSERT(kryptos_mp_eq(q, eq) == 1);
         CUTE_ASSERT(kryptos_mp_eq(r, er) == 1);
@@ -3641,7 +3660,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_pow_tests);
     CUTE_RUN_TEST(kryptos_mp_is_odd_tests);
     CUTE_RUN_TEST(kryptos_mp_is_even_tests);
-    CUTE_RUN_TEST(kryptos_mp_me_mod_n_tests);
+    //CUTE_RUN_TEST(kryptos_mp_me_mod_n_tests);
 
 CUTE_TEST_CASE_END
 

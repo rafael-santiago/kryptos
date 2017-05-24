@@ -11,6 +11,7 @@
 
 #include <kryptos_mp.h>
 #include <kryptos_memory.h>
+#include <kryptos_hex.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -548,9 +549,10 @@ kryptos_mp_value_t *kryptos_mp_pow(const kryptos_mp_value_t *g, const kryptos_mp
 }
 
 kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp_value_t *y, kryptos_mp_value_t **r) {
-    kryptos_mp_value_t *temp, *q, *_1;
-    ssize_t yi;
-    int is_zero;
+    kryptos_mp_value_t *q = NULL, *yb_e_nt = NULL, *_1 = NULL, *xt = NULL, *q_i_t_1 = NULL, *yb = NULL;
+    kryptos_u8_t xb[6535];
+    ssize_t i, t, xi, c, cn;
+    int less_than_zero = 0, is_zero;
 
     if (x == NULL || y == NULL) {
         return NULL;
@@ -558,8 +560,8 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
 
     is_zero = 1;
 
-    for (yi = y->data_size - 1; yi >= 0 && is_zero; yi--) {
-        is_zero = (y->data[yi] == 0);
+    for (xi = y->data_size - 1; xi >= 0 && is_zero; xi--) {
+        is_zero = (y->data[xi] == 0);
     }
 
     if (is_zero) {
@@ -586,59 +588,167 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
         return kryptos_hex_value_as_mp("1", 1);
     }
 
-    temp = NULL;
-    q = NULL;
-    _1 = NULL;
-
-    temp = kryptos_assign_mp_value(&temp, x);
-
-    if (temp == NULL) {
-        goto kryptos_mp_div_epilogue;
-    }
-
     _1 = kryptos_hex_value_as_mp("1", 1);
 
     if (_1 == NULL) {
         goto kryptos_mp_div_epilogue;
     }
 
-    q = kryptos_new_mp_value(x->data_size << 3);
+    xb[0] = '0';
+    xb[1] = '1';
+    cn = x->data_size - y->data_size;
+
+    if (cn > sizeof(xb)) {
+        // INFO(Rafael): A hexadecimal with more than 65535 nibbles is a HUGE number and we will not cover it.
+        goto kryptos_mp_div_epilogue;
+    }
+
+    for (c = 0, xi = 2; c < cn; c++, xi += 2) {
+        xb[xi] = '0';
+        xb[xi + 1] = '0';
+    }
+    xb[xi] = 0;
+
+    yb_e_nt = kryptos_hex_value_as_mp(xb, strlen(xb)); // INFO(Rafael): b^n-t.
+
+    if (yb_e_nt == NULL) {
+        goto kryptos_mp_div_epilogue;
+    }
+
+    // INFO(Rafael): q is automatically zeroed.
+    q = kryptos_new_mp_value((x->data_size - y->data_size + 1) << 3);
 
     if (q == NULL) {
         goto kryptos_mp_div_epilogue;
     }
 
-    if (kryptos_mp_eq(y, _1)) {
-        // INFO(Rafael): If y == 1, q = 1 and r = 0 and then return.
-        q = kryptos_assign_mp_value(&q, x);
+    // INFO(Rafael): Calculating yb^(n-t).
 
-        if (r != NULL) {
-            (*r) = kryptos_new_mp_value(q->data_size << 3);
-        }
+    yb_e_nt = kryptos_mp_mul(&yb_e_nt, y); // INFO(Rafael): y = yb^n-t.
 
+    if (yb_e_nt == NULL) {
         goto kryptos_mp_div_epilogue;
     }
 
-    // INFO(Rafael): We can divide.
+    xt = kryptos_assign_mp_value(&xt, x);
 
-    while (kryptos_mp_ge(temp, y)) {
-        temp = kryptos_mp_sub(&temp, y);
-        q = kryptos_mp_add(&q, _1);
+    if (xt == NULL) {
+        goto kryptos_mp_div_epilogue;
     }
 
-    if (r != NULL) {
-        (*r) = temp;
-        temp = NULL;
+//    printf("xt = ");
+//    for (i = xt->data_size - 1; i >= 0; i--) printf("%.2X ", xt->data[i]);
+//    printf("\n");
+
+    while (kryptos_mp_ge(xt, yb_e_nt)) {
+        q->data[q->data_size - 1] += 1;
+        xt = kryptos_mp_sub(&xt, yb_e_nt);
+//        printf("\tq' = ");
+//        for (i = q->data_size - 1; i >= 0; i--) printf("%.2X ", q->data[i]);
+//        printf("\n");
+    }
+
+    if (q->data_size == 1) {
+        goto kryptos_mp_div_epilogue;
+    }
+
+    t = y->data_size - 1;
+
+    for (i = xt->data_size - 1; i >= (t + 1); i--) {
+        if (xt->data[i] == y->data[t]) {
+            q->data[i - t - 1] = 0xFF;
+        } else {
+            q->data[i - t - 1] = (xt->data[i] * 0x100 + xt->data[i - 1]) / y->data[t];
+        }
+
+        while (q->data[i - t - 1] * (y->data[t] * 0x100 + y->data[t - 1]) >
+                xt->data[i] * 0x10000 + xt->data[i - 1] * 0x100 + xt->data[i - 2]) {
+            q->data[i - t - 1] -= 1;
+        }
+
+        kryptos_u64_to_hex(xb, sizeof(xb) - 1, q->data[i - t - 1]);
+        q_i_t_1 = kryptos_hex_value_as_mp(xb, strlen(xb)); // INFO(Rafael): q_i - t - 1.
+
+        if (q_i_t_1 == NULL) {
+            kryptos_del_mp_value(q);
+            q = NULL;
+            goto kryptos_mp_div_epilogue;
+        }
+
+        xb[0] = '0';
+        xb[1] = '1';
+        cn = i - t - 1;
+
+        for (c = 0, xi = 2; c < cn; c++, xi += 2) {
+            xb[xi] = '0';
+            xb[xi + 1] = '0';
+        }
+        xb[xi] = 0;
+        yb = kryptos_hex_value_as_mp(xb, strlen(xb)); // INFO(Rafael): b^i-t-1.
+
+        if (yb == NULL) {
+            kryptos_del_mp_value(q);
+            q = NULL;
+            goto kryptos_mp_div_epilogue;
+        }
+
+        yb = kryptos_mp_mul(&yb, y); // INFO(Rafael): yb^i-t-1.
+
+        if (yb == NULL) {
+            kryptos_del_mp_value(q);
+            q = NULL;
+            goto kryptos_mp_div_epilogue;
+        }
+
+        q_i_t_1 = kryptos_mp_mul(&q_i_t_1, yb); // INFO(Rafael): q_i - t - 1 * yb^i-t-1.
+
+        if (q_i_t_1 == NULL) {
+            kryptos_del_mp_value(q);
+            q = NULL;
+            goto kryptos_mp_div_epilogue;
+        }
+
+        less_than_zero = kryptos_mp_lt(xt, q_i_t_1);
+
+        xt = kryptos_mp_sub(&xt, q_i_t_1); // INFO(Rafael): x = x - q_i - t - 1 * yb^i-t-1.
+
+        if (xt == NULL) {
+            kryptos_del_mp_value(q);
+            q = NULL;
+            goto kryptos_mp_div_epilogue;
+        }
+
+        if (less_than_zero) {
+            xt = kryptos_mp_add(&xt, yb);
+
+            if (xt == NULL) {
+                kryptos_del_mp_value(q);
+                q = NULL;
+                goto kryptos_mp_div_epilogue;
+            }
+
+            q->data[i - t - 1] -= 1;
+        }
+
+        kryptos_del_mp_value(q_i_t_1);
+        kryptos_del_mp_value(yb);
+        q_i_t_1 = yb = NULL;
     }
 
 kryptos_mp_div_epilogue:
 
-    if (temp != NULL) {
-        kryptos_del_mp_value(temp);
-    }
-
     if (_1 != NULL) {
         kryptos_del_mp_value(_1);
+    }
+
+    if (yb_e_nt != NULL) {
+        kryptos_del_mp_value(yb_e_nt);
+    }
+
+    if (r != NULL) {
+        (*r) = xt;
+    } else {
+        kryptos_del_mp_value(xt);
     }
 
     return q;
