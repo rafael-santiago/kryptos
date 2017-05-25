@@ -56,4 +56,10 @@ kryptos_mp_value_t *kryptos_mp_pow(const kryptos_mp_value_t *g, const kryptos_mp
 
 kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const kryptos_mp_value_t *e, const kryptos_mp_value_t *n);
 
+kryptos_mp_value_t *kryptos_mp_gen_random(const kryptos_mp_value_t *n);
+
+int kryptos_mp_is_prime(const kryptos_mp_value_t *n);
+
+int kryptos_mp_fermat_test(const kryptos_mp_value_t *n, const int k);
+
 #endif

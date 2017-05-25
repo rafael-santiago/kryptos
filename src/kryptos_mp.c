@@ -12,6 +12,7 @@
 #include <kryptos_mp.h>
 #include <kryptos_memory.h>
 #include <kryptos_hex.h>
+#include <kryptos_random.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -818,6 +819,150 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
     kryptos_del_mp_value(div);
 
     return mod_n;
+}
+
+kryptos_mp_value_t *kryptos_mp_gen_random(const kryptos_mp_value_t *n) {
+    kryptos_mp_value_t *r = NULL, *r_div = NULL, *r_mod = NULL;
+    ssize_t ri;
+
+    if (n == NULL) {
+        return NULL;
+    }
+
+    r = kryptos_new_mp_value(n->data_size << 3);
+
+    if (r == NULL) {
+        return NULL;
+    }
+
+    for (ri = r->data_size - 1; ri >= 0; ri--) {
+        r->data[ri] = kryptos_get_random_byte();
+    }
+
+    r_div = kryptos_mp_div(r, n, &r_mod);
+
+    kryptos_del_mp_value(r);
+
+    kryptos_del_mp_value(r_div);
+
+    return r_mod;
+}
+
+int kryptos_mp_is_prime(const kryptos_mp_value_t *n) {
+    int is_prime = kryptos_mp_fermat_test(n, 7);
+
+    if (is_prime) {
+        // TODO(Rafael): Test this attested prime by Fermat's Test against Miller-Rabin test.
+    }
+
+    return is_prime;
+}
+
+int kryptos_mp_fermat_test(const kryptos_mp_value_t *n, const int k) {
+    kryptos_mp_value_t *a = NULL, *n_1 = NULL, *_1 = NULL, *p = NULL, *p_div = NULL, *p_mod = NULL;
+    int i, is_prime = 1;
+
+    if (n == NULL) {
+        return 0;
+    }
+
+    a = kryptos_hex_value_as_mp("2", 1);
+
+    if (kryptos_mp_le(n, a)) {
+        is_prime = kryptos_mp_eq(n, a);
+        goto kryptos_mp_fermat_test_epilogue;
+    }
+
+    kryptos_del_mp_value(a);
+    a = NULL;
+
+    if (kryptos_mp_is_even(n)) { // WARN(Rafael): Almost like that old 80's song "Don't get mad AND AIN'T even..." ;)
+        return 0;
+    }
+
+    _1 = kryptos_hex_value_as_mp("1", 1);
+
+    if (_1 == NULL) {
+        return 0;
+    }
+
+    n_1 = kryptos_assign_mp_value(&n_1, n);
+
+    if (n_1 == NULL) {
+        goto kryptos_mp_fermat_test_epilogue;
+    }
+
+    n_1 = kryptos_mp_sub(&n_1, _1);
+
+    if (n_1 == NULL) {
+        goto kryptos_mp_fermat_test_epilogue;
+    }
+
+    for (i = 0; i < k && is_prime; i++) {
+        a = kryptos_mp_gen_random(n);
+
+        if (a == NULL) {
+            is_prime = 0;
+            goto kryptos_mp_fermat_test_epilogue;
+        }
+
+        p = kryptos_mp_pow(a, n_1);
+
+        kryptos_del_mp_value(a);
+        a = NULL;
+
+        if (p == NULL) {
+            is_prime = 0;
+            goto kryptos_mp_fermat_test_epilogue;
+        }
+
+        p_div = kryptos_mp_div(p, n, &p_mod);
+
+        if (p_div == NULL || p_mod == NULL) {
+            is_prime = 0;
+            goto kryptos_mp_fermat_test_epilogue;
+        }
+
+        is_prime = kryptos_mp_eq(p_mod, _1);
+
+        kryptos_del_mp_value(p);
+        kryptos_del_mp_value(p_div);
+        kryptos_del_mp_value(p_mod);
+
+        p = p_div = p_mod = NULL;
+    }
+
+kryptos_mp_fermat_test_epilogue:
+
+    // INFO(Rafael): Housekeeping
+
+    if (a != NULL) {
+        kryptos_del_mp_value(a);
+        a = NULL;
+    }
+
+    if (p != NULL) {
+        kryptos_del_mp_value(p);
+    }
+
+    if (p_div != NULL) {
+        kryptos_del_mp_value(p_div);
+    }
+
+    if (p_mod != NULL) {
+        kryptos_del_mp_value(p_mod);
+    }
+
+    if (_1 != NULL) {
+        kryptos_del_mp_value(_1);
+    }
+
+    if (n_1 != NULL) {
+        kryptos_del_mp_value(n_1);
+    }
+
+    // INFO(Rafael): If you only have picked Fermat liars, sorry! ;)
+    return is_prime;
 }
 
 #undef kryptos_mp_xnb
