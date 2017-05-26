@@ -60,6 +60,8 @@ kryptos_mp_value_t *kryptos_mp_gen_random(const kryptos_mp_value_t *n);
 
 int kryptos_mp_is_prime(const kryptos_mp_value_t *n);
 
+int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn);
+
 int kryptos_mp_fermat_test(const kryptos_mp_value_t *n, const int k);
 
 #endif

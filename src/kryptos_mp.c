@@ -852,7 +852,156 @@ int kryptos_mp_is_prime(const kryptos_mp_value_t *n) {
     int is_prime = kryptos_mp_fermat_test(n, 7);
 
     if (is_prime) {
-        // TODO(Rafael): Test this attested prime by Fermat's Test against Miller-Rabin test.
+        is_prime = kryptos_mp_miller_rabin_test(n, 14);
+    }
+
+    return is_prime;
+}
+
+int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
+    kryptos_mp_value_t *k = NULL, *m = NULL, *n_1 = NULL, *_1 = NULL, *_0 = NULL, *b = NULL,
+                       *e = NULL, *p = NULL, *n_div = NULL, *n_mod = NULL, *a = NULL;
+    int is_prime = 1;
+    int s;
+
+    if (n == NULL) {
+        return 0;
+    }
+
+    if (kryptos_mp_is_even(n)) {
+        return 0;
+    }
+
+    a = kryptos_hex_value_as_mp("2", 1);
+
+    if (kryptos_mp_eq(n, a)) {
+        goto kryptos_mp_miller_rabin_epilogue;
+    }
+
+    // INFO(Rafael): Setting up some initial values.
+
+    _1 = kryptos_hex_value_as_mp("1", 1); // 1.
+    if (_1 == NULL) {
+        is_prime = 0;
+        goto kryptos_mp_miller_rabin_epilogue;
+    }
+
+    n_1 = kryptos_assign_mp_value(&n_1, n);
+    if (n_1 == NULL) {
+        is_prime = 0;
+        goto kryptos_mp_miller_rabin_epilogue;
+    }
+
+    // INFO(Rafael): Step 1, finding n - 1, m and k.
+
+    n_1 = kryptos_mp_sub(&n_1, _1); // n - 1.
+    if (n_1 == NULL) {
+        is_prime = 0;
+        goto kryptos_mp_miller_rabin_epilogue;
+    }
+
+    // INFO(Rafael): Now k and m.
+
+    _0 = kryptos_hex_value_as_mp("0", 1);
+
+    b = kryptos_hex_value_as_mp("2", 1);
+    e = kryptos_hex_value_as_mp("1", 1);
+    p = kryptos_mp_pow(b, e);
+    n_div = kryptos_mp_div(n_1, p, &n_mod); // INFO(Rafael): Maybe it should be replaced by "n_1 << e".
+
+    do {
+        // INFO(Rafael): Initially always should enter into this loop because n - 1 / 2^1 is zero (n should be > 2 and odd).
+        m = kryptos_assign_mp_value(&m, n_div); // temp m.
+        k = kryptos_assign_mp_value(&k, e); // temp k.
+        kryptos_del_mp_value(p);
+        kryptos_del_mp_value(n_div);
+        kryptos_del_mp_value(n_mod);
+        p = n_div = n_mod = NULL;
+        e = kryptos_mp_add(&e, _1);
+        p = kryptos_mp_pow(b, e);
+        n_div = kryptos_mp_div(n_1, p, &n_mod); // INFO(Rafael): Maybe it should be replaced by "n_1 << e".
+    } while (kryptos_mp_eq(n_mod, _0));
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(n_div);
+    kryptos_del_mp_value(n_mod);
+    p = n_div = n_mod = NULL;
+
+    // INFO(Rafael): Now we got n - 1 = 2^k x m.
+
+    // INFO(Rafael): Step 2, guessing a. Where 1 < a < n - 1.
+
+    p = kryptos_assign_mp_value(&p, n_1);
+    p = kryptos_mp_sub(&p, _1); // n - 2.
+    do {
+        a = kryptos_mp_gen_random(p);
+    } while kryptos_mp_le(a, _1);
+    kryptos_del_mp_value(p);
+    p = NULL;
+
+    // INFO(Rafael): Step 3, b0 = a^m mod n.
+    p = kryptos_mp_pow(a, m);
+    n_div = kryptos_mp_div(p, n, &n_mod);
+
+    is_prime = kryptos_mp_eq(n_mod, _1) || kryptos_mp_eq(n_mod, n_1); // INFO(Rafael): n - 1 means "-1".
+
+    if (!is_prime) {
+        e = kryptos_hex_value_as_mp("2", 1);
+        // INFO(Rafael): The last test failed let's calculate b_s .. b_sn.
+        //               If bs = a^2 mod n = 1 is composite, -1 is prime, otherwise go ahead trying until s = sn.
+        for (s = 0; s < sn && !is_prime; s++) {
+            kryptos_del_mp_value(p);
+            p = kryptos_mp_pow(n_mod, e); // INFO(Rafael): b_s-1 ^ 2.
+            kryptos_del_mp_value(n_div);
+            kryptos_del_mp_value(n_mod);
+            n_mod = NULL;
+            n_div = kryptos_mp_div(p, n, &n_mod); // bs = a^2 mod n.
+
+            if (kryptos_mp_eq(n_mod, _1)) {
+                // INFO(Rafael): Nevermind, it is composite.
+                goto kryptos_mp_miller_rabin_epilogue;
+            }
+
+            is_prime = kryptos_mp_eq(n_mod, n_1);
+        }
+    }
+
+kryptos_mp_miller_rabin_epilogue:
+
+    if (b != NULL) {
+        kryptos_del_mp_value(b);
+    }
+
+    if (e != NULL) {
+        kryptos_del_mp_value(e);
+    }
+
+    if (p != NULL) {
+        kryptos_del_mp_value(p);
+    }
+
+    if (n_div != NULL) {
+        kryptos_del_mp_value(p);
+    }
+
+    if (n_mod != NULL) {
+        kryptos_del_mp_value(n_mod);
+    }
+
+    if (m != NULL) {
+        kryptos_del_mp_value(m);
+    }
+
+    if (k != NULL) {
+        kryptos_del_mp_value(k);
+    }
+
+    if (_1 != NULL) {
+        kryptos_del_mp_value(_1);
+    }
+
+    if (_0 != NULL) {
+        kryptos_del_mp_value(_0);
     }
 
     return is_prime;
