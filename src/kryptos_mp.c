@@ -968,6 +968,10 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
 
 kryptos_mp_miller_rabin_epilogue:
 
+    if (a != NULL) {
+        kryptos_del_mp_value(a);
+    }
+
     if (b != NULL) {
         kryptos_del_mp_value(b);
     }
