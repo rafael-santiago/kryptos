@@ -910,7 +910,7 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
     n_div = kryptos_mp_div(n_1, p, &n_mod); // INFO(Rafael): Maybe it should be replaced by "n_1 << e".
 
     do {
-        // INFO(Rafael): Initially always should enter into this loop because n - 1 / 2^1 is zero (n should be > 2 and odd).
+        // INFO(Rafael): Initially always should enter into this loop because n - 1 mod 2^1 is zero (n should be > 2 and odd).
         m = kryptos_assign_mp_value(&m, n_div); // temp m.
         k = kryptos_assign_mp_value(&k, e); // temp k.
         kryptos_del_mp_value(p);
