@@ -64,4 +64,8 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn);
 
 int kryptos_mp_fermat_test(const kryptos_mp_value_t *n, const int k);
 
+kryptos_mp_value_t *kryptos_mp_lsh(kryptos_mp_value_t **a, const int level);
+
+kryptos_mp_value_t *kryptos_mp_rsh(kryptos_mp_value_t **a, const int level);
+
 #endif
