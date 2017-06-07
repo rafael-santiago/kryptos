@@ -98,12 +98,12 @@ kryptos-tests.epilogue() {
             hefesto.sys.echo("*** STRESS TESTING INFO: ");
 
             if ($exit_code == 0) {
-                $status_msg = "ALL RUNS PASSED!\n";
+                $status_msg = "ALL RUNNINGS PASSED!\n";
                 if (hefesto.sys.os_name() != "windows") {
                     $status_msg = "\x1B[32m" + $status_msg + "\x1B[m";
                 }
             } else {
-                $status_msg = "ERROR DURING A TEST RUN!\n";
+                $status_msg = "ERROR DURING A TEST RUNNING!\n";
                 if (hefesto.sys.os_name() != "windows") {
                     $status_msg = "\x1B[31m" + $status_msg + "\x1B[m";
                 }
