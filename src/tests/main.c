@@ -3604,7 +3604,6 @@ CUTE_TEST_CASE(kryptos_mp_fermat_test_tests)
     kryptos_mp_value_t *n;
 
     for (t = 0; t < test_nr; t++) {
-        printf("N: %s\n", test_vector[t].n);
         n = kryptos_hex_value_as_mp(test_vector[t].n, strlen(test_vector[t].n));
         CUTE_ASSERT(n != NULL);
         CUTE_ASSERT(kryptos_mp_fermat_test(n, 10) == test_vector[t].is_prime);
@@ -3771,7 +3770,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_is_odd_tests);
     CUTE_RUN_TEST(kryptos_mp_is_even_tests);
     CUTE_RUN_TEST(kryptos_mp_me_mod_n_tests);
-    //CUTE_RUN_TEST(kryptos_mp_fermat_test_tests);
+    CUTE_RUN_TEST(kryptos_mp_fermat_test_tests);
 
 CUTE_TEST_CASE_END
 

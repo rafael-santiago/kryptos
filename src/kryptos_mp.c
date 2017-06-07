@@ -651,7 +651,7 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
             if (div_nr > 0) {
                 q = kryptos_mp_lsh(&q, 8); // INFO(Rafael): The curr_x is not enough for dividing (curr_x < y).
                                            //               Thus, adds one digit zero to the quocient before getting
-                                           //               digit from x.
+                                           //               the next digit from x.
             }
         }
     }
@@ -661,7 +661,7 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
     }
 
     if (r != NULL) {
-        // INFO(Rafael): Reverting the remainder because there is nothing to come down from x anymore.
+        // INFO(Rafael): Reverting the remainder because there is nothing to get from x anymore.
         curr_x = kryptos_mp_rsh(&curr_x, 8);
         (*r) = curr_x;
     } else {
@@ -901,7 +901,6 @@ kryptos_mp_miller_rabin_epilogue:
 int kryptos_mp_fermat_test(const kryptos_mp_value_t *n, const int k) {
     kryptos_mp_value_t *a = NULL, *n_1 = NULL, *_1 = NULL, *p = NULL, *p_div = NULL, *p_mod = NULL, *n_2 = NULL;
     int i, is_prime = 1;
-    ssize_t d;
 
     if (n == NULL) {
         return 0;
@@ -954,24 +953,12 @@ int kryptos_mp_fermat_test(const kryptos_mp_value_t *n, const int k) {
         a = kryptos_mp_gen_random(n_2);
         a = kryptos_mp_add(&a, _1);
 
-        printf("n = ");
-        for (d = n->data_size - 1; d >= 0; d--) printf("%.2X ", n->data[d]);
-        printf("\n");
-
-        printf("a = ");
-        for (d = a->data_size - 1; d >= 0; d--) printf("%.2X ", a->data[d]);
-        printf("\n");
-
         if (a == NULL) {
             is_prime = 0;
             goto kryptos_mp_fermat_test_epilogue;
         }
 
         p = kryptos_mp_pow(a, n_1);
-
-        printf("p = ");
-        for (d = p->data_size - 1; d >= 0; d--) printf("%.2X ", p->data[d]);
-        printf("\n");
 
         kryptos_del_mp_value(a);
         a = NULL;
@@ -982,10 +969,6 @@ int kryptos_mp_fermat_test(const kryptos_mp_value_t *n, const int k) {
         }
 
         p_div = kryptos_mp_div(p, n, &p_mod);
-
-        printf("p_mod = ");
-        for (d = p_mod->data_size - 1; d >= 0; d--) printf("%.2X ", p_mod->data[d]);
-        printf("\n");
 
         if (p_div == NULL || p_mod == NULL) {
             is_prime = 0;
@@ -1000,7 +983,7 @@ int kryptos_mp_fermat_test(const kryptos_mp_value_t *n, const int k) {
 
         p = p_div = p_mod = NULL;
     }
-printf("--\n");
+
 kryptos_mp_fermat_test_epilogue:
 
     // INFO(Rafael): Housekeeping
