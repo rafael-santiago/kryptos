@@ -644,13 +644,14 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
                 kryptos_del_mp_value(i);
                 sy = i = NULL;
 //                printf("Q' = "); print_mp(q);
-            } while (kryptos_mp_ge(curr_x, y)); // INFO(Rafael): Enquanto der para ir dividindo.
-            curr_x = kryptos_mp_lsh(&curr_x, 8); // INFO(Rafael): Prepara para descer o próximo dígito.
+            } while (kryptos_mp_ge(curr_x, y)); // INFO(Rafael): While is possible to divide... go into the loop again.
+            curr_x = kryptos_mp_lsh(&curr_x, 8); // INFO(Rafael): Opens one position for the next digit.
         } else {
-            curr_x = kryptos_mp_lsh(&curr_x, 8); // INFO(Rafael): Prepara para descer o próximo dígito.
+            curr_x = kryptos_mp_lsh(&curr_x, 8); // INFO(Rafael): Opens one position for the next digit.
             if (div_nr > 0) {
-                q = kryptos_mp_lsh(&q, 8); // INFO(Rafael): Tentou dividir e os números descidos não foram suficientes, nisso
-                                           //               põe um dígito zero no quociente antes de descer o próximo.
+                q = kryptos_mp_lsh(&q, 8); // INFO(Rafael): The curr_x is not enough for dividing (curr_x < y).
+                                           //               Thus, adds one digit zero to the quocient before getting
+                                           //               digit from x.
             }
         }
     }
@@ -660,14 +661,14 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
     }
 
     if (r != NULL) {
-        curr_x = kryptos_mp_rsh(&curr_x, 8); // INFO(Rafael): Volta um byte pois anteriormente isso foi preparado para o próximo
-                                             //               dígito, mas não havia mais nenhum.
+        // INFO(Rafael): Reverting the remainder because there is nothing to come down from x anymore.
+        curr_x = kryptos_mp_rsh(&curr_x, 8);
         (*r) = curr_x;
     } else {
         kryptos_del_mp_value(curr_x);
     }
 
-    if (q != NULL) {  // INFO(Rafael): Eliminando bytes não usados no quociente.
+    if (q != NULL) {  // INFO(Rafael): Eliminating unused bytes.
         for (di = q->data_size - 1; di >= 0 && q->data[di] == 0; di--)
             ;
 
