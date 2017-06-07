@@ -8,6 +8,7 @@
 
 include ~/toolsets/gcc/gcc-app.hsl
 include ~/fsutil.hsl
+include ~/conv.hsl
 
 local var sources type list;
 local var includes type list;
@@ -53,11 +54,66 @@ kryptos-tests.prologue() {
 
 kryptos-tests.epilogue() {
     if (hefesto.sys.last_forge_result() == 0) {
+        var stress_tests type list;
+        $stress_tests = hefesto.sys.get_option("stress-tests");
+
         var exit_code type int;
-        $exit_code = hefesto.sys.run(hefesto.sys.make_path("bin", "kryptos-tests --cutest-leak-check"));
-        if ($exit_code != 0) {
-            hefesto.sys.echo("~~~ TESTS FAILURE.\n");
-            hefesto.project.abort($exit_code);
+        if ($stress_tests.count() == 0) {
+            $exit_code = hefesto.sys.run(hefesto.sys.make_path("bin", "kryptos-tests --cutest-leak-check"));
+            if ($exit_code != 0) {
+                hefesto.sys.echo("~~~ TESTS FAILURE.\n");
+                hefesto.project.abort($exit_code);
+            }
+        } else {
+            var runnings_nr type list;
+            $runnings_nr = hefesto.sys.get_option("runnings-nr");
+            if ($runnings_nr.count() == 0) {
+                hefesto.sys.echo("ERROR: Build ran with --stress-test but without --runnings-nr option.\n");
+                hefesto.project.abort(1);
+            }
+            var rmax type int;
+            var sdata type string;
+
+            $sdata = $runnings_nr.item(0);
+            $rmax = str2int($sdata);
+
+            if ($rmax <= 1) {
+                hefesto.sys.echo("ERROR: Build ran with invalid data in --runnings-nr option. " +
+                                 "It should be a valid integer > 1.\n");
+                hefesto.project.abort(1);
+            }
+
+            var r type int;
+            $r = 0;
+
+            $exit_code = 0;
+
+            while ($r < $rmax && $exit_code == 0) {
+                $exit_code = hefesto.sys.run(hefesto.sys.make_path("bin", "kryptos-tests --cutest-leak-check"));
+                $r = $r + 1;
+            }
+
+            var status_msg type string;
+
+            hefesto.sys.echo("*** STRESS TESTING INFO: ");
+
+            if ($exit_code == 0) {
+                $status_msg = "ALL RUNS PASSED!\n";
+                if (hefesto.sys.os_name() != "windows") {
+                    $status_msg = "\x1B[32m" + $status_msg + "\x1B[m";
+                }
+            } else {
+                $status_msg = "ERROR DURING A TEST RUN!\n";
+                if (hefesto.sys.os_name() != "windows") {
+                    $status_msg = "\x1B[31m" + $status_msg + "\x1B[m";
+                }
+            }
+
+            hefesto.sys.echo($status_msg);
+
+            if ($exit_code != 0) {
+                hefesto.project.abort($exit_code);
+            }
         }
     }
 }
