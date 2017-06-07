@@ -3770,7 +3770,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_pow_tests);
     CUTE_RUN_TEST(kryptos_mp_is_odd_tests);
     CUTE_RUN_TEST(kryptos_mp_is_even_tests);
-    //CUTE_RUN_TEST(kryptos_mp_me_mod_n_tests);
+    CUTE_RUN_TEST(kryptos_mp_me_mod_n_tests);
     //CUTE_RUN_TEST(kryptos_mp_fermat_test_tests);
 
 CUTE_TEST_CASE_END
