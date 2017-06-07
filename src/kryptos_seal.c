@@ -506,3 +506,19 @@ void kryptos_seal_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t
     ktask->arg[1] = L;
     ktask->arg[2] = n;
 }
+
+#undef kryptos_seal_f
+#undef kryptos_seal_g
+#undef kryptos_seal_h
+
+#undef kryptos_seal_roll
+#undef kryptos_seal_rolr
+#undef kryptos_seal_safe_inc
+#undef kryptos_seal_initialize
+
+#undef KRYPTOS_SEALKEYSTREAMSIZE
+#undef KRYPTOS_SEALMAXL
+#undef KRYPTOS_SEAL_Y1
+#undef KRYPTOS_SEAL_Y2
+#undef KRYPTOS_SEAL_Y3
+#undef KRYPTOS_SEAL_Y4

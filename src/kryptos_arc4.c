@@ -118,3 +118,5 @@ void kryptos_arc4_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t
     ktask->key = key;
     ktask->key_size = key_size;
 }
+
+#undef kryptos_arc4stream

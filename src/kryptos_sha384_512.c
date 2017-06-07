@@ -332,3 +332,7 @@ static void kryptos_sha384_512_do_block(struct kryptos_sha384_512_ctx *ctx) {
 #undef kryptos_sha384_512_SSIG1
 
 #undef KRYPTOS_SHA384_512_LEN_BLOCK_OFFSET
+
+#undef KRYPTOS_SHA384_HASH_SIZE
+
+#undef KRYPTOS_SHA512_HASH_SIZE

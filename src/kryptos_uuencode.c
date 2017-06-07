@@ -157,3 +157,5 @@ static kryptos_u8_t *kryptos_uuencode_decode_buffer(const kryptos_u8_t *buffer, 
 
     return out;
 }
+
+#undef KRYPTOS_UUENCODE_BYTES_PER_LINE

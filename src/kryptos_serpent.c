@@ -917,3 +917,51 @@ static void kryptos_serpent_block_decrypt(kryptos_u8_t *block, struct kryptos_se
 
     r0 = r1 = r2 = r3  = r4 = 0;
 }
+
+#undef kryptos_serpent_get_u8_from_u32
+
+#undef kryptos_serpent_u32_rl
+
+#undef kryptos_serpent_u32_rr
+
+#undef kryptos_serpent_phi
+
+#undef kryptos_serpent_lk
+
+#undef kryptos_serpent_lk_1
+
+#undef kryptos_serpent_sbox0
+
+#undef kryptos_serpent_sbox1
+
+#undef kryptos_serpent_sbox2
+
+#undef kryptos_serpent_sbox3
+
+#undef kryptos_serpent_sbox4
+
+#undef kryptos_serpent_sbox5
+
+#undef kryptos_serpent_sbox6
+
+#undef kryptos_serpent_sbox7
+
+#undef kryptos_serpent_sbox0_1
+
+#undef kryptos_serpent_sbox1_1
+
+#undef kryptos_serpent_sbox2_1
+
+#undef kryptos_serpent_sbox3_1
+
+#undef kryptos_serpent_sbox4_1
+
+#undef kryptos_serpent_sbox5_1
+
+#undef kryptos_serpent_sbox6_1
+
+#undef kryptos_serpent_sbox7_1
+
+#undef kryptos_serpent_ld_regs
+
+#undef kryptos_serpent_sto_key

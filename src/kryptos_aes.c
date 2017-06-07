@@ -588,3 +588,17 @@ static void kryptos_aes_block_decrypt(kryptos_u8_t *block, struct kryptos_aes_su
     memset(wblock, 0, sizeof(wblock));
     i = j = r = k = b = 0;
 }
+
+#undef kryptos_aes_rotl
+
+#undef kryptos_aes_get_u8_from_u32
+
+#undef KRYPTOS_AES_DX1
+#undef KRYPTOS_AES_DX2
+#undef KRYPTOS_AES_DX3
+#undef KRYPTOS_AES_DX4
+
+#undef KRYPTOS_AES_INVDX1
+#undef KRYPTOS_AES_INVDX2
+#undef KRYPTOS_AES_INVDX3
+#undef KRYPTOS_AES_INVDX4

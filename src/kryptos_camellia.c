@@ -1090,3 +1090,22 @@ static void kryptos_camellia_FL_1(kryptos_u32_t data[2], const kryptos_u32_t kl,
     data[0] = data[0] ^ (data[1] | kr);
     data[1] = data[1] ^ kryptos_camellia_rotl((data[0] & kl), 1);
 }
+
+#undef kryptos_camellia_rotl
+
+#undef KRYPTOS_CAMELLIA_SIGMA1L
+#undef KRYPTOS_CAMELLIA_SIGMA1R
+#undef KRYPTOS_CAMELLIA_SIGMA2L
+#undef KRYPTOS_CAMELLIA_SIGMA2R
+#undef KRYPTOS_CAMELLIA_SIGMA3L
+#undef KRYPTOS_CAMELLIA_SIGMA3R
+#undef KRYPTOS_CAMELLIA_SIGMA4L
+#undef KRYPTOS_CAMELLIA_SIGMA4R
+#undef KRYPTOS_CAMELLIA_SIGMA5L
+#undef KRYPTOS_CAMELLIA_SIGMA5R
+#undef KRYPTOS_CAMELLIA_SIGMA6L
+#undef KRYPTOS_CAMELLIA_SIGMA6R
+
+#undef kryptos_camellia_get_u8_from_u32
+
+#undef kryptos_camellia_assignment

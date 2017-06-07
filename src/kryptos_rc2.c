@@ -406,3 +406,27 @@ static void kryptos_rc2_block_decrypt(kryptos_u8_t *block, struct kryptos_rc2_su
     memset(r, 0L, sizeof(r));
     ri = 0;
 }
+
+#undef kryptos_rc2_get_byte
+
+#undef kryptos_rc2_rol
+
+#undef kryptos_rc2_rollevel
+
+#undef kryptos_rc2_mixupr
+
+#undef kryptos_rc2_mashr
+
+#undef kryptos_rc2_mixinground
+
+#undef kryptos_rc2_mashinground
+
+#undef kryptos_rc2_ror
+
+#undef kryptos_rc2_rmixupr
+
+#undef kryptos_rc2_rmashr
+
+#undef kryptos_rc2_rmixinground
+
+#undef kryptos_rc2_rmashinground

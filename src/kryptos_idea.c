@@ -286,3 +286,9 @@ static void kryptos_idea_block_decrypt(kryptos_u8_t *block, struct kryptos_idea_
     y1 = y2 = z1 = z2 = 0;
     r = 0;
 }
+
+#undef kryptos_idea_get_byte_from_u32
+
+#undef kryptos_idea_get_byte_from_u16
+
+#undef kryptos_idea_mul

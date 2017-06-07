@@ -442,3 +442,13 @@ static void kryptos_saferk64_block_decrypt(kryptos_u8_t *block, struct kryptos_s
     c6 =
     c7 = 0;
 }
+
+#undef KRYPTOS_SAFERK64_MAX_ROUND
+
+#undef kryptos_saferk64_shl
+
+#undef kryptos_saferk64_get_u8_from_u32
+
+#undef kryptos_saferk64_HT2
+
+#undef kryptos_saferk64_IHT2

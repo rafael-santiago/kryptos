@@ -816,3 +816,7 @@ static kryptos_u32_t kryptos_cast5_f(const kryptos_u32_t D, const kryptos_u32_t 
 
     return value;
 }
+
+#undef kryptos_cast5_shl
+
+#undef kryptos_cast5_get_u8_from_u32

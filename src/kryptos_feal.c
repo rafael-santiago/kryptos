@@ -240,3 +240,11 @@ static kryptos_u32_t kryptos_feal_f(kryptos_u32_t V, kryptos_u16_t W) {
 
   return ((kryptos_u32_t) U[0] << 24 | (kryptos_u32_t) U[1] << 16 | (kryptos_u32_t) U[2] << 8 | (kryptos_u32_t) U[3]);
 }
+
+#undef KRYPTOS_FEAL_MAX
+
+#undef kryptos_feal_rotl2
+
+#undef kryptos_feal_get_byte_from_u32
+
+#undef kryptos_feal_get_byte_from_u16

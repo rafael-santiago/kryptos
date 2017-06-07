@@ -210,3 +210,9 @@ static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx) {
 #undef kryptos_sha1_K
 
 #undef KRYPTOS_SHA1_LEN_BLOCK_OFFSET
+
+#undef KRYPTOS_SHA1_BYTES_PER_BLOCK
+
+#undef KRYPTOS_SHA1_LEN_BLOCK_OFFSET
+
+#undef KRYPTOS_SHA1_HASH_SIZE

@@ -115,3 +115,5 @@ kryptos_u8_t *kryptos_cpy_u64_as_big_endian(kryptos_u8_t *dest, const size_t des
 
     return dest;
 }
+
+#undef kryptos_u32_rev

@@ -336,3 +336,7 @@ static void kryptos_sha224_256_do_block(struct kryptos_sha224_256_ctx *ctx) {
 #undef kryptos_sha224_256_SSIG1
 
 #undef KRYPTOS_SHA224_256_LEN_BLOCK_OFFSET
+
+#undef KRYPTOS_SHA224_HASH_SIZE
+
+#undef KRYPTOS_SHA256_HASH_SIZE

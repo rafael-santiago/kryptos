@@ -430,3 +430,9 @@ static void kryptos_blowfish_puff_up(const kryptos_u8_t *key, size_t key_size, s
     xl = NULL;
     xr = NULL;
 }
+
+#undef KRYPTOS_BLOWFISH_MAX_KEY_NR
+
+#undef kryptos_blowfish_get_byte_from_u32
+
+#undef kryptos_blowfish_F
