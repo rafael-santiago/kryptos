@@ -11,7 +11,6 @@
 
 #include <kryptos_mp.h>
 #include <kryptos_memory.h>
-#include <kryptos_hex.h>
 #include <kryptos_random.h>
 #include <string.h>
 #include <ctype.h>
@@ -604,12 +603,26 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
 
     q = kryptos_new_mp_value(x->data_size << 3);
 
+    if (q == NULL) {
+        goto kryptos_mp_div_epilogue;
+    }
+
 //    printf("q = ");print_mp(q);
     curr_x = kryptos_new_mp_value(x->data_size << 3);
+    if (curr_x == NULL) {
+        kryptos_del_mp_value(q);
+        q = NULL;
+        goto kryptos_mp_div_epilogue;
+    }
 //    printf("curr_x = ");print_mp(curr_x);
 //    printf("x = ");print_mp(x);
 
     _1 = kryptos_hex_value_as_mp("1", 1);
+    if (_1 == NULL) {
+        kryptos_del_mp_value(q);
+        q = NULL;
+        goto kryptos_mp_div_epilogue;
+    }
 
     for (d = x->data_size - 1; d >= 0; d--) {
         curr_x->data[0] = x->data[d];
@@ -617,23 +630,64 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
 //            printf("CURR_X => "); print_mp(curr_x);
             do {
                 div_nr++;
-                sy = kryptos_hex_value_as_mp("0", 1);
-                i = kryptos_hex_value_as_mp("0", 1);
+                if ((sy = kryptos_hex_value_as_mp("0", 1)) == NULL) {
+                    kryptos_del_mp_value(q);
+                    q = NULL;
+                    goto kryptos_mp_div_epilogue;
+                }
+                if ((i = kryptos_hex_value_as_mp("0", 1)) == NULL) {
+                    kryptos_del_mp_value(q);
+                    q = NULL;
+                    goto kryptos_mp_div_epilogue;
+                }
 //                printf("\tINITIAL-SY'(%d) = ", sy->data_size); print_mp(sy);
 //                printf("\tINITIAL-I'(%d) = ", i->data_size); print_mp(i);
                 while (kryptos_mp_le(sy, curr_x)) {
                     sy = kryptos_mp_add(&sy, y);
+
+                    if (sy == NULL) {
+                        kryptos_del_mp_value(q);
+                        q = NULL;
+                        goto kryptos_mp_div_epilogue;
+                    }
+
                     i = kryptos_mp_add(&i, _1);
+
+                    if (i == NULL) {
+                        kryptos_del_mp_value(q);
+                        q = NULL;
+                        goto kryptos_mp_div_epilogue;
+                    }
 //                    printf("\tSY' = "); print_mp(sy);
 //                    printf("\tI' = "); print_mp(i);
                 }
 
                 i = kryptos_mp_sub(&i, _1);
+
+                if (i == NULL) {
+                    kryptos_del_mp_value(q);
+                    q = NULL;
+                    goto kryptos_mp_div_epilogue;
+                }
+
                 sy = kryptos_mp_sub(&sy, y);
+
+                if (sy == NULL) {
+                    kryptos_del_mp_value(q);
+                    q = NULL;
+                    goto kryptos_mp_div_epilogue;
+                }
 
 //                printf("\tNEXT-CURR-X = "); print_mp(curr_x);
 //                printf("\tSY = "); print_mp(sy);
                 curr_x = kryptos_mp_sub(&curr_x, sy);
+
+                if (curr_x == NULL) {
+                    kryptos_del_mp_value(q);
+                    q = NULL;
+                    goto kryptos_mp_div_epilogue;
+                }
+
 //                printf("\tNEXT-CURR-X' = "); print_mp(curr_x);
                 for (di = i->data_size - 1; di >= 0; di--) {
                     q = kryptos_mp_lsh(&q, 8);
@@ -646,26 +700,51 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
 //                printf("Q' = "); print_mp(q);
             } while (kryptos_mp_ge(curr_x, y)); // INFO(Rafael): While is possible to divide... go into the loop again.
             curr_x = kryptos_mp_lsh(&curr_x, 8); // INFO(Rafael): Opens one position for the next digit.
+            if (curr_x == NULL) {
+                kryptos_del_mp_value(q);
+                q = NULL;
+                goto kryptos_mp_div_epilogue;
+            }
         } else {
             curr_x = kryptos_mp_lsh(&curr_x, 8); // INFO(Rafael): Opens one position for the next digit.
+
+            if (curr_x == NULL) {
+                kryptos_del_mp_value(q);
+                q = NULL;
+                goto kryptos_mp_div_epilogue;
+            }
+
             if (div_nr > 0) {
                 q = kryptos_mp_lsh(&q, 8); // INFO(Rafael): The curr_x is not enough for dividing (curr_x < y).
                                            //               Thus, adds one digit zero to the quocient before getting
                                            //               the next digit from x.
+
+                if (q == NULL) {
+                    kryptos_del_mp_value(q);
+                    q = NULL;
+                    goto kryptos_mp_div_epilogue;
+                }
             }
         }
     }
 
+kryptos_mp_div_epilogue:
     if (_1 != NULL) {
         kryptos_del_mp_value(_1);
     }
 
     if (r != NULL) {
         // INFO(Rafael): Reverting the remainder because there is nothing to get from x anymore.
-        curr_x = kryptos_mp_rsh(&curr_x, 8);
-        (*r) = curr_x;
+        if (q != NULL) {
+            curr_x = kryptos_mp_rsh(&curr_x, 8);
+            (*r) = curr_x;
+        } else {
+            (*r) = NULL;
+        }
     } else {
-        kryptos_del_mp_value(curr_x);
+        if (curr_x != NULL) {
+            kryptos_del_mp_value(curr_x);
+        }
     }
 
     if (q != NULL) {  // INFO(Rafael): Eliminating unused bytes.
@@ -762,8 +841,13 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
 
     a = kryptos_hex_value_as_mp("2", 1);
 
+    if (a == NULL) {
+        is_prime = 0;
+        goto kryptos_mp_miller_rabin_test_epilogue;
+    }
+
     if (kryptos_mp_eq(n, a)) {
-        goto kryptos_mp_miller_rabin_epilogue;
+        goto kryptos_mp_miller_rabin_test_epilogue;
     }
 
     // INFO(Rafael): Setting up some initial values.
@@ -771,13 +855,13 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
     _1 = kryptos_hex_value_as_mp("1", 1); // 1.
     if (_1 == NULL) {
         is_prime = 0;
-        goto kryptos_mp_miller_rabin_epilogue;
+        goto kryptos_mp_miller_rabin_test_epilogue;
     }
 
     n_1 = kryptos_assign_mp_value(&n_1, n);
     if (n_1 == NULL) {
         is_prime = 0;
-        goto kryptos_mp_miller_rabin_epilogue;
+        goto kryptos_mp_miller_rabin_test_epilogue;
     }
 
     // INFO(Rafael): Step 1, finding n - 1, m and k.
@@ -785,29 +869,51 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
     n_1 = kryptos_mp_sub(&n_1, _1); // n - 1.
     if (n_1 == NULL) {
         is_prime = 0;
-        goto kryptos_mp_miller_rabin_epilogue;
+        goto kryptos_mp_miller_rabin_test_epilogue;
     }
 
     // INFO(Rafael): Now k and m.
 
     _0 = kryptos_hex_value_as_mp("0", 1);
 
+    if (_0 == NULL) {
+        is_prime = 0;
+        goto kryptos_mp_miller_rabin_test_epilogue;
+    }
+
     b = kryptos_hex_value_as_mp("2", 1);
     e = kryptos_hex_value_as_mp("1", 1);
     p = kryptos_mp_pow(b, e);
     n_div = kryptos_mp_div(n_1, p, &n_mod); // INFO(Rafael): Maybe it should be replaced by "n_1 << e".
 
+    if (b == NULL || e == NULL || p == NULL || n_div == NULL) {
+        is_prime = 0;
+        goto kryptos_mp_miller_rabin_test_epilogue;
+    }
+
     do {
         // INFO(Rafael): Initially always should enter into this loop because n - 1 mod 2^1 is zero (n should be > 2 and odd).
         m = kryptos_assign_mp_value(&m, n_div); // temp m.
         k = kryptos_assign_mp_value(&k, e); // temp k.
+        if (m == NULL || k == NULL) {
+            is_prime = 0;
+            goto kryptos_mp_miller_rabin_test_epilogue;
+        }
         kryptos_del_mp_value(p);
         kryptos_del_mp_value(n_div);
         kryptos_del_mp_value(n_mod);
         p = n_div = n_mod = NULL;
         e = kryptos_mp_add(&e, _1);
         p = kryptos_mp_pow(b, e);
+        if (e == NULL || p == NULL) {
+            is_prime = 0;
+            goto kryptos_mp_miller_rabin_test_epilogue;
+        }
         n_div = kryptos_mp_div(n_1, p, &n_mod); // INFO(Rafael): Maybe it should be replaced by "n_1 << e".
+        if (n_div == NULL || n_mod == NULL) {
+            is_prime = 0;
+            goto kryptos_mp_miller_rabin_test_epilogue;
+        }
     } while (kryptos_mp_eq(n_mod, _0));
 
     kryptos_del_mp_value(p);
@@ -821,48 +927,86 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
     // INFO(Rafael): Step 2, guessing a. Where 1 < a < n - 1.
 
     p = kryptos_assign_mp_value(&p, n_1);
+
+    if (p == NULL) {
+        is_prime = 0;
+        goto kryptos_mp_miller_rabin_test_epilogue;
+    }
+
     p = kryptos_mp_sub(&p, _1); // n - 2.
+
+    if (p == NULL) {
+        is_prime = 0;
+        goto kryptos_mp_miller_rabin_test_epilogue;
+    }
+
     if (!kryptos_mp_eq(p, _1)) {
         do {
             if (a != NULL) {
                 kryptos_del_mp_value(a);
             }
-            a = kryptos_mp_gen_random(p);
+            if ((a = kryptos_mp_gen_random(p)) == NULL) {
+                is_prime = 0;
+                goto kryptos_mp_miller_rabin_test_epilogue;
+            }
         } while kryptos_mp_le(a, _1);
     } else {
-        a = kryptos_assign_mp_value(&a, p);
+        if ((a = kryptos_assign_mp_value(&a, p)) == NULL) {
+            is_prime = 0;
+            goto kryptos_mp_miller_rabin_test_epilogue;
+        }
     }
     kryptos_del_mp_value(p);
     p = NULL;
 
     // INFO(Rafael): Step 3, b0 = a^m mod n.
-    p = kryptos_mp_pow(a, m);
-    n_div = kryptos_mp_div(p, n, &n_mod);
+    if ((p = kryptos_mp_pow(a, m)) == NULL) {
+        is_prime = 0;
+        goto kryptos_mp_miller_rabin_test_epilogue;
+    }
+
+    if ((n_div = kryptos_mp_div(p, n, &n_mod)) == NULL || n_mod == NULL) {
+        is_prime = 0;
+        goto kryptos_mp_miller_rabin_test_epilogue;
+    }
 
     is_prime = kryptos_mp_eq(n_mod, _1) || kryptos_mp_eq(n_mod, n_1); // INFO(Rafael): n - 1 means "-1".
 
     if (!is_prime) {
-        e = kryptos_hex_value_as_mp("2", 1);
+        if ((e = kryptos_hex_value_as_mp("2", 1)) == NULL) {
+            is_prime = 0;
+            goto kryptos_mp_miller_rabin_test_epilogue;
+        }
+
         // INFO(Rafael): The last test failed let's calculate b_s .. b_sn.
         //               If bs = a^2 mod n = 1 is composite, -1 is prime, otherwise go ahead trying until s = sn.
         for (s = 0; s < sn && !is_prime; s++) {
             kryptos_del_mp_value(p);
             p = kryptos_mp_pow(n_mod, e); // INFO(Rafael): b_s-1 ^ 2.
+            if (p == NULL) {
+                is_prime = 0;
+                goto kryptos_mp_miller_rabin_test_epilogue;
+            }
             kryptos_del_mp_value(n_div);
             kryptos_del_mp_value(n_mod);
             n_mod = NULL;
             n_div = kryptos_mp_div(p, n, &n_mod); // bs = a^2 mod n.
 
+            if (n_div == NULL || n_mod == NULL) {
+                is_prime = 0;
+                goto kryptos_mp_miller_rabin_test_epilogue;
+            }
+
             if (kryptos_mp_eq(n_mod, _1)) {
                 // INFO(Rafael): Nevermind, it is composite.
-                goto kryptos_mp_miller_rabin_epilogue;
+                goto kryptos_mp_miller_rabin_test_epilogue;
             }
 
             is_prime = kryptos_mp_eq(n_mod, n_1);
         }
     }
 
-kryptos_mp_miller_rabin_epilogue:
+kryptos_mp_miller_rabin_test_epilogue:
 
     if (a != NULL) {
         kryptos_del_mp_value(a);
@@ -921,6 +1065,11 @@ int kryptos_mp_fermat_test(const kryptos_mp_value_t *n, const int k) {
 
     a = kryptos_hex_value_as_mp("2", 1);
 
+    if (a == NULL) {
+        is_prime = 0;
+        goto kryptos_mp_fermat_test_epilogue;
+    }
+
     if (kryptos_mp_le(n, a)) {
         is_prime = kryptos_mp_eq(n, a);
         goto kryptos_mp_fermat_test_epilogue;
@@ -936,7 +1085,8 @@ int kryptos_mp_fermat_test(const kryptos_mp_value_t *n, const int k) {
     _1 = kryptos_hex_value_as_mp("1", 1);
 
     if (_1 == NULL) {
-        return 0;
+        is_prime = 0;
+        goto kryptos_mp_fermat_test_epilogue;
     }
 
     n_1 = kryptos_assign_mp_value(&n_1, n);
