@@ -68,7 +68,7 @@ kryptos-tests.epilogue() {
             var runnings_nr type list;
             $runnings_nr = hefesto.sys.get_option("runnings-nr");
             if ($runnings_nr.count() == 0) {
-                hefesto.sys.echo("ERROR: Build ran with --stress-test but without --runnings-nr option.\n");
+                hefesto.sys.echo("ERROR: Build ran with --stress-tests but without --runnings-nr option.\n");
                 hefesto.project.abort(1);
             }
             var rmax type int;

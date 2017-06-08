@@ -812,7 +812,8 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
     kryptos_del_mp_value(p);
     kryptos_del_mp_value(n_div);
     kryptos_del_mp_value(n_mod);
-    p = n_div = n_mod = NULL;
+    kryptos_del_mp_value(e);
+    e = p = n_div = n_mod = NULL;
 
     // INFO(Rafael): Now we got n - 1 = 2^k x m.
 
@@ -820,9 +821,16 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
 
     p = kryptos_assign_mp_value(&p, n_1);
     p = kryptos_mp_sub(&p, _1); // n - 2.
-    do {
-        a = kryptos_mp_gen_random(p);
-    } while kryptos_mp_le(a, _1);
+    if (!kryptos_mp_eq(p, _1)) {
+        do {
+            if (a != NULL) {
+                kryptos_del_mp_value(a);
+            }
+            a = kryptos_mp_gen_random(p);
+        } while kryptos_mp_le(a, _1);
+    } else {
+        a = kryptos_assign_mp_value(&a, p);
+    }
     kryptos_del_mp_value(p);
     p = NULL;
 
@@ -872,7 +880,7 @@ kryptos_mp_miller_rabin_epilogue:
     }
 
     if (n_div != NULL) {
-        kryptos_del_mp_value(p);
+        kryptos_del_mp_value(n_div);
     }
 
     if (n_mod != NULL) {
@@ -893,6 +901,10 @@ kryptos_mp_miller_rabin_epilogue:
 
     if (_0 != NULL) {
         kryptos_del_mp_value(_0);
+    }
+
+    if (n_1 != NULL) {
+        kryptos_del_mp_value(n_1);
     }
 
     return is_prime;
