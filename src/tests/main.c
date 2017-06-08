@@ -3727,6 +3727,15 @@ CUTE_TEST_CASE(kryptos_mp_is_prime_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_gen_prime_tests)
+    kryptos_mp_value_t *p = kryptos_mp_gen_prime(8);
+    CUTE_ASSERT(p != NULL);
+    CUTE_ASSERT((p->data_size << 3) == 8);
+    kryptos_del_mp_value(p);
+    // INFO(Rafael): Well, all we need to do is to believe in this function... To test the return to make sure if the
+    //               value is really prime means to use the same tests (Fermat, Miller-Rabin) used by the generating function.
+CUTE_TEST_CASE_END
+
 // INFO(Rafael): End of multiprecision testing area.
 
 CUTE_TEST_CASE(kryptos_test_monkey)
@@ -3813,6 +3822,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_fermat_test_tests);
     CUTE_RUN_TEST(kryptos_mp_miller_rabin_test_tests);
     CUTE_RUN_TEST(kryptos_mp_is_prime_tests);
+    CUTE_RUN_TEST(kryptos_mp_gen_prime_tests);
 
 CUTE_TEST_CASE_END
 

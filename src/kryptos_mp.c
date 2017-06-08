@@ -1116,6 +1116,30 @@ kryptos_mp_rsh_epilogue:
     return (*a);
 }
 
+kryptos_mp_value_t *kryptos_mp_gen_prime(const size_t bitsize) {
+    kryptos_mp_value_t *pn = NULL;
+    ssize_t d;
+    int is_prime = 0;
+
+    pn = kryptos_new_mp_value(bitsize);
+
+    if (pn == NULL) {
+        return NULL;
+    }
+
+    while (!is_prime) {
+        for (d = 0; d < pn->data_size; d++) {
+            pn->data[d] = kryptos_get_random_byte();
+        }
+
+        pn->data[0] |= 0x1;
+
+        is_prime = kryptos_mp_is_prime(pn);
+    }
+
+    return pn;
+}
+
 #undef kryptos_mp_xnb
 
 #undef kryptos_mp_nbx
