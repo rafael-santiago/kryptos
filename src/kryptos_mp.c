@@ -739,6 +739,7 @@ int kryptos_mp_is_prime(const kryptos_mp_value_t *n) {
     int is_prime = kryptos_mp_fermat_test(n, 7);
 
     if (is_prime) {
+        // INFO(Rafael): Avoiding Carmichel's numbers.
         is_prime = kryptos_mp_miller_rabin_test(n, 14);
     }
 
@@ -1029,7 +1030,7 @@ kryptos_mp_fermat_test_epilogue:
         kryptos_del_mp_value(n_2);
     }
 
-    // INFO(Rafael): If you only have picked Fermat liars, sorry! ;)
+    // INFO(Rafael): If you have picked only Fermat liars, sorry! ;)
     return is_prime;
 }
 

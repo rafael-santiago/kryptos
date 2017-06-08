@@ -3707,6 +3707,26 @@ CUTE_TEST_CASE(kryptos_mp_miller_rabin_test_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_is_prime_tests)
+    struct is_prime_test_ctx {
+        kryptos_u8_t *n;
+        int is_prime;
+    };
+    struct is_prime_test_ctx test_vector[] = {
+        {  "3", 1 }, {  "4", 0 }, {  "5", 1 }, {  "6", 0 }, {  "7", 1 }, {  "8", 0 }, {  "9", 0 },
+        {  "A", 0 }, {  "B", 1 }, {  "C", 0 }, {  "D", 1 }, {  "E", 0 }, {  "F", 0 }, { "35", 1 }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *n = NULL;
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        n = kryptos_hex_value_as_mp(test_vector[tv].n, strlen(test_vector[tv].n));
+        CUTE_ASSERT(n != NULL);
+        CUTE_ASSERT(kryptos_mp_is_prime(n) == test_vector[tv].is_prime);
+        kryptos_del_mp_value(n);
+    }
+CUTE_TEST_CASE_END
+
 // INFO(Rafael): End of multiprecision testing area.
 
 CUTE_TEST_CASE(kryptos_test_monkey)
@@ -3792,6 +3812,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_me_mod_n_tests);
     CUTE_RUN_TEST(kryptos_mp_fermat_test_tests);
     CUTE_RUN_TEST(kryptos_mp_miller_rabin_test_tests);
+    CUTE_RUN_TEST(kryptos_mp_is_prime_tests);
 
 CUTE_TEST_CASE_END
 
