@@ -3728,16 +3728,25 @@ CUTE_TEST_CASE(kryptos_mp_is_prime_tests)
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_mp_gen_prime_tests)
-    kryptos_mp_value_t *p = kryptos_mp_gen_prime(8);
+    kryptos_mp_value_t *p = kryptos_mp_gen_prime(16);
+    ssize_t d;
     CUTE_ASSERT(p != NULL);
-    CUTE_ASSERT((p->data_size << 3) == 8);
+    CUTE_ASSERT((p->data_size << 3) == 16);
     kryptos_del_mp_value(p);
     // INFO(Rafael): Well, all we need to do is to believe in this function... To test the return to make sure if the
     //               value is really prime means to use the same tests (Fermat, Miller-Rabin) used by the generating function.
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_mp_gen_prime_2k1_tests)
-    //kryptos_mp_value_t *p = kryptos_mp_gen_prime_2k1(16);
+    kryptos_mp_value_t *p = kryptos_mp_gen_prime_2k1(80);
+    ssize_t d;
+    CUTE_ASSERT(p != NULL);
+    for (d = p->data_size - 1; d >= 0; d--) printf("%.2X", p->data[d]);
+    printf("\n");
+    kryptos_del_mp_value(p);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(poke_bloody_poke)
     ssize_t d;
     kryptos_mp_value_t *a = kryptos_new_mp_value(14096);
     kryptos_mp_value_t *b = kryptos_new_mp_value(80);
@@ -3782,14 +3791,6 @@ CUTE_TEST_CASE(kryptos_mp_gen_prime_2k1_tests)
         printf("%.2X", m->data[d]);
     }
     printf("\n");
-
-/*
-    printf("p = ");
-    for (d = a->data_size - 1; d >= 0; d--) {
-        printf("%.2X", a->data[d]);
-    }
-    printf("\n");
-*/
 
     kryptos_del_mp_value(a);
     kryptos_del_mp_value(b);

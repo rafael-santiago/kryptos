@@ -834,19 +834,12 @@ kryptos_mp_value_t *kryptos_mp_gen_random(const kryptos_mp_value_t *n) {
 }
 
 int kryptos_mp_is_prime(const kryptos_mp_value_t *n) {
-    int is_prime = kryptos_mp_fermat_test(n, 7);
-
-    if (is_prime) {
-        // INFO(Rafael): Avoiding Carmichel's numbers.
-        is_prime = kryptos_mp_miller_rabin_test(n, 14);
-    }
-
-    return is_prime;
+    return kryptos_mp_miller_rabin_test(n, 14);
 }
 
 int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
     kryptos_mp_value_t *k = NULL, *m = NULL, *n_1 = NULL, *_1 = NULL, *_0 = NULL, *b = NULL,
-                       *e = NULL, *p = NULL, *n_div = NULL, *n_mod = NULL, *a = NULL;
+                       *e = NULL, *p = NULL, *n_div = NULL, *n_mod = NULL, *a = NULL, *bs = NULL;
     int is_prime = 1;
     int s;
 
@@ -979,12 +972,20 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
     p = NULL;
 
     // INFO(Rafael): Step 3, b0 = a^m mod n.
+/*
     if ((p = kryptos_mp_pow(a, m)) == NULL) {
         is_prime = 0;
         goto kryptos_mp_miller_rabin_test_epilogue;
     }
 
     if ((n_div = kryptos_mp_div(p, n, &n_mod)) == NULL || n_mod == NULL) {
+        is_prime = 0;
+        goto kryptos_mp_miller_rabin_test_epilogue;
+    }
+*/
+    n_mod = kryptos_mp_me_mod_n(a, m, n);
+
+    if (n_mod == NULL) {
         is_prime = 0;
         goto kryptos_mp_miller_rabin_test_epilogue;
     }
@@ -1000,7 +1001,9 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
         // INFO(Rafael): The last test failed let's calculate b_s .. b_sn.
         //               If bs = a^2 mod n = 1 is composite, -1 is prime, otherwise go ahead trying until s = sn.
         for (s = 0; s < sn && !is_prime; s++) {
+/*
             kryptos_del_mp_value(p);
+
             p = kryptos_mp_pow(n_mod, e); // INFO(Rafael): b_s-1 ^ 2.
             if (p == NULL) {
                 is_prime = 0;
@@ -1010,11 +1013,21 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
             kryptos_del_mp_value(n_mod);
             n_mod = NULL;
             n_div = kryptos_mp_div(p, n, &n_mod); // bs = a^2 mod n.
+*/
+            bs = kryptos_mp_me_mod_n(n_mod, e, n); // INFO(Rafael): bs = a^2 mod n.
+            kryptos_del_mp_value(n_mod);
+            n_mod = bs;
 
+            if (n_mod == NULL) {
+                is_prime = 0;
+                goto kryptos_mp_miller_rabin_test_epilogue;
+            }
+/*
             if (n_div == NULL || n_mod == NULL) {
                 is_prime = 0;
                 goto kryptos_mp_miller_rabin_test_epilogue;
             }
+*/
 
             if (kryptos_mp_eq(n_mod, _1)) {
                 // INFO(Rafael): Nevermind, it is composite.
