@@ -53,7 +53,7 @@ kryptos_mp_value_t *kryptos_new_mp_value(const size_t bitsize) {
         mp->data_size++;
     }
 
-    mp->data_size =  mp->data_size >> 3;
+    mp->data_size = mp->data_size >> 3;
 
     mp->data = (kryptos_u8_t *) kryptos_newseg(mp->data_size);
     memset(mp->data, 0, mp->data_size);
@@ -90,7 +90,8 @@ kryptos_mp_value_t *kryptos_assign_mp_value(kryptos_mp_value_t **dest,
     if (src->data_size > (*dest)->data_size) {
         kryptos_freeseg((*dest)->data);
         (*dest)->data_size = src->data_size;
-        (*dest)->data = (kryptos_u8_t *) kryptos_newseg(src->data_size << 3);
+        //(*dest)->data = (kryptos_u8_t *) kryptos_newseg(src->data_size << 3);
+        (*dest)->data = (kryptos_u8_t *) kryptos_newseg(src->data_size);
     }
 
     memset((*dest)->data, 0, (*dest)->data_size);
@@ -132,7 +133,7 @@ kryptos_mp_value_t *kryptos_hex_value_as_mp(const kryptos_u8_t *value, const siz
         vp++;
     }
 
-    while (vp < vp_end) {
+    while (vp < vp_end && d >= 0) {
         nb = 0;
         if ((vp + 1) != vp_end) {
             nb = kryptos_mp_xnb(*(vp + 1));
@@ -629,7 +630,7 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
         if (kryptos_mp_ge(curr_x, y)) {
 //            printf("CURR_X => "); print_mp(curr_x);
             do {
-                div_nr++;
+                div_nr = 1;
                 if ((sy = kryptos_hex_value_as_mp("0", 1)) == NULL) {
                     kryptos_del_mp_value(q);
                     q = NULL;
@@ -738,13 +739,14 @@ kryptos_mp_div_epilogue:
         if (q != NULL) {
             curr_x = kryptos_mp_rsh(&curr_x, 8);
             (*r) = curr_x;
+            curr_x = NULL;
         } else {
             (*r) = NULL;
         }
-    } else {
-        if (curr_x != NULL) {
-            kryptos_del_mp_value(curr_x);
-        }
+    }
+
+    if (curr_x != NULL) {
+        kryptos_del_mp_value(curr_x);
     }
 
     if (q != NULL) {  // INFO(Rafael): Eliminating unused bytes.
@@ -773,9 +775,11 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
         return NULL;
     }
 
-    A = kryptos_hex_value_as_mp("1", 1);
+    if ((A = kryptos_hex_value_as_mp("1", 1)) == NULL) {
+        return NULL;
+    }
 
-#define kryptos_mp_me_mod_n(e, t, bn, A, m, n) {\
+#define kryptos_mp_me_mod_n(e, t, bn, A, m, n, div, mod) {\
     A = kryptos_mp_mul(&A, A);\
     if ( ( ((e)->data[t] & (1 << (bn))) >> (bn) ) ) {\
         A = kryptos_mp_mul(&A, m);\
@@ -784,20 +788,23 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
     kryptos_del_mp_value(A);\
     A = NULL;\
     A = kryptos_assign_mp_value(&A, mod);\
+    if (A == NULL) {\
+        return NULL;\
+    }\
     kryptos_del_mp_value(div);\
     kryptos_del_mp_value(mod);\
     div = mod = NULL;\
 }
 
     for (t = e->data_size - 1; t >= 0; t--) {
-        kryptos_mp_me_mod_n(e, t, 7, A, m, n);
-        kryptos_mp_me_mod_n(e, t, 6, A, m, n);
-        kryptos_mp_me_mod_n(e, t, 5, A, m, n);
-        kryptos_mp_me_mod_n(e, t, 4, A, m, n);
-        kryptos_mp_me_mod_n(e, t, 3, A, m, n);
-        kryptos_mp_me_mod_n(e, t, 2, A, m, n);
-        kryptos_mp_me_mod_n(e, t, 1, A, m, n);
-        kryptos_mp_me_mod_n(e, t, 0, A, m, n);
+        kryptos_mp_me_mod_n(e, t, 7, A, m, n, div, mod);
+        kryptos_mp_me_mod_n(e, t, 6, A, m, n, div, mod);
+        kryptos_mp_me_mod_n(e, t, 5, A, m, n, div, mod);
+        kryptos_mp_me_mod_n(e, t, 4, A, m, n, div, mod);
+        kryptos_mp_me_mod_n(e, t, 3, A, m, n, div, mod);
+        kryptos_mp_me_mod_n(e, t, 2, A, m, n, div, mod);
+        kryptos_mp_me_mod_n(e, t, 1, A, m, n, div, mod);
+        kryptos_mp_me_mod_n(e, t, 0, A, m, n, div, mod);
     }
 
 #undef kryptos_mp_me_mod_n
@@ -824,17 +831,23 @@ kryptos_mp_value_t *kryptos_mp_gen_random(const kryptos_mp_value_t *n) {
         r->data[ri] = kryptos_get_random_byte();
     }
 
-    r_div = kryptos_mp_div(r, n, &r_mod);
+    if ((r_div = kryptos_mp_div(r, n, &r_mod)) != NULL) {
+        kryptos_del_mp_value(r_div);
+    }
 
     kryptos_del_mp_value(r);
-
-    kryptos_del_mp_value(r_div);
 
     return r_mod;
 }
 
 int kryptos_mp_is_prime(const kryptos_mp_value_t *n) {
-    return kryptos_mp_miller_rabin_test(n, 14);
+    int is_prime = kryptos_mp_fermat_test(n, 7);
+
+    if (is_prime) {
+        return kryptos_mp_miller_rabin_test(n, 14);
+    }
+
+    return is_prime;
 }
 
 int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
@@ -1166,7 +1179,6 @@ int kryptos_mp_fermat_test(const kryptos_mp_value_t *n, const int k) {
         is_prime = kryptos_mp_eq(p_mod, _1);
 
         kryptos_del_mp_value(p_mod);
-
         p_mod = NULL;
     }
 
@@ -1176,7 +1188,6 @@ kryptos_mp_fermat_test_epilogue:
 
     if (a != NULL) {
         kryptos_del_mp_value(a);
-        a = NULL;
     }
 
     if (p_mod != NULL) {
@@ -1213,7 +1224,6 @@ kryptos_mp_value_t *kryptos_mp_lsh(kryptos_mp_value_t **a, const int level) {
 
     if (t == NULL) {
         goto kryptos_mp_lsh_epilogue;
-        return NULL;
     }
 
     t = kryptos_assign_mp_value(&t, *a);
@@ -1247,7 +1257,6 @@ kryptos_mp_value_t *kryptos_mp_rsh(kryptos_mp_value_t **a, const int level) {
     t = kryptos_new_mp_value((((*a)->data_size) << 3));
 
     if (t == NULL) {
-        goto kryptos_mp_rsh_epilogue;
         return NULL;
     }
 
@@ -1263,15 +1272,12 @@ kryptos_mp_value_t *kryptos_mp_rsh(kryptos_mp_value_t **a, const int level) {
 
 kryptos_mp_rsh_epilogue:
 
-    for (dn = 0; dn < t->data_size && t->data[dn] != 0; dn++)
-        ;
-
     kryptos_del_mp_value(*a);
 
-    (*a) = kryptos_new_mp_value((dn + (dn == 0)) << 3);
+    (*a) = kryptos_new_mp_value(t->data_size << 3);
 
     d = 0;
-    while (d <= dn) {
+    while (d < t->data_size) {
         (*a)->data[d] = t->data[d];
         d++;
     }
