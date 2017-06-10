@@ -3736,6 +3736,67 @@ CUTE_TEST_CASE(kryptos_mp_gen_prime_tests)
     //               value is really prime means to use the same tests (Fermat, Miller-Rabin) used by the generating function.
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_gen_prime_2k1_tests)
+    //kryptos_mp_value_t *p = kryptos_mp_gen_prime_2k1(16);
+    ssize_t d;
+    kryptos_mp_value_t *a = kryptos_new_mp_value(14096);
+    kryptos_mp_value_t *b = kryptos_new_mp_value(80);
+    kryptos_mp_value_t *dd = NULL, *m = NULL;
+    for (d = a->data_size - 1; d >= 0; d--) {
+        a->data[d] = kryptos_get_random_byte();
+    }
+
+    for (d = b->data_size - 1; d >= 0; d--) {
+        b->data[d] = kryptos_get_random_byte();
+    }
+
+    while (kryptos_mp_lt(a, b)) {
+        for (d = a->data_size - 1; d >= 0; d--) {
+            a->data[d] = kryptos_get_random_byte();
+        }
+    }
+
+    printf("a = ");
+    for (d = a->data_size - 1; d >= 0; d--) {
+        printf("%.2X", a->data[d]);
+    }
+    printf("\n");
+
+    printf("b = ");
+    for (d = b->data_size - 1; d >= 0; d--) {
+        printf("%.2X", b->data[d]);
+    }
+    printf("\n");
+
+    //a = kryptos_mp_mul(&a, b);
+    dd = kryptos_mp_div(a, b, &m);
+
+    printf("d = ");
+    for (d = dd->data_size - 1; d >= 0; d--) {
+        printf("%.2X", dd->data[d]);
+    }
+    printf("\n");
+
+    printf("m = ");
+    for (d = m->data_size - 1; d >= 0; d--) {
+        printf("%.2X", m->data[d]);
+    }
+    printf("\n");
+
+/*
+    printf("p = ");
+    for (d = a->data_size - 1; d >= 0; d--) {
+        printf("%.2X", a->data[d]);
+    }
+    printf("\n");
+*/
+
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+    kryptos_del_mp_value(dd);
+    kryptos_del_mp_value(m);
+CUTE_TEST_CASE_END
+
 // INFO(Rafael): End of multiprecision testing area.
 
 CUTE_TEST_CASE(kryptos_test_monkey)
@@ -3823,6 +3884,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_miller_rabin_test_tests);
     CUTE_RUN_TEST(kryptos_mp_is_prime_tests);
     CUTE_RUN_TEST(kryptos_mp_gen_prime_tests);
+    //CUTE_RUN_TEST(kryptos_mp_gen_prime_2k1_tests);
 
 CUTE_TEST_CASE_END
 

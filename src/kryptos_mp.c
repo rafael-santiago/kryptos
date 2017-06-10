@@ -766,25 +766,44 @@ kryptos_mp_div_epilogue:
 }
 
 kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const kryptos_mp_value_t *e, const kryptos_mp_value_t *n) {
-    kryptos_mp_value_t *me = NULL, *mod_n = NULL, *div = NULL;
+    kryptos_mp_value_t *A = NULL, *div = NULL, *mod = NULL;
+    ssize_t t;
 
-    me = kryptos_mp_pow(m, e);
-
-    if (me == NULL) {
+    if (m == NULL || e == NULL || n == NULL) {
         return NULL;
     }
 
-    div = kryptos_mp_div(me, n, &mod_n);
+    A = kryptos_hex_value_as_mp("1", 1);
 
-    kryptos_del_mp_value(me);
+#define kryptos_mp_me_mod_n(e, t, bn, A, m, n) {\
+    A = kryptos_mp_mul(&A, A);\
+    if ( ( ((e)->data[t] & (1 << (bn))) >> (bn) ) ) {\
+        A = kryptos_mp_mul(&A, m);\
+    }\
+    div = kryptos_mp_div(A, n, &mod);\
+    kryptos_del_mp_value(A);\
+    A = NULL;\
+    A = kryptos_assign_mp_value(&A, mod);\
+    kryptos_del_mp_value(div);\
+    kryptos_del_mp_value(mod);\
+    div = mod = NULL;\
+}
 
-    if (div == NULL) {
-        return NULL;
+    for (t = e->data_size - 1; t >= 0; t--) {
+        kryptos_mp_me_mod_n(e, t, 7, A, m, n);
+        kryptos_mp_me_mod_n(e, t, 6, A, m, n);
+        kryptos_mp_me_mod_n(e, t, 5, A, m, n);
+        kryptos_mp_me_mod_n(e, t, 4, A, m, n);
+        kryptos_mp_me_mod_n(e, t, 3, A, m, n);
+        kryptos_mp_me_mod_n(e, t, 2, A, m, n);
+        kryptos_mp_me_mod_n(e, t, 1, A, m, n);
+        kryptos_mp_me_mod_n(e, t, 0, A, m, n);
     }
 
-    kryptos_del_mp_value(div);
+#undef kryptos_mp_me_mod_n
 
-    return mod_n;
+    return A;
+
 }
 
 kryptos_mp_value_t *kryptos_mp_gen_random(const kryptos_mp_value_t *n) {
@@ -1056,7 +1075,7 @@ kryptos_mp_miller_rabin_test_epilogue:
 }
 
 int kryptos_mp_fermat_test(const kryptos_mp_value_t *n, const int k) {
-    kryptos_mp_value_t *a = NULL, *n_1 = NULL, *_1 = NULL, *p = NULL, *p_div = NULL, *p_mod = NULL, *n_2 = NULL;
+    kryptos_mp_value_t *a = NULL, *n_1 = NULL, *_1 = NULL, *p_mod = NULL, *n_2 = NULL;
     int i, is_prime = 1;
 
     if (n == NULL) {
@@ -1121,30 +1140,21 @@ int kryptos_mp_fermat_test(const kryptos_mp_value_t *n, const int k) {
             goto kryptos_mp_fermat_test_epilogue;
         }
 
-        p = kryptos_mp_pow(a, n_1);
+        p_mod = kryptos_mp_me_mod_n(a, n_1, n);
 
         kryptos_del_mp_value(a);
         a = NULL;
 
-        if (p == NULL) {
-            is_prime = 0;
-            goto kryptos_mp_fermat_test_epilogue;
-        }
-
-        p_div = kryptos_mp_div(p, n, &p_mod);
-
-        if (p_div == NULL || p_mod == NULL) {
+        if (p_mod == NULL) {
             is_prime = 0;
             goto kryptos_mp_fermat_test_epilogue;
         }
 
         is_prime = kryptos_mp_eq(p_mod, _1);
 
-        kryptos_del_mp_value(p);
-        kryptos_del_mp_value(p_div);
         kryptos_del_mp_value(p_mod);
 
-        p = p_div = p_mod = NULL;
+        p_mod = NULL;
     }
 
 kryptos_mp_fermat_test_epilogue:
@@ -1154,14 +1164,6 @@ kryptos_mp_fermat_test_epilogue:
     if (a != NULL) {
         kryptos_del_mp_value(a);
         a = NULL;
-    }
-
-    if (p != NULL) {
-        kryptos_del_mp_value(p);
-    }
-
-    if (p_div != NULL) {
-        kryptos_del_mp_value(p_div);
     }
 
     if (p_mod != NULL) {
@@ -1288,6 +1290,70 @@ kryptos_mp_value_t *kryptos_mp_gen_prime(const size_t bitsize) {
     }
 
     return pn;
+}
+
+kryptos_mp_value_t *kryptos_mp_gen_prime_2k1(const size_t k_bitsize) {
+    // INFO(Rafael): This function will generate a p = 2k + 1. k is also a prime.
+    kryptos_mp_value_t *k = NULL;
+    kryptos_mp_value_t *p = NULL, *_2 = NULL, *_1 = NULL;
+    int is_prime = 0;
+
+    if ((_1 = kryptos_hex_value_as_mp("1", 1)) == NULL) {
+        goto kryptos_mp_gen_prime_2k1_epilogue;
+    }
+
+    if ((_2 = kryptos_hex_value_as_mp("2", 1)) == NULL) {
+        goto kryptos_mp_gen_prime_2k1_epilogue;
+    }
+
+    do {
+        if ((k = kryptos_mp_gen_prime(k_bitsize)) == NULL) {
+            goto kryptos_mp_gen_prime_2k1_epilogue;
+        }
+printf("k = ");print_mp(k);
+        if ((p = kryptos_assign_mp_value(&p, k)) == NULL) {
+            goto kryptos_mp_gen_prime_2k1_epilogue;
+        }
+
+        if ((p = kryptos_mp_mul(&p, _2)) == NULL) {
+            goto kryptos_mp_gen_prime_2k1_epilogue;
+        }
+
+        if((p = kryptos_mp_add(&p, _1)) == NULL) {
+            goto kryptos_mp_gen_prime_2k1_epilogue;
+        }
+printf("p = ");print_mp(p);
+        kryptos_del_mp_value(k);
+        k = NULL;
+
+        if ((is_prime = kryptos_mp_is_prime(p)) == 0) {
+            kryptos_del_mp_value(p);
+            p = NULL;
+        }
+
+    } while (!is_prime);
+
+
+kryptos_mp_gen_prime_2k1_epilogue:
+
+    if (_1 != NULL) {
+        kryptos_del_mp_value(_1);
+    }
+
+    if (_2 != NULL) {
+        kryptos_del_mp_value(_2);
+    }
+
+    if (k != NULL) {
+        kryptos_del_mp_value(k);
+    }
+
+    if (!is_prime && p != NULL) {
+        kryptos_del_mp_value(p);
+        p = NULL;
+    }
+
+    return p;
 }
 
 #undef kryptos_mp_xnb
