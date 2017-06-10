@@ -68,7 +68,7 @@ kryptos_mp_value_t *kryptos_mp_lsh(kryptos_mp_value_t **a, const int level);
 
 kryptos_mp_value_t *kryptos_mp_rsh(kryptos_mp_value_t **a, const int level);
 
-kryptos_mp_value_t *kryptos_mp_gen_prime(const size_t bitsize);
+kryptos_mp_value_t *kryptos_mp_gen_prime(const size_t bitsize, const int fast_method);
 
 kryptos_mp_value_t *kryptos_mp_gen_prime_2k1(const size_t k_bitsize);
 

@@ -3728,7 +3728,7 @@ CUTE_TEST_CASE(kryptos_mp_is_prime_tests)
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_mp_gen_prime_tests)
-    kryptos_mp_value_t *p = kryptos_mp_gen_prime(16);
+    kryptos_mp_value_t *p = kryptos_mp_gen_prime(16, 0);
     ssize_t d;
     CUTE_ASSERT(p != NULL);
     CUTE_ASSERT((p->data_size << 3) == 16);

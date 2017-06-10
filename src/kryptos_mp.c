@@ -352,6 +352,8 @@ kryptos_mp_value_t *kryptos_assign_hex_value_to_mp(kryptos_mp_value_t **dest,
     return (*dest);
 }
 
+// TODO(Rafael): Maybe the Karatsuba could be a good idea with huge numbers, so kryptos_mp_mul() could redirect to Karatsuba
+//               in case of really huge numbers. Just thinking about.
 kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
     size_t r;
     kryptos_mp_value_t *m;
@@ -844,6 +846,7 @@ int kryptos_mp_is_prime(const kryptos_mp_value_t *n) {
     int is_prime = kryptos_mp_fermat_test(n, 7);
 
     if (is_prime) {
+        // INFO(Rafael): Avoiding any Carmichael's number.
         return kryptos_mp_miller_rabin_test(n, 14);
     }
 
@@ -1287,7 +1290,7 @@ kryptos_mp_rsh_epilogue:
     return (*a);
 }
 
-kryptos_mp_value_t *kryptos_mp_gen_prime(const size_t bitsize) {
+kryptos_mp_value_t *kryptos_mp_gen_prime(const size_t bitsize, const int fast_method) {
     kryptos_mp_value_t *pn = NULL;
     ssize_t d;
     int is_prime = 0;
@@ -1305,7 +1308,12 @@ kryptos_mp_value_t *kryptos_mp_gen_prime(const size_t bitsize) {
 
         pn->data[0] |= 0x1;
 
-        is_prime = kryptos_mp_is_prime(pn);
+        if (!fast_method) {
+            is_prime = kryptos_mp_is_prime(pn);
+        } else {
+            // INFO(Rafael): The Miller-Rabin tends to converge sooner than Fermat.
+            is_prime = kryptos_mp_miller_rabin_test(pn, 14);
+        }
     }
 
     return pn;
@@ -1326,7 +1334,7 @@ kryptos_mp_value_t *kryptos_mp_gen_prime_2k1(const size_t k_bitsize) {
     }
 
     do {
-        if ((k = kryptos_mp_gen_prime(k_bitsize)) == NULL) {
+        if ((k = kryptos_mp_gen_prime(k_bitsize, 0)) == NULL) {
             goto kryptos_mp_gen_prime_2k1_epilogue;
         }
 printf("k = ");print_mp(k);
