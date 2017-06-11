@@ -20,6 +20,7 @@
 #include <kryptos_hash_common.h>
 #include <kryptos_huffman.h>
 #include <kryptos_mp.h>
+#include <kryptos_dh.h>
 #include "test_vectors.h"
 #include <stdlib.h>
 #include <string.h>
@@ -3731,21 +3732,21 @@ CUTE_TEST_CASE(kryptos_mp_gen_prime_tests)
     kryptos_mp_value_t *p = kryptos_mp_gen_prime(16, 0);
     ssize_t d;
     CUTE_ASSERT(p != NULL);
-//    CUTE_ASSERT((p->data_size << 3) == 16);
+    CUTE_ASSERT((p->data_size << 3) == 16);
     kryptos_del_mp_value(p);
     // INFO(Rafael): Well, all we need to do is to believe in this function... To test the return to make sure if the
     //               value is really prime means to use the same tests (Fermat, Miller-Rabin) used by the generating function.
 CUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_mp_gen_prime_2k1_tests)
+/*CUTE_TEST_CASE(kryptos_mp_gen_prime_2k1_tests)
     kryptos_mp_value_t *p = kryptos_mp_gen_prime_2k1(80);
     ssize_t d;
     CUTE_ASSERT(p != NULL);
     for (d = p->data_size - 1; d >= 0; d--) printf("%.2X", p->data[d]);
     printf("\n");
     kryptos_del_mp_value(p);
-CUTE_TEST_CASE_END
-
+CUTE_TEST_CASE_END*/
+/*
 CUTE_TEST_CASE(poke_bloody_poke)
     ssize_t d;
     kryptos_mp_value_t *a = kryptos_new_mp_value(14096);
@@ -3797,8 +3798,44 @@ CUTE_TEST_CASE(poke_bloody_poke)
     kryptos_del_mp_value(dd);
     kryptos_del_mp_value(m);
 CUTE_TEST_CASE_END
+*/
 
 // INFO(Rafael): End of multiprecision testing area.
+
+CUTE_TEST_CASE(kryptos_dh_get_modp_tests)
+    struct modp_test_ctx {
+        kryptos_dh_modp_group_bits_t bits;
+        size_t expected_bitsize;
+    };
+    struct modp_test_ctx test_vector[] = {
+            { kKryptosDHGroup1536, 1536 },
+            { kKryptosDHGroup2048, 2048 },
+            { kKryptosDHGroup3072, 3072 },
+            { kKryptosDHGroup4096, 4096 },
+            { kKryptosDHGroup6144, 6144 },
+            { kKryptosDHGroup8192, 8192 }
+    };
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+    size_t t;
+    kryptos_mp_value_t *p = NULL, *g = NULL;
+
+    CUTE_ASSERT(kryptos_dh_get_modp(-1, &p, &g) == kKryptosInvalidParams);
+
+    CUTE_ASSERT(kryptos_dh_get_modp(kKryptosDHGroup1536, &p, NULL) == kKryptosInvalidParams);
+
+    CUTE_ASSERT(kryptos_dh_get_modp(kKryptosDHGroup1536, NULL, &g) == kKryptosInvalidParams);
+
+    CUTE_ASSERT(kryptos_dh_get_modp(kKryptosDHGroup1536, NULL, NULL) == kKryptosInvalidParams);
+
+    for (t = 0; t < test_vector_nr; t++) {
+        CUTE_ASSERT(kryptos_dh_get_modp(test_vector[t].bits, &p, &g) == kKryptosSuccess);
+        CUTE_ASSERT(p != NULL);
+        CUTE_ASSERT(g != NULL);
+        CUTE_ASSERT((p->data_size << 3) == test_vector[t].expected_bitsize);
+        kryptos_del_mp_value(p);
+        kryptos_del_mp_value(g);
+    }
+CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_test_monkey)
     // CLUE(Rafael): Before adding a new test try to find out the best place that it fits.
@@ -3820,6 +3857,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     // INFO(Rafael): Internal DSL stuff.
     CUTE_RUN_TEST(kryptos_dsl_tests);
+
+    // INFO(Rafael): Symmetric stuff.
 
     // INFO(Rafael): Cipher validation using official test vectors.
     CUTE_RUN_TEST(kryptos_arc4_tests);
@@ -3886,6 +3925,10 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_is_prime_tests);
     CUTE_RUN_TEST(kryptos_mp_gen_prime_tests);
     //CUTE_RUN_TEST(kryptos_mp_gen_prime_2k1_tests);
+
+    // INFO(Rafael): Asymmetric stuff
+
+    CUTE_RUN_TEST(kryptos_dh_get_modp_tests);
 
 CUTE_TEST_CASE_END
 

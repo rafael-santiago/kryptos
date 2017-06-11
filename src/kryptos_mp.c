@@ -988,14 +988,14 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
     p = NULL;
 
     // INFO(Rafael): Step 3, b0 = a^m mod n.
-
-//printf("a = ");
-//print_mp(a);
-//printf("m = ");
-//print_mp(m);
-//printf("n = ");
-//print_mp(n);
-
+/*
+printf("a = ");
+print_mp(a);
+printf("m = ");
+print_mp(m);
+printf("n = ");
+print_mp(n);
+*/
     n_mod = kryptos_mp_me_mod_n(a, m, n);
 
     if (n_mod == NULL) {
