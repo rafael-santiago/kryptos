@@ -231,8 +231,10 @@ kryptos_task_result_t kryptos_dh_get_modp(const kryptos_dh_modp_group_bits_t bit
 
         if ((*p) != NULL) {
             kryptos_del_mp_value(*p);
+            (*p) = NULL;
         } else if ((*g) != NULL) {
             kryptos_del_mp_value(*g);
+            (*p) = NULL;
         }
     }
 

@@ -33,6 +33,9 @@
 #include <kryptos_md5.h>
 #include <kryptos_ripemd128_160.h>
 
+#include <kryptos_base64.h>
+#include <kryptos_uuencode.h>
+
 #include <kryptos_hmac.h>
 
 #define kryptos_task_set_ecb_mode(ktask) ( (ktask)->mode = kKryptosECB )

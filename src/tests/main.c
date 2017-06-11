@@ -21,6 +21,7 @@
 #include <kryptos_huffman.h>
 #include <kryptos_mp.h>
 #include <kryptos_dh.h>
+#include <kryptos_pem.h>
 #include "test_vectors.h"
 #include <stdlib.h>
 #include <string.h>
@@ -3837,6 +3838,38 @@ CUTE_TEST_CASE(kryptos_dh_get_modp_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_pem_get_data_tests)
+    kryptos_u8_t *buf = "-----BEGIN FOOBAR (1)-----\n"
+                        "Rm9vYmFyMQ==\n"
+                        "-----END FOOBAR (1)-----\n"
+                        "-----BEGIN FOOBAR (0)-----\n"
+                        "Rm9vYmFyMA==\n"
+                        "-----END FOOBAR (0)-----\n";
+    size_t data_size = 0;
+    kryptos_u8_t *data = NULL;
+
+    data = kryptos_pem_get_data("THE-DROIDS-WE-ARE-LOOKING-FOR", buf, strlen(buf), &data_size);
+
+    CUTE_ASSERT(data == NULL);
+
+    data = kryptos_pem_get_data("FOOBAR (0)", buf, strlen(buf), &data_size);
+
+    CUTE_ASSERT(data != NULL);
+    CUTE_ASSERT(data_size == 7);
+    CUTE_ASSERT(strcmp(data, "Foobar0") == 0);
+
+    kryptos_freeseg(data);
+
+    data_size = 0;
+    data = kryptos_pem_get_data("FOOBAR (1)", buf, strlen(buf), &data_size);
+
+    CUTE_ASSERT(data != NULL);
+    CUTE_ASSERT(data_size == 7);
+    CUTE_ASSERT(strcmp(data, "Foobar1") == 0);
+
+    kryptos_freeseg(data);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_test_monkey)
     // CLUE(Rafael): Before adding a new test try to find out the best place that it fits.
     //               At first glance you should consider the utility that it implements into the library.
@@ -3896,6 +3929,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_base64_tests);
     CUTE_RUN_TEST(kryptos_uuencode_tests);
     CUTE_RUN_TEST(kryptos_huffman_tests);
+    CUTE_RUN_TEST(kryptos_pem_get_data_tests);
 
     // INFO(Rafael): Multiprecision stuff.
     CUTE_RUN_TEST(kryptos_mp_new_value_tests);
