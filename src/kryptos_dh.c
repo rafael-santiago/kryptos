@@ -28,7 +28,7 @@ struct kryptos_dh_modp_group_ctx {
 
 #define KRYPTOS_DH_GROUPS_END };
 
-#define KRYPTOS_DH_ADD_GROUP(bits) { dh_ ## bits ## _modp, sizeof(dh_ ## bits ## _modp) / sizeof(dh_ ## bits ## _modp[0]) }
+#define KRYPTOS_DH_ADD_BIT_GROUP(bits) { dh_ ## bits ## _modp, sizeof(dh_ ## bits ## _modp) / sizeof(dh_ ## bits ## _modp[0]) }
 
 KRYPTOS_DH_MODP_GROUP_BEGIN(1536)
     KRYPTOS_DH_ADD_GROUP_ENTRY("FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1"
@@ -177,12 +177,12 @@ KRYPTOS_DH_MODP_GROUP_BEGIN(8192)
 KRYPTOS_DH_MODP_GROUP_END
 
 KRYPTOS_DH_GROUPS_BEGIN(dh_groups)
-    KRYPTOS_DH_ADD_GROUP(1536),
-    KRYPTOS_DH_ADD_GROUP(2048),
-    KRYPTOS_DH_ADD_GROUP(3072),
-    KRYPTOS_DH_ADD_GROUP(4096),
-    KRYPTOS_DH_ADD_GROUP(6144),
-    KRYPTOS_DH_ADD_GROUP(8192)
+    KRYPTOS_DH_ADD_BIT_GROUP(1536),
+    KRYPTOS_DH_ADD_BIT_GROUP(2048),
+    KRYPTOS_DH_ADD_BIT_GROUP(3072),
+    KRYPTOS_DH_ADD_BIT_GROUP(4096),
+    KRYPTOS_DH_ADD_BIT_GROUP(6144),
+    KRYPTOS_DH_ADD_BIT_GROUP(8192)
 KRYPTOS_DH_GROUPS_END
 
 static void kryptos_dh_get_random_modp_entry(const struct kryptos_dh_modp_group_ctx *entries,
@@ -258,4 +258,4 @@ kryptos_dh_get_modp_epilogue:
 
 #undef KRYPTOS_DH_GROUPS_END
 
-#undef KRYPTOS_DH_ADD_GROUP
+#undef KRYPTOS_DH_ADD_BIT_GROUP
