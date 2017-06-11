@@ -7,10 +7,12 @@
  */
 #include <kryptos_dh.h>
 #include <kryptos_random.h>
-#include <string.h>
 
 struct kryptos_dh_modp_group_entry_ctx {
-    kryptos_u8_t *p, *g;
+    kryptos_u8_t *p;
+    size_t p_size;
+    kryptos_u8_t *g;
+    size_t g_size;
 };
 
 struct kryptos_dh_modp_group_ctx {
@@ -22,7 +24,7 @@ struct kryptos_dh_modp_group_ctx {
 
 #define KRYPTOS_DH_MODP_GROUP_END };
 
-#define KRYPTOS_DH_ADD_GROUP_ENTRY(g, p) { g, p }
+#define KRYPTOS_DH_ADD_GROUP_ENTRY(p, ps, g, gs) { p, ps, g, gs }
 
 #define KRYPTOS_DH_GROUPS_BEGIN(name) static struct kryptos_dh_modp_group_ctx name [] = {
 
@@ -38,7 +40,7 @@ KRYPTOS_DH_MODP_GROUP_BEGIN(1536)
                                "EE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3D"
                                "C2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F"
                                "83655D23DCA3AD961C62F356208552BB9ED529077096966D"
-                               "670C354E4ABC9804F1746C08CA237327FFFFFFFFFFFFFFFF", "2") // INFO(Rafael): RFC-3526.
+                               "670C354E4ABC9804F1746C08CA237327FFFFFFFFFFFFFFFF", 384, "2", 1) // INFO(Rafael): RFC-3526.
 KRYPTOS_DH_MODP_GROUP_END
 
 KRYPTOS_DH_MODP_GROUP_BEGIN(2048)
@@ -52,7 +54,7 @@ KRYPTOS_DH_MODP_GROUP_BEGIN(2048)
                                "670C354E4ABC9804F1746C08CA18217C32905E462E36CE3B"
                                "E39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9"
                                "DE2BCBF6955817183995497CEA956AE515D2261898FA0510"
-                               "15728E5A8AACAA68FFFFFFFFFFFFFFFF", "2") // INFO(Rafael): RFC-3526.
+                               "15728E5A8AACAA68FFFFFFFFFFFFFFFF", 512, "2", 1) // INFO(Rafael): RFC-3526.
 KRYPTOS_DH_MODP_GROUP_END
 
 KRYPTOS_DH_MODP_GROUP_BEGIN(3072)
@@ -71,7 +73,7 @@ KRYPTOS_DH_MODP_GROUP_BEGIN(3072)
                                "ABF5AE8CDB0933D71E8C94E04A25619DCEE3D2261AD2EE6B"
                                "F12FFA06D98A0864D87602733EC86A64521F2B18177B200C"
                                "BBE117577A615D6C770988C0BAD946E208E24FA074E5AB31"
-                               "43DB5BFCE0FD108E4B82D120A93AD2CAFFFFFFFFFFFFFFFF", "2") // INFO(Rafael): RFC-3526.
+                               "43DB5BFCE0FD108E4B82D120A93AD2CAFFFFFFFFFFFFFFFF", 768, "2", 1) // INFO(Rafael): RFC-3526.
 KRYPTOS_DH_MODP_GROUP_END
 
 KRYPTOS_DH_MODP_GROUP_BEGIN(4096)
@@ -96,7 +98,7 @@ KRYPTOS_DH_MODP_GROUP_BEGIN(4096)
                                "287C59474E6BC05D99B2964FA090C3A2233BA186515BE7ED"
                                "1F612970CEE2D7AFB81BDD762170481CD0069127D5B05AA9"
                                "93B4EA988D8FDDC186FFB7DC90A6C08F4DF435C934063199"
-                               "FFFFFFFFFFFFFFFF", "2") // INFO(Rafael): RFC-3526.
+                               "FFFFFFFFFFFFFFFF", 1024, "2", 1) // INFO(Rafael): RFC-3526.
 KRYPTOS_DH_MODP_GROUP_END
 
 KRYPTOS_DH_MODP_GROUP_BEGIN(6144)
@@ -127,7 +129,7 @@ KRYPTOS_DH_MODP_GROUP_BEGIN(6144)
                                "CC8F6D7EBF48E1D814CC5ED20F8037E0A79715EEF29BE32806A1D58B"
                                "B7C5DA76F550AA3D8A1FBFF0EB19CCB1A313D55CDA56C9EC2EF29632"
                                "387FE8D76E3C0468043E8F663F4860EE12BF2D5B0B7474D6E694F91E"
-                               "6DCC4024FFFFFFFFFFFFFFFF", "2") // INFO(Rafael): RFC-3526.
+                               "6DCC4024FFFFFFFFFFFFFFFF", 1536, "2", 1) // INFO(Rafael): RFC-3526.
 KRYPTOS_DH_MODP_GROUP_END
 
 KRYPTOS_DH_MODP_GROUP_BEGIN(8192)
@@ -173,7 +175,7 @@ KRYPTOS_DH_MODP_GROUP_BEGIN(8192)
                                  "B1D510BD7EE74D73FAF36BC31ECFA268359046F4EB879F92"
                                  "4009438B481C6CD7889A002ED5EE382BC9190DA6FC026E47"
                                  "9558E4475677E9AA9E3050E2765694DFC81F56E880B96E71"
-                                 "60C980DD98EDD3DFFFFFFFFFFFFFFFFF", "2") // INFO(Rafael): RFC-3526.
+                                 "60C980DD98EDD3DFFFFFFFFFFFFFFFFF", 2048, "2", 1) // INFO(Rafael): RFC-3526.
 KRYPTOS_DH_MODP_GROUP_END
 
 KRYPTOS_DH_GROUPS_BEGIN(dh_groups)
@@ -208,8 +210,8 @@ static void kryptos_dh_get_random_modp_entry(const struct kryptos_dh_modp_group_
 
 #endif
     index = index % entries->data_nr;
-    (*p) = kryptos_hex_value_as_mp(entries->data[index].p, strlen(entries->data[index].p));
-    (*g) = kryptos_hex_value_as_mp(entries->data[index].g, strlen(entries->data[index].g));
+    (*p) = kryptos_hex_value_as_mp(entries->data[index].p, entries->data[index].p_size);
+    (*g) = kryptos_hex_value_as_mp(entries->data[index].g, entries->data[index].g_size);
 }
 
 kryptos_task_result_t kryptos_dh_get_modp(const kryptos_dh_modp_group_bits_t bits,
