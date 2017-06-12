@@ -59,7 +59,8 @@ kryptos-tests.epilogue() {
 
         var exit_code type int;
         if ($stress_tests.count() == 0) {
-            $exit_code = hefesto.sys.run(hefesto.sys.make_path("bin", "kryptos-tests --cutest-leak-check"));
+            $exit_code = hefesto.sys.run(hefesto.sys.make_path("bin", "kryptos-tests --cutest-leak-check" +
+                                                                       hefesto.project.cmdline()));
             if ($exit_code != 0) {
                 hefesto.sys.echo("~~~ TESTS FAILURE.\n");
                 hefesto.project.abort($exit_code);
@@ -89,7 +90,8 @@ kryptos-tests.epilogue() {
             $exit_code = 0;
 
             while ($r < $rmax && $exit_code == 0) {
-                $exit_code = hefesto.sys.run(hefesto.sys.make_path("bin", "kryptos-tests --cutest-leak-check"));
+                $exit_code = hefesto.sys.run(hefesto.sys.make_path("bin", "kryptos-tests --cutest-leak-check " +
+                                                                           hefesto.project.cmdline()));
                 $r = $r + 1;
             }
 

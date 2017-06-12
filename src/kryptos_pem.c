@@ -82,11 +82,11 @@ kryptos_task_result_t kryptos_pem_put_data(kryptos_u8_t **pem_buf, size_t *pem_b
 kryptos_pem_put_data_epilogue:
 
     if (kryptos_last_task_succeed(ktask)) {
-        new_pem_buf_size += ktask->out_size + 1; // INFO(Rafael): +1 is related with '\n' before the header end.
+        new_pem_buf_size += ktask->out_size + 1; // INFO(Rafael): +1 is related with '\n' before the header.
 
-        new_pem_buf = (kryptos_u8_t *) kryptos_newseg(new_pem_buf_size);
+        new_pem_buf = (kryptos_u8_t *) kryptos_newseg(new_pem_buf_size + 1);
         if (new_pem_buf != NULL) {
-            memset(new_pem_buf, 0, new_pem_buf_size);
+            memset(new_pem_buf, 0, new_pem_buf_size + 1);
 
             if ((*pem_buf) != NULL) {
                 memcpy(new_pem_buf, (*pem_buf), old_pem_buf_size);

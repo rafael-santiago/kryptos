@@ -190,6 +190,21 @@ KRYPTOS_DH_GROUPS_END
 static void kryptos_dh_get_random_modp_entry(const struct kryptos_dh_modp_group_ctx *entries,
                                              kryptos_mp_value_t **p, kryptos_mp_value_t **g);
 
+kryptos_task_result_t kryptos_dh_eval_t(kryptos_mp_value_t **t,
+                                        const kryptos_mp_value_t *g, const kryptos_mp_value_t *s, const kryptos_mp_value_t *p) {
+    if (t == NULL || g == NULL || s == NULL || p == NULL) {
+        return kKryptosInvalidParams;
+    }
+
+    (*t) = kryptos_mp_me_mod_n(g, s, p);
+
+    if ((*t) == NULL) {
+        return kKryptosProcessError;
+    }
+
+    return kKryptosSuccess;
+}
+
 kryptos_task_result_t kryptos_dh_get_random_s(kryptos_mp_value_t **s, const kryptos_mp_value_t *p) {
     kryptos_mp_value_t *p_2 = NULL, *_2 = NULL;
     kryptos_task_result_t result = kKryptosProcessError;
