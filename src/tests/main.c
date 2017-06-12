@@ -3882,8 +3882,11 @@ CUTE_TEST_CASE(kryptos_pem_put_data_tests)
                                     "-----END FOOBAR (0)-----\n";
 
     CUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (1)", foobar1, strlen(foobar1)) == kKryptosSuccess);
+    CUTE_ASSERT(pem_buf != NULL);
     CUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (1)", foobar0, strlen(foobar0)) == kKryptosInvalidParams);
+    CUTE_ASSERT(pem_buf != NULL);
     CUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (0)", foobar0, strlen(foobar0)) == kKryptosSuccess);
+    CUTE_ASSERT(pem_buf != NULL);
     CUTE_ASSERT(pem_buf_size == strlen(expected_buffer));
     CUTE_ASSERT(strcmp(pem_buf, expected_buffer) == 0);
     kryptos_freeseg(pem_buf);
