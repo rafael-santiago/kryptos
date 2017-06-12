@@ -3870,6 +3870,25 @@ CUTE_TEST_CASE(kryptos_pem_get_data_tests)
     kryptos_freeseg(data);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_pem_put_data_tests)
+    kryptos_u8_t *foobar1 = "Foobar1", *foobar0 = "Foobar0";
+    kryptos_u8_t *pem_buf = NULL;
+    size_t pem_buf_size = 0;
+    kryptos_u8_t *expected_buffer = "-----BEGIN FOOBAR (1)-----\n"
+                                    "Rm9vYmFyMQ==\n"
+                                    "-----END FOOBAR (1)-----\n"
+                                    "-----BEGIN FOOBAR (0)-----\n"
+                                    "Rm9vYmFyMA==\n"
+                                    "-----END FOOBAR (0)-----\n";
+
+    CUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (1)", foobar1, strlen(foobar1)) == kKryptosSuccess);
+    CUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (1)", foobar0, strlen(foobar0)) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (0)", foobar0, strlen(foobar0)) == kKryptosSuccess);
+    CUTE_ASSERT(pem_buf_size == strlen(expected_buffer));
+    CUTE_ASSERT(strcmp(pem_buf, expected_buffer) == 0);
+    kryptos_freeseg(pem_buf);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_test_monkey)
     // CLUE(Rafael): Before adding a new test try to find out the best place that it fits.
     //               At first glance you should consider the utility that it implements into the library.
@@ -3930,6 +3949,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_uuencode_tests);
     CUTE_RUN_TEST(kryptos_huffman_tests);
     CUTE_RUN_TEST(kryptos_pem_get_data_tests);
+    CUTE_RUN_TEST(kryptos_pem_put_data_tests);
 
     // INFO(Rafael): Multiprecision stuff.
     CUTE_RUN_TEST(kryptos_mp_new_value_tests);
