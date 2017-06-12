@@ -3838,6 +3838,26 @@ CUTE_TEST_CASE(kryptos_dh_get_modp_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_dh_get_random_s_tests)
+    kryptos_dh_modp_group_bits_t bits[] = {
+        kKryptosDHGroup1536, kKryptosDHGroup3072, kKryptosDHGroup4096, kKryptosDHGroup6144, kKryptosDHGroup8192
+    };
+    size_t bits_nr = sizeof(bits) / sizeof(bits[0]), b;
+    kryptos_mp_value_t *p = NULL, *g = NULL, *s = NULL;
+
+    CUTE_ASSERT(kryptos_dh_get_random_s(NULL, NULL) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dh_get_random_s(&s, NULL) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dh_get_random_s(NULL, (kryptos_mp_value_t *)&b) == kKryptosInvalidParams);
+
+    for (b = 0; b < bits_nr; b++) {
+        CUTE_ASSERT(kryptos_dh_get_modp(bits[b], &p, &g) == kKryptosSuccess);
+        CUTE_ASSERT(kryptos_dh_get_random_s(&s, p) == kKryptosSuccess);
+        kryptos_del_mp_value(p);
+        kryptos_del_mp_value(g);
+        kryptos_del_mp_value(s);
+    }
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_pem_get_data_tests)
     kryptos_u8_t *buf = "-----BEGIN FOOBAR (1)-----\n"
                         "Rm9vYmFyMQ==\n"
@@ -3986,6 +4006,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     // INFO(Rafael): Asymmetric stuff
 
     CUTE_RUN_TEST(kryptos_dh_get_modp_tests);
+    CUTE_RUN_TEST(kryptos_dh_get_random_s_tests);
 
 CUTE_TEST_CASE_END
 

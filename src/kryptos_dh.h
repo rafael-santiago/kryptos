@@ -24,4 +24,6 @@ typedef enum {
 kryptos_task_result_t kryptos_dh_get_modp(const kryptos_dh_modp_group_bits_t bits,
                                           kryptos_mp_value_t **p, kryptos_mp_value_t **g);
 
+kryptos_task_result_t kryptos_dh_get_random_s(kryptos_mp_value_t **s, const kryptos_mp_value_t *p);
+
 #endif

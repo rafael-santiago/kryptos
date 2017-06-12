@@ -190,28 +190,51 @@ KRYPTOS_DH_GROUPS_END
 static void kryptos_dh_get_random_modp_entry(const struct kryptos_dh_modp_group_ctx *entries,
                                              kryptos_mp_value_t **p, kryptos_mp_value_t **g);
 
-static void kryptos_dh_get_random_modp_entry(const struct kryptos_dh_modp_group_ctx *entries,
-                                             kryptos_mp_value_t **p, kryptos_mp_value_t **g) {
-    size_t index =
-#if __WORDSIZE == 64
-                    (size_t) kryptos_get_random_byte() << 56 |
-                    (size_t) kryptos_get_random_byte() << 48 |
-                    (size_t) kryptos_get_random_byte() << 40 |
-                    (size_t) kryptos_get_random_byte() << 32 |
-                    (size_t) kryptos_get_random_byte() << 24 |
-                    (size_t) kryptos_get_random_byte() << 16 |
-                    (size_t) kryptos_get_random_byte() <<  8 |
-                    (size_t) kryptos_get_random_byte();
-#else
-                    (size_t) kryptos_get_random_byte() << 24 |
-                    (size_t) kryptos_get_random_byte() << 16 |
-                    (size_t) kryptos_get_random_byte() <<  8 |
-                    (size_t) kryptos_get_random_byte();
+kryptos_task_result_t kryptos_dh_get_random_s(kryptos_mp_value_t **s, const kryptos_mp_value_t *p) {
+    kryptos_mp_value_t *p_2 = NULL, *_2 = NULL;
+    kryptos_task_result_t result = kKryptosProcessError;
+    ssize_t d;
 
-#endif
-    index = index % entries->data_nr;
-    (*p) = kryptos_hex_value_as_mp(entries->data[index].p, entries->data[index].p_size);
-    (*g) = kryptos_hex_value_as_mp(entries->data[index].g, entries->data[index].g_size);
+    if (p == NULL || s == NULL) {
+        return kKryptosInvalidParams;
+    }
+
+    if ((_2 = kryptos_hex_value_as_mp("2", 1)) == NULL) {
+        goto kryptos_dh_get_random_s_epilogue;
+    }
+
+    if ((p_2 = kryptos_assign_mp_value(&p_2, p)) == NULL) {
+        goto kryptos_dh_get_random_s_epilogue;
+    }
+
+    if ((p_2 = kryptos_mp_sub(&p_2, _2)) == NULL) {
+        goto kryptos_dh_get_random_s_epilogue;
+    }
+
+    (*s) = kryptos_new_mp_value(p->data_size << 3);
+
+    if ((*s) == NULL) {
+        goto kryptos_dh_get_random_s_epilogue;
+    }
+
+    do {
+        for (d = 0; d < (*s)->data_size; d++) {
+            (*s)->data[d] = kryptos_get_random_byte();
+        }
+    } while (kryptos_mp_gt(*s, p_2) || kryptos_mp_lt(*s, _2));
+
+    result = kKryptosSuccess;
+
+kryptos_dh_get_random_s_epilogue:
+    if (_2 != NULL) {
+        kryptos_del_mp_value(_2);
+    }
+
+    if (p_2 != NULL) {
+        kryptos_del_mp_value(p_2);
+    }
+
+    return result;
 }
 
 kryptos_task_result_t kryptos_dh_get_modp(const kryptos_dh_modp_group_bits_t bits,
@@ -250,6 +273,30 @@ kryptos_dh_get_modp_epilogue:
     }
 
     return result;
+}
+
+static void kryptos_dh_get_random_modp_entry(const struct kryptos_dh_modp_group_ctx *entries,
+                                             kryptos_mp_value_t **p, kryptos_mp_value_t **g) {
+    size_t index =
+#if __WORDSIZE == 64
+                    (size_t) kryptos_get_random_byte() << 56 |
+                    (size_t) kryptos_get_random_byte() << 48 |
+                    (size_t) kryptos_get_random_byte() << 40 |
+                    (size_t) kryptos_get_random_byte() << 32 |
+                    (size_t) kryptos_get_random_byte() << 24 |
+                    (size_t) kryptos_get_random_byte() << 16 |
+                    (size_t) kryptos_get_random_byte() <<  8 |
+                    (size_t) kryptos_get_random_byte();
+#else
+                    (size_t) kryptos_get_random_byte() << 24 |
+                    (size_t) kryptos_get_random_byte() << 16 |
+                    (size_t) kryptos_get_random_byte() <<  8 |
+                    (size_t) kryptos_get_random_byte();
+
+#endif
+    index = index % entries->data_nr;
+    (*p) = kryptos_hex_value_as_mp(entries->data[index].p, entries->data[index].p_size);
+    (*g) = kryptos_hex_value_as_mp(entries->data[index].g, entries->data[index].g_size);
 }
 
 #undef KRYPTOS_DH_MODP_GROUP_BEGIN
