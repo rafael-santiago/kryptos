@@ -36,6 +36,18 @@ static kryptos_u8_t nbxlt[] = {
 
 #define KRYPTOS_MP_MULTIBYTE_FLOOR 4
 
+#define kryptos_mp_get_u32_from_mp(m, i) ( ((i) < (m)->data_size) ? ( (kryptos_u32_t)((m)->data[(i) + 3] << 24) |\
+                                                                      (kryptos_u32_t)((m)->data[(i) + 2] << 16) |\
+                                                                      (kryptos_u32_t)((m)->data[(i) + 1] <<  8) |\
+                                                                      (kryptos_u32_t)((m)->data[  (i)  ]) ) : 0 )
+
+#define kryptos_mp_put_u32_into_mp(m, i, v) {\
+    (m)->data[(i) + 3] = (v) >> 24;\
+    (m)->data[(i) + 2] = ((v) >> 16) & 0xFF;\
+    (m)->data[(i) + 1] = ((v) >>  8) & 0xFF;\
+    (m)->data[  (i)  ] = (v) & 0xFF;\
+}
+
 static kryptos_mp_value_t *kryptos_mp_pad_for_multibyte(const kryptos_mp_value_t *v);
 
 static kryptos_mp_value_t *kryptos_mp_multibyte_add(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
@@ -230,18 +242,6 @@ static kryptos_mp_value_t *kryptos_mp_multibyte_add(const kryptos_mp_value_t *a,
     s = i = 0;
     c = 0;
 
-#define kryptos_mp_get_u32_from_mp(m, i) ( ((i) < (m)->data_size) ? ( (kryptos_u32_t)((m)->data[(i) + 3] << 24) |\
-                                                                      (kryptos_u32_t)((m)->data[(i) + 2] << 16) |\
-                                                                      (kryptos_u32_t)((m)->data[(i) + 1] <<  8) |\
-                                                                      (kryptos_u32_t)((m)->data[  (i)  ]) ) : 0 )
-
-#define kryptos_mp_put_u32_into_mp(m, i, v) {\
-    (m)->data[(i) + 3] = (v) >> 24;\
-    (m)->data[(i) + 2] = ((v) >> 16) & 0xFF;\
-    (m)->data[(i) + 1] = ((v) >>  8) & 0xFF;\
-    (m)->data[  (i)  ] = (v) & 0xFF;\
-}
-
     while (i < a4->data_size) {
         u64sum = (kryptos_u64_t) kryptos_mp_get_u32_from_mp(a4, i) + (kryptos_u64_t) kryptos_mp_get_u32_from_mp(b4, i) + c;
         c = (u64sum > 0xFFFFFFFF);
@@ -253,10 +253,6 @@ static kryptos_mp_value_t *kryptos_mp_multibyte_add(const kryptos_mp_value_t *a,
     if (c > 0 && s < sum->data_size) {
         sum->data[s] = c;
     }
-
-#undef kryptos_mp_get_u32_from_mp
-
-#undef kryptos_mp_put_u32_into_mp
 
 kryptos_mp_multibyte_add_epilogue:
 
@@ -342,6 +338,55 @@ kryptos_mp_add_epilogue:
     return (*dest);
 }
 
+static kryptos_mp_value_t *kryptos_mp_multibyte_sub(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b) {
+    kryptos_mp_value_t *a4 = NULL, *b4 = NULL, *delta = NULL;
+    kryptos_u64_t u64sub;
+    kryptos_u64_t c;
+    ssize_t s, dn, d;
+
+    if ((a4 = kryptos_mp_pad_for_multibyte(a)) == NULL) {
+        goto kryptos_mp_multibyte_sub_epilogue;
+    }
+
+    if ((b4 = kryptos_mp_pad_for_multibyte(b)) == NULL) {
+        goto kryptos_mp_multibyte_sub_epilogue;
+    }
+
+    delta = kryptos_new_mp_value((a4->data_size + b4->data_size) << 3);
+
+    if (delta == NULL) {
+        goto kryptos_mp_multibyte_sub_epilogue;
+    }
+
+    s = d = 0;
+    c = 0;
+    dn = (a4->data_size > b4->data_size) ? a4->data_size : b4->data_size;
+
+    while (d < dn) {
+        u64sub = (kryptos_u64_t) kryptos_mp_get_u32_from_mp(a4, d) - (kryptos_u64_t) kryptos_mp_get_u32_from_mp(b4, d) + c;
+        c += u64sub >> 32;
+        kryptos_mp_put_u32_into_mp(delta, s, u64sub);
+        d += 4;
+        s += 4;
+    }
+
+    if (c == 0xFFFFFFFF && s < delta->data_size) {
+        delta->data[s] = 0x0F;
+    }
+
+kryptos_mp_multibyte_sub_epilogue:
+
+    if (a4 != NULL) {
+        kryptos_del_mp_value(a4);
+    }
+
+    if (b4 != NULL) {
+        kryptos_del_mp_value(b4);
+    }
+
+    return delta;
+}
+
 kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
     ssize_t d, s, sn, dn;
     kryptos_u16_t bsub;
@@ -356,6 +401,12 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
         (*dest) = kryptos_new_mp_value(src->data_size << 3);
         memcpy((*dest)->data, src->data, src->data_size);
         return (*dest);
+    }
+
+    if ((*dest)->data_size >= KRYPTOS_MP_MULTIBYTE_FLOOR) {
+        if ((delta = kryptos_mp_multibyte_sub((*dest), src)) != NULL) {
+            goto kryptos_mp_sub_epilogue;
+        }
     }
 
     delta = kryptos_new_mp_value((src->data_size + (*dest)->data_size) << 3);
@@ -382,6 +433,8 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
         //               However, we will sign that the src was greater than dest by setting the most significant nibble to 0xF.
         delta->data[s] = 0x0F;
     }
+
+kryptos_mp_sub_epilogue:
 
     for (sn = delta->data_size - 1; sn >= 0 && delta->data[sn] == 0; sn--)
         ;
@@ -1462,3 +1515,9 @@ kryptos_mp_gen_prime_2k1_epilogue:
 #undef kryptos_mp_nbx
 
 #undef kryptos_mp_max_min
+
+#undef KRYPTOS_MP_MULTIBYTE_FLOOR
+
+#undef kryptos_mp_get_u32_from_mp
+
+#undef kryptos_mp_put_u32_into_mp
