@@ -3200,10 +3200,12 @@ CUTE_TEST_CASE(kryptos_mp_add_tests)
         kryptos_u8_t *a, *b, *e;
     };
     struct add_tests_ctx test_vector[] = {
-        {   "01",   "01",    "02" },
-        {   "02",   "0A",    "0C" },
-        { "DEAD", "BEEF", "19D9C" },
-        { "6671",   "00",  "6671" }
+        {       "01",       "01",        "02" },
+        {       "02",       "0A",        "0C" },
+        {     "DEAD",     "BEEF",     "19D9C" },
+        {     "6671",       "00",      "6671" },
+        { "DEADBEEF",     "BEEF",  "DEAE7DDE" },
+        { "DEADBEEF", "DEADBEEF", "1BD5B7DDE" }
     };
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
 
@@ -3367,7 +3369,9 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
         {     "ABCDEF01023",      "32010FEDCBA",         "3", "15CABF379F5" },
         {         "9876546",             "6671",      "17D0",         "276" },
         {         "9876546",                "2",   "4C3B2A3",           "0" },
-        {      "41C21CB8E1",               "0D", "50EEE8460",           "1" }
+        {      "41C21CB8E1",               "0D", "50EEE8460",           "1" },
+        {            "06E4",               "35",        "21",           "F" },
+        {        "0307ED59",             "6EB1",       "702",        "38F7" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     ssize_t d;
