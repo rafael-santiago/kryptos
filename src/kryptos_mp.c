@@ -52,6 +52,10 @@ static kryptos_mp_value_t *kryptos_mp_pad_for_multibyte(const kryptos_mp_value_t
 
 static kryptos_mp_value_t *kryptos_mp_multibyte_add(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
 
+static kryptos_mp_value_t *kryptos_mp_multibyte_sub(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
+
+static kryptos_mp_value_t *kryptos_mp_multibyte_mul(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
+
 kryptos_mp_value_t *kryptos_new_mp_value(const size_t bitsize) {
     kryptos_mp_value_t *mp;
 
@@ -500,8 +504,60 @@ kryptos_mp_value_t *kryptos_assign_hex_value_to_mp(kryptos_mp_value_t **dest,
     return (*dest);
 }
 
-// TODO(Rafael): Maybe the Karatsuba could be a good idea with huge numbers, so kryptos_mp_mul() could redirect to Karatsuba
-//               in case of really huge numbers. Just thinking about.
+static kryptos_mp_value_t *kryptos_mp_multibyte_mul(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b) {
+    kryptos_mp_value_t *a4 = NULL, *b4 = NULL, *mul = NULL;
+    kryptos_u64_t u64mul, u64sum;
+    kryptos_u8_t ac;
+    ssize_t ad, bd, r;
+    kryptos_u32_t mc;
+
+    if ((a4 = kryptos_mp_pad_for_multibyte(a)) == NULL) {
+        goto kryptos_mp_multibyte_mul_epilogue;
+    }
+
+    if ((b4 = kryptos_mp_pad_for_multibyte(b)) == NULL) {
+        goto kryptos_mp_multibyte_mul_epilogue;
+    }
+
+    mul = kryptos_new_mp_value((a4->data_size + b4->data_size + 4) << 3);
+
+    if (mul == NULL) {
+        goto kryptos_mp_multibyte_mul_epilogue;
+    }
+
+    for (bd = 0, r = 0; bd < b4->data_size; bd += 4, r += 4) {
+        mc = 0;
+        ac = 0;
+
+        for (ad = 0; ad < a4->data_size; ad += 4) {
+            u64mul = (kryptos_u64_t) kryptos_mp_get_u32_from_mp(b4, bd) *
+                        (kryptos_u64_t) kryptos_mp_get_u32_from_mp(a4, ad) + (kryptos_u64_t) mc;
+            mc = u64mul >> 32;
+
+            u64sum = (kryptos_u64_t) kryptos_mp_get_u32_from_mp(mul, ad + r) + (u64mul & 0xFFFFFFFF) + (kryptos_u64_t) ac;
+            ac = (u64sum > 0xFFFFFFFF);
+            kryptos_mp_put_u32_into_mp(mul, ad + r, u64sum);
+        }
+
+        if ((ad + r) < mul->data_size) {
+            u64sum = ((kryptos_u64_t) kryptos_mp_get_u32_from_mp(mul, ad + r) + mc + ac) & 0xFFFFFFFF;
+            kryptos_mp_put_u32_into_mp(mul, ad + r, u64sum);
+        }
+    }
+
+kryptos_mp_multibyte_mul_epilogue:
+
+    if (a4 != NULL) {
+        kryptos_del_mp_value(a4);
+    }
+
+    if (b4 != NULL) {
+        kryptos_del_mp_value(b4);
+    }
+
+    return mul;
+}
+
 kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
     size_t r;
     kryptos_mp_value_t *m;
@@ -521,6 +577,14 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
         return (*dest);
     }
 
+    kryptos_mp_max_min(x, y, (*dest), src);
+
+    if (x->data_size >= KRYPTOS_MP_MULTIBYTE_FLOOR) {
+        if ((m = kryptos_mp_multibyte_mul(x, y)) != NULL) {
+            goto kryptos_mp_mul_epilogue;
+        }
+    }
+
     // CLUE(Rafael): Encantamentos baseados em algumas propriedades que talvez a tia Tetéia não quis te contar.
 
     m = kryptos_new_mp_value(((*dest)->data_size + src->data_size + 1) << 3);
@@ -529,8 +593,6 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
         // WARN(Rafael): Better let a memory leak than return a wrong result.
         return NULL;
     }
-
-    kryptos_mp_max_min(x, y, (*dest), src);
 
     // CLUE(Rafael): Multiplicando igual na aula da tia Tetéia.
 
@@ -543,19 +605,6 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
             mc = (bmul >> 8);
             // INFO(Rafael): "Parallelizing" the multiplications sum in order to not call kryptos_mp_add() x->data_size times.
             //               Besides time it will also save memory.
-            //
-            //               Somando as multiplicações igual na aula da tia Tetéia, mas de uma forma não usual para Humanos.
-            //               A tia Tetéia vai nos dar um zero, pois é ofuscado pra cacete. O tio Pressman já teve um treco,
-            //               pois não estamos Re-u-ti-li-zan-do a... callstack, chamando kryptos_mp_add() x->data_size vezes.
-            //               Hahah!! The zueira never ends.
-            //
-            //               Mas sério: uma coisa é fazer algo fácil de entender quando dá para fazer, outra coisa é subutilizar
-            //               o Hardware em prol de gente preguiçosa que não consegue pensar fora da caixa. Um programa
-            //               tem acima de tudo que fazer de forma mais eficiente o que se presta, código é para ser executado.
-            //               A CPU não se importa se vai bufferizar cada multiplicação ou executá-las de forma "paralela".
-            //               Mas tem uma forma (um tanto peculiar) de protestar, executando mais lentamente, a forma menos
-            //               indicada segundo ela. E programamos acima de tudo para ela, pois é ela quem executa o que está
-            //               abstraído aqui em prol de usuários seres Humanos. ;)
             bsum = m->data[xd + r] + (bmul & 0xFF) + ac;
             ac = (bsum > 0xFF);
             m->data[xd + r] = (bsum & 0xFF);
@@ -565,6 +614,8 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
             m->data[xd + r] = (m->data[xd + r] + mc + ac) & 0xFF;
         }
     }
+
+kryptos_mp_mul_epilogue:
 
     for (xd = m->data_size - 1; xd >= 0 && m->data[xd] == 0; xd--)
         ;
@@ -579,7 +630,6 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
     }
 
     // INFO(Rafael): Housekeeping.
-
     kryptos_del_mp_value(m);
     r = 0;
     bmul = 0;
