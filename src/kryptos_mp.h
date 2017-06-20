@@ -72,4 +72,6 @@ kryptos_mp_value_t *kryptos_mp_gen_prime(const size_t bitsize, const int fast_me
 
 kryptos_mp_value_t *kryptos_mp_gen_prime_2k1(const size_t k_bitsize);
 
+kryptos_mp_value_t *kryptos_mp_montgomery_reduction(const kryptos_mp_value_t *x, const kryptos_mp_value_t *y);
+
 #endif

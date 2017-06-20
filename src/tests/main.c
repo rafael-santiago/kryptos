@@ -3940,6 +3940,39 @@ CUTE_TEST_CASE(kryptos_pem_put_data_tests)
     kryptos_freeseg(pem_buf);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_montgomery_reduction_tests)
+    kryptos_mp_value_t *m;
+    kryptos_mp_value_t *x;
+    kryptos_mp_value_t *y;
+    kryptos_mp_value_t *e;
+    struct montgomery_reduction_test_ctx {
+        kryptos_u8_t *x, *y, *e;
+    };
+    struct montgomery_reduction_test_ctx test_vector[] = {
+        {    "37",   "7",   "6" },
+        {   "109",   "3",   "1" },
+        {   "101",   "D",   "A" },
+        { "74EF9", "599", "15B" }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        x = kryptos_hex_value_as_mp(test_vector[tv].x, strlen(test_vector[tv].x));
+        CUTE_ASSERT(x != NULL);
+        y = kryptos_hex_value_as_mp(test_vector[tv].y, strlen(test_vector[tv].y));
+        CUTE_ASSERT(y != NULL);
+        e = kryptos_hex_value_as_mp(test_vector[tv].e, strlen(test_vector[tv].e));
+        CUTE_ASSERT(e != NULL);
+        m = kryptos_mp_montgomery_reduction(x, y);
+        CUTE_ASSERT(m != NULL);
+        CUTE_ASSERT(kryptos_mp_eq(m, e) == 1);
+        kryptos_del_mp_value(m);
+        kryptos_del_mp_value(x);
+        kryptos_del_mp_value(y);
+        kryptos_del_mp_value(e);
+    }
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_test_monkey)
     // CLUE(Rafael): Before adding a new test try to find out the best place that it fits.
     //               At first glance you should consider the utility that it implements into the library.
@@ -4030,6 +4063,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_is_prime_tests);
     CUTE_RUN_TEST(kryptos_mp_gen_prime_tests);
     //CUTE_RUN_TEST(kryptos_mp_gen_prime_2k1_tests);
+
+    CUTE_RUN_TEST(kryptos_mp_montgomery_reduction_tests);
 
     // INFO(Rafael): Asymmetric stuff
 

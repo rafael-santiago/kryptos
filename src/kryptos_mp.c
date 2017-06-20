@@ -56,6 +56,9 @@ static kryptos_mp_value_t *kryptos_mp_multibyte_sub(const kryptos_mp_value_t *a,
 
 static kryptos_mp_value_t *kryptos_mp_multibyte_mul(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
 
+static kryptos_mp_value_t *kryptos_mp_montgomery_reduction_2kx_mod_y(const kryptos_mp_value_t *x,
+                                                                     const kryptos_mp_value_t *y);
+
 kryptos_mp_value_t *kryptos_new_mp_value(const size_t bitsize) {
     kryptos_mp_value_t *mp;
 
@@ -1558,6 +1561,96 @@ kryptos_mp_gen_prime_2k1_epilogue:
     }
 
     return p;
+}
+
+kryptos_mp_value_t *kryptos_mp_montgomery_reduction(const kryptos_mp_value_t *x, const kryptos_mp_value_t *y) {
+    // INFO(Rafael): This calculates ZR mod Y.
+    kryptos_mp_value_t *z = NULL, *r = NULL, *b = NULL, *d = NULL;
+    kryptos_u8_t buf[255];
+    ssize_t rdn, rd;
+
+    if (x == NULL || y == NULL) {
+        return NULL;
+    }
+
+    if ((z = kryptos_mp_montgomery_reduction_2kx_mod_y(x, y)) == NULL) {
+        return NULL;
+    }
+
+    b = kryptos_hex_value_as_mp("1", 1);
+    b = kryptos_mp_lsh(&b, x->data_size << 3);
+
+    if ((d = kryptos_mp_div(b, y, &r)) == NULL) {
+        goto kryptos_mp_montgomery_reduction_epilogue;
+    }
+
+    kryptos_del_mp_value(d);
+
+    if ((z = kryptos_mp_mul(&z, r)) == NULL) {
+        goto kryptos_mp_montgomery_reduction_epilogue;
+    }
+
+    kryptos_del_mp_value(r);
+    r = NULL;
+
+    if ((d = kryptos_mp_div(z, y, &r)) == NULL) {
+        goto kryptos_mp_montgomery_reduction_epilogue;
+    }
+
+    kryptos_del_mp_value(d);
+
+    if (r != NULL) {
+        for (rdn = r->data_size - 1; rdn >= 0 && r->data[rdn] == 0; rdn--)
+            ;
+
+        if (rdn > - 1) {
+            d = r;
+            r = kryptos_new_mp_value((rdn + 1) << 3);
+            for (rd = 0; rd <= rdn; rd++) {
+                r->data[rd] = d->data[rd];
+            }
+            kryptos_del_mp_value(d);
+        }
+    }
+
+kryptos_mp_montgomery_reduction_epilogue:
+
+    if (z != NULL) {
+        kryptos_del_mp_value(z);
+    }
+
+    if (b != NULL) {
+        kryptos_del_mp_value(b);
+    }
+
+    return r;
+}
+
+static kryptos_mp_value_t *kryptos_mp_montgomery_reduction_2kx_mod_y(const kryptos_mp_value_t *x,
+                                                                     const kryptos_mp_value_t *y) {
+    // INFO(Rafael): Calculates 2^-K X mod Y. K is the bit length.
+    kryptos_mp_value_t *xt = NULL;
+    ssize_t k, ks;
+
+    if (x == NULL || y == NULL) {
+        return NULL;
+    }
+
+    xt = kryptos_assign_mp_value(&xt, x);
+    ks = xt->data_size << 3;
+
+    for (k = 0; k < ks; k++) {
+        if (kryptos_mp_is_odd(xt)) {
+            xt = kryptos_mp_add(&xt, y);
+        }
+        xt = kryptos_mp_rsh(&xt, 1);
+    }
+
+    if (kryptos_mp_ge(xt, y)) {
+        xt = kryptos_mp_sub(&xt, y);
+    }
+
+    return xt;
 }
 
 #undef kryptos_mp_xnb
