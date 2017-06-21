@@ -971,8 +971,9 @@ kryptos_mp_div_epilogue:
 }
 
 kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const kryptos_mp_value_t *e, const kryptos_mp_value_t *n) {
-    kryptos_mp_value_t *A = NULL, *div = NULL, *mod = NULL;
+    kryptos_mp_value_t *A = NULL, *mod = NULL, *div = NULL;
     ssize_t t;
+    int is_odd;
 
     if (m == NULL || e == NULL || n == NULL) {
         return NULL;
@@ -982,33 +983,65 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
         return NULL;
     }
 
+    is_odd = kryptos_mp_is_odd(n);
+
+#define kryptos_mp_me_mod_n_mont(e, t, bn, A, m, n, mod) {\
+    A = kryptos_mp_mul(&A, A);\
+    mod = kryptos_mp_montgomery_reduction(A, n);\
+    kryptos_del_mp_value(A);\
+    A = mod;\
+    mod = NULL;\
+    if ( ( ((e)->data[t] & (1 << (bn))) >> (bn) ) ) {\
+        A = kryptos_mp_mul(&A, m);\
+        mod = kryptos_mp_montgomery_reduction(A, n);\
+        kryptos_del_mp_value(A);\
+        A = mod;\
+        mod = NULL;\
+    }\
+}
+
 #define kryptos_mp_me_mod_n(e, t, bn, A, m, n, div, mod) {\
     A = kryptos_mp_mul(&A, A);\
     div = kryptos_mp_div(A, n, &mod);\
     kryptos_del_mp_value(A);\
-    A = mod;\
     kryptos_del_mp_value(div);\
+    A = mod;\
     div = mod = NULL;\
     if ( ( ((e)->data[t] & (1 << (bn))) >> (bn) ) ) {\
         A = kryptos_mp_mul(&A, m);\
         div = kryptos_mp_div(A, n, &mod);\
         kryptos_del_mp_value(A);\
-        A = mod;\
         kryptos_del_mp_value(div);\
+        A = mod;\
         div = mod = NULL;\
     }\
 }
 
-    for (t = e->data_size - 1; t >= 0; t--) {
-        kryptos_mp_me_mod_n(e, t, 7, A, m, n, div, mod);
-        kryptos_mp_me_mod_n(e, t, 6, A, m, n, div, mod);
-        kryptos_mp_me_mod_n(e, t, 5, A, m, n, div, mod);
-        kryptos_mp_me_mod_n(e, t, 4, A, m, n, div, mod);
-        kryptos_mp_me_mod_n(e, t, 3, A, m, n, div, mod);
-        kryptos_mp_me_mod_n(e, t, 2, A, m, n, div, mod);
-        kryptos_mp_me_mod_n(e, t, 1, A, m, n, div, mod);
-        kryptos_mp_me_mod_n(e, t, 0, A, m, n, div, mod);
+    if (kryptos_mp_is_odd(n)) {
+        for (t = e->data_size - 1; t >= 0; t--) {
+            kryptos_mp_me_mod_n_mont(e, t, 7, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 6, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 5, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 4, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 3, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 2, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 1, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 0, A, m, n, mod);
+        }
+    } else {
+        for (t = e->data_size - 1; t >= 0; t--) {
+            kryptos_mp_me_mod_n(e, t, 7, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 6, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 5, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 4, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 3, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 2, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 1, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 0, A, m, n, div, mod);
+        }
     }
+
+#undef kryptos_mp_me_mod_n_mont
 
 #undef kryptos_mp_me_mod_n
 
