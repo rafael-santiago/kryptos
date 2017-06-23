@@ -196,6 +196,10 @@ kryptos_task_result_t kryptos_dh_eval_t(kryptos_mp_value_t **t,
         return kKryptosInvalidParams;
     }
 
+    printf("g = "); print_mp(g);
+    printf("s = "); print_mp(s);
+    printf("p = "); print_mp(p);
+
     (*t) = kryptos_mp_me_mod_n(g, s, p);
 
     if ((*t) == NULL) {

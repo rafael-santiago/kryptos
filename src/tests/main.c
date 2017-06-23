@@ -3205,7 +3205,25 @@ CUTE_TEST_CASE(kryptos_mp_add_tests)
         {     "DEAD",     "BEEF",     "19D9C" },
         {     "6671",       "00",      "6671" },
         { "DEADBEEF",     "BEEF",  "DEAE7DDE" },
-        { "DEADBEEF", "DEADBEEF", "1BD5B7DDE" }
+        { "DEADBEEF", "DEADBEEF", "1BD5B7DDE" },
+        { "FFFFFFFFFFFFFFFFFFFF"
+          "FFFFFFFFFFFFFFFFFFFF"
+          "FFFFFFFFFFFFFFFFFFFF"
+          "FFFFFFFFFFFFFFFFFFFF"
+          "FFFFFFFFFFFFFFFFFFFF"
+          "FFFFFFFFFFFF7300",
+                                "FFFFFFFFFFFFFFFFFFFF"
+                                "FFFFFFFFFFFFFFFFFFFF"
+                                "FFFFFFFFFFFFFFFFFFFF"
+                                "FFFFFFFFFFFFFFFFFFFF"
+                                "FFFFFFFFFFFFFFFFFFFF"
+                                "FFFFFFFFFFFF7300",
+                                                      "1FFFFFFFFFFFFFFFFFFF"
+                                                      "FFFFFFFFFFFFFFFFFFFF"
+                                                      "FFFFFFFFFFFFFFFFFFFF"
+                                                      "FFFFFFFFFFFFFFFFFFFF"
+                                                      "FFFFFFFFFFFFFFFFFFFF"
+                                                      "FFFFFFFFFFFFEE600"   }
     };
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
 
@@ -3347,31 +3365,32 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
         kryptos_u8_t *x, *y, *eq, *er;
     };
     struct div_tests_ctx test_vector[] = {
-        {            "0002",                "1",         "2",           "0" },
-        {            "0002",                "2",         "1",           "0" },
-        {            "0003",                "2",         "1",           "1" },
-        {            "0004",                "2",         "2",           "0" },
-        {            "0007",                "2",         "3",           "1" },
-        {            "0008",                "2",         "4",           "0" },
-        {               "2",                "2",         "1",           "0" },
-        {               "3",                "2",         "1",           "1" },
-        {               "4",                "2",         "2",           "0" },
-        {               "7",                "2",         "3",           "1" },
-        {               "8",                "2",         "4",           "0" },
-        {             "ABC",              "BAD",         "0",         "ABC" },
-        {             "BAD",              "ABC",         "1",          "F1" },
-        {            "DEAD",             "BEEF",         "1",        "1FBE" },
-        {             "100",               "50",         "3",          "10" },
-        {        "DEADBEEF",            "DEADB",      "1000",         "EEF" },
-        {    "DEADBEEFDEAD",         "DEADBEEF",     "10000",        "DEAD" },
-        {           "10001",              "100",       "100",           "1" },
-        {    "BABACABABACA",     "252525252525",         "5", "10111010111" },
-        {     "ABCDEF01023",      "32010FEDCBA",         "3", "15CABF379F5" },
-        {         "9876546",             "6671",      "17D0",         "276" },
-        {         "9876546",                "2",   "4C3B2A3",           "0" },
-        {      "41C21CB8E1",               "0D", "50EEE8460",           "1" },
-        {            "06E4",               "35",        "21",           "F" },
-        {        "0307ED59",             "6EB1",       "702",        "38F7" }
+        {                             "0002",                "1",                "2",                "0" },
+        {                             "0002",                "2",                "1",                "0" },
+        {                             "0003",                "2",                "1",                "1" },
+        {                             "0004",                "2",                "2",                "0" },
+        {                             "0007",                "2",                "3",                "1" },
+        {                             "0008",                "2",                "4",                "0" },
+        {                                "2",                "2",                "1",                "0" },
+        {                                "3",                "2",                "1",                "1" },
+        {                                "4",                "2",                "2",                "0" },
+        {                                "7",                "2",                "3",                "1" },
+        {                                "8",                "2",                "4",                "0" },
+        {                              "ABC",              "BAD",                "0",              "ABC" },
+        {                              "BAD",              "ABC",                "1",               "F1" },
+        {                             "DEAD",             "BEEF",                "1",             "1FBE" },
+        {                              "100",               "50",                "3",               "10" },
+        {                         "DEADBEEF",            "DEADB",             "1000",              "EEF" },
+        {                     "DEADBEEFDEAD",         "DEADBEEF",            "10000",             "DEAD" },
+        {                            "10001",              "100",              "100",                "1" },
+        {                     "BABACABABACA",     "252525252525",                "5",      "10111010111" },
+        {                      "ABCDEF01023",      "32010FEDCBA",                "3",      "15CABF379F5" },
+        {                          "9876546",             "6671",             "17D0",              "276" },
+        {                          "9876546",                "2",          "4C3B2A3",                "0" },
+        {                       "41C21CB8E1",               "0D",        "50EEE8460",                "1" },
+        {                             "06E4",               "35",               "21",                "F" },
+        {                         "0307ED59",             "6EB1",              "702",             "38F7" },
+        { "4083FB324A10B35102CBB276A0348322", "C61E99756B0CC3D9", "535D1CD93DFF2556", "8DCBC13907755B3C" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     ssize_t d;
@@ -3414,6 +3433,9 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
     kryptos_del_mp_value(er);
 
     for (tv = 0; tv < tv_nr; tv++) {
+
+printf("*** %s / %s\n", test_vector[tv].x, test_vector[tv].y);
+
         x = kryptos_hex_value_as_mp(test_vector[tv].x, strlen(test_vector[tv].x));
         y = kryptos_hex_value_as_mp(test_vector[tv].y, strlen(test_vector[tv].y));
         eq = kryptos_hex_value_as_mp(test_vector[tv].eq, strlen(test_vector[tv].eq));
@@ -3425,10 +3447,8 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
 
         CUTE_ASSERT(q != NULL);
         CUTE_ASSERT(r != NULL);
-/*
-printf("*** %s / %s\n", test_vector[tv].x, test_vector[tv].y);
 
-printf("Q  = ");
+/*printf("Q  = ");
 for (d = q->data_size - 1; d >= 0; d--) printf("%.2X ", q->data[d]);
 printf("\n");
 
@@ -3754,11 +3774,11 @@ CUTE_TEST_CASE_END
     printf("\n");
     kryptos_del_mp_value(p);
 CUTE_TEST_CASE_END*/
-/*
+
 CUTE_TEST_CASE(poke_bloody_poke)
     ssize_t d;
-    kryptos_mp_value_t *a = kryptos_new_mp_value(14096);
-    kryptos_mp_value_t *b = kryptos_new_mp_value(80);
+    kryptos_mp_value_t *a = kryptos_new_mp_value(128);
+    kryptos_mp_value_t *b = kryptos_new_mp_value(64);
     kryptos_mp_value_t *dd = NULL, *m = NULL;
     for (d = a->data_size - 1; d >= 0; d--) {
         a->data[d] = kryptos_get_random_byte();
@@ -3806,7 +3826,7 @@ CUTE_TEST_CASE(poke_bloody_poke)
     kryptos_del_mp_value(dd);
     kryptos_del_mp_value(m);
 CUTE_TEST_CASE_END
-*/
+
 
 // INFO(Rafael): End of multiprecision testing area.
 
@@ -4073,9 +4093,13 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     CUTE_RUN_TEST(kryptos_dh_get_modp_tests);
     CUTE_RUN_TEST(kryptos_dh_get_random_s_tests);
-    if (CUTE_GET_OPTION("quick-dh-tests") == NULL) {
-        CUTE_RUN_TEST(kryptos_dh_eval_t_tests);
-    }
+
+
+    CUTE_RUN_TEST(poke_bloody_poke);
+
+//    if (CUTE_GET_OPTION("quick-dh-tests") == NULL) {
+//        CUTE_RUN_TEST(kryptos_dh_eval_t_tests);
+//    }
 
 CUTE_TEST_CASE_END
 
