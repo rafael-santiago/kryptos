@@ -3390,10 +3390,12 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
         {                       "41C21CB8E1",               "0D",        "50EEE8460",                "1" },
         {                             "06E4",               "35",               "21",                "F" },
         {                         "0307ED59",             "6EB1",              "702",             "38F7" },
-        { "4083FB324A10B35102CBB276A0348322", "C61E99756B0CC3D9", "535D1CD93DFF2556", "8DCBC13907755B3C" }
+        { "4083FB324A10B35102CBB276A0348322", "C61E99756B0CC3D9", "535D1CD93DFF2556", "8DCBC13907755B3C" },
+        {                           "072608",             "0647",              "123",              "353" },
+        {                             "3AA4",               "02",             "1D52",                "0" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
-    ssize_t d;
+    ssize_t d, i;
 
     x = NULL;
     y = NULL;
@@ -3434,7 +3436,7 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
 
     for (tv = 0; tv < tv_nr; tv++) {
 
-printf("*** %s / %s\n", test_vector[tv].x, test_vector[tv].y);
+/*printf("*** %s / %s\n", test_vector[tv].x, test_vector[tv].y);*/
 
         x = kryptos_hex_value_as_mp(test_vector[tv].x, strlen(test_vector[tv].x));
         y = kryptos_hex_value_as_mp(test_vector[tv].y, strlen(test_vector[tv].y));
@@ -4084,7 +4086,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_fermat_test_tests);
     CUTE_RUN_TEST(kryptos_mp_miller_rabin_test_tests);
     CUTE_RUN_TEST(kryptos_mp_is_prime_tests);
-    CUTE_RUN_TEST(kryptos_mp_gen_prime_tests);
+//    CUTE_RUN_TEST(kryptos_mp_gen_prime_tests);
     //CUTE_RUN_TEST(kryptos_mp_gen_prime_2k1_tests);
 
     CUTE_RUN_TEST(kryptos_mp_montgomery_reduction_tests);
@@ -4095,7 +4097,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_dh_get_random_s_tests);
 
 
-    CUTE_RUN_TEST(poke_bloody_poke);
+//    CUTE_RUN_TEST(poke_bloody_poke);
 
 //    if (CUTE_GET_OPTION("quick-dh-tests") == NULL) {
 //        CUTE_RUN_TEST(kryptos_dh_eval_t_tests);
