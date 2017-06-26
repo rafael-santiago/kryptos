@@ -368,9 +368,11 @@ static kryptos_mp_value_t *kryptos_mp_multibyte_sub(const kryptos_mp_value_t *a,
     s = d = 0;
     c = 0;
     dn = (a4->data_size > b4->data_size) ? a4->data_size : b4->data_size;
-
+//printf("a4 = "); print_mp(a4);
+//printf("b4 = "); print_mp(b4);
     while (d < dn) {
         u64sub = (kryptos_u64_t) kryptos_mp_get_u32_from_mp(a4, d) - (kryptos_u64_t) kryptos_mp_get_u32_from_mp(b4, d) + c;
+//        printf("\t%X - %X + %X = %"PRIx64"\n", kryptos_mp_get_u32_from_mp(a4, d), kryptos_mp_get_u32_from_mp(b4, d), c, u64sub);
         c += u64sub >> 32;
         kryptos_mp_put_u32_into_mp(delta, s, u64sub);
         d += 4;
@@ -391,6 +393,8 @@ kryptos_mp_multibyte_sub_epilogue:
         kryptos_del_mp_value(b4);
     }
 
+//printf("delta = "); print_mp(delta);
+//printf("--\n");
     return delta;
 }
 
@@ -410,11 +414,13 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
         return (*dest);
     }
 
+/*
     if ((*dest)->data_size >= KRYPTOS_MP_MULTIBYTE_FLOOR) {
         if ((delta = kryptos_mp_multibyte_sub((*dest), src)) != NULL) {
             goto kryptos_mp_sub_epilogue;
         }
     }
+*/
 
     delta = kryptos_new_mp_value((src->data_size + (*dest)->data_size) << 3);
 
@@ -753,7 +759,7 @@ kryptos_mp_value_t *kryptos_mp_pow(const kryptos_mp_value_t *g, const kryptos_mp
     return A;
 }
 
-static void print_mp(const kryptos_mp_value_t *v) {
+void print_mp(const kryptos_mp_value_t *v) {
     ssize_t d;
     for (d = v->data_size - 1; d >= 0; d--) printf("%.2X", v->data[d]);
     printf("\n");
@@ -767,6 +773,8 @@ static ssize_t kryptos_mp_max_used_byte(const kryptos_mp_value_t *x) {
 }
 
 #ifndef KRYPTOS_MP_SLOWER_MP_DIV
+
+#undef KRYPTOS_MP_DIV_DEBUG_INFO
 
 kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp_value_t *y, kryptos_mp_value_t **r) {
     kryptos_mp_value_t *q = NULL, *xn = NULL, *yn = NULL, *b = NULL;
@@ -860,7 +868,7 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
         goto kryptos_mp_div_epilogue;
     }
 
-    for (j = m - 1; j >= 0 /*&& kryptos_mp_ge(xn, yn)*/; j--) {
+    for (j = m - 1; j >= 0; j--) {
 
         xi = n + j;
 
@@ -874,9 +882,23 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
             qtemp = (qtemp << 8) | xn->data[xi - 1];
         }
 
+#ifdef KRYPTOS_MP_DIV_DEBUG_INFO
+
+        printf("\tqtemp = %X\n", qtemp);
+        printf("\t%X / %X = ", qtemp, yn->data[n - 1]);
+#endif
+
         qtemp /= yn->data[n - 1];
 
+#ifdef KRYPTOS_MP_DIV_DEBUG_INFO
+        printf("%X\n", qtemp);
+#endif
+
         d = j;
+
+#ifdef KRYPTOS_MP_DIV_DEBUG_INFO
+        printf("\t-- is_less loop begin.\n");
+#endif
 
         do {
 
@@ -893,7 +915,7 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
             b->data[1] = qtemp >> 8;
             b->data[0] = qtemp & 0xFF;
             b = kryptos_mp_mul(&b, yn);
-            b = kryptos_mp_lsh(&b, 8 * j);
+            b = kryptos_mp_lsh(&b, 8 * d);
 
             is_less = kryptos_mp_lt(xn, b);
 
@@ -902,14 +924,34 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
                 kryptos_del_mp_value(b);
                 b = NULL;
                 j = d;
+#ifdef KRYPTOS_MP_DIV_DEBUG_INFO
+                printf("\t\tis_less == 1, qtemp = %X\n", qtemp);
+#endif
             }
         } while (is_less);
 
+#ifdef KRYPTOS_MP_DIV_DEBUG_INFO
+        printf("\t-- is_less loop end.\n");
+        printf("\txn' = "); print_mp(xn);
+        printf("\tb   = "); print_mp(b);
+#endif
+
         xn = kryptos_mp_sub(&xn, b);
+
+#ifdef KRYPTOS_MP_DIV_DEBUG_INFO
+        printf("\txn- = "); print_mp(xn);
+#endif
 
         if (b != NULL) {
             kryptos_del_mp_value(b);
         }
+
+#ifdef KRYPTOS_MP_DIV_DEBUG_INFO
+        printf("-- end of iteration.\n");
+        printf("\tQ'  = "); print_mp(q);
+        printf("\tXN' = "); print_mp(xn);
+        printf("--\n");
+#endif
 
     }
 
@@ -953,6 +995,12 @@ kryptos_mp_div_epilogue:
     if (yn != NULL) {
         kryptos_del_mp_value(yn);
     }
+
+#ifdef KRYPTOS_MP_DIV_DEBUG_INFO
+    printf("-- end of algorithm\n");
+    printf("\tQ = "); print_mp(q);
+    printf("\tR = "); print_mp(*r);
+#endif
 
     return q;
 }

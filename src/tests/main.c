@@ -3271,7 +3271,74 @@ CUTE_TEST_CASE(kryptos_mp_sub_tests)
         {         "DEADBEEF", "BEEFDEAD",         "1FBDE042" },
         {                "5",     "1006",            "FEFFF" },
         {               "10",     "1006",            "FF00A" },
-        { "BABABABABABABABA",       "FD", "BABABABABABAB9BD" }
+        { "BABABABABABABABA",       "FD", "BABABABABABAB9BD" },
+        { "2B2CC74FC1B75D0F"
+          "9C18DC99223085A5"
+          "EB12D039DFB91475"
+          "E99E4B1A7E4F3BF9"
+          "D1741969150D072D"
+          "5956A0D5668FB0A8"
+          "04A75FE572E9AD34"
+          "5F3AA6BBF5F2DE06"
+          "3D8556760F474F5C"
+          "6B4CB525D1B36383"
+          "15ACE084993BCE2B"
+          "5D87BA2EF383F8E8"
+          "783BC43BD2564E3D"
+          "58318D6F2D712361"
+          "6EF11F5D696EE176"
+          "34BE105678DBDD80"
+          "AEF23E5FBBBD04F5"
+          "3A50430D72A2A149"
+          "BDB4D5DD68B5C2FF"
+          "F0EA213BC00BE620"
+          "AA0753B68FFACFB1"
+          "09110CC071E13FF3"
+          "884ECFE7F6", "2ACA8449BD982E18"
+                        "C8C4000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000", "624306041F2EF6D3"
+                                      "54DC99223085A5EB"
+                                      "12D039DFB91475E9"
+                                      "9E4B1A7E4F3BF9D1"
+                                      "741969150D072D59"
+                                      "56A0D5668FB0A804"
+                                      "A75FE572E9AD345F"
+                                      "3AA6BBF5F2DE063D"
+                                      "8556760F474F5C6B"
+                                      "4CB525D1B3638315"
+                                      "ACE084993BCE2B5D"
+                                      "87BA2EF383F8E878"
+                                      "3BC43BD2564E3D58"
+                                      "318D6F2D7123616E"
+                                      "F11F5D696EE17634"
+                                      "BE105678DBDD80AE"
+                                      "F23E5FBBBD04F53A"
+                                      "50430D72A2A149BD"
+                                      "B4D5DD68B5C2FFF0"
+                                      "EA213BC00BE620AA"
+                                      "0753B68FFACFB109"
+                                      "110CC071E13FF388"
+                                      "4ECFE7F6" }
     };
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     ssize_t x;
@@ -3392,7 +3459,72 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
         {                         "0307ED59",             "6EB1",              "702",             "38F7" },
         { "4083FB324A10B35102CBB276A0348322", "C61E99756B0CC3D9", "535D1CD93DFF2556", "8DCBC13907755B3C" },
         {                           "072608",             "0647",              "123",              "353" },
-        {                             "3AA4",               "02",             "1D52",                "0" }
+        {                             "3AA4",               "02",             "1D52",                "0" },
+        { "0FE95C5A853FEF9DC716090255DA76AB"
+          "657A20DF154A3AA3414F0306C0260D0D"
+          "E51086E63D51C1093F87735C2F4A665D"
+          "E88A13C148C01F3E9401A123DAB73DB7"
+          "F225C69EEB361C72F72BB1C8E90AB039"
+          "D82D4FB15D260554BA90B88E02E03A53"
+          "37AAA2BCE6CF0D86B7B9A8F5AA9E5696"
+          "885B88BB43B1A0DE7C143B4D5EF38C1E"
+          "7B4A1C262AFA778F92CA15B1CEC74E5D"
+          "6F723DEE631E050F701A7923811C7A9A"
+          "D3C759205217E6790CEC2749F64D0EFB"
+          "7579A5D1775880247C85A8454CEC282A",             "E744", "119D040A78353383"
+                                                                  "FB99295D79EE5A29"
+                                                                  "7FF2DBD46FC6F801"
+                                                                  "8718858E28537E33"
+                                                                  "6432E16541DA9C39"
+                                                                  "5A17D93D7C13547B"
+                                                                  "8802293476600F36"
+                                                                  "E5DF626A1254A32B"
+                                                                  "E3BA7F89775A37F2"
+                                                                  "D11771A823E2406B"
+                                                                  "33C174B3EFC4863D"
+                                                                  "08264BC8750FA9BD"
+                                                                  "A68E4A2FDEDB4505"
+                                                                  "F74A38CA57684E8D"
+                                                                  "7BDF73AC5F347681"
+                                                                  "AB5EFCC116E5EAFE"
+                                                                  "F58B82DF33BE4EB2"
+                                                                  "0EF3EF43E1CC470A"
+                                                                  "99A247D7553E7A6B"
+                                                                  "68CED4FFEB174F24"
+                                                                  "5B0268B64F6C6363"
+                                                                  "5A5B0B32F6DF49E3"
+                                                                  "003287A4802A9E47"
+                                                                  "6B0042B77FA5",                 "5D56" },
+        { "9048E998B14FC9A31D8A96E11CE4A9"
+          "4BEA7535A618DC99223085A5EB12D0"
+          "39DFB91475E99E4B1A7E4F3BF9D174"
+          "1969150D072D5956A0D5668FB0A804"
+          "A75FE572E9AD345F3AA6BBF5F2DE06"
+          "3D8556760F474F5C6B4CB525D1B363"
+          "8315ACE084993BCE2B5D87BA2EF383"
+          "F8E8783BC43BD2564E3D58318D6F2D"
+          "7123616EF11F5D696EE17634BE1056"
+          "78DBDD80AEF23E5FBBBD04F53A5043"
+          "0D72A2A149BDB4D5DD68B5C2FFF0EA"
+          "213BC00BE620AA0753B68FFACFB109"
+          "110CC071E13FF3884ECFE7F6",  "675830FF5F9FD4C31A", "01656A56156E4BCD158C0"
+                                                             "D596AF368CF4913931F01"
+                                                             "0F95FF7711AB7F4E4DC6B"
+                                                             "7CC1451A465AF09F6CFC2"
+                                                             "238C18BA9D2FE3B9D7DE5"
+                                                             "792CB99B620B47C777DDB"
+                                                             "A31359298E5CC7EAC8429"
+                                                             "F6713381981C82DCB6327"
+                                                             "7B52096E8BCA0EEEBFD1D"
+                                                             "9CF487D5D7F2CE465D5E0"
+                                                             "D8D0BD71FB63CF283EAFC"
+                                                             "93C64E38C39D6D79CBE84"
+                                                             "09935F428E6A89A7449C0"
+                                                             "56E461AD4C592B1C21CB7"
+                                                             "3935D8F25EAFBD785B0B9"
+                                                             "117A59A741E21D2157EC9"
+                                                             "44A6AC320FB825A1EF88A"
+                                                             "2DF372CDA3B", "459B1B14412C2ACCF8" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     ssize_t d, i;
@@ -3759,7 +3891,7 @@ CUTE_TEST_CASE(kryptos_mp_is_prime_tests)
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_mp_gen_prime_tests)
-    kryptos_mp_value_t *p = kryptos_mp_gen_prime(16, 0);
+    kryptos_mp_value_t *p = kryptos_mp_gen_prime(16, 1);
     ssize_t d;
     CUTE_ASSERT(p != NULL);
     CUTE_ASSERT((p->data_size << 3) == 16);
@@ -3779,8 +3911,8 @@ CUTE_TEST_CASE_END*/
 
 CUTE_TEST_CASE(poke_bloody_poke)
     ssize_t d;
-    kryptos_mp_value_t *a = kryptos_new_mp_value(128);
-    kryptos_mp_value_t *b = kryptos_new_mp_value(64);
+    kryptos_mp_value_t *a = kryptos_new_mp_value(1536);
+    kryptos_mp_value_t *b = kryptos_new_mp_value(70);
     kryptos_mp_value_t *dd = NULL, *m = NULL;
     for (d = a->data_size - 1; d >= 0; d--) {
         a->data[d] = kryptos_get_random_byte();
@@ -3901,7 +4033,9 @@ CUTE_TEST_CASE(kryptos_dh_eval_t_tests)
     CUTE_ASSERT(kryptos_dh_eval_t(&t, (kryptos_mp_value_t *)&b, (kryptos_mp_value_t *)&b, NULL) == kKryptosInvalidParams);
 
     for (b = 0; b < bits_nr; b++) {
-        CUTE_ASSERT(kryptos_dh_get_modp(bits[b], &p, &g) == kKryptosSuccess);
+        //CUTE_ASSERT(kryptos_dh_get_modp(bits[b], &p, &g) == kKryptosSuccess);
+        p = kryptos_mp_gen_prime(64, 1);
+        g = kryptos_mp_gen_prime(64, 1);
         CUTE_ASSERT(kryptos_dh_get_random_s(&s, p) == kKryptosSuccess);
         CUTE_ASSERT(kryptos_dh_eval_t(&t, g, s, p) == kKryptosSuccess);
         kryptos_del_mp_value(p);
@@ -4086,7 +4220,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_fermat_test_tests);
     CUTE_RUN_TEST(kryptos_mp_miller_rabin_test_tests);
     CUTE_RUN_TEST(kryptos_mp_is_prime_tests);
-//    CUTE_RUN_TEST(kryptos_mp_gen_prime_tests);
+    CUTE_RUN_TEST(kryptos_mp_gen_prime_tests);
     //CUTE_RUN_TEST(kryptos_mp_gen_prime_2k1_tests);
 
     CUTE_RUN_TEST(kryptos_mp_montgomery_reduction_tests);
