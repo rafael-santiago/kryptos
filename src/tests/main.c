@@ -3697,6 +3697,8 @@ CUTE_TEST_CASE(kryptos_mp_div_2p_tests)
         kryptos_del_mp_value(x);
         kryptos_del_mp_value(eq);
         kryptos_del_mp_value(er);
+        kryptos_del_mp_value(q);
+        kryptos_del_mp_value(r);
     }
 CUTE_TEST_CASE_END
 
@@ -4331,7 +4333,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_fermat_test_tests);
     CUTE_RUN_TEST(kryptos_mp_miller_rabin_test_tests);
     CUTE_RUN_TEST(kryptos_mp_is_prime_tests);
-    CUTE_RUN_TEST(kryptos_mp_gen_prime_tests);
+    //CUTE_RUN_TEST(kryptos_mp_gen_prime_tests);
     //CUTE_RUN_TEST(kryptos_mp_gen_prime_2k1_tests);
 
     CUTE_RUN_TEST(kryptos_mp_montgomery_reduction_tests);
