@@ -1209,6 +1209,50 @@ kryptos_mp_div_epilogue:
 
 #endif
 
+kryptos_mp_value_t *kryptos_mp_div_2p(const kryptos_mp_value_t *x, const kryptos_u32_t power, kryptos_mp_value_t **r) {
+    kryptos_mp_value_t *q = NULL;
+    kryptos_mp_value_t *p = NULL, *tr = NULL;
+    ssize_t dn, d;
+
+    if (x == NULL) {
+        return NULL;
+    }
+
+    if ((q = kryptos_assign_mp_value(&q, x)) == NULL) {
+        return NULL;
+    }
+
+    q = kryptos_mp_rsh(&q, power);
+
+    if (r != NULL) {
+        p = kryptos_new_mp_value(8);
+        p->data[0] = 1;
+        p = kryptos_mp_lsh(&p, power);
+        p = kryptos_mp_mul(&p, q);
+
+        tr = kryptos_assign_mp_value(&tr, x);
+        tr = kryptos_mp_sub(&tr, p);
+
+        for (dn = tr->data_size - 1; dn >= 0 && tr->data[dn] == 0; dn--)
+            ;
+
+        if (dn >= 0) {
+            (*r) = kryptos_new_mp_value((dn + 1) << 3);
+            for (d = 0; d <= dn; d++) {
+                (*r)->data[d] = tr->data[d];
+            }
+
+        } else {
+            (*r) = kryptos_new_mp_value(8);
+        }
+
+        kryptos_del_mp_value(tr);
+        kryptos_del_mp_value(p);
+    }
+
+    return q;
+}
+
 kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const kryptos_mp_value_t *e, const kryptos_mp_value_t *n) {
     kryptos_mp_value_t *A = NULL, *mod = NULL, *div = NULL;
     ssize_t t;
@@ -1385,6 +1429,7 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
     b = kryptos_hex_value_as_mp("2", 1);
     e = kryptos_hex_value_as_mp("1", 1);
     p = kryptos_mp_pow(b, e);
+    // TODO(Rafael): Dividir usando shift.
     n_div = kryptos_mp_div(n_1, p, &n_mod); // INFO(Rafael): Maybe it should be replaced by "n_1 << e".
 
     if (b == NULL || e == NULL || p == NULL || n_div == NULL) {

@@ -76,4 +76,6 @@ kryptos_mp_value_t *kryptos_mp_montgomery_reduction(const kryptos_mp_value_t *x,
 
 void print_mp(const kryptos_mp_value_t *v);
 
+kryptos_mp_value_t *kryptos_mp_div_2p(const kryptos_mp_value_t *x, const kryptos_u32_t power, kryptos_mp_value_t **r);
+
 #endif

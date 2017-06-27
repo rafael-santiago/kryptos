@@ -3610,6 +3610,96 @@ printf("\n--\n");
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_div_2p_tests)
+    struct div_2p_tests_ctx {
+        kryptos_u8_t *x;
+        int p;
+        kryptos_u8_t *q, *r;
+    };
+    struct div_2p_tests_ctx test_vector[] = {
+        { "1667", 1,  "B33", "1" },
+        { "DECEB", 5, "6F67", "B" },
+        { "22CD01A3F7EFEC21C982BE4ECB3450"
+          "21E9BC8A9C64F0679E83E993CB05C8"
+          "F3EB5F4FD03EE631BAF5F596DDC263"
+          "8A5DA62CAB41FB364BBC84D3E44624"
+          "CA07576BB4900A9041DABC95BFC20C"
+          "7167D7AD07E40A2FF3D23149C3569F"
+          "D1B307AC86C008C625D29745B2A5F2"
+          "0F20742CA317C52DD31AA3BABC6689"
+          "996BC624BA3763BD56B850A5F776C5"
+          "7B84B1FB8B53A0B67835FCD42ED3E7"
+          "246CF5B70740573FB9B1F646FECB5A"
+          "39DC038CB000BC8D9501ECB0FAD166"
+          "9341D28A4633F9DF0E67594985508B"
+          "590694B03801B2E02597FE59046125"
+          "2026716864A62F413B51DD9A8E0",  1, "116680D1FBF7F610E4C15F27659A2810"
+                                             "F4DE454E327833CF41F4C9E582E479F5"
+                                             "AFA7E81F7318DD7AFACB6EE131C52ED3"
+                                             "1655A0FD9B25DE4269F223126503ABB5"
+                                             "DA48054820ED5E4ADFE10638B3EBD683"
+                                             "F20517F9E918A4E1AB4FE8D983D64360"
+                                             "046312E94BA2D952F907903A16518BE2"
+                                             "96E98D51DD5E3344CCB5E3125D1BB1DE"
+                                             "AB5C2852FBBB62BDC258FDC5A9D05B3C"
+                                             "1AFE6A1769F392367ADB83A02B9FDCD8"
+                                             "FB237F65AD1CEE01C658005E46CA80F6"
+                                             "587D68B349A0E9452319FCEF8733ACA4"
+                                             "C2A845AC834A581C00D97012CBFF2C82"
+                                             "3092901338B4325317A09DA8EECD470", "0" },
+        { "14BE2E7ED21BB6C06182985BA9F985D5"
+          "3EB7DBA458E014DB09033C91EE4A3777"
+          "2676EC1145A7DB3E736A74DCC9E1AC72"
+          "B8B6F1DB726C637531E61B5914952138"
+          "D8072CF3DCE89710C7E472F7A6539B07"
+          "E8899C75F5A455C5D8C55177144E72EF"
+          "3D1ACEF2461F508C0E47C9298ECD13FE"
+          "8CA0C86C602124A3FAFCAF81CB285CC8"
+          "8E4CEB3DF48080946FE72FFD1B101652"
+          "A5B9DB1E8B58D1039BF32067F7212138"
+          "55597005881EE5A5F39EB5E862E9B53E"
+          "2ABAF7C9023CA7345FF921EAD62F54C5"
+          "A4E0B296C7BEA70AD9EF34BF1858DFE1"
+          "EEC1276A39EFA7A1D7C18311FB348BB6"
+          "0467F", 6, "52F8B9FB486EDB01860A616EA7E61754"
+                      "FADF6E916380536C240CF247B928DDDC"
+                      "99DBB045169F6CF9CDA9D3732786B1CA"
+                      "E2DBC76DC9B18DD4C7986D64525484E3"
+                      "601CB3CF73A25C431F91CBDE994E6C1F"
+                      "A22671D7D6915717631545DC5139CBBC"
+                      "F46B3BC9187D4230391F24A63B344FFA"
+                      "328321B18084928FEBF2BE072CA17322"
+                      "3933ACF7D2020251BF9CBFF46C40594A"
+                      "96E76C7A2D63440E6FCC819FDC8484E1"
+                      "5565C016207B9697CE7AD7A18BA6D4F8"
+                      "AAEBDF2408F29CD17FE487AB58BD5316"
+                      "9382CA5B1EFA9C2B67BCD2FC61637F87"
+                      "BB049DA8E7BE9E875F060C47ECD22ED8"
+                      "119", "3F" }
+    };
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *x, *q, *r, *eq, *er;
+
+    CUTE_ASSERT(kryptos_mp_div_2p(NULL, 0, NULL) == NULL);
+
+    for (tv = 0; tv < test_vector_nr; tv++) {
+        x = kryptos_hex_value_as_mp(test_vector[tv].x, strlen(test_vector[tv].x));
+        CUTE_ASSERT(x != NULL);
+        eq = kryptos_hex_value_as_mp(test_vector[tv].q, strlen(test_vector[tv].q));
+        CUTE_ASSERT(eq != NULL);
+        er = kryptos_hex_value_as_mp(test_vector[tv].r, strlen(test_vector[tv].r));
+        CUTE_ASSERT(er != NULL);
+        q = kryptos_mp_div_2p(x, test_vector[tv].p, &r);
+        CUTE_ASSERT(q != NULL);
+        CUTE_ASSERT(r != NULL);
+        CUTE_ASSERT(kryptos_mp_eq(q, eq) == 1);
+        CUTE_ASSERT(kryptos_mp_eq(r, er) == 1);
+        kryptos_del_mp_value(x);
+        kryptos_del_mp_value(eq);
+        kryptos_del_mp_value(er);
+    }
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_mp_pow_tests)
     kryptos_mp_value_t *b, *e, *pe, *p;
     struct pow_tests_ctx {
@@ -3911,8 +4001,8 @@ CUTE_TEST_CASE_END*/
 
 CUTE_TEST_CASE(poke_bloody_poke)
     ssize_t d;
-    kryptos_mp_value_t *a = kryptos_new_mp_value(1536);
-    kryptos_mp_value_t *b = kryptos_new_mp_value(70);
+    kryptos_mp_value_t *a = kryptos_new_mp_value(16);
+    kryptos_mp_value_t *b = kryptos_new_mp_value(8);
     kryptos_mp_value_t *dd = NULL, *m = NULL;
     for (d = a->data_size - 1; d >= 0; d--) {
         a->data[d] = kryptos_get_random_byte();
@@ -3921,7 +4011,7 @@ CUTE_TEST_CASE(poke_bloody_poke)
     for (d = b->data_size - 1; d >= 0; d--) {
         b->data[d] = kryptos_get_random_byte();
     }
-
+b->data[0] = 2;
     while (kryptos_mp_lt(a, b)) {
         for (d = a->data_size - 1; d >= 0; d--) {
             a->data[d] = kryptos_get_random_byte();
@@ -3955,10 +4045,30 @@ CUTE_TEST_CASE(poke_bloody_poke)
     }
     printf("\n");
 
+    kryptos_del_mp_value(dd);
+    kryptos_del_mp_value(m);
+
+
+    dd = kryptos_mp_div_2p(a, 1, &m);
+
+
+    printf("d' = ");
+    for (d = dd->data_size - 1; d >= 0; d--) {
+        printf("%.2X", dd->data[d]);
+    }
+    printf("\n");
+
+    printf("m' = ");
+    for (d = m->data_size - 1; d >= 0; d--) {
+        printf("%.2X", m->data[d]);
+    }
+    printf("\n");
+
     kryptos_del_mp_value(a);
     kryptos_del_mp_value(b);
     kryptos_del_mp_value(dd);
     kryptos_del_mp_value(m);
+
 CUTE_TEST_CASE_END
 
 
@@ -4213,6 +4323,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_lsh_tests);
     CUTE_RUN_TEST(kryptos_mp_rsh_tests);
     CUTE_RUN_TEST(kryptos_mp_div_tests);
+    CUTE_RUN_TEST(kryptos_mp_div_2p_tests);
     CUTE_RUN_TEST(kryptos_mp_pow_tests);
     CUTE_RUN_TEST(kryptos_mp_is_odd_tests);
     CUTE_RUN_TEST(kryptos_mp_is_even_tests);
