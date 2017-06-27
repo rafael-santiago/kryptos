@@ -1222,31 +1222,56 @@ kryptos_mp_value_t *kryptos_mp_div_2p(const kryptos_mp_value_t *x, const kryptos
         return NULL;
     }
 
-    q = kryptos_mp_rsh(&q, power);
+    if ((q = kryptos_mp_rsh(&q, power)) == NULL) {
+        return NULL;
+    }
 
     if (r != NULL) {
-        p = kryptos_new_mp_value(8);
-        p->data[0] = 1;
-        p = kryptos_mp_lsh(&p, power);
-        p = kryptos_mp_mul(&p, q);
+        (*r) = NULL;
+        if ((p = kryptos_new_mp_value(8)) == NULL) {
+            goto kryptos_mp_div_2p_epilogue;
+        }
 
-        tr = kryptos_assign_mp_value(&tr, x);
-        tr = kryptos_mp_sub(&tr, p);
+        p->data[0] = 1;
+        if ((p = kryptos_mp_lsh(&p, power)) == NULL) {
+            goto kryptos_mp_div_2p_epilogue;
+        }
+
+        if ((p = kryptos_mp_mul(&p, q)) == NULL) {
+            goto kryptos_mp_div_2p_epilogue;
+        }
+
+        if ((tr = kryptos_assign_mp_value(&tr, x)) == NULL) {
+            goto kryptos_mp_div_2p_epilogue;
+        }
+
+        if ((tr = kryptos_mp_sub(&tr, p)) == NULL) {
+            goto kryptos_mp_div_2p_epilogue;
+        }
 
         for (dn = tr->data_size - 1; dn >= 0 && tr->data[dn] == 0; dn--)
             ;
 
         if (dn >= 0) {
             (*r) = kryptos_new_mp_value((dn + 1) << 3);
-            for (d = 0; d <= dn; d++) {
-                (*r)->data[d] = tr->data[d];
+            if ((*r) != NULL) {
+                for (d = 0; d <= dn; d++) {
+                    (*r)->data[d] = tr->data[d];
+                }
             }
-
         } else {
             (*r) = kryptos_new_mp_value(8);
         }
 
+    }
+
+kryptos_mp_div_2p_epilogue:
+
+    if (tr != NULL) {
         kryptos_del_mp_value(tr);
+    }
+
+    if (p != NULL) {
         kryptos_del_mp_value(p);
     }
 
