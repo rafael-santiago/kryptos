@@ -4160,6 +4160,53 @@ CUTE_TEST_CASE(kryptos_dh_eval_t_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_dh_standard_key_exchange_tests)
+    // INFO(Rafael): Here only the standard exchange implementation is simulated.
+    kryptos_mp_value_t *g = NULL, *p = NULL;
+    kryptos_mp_value_t *s_alice = NULL, *s_bob = NULL;
+    kryptos_mp_value_t *t_alice = NULL, *t_bob = NULL;
+    kryptos_mp_value_t *kab_alice = NULL, *kab_bob = NULL;
+
+    // INFO(Rafael): Alice and Bob agree about a p and g.
+    kryptos_dh_get_modp(kKryptosDHGroup1536, &p, &g);
+
+    // INFO(Rafael): Alice picks one random value sa 1 <= sa <= p - 2.
+    s_alice = kryptos_hex_value_as_mp("AA", 2); // WARN(Rafael): The Eve's dream.
+    CUTE_ASSERT(s_alice != NULL);
+
+    // INFO(Rafael): Bob picks one random value sb 1 <= sb <= p - 2.
+    s_bob = kryptos_hex_value_as_mp("BB", 2); // WARN(Rafael): The Eve's dream.
+    CUTE_ASSERT(s_bob != NULL);
+
+    // INFO(Rafael): Alice calculates ta = g^s mod p and she also sends her result to Bob.
+    CUTE_ASSERT(kryptos_dh_eval_t(&t_alice, g, s_alice, p) == kKryptosSuccess);
+    CUTE_ASSERT(t_alice != NULL);
+
+    // INFO(Rafael): Bob calculates tb = g^s mod p and he also sends his result to Alice.
+    CUTE_ASSERT(kryptos_dh_eval_t(&t_bob, g, s_bob, p) == kKryptosSuccess);
+    CUTE_ASSERT(t_bob != NULL);
+
+    // INFO(Rafael): Alice calculates kab = tb^sa mod p.
+    CUTE_ASSERT(kryptos_dh_eval_t(&kab_alice, t_bob, s_alice, p) == kKryptosSuccess);
+    CUTE_ASSERT(kab_alice != NULL);
+
+    // INFO(Rafael): Bob calculates kab = ta^sb mod p.
+    CUTE_ASSERT(kryptos_dh_eval_t(&kab_bob, t_alice, s_bob, p) == kKryptosSuccess);
+    CUTE_ASSERT(kab_bob != NULL);
+
+    CUTE_ASSERT(kryptos_mp_eq(kab_alice, kab_bob) == 1);
+
+    kryptos_del_mp_value(g);
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(s_alice);
+    kryptos_del_mp_value(s_bob);
+    kryptos_del_mp_value(t_alice);
+    kryptos_del_mp_value(t_bob);
+    kryptos_del_mp_value(kab_alice);
+    kryptos_del_mp_value(kab_bob);
+
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_pem_get_data_tests)
     kryptos_u8_t *buf = "-----BEGIN FOOBAR (1)-----\n"
                         "Rm9vYmFyMQ==\n"
@@ -4346,6 +4393,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_dh_get_modp_tests);
     CUTE_RUN_TEST(kryptos_dh_get_random_s_tests);
     CUTE_RUN_TEST(kryptos_dh_eval_t_tests);
+    CUTE_RUN_TEST(kryptos_dh_standard_key_exchange_tests);
 
 //    CUTE_RUN_TEST(poke_bloody_poke);
 
