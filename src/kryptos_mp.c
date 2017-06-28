@@ -1396,10 +1396,10 @@ int kryptos_mp_is_prime(const kryptos_mp_value_t *n) {
 }
 
 int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
-    kryptos_mp_value_t *k = NULL, *m = NULL, *n_1 = NULL, *_1 = NULL, *_0 = NULL, *b = NULL,
+    kryptos_mp_value_t *k = NULL, *m = NULL, *n_1 = NULL, *_1 = NULL, *_0 = NULL,
                        *e = NULL, *p = NULL, *n_div = NULL, *n_mod = NULL, *a = NULL, *bs = NULL;
     int is_prime = 1;
-    int s;
+    int s, pn;
 
     if (n == NULL) {
         return 0;
@@ -1451,13 +1451,9 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
         goto kryptos_mp_miller_rabin_test_epilogue;
     }
 
-    b = kryptos_hex_value_as_mp("2", 1);
-    e = kryptos_hex_value_as_mp("1", 1);
-    p = kryptos_mp_pow(b, e);
-    // TODO(Rafael): Dividir usando shift.
-    n_div = kryptos_mp_div(n_1, p, &n_mod); // INFO(Rafael): Maybe it should be replaced by "n_1 << e".
-
-    if (b == NULL || e == NULL || p == NULL || n_div == NULL) {
+    pn = 1;
+    n_div = kryptos_mp_div_2p(n_1, pn, &n_mod);
+    if ((k = kryptos_new_mp_value(32)) == NULL) {
         is_prime = 0;
         goto kryptos_mp_miller_rabin_test_epilogue;
     }
@@ -1465,33 +1461,28 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
     do {
         // INFO(Rafael): Initially always should enter into this loop because n - 1 mod 2^1 is zero (n should be > 2 and odd).
         m = kryptos_assign_mp_value(&m, n_div); // temp m.
-        k = kryptos_assign_mp_value(&k, e); // temp k.
-        if (m == NULL || k == NULL) {
+        k->data[3] = pn >> 24;
+        k->data[2] = (pn >> 16) & 0xFF;
+        k->data[1] = (pn >>  8) & 0xFF;
+        k->data[0] = pn & 0xFF;
+        if (m == NULL) {
             is_prime = 0;
             goto kryptos_mp_miller_rabin_test_epilogue;
         }
-        kryptos_del_mp_value(p);
         kryptos_del_mp_value(n_div);
         kryptos_del_mp_value(n_mod);
-        p = n_div = n_mod = NULL;
-        e = kryptos_mp_add(&e, _1);
-        p = kryptos_mp_pow(b, e);
-        if (e == NULL || p == NULL) {
-            is_prime = 0;
-            goto kryptos_mp_miller_rabin_test_epilogue;
-        }
-        n_div = kryptos_mp_div(n_1, p, &n_mod); // INFO(Rafael): Maybe it should be replaced by "n_1 << e".
+        n_div = n_mod = NULL;
+        pn++;
+        n_div = kryptos_mp_div_2p(n_1, pn, &n_mod);
         if (n_div == NULL || n_mod == NULL) {
             is_prime = 0;
             goto kryptos_mp_miller_rabin_test_epilogue;
         }
     } while (kryptos_mp_eq(n_mod, _0));
 
-    kryptos_del_mp_value(p);
     kryptos_del_mp_value(n_div);
     kryptos_del_mp_value(n_mod);
-    kryptos_del_mp_value(e);
-    e = p = n_div = n_mod = NULL;
+    n_div = n_mod = NULL;
 
     // INFO(Rafael): Now we got n - 1 = 2^k x m.
 
@@ -1531,14 +1522,7 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
     p = NULL;
 
     // INFO(Rafael): Step 3, b0 = a^m mod n.
-/*
-printf("a = ");
-print_mp(a);
-printf("m = ");
-print_mp(m);
-printf("n = ");
-print_mp(n);
-*/
+
     n_mod = kryptos_mp_me_mod_n(a, m, n);
 
     if (n_mod == NULL) {
@@ -1580,10 +1564,6 @@ kryptos_mp_miller_rabin_test_epilogue:
 
     if (a != NULL) {
         kryptos_del_mp_value(a);
-    }
-
-    if (b != NULL) {
-        kryptos_del_mp_value(b);
     }
 
     if (e != NULL) {
