@@ -4147,7 +4147,7 @@ CUTE_TEST_CASE(kryptos_dh_eval_t_tests)
 
     for (b = 0; b < bits_nr; b++) {
         CUTE_ASSERT(kryptos_dh_get_modp(bits[b], &p, &g) == kKryptosSuccess);
-        if (CUTE_GET_OPTION("quick-dh-tests") == NULL) {
+        if (CUTE_GET_OPTION("quick-dh-tests") != NULL) {
             // INFO(Rafael): Unrealistic bit size. However, faster for tests.
             bit_size = 8;
         }
