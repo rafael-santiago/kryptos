@@ -11,6 +11,12 @@
 #include <kryptos_types.h>
 #include <kryptos_mp.h>
 
+#define KRYPTOS_DH_PEM_HDR_PARAM_P "DH PARAM P"
+
+#define KRYPTOS_DH_PEM_HDR_PARAM_G "DH PARAM G"
+
+#define KRYPTOS_DH_PEM_HDR_PARAM_T "DH PARAM T"
+
 typedef enum {
     kKryptosDHGroup1536 = 0,
     kKryptosDHGroup2048,
@@ -21,6 +27,26 @@ typedef enum {
     kKryptosDHGroupNr
 }kryptos_dh_modp_group_bits_t;
 
+struct kryptos_dh_xchg_ctx {
+    kryptos_mp_value_t *p, *g;
+    kryptos_mp_value_t *t, *s, *k;
+    size_t s_bits;
+    kryptos_u8_t *in, *out;
+    size_t in_size, out_size;
+    kryptos_u8_t *result_verbose;
+    kryptos_task_result_t result;
+};
+
+#define kryptos_dh_init_xchg_ctx(xc) {\
+    (xc)->p = (xc)->g = (xc)->t = \
+    (xc)->s = (xc)->k = NULL;\
+    (xc)->s_bits = 0;\
+    (xc)->in = (xc)->out = NULL;\
+    (xc)->in_size = (xc)->out_size = 0;\
+    (xc)->result_verbose = NULL;\
+    (xc)->result = kKryptosSuccess;\
+}
+
 kryptos_task_result_t kryptos_dh_get_modp(const kryptos_dh_modp_group_bits_t bits,
                                           kryptos_mp_value_t **p, kryptos_mp_value_t **g);
 
@@ -28,5 +54,9 @@ kryptos_task_result_t kryptos_dh_get_random_s(kryptos_mp_value_t **s, const kryp
 
 kryptos_task_result_t kryptos_dh_eval_t(kryptos_mp_value_t **t,
                                         const kryptos_mp_value_t *g, const kryptos_mp_value_t *s, const kryptos_mp_value_t *p);
+
+void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data);
+
+void kryptos_clear_dh_xchg_ctx(struct kryptos_dh_xchg_ctx *data);
 
 #endif

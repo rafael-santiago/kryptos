@@ -4160,7 +4160,7 @@ CUTE_TEST_CASE(kryptos_dh_eval_t_tests)
     }
 CUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_dh_standard_key_exchange_tests)
+CUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     // INFO(Rafael): Here only the standard exchange implementation is simulated.
     kryptos_mp_value_t *g = NULL, *p = NULL;
     kryptos_mp_value_t *s_alice = NULL, *s_bob = NULL;
@@ -4208,6 +4208,62 @@ CUTE_TEST_CASE(kryptos_dh_standard_key_exchange_tests)
     kryptos_del_mp_value(kab_alice);
     kryptos_del_mp_value(kab_bob);
 
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
+    // INFO(Rafael): Here we will test the "oracle" mode of the exchange process.
+    struct kryptos_dh_xchg_ctx alice_stuff, bob_stuff, *alice = &alice_stuff, *bob = &bob_stuff;
+
+    kryptos_dh_init_xchg_ctx(alice);
+    kryptos_dh_init_xchg_ctx(bob);
+
+    // INFO(Rafael): Alice will start the protocol. So she picks a pre-computed DH group.
+    CUTE_ASSERT(kryptos_dh_get_modp(kKryptosDHGroup1536, &alice->p, &alice->g) == kKryptosSuccess);
+
+    // INFO(Rafael): Mas... Alice é vida loka...
+    alice->s_bits = 8;
+
+    kryptos_dh_process_stdxchg(&alice);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+    CUTE_ASSERT(alice->s != NULL);
+    CUTE_ASSERT(alice->out != NULL);
+
+    // INFO(Rafael): Now Alice got PEM data that she must send to Bob.
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+
+    // INFO(Rafael): Feito Alice, Bob é também um vida loka!!!
+    bob->s_bits = 8;
+
+    // INFO(Rafael): Once the PEM data received Bob process it.
+    kryptos_dh_process_stdxchg(&bob);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    CUTE_ASSERT(bob->s != NULL);
+    CUTE_ASSERT(bob->out != NULL);
+    CUTE_ASSERT(bob->k != NULL);
+
+    // INFO(Rafael): Now Bob got the value of t encoded as a PEM, so he sends it to Alice.
+    alice->in = bob->out;
+    alice->in_size = bob->out_size;
+
+    // INFO(Rafael): Alice process the PEM data received from Bob.
+    kryptos_dh_process_stdxchg(&alice);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+    CUTE_ASSERT(alice->k != NULL);
+
+//    printf("Alice KAB = "); print_mp(alice->k);
+//    printf("Bob KAB = "); print_mp(bob->k);
+
+    CUTE_ASSERT(kryptos_mp_eq(alice->k, bob->k) == 1);
+
+    alice->in = NULL;
+    bob->in = NULL;
+
+    kryptos_clear_dh_xchg_ctx(alice);
+    kryptos_clear_dh_xchg_ctx(bob);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_pem_get_data_tests)
@@ -4396,7 +4452,11 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_dh_get_modp_tests);
     CUTE_RUN_TEST(kryptos_dh_get_random_s_tests);
     CUTE_RUN_TEST(kryptos_dh_eval_t_tests);
-    CUTE_RUN_TEST(kryptos_dh_standard_key_exchange_tests);
+
+    if (CUTE_GET_OPTION("skip-dh-xchg-tests") == NULL) {
+        CUTE_RUN_TEST(kryptos_dh_standard_key_exchange_bare_bone_tests);
+        CUTE_RUN_TEST(kryptos_dh_process_stdxchg_tests);
+    }
 
 //    CUTE_RUN_TEST(poke_bloody_poke);
 
