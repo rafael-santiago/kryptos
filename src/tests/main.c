@@ -4118,13 +4118,13 @@ CUTE_TEST_CASE(kryptos_dh_get_random_s_tests)
     size_t bits_nr = sizeof(bits) / sizeof(bits[0]), b;
     kryptos_mp_value_t *p = NULL, *g = NULL, *s = NULL;
 
-    CUTE_ASSERT(kryptos_dh_get_random_s(NULL, NULL) == kKryptosInvalidParams);
-    CUTE_ASSERT(kryptos_dh_get_random_s(&s, NULL) == kKryptosInvalidParams);
-    CUTE_ASSERT(kryptos_dh_get_random_s(NULL, (kryptos_mp_value_t *)&b) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dh_get_random_s(NULL, NULL, 0) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dh_get_random_s(&s, NULL, 0) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dh_get_random_s(NULL, (kryptos_mp_value_t *)&b, 0) == kKryptosInvalidParams);
 
     for (b = 0; b < bits_nr; b++) {
         CUTE_ASSERT(kryptos_dh_get_modp(bits[b], &p, &g) == kKryptosSuccess);
-        CUTE_ASSERT(kryptos_dh_get_random_s(&s, p) == kKryptosSuccess);
+        CUTE_ASSERT(kryptos_dh_get_random_s(&s, p, 0) == kKryptosSuccess);
         kryptos_del_mp_value(p);
         kryptos_del_mp_value(g);
         kryptos_del_mp_value(s);
@@ -4133,10 +4133,11 @@ CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_dh_eval_t_tests)
     kryptos_dh_modp_group_bits_t bits[] = {
-        kKryptosDHGroup1536/*, kKryptosDHGroup3072, kKryptosDHGroup4096, kKryptosDHGroup6144, kKryptosDHGroup8192*/
+        kKryptosDHGroup1536, kKryptosDHGroup3072, kKryptosDHGroup4096, kKryptosDHGroup6144, kKryptosDHGroup8192
     };
     size_t bits_nr = sizeof(bits) / sizeof(bits[0]), b;
     kryptos_mp_value_t *p = NULL, *g = NULL, *s = NULL, *t = NULL;
+    size_t bit_size = 256;
 
     CUTE_ASSERT(kryptos_dh_eval_t(NULL, NULL, NULL, NULL) == kKryptosInvalidParams);
     CUTE_ASSERT(kryptos_dh_eval_t(&t, NULL, NULL, NULL) == kKryptosInvalidParams);
@@ -4145,10 +4146,12 @@ CUTE_TEST_CASE(kryptos_dh_eval_t_tests)
     CUTE_ASSERT(kryptos_dh_eval_t(&t, (kryptos_mp_value_t *)&b, (kryptos_mp_value_t *)&b, NULL) == kKryptosInvalidParams);
 
     for (b = 0; b < bits_nr; b++) {
-        //CUTE_ASSERT(kryptos_dh_get_modp(bits[b], &p, &g) == kKryptosSuccess);
-        p = kryptos_mp_gen_prime(64, 1);
-        g = kryptos_mp_gen_prime(64, 1);
-        CUTE_ASSERT(kryptos_dh_get_random_s(&s, p) == kKryptosSuccess);
+        CUTE_ASSERT(kryptos_dh_get_modp(bits[b], &p, &g) == kKryptosSuccess);
+        if (CUTE_GET_OPTION("quick-dh-tests") == NULL) {
+            // INFO(Rafael): Unrealistic bit size. However, faster for tests.
+            bit_size = 8;
+        }
+        CUTE_ASSERT(kryptos_dh_get_random_s(&s, p, bit_size) == kKryptosSuccess);
         CUTE_ASSERT(kryptos_dh_eval_t(&t, g, s, p) == kKryptosSuccess);
         kryptos_del_mp_value(p);
         kryptos_del_mp_value(g);
@@ -4342,13 +4345,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     CUTE_RUN_TEST(kryptos_dh_get_modp_tests);
     CUTE_RUN_TEST(kryptos_dh_get_random_s_tests);
-
+    CUTE_RUN_TEST(kryptos_dh_eval_t_tests);
 
 //    CUTE_RUN_TEST(poke_bloody_poke);
-
-//    if (CUTE_GET_OPTION("quick-dh-tests") == NULL) {
-//        CUTE_RUN_TEST(kryptos_dh_eval_t_tests);
-//    }
 
 CUTE_TEST_CASE_END
 

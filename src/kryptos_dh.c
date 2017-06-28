@@ -205,7 +205,7 @@ kryptos_task_result_t kryptos_dh_eval_t(kryptos_mp_value_t **t,
     return kKryptosSuccess;
 }
 
-kryptos_task_result_t kryptos_dh_get_random_s(kryptos_mp_value_t **s, const kryptos_mp_value_t *p) {
+kryptos_task_result_t kryptos_dh_get_random_s(kryptos_mp_value_t **s, const kryptos_mp_value_t *p, const size_t s_bits) {
     kryptos_mp_value_t *p_2 = NULL, *_2 = NULL;
     kryptos_task_result_t result = kKryptosProcessError;
     ssize_t d;
@@ -226,7 +226,7 @@ kryptos_task_result_t kryptos_dh_get_random_s(kryptos_mp_value_t **s, const kryp
         goto kryptos_dh_get_random_s_epilogue;
     }
 
-    (*s) = kryptos_new_mp_value(p->data_size << 3);
+    (*s) = kryptos_new_mp_value((s_bits == 0 || (s_bits >> 3) > p->data_size) ? p->data_size << 3 : s_bits);
 
     if ((*s) == NULL) {
         goto kryptos_dh_get_random_s_epilogue;

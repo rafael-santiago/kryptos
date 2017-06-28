@@ -1324,7 +1324,7 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
         div = mod = NULL;\
     }\
 }
-
+/*
     if (kryptos_mp_is_odd(n)) {
         for (t = e->data_size - 1; t >= 0; t--) {
             kryptos_mp_me_mod_n_mont(e, t, 7, A, m, n, mod);
@@ -1336,7 +1336,7 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
             kryptos_mp_me_mod_n_mont(e, t, 1, A, m, n, mod);
             kryptos_mp_me_mod_n_mont(e, t, 0, A, m, n, mod);
         }
-    } else {
+    } else {*/
         for (t = e->data_size - 1; t >= 0; t--) {
             kryptos_mp_me_mod_n(e, t, 7, A, m, n, div, mod);
             kryptos_mp_me_mod_n(e, t, 6, A, m, n, div, mod);
@@ -1347,7 +1347,7 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
             kryptos_mp_me_mod_n(e, t, 1, A, m, n, div, mod);
             kryptos_mp_me_mod_n(e, t, 0, A, m, n, div, mod);
         }
-    }
+/*    }*/
 
 #undef kryptos_mp_me_mod_n_mont
 
