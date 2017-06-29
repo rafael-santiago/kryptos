@@ -4266,6 +4266,142 @@ CUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
     kryptos_clear_dh_xchg_ctx(bob);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_dh_mk_key_pair_tests)
+    struct kryptos_dh_xchg_ctx key_ctx, *kp = &key_ctx;
+    kryptos_u8_t *k_pub = NULL, *k_priv = NULL;
+    size_t k_pub_size, k_priv_size;
+    kryptos_u8_t *pem_data;
+    size_t pem_data_size;
+
+    kryptos_dh_mk_key_pair(NULL, &k_pub_size, &k_priv, &k_priv_size, &kp);
+    CUTE_ASSERT(kryptos_last_task_succeed(kp) != 1);
+
+    kryptos_dh_mk_key_pair(&k_pub, NULL, &k_priv, &k_priv_size, &kp);
+    CUTE_ASSERT(kryptos_last_task_succeed(kp) != 1);
+
+    kryptos_dh_mk_key_pair(&k_pub, &k_pub_size, NULL, &k_priv_size, &kp);
+    CUTE_ASSERT(kryptos_last_task_succeed(kp) != 1);
+
+    kryptos_dh_mk_key_pair(&k_pub, &k_pub_size, &k_priv, NULL, &kp);
+    CUTE_ASSERT(kryptos_last_task_succeed(kp) != 1);
+
+    kryptos_dh_mk_key_pair(&k_pub, &k_pub_size, &k_priv, &k_priv_size, NULL);
+    CUTE_ASSERT(kryptos_last_task_succeed(kp) != 1);
+
+    // INFO(Rafael): Preparing our context.
+    kryptos_dh_init_xchg_ctx(kp);
+    CUTE_ASSERT(kryptos_dh_get_modp(kKryptosDHGroup1536, &kp->p, &kp->g) == kKryptosSuccess);
+    kp->s_bits = 8;
+
+    kryptos_dh_mk_key_pair(&k_pub, &k_pub_size, &k_priv, &k_priv_size, &kp);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(kp) == 1);
+    CUTE_ASSERT(k_pub != NULL);
+    CUTE_ASSERT(k_pub_size != 0);
+    CUTE_ASSERT(k_priv != NULL);
+    CUTE_ASSERT(k_priv_size != 0);
+
+    // INFO(Rafael): Verifying the public buffer, this must include: P, G and T but never S.
+
+    pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_P, k_pub, k_pub_size, &pem_data_size);
+    CUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
+    kryptos_freeseg(pem_data);
+
+    pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_G, k_pub, k_pub_size, &pem_data_size);
+    CUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
+    kryptos_freeseg(pem_data);
+
+    pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_T, k_pub, k_pub_size, &pem_data_size);
+    CUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
+    kryptos_freeseg(pem_data);
+
+    pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_S, k_pub, k_pub_size, &pem_data_size);
+    CUTE_ASSERT(pem_data == NULL);
+
+    // INFO(Rafael): Verifying the private buffer, this must include S and also P.
+
+    pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_S, k_priv, k_priv_size, &pem_data_size);
+    CUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
+    kryptos_freeseg(pem_data);
+
+    pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_P, k_priv, k_priv_size, &pem_data_size);
+    CUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
+    kryptos_freeseg(pem_data);
+
+    kryptos_clear_dh_xchg_ctx(kp);
+    kryptos_freeseg(k_pub);
+    kryptos_freeseg(k_priv);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
+    struct kryptos_dh_xchg_ctx alice_ctx, *alice = &alice_ctx, bob_ctx, *bob = &bob_ctx;
+    kryptos_u8_t *k_pub_bob = NULL, *k_priv_bob = NULL;
+    size_t k_pub_bob_size, k_priv_bob_size;
+
+    // INFO(Rafael): Bob generates his key pair and send his public key to Alice. This must be done only once.
+
+    kryptos_dh_init_xchg_ctx(bob);
+    CUTE_ASSERT(kryptos_dh_get_modp(kKryptosDHGroup1536, &bob->p, &bob->g) == kKryptosSuccess);
+    bob->s_bits = 8;
+
+    kryptos_dh_mk_key_pair(&k_pub_bob, &k_pub_bob_size, &k_priv_bob, &k_priv_bob_size, &bob);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    CUTE_ASSERT(k_pub_bob != NULL);
+    CUTE_ASSERT(k_pub_bob_size != 0);
+    CUTE_ASSERT(k_priv_bob != NULL);
+    CUTE_ASSERT(k_priv_bob_size != 0);
+
+    kryptos_clear_dh_xchg_ctx(bob);
+
+    // INFO(Rafael): Now, Alice wants to communicate with Bob...
+
+    kryptos_dh_init_xchg_ctx(alice);
+
+    alice->in = k_pub_bob;
+    alice->in_size = k_pub_bob_size;
+    alice->s_bits = 8;
+
+    kryptos_dh_process_modxchg(&alice);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+    CUTE_ASSERT(alice->out != NULL && alice->out_size != 0);
+    CUTE_ASSERT(alice->k != NULL);
+
+    // INFO(Rafael): Alice gets the private key session K and also the public value U. She sends U to Bob.
+    //               In order to successfully calculate the session K He also includes in his input his private key info.
+
+    bob->in_size = alice->out_size + k_priv_bob_size;
+    bob->in = (kryptos_u8_t *) kryptos_newseg(bob->in_size);
+    CUTE_ASSERT(bob->in != NULL);
+    memcpy(bob->in, alice->out, alice->out_size);
+    memcpy(bob->in + alice->out_size, k_priv_bob, k_priv_bob_size);
+
+    bob->s_bits = 8;
+
+    kryptos_dh_process_modxchg(&bob);
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    CUTE_ASSERT(bob->out == NULL && bob->out_size == 0); // INFO(Rafael): Bob does not need to send any data to Alice.
+    CUTE_ASSERT(bob->k != NULL);
+
+    // INFO(Rafael): Alice and Bob must agree each other about K.
+
+    CUTE_ASSERT(kryptos_mp_eq(alice->k, bob->k) == 1);
+
+    // INFO(Rafael): Parafraseando o Otto, Alice é do tempo do Bob, lá do Pina de Copacabana. On the wire o que ela gosta
+    //               de evitar é o man-in-the-middle. A-li-ce é do tem-po do Boooob. Lá do Pina de Copa-ca-baaaa-naaaa...
+    //               Críptico não?! "- Inquirrível!", diria Dr. Frankenstein. Mas o kryptos_dh_process_modxchg() is alive,
+    //               is alive!!! d:^p
+
+    alice->in = NULL;
+
+    kryptos_clear_dh_xchg_ctx(alice);
+    kryptos_clear_dh_xchg_ctx(bob);
+    kryptos_freeseg(k_pub_bob);
+    kryptos_freeseg(k_priv_bob);
+
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_pem_get_data_tests)
     kryptos_u8_t *buf = "-----BEGIN FOOBAR (1)-----\n"
                         "Rm9vYmFyMQ==\n"
@@ -4456,6 +4592,10 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     if (CUTE_GET_OPTION("skip-dh-xchg-tests") == NULL) {
         CUTE_RUN_TEST(kryptos_dh_standard_key_exchange_bare_bone_tests);
         CUTE_RUN_TEST(kryptos_dh_process_stdxchg_tests);
+        CUTE_RUN_TEST(kryptos_dh_mk_key_pair_tests);
+        CUTE_RUN_TEST(kryptos_dh_process_modxchg_tests);
+    } else {
+        printf("WARN: The Diffie-Hellman-Merkle exchange tests were skipped.\n");
     }
 
 //    CUTE_RUN_TEST(poke_bloody_poke);

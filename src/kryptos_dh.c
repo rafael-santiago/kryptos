@@ -197,6 +197,226 @@ static kryptos_task_result_t kryptos_dh_ld_parameter_from_input(const kryptos_u8
                                                                 const kryptos_u8_t *in, const size_t in_size,
                                                                 kryptos_mp_value_t **number);
 
+void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8_t **k_priv, size_t *k_priv_size,
+                            struct kryptos_dh_xchg_ctx **data) {
+
+    if (data == NULL) {
+        return;
+    }
+
+    if (k_pub == NULL || k_priv == NULL || k_pub_size == NULL || k_priv_size == NULL) {
+        (*data)->result = kKryptosInvalidParams;
+        (*data)->result_verbose = "NULL key pair pointers.";
+        return;
+    }
+
+    if ((*data)->p == NULL || (*data)->g == NULL) {
+        (*data)->result = kKryptosInvalidParams;
+        (*data)->result_verbose = "The p and g parameters cannot be NULL.";
+        return;
+    }
+
+    if ((*data)->s != NULL) {
+        kryptos_del_mp_value((*data)->s);
+    }
+
+    (*data)->result = kryptos_dh_get_random_s(&(*data)->s, (*data)->p, (*data)->s_bits);
+    if (!kryptos_last_task_succeed(*data)) {
+        (*data)->result_verbose = "Error while generating s.";
+        return;
+    }
+
+    (*data)->result = kryptos_dh_eval_t(&(*data)->t, (*data)->g, (*data)->s, (*data)->p);
+    if (!kryptos_last_task_succeed(*data)) {
+        (*data)->result_verbose = "Unable to get t.";
+        return;
+    }
+
+    if ((*k_pub) != NULL) {
+        kryptos_freeseg(*k_pub);
+    }
+
+    (*data)->result = kryptos_pem_put_data(k_pub,
+                                           k_pub_size,
+                                           KRYPTOS_DH_PEM_HDR_PARAM_P,
+                                           (*data)->p->data,
+                                           (*data)->p->data_size);
+    if (!kryptos_last_task_succeed(*data)) {
+        (*data)->result_verbose = "Unable to export p into the public buffer.";
+        return;
+    }
+
+    (*data)->result = kryptos_pem_put_data(k_pub,
+                                           k_pub_size,
+                                           KRYPTOS_DH_PEM_HDR_PARAM_G,
+                                           (*data)->g->data,
+                                           (*data)->g->data_size);
+    if (!kryptos_last_task_succeed(*data)) {
+        (*data)->result_verbose = "Unable to export g into the public buffer.";
+        return;
+    }
+
+    (*data)->result = kryptos_pem_put_data(k_pub,
+                                           k_pub_size,
+                                           KRYPTOS_DH_PEM_HDR_PARAM_T,
+                                           (*data)->t->data,
+                                           (*data)->t->data_size);
+    if (!kryptos_last_task_succeed(*data)) {
+        (*data)->result_verbose = "Unable to export t into the public buffer.";
+        return;
+    }
+
+    kryptos_del_mp_value((*data)->t);
+    (*data)->t = NULL;
+
+    if ((*k_priv) != NULL) {
+        kryptos_freeseg(*k_priv);
+    }
+
+    (*data)->result = kryptos_pem_put_data(k_priv,
+                                           k_priv_size,
+                                           KRYPTOS_DH_PEM_HDR_PARAM_S,
+                                           (*data)->s->data,
+                                           (*data)->s->data_size);
+
+    // INFO(Rafael): P is public but it is also relevant during the "decryption" at receiver's side. So let's simplify the
+    //               things to him/her putting all together in one place.
+
+    (*data)->result = kryptos_pem_put_data(k_priv,
+                                           k_priv_size,
+                                           KRYPTOS_DH_PEM_HDR_PARAM_P,
+                                           (*data)->p->data,
+                                           (*data)->p->data_size);
+
+    if (!kryptos_last_task_succeed(*data)) {
+        (*data)->result_verbose = "Unable to export s into the private buffer.";
+    }
+
+    kryptos_del_mp_value((*data)->s);
+    (*data)->s = NULL;
+}
+
+void kryptos_dh_process_modxchg(struct kryptos_dh_xchg_ctx **data) {
+    // INFO(Rafael): This modified implementation eliminates (or at least mitigates) man-in-the-middle attacks.
+
+    kryptos_u8_t *pem_data = NULL;
+    size_t pem_data_size;
+    kryptos_mp_value_t *u = NULL;
+
+    if (data == NULL) {
+        return;
+    }
+
+    (*data)->result = kryptos_dh_ld_parameter_from_input(KRYPTOS_DH_PEM_HDR_PARAM_U, (*data)->in, (*data)->in_size, &u);
+
+    if (!kryptos_last_task_succeed(*data)) {
+        // INFO(Rafael): This means that the user wants calculates K and also U (U will be sent to someone, calm down not you).
+        //               In other words, the caller is the sender.
+
+        // INFO(Rafael): Loading the receiver public key info...
+
+        (*data)->result = kryptos_dh_ld_parameter_from_input(KRYPTOS_DH_PEM_HDR_PARAM_P, (*data)->in, (*data)->in_size,
+                                                             &(*data)->p);
+        if (!kryptos_last_task_succeed(*data)) {
+            (*data)->result_verbose = "Unable to get p from input.";
+            return;
+        }
+
+        (*data)->result = kryptos_dh_ld_parameter_from_input(KRYPTOS_DH_PEM_HDR_PARAM_G, (*data)->in, (*data)->in_size,
+                                                             &(*data)->g);
+        if (!kryptos_last_task_succeed(*data)) {
+            (*data)->result_verbose = "Unable to get g from input.";
+            return;
+        }
+
+        (*data)->result = kryptos_dh_ld_parameter_from_input(KRYPTOS_DH_PEM_HDR_PARAM_T, (*data)->in, (*data)->in_size,
+                                                             &(*data)->t);
+        if (!kryptos_last_task_succeed(*data)) {
+            (*data)->result_verbose = "Unable to get t from input.";
+            return;
+        }
+
+        // INFO(Rafael): The sender will pick a random s.
+
+        (*data)->result = kryptos_dh_get_random_s(&(*data)->s, (*data)->p, (*data)->s_bits);
+        if (!kryptos_last_task_succeed(*data)) {
+            (*data)->result_verbose = "Error while generating s.";
+            return;
+        }
+
+        // INFO(Rafael): Now the sender calculates u.
+
+        (*data)->result = kryptos_dh_eval_t(&u, (*data)->g, (*data)->s, (*data)->p);
+        if (!kryptos_last_task_succeed(*data)) {
+            (*data)->result_verbose = "Unable to get u.";
+            return;
+        }
+
+        // INFO(Rafael): The sender also prepares this u for sending. If she/he wants to include the cryptogram into this
+        //               PEM and send all together is possible. But this is out of scope here...
+
+        (*data)->result = kryptos_pem_put_data(&(*data)->out,
+                                               &(*data)->out_size,
+                                               KRYPTOS_DH_PEM_HDR_PARAM_U,
+                                               u->data,
+                                               u->data_size);
+
+        if (!kryptos_last_task_succeed(*data)) {
+            (*data)->result_verbose = "Unable to export u into the output buffer.";
+            return;
+        }
+
+        kryptos_del_mp_value(u);
+
+        // INFO(Rafael): Now the sender calculates the session key.
+
+        (*data)->result = kryptos_dh_eval_t(&(*data)->k, (*data)->t, (*data)->s, (*data)->p);
+        if (!kryptos_last_task_succeed(*data)) {
+            (*data)->result_verbose = "Unable to get k.";
+            return;
+        }
+
+        kryptos_del_mp_value((*data)->p);
+        kryptos_del_mp_value((*data)->g);
+        kryptos_del_mp_value((*data)->t);
+        kryptos_del_mp_value((*data)->s);
+
+        (*data)->p = (*data)->g = (*data)->t = (*data)->s = NULL;
+    } else {
+        // INFO(Rafael): The caller is the receiver. Loading the receiver private key info...
+
+        (*data)->result = kryptos_dh_ld_parameter_from_input(KRYPTOS_DH_PEM_HDR_PARAM_P, (*data)->in, (*data)->in_size,
+                                                             &(*data)->p);
+        if (!kryptos_last_task_succeed(*data)) {
+            (*data)->result_verbose = "Unable to get p from input.";
+            return;
+        }
+
+        (*data)->result = kryptos_dh_ld_parameter_from_input(KRYPTOS_DH_PEM_HDR_PARAM_S, (*data)->in, (*data)->in_size,
+                                                             &(*data)->s);
+        if (!kryptos_last_task_succeed(*data)) {
+            (*data)->result_verbose = "Unable to get s from input.";
+            return;
+        }
+
+        // INFO(Rafael): Getting the session key.
+
+        (*data)->result = kryptos_dh_eval_t(&(*data)->k, u, (*data)->s, (*data)->p);
+        if (!kryptos_last_task_succeed(*data)) {
+            (*data)->result_verbose = "Unable to get k.";
+        }
+
+        kryptos_del_mp_value((*data)->p);
+        kryptos_del_mp_value((*data)->s);
+        kryptos_del_mp_value(u);
+
+        (*data)->p = (*data)->s = NULL;
+
+        // INFO(Rafael): No dialogue between the sender and receiver so no man-in-the-middle. If the input also includes
+        //               the cryptogram, it must be processed later, here this is out of scope.
+    }
+}
+
 void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data) {
     int at_sender_side = 1;
 

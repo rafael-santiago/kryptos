@@ -17,6 +17,10 @@
 
 #define KRYPTOS_DH_PEM_HDR_PARAM_T "DH PARAM T"
 
+#define KRYPTOS_DH_PEM_HDR_PARAM_S "DH PARAM S"
+
+#define KRYPTOS_DH_PEM_HDR_PARAM_U "DH PARAM U"
+
 typedef enum {
     kKryptosDHGroup1536 = 0,
     kKryptosDHGroup2048,
@@ -56,6 +60,11 @@ kryptos_task_result_t kryptos_dh_eval_t(kryptos_mp_value_t **t,
                                         const kryptos_mp_value_t *g, const kryptos_mp_value_t *s, const kryptos_mp_value_t *p);
 
 void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data);
+
+void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8_t **k_priv, size_t *k_priv_size,
+                            struct kryptos_dh_xchg_ctx **data);
+
+void kryptos_dh_process_modxchg(struct kryptos_dh_xchg_ctx **data);
 
 void kryptos_clear_dh_xchg_ctx(struct kryptos_dh_xchg_ctx *data);
 
