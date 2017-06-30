@@ -1981,6 +1981,90 @@ static kryptos_mp_value_t *kryptos_mp_montgomery_reduction_2kx_mod_y(const krypt
     return xt;
 }
 
+kryptos_mp_value_t *kryptos_mp_gcd(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b) {
+    kryptos_mp_value_t *x = NULL, *y = NULL;
+    kryptos_mp_value_t *g = NULL, *t = NULL, *gcd = NULL, *_0 = NULL;
+
+    if (a == NULL || b == NULL) {
+        return NULL;
+    }
+
+    if (kryptos_mp_gt(a, b)) {
+        x = kryptos_assign_mp_value(&x, a);
+        y = kryptos_assign_mp_value(&y, b);
+    } else {
+        x = kryptos_assign_mp_value(&x, b);
+        y = kryptos_assign_mp_value(&y, a);
+    }
+
+    if ((g = kryptos_hex_value_as_mp("1", 1)) == NULL) {
+        goto kryptos_mp_gcd_epilogue;
+    }
+
+    while (kryptos_mp_is_even(x) && kryptos_mp_is_even(y)) {
+        x = kryptos_mp_rsh(&x, 1);
+        y = kryptos_mp_rsh(&y, 1);
+        g = kryptos_mp_lsh(&g, 1);
+    }
+
+    if ((_0 = kryptos_hex_value_as_mp("0", 1)) == NULL) {
+        goto kryptos_mp_gcd_epilogue;
+    }
+
+    while (kryptos_mp_ne(x, _0)) {
+        while (kryptos_mp_is_even(x)) {
+            x = kryptos_mp_rsh(&x, 1);
+        }
+
+        while (kryptos_mp_is_even(y)) {
+            y = kryptos_mp_rsh(&y, 1);
+        }
+
+        if (kryptos_mp_lt(y, x)) {
+            t = kryptos_assign_mp_value(&t, x);
+            t = kryptos_mp_sub(&t, y);
+        } else {
+            t = kryptos_assign_mp_value(&t, y);
+            t = kryptos_mp_sub(&t, x);
+        }
+
+        t = kryptos_mp_rsh(&t, 1);
+
+        if (kryptos_mp_ge(x, y)) {
+            x = kryptos_assign_mp_value(&x, t);
+        } else {
+            y = kryptos_assign_mp_value(&y, t);
+        }
+    }
+
+    gcd = kryptos_assign_mp_value(&gcd, g);
+    gcd = kryptos_mp_mul(&gcd, y);
+
+kryptos_mp_gcd_epilogue:
+
+    if (x != NULL) {
+        kryptos_del_mp_value(x);
+    }
+
+    if (y != NULL) {
+        kryptos_del_mp_value(y);
+    }
+
+    if (g != NULL) {
+        kryptos_del_mp_value(g);
+    }
+
+    if (t != NULL) {
+        kryptos_del_mp_value(t);
+    }
+
+    if (_0 != NULL) {
+        kryptos_del_mp_value(_0);
+    }
+
+    return gcd;
+}
+
 #undef kryptos_mp_xnb
 
 #undef kryptos_mp_nbx

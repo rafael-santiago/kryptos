@@ -4388,10 +4388,9 @@ CUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
 
     CUTE_ASSERT(kryptos_mp_eq(alice->k, bob->k) == 1);
 
-    // INFO(Rafael): Parafraseando o Otto, Alice é do tempo do Bob, lá do Pina de Copacabana. On the wire o que ela gosta
-    //               de evitar é o man-in-the-middle. A-li-ce é do tem-po do Boooob. Lá do Pina de Copa-ca-baaaa-naaaa...
-    //               Críptico não?! "- Inquirrível!", diria Dr. Frankenstein. Mas o kryptos_dh_process_modxchg() is alive,
-    //               is alive!!! d:^p
+    // INFO(Rafael): Parafraseando o Otto: 'Alice é do tempo do Bob, lá do Pina de Copacabana. On the wire o que ela gosta
+    //               de evitar é o man-in-the-middle. A-li-ce é do tem-po do Boooob. Lá do Pina de Copa-ca-baaaa-naaaa...'
+    //               Críptico não?! '- Inquirrível!', diria Dr. Frankenstein. Mas a kryptos_dh_process_modxchg() is alive! d:^p
 
     alice->in = NULL;
 
@@ -4489,6 +4488,51 @@ CUTE_TEST_CASE(kryptos_mp_montgomery_reduction_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_gcd_tests)
+    struct gcd_tests_ctx {
+        kryptos_u8_t *x, *y, *gcd;
+    };
+    struct gcd_tests_ctx test_vector[] = {
+        {                              "6E4",                             "364",   "1C" },
+        {                                "D",                               "D",    "D" },
+        {                               "25",                             "258",    "1" },
+        {                               "14",                              "64",   "14" },
+        {                            "98601",                          "1F74CD", "49E1" },
+        { "29EC3865B1400AC43088F02295967869"
+          "D9366A9C1CCD15349E1FD4FE419F9433"
+          "36ED7A6BD33FCFC9831D3809FDFE6631"
+          "D8C4984BFA7A86D367D5D54EB7D9DAC4"
+          "94AE7576332F8863BF6C657A3BF6C657"
+          "A3BF6C657A3BF6C657A3BF",          "999E0D9FCCD8F2508E2B1EEACF8462A8"
+                                             "47F8F57A7B4FEBB480442C646D08E4C5"
+                                             "E28D20DE9D804032DB83D29A5EA0A6E8"
+                                             "47AAEEB7208AC801120D9034E9C6E7D8"
+                                             "E43B497E067005EB2FA17B8BA3FB27FE"
+                                             "9EB96EC25D101DD64AE7A363328",         "3" }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *x, *y, *g, *eg;
+    for (tv = 0; tv < tv_nr; tv++) {
+        x = kryptos_hex_value_as_mp(test_vector[tv].x, strlen(test_vector[tv].x));
+        CUTE_ASSERT(x != NULL);
+        y = kryptos_hex_value_as_mp(test_vector[tv].y, strlen(test_vector[tv].y));
+        CUTE_ASSERT(y != NULL);
+        eg = kryptos_hex_value_as_mp(test_vector[tv].gcd, strlen(test_vector[tv].gcd));
+        CUTE_ASSERT(eg != NULL);
+        g = kryptos_mp_gcd(x, y);
+        CUTE_ASSERT(g != NULL);
+        CUTE_ASSERT(kryptos_mp_eq(g, eg) == 1);
+        kryptos_del_mp_value(g);
+        g = kryptos_mp_gcd(y, x);
+        CUTE_ASSERT(g != NULL);
+        CUTE_ASSERT(kryptos_mp_eq(g, eg) == 1);
+        kryptos_del_mp_value(g);
+        kryptos_del_mp_value(x);
+        kryptos_del_mp_value(y);
+        kryptos_del_mp_value(eg);
+    }
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_test_monkey)
     // CLUE(Rafael): Before adding a new test try to find out the best place that it fits.
     //               At first glance you should consider the utility that it implements into the library.
@@ -4580,8 +4624,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_is_prime_tests);
     CUTE_RUN_TEST(kryptos_mp_gen_prime_tests);
     //CUTE_RUN_TEST(kryptos_mp_gen_prime_2k1_tests);
-
     CUTE_RUN_TEST(kryptos_mp_montgomery_reduction_tests);
+    CUTE_RUN_TEST(kryptos_mp_gcd_tests);
 
     // INFO(Rafael): Asymmetric stuff
 
