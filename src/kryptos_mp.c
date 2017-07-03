@@ -2291,6 +2291,45 @@ kryptos_mp_modinv_epilogue:
     return a;
 }
 
+kryptos_mp_value_t *kryptos_mp_not(kryptos_mp_value_t *n) {
+    ssize_t d;
+
+    if (n == NULL) {
+        return NULL;
+    }
+
+    for (d = n->data_size - 1; d >= 0; d--) {
+        n->data[d] = ~n->data[d];
+    }
+
+    return n;
+}
+
+kryptos_mp_value_t *kryptos_mp_get_unsigned(kryptos_mp_value_t *n) {
+    kryptos_mp_value_t *_1 = NULL;
+
+    if (n == NULL) {
+        return NULL;
+    }
+
+    if ((n = kryptos_mp_not(n)) == NULL) {
+        return NULL;
+    }
+
+    if ((_1 = kryptos_hex_value_as_mp("1", 1)) == NULL) {
+        return NULL;
+    }
+
+    if ((n = kryptos_mp_add(&n, _1)) == NULL) {
+        kryptos_del_mp_value(_1);
+        return NULL;
+    }
+
+    kryptos_del_mp_value(_1);
+
+    return n;
+}
+
 #undef kryptos_mp_xnb
 
 #undef kryptos_mp_nbx

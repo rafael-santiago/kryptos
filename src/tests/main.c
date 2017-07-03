@@ -3452,6 +3452,75 @@ CUTE_TEST_CASE(kryptos_mp_mul_tests)
 
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_not_tests)
+    struct not_tests_ctx {
+        kryptos_u8_t *n, *en;
+    };
+    struct not_tests_ctx test_vector[] = {
+        {               "FE",                "1" },
+        {                "1",               "FE" },
+        {             "FFFE",                "1" },
+        {             "0001",             "FFFE" },
+        {         "FFFFFFFE",         "00000001" },
+        {         "00000001",         "FFFFFFFE" },
+        { "FFFFFFFFFFFFFFFE", "0000000000000001" },
+        { "0000000000000001", "FFFFFFFFFFFFFFFE" }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *n, *en;
+    for (tv = 0; tv < tv_nr; tv++) {
+        n = kryptos_hex_value_as_mp(test_vector[tv].n, strlen(test_vector[tv].n));
+        CUTE_ASSERT(n != NULL);
+        en = kryptos_hex_value_as_mp(test_vector[tv].en, strlen(test_vector[tv].en));
+        CUTE_ASSERT(en != NULL);
+        n = kryptos_mp_not(n);
+        CUTE_ASSERT(kryptos_mp_eq(n, en) == 1);
+        kryptos_del_mp_value(n);
+        kryptos_del_mp_value(en);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_get_unsigned_tests)
+    struct get_unsigned_tests_ctx {
+        kryptos_u8_t *n, *en;
+    };
+    // INFO(Rafael): This is equivalent to the C's char type range (-128 to 128).
+    //               We could continue testing beyound the infinity but I am in a rush.
+    struct get_unsigned_tests_ctx test_vector[] = {
+        { "FF", "01" }, { "FE", "02" }, { "FD", "03" }, { "FC", "04" }, { "FB", "05" }, { "FA", "06" }, { "F9", "07" },
+        { "F8", "08" }, { "F7", "09" }, { "F6", "0A" }, { "F5", "0B" }, { "F4", "0C" }, { "F3", "0D" }, { "F2", "0E" },
+        { "F1", "0F" }, { "F0", "10" }, { "EF", "11" }, { "EE", "12" }, { "ED", "13" }, { "EC", "14" }, { "EB", "15" },
+        { "EA", "16" }, { "E9", "17" }, { "E8", "18" }, { "E7", "19" }, { "E6", "1A" }, { "E5", "1B" }, { "E4", "1C" },
+        { "E3", "1D" }, { "E2", "1E" }, { "E1", "1F" }, { "E0", "20" }, { "DF", "21" }, { "DE", "22" }, { "DD", "23" },
+        { "DC", "24" }, { "DB", "25" }, { "DA", "26" }, { "D9", "27" }, { "D8", "28" }, { "D7", "29" }, { "D6", "2A" },
+        { "D5", "2B" }, { "D4", "2C" }, { "D3", "2D" }, { "D2", "2E" }, { "D1", "2F" }, { "D0", "30" }, { "CF", "31" },
+        { "CE", "32" }, { "CD", "33" }, { "CC", "34" }, { "CB", "35" }, { "CA", "36" }, { "C9", "37" }, { "C8", "38" },
+        { "C7", "39" }, { "C6", "3A" }, { "C5", "3B" }, { "C4", "3C" }, { "C3", "3D" }, { "C2", "3E" }, { "C1", "3F" },
+        { "C0", "40" }, { "BF", "41" }, { "BE", "42" }, { "BD", "43" }, { "BC", "44" }, { "BB", "45" }, { "BA", "46" },
+        { "B9", "47" }, { "B8", "48" }, { "B7", "49" }, { "B6", "4A" }, { "B5", "4B" }, { "B4", "4C" }, { "B3", "4D" },
+        { "B2", "4E" }, { "B1", "4F" }, { "B0", "50" }, { "AF", "51" }, { "AE", "52" }, { "AD", "53" }, { "AC", "54" },
+        { "AB", "55" }, { "AA", "56" }, { "A9", "57" }, { "A8", "58" }, { "A7", "59" }, { "A6", "5A" }, { "A5", "5B" },
+        { "A4", "5C" }, { "A3", "5D" }, { "A2", "5E" }, { "A1", "5F" }, { "A0", "60" }, { "9F", "61" }, { "9E", "62" },
+        { "9D", "63" }, { "9C", "64" }, { "9B", "65" }, { "9A", "66" }, { "99", "67" }, { "98", "68" }, { "97", "69" },
+        { "96", "6A" }, { "95", "6B" }, { "94", "6C" }, { "93", "6D" }, { "92", "6E" }, { "91", "6F" }, { "90", "70" },
+        { "8F", "71" }, { "8E", "72" }, { "8D", "73" }, { "8C", "74" }, { "8B", "75" }, { "8A", "76" }, { "89", "77" },
+        { "88", "78" }, { "87", "79" }, { "86", "7A" }, { "85", "7B" }, { "84", "7C" }, { "83", "7D" }, { "82", "7E" },
+        { "81", "7F" }, { "80", "80" }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *n, *en;
+    for (tv = 0; tv < tv_nr; tv++) {
+        n = kryptos_hex_value_as_mp(test_vector[tv].n, strlen(test_vector[tv].n));
+        CUTE_ASSERT(n != NULL);
+        en = kryptos_hex_value_as_mp(test_vector[tv].en, strlen(test_vector[tv].en));
+        CUTE_ASSERT(en != NULL);
+        n = kryptos_mp_get_unsigned(n);
+        CUTE_ASSERT(kryptos_mp_eq(n, en) == 1);
+        kryptos_del_mp_value(n);
+        kryptos_del_mp_value(en);
+    }
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_mp_div_tests)
     kryptos_mp_value_t *x, *y, *q, *r, *eq, *er;
     struct div_tests_ctx {
@@ -4669,6 +4738,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_add_tests);
     CUTE_RUN_TEST(kryptos_mp_sub_tests);
     CUTE_RUN_TEST(kryptos_mp_mul_tests);
+    CUTE_RUN_TEST(kryptos_mp_not_tests);
+    CUTE_RUN_TEST(kryptos_mp_get_unsigned_tests);
     CUTE_RUN_TEST(kryptos_mp_lsh_tests);
     CUTE_RUN_TEST(kryptos_mp_rsh_tests);
     CUTE_RUN_TEST(kryptos_mp_div_tests);
@@ -4684,7 +4755,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     //CUTE_RUN_TEST(kryptos_mp_gen_prime_2k1_tests);
     CUTE_RUN_TEST(kryptos_mp_montgomery_reduction_tests);
     CUTE_RUN_TEST(kryptos_mp_gcd_tests);
-//    CUTE_RUN_TEST(kryptos_mp_modinv_tests);
+    //CUTE_RUN_TEST(kryptos_mp_modinv_tests);
 
     // INFO(Rafael): Asymmetric stuff
 

@@ -84,4 +84,8 @@ kryptos_mp_value_t *kryptos_mp_gcd(const kryptos_mp_value_t *a, const kryptos_mp
 
 kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *a, const kryptos_mp_value_t *m);
 
+kryptos_mp_value_t *kryptos_mp_not(kryptos_mp_value_t *n);
+
+kryptos_mp_value_t *kryptos_mp_get_unsigned(kryptos_mp_value_t *n);
+
 #endif
