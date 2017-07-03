@@ -3480,13 +3480,13 @@ CUTE_TEST_CASE(kryptos_mp_not_tests)
     }
 CUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_mp_get_unsigned_tests)
-    struct get_unsigned_tests_ctx {
+CUTE_TEST_CASE(kryptos_mp_inv_signal_tests)
+    struct inv_signal_tests_ctx {
         kryptos_u8_t *n, *en;
     };
     // INFO(Rafael): This is equivalent to the "signed char" range (-128 to 128).
     //               We could continue testing beyond the infinity but I am in a rush.
-    struct get_unsigned_tests_ctx test_vector[] = {
+    struct inv_signal_tests_ctx test_vector[] = {
         { "FF", "01" }, { "FE", "02" }, { "FD", "03" }, { "FC", "04" }, { "FB", "05" }, { "FA", "06" }, { "F9", "07" },
         { "F8", "08" }, { "F7", "09" }, { "F6", "0A" }, { "F5", "0B" }, { "F4", "0C" }, { "F3", "0D" }, { "F2", "0E" },
         { "F1", "0F" }, { "F0", "10" }, { "EF", "11" }, { "EE", "12" }, { "ED", "13" }, { "EC", "14" }, { "EB", "15" },
@@ -3514,10 +3514,68 @@ CUTE_TEST_CASE(kryptos_mp_get_unsigned_tests)
         CUTE_ASSERT(n != NULL);
         en = kryptos_hex_value_as_mp(test_vector[tv].en, strlen(test_vector[tv].en));
         CUTE_ASSERT(en != NULL);
-        n = kryptos_mp_get_unsigned(n);
+        n = kryptos_mp_inv_signal(n);
         CUTE_ASSERT(kryptos_mp_eq(n, en) == 1);
         kryptos_del_mp_value(n);
         kryptos_del_mp_value(en);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_signed_add_tests)
+    struct signed_add_tests_ctx {
+        int a_neg;
+        kryptos_u8_t *a;
+        int b_neg;
+        kryptos_u8_t *b;
+        kryptos_u8_t *s;
+    };
+    kryptos_mp_value_t *a, *b, *s;
+    struct signed_add_tests_ctx test_vector[] = {
+        { 1, "02", 0, "04", "02" },
+        { 0, "02", 1, "04", "FE" },
+        { 1, "02", 1, "04", "FA" },
+        { 1, "02", 1, "02", "FC" },
+        { 1, "02", 0, "02", "00" },
+        { 1, "02", 0,  "A", "08" },
+        { 1, "02", 1,  "A", "F4" },
+        { 0, "02", 1,  "A", "F8" }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
+
+        CUTE_ASSERT(a != NULL);
+
+        if (test_vector[tv].a_neg) {
+            a = kryptos_mp_inv_signal(a);
+        }
+
+        CUTE_ASSERT(a != NULL);
+
+        b = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));
+
+        CUTE_ASSERT(b != NULL);
+
+        if (test_vector[tv].b_neg) {
+            b = kryptos_mp_inv_signal(b);
+        }
+
+        CUTE_ASSERT(b != NULL);
+
+        CUTE_ASSERT(a != NULL);
+
+        s = kryptos_hex_value_as_mp(test_vector[tv].s, strlen(test_vector[tv].s));
+
+        CUTE_ASSERT(s != NULL);
+
+        a = kryptos_mp_signed_add(&a, b);
+
+        CUTE_ASSERT(kryptos_mp_eq(a, s) == 1);
+
+        kryptos_del_mp_value(a);
+        kryptos_del_mp_value(b);
+        kryptos_del_mp_value(s);
     }
 CUTE_TEST_CASE_END
 
@@ -4739,7 +4797,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_sub_tests);
     CUTE_RUN_TEST(kryptos_mp_mul_tests);
     CUTE_RUN_TEST(kryptos_mp_not_tests);
-    CUTE_RUN_TEST(kryptos_mp_get_unsigned_tests);
+    CUTE_RUN_TEST(kryptos_mp_inv_signal_tests);
+    CUTE_RUN_TEST(kryptos_mp_signed_add_tests);
     CUTE_RUN_TEST(kryptos_mp_lsh_tests);
     CUTE_RUN_TEST(kryptos_mp_rsh_tests);
     CUTE_RUN_TEST(kryptos_mp_div_tests);

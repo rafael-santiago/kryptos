@@ -2305,7 +2305,7 @@ kryptos_mp_value_t *kryptos_mp_not(kryptos_mp_value_t *n) {
     return n;
 }
 
-kryptos_mp_value_t *kryptos_mp_get_unsigned(kryptos_mp_value_t *n) {
+kryptos_mp_value_t *kryptos_mp_inv_signal(kryptos_mp_value_t *n) {
     kryptos_mp_value_t *_1 = NULL;
 
     if (n == NULL) {
@@ -2328,6 +2328,53 @@ kryptos_mp_value_t *kryptos_mp_get_unsigned(kryptos_mp_value_t *n) {
     kryptos_del_mp_value(_1);
 
     return n;
+}
+
+kryptos_mp_value_t *kryptos_mp_signed_add(kryptos_mp_value_t **dest, kryptos_mp_value_t *src) {
+    int is_dest_neg = 0, is_src_neg = 0, dest_gt_src = 0;
+    kryptos_mp_value_t *d = NULL, *s = NULL;
+
+    if (dest == NULL || src == NULL) {
+        return NULL;
+    }
+
+    d = kryptos_assign_mp_value(&d, *dest);
+    s = kryptos_assign_mp_value(&s, src);
+
+    if ((is_dest_neg = kryptos_mp_is_neg(d)) == 1) {
+        d = kryptos_mp_inv_signal(d);
+    }
+
+    if ((is_src_neg = kryptos_mp_is_neg(s)) == 1) {
+        s = kryptos_mp_inv_signal(s);
+    }
+
+    dest_gt_src = kryptos_mp_gt(d, s);
+
+    if (is_dest_neg != is_src_neg) {
+        if (dest_gt_src == 0) {
+            s = kryptos_mp_sub(&s, d);
+            d = kryptos_assign_mp_value(&d, s);
+            if (is_src_neg) {
+                d = kryptos_mp_inv_signal(d);
+            }
+        } else {
+            d = kryptos_mp_sub(&d, s);
+            d = kryptos_mp_inv_signal(d);
+        }
+    } else {
+        d = kryptos_mp_add(&d, s);
+        if (is_dest_neg) {
+            d = kryptos_mp_inv_signal(d);
+        }
+    }
+
+    kryptos_assign_mp_value(dest, d);
+
+    kryptos_del_mp_value(d);
+    kryptos_del_mp_value(s);
+
+    return (*dest);
 }
 
 #undef kryptos_mp_xnb
