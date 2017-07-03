@@ -3484,8 +3484,8 @@ CUTE_TEST_CASE(kryptos_mp_get_unsigned_tests)
     struct get_unsigned_tests_ctx {
         kryptos_u8_t *n, *en;
     };
-    // INFO(Rafael): This is equivalent to the C's char type range (-128 to 128).
-    //               We could continue testing beyound the infinity but I am in a rush.
+    // INFO(Rafael): This is equivalent to the "signed char" range (-128 to 128).
+    //               We could continue testing beyond the infinity but I am in a rush.
     struct get_unsigned_tests_ctx test_vector[] = {
         { "FF", "01" }, { "FE", "02" }, { "FD", "03" }, { "FC", "04" }, { "FB", "05" }, { "FA", "06" }, { "F9", "07" },
         { "F8", "08" }, { "F7", "09" }, { "F6", "0A" }, { "F5", "0B" }, { "F4", "0C" }, { "F3", "0D" }, { "F2", "0E" },
