@@ -88,6 +88,14 @@ kryptos_mp_value_t *kryptos_mp_not(kryptos_mp_value_t *n);
 
 kryptos_mp_value_t *kryptos_mp_inv_signal(kryptos_mp_value_t *n);
 
-kryptos_mp_value_t *kryptos_mp_signed_add(kryptos_mp_value_t **dest, kryptos_mp_value_t *src);
+// INFO(Rafael): Since addition and subtraction are reciprocal for integers.
+//               The differentiation between them is merely a theoretical fiction, so,
+//               all we need to create are fancy mnemonics.
+
+#define kryptos_mp_signed_add(d, s) ( kryptos_mp_int_add((d), (s)) )
+
+#define kryptos_mp_signed_sub(d, s) ( kryptos_mp_int_add((d), (s)) )
+
+kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest, kryptos_mp_value_t *src);
 
 #endif
