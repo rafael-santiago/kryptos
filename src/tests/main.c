@@ -20,7 +20,6 @@
 #include <kryptos_hash_common.h>
 #include <kryptos_huffman.h>
 #include <kryptos_mp.h>
-#include <kryptos_dh.h>
 #include <kryptos_pem.h>
 #include "test_vectors.h"
 #include <stdlib.h>
@@ -3194,6 +3193,33 @@ CUTE_TEST_CASE(kryptos_mp_le_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_is_neg_tests)
+    struct is_neg_tests_ctx {
+        kryptos_u8_t *v;
+        int is_neg;
+    };
+    struct is_neg_tests_ctx test_vector[] = {
+        {                "2", 0 },
+        {               "FE", 1 },
+        {             "0002", 0 },
+        {             "FFFE", 1 },
+        {         "0000000A", 0 },
+        {         "FFFFFFF6", 1 },
+        {         "21524111", 0 },
+        {         "DEADBEEF", 1 },
+        { "2152411021524111", 0 },
+        { "DEADBEEFDEADBEEF", 1 }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *v;
+    for (tv = 0; tv < tv_nr; tv++) {
+        v = kryptos_hex_value_as_mp(test_vector[tv].v, strlen(test_vector[tv].v));
+        CUTE_ASSERT(v != NULL);
+        CUTE_ASSERT(kryptos_mp_is_neg(v) == test_vector[tv].is_neg);
+        kryptos_del_mp_value(v);
+    }
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_mp_add_tests)
     kryptos_mp_value_t *a, *b, *e;
     struct add_tests_ctx {
@@ -3202,7 +3228,7 @@ CUTE_TEST_CASE(kryptos_mp_add_tests)
     struct add_tests_ctx test_vector[] = {
         {       "01",       "01",        "02" },
         {       "02",       "0A",        "0C" },
-        {     "DEAD",     "BEEF",     "19D9C" },
+        {     "DEAD",     "BEEF",      "9D9C" },
         {     "6671",       "00",      "6671" },
         { "DEADBEEF",     "BEEF",  "DEAE7DDE" },
         { "DEADBEEF", "DEADBEEF", "1BD5B7DDE" },
@@ -3266,11 +3292,11 @@ CUTE_TEST_CASE(kryptos_mp_sub_tests)
         {               "06",       "02",               "04" },
         {             "2001",     "1006",              "FFB" },
         {             "DEAD",     "BEEF",             "1FBE" },
-        {             "BEEF",     "DEAD",            "FE042" },
-        {               "01",       "02",              "FFF" },
+        {             "BEEF",     "DEAD",             "E042" },
+        {               "01",       "02",               "FF" },
         {         "DEADBEEF", "BEEFDEAD",         "1FBDE042" },
-        {                "5",     "1006",            "FEFFF" },
-        {               "10",     "1006",            "FF00A" },
+        {                "5",     "1006",             "EFFF" },
+        {               "10",     "1006",             "F00A" },
         { "BABABABABABABABA",       "FD", "BABABABABABAB9BD" },
         { "2B2CC74FC1B75D0F"
           "9C18DC99223085A5"
@@ -4533,6 +4559,37 @@ CUTE_TEST_CASE(kryptos_mp_gcd_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_modinv_tests)
+    struct egcd_tests_ctx {
+        kryptos_u8_t *a, *m, *v;
+    };
+    struct egcd_tests_ctx test_vector[] = {
+//        { "10F", "17F", "6A" },
+//        { "3", "14", "7" },
+        { "1819E5B", "8F5B23580", "6BE56E4D3" },
+//        { "3", "7", "5" }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *a, *m, *ev, *v;
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
+        CUTE_ASSERT(a != NULL);
+        m = kryptos_hex_value_as_mp(test_vector[tv].m, strlen(test_vector[tv].m));
+        CUTE_ASSERT(m != NULL);
+        ev = kryptos_hex_value_as_mp(test_vector[tv].v, strlen(test_vector[tv].v));
+        CUTE_ASSERT(ev != NULL);
+        v = kryptos_mp_modinv(a, m);
+        CUTE_ASSERT(v != NULL);
+printf("V = "); print_mp(v);
+        CUTE_ASSERT(kryptos_mp_eq(v, ev) == 1);
+        kryptos_del_mp_value(a);
+        kryptos_del_mp_value(m);
+        kryptos_del_mp_value(ev);
+        kryptos_del_mp_value(v);
+    }
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_test_monkey)
     // CLUE(Rafael): Before adding a new test try to find out the best place that it fits.
     //               At first glance you should consider the utility that it implements into the library.
@@ -4608,6 +4665,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_ge_tests);
     CUTE_RUN_TEST(kryptos_mp_lt_tests);
     CUTE_RUN_TEST(kryptos_mp_le_tests);
+    CUTE_RUN_TEST(kryptos_mp_is_neg_tests);
     CUTE_RUN_TEST(kryptos_mp_add_tests);
     CUTE_RUN_TEST(kryptos_mp_sub_tests);
     CUTE_RUN_TEST(kryptos_mp_mul_tests);
@@ -4626,6 +4684,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     //CUTE_RUN_TEST(kryptos_mp_gen_prime_2k1_tests);
     CUTE_RUN_TEST(kryptos_mp_montgomery_reduction_tests);
     CUTE_RUN_TEST(kryptos_mp_gcd_tests);
+//    CUTE_RUN_TEST(kryptos_mp_modinv_tests);
 
     // INFO(Rafael): Asymmetric stuff
 

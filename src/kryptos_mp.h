@@ -34,6 +34,8 @@ int kryptos_mp_eq(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
 
 const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
 
+#define kryptos_mp_is_neg(a) ( (a->data[a->data_size - 1] >> 7) )
+
 #define kryptos_mp_ne(a, b) ( kryptos_mp_eq((a), (b)) == 0 )
 
 #define kryptos_mp_gt(a, b) ( kryptos_mp_ne((a), (b)) && kryptos_mp_get_gt((a), (b)) == (a) )
@@ -79,5 +81,7 @@ void print_mp(const kryptos_mp_value_t *v);
 kryptos_mp_value_t *kryptos_mp_div_2p(const kryptos_mp_value_t *x, const kryptos_u32_t power, kryptos_mp_value_t **r);
 
 kryptos_mp_value_t *kryptos_mp_gcd(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
+
+kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *a, const kryptos_mp_value_t *m);
 
 #endif
