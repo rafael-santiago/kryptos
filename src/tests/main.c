@@ -3536,9 +3536,10 @@ CUTE_TEST_CASE(kryptos_mp_signed_add_tests)
         { 1, "02", 1, "04", "FA" },
         { 1, "02", 1, "02", "FC" },
         { 1, "02", 0, "02", "00" },
-        { 1, "02", 0,  "A", "08" },
-        { 1, "02", 1,  "A", "F4" },
-        { 0, "02", 1,  "A", "F8" }
+        { 1, "02", 0, "0A", "08" },
+        { 1, "02", 1, "0A", "F4" },
+        { 0, "02", 1, "0A", "F8" },
+        { 0, "07", 0, "07", "0E" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
 
@@ -3595,7 +3596,8 @@ CUTE_TEST_CASE(kryptos_mp_signed_sub_tests)
     struct signed_sub_tests_ctx test_vector[] = {
         { 0, "13", 1, "0C", "07" },
         { 1, "13", 0, "0C", "F9" },
-        { 1, "13", 1, "0C", "E1" }
+        { 1, "13", 1, "0C", "E1" },
+        { 0, "07", 0, "07", "00" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
 
@@ -4159,12 +4161,12 @@ CUTE_TEST_CASE(kryptos_mp_lsh_tests)
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_mp_rsh_tests)
-    struct lsh_tests_ctx {
+    struct rsh_tests_ctx {
         kryptos_u8_t *a;
         int l;
         kryptos_u8_t *e;
     };
-    struct lsh_tests_ctx test_vector[] = {
+    struct rsh_tests_ctx test_vector[] = {
         {        "2",  1,             "1" },
         {       "10",  4,             "1" },
         {       "10", 16,             "0" },
@@ -4197,6 +4199,40 @@ CUTE_TEST_CASE(kryptos_mp_rsh_tests)
         kryptos_del_mp_value(e);
     }
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_signed_rsh_tests)
+    struct signed_rsh_tests_ctx {
+        kryptos_u8_t *a;
+        int l;
+        kryptos_u8_t *e;
+    };
+    struct signed_rsh_tests_ctx test_vector[] = {
+        {        "FEF2",  1,       "FF79" },
+        {        "7FF2",  1,       "3FF9" },
+        {        "FFFF", 10,       "FFFF" },
+        {        "00FF",  3,       "001F" }
+    };
+    size_t test_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;
+    kryptos_mp_value_t *a, *e;
+    ssize_t d;
+
+    for (t = 0; t < test_nr; t++) {
+        a = kryptos_hex_value_as_mp(test_vector[t].a, strlen(test_vector[t].a));
+        e = kryptos_hex_value_as_mp(test_vector[t].e, strlen(test_vector[t].e));
+
+        CUTE_ASSERT(a != NULL && e != NULL);
+
+        a = kryptos_mp_signed_rsh(&a, test_vector[t].l);
+
+        CUTE_ASSERT(a != NULL);
+
+        CUTE_ASSERT(kryptos_mp_eq(a, e) == 1);
+
+        kryptos_del_mp_value(a);
+        kryptos_del_mp_value(e);
+    }
+CUTE_TEST_CASE_END
+
 
 CUTE_TEST_CASE(kryptos_mp_miller_rabin_test_tests)
     struct miller_rabin_test_ctx {
@@ -4793,10 +4829,10 @@ CUTE_TEST_CASE(kryptos_mp_modinv_tests)
         kryptos_u8_t *a, *m, *v;
     };
     struct egcd_tests_ctx test_vector[] = {
-//        { "10F", "17F", "6A" },
-//        { "3", "14", "7" },
-        { "1819E5B", "8F5B23580", "6BE56E4D3" },
-//        { "3", "7", "5" }
+        { "10F", "17F", "6A" },
+        { "3", "14", "7" },
+//        { "1819E5B", "8F5B23580", "6BE56E4D3" },
+        { "3", "7", "5" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     kryptos_mp_value_t *a, *m, *ev, *v;
@@ -4810,7 +4846,7 @@ CUTE_TEST_CASE(kryptos_mp_modinv_tests)
         CUTE_ASSERT(ev != NULL);
         v = kryptos_mp_modinv(a, m);
         CUTE_ASSERT(v != NULL);
-printf("V = "); print_mp(v);
+//printf("V = "); print_mp(v);
         CUTE_ASSERT(kryptos_mp_eq(v, ev) == 1);
         kryptos_del_mp_value(a);
         kryptos_del_mp_value(m);
@@ -4905,6 +4941,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_signed_mul_tests);
     CUTE_RUN_TEST(kryptos_mp_lsh_tests);
     CUTE_RUN_TEST(kryptos_mp_rsh_tests);
+    CUTE_RUN_TEST(kryptos_mp_signed_rsh_tests);
     CUTE_RUN_TEST(kryptos_mp_div_tests);
     CUTE_RUN_TEST(kryptos_mp_div_2p_tests);
     CUTE_RUN_TEST(kryptos_mp_pow_tests);
@@ -4918,7 +4955,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     //CUTE_RUN_TEST(kryptos_mp_gen_prime_2k1_tests);
     CUTE_RUN_TEST(kryptos_mp_montgomery_reduction_tests);
     CUTE_RUN_TEST(kryptos_mp_gcd_tests);
-    //CUTE_RUN_TEST(kryptos_mp_modinv_tests);
+//    CUTE_RUN_TEST(kryptos_mp_modinv_tests);
 
     // INFO(Rafael): Asymmetric stuff
 

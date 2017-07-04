@@ -34,7 +34,7 @@ int kryptos_mp_eq(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
 
 const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
 
-#define kryptos_mp_is_neg(a) ( (a->data[a->data_size - 1] >> 7) )
+#define kryptos_mp_is_neg(a) ( ((a)->data[(a)->data_size - 1] >> 7) )
 
 #define kryptos_mp_ne(a, b) ( kryptos_mp_eq((a), (b)) == 0 )
 
@@ -68,7 +68,11 @@ int kryptos_mp_fermat_test(const kryptos_mp_value_t *n, const int k);
 
 kryptos_mp_value_t *kryptos_mp_lsh(kryptos_mp_value_t **a, const int level);
 
-kryptos_mp_value_t *kryptos_mp_rsh(kryptos_mp_value_t **a, const int level);
+kryptos_mp_value_t *kryptos_mp_rsh_op(kryptos_mp_value_t **a, const int level, const int signed_op);
+
+#define kryptos_mp_rsh(a, l) ( kryptos_mp_rsh_op((a), (l), 0) )
+
+#define kryptos_mp_signed_rsh(a, l) ( kryptos_mp_rsh_op((a), (l), 1) )
 
 kryptos_mp_value_t *kryptos_mp_gen_prime(const size_t bitsize, const int fast_method);
 
@@ -92,11 +96,13 @@ kryptos_mp_value_t *kryptos_mp_inv_signal(kryptos_mp_value_t *n);
 //               The differentiation between them is merely a theoretical fiction, so,
 //               all we need to create are fancy mnemonics.
 
-#define kryptos_mp_signed_add(d, s) ( kryptos_mp_int_add((d), (s)) )
+#define kryptos_mp_signed_add(d, s) ( kryptos_mp_int_add((d), (s), kryptos_mp_add) )
 
-#define kryptos_mp_signed_sub(d, s) ( kryptos_mp_int_add((d), (s)) )
+#define kryptos_mp_signed_sub(d, s) ( kryptos_mp_int_add((d), (s), kryptos_mp_sub) )
 
-kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src);
+kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest,
+                                       const kryptos_mp_value_t *src,
+                                       kryptos_mp_value_t *(*op)(kryptos_mp_value_t **, const kryptos_mp_value_t *));
 
 kryptos_mp_value_t *kryptos_mp_signed_mul(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src);
 
