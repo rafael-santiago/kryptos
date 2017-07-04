@@ -3636,6 +3636,52 @@ CUTE_TEST_CASE(kryptos_mp_signed_sub_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_signed_mul_tests)
+    struct signed_mul_tests_ctx {
+        int a_neg;
+        kryptos_u8_t *a;
+        int b_neg;
+        kryptos_u8_t *b;
+        kryptos_u8_t *p;
+    };
+    struct signed_mul_tests_ctx test_vector[] = {
+        { 1, "2", 0, "4", "F8" },
+        { 0, "2", 0, "4", "08" },
+        { 0, "2", 1, "4", "F8" },
+        { 1, "2", 1, "4", "08" }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *a, *b, *p;
+    for (tv = 0; tv < tv_nr; tv++) {
+        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
+        CUTE_ASSERT(a != NULL);
+
+        if (test_vector[tv].a_neg) {
+            a = kryptos_mp_inv_signal(a);
+            CUTE_ASSERT(a != NULL);
+        }
+
+        b = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));
+        CUTE_ASSERT(b != NULL);
+
+        if (test_vector[tv].b_neg) {
+            b = kryptos_mp_inv_signal(b);
+            CUTE_ASSERT(b != NULL);
+        }
+
+        p = kryptos_hex_value_as_mp(test_vector[tv].p, strlen(test_vector[tv].p));
+        CUTE_ASSERT(p != NULL);
+
+        a = kryptos_mp_signed_mul(&a, b);
+        CUTE_ASSERT(a != NULL);
+        CUTE_ASSERT(kryptos_mp_eq(a, p) == 1);
+
+        kryptos_del_mp_value(a);
+        kryptos_del_mp_value(b);
+        kryptos_del_mp_value(p);
+    }
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_mp_div_tests)
     kryptos_mp_value_t *x, *y, *q, *r, *eq, *er;
     struct div_tests_ctx {
@@ -4280,7 +4326,6 @@ b->data[0] = 2;
     kryptos_del_mp_value(b);
     kryptos_del_mp_value(dd);
     kryptos_del_mp_value(m);
-
 CUTE_TEST_CASE_END
 
 
@@ -4857,6 +4902,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_inv_signal_tests);
     CUTE_RUN_TEST(kryptos_mp_signed_add_tests);
     CUTE_RUN_TEST(kryptos_mp_signed_sub_tests);
+    CUTE_RUN_TEST(kryptos_mp_signed_mul_tests);
     CUTE_RUN_TEST(kryptos_mp_lsh_tests);
     CUTE_RUN_TEST(kryptos_mp_rsh_tests);
     CUTE_RUN_TEST(kryptos_mp_div_tests);

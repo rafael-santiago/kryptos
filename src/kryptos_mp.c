@@ -2336,7 +2336,7 @@ kryptos_mp_value_t *kryptos_mp_inv_signal(kryptos_mp_value_t *n) {
     return n;
 }
 
-kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest, kryptos_mp_value_t *src) {
+kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
     int is_d_neg = 0, is_s_neg = 0, neg = 0;
     kryptos_mp_value_t *d = NULL, *s = NULL;
     int is_dest_gt = 0;
@@ -2348,7 +2348,11 @@ kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest, kryptos_mp_val
     kryptos_mp_abort_when_null(d = kryptos_assign_mp_value(&d, *dest), kryptos_mp_int_add_epilogue);
     kryptos_mp_abort_when_null(s = kryptos_assign_mp_value(&s, src), kryptos_mp_int_add_epilogue);
 
-    if (!(is_d_neg = kryptos_mp_is_neg(d)) && !(is_s_neg = kryptos_mp_is_neg(s))) {
+    is_d_neg = kryptos_mp_is_neg(d);
+
+    is_s_neg = kryptos_mp_is_neg(s);
+
+    if (!is_d_neg && !is_s_neg) {
         kryptos_mp_abort_when_null(d = kryptos_mp_add(&d, s), kryptos_mp_int_add_epilogue);
     } else if (kryptos_mp_is_neg(d) && kryptos_mp_is_neg(s)) {
         kryptos_mp_abort_when_null(d = kryptos_mp_inv_signal(d), kryptos_mp_int_add_epilogue);
@@ -2382,6 +2386,47 @@ kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest, kryptos_mp_val
     kryptos_mp_abort_when_null((*dest) = kryptos_assign_mp_value(dest, d), kryptos_mp_int_add_epilogue);
 
 kryptos_mp_int_add_epilogue:
+
+    if (d != NULL) {
+        kryptos_del_mp_value(d);
+    }
+
+    if (s != NULL) {
+        kryptos_del_mp_value(s);
+    }
+
+    return (*dest);
+}
+
+kryptos_mp_value_t *kryptos_mp_signed_mul(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
+    int is_d_neg, is_s_neg;
+    kryptos_mp_value_t *s = NULL, *d = NULL;
+
+    if (dest == NULL || src == NULL) {
+        return NULL;
+    }
+
+    kryptos_mp_abort_when_null(d = kryptos_assign_mp_value(&d, *dest), kryptos_mp_signed_mul_epilogue);
+
+    kryptos_mp_abort_when_null(s = kryptos_assign_mp_value(&s, src), kryptos_mp_signed_mul_epilogue);
+
+    if ((is_d_neg = kryptos_mp_is_neg(d)) == 1) {
+        kryptos_mp_abort_when_null(d = kryptos_mp_inv_signal(d), kryptos_mp_signed_mul_epilogue);
+    }
+
+    if ((is_s_neg = kryptos_mp_is_neg(s)) == 1) {
+        kryptos_mp_abort_when_null(s = kryptos_mp_inv_signal(s), kryptos_mp_signed_mul_epilogue);
+    }
+
+    kryptos_mp_abort_when_null(d = kryptos_mp_mul(&d, s), kryptos_mp_signed_mul_epilogue);
+
+    if (is_d_neg != is_s_neg) {
+        kryptos_mp_abort_when_null(d = kryptos_mp_inv_signal(d), kryptos_mp_signed_mul_epilogue);
+    }
+
+    kryptos_mp_abort_when_null((*dest) = kryptos_assign_mp_value(dest, d), kryptos_mp_signed_mul_epilogue);
+
+kryptos_mp_signed_mul_epilogue:
 
     if (d != NULL) {
         kryptos_del_mp_value(d);
