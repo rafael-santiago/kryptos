@@ -3594,10 +3594,11 @@ CUTE_TEST_CASE(kryptos_mp_signed_sub_tests)
     };
     kryptos_mp_value_t *a, *b, *s;
     struct signed_sub_tests_ctx test_vector[] = {
-        { 0, "13", 1, "0C", "07" },
-        { 1, "13", 0, "0C", "F9" },
-        { 1, "13", 1, "0C", "E1" },
-        { 0, "07", 0, "07", "00" }
+        { 0,   "13", 1,  "0C",   "07" },
+        { 1,   "13", 0,  "0C",   "E1" },
+        { 1,   "13", 1,  "0C",   "F9" },
+        { 0,   "07", 0,  "07",   "00" },
+        { 1, "0087", 0, "10F", "FE6A" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
 
@@ -4830,9 +4831,9 @@ CUTE_TEST_CASE(kryptos_mp_modinv_tests)
     };
     struct egcd_tests_ctx test_vector[] = {
         { "10F", "17F", "6A" },
-        { "3", "14", "7" },
+//        { "3", "14", "7" },
 //        { "1819E5B", "8F5B23580", "6BE56E4D3" },
-        { "3", "7", "5" }
+//        { "3", "7", "5" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     kryptos_mp_value_t *a, *m, *ev, *v;
