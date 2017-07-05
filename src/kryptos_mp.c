@@ -2415,21 +2415,25 @@ kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest, const kryptos_
         op = kryptos_mp_sub;
     }
 
-    if (is_d_neg) {
-        d = kryptos_mp_inv_signal(d);
-    }
+    if (is_s_neg || is_d_neg) {
+        if (is_d_neg) {
+            d = kryptos_mp_inv_signal(d);
+        }
 
-    if (is_s_neg) {
-        s = kryptos_mp_inv_signal(s);
-    }
+        if (is_s_neg) {
+            s = kryptos_mp_inv_signal(s);
+        }
 
-    if (kryptos_mp_gt(d, s)) {
-        d = op(&d, s);
-        neg = is_d_neg;
+        if (kryptos_mp_gt(d, s)) {
+            d = op(&d, s);
+            neg = is_d_neg;
+        } else {
+            s = op(&s, d);
+            d = kryptos_assign_mp_value(&d, s);
+            neg = is_s_neg;
+        }
     } else {
-        s = op(&s, d);
-        d = kryptos_assign_mp_value(&d, s);
-        neg = is_s_neg;
+        d = op(&d, s);
     }
 
     if (neg && !kryptos_mp_is_neg(d)) {
