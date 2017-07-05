@@ -2249,6 +2249,7 @@ kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *ua, const krypto
             printf("\tuL = "); print_mp(u);
             printf("\tAL = "); print_mp(A);
             printf("\tBL = "); print_mp(B);
+            printf("\t\tD = "); print_mp(D);
             u = kryptos_mp_signed_sub(&u, v);
             A = kryptos_mp_signed_sub(&A, C);
             B = kryptos_mp_signed_sub(&B, D);
@@ -2391,6 +2392,61 @@ kryptos_mp_value_t *kryptos_mp_inv_signal(kryptos_mp_value_t *n) {
 
 kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src,
                                        kryptos_mp_value_t *(*op)(kryptos_mp_value_t **, const kryptos_mp_value_t *)) {
+    kryptos_mp_value_t *d = NULL, *s = NULL;
+    int is_d_neg = 0, is_s_neg = 0, neg = 0;
+
+    if (dest == NULL || src == NULL) {
+        return NULL;
+    }
+
+    d = kryptos_assign_mp_value(&d, *dest);
+    s = kryptos_assign_mp_value(&s, src);
+
+    is_d_neg = kryptos_mp_is_neg(d);
+    is_s_neg = kryptos_mp_is_neg(s);
+
+    if (is_s_neg != is_d_neg && op == kryptos_mp_sub) {
+        op = kryptos_mp_add;
+        if (is_s_neg == 0) {
+            is_s_neg = 1;
+            s = kryptos_mp_inv_signal(s);
+        }
+    } else if (is_s_neg != is_d_neg && op == kryptos_mp_add) {
+        op = kryptos_mp_sub;
+    }
+
+    if (is_d_neg) {
+        d = kryptos_mp_inv_signal(d);
+    }
+
+    if (is_s_neg) {
+        s = kryptos_mp_inv_signal(s);
+    }
+
+    if (kryptos_mp_gt(d, s)) {
+        d = op(&d, s);
+        neg = is_d_neg;
+    } else {
+        s = op(&s, d);
+        d = kryptos_assign_mp_value(&d, s);
+        neg = is_s_neg;
+    }
+
+    if (neg && !kryptos_mp_is_neg(d)) {
+        d = kryptos_mp_inv_signal(d);
+    }
+
+    (*dest) = kryptos_assign_mp_value(dest, d);
+
+    kryptos_del_mp_value(d);
+    kryptos_del_mp_value(s);
+
+    return (*dest);
+}
+
+/*
+kryptos_mp_value_t *kryptos_mp_int_add_crazy(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src,
+                                       kryptos_mp_value_t *(*op)(kryptos_mp_value_t **, const kryptos_mp_value_t *)) {
     int is_d_neg = 0, is_s_neg = 0, neg = 0;
     kryptos_mp_value_t *d = NULL, *s = NULL;
     int is_dest_gt = 0;
@@ -2411,7 +2467,7 @@ kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest, const kryptos_
     } else if (kryptos_mp_is_neg(d) && kryptos_mp_is_neg(s)) {
         kryptos_mp_abort_when_null(d = kryptos_mp_inv_signal(d), kryptos_mp_int_add_epilogue);
         kryptos_mp_abort_when_null(s = kryptos_mp_inv_signal(s), kryptos_mp_int_add_epilogue);
-        kryptos_mp_abort_when_null(d = /*kryptos_mp_add*/op(&d, s), kryptos_mp_int_add_epilogue);
+        kryptos_mp_abort_when_null(d = op(&d, s), kryptos_mp_int_add_epilogue);
         kryptos_mp_abort_when_null(d = kryptos_mp_inv_signal(d), kryptos_mp_int_add_epilogue);
     } else if (is_s_neg == 0 && op == kryptos_mp_sub) {
         s = kryptos_mp_inv_signal(s);
@@ -2424,14 +2480,16 @@ kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest, const kryptos_
         if (is_s_neg) {
             kryptos_mp_abort_when_null(s = kryptos_mp_inv_signal(s), kryptos_mp_int_add_epilogue);
         }
-
-        if (kryptos_mp_gt(d, s) == 0) {
+        printf("booo = %d %d\n", is_d_neg, is_s_neg);
+        if (kryptos_mp_gt(d, s)) {
             kryptos_mp_abort_when_null(d = kryptos_mp_sub(&d, s), kryptos_mp_int_add_epilogue);
             neg = is_d_neg;
         } else {
+            printf("s is gt!\n");
             kryptos_mp_abort_when_null(s = kryptos_mp_sub(&s, d), kryptos_mp_int_add_epilogue);
             kryptos_mp_abort_when_null(d = kryptos_assign_mp_value(&d, s), kryptos_mp_int_add_epilogue);
             neg = is_s_neg;
+            printf("new d = "); print_mp(d);
         }
 
         if (neg == 1) {
@@ -2453,7 +2511,7 @@ kryptos_mp_int_add_epilogue:
     }
 
     return (*dest);
-}
+}*/
 
 kryptos_mp_value_t *kryptos_mp_signed_mul(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
     int is_d_neg, is_s_neg;

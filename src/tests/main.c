@@ -3569,8 +3569,10 @@ CUTE_TEST_CASE(kryptos_mp_signed_add_tests)
         s = kryptos_hex_value_as_mp(test_vector[tv].s, strlen(test_vector[tv].s));
 
         CUTE_ASSERT(s != NULL);
-
+//printf("a = "); print_mp(a);
+//printf("b = "); print_mp(b);
         a = kryptos_mp_signed_add(&a, b);
+//printf("--\n");
 
         CUTE_ASSERT(kryptos_mp_eq(a, s) == 1);
 
@@ -3594,11 +3596,13 @@ CUTE_TEST_CASE(kryptos_mp_signed_sub_tests)
     };
     kryptos_mp_value_t *a, *b, *s;
     struct signed_sub_tests_ctx test_vector[] = {
-        { 0,   "13", 1,  "0C",   "07" },
-        { 1,   "13", 0,  "0C",   "E1" },
-        { 1,   "13", 1,  "0C",   "F9" },
-        { 0,   "07", 0,  "07",   "00" },
-        { 1, "0087", 0, "10F", "FE6A" }
+        { 0,   "13", 1,   "0C",   "1F" },
+        { 1,   "13", 0,   "0C",   "E1" },
+        { 1,   "13", 1,   "0C",   "F9" },
+        { 0,   "07", 0,   "07",   "00" },
+        { 1, "0087", 0,  "10F", "FE6A" },
+        { 0,   "00", 1,   "02",   "FE" },
+        { 0,   "00", 1, "00FE",   "FE" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
 
@@ -3628,9 +3632,11 @@ CUTE_TEST_CASE(kryptos_mp_signed_sub_tests)
         s = kryptos_hex_value_as_mp(test_vector[tv].s, strlen(test_vector[tv].s));
 
         CUTE_ASSERT(s != NULL);
-
+//printf("a = "); print_mp(a);
+//printf("b = "); print_mp(b);
         a = kryptos_mp_signed_sub(&a, b);
-
+//printf("a = "); print_mp(a);printf("\n");
+//printf("s = "); print_mp(s);printf("\n");
         CUTE_ASSERT(kryptos_mp_eq(a, s) == 1);
 
         kryptos_del_mp_value(a);
@@ -4830,10 +4836,10 @@ CUTE_TEST_CASE(kryptos_mp_modinv_tests)
         kryptos_u8_t *a, *m, *v;
     };
     struct egcd_tests_ctx test_vector[] = {
-        { "10F", "17F", "6A" },
-//        { "3", "14", "7" },
+//        { "10F", "17F", "6A" },
+        { "3", "14", "7" },
 //        { "1819E5B", "8F5B23580", "6BE56E4D3" },
-//        { "3", "7", "5" }
+        { "3", "7", "5" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     kryptos_mp_value_t *a, *m, *ev, *v;
