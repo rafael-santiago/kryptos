@@ -3583,10 +3583,6 @@ CUTE_TEST_CASE(kryptos_mp_signed_add_tests)
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_mp_signed_sub_tests)
-    // WARN(Rafael): This test is the same thing done in kryptos_mp_signed_add(), but here we will use the macro
-    //               kryptos_mp_signed_sub() instead. Yes, macros, because kryptos_mp_signed_add() and
-    //               kryptos_mp_signed_sub(), under the hood, invoke the same function due to addition and
-    //               subtraction be reciprocal in this context. By the way, I need to tell you about Santa Claus.
     struct signed_sub_tests_ctx {
         int a_neg;
         kryptos_u8_t *a;
@@ -3603,7 +3599,8 @@ CUTE_TEST_CASE(kryptos_mp_signed_sub_tests)
         { 1, "0087", 0,  "10F", "FE6A" },
         { 0,   "00", 1,   "02",   "FE" },
         { 0,   "00", 1, "00FE",   "FE" },
-        { 0,    "1", 0,    "3",   "FE" }
+        { 0,    "1", 0,    "3",   "FE" },
+        { 0, "006D", 1, "00FE",  "16B" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
 
@@ -3633,11 +3630,9 @@ CUTE_TEST_CASE(kryptos_mp_signed_sub_tests)
         s = kryptos_hex_value_as_mp(test_vector[tv].s, strlen(test_vector[tv].s));
 
         CUTE_ASSERT(s != NULL);
-//printf("a = "); print_mp(a);
-//printf("b = "); print_mp(b);
+
         a = kryptos_mp_signed_sub(&a, b);
-//printf("a = "); print_mp(a);printf("\n");
-//printf("s = "); print_mp(s);printf("\n\n");
+
         CUTE_ASSERT(kryptos_mp_eq(a, s) == 1);
 
         kryptos_del_mp_value(a);
@@ -3645,6 +3640,7 @@ CUTE_TEST_CASE(kryptos_mp_signed_sub_tests)
         kryptos_del_mp_value(s);
     }
 CUTE_TEST_CASE_END
+
 
 CUTE_TEST_CASE(kryptos_mp_signed_mul_tests)
     struct signed_mul_tests_ctx {
@@ -4837,7 +4833,7 @@ CUTE_TEST_CASE(kryptos_mp_modinv_tests)
         kryptos_u8_t *a, *m, *v;
     };
     struct egcd_tests_ctx test_vector[] = {
-//        { "10F", "17F", "6A" },
+        { "10F", "17F", "6A" },
 //        { "3", "14", "7" },
 //        { "1819E5B", "8F5B23580", "6BE56E4D3" },
 //        { "3", "7", "5" }

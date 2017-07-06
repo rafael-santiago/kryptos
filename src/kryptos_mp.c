@@ -2182,6 +2182,16 @@ kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *ua, const krypto
 
     u = kryptos_assign_mp_value(&u, x);
     v = kryptos_assign_mp_value(&v, y);
+
+    //A = kryptos_new_mp_value(m->data_size << 3);
+    //B = kryptos_new_mp_value(m->data_size << 3);
+    //C = kryptos_new_mp_value(m->data_size << 3);
+    //D = kryptos_new_mp_value(m->data_size << 3);
+
+    //A = kryptos_assign_mp_value(&A, _1);
+    //B = kryptos_assign_mp_value(&B, _0);
+    //C = kryptos_assign_mp_value(&C, _0);
+    //D = kryptos_assign_mp_value(&A, _1);
     A = kryptos_hex_value_as_mp("1", 1);
     B = kryptos_hex_value_as_mp("0", 1);
     C = kryptos_hex_value_as_mp("0", 1);
@@ -2247,9 +2257,10 @@ kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *ua, const krypto
 
         if (kryptos_mp_ge(u, v)) {
             printf("\tuL = "); print_mp(u);
+            printf("\tC = "); print_mp(C);
             printf("\tAL = "); print_mp(A);
             printf("\tBL = "); print_mp(B);
-            printf("\t\tD = "); print_mp(D);
+//            printf("\t\tD = "); print_mp(D);
             u = kryptos_mp_signed_sub(&u, v);
             A = kryptos_mp_signed_sub(&A, C);
             B = kryptos_mp_signed_sub(&B, D);
@@ -2258,6 +2269,7 @@ kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *ua, const krypto
             printf("\tBL' = "); print_mp(B);
         } else {
             printf("\tvL = "); print_mp(v);
+            printf("\tA = "); print_mp(A);
             printf("\tCL = "); print_mp(C);
             printf("\tDL = "); print_mp(D);
             v = kryptos_mp_signed_sub(&v, u);
@@ -2390,10 +2402,11 @@ kryptos_mp_value_t *kryptos_mp_inv_signal(kryptos_mp_value_t *n) {
     return n;
 }
 
-kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src,
-                                       kryptos_mp_value_t *(*op)(kryptos_mp_value_t **, const kryptos_mp_value_t *)) {
+kryptos_mp_value_t *kryptos_mp_signed_sub(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
+    // TODO(Rafael): Make this code resilient to NULL returns.
+    int is_d_neg, is_s_neg, neg = 0;
     kryptos_mp_value_t *d = NULL, *s = NULL;
-    int is_d_neg = 0, is_s_neg = 0, neg = 0;
+    size_t dsize;
 
     if (dest == NULL || src == NULL) {
         return NULL;
@@ -2404,6 +2417,161 @@ kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest, const kryptos_
 
     is_d_neg = kryptos_mp_is_neg(d);
     is_s_neg = kryptos_mp_is_neg(s);
+
+    if (is_d_neg == is_s_neg) {
+        // INFO(Rafael): Same signals.
+        if (is_d_neg) {
+            d = kryptos_mp_inv_signal(d);
+            s = kryptos_mp_inv_signal(s);
+        }
+
+        if (kryptos_mp_gt(d, s)) {
+            d = kryptos_mp_sub(&d, s);
+            neg = is_d_neg;
+        } else {
+            s = kryptos_mp_sub(&s, d);
+            d = kryptos_assign_mp_value(&d, s);
+            neg = 1;
+        }
+
+        if (neg) {
+            d = kryptos_mp_inv_signal(d);
+        }
+
+    } else {
+        // INFO(Rafael): Different signals.
+        if (is_d_neg) {
+            d = kryptos_mp_inv_signal(d);
+        }
+
+        if (is_s_neg) {
+            s = kryptos_mp_inv_signal(s);
+        }
+
+        d = kryptos_mp_add(&d, s);
+
+        neg = kryptos_mp_gt(d, s) ? is_d_neg : is_s_neg;
+
+        if (neg && !kryptos_mp_is_neg(d)) {
+            d = kryptos_mp_inv_signal(d);
+        }
+    }
+
+kryptos_mp_signed_sub_epilogue:
+
+    if (d != NULL) {
+        if (src->data_size > (*dest)->data_size) {
+            dsize = src->data_size;
+        } else {
+            dsize = (*dest)->data_size;
+        }
+        kryptos_del_mp_value(*dest);
+        (*dest) = kryptos_new_mp_value(dsize << 3);
+        (*dest) = kryptos_assign_mp_value(dest, d);
+        kryptos_del_mp_value(d);
+    }
+
+    if (s != NULL) {
+        kryptos_del_mp_value(s);
+    }
+
+    return (*dest);
+}
+
+kryptos_mp_value_t *kryptos_mp_signed_add(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
+    // TODO(Rafael): Make this code resilient to NULL returns.
+    int is_d_neg, is_s_neg, neg = 0;
+    kryptos_mp_value_t *d = NULL, *s = NULL;
+    size_t dsize;
+
+    if (dest == NULL || src == NULL) {
+        return NULL;
+    }
+
+    d = kryptos_assign_mp_value(&d, *dest);
+    s = kryptos_assign_mp_value(&s, src);
+
+    is_d_neg = kryptos_mp_is_neg(d);
+    is_s_neg = kryptos_mp_is_neg(s);
+
+    if (is_d_neg == is_s_neg) {
+        // INFO(Rafael): Same signals.
+        if (is_d_neg) {
+            d = kryptos_mp_inv_signal(d);
+            s = kryptos_mp_inv_signal(s);
+            neg = 1;
+        }
+        d = kryptos_mp_add(&d, s);
+        if (neg) {
+            d = kryptos_mp_inv_signal(d);
+        }
+    } else {
+        // INFO(Rafael): Different signals.
+        if (is_d_neg) {
+            d = kryptos_mp_inv_signal(d);
+        }
+
+        if (is_s_neg) {
+            s = kryptos_mp_inv_signal(s);
+        }
+
+        if (kryptos_mp_gt(d, s)) {
+            d = kryptos_mp_sub(&d, s);
+            neg = is_d_neg;
+        } else {
+            s = kryptos_mp_sub(&s, d);
+            d = kryptos_assign_mp_value(&d, s);
+            neg = is_s_neg;
+        }
+
+        if (neg) {
+            d = kryptos_mp_inv_signal(d);
+        }
+    }
+
+kryptos_mp_signed_add_epilogue:
+
+    if (d != NULL) {
+        if (src->data_size > (*dest)->data_size) {
+            dsize = src->data_size;
+        } else {
+            dsize = (*dest)->data_size;
+        }
+        kryptos_del_mp_value(*dest);
+        (*dest) = kryptos_new_mp_value(dsize << 3);
+        (*dest) = kryptos_assign_mp_value(dest, d);
+        kryptos_del_mp_value(d);
+    }
+
+    if (s != NULL) {
+        kryptos_del_mp_value(s);
+    }
+
+    return (*dest);
+}
+
+/*
+kryptos_mp_value_t *kryptos_mp_int_add_mess_from_hell(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src,
+                                       kryptos_mp_value_t *(*op)(kryptos_mp_value_t **, const kryptos_mp_value_t *)) {
+    kryptos_mp_value_t *d = NULL, *s = NULL, *_0 = NULL;
+    int is_d_neg = 0, is_s_neg = 0, neg = 0, is_sub = 0, is_d_zero = 0;
+    ssize_t dsize;
+
+    if (dest == NULL || src == NULL) {
+        return NULL;
+    }
+
+    d = kryptos_assign_mp_value(&d, *dest);
+    s = kryptos_assign_mp_value(&s, src);
+
+    is_d_neg = kryptos_mp_is_neg(d);
+    is_s_neg = kryptos_mp_is_neg(s);
+
+    is_sub = (op == kryptos_mp_sub);
+
+    _0 = kryptos_hex_value_as_mp("0", 1);
+    is_d_zero = kryptos_mp_eq(d, _0);
+    kryptos_del_mp_value(_0);
 
     if (is_s_neg != is_d_neg && op == kryptos_mp_sub) {
         op = kryptos_mp_add;
@@ -2424,6 +2592,8 @@ kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest, const kryptos_
             s = kryptos_mp_inv_signal(s);
         }
 
+//printf("d = "); print_mp(d);
+//printf("s = "); print_mp(s);
         if (kryptos_mp_gt(d, s)) {
             d = op(&d, s);
             neg = is_d_neg;
@@ -2431,7 +2601,11 @@ kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest, const kryptos_
             s = op(&s, d);
             d = kryptos_assign_mp_value(&d, s);
             neg = is_s_neg;
+            if (op == kryptos_mp_add && is_s_neg && is_d_neg == 0 && !is_d_zero && is_sub) {
+                neg = 0;
+            }
         }
+//printf("r = "); print_mp(d);
     } else {
         d = op(&d, s);
     }
@@ -2440,7 +2614,16 @@ kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest, const kryptos_
         d = kryptos_mp_inv_signal(d);
     }
 
-    (*dest) = kryptos_assign_mp_value(dest, d);
+    if (d != NULL) {
+        if (src->data_size > (*dest)->data_size) {
+            dsize = src->data_size;
+        } else {
+            dsize = (*dest)->data_size;
+        }
+        kryptos_del_mp_value(*dest);
+        (*dest) = kryptos_new_mp_value(dsize << 3);
+        (*dest) = kryptos_assign_mp_value(dest, d);
+    }
 
     kryptos_del_mp_value(d);
     kryptos_del_mp_value(s);
@@ -2448,7 +2631,6 @@ kryptos_mp_value_t *kryptos_mp_int_add(kryptos_mp_value_t **dest, const kryptos_
     return (*dest);
 }
 
-/*
 kryptos_mp_value_t *kryptos_mp_int_add_crazy(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src,
                                        kryptos_mp_value_t *(*op)(kryptos_mp_value_t **, const kryptos_mp_value_t *)) {
     int is_d_neg = 0, is_s_neg = 0, neg = 0;
