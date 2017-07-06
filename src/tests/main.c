@@ -3539,7 +3539,72 @@ CUTE_TEST_CASE(kryptos_mp_signed_add_tests)
         { 1, "02", 0, "0A", "08" },
         { 1, "02", 1, "0A", "F4" },
         { 0, "02", 1, "0A", "F8" },
-        { 0, "07", 0, "07", "0E" }
+        { 0, "07", 0, "07", "0E" },
+        { 1, "201", 0, "17F", "FF7E" }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
+
+        CUTE_ASSERT(a != NULL);
+
+        if (test_vector[tv].a_neg) {
+            a = kryptos_mp_inv_signal(a);
+        }
+
+        CUTE_ASSERT(a != NULL);
+
+        b = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));
+
+        CUTE_ASSERT(b != NULL);
+
+        if (test_vector[tv].b_neg) {
+            b = kryptos_mp_inv_signal(b);
+        }
+
+        CUTE_ASSERT(b != NULL);
+
+        CUTE_ASSERT(a != NULL);
+
+        s = kryptos_hex_value_as_mp(test_vector[tv].s, strlen(test_vector[tv].s));
+
+        CUTE_ASSERT(s != NULL);
+printf("a = "); print_mp(a);
+printf("b = "); print_mp(b);
+        a = kryptos_mp_signed_add(&a, b);
+printf("s = "); print_mp(a);
+printf("e = "); print_mp(s);
+printf("--\n");
+
+        CUTE_ASSERT(kryptos_mp_eq(a, s) == 1);
+
+        kryptos_del_mp_value(a);
+        kryptos_del_mp_value(b);
+        kryptos_del_mp_value(s);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_signed_sub_tests)
+    struct signed_sub_tests_ctx {
+        int a_neg;
+        kryptos_u8_t *a;
+        int b_neg;
+        kryptos_u8_t *b;
+        kryptos_u8_t *s;
+    };
+    kryptos_mp_value_t *a, *b, *s;
+    struct signed_sub_tests_ctx test_vector[] = {
+        { 0,   "13", 1,   "0C",   "1F" },
+        { 1,   "13", 0,   "0C",   "E1" },
+        { 1,   "13", 1,   "0C",   "F9" },
+        { 0,   "07", 0,   "07",   "00" },
+        { 1, "0087", 0,  "10F", "FE6A" },
+        { 0,   "00", 1,   "02",   "FE" },
+        { 0,   "00", 1, "00FE",   "FE" },
+        { 0,    "1", 0,    "3",   "FE" },
+        { 0, "006D", 1, "00FE",  "16B" },
+        { 1, "0024", 1, "00FE",   "DA" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
 
@@ -3571,67 +3636,8 @@ CUTE_TEST_CASE(kryptos_mp_signed_add_tests)
         CUTE_ASSERT(s != NULL);
 //printf("a = "); print_mp(a);
 //printf("b = "); print_mp(b);
-        a = kryptos_mp_signed_add(&a, b);
-//printf("--\n");
-
-        CUTE_ASSERT(kryptos_mp_eq(a, s) == 1);
-
-        kryptos_del_mp_value(a);
-        kryptos_del_mp_value(b);
-        kryptos_del_mp_value(s);
-    }
-CUTE_TEST_CASE_END
-
-CUTE_TEST_CASE(kryptos_mp_signed_sub_tests)
-    struct signed_sub_tests_ctx {
-        int a_neg;
-        kryptos_u8_t *a;
-        int b_neg;
-        kryptos_u8_t *b;
-        kryptos_u8_t *s;
-    };
-    kryptos_mp_value_t *a, *b, *s;
-    struct signed_sub_tests_ctx test_vector[] = {
-        { 0,   "13", 1,   "0C",   "1F" },
-        { 1,   "13", 0,   "0C",   "E1" },
-        { 1,   "13", 1,   "0C",   "F9" },
-        { 0,   "07", 0,   "07",   "00" },
-        { 1, "0087", 0,  "10F", "FE6A" },
-        { 0,   "00", 1,   "02",   "FE" },
-        { 0,   "00", 1, "00FE",   "FE" },
-        { 0,    "1", 0,    "3",   "FE" },
-        { 0, "006D", 1, "00FE",  "16B" }
-    };
-    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
-
-    for (tv = 0; tv < tv_nr; tv++) {
-        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
-
-        CUTE_ASSERT(a != NULL);
-
-        if (test_vector[tv].a_neg) {
-            a = kryptos_mp_inv_signal(a);
-        }
-
-        CUTE_ASSERT(a != NULL);
-
-        b = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));
-
-        CUTE_ASSERT(b != NULL);
-
-        if (test_vector[tv].b_neg) {
-            b = kryptos_mp_inv_signal(b);
-        }
-
-        CUTE_ASSERT(b != NULL);
-
-        CUTE_ASSERT(a != NULL);
-
-        s = kryptos_hex_value_as_mp(test_vector[tv].s, strlen(test_vector[tv].s));
-
-        CUTE_ASSERT(s != NULL);
-
         a = kryptos_mp_signed_sub(&a, b);
+//printf("s = "); print_mp(a);printf("\n");
 
         CUTE_ASSERT(kryptos_mp_eq(a, s) == 1);
 
@@ -4836,7 +4842,7 @@ CUTE_TEST_CASE(kryptos_mp_modinv_tests)
         { "10F", "17F", "6A" },
 //        { "3", "14", "7" },
 //        { "1819E5B", "8F5B23580", "6BE56E4D3" },
-//        { "3", "7", "5" }
+//        { "3", "7", "5" },
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     kryptos_mp_value_t *a, *m, *ev, *v;
@@ -4959,7 +4965,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     //CUTE_RUN_TEST(kryptos_mp_gen_prime_2k1_tests);
     CUTE_RUN_TEST(kryptos_mp_montgomery_reduction_tests);
     CUTE_RUN_TEST(kryptos_mp_gcd_tests);
-//    CUTE_RUN_TEST(kryptos_mp_modinv_tests);
+    CUTE_RUN_TEST(kryptos_mp_modinv_tests);
 
     // INFO(Rafael): Asymmetric stuff
 
