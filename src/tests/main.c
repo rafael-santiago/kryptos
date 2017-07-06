@@ -3570,12 +3570,12 @@ CUTE_TEST_CASE(kryptos_mp_signed_add_tests)
         s = kryptos_hex_value_as_mp(test_vector[tv].s, strlen(test_vector[tv].s));
 
         CUTE_ASSERT(s != NULL);
-printf("a = "); print_mp(a);
-printf("b = "); print_mp(b);
+//printf("a = "); print_mp(a);
+//printf("b = "); print_mp(b);
         a = kryptos_mp_signed_add(&a, b);
-printf("s = "); print_mp(a);
-printf("e = "); print_mp(s);
-printf("--\n");
+//printf("s = "); print_mp(a);
+//printf("e = "); print_mp(s);
+//printf("--\n");
 
         CUTE_ASSERT(kryptos_mp_eq(a, s) == 1);
 
@@ -4839,10 +4839,10 @@ CUTE_TEST_CASE(kryptos_mp_modinv_tests)
         kryptos_u8_t *a, *m, *v;
     };
     struct egcd_tests_ctx test_vector[] = {
-        { "10F", "17F", "6A" },
-//        { "3", "14", "7" },
-//        { "1819E5B", "8F5B23580", "6BE56E4D3" },
-//        { "3", "7", "5" },
+        {     "10F",       "17F",        "6A" },
+        {       "3",        "14",         "7" },
+        { "1819E5B", "8F5B23580", "6BE56E4D3" },
+        {       "3",         "7",         "5" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     kryptos_mp_value_t *a, *m, *ev, *v;
@@ -4856,7 +4856,6 @@ CUTE_TEST_CASE(kryptos_mp_modinv_tests)
         CUTE_ASSERT(ev != NULL);
         v = kryptos_mp_modinv(a, m);
         CUTE_ASSERT(v != NULL);
-//printf("V = "); print_mp(v);
         CUTE_ASSERT(kryptos_mp_eq(v, ev) == 1);
         kryptos_del_mp_value(a);
         kryptos_del_mp_value(m);
