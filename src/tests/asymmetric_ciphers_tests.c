@@ -322,10 +322,6 @@ CUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
 
     CUTE_ASSERT(kryptos_mp_eq(alice->k, bob->k) == 1);
 
-    // INFO(Rafael): Parafraseando o Otto: 'Alice é do tempo do Bob, lá do Pina de Copacabana. On the wire o que ela gosta
-    //               de evitar é o man-in-the-middle. A-li-ce é do tem-po do Boooob. Lá do Pina de Copa-ca-baaaa-naaaa...'
-    //               Críptico não?! '- Inquirrível!', diria Dr. Frankenstein. Mas a kryptos_dh_process_modxchg() is alive! d:^p
-
     alice->in = NULL;
 
     kryptos_clear_dh_xchg_ctx(alice);
