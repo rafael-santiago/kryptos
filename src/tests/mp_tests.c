@@ -1801,6 +1801,7 @@ CUTE_TEST_CASE(kryptos_mp_gen_prime_tests)
     kryptos_mp_value_t *p = kryptos_mp_gen_prime(16);
     ssize_t d;
     CUTE_ASSERT(p != NULL);
+//    printf("prime = "); print_mp(p);
     CUTE_ASSERT((p->data_size << 3) == 16);
     kryptos_del_mp_value(p);
     // INFO(Rafael): Well, all we need to do is to believe in this function... To test the return to make sure if the
