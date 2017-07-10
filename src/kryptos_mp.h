@@ -100,4 +100,6 @@ kryptos_mp_value_t *kryptos_mp_signed_sub(kryptos_mp_value_t **dest,
 
 kryptos_mp_value_t *kryptos_mp_signed_mul(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src);
 
+ssize_t kryptos_mp_bitcount(const kryptos_mp_value_t *n);
+
 #endif

@@ -796,6 +796,31 @@ CUTE_TEST_CASE(kryptos_mp_add_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_bitcount_tests)
+    struct bitcount_tests_ctx {
+        kryptos_u8_t *n;
+        ssize_t c;
+    };
+    struct bitcount_tests_ctx test_vector[] = {
+        { "00", 0 }, { "01", 1 }, { "02", 2 }, { "03", 2 },
+        { "04", 3 }, { "05", 3 }, { "06", 3 }, { "07", 3 },
+        { "08", 4 }, { "09", 4 }, { "0A", 4 }, { "0B", 4 },
+        { "0C", 4 }, { "0D", 4 }, { "0E", 4 }, { "0F", 4 },
+        { "1F", 5 }, { "2F", 6 }, { "3F", 6 }, { "4F", 7 },
+        { "5F", 7 }, { "6F", 7 }, { "7F", 7 }, { "8F", 8 },
+        { "9F", 8 }, { "AF", 8 }, { "BF", 8 }, { "CF", 8 },
+        { "DF", 8 }, { "EF", 8 }, { "FF", 8 }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *n = NULL;
+    for (tv = 0; tv < tv_nr; tv++) {
+        n = kryptos_hex_value_as_mp(test_vector[tv].n, strlen(test_vector[tv].n));
+        CUTE_ASSERT(n != NULL);
+        CUTE_ASSERT(kryptos_mp_bitcount(n) == test_vector[tv].c);
+        kryptos_del_mp_value(n);
+    }
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_mp_sub_tests)
     kryptos_mp_value_t *a, *b, *e;
     struct sub_tests_ctx {
@@ -1362,8 +1387,8 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
 
         CUTE_ASSERT(q != NULL);
         CUTE_ASSERT(r != NULL);
-
-/*printf("Q  = ");
+/*
+printf("Q  = ");
 for (d = q->data_size - 1; d >= 0; d--) printf("%.2X ", q->data[d]);
 printf("\n");
 
