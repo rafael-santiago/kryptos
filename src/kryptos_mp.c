@@ -680,8 +680,8 @@ static kryptos_mp_value_t *kryptos_mp_multibyte_sub(const kryptos_mp_value_t *a,
         bn = b->data_size;
     }
 
-//printf("a4 = "); print_mp(a4);
-//printf("b4 = "); print_mp(b4);
+//printf("a4 = "); kryptos_print_mp(a4);
+//printf("b4 = "); kryptos_print_mp(b4);
     while (d < dn) {
         u64sub = (kryptos_u64_t) kryptos_mp_get_u32_from_mp(a4, d) - (kryptos_u64_t) kryptos_mp_get_u32_from_mp(b4, d) + c;
 //        printf("\t%X - %X + %X = %"PRIx64"\n", kryptos_mp_get_u32_from_mp(a4, d), kryptos_mp_get_u32_from_mp(b4, d), c, u64sub);
@@ -700,7 +700,7 @@ static kryptos_mp_value_t *kryptos_mp_multibyte_sub(const kryptos_mp_value_t *a,
         delta->data[d] &= 1 << (dn - bn);
     }
 
-    print_mp(delta);
+    kryptos_print_mp(delta);
     printf("bn = %d | %d\n", bn, dn);
 
 //    for (d = delta->data_size - 1; d >= dn; d--) {
@@ -717,7 +717,7 @@ kryptos_mp_multibyte_sub_epilogue:
         kryptos_del_mp_value(b4);
     }
 
-//printf("delta = "); print_mp(delta);
+//printf("delta = "); kryptos_print_mp(delta);
 //printf("--\n");
     return delta;
 }
@@ -1085,7 +1085,7 @@ kryptos_mp_value_t *kryptos_mp_pow(const kryptos_mp_value_t *g, const kryptos_mp
     return A;
 }
 
-void print_mp(const kryptos_mp_value_t *v) {
+void kryptos_print_mp(const kryptos_mp_value_t *v) {
     ssize_t d;
     for (d = v->data_size - 1; d >= 0; d--) printf("%.2X", v->data[d]);
     printf("\n");
@@ -1317,14 +1317,14 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
 
 #ifdef KRYPTOS_MP_DIV_DEBUG_INFO
         printf("\t-- is_less loop end.\n");
-        printf("\txn' = "); print_mp(xn);
-        printf("\tb   = "); print_mp(b);
+        printf("\txn' = "); kryptos_print_mp(xn);
+        printf("\tb   = "); kryptos_print_mp(b);
 #endif
 
         xn = kryptos_mp_sub(&xn, b);
 
 #ifdef KRYPTOS_MP_DIV_DEBUG_INFO
-        printf("\txn- = "); print_mp(xn);
+        printf("\txn- = "); kryptos_print_mp(xn);
 #endif
 
         if (b != NULL) {
@@ -1334,8 +1334,8 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
 
 #ifdef KRYPTOS_MP_DIV_DEBUG_INFO
         printf("-- end of iteration.\n");
-        printf("\tQ'  = "); print_mp(q);
-        printf("\tXN' = "); print_mp(xn);
+        printf("\tQ'  = "); kryptos_print_mp(q);
+        printf("\tXN' = "); kryptos_print_mp(xn);
         printf("--\n");
 #endif
 
@@ -1390,8 +1390,8 @@ kryptos_mp_div_epilogue:
 
 #ifdef KRYPTOS_MP_DIV_DEBUG_INFO
     printf("-- end of algorithm\n");
-    printf("\tQ = "); print_mp(q);
-    printf("\tR = "); print_mp(*r);
+    printf("\tQ = "); kryptos_print_mp(q);
+    printf("\tR = "); kryptos_print_mp(*r);
 #endif
 
     return q;
@@ -2208,16 +2208,17 @@ kryptos_mp_value_t *kryptos_mp_gen_prime(const size_t bitsize) {
         }
 
         pn->data[0] |= 0x1;
+
 /*
         d = 0;
 
         while (!(is_prime = kryptos_mp_gen_prime_small_primes_test(pn, &p)) && d < 0xffffffff) {
-            if (p == NULL) {
+            //if (p == NULL) {
                 pn = kryptos_mp_add(&pn, _2);
-            } else {
-                pn = kryptos_mp_add(&pn, p);
-                pn->data[0] |= 0x1;
-            }
+            //} else {
+            //    pn = kryptos_mp_add(&pn, p);
+            //    pn->data[0] |= 0x1;
+            //}
             kryptos_del_mp_value(p);
             p = NULL;
             d++;
@@ -2259,7 +2260,7 @@ kryptos_mp_value_t *kryptos_mp_gen_prime_2k1(const size_t k_bitsize) {
         if ((k = kryptos_mp_gen_prime(k_bitsize)) == NULL) {
             goto kryptos_mp_gen_prime_2k1_epilogue;
         }
-printf("k = ");print_mp(k);
+printf("k = ");kryptos_print_mp(k);
         if ((p = kryptos_assign_mp_value(&p, k)) == NULL) {
             goto kryptos_mp_gen_prime_2k1_epilogue;
         }
@@ -2271,7 +2272,7 @@ printf("k = ");print_mp(k);
         if((p = kryptos_mp_add(&p, _1)) == NULL) {
             goto kryptos_mp_gen_prime_2k1_epilogue;
         }
-printf("p = ");print_mp(p);
+printf("p = ");kryptos_print_mp(p);
         kryptos_del_mp_value(k);
         k = NULL;
 
@@ -2325,10 +2326,10 @@ kryptos_mp_value_t *kryptos_mp_montgomery_reduction(const kryptos_mp_value_t *x,
     if ((d = kryptos_mp_div(b, y, &r)) == NULL) {
         goto kryptos_mp_montgomery_reduction_epilogue;
     }
-//printf("x = "); print_mp(x);
-//printf("d = "); print_mp(d);
-//printf("r = "); print_mp(r);
-//printf("z = "); print_mp(z);
+//printf("x = "); kryptos_print_mp(x);
+//printf("d = "); kryptos_print_mp(d);
+//printf("r = "); kryptos_print_mp(r);
+//printf("z = "); kryptos_print_mp(z);
 //printf("DIV1-END\n");
     kryptos_del_mp_value(d);
 
@@ -2338,8 +2339,8 @@ kryptos_mp_value_t *kryptos_mp_montgomery_reduction(const kryptos_mp_value_t *x,
 
     kryptos_del_mp_value(r);
     r = NULL;
-//printf("z = ");print_mp(z);
-//printf("y = ");print_mp(y);
+//printf("z = ");kryptos_print_mp(z);
+//printf("y = ");kryptos_print_mp(y);
 //printf("DIV2-BEGIN\n");
     if ((d = kryptos_mp_div(z, y, &r)) == NULL) {
         goto kryptos_mp_montgomery_reduction_epilogue;
@@ -2524,35 +2525,35 @@ kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *ua, const krypto
     D = kryptos_hex_value_as_mp("1", 1);
 
     do {
-        printf("u = "); print_mp(u);
-        printf("v = "); print_mp(v);
-        printf("A = "); print_mp(A);
-        printf("B = "); print_mp(B);
-        printf("C = "); print_mp(C);
-        printf("D = "); print_mp(D);
-        printf("x = "); print_mp(x);
-        printf("y = "); print_mp(y);
+        printf("u = "); kryptos_print_mp(u);
+        printf("v = "); kryptos_print_mp(v);
+        printf("A = "); kryptos_print_mp(A);
+        printf("B = "); kryptos_print_mp(B);
+        printf("C = "); kryptos_print_mp(C);
+        printf("D = "); kryptos_print_mp(D);
+        printf("x = "); kryptos_print_mp(x);
+        printf("y = "); kryptos_print_mp(y);
         printf("--\n");
         while (kryptos_mp_is_even(u)) {
             u = kryptos_mp_signed_rsh(&u, 1);
             if (kryptos_mp_is_even(A) && kryptos_mp_is_even(B)) {
-                printf("\tA = "); print_mp(A);
-                printf("\tB = "); print_mp(B);
+                printf("\tA = "); kryptos_print_mp(A);
+                printf("\tB = "); kryptos_print_mp(B);
                 A = kryptos_mp_signed_rsh(&A, 1);
                 B = kryptos_mp_signed_rsh(&B, 1);
-                printf("\tA' = "); print_mp(A);
-                printf("\tB' = "); print_mp(B);
+                printf("\tA' = "); kryptos_print_mp(A);
+                printf("\tB' = "); kryptos_print_mp(B);
             } else {
-                printf("\tA = "); print_mp(A);
-                printf("\ty = "); print_mp(y);
+                printf("\tA = "); kryptos_print_mp(A);
+                printf("\ty = "); kryptos_print_mp(y);
                 A = kryptos_mp_add(&A, y);
                 A = kryptos_mp_signed_rsh(&A, 1);
-                printf("\tA'= "); print_mp(A);
-                printf("\tB = "); print_mp(B);
-                printf("\tx = "); print_mp(x);
+                printf("\tA'= "); kryptos_print_mp(A);
+                printf("\tB = "); kryptos_print_mp(B);
+                printf("\tx = "); kryptos_print_mp(x);
                 B = kryptos_mp_sub(&B, x);
                 B = kryptos_mp_signed_rsh(&B, 1);
-                printf("\tB' = "); print_mp(B);
+                printf("\tB' = "); kryptos_print_mp(B);
             }
             printf("--\n");
         }
@@ -2560,50 +2561,50 @@ kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *ua, const krypto
         while (kryptos_mp_is_even(v)) {
             v = kryptos_mp_signed_rsh(&v, 1);
             if (kryptos_mp_is_even(C) && kryptos_mp_is_even(D)) {
-                printf("\tC = "); print_mp(C);
-                printf("\tD = "); print_mp(D);
+                printf("\tC = "); kryptos_print_mp(C);
+                printf("\tD = "); kryptos_print_mp(D);
                 C = kryptos_mp_signed_rsh(&C, 1);
                 D = kryptos_mp_signed_rsh(&D, 1);
-                printf("\tC' = "); print_mp(C);
-                printf("\tD' = "); print_mp(D);
+                printf("\tC' = "); kryptos_print_mp(C);
+                printf("\tD' = "); kryptos_print_mp(D);
             } else {
-                printf("\tC = "); print_mp(C);
-                printf("\ty = "); print_mp(y);
+                printf("\tC = "); kryptos_print_mp(C);
+                printf("\ty = "); kryptos_print_mp(y);
                 C = kryptos_mp_add(&C, y);
                 C = kryptos_mp_signed_rsh(&C, 1);
-                printf("\tC'= "); print_mp(C);
-                printf("\tD = "); print_mp(D);
-                printf("\tx = "); print_mp(x);
+                printf("\tC'= "); kryptos_print_mp(C);
+                printf("\tD = "); kryptos_print_mp(D);
+                printf("\tx = "); kryptos_print_mp(x);
                 D = kryptos_mp_sub(&D, x);
-                printf("\tD' = "); print_mp(D);
+                printf("\tD' = "); kryptos_print_mp(D);
                 D = kryptos_mp_signed_rsh(&D, 1);
-                printf("\tD'' = "); print_mp(D);
+                printf("\tD'' = "); kryptos_print_mp(D);
             }
         }
 
         if (kryptos_mp_ge(u, v)) {
-            printf("\tuL = "); print_mp(u);
-            printf("\tC = "); print_mp(C);
-            printf("\tAL = "); print_mp(A);
-            printf("\tBL = "); print_mp(B);
-//            printf("\t\tD = "); print_mp(D);
+            printf("\tuL = "); kryptos_print_mp(u);
+            printf("\tC = "); kryptos_print_mp(C);
+            printf("\tAL = "); kryptos_print_mp(A);
+            printf("\tBL = "); kryptos_print_mp(B);
+//            printf("\t\tD = "); kryptos_print_mp(D);
             u = kryptos_mp_sub(&u, v);
             A = kryptos_mp_sub(&A, C);
             B = kryptos_mp_sub(&B, D);
-            printf("\tuL' = "); print_mp(u);
-            printf("\tAL' = "); print_mp(A);
-            printf("\tBL' = "); print_mp(B);
+            printf("\tuL' = "); kryptos_print_mp(u);
+            printf("\tAL' = "); kryptos_print_mp(A);
+            printf("\tBL' = "); kryptos_print_mp(B);
         } else {
-            printf("\tvL = "); print_mp(v);
-            printf("\tA = "); print_mp(A);
-            printf("\tCL = "); print_mp(C);
-            printf("\tDL = "); print_mp(D);
+            printf("\tvL = "); kryptos_print_mp(v);
+            printf("\tA = "); kryptos_print_mp(A);
+            printf("\tCL = "); kryptos_print_mp(C);
+            printf("\tDL = "); kryptos_print_mp(D);
             v = kryptos_mp_sub(&v, u);
             C = kryptos_mp_sub(&C, A);
             D = kryptos_mp_sub(&D, B);
-            printf("\tvL' = "); print_mp(v);
-            printf("\tCL' = "); print_mp(C);
-            printf("\tDL' = "); print_mp(D);
+            printf("\tvL' = "); kryptos_print_mp(v);
+            printf("\tCL' = "); kryptos_print_mp(C);
+            printf("\tDL' = "); kryptos_print_mp(D);
         }
 
         if ((has_converged = kryptos_mp_eq(u, _0))) {
@@ -2620,9 +2621,9 @@ kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *ua, const krypto
 
 kryptos_mp_modinv_epilogue:
 
-    printf("a = "); print_mp(a);
-    printf("b = "); print_mp(b);
-    printf("gcd = "); print_mp(gcd);
+    printf("a = "); kryptos_print_mp(a);
+    printf("b = "); kryptos_print_mp(b);
+    printf("gcd = "); kryptos_print_mp(gcd);
 
     if (!kryptos_mp_eq(gcd, _1)) {
         // INFO(Rafael): There is no multiplicative inverse.

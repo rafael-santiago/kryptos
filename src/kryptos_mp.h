@@ -80,7 +80,7 @@ kryptos_mp_value_t *kryptos_mp_gen_prime_2k1(const size_t k_bitsize);
 
 kryptos_mp_value_t *kryptos_mp_montgomery_reduction(const kryptos_mp_value_t *x, const kryptos_mp_value_t *y);
 
-void print_mp(const kryptos_mp_value_t *v);
+void kryptos_print_mp(const kryptos_mp_value_t *v);
 
 kryptos_mp_value_t *kryptos_mp_div_2p(const kryptos_mp_value_t *x, const kryptos_u32_t power, kryptos_mp_value_t **r);
 
