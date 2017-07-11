@@ -1098,6 +1098,30 @@ static ssize_t kryptos_mp_max_used_byte(const kryptos_mp_value_t *x) {
     return b;
 }
 
+kryptos_mp_value_t *kryptos_mp_mul_byte(kryptos_mp_value_t **x, const kryptos_u8_t byte) {
+    ssize_t d;
+    kryptos_u8_t mc = 0;
+    short bmul;
+
+    if (x == NULL) {
+        return NULL;
+    }
+
+    for (d = 0; d < (*x)->data_size; d++) {
+        bmul = (*x)->data[d] * byte + mc;
+        mc = (bmul >> 8);
+        (*x)->data[d] = (bmul & 0xFF);
+    }
+
+    if (mc > 0) {
+        (*x) = kryptos_mp_lsh(x, 8);
+        (*x) = kryptos_mp_rsh(x, 8);
+        (*x)->data[(*x)->data_size - 1] = mc;
+    }
+
+    return (*x);
+}
+
 #ifndef KRYPTOS_MP_SLOWER_MP_DIV
 
 #undef KRYPTOS_MP_DIV_DEBUG_INFO
@@ -1228,6 +1252,7 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
     }
 
     kryptos_del_mp_value(b);
+    b = NULL;
 
     if (kryptos_mp_lt(xn, yn)) {
         goto kryptos_mp_div_epilogue;
@@ -1255,6 +1280,10 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
 
         qtemp /= yn->data[n - 1];
 
+        if (qtemp > 0xFF) {
+            qtemp = 0xFF;
+        }
+
 #ifdef KRYPTOS_MP_DIV_DEBUG_INFO
         printf("%X\n", qtemp);
 #endif
@@ -1267,20 +1296,10 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
 
         do {
 
-            if (qtemp <= 0xFF) {
-                q->data[j] = qtemp & 0xFF;
-            } else {
-                // INFO(Rafael): Since it was not normalized we must handle this issue here.
-                q->data[j--] = qtemp >> 8;
-                if (j >= 0) {
-                    q->data[j  ] = qtemp & 0xFF;
-                }
-            }
+            q->data[j] = qtemp & 0xFF;
 
-            b = kryptos_new_mp_value(2 << 3);
-            b->data[1] = qtemp >> 8;
-            b->data[0] = qtemp & 0xFF;
-            b = kryptos_mp_mul(&b, yn);
+            b = kryptos_assign_mp_value(&b, yn);
+            b = kryptos_mp_mul_byte(&b, q->data[j]);
             b = kryptos_mp_lsh(&b, 8 * d);
 
             is_less = kryptos_mp_lt(xn, b);
@@ -1310,6 +1329,7 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
 
         if (b != NULL) {
             kryptos_del_mp_value(b);
+            b = NULL;
         }
 
 #ifdef KRYPTOS_MP_DIV_DEBUG_INFO
