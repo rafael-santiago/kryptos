@@ -343,14 +343,18 @@ kryptos_mp_value_t *kryptos_new_mp_value(const size_t bitsize) {
         mp->data_size++;
     }
 
-    while ((mp->data_size % 8) != 0) {
+    while ((mp->data_size % (sizeof(kryptos_mp_digit_t) << 3)) != 0) {
         mp->data_size++;
     }
 
-    mp->data_size = mp->data_size >> 3;
+    mp->data_size = kryptos_mp_bit2byte(mp->data_size);
 
-    mp->data = (kryptos_u8_t *) kryptos_newseg(mp->data_size);
-    memset(mp->data, 0, mp->data_size);
+    if (mp->data_size == 0) {
+        mp->data_size = 1;
+    }
+
+    mp->data = (kryptos_u8_t *) kryptos_newseg(mp->data_size * sizeof(kryptos_mp_digit_t));
+    memset(mp->data, 0, mp->data_size * sizeof(kryptos_mp_digit_t));
 
     return mp;
 }
@@ -384,8 +388,7 @@ kryptos_mp_value_t *kryptos_assign_mp_value(kryptos_mp_value_t **dest,
     if (src->data_size > (*dest)->data_size) {
         kryptos_freeseg((*dest)->data);
         (*dest)->data_size = src->data_size;
-        //(*dest)->data = (kryptos_u8_t *) kryptos_newseg(src->data_size << 3);
-        (*dest)->data = (kryptos_u8_t *) kryptos_newseg(src->data_size);
+        (*dest)->data = (kryptos_mp_digit_t *) kryptos_newseg(kryptos_mp_byte2bit(src->data_size));
     }
 
     memset((*dest)->data, 0, (*dest)->data_size);
@@ -405,6 +408,9 @@ kryptos_mp_value_t *kryptos_hex_value_as_mp(const kryptos_u8_t *value, const siz
     const kryptos_u8_t *vp, *vp_end;
     size_t d;
     kryptos_u8_t nb;
+#ifdef KRYPTOS_MP_U32_DIGIT
+    size_t w;
+#endif
 
     if (value == NULL || value_size == 0) {
         return NULL;
@@ -420,6 +426,8 @@ kryptos_mp_value_t *kryptos_hex_value_as_mp(const kryptos_u8_t *value, const siz
     vp_end = vp + value_size;
 
     d = mp->data_size - 1;
+
+#ifndef KRYPTOS_MP_U32_DIGIT
 
     if ((value_size % 2) != 0) {
         mp->data[d] = kryptos_mp_xnb(*vp);
@@ -440,6 +448,32 @@ kryptos_mp_value_t *kryptos_hex_value_as_mp(const kryptos_u8_t *value, const siz
         d--;
     }
 
+#else
+    w = 0;
+
+    while (vp < vp_end && d >= 0) {
+        nb = kryptos_mp_xnb(*vp);
+
+        mp->data[d] <<= 4;
+
+        if ((vp + 1) != vp_end) {
+            nb = nb << 4 | kryptos_mp_xnb(*(vp + 1));
+            mp->data[d] <<= 4;
+        }
+
+        mp->data[d] |= nb;
+
+        w = (w + 1) % sizeof(kryptos_mp_digit_t);
+
+        if (w == 0) {
+            d--;
+        }
+
+        vp += 2;
+    }
+
+#endif
+
     return mp;
 }
 
@@ -451,7 +485,11 @@ kryptos_u8_t *kryptos_mp_value_as_hex(const kryptos_mp_value_t *value, size_t *h
         return NULL;
     }
 
+#ifndef KRYPTOS_MP_U32_DIGIT
     *hex_size = value->data_size << 1;
+#else
+    *hex_size = (value->data_size << 2) << 1;
+#endif
 
     hex = (kryptos_u8_t *) kryptos_newseg(*hex_size + 1);
 
@@ -467,12 +505,29 @@ kryptos_u8_t *kryptos_mp_value_as_hex(const kryptos_mp_value_t *value, size_t *h
     hp = hex;
     hp_end = hp + *hex_size;
 
+#ifndef KRYPTOS_MP_U32_DIGIT
+
     while (d >= 0) {
         *hp       = kryptos_mp_nbx(value->data[d] >> 4);
         *(hp + 1) = kryptos_mp_nbx(value->data[d] & 0xF);
         hp += 2;
         d--;
     }
+
+#else
+    while (d >= 0) {
+        *hp       = kryptos_mp_nbx(value->data[d] >> 28);
+        *(hp + 1) = kryptos_mp_nbx((value->data[d] >> 24) & 0xF);
+        *(hp + 2) = kryptos_mp_nbx((value->data[d] >> 20) & 0xF);
+        *(hp + 3) = kryptos_mp_nbx((value->data[d] >> 16) & 0xF);
+        *(hp + 4) = kryptos_mp_nbx((value->data[d] >> 12) & 0xF);
+        *(hp + 5) = kryptos_mp_nbx((value->data[d] >>  8) & 0xF);
+        *(hp + 6) = kryptos_mp_nbx((value->data[d] >>  4) & 0xF);
+        *(hp + 7) = kryptos_mp_nbx(value->data[d] & 0xF);
+        hp += 8;
+        d--;
+    }
+#endif
 
     return hex;
 }
@@ -627,6 +682,7 @@ ssize_t kryptos_mp_bitcount(const kryptos_mp_value_t *n) {
 
     b = dn << 3;
 
+#ifndef KRYPTOS_MP_U32_DIGIT
     if (n->data[dn] >> 7) {
         b += 8;
     } else if (n->data[dn] >> 6) {
@@ -644,6 +700,73 @@ ssize_t kryptos_mp_bitcount(const kryptos_mp_value_t *n) {
     } else if (n->data[dn] & 0x1) {
         b += 1;
     }
+#else
+    if (n->data[dn] >> 31) {
+        b += 32;
+    } else if (n->data[dn] >> 30) {
+        b += 31;
+    } else if (n->data[dn] >> 29) {
+        b += 30;
+    } else if (n->data[dn] >> 28) {
+        b += 29;
+    } else if (n->data[dn] >> 27) {
+        b += 28;
+    } else if (n->data[dn] >> 26) {
+        b += 27;
+    } else if (n->data[dn] >> 25) {
+        b += 26;
+    } else if (n->data[dn] >> 24) {
+        b += 25;
+    } else if (n->data[dn] >> 23) {
+        b += 24;
+    } else if (n->data[dn] >> 22) {
+        b += 23;
+    } else if (n->data[dn] >> 21) {
+        b += 22;
+    } else if (n->data[dn] >> 20) {
+        b += 21;
+    } else if (n->data[dn] >> 19) {
+        b += 20;
+    } else if (n->data[dn] >> 18) {
+        b += 19;
+    } else if (n->data[dn] >> 17) {
+        b += 18;
+    } else if (n->data[dn] >> 16) {
+        b += 17;
+    } else if (n->data[dn] >> 15) {
+        b += 16;
+    } else if (n->data[dn] >> 14) {
+        b += 15;
+    } else if (n->data[dn] >> 13) {
+        b += 14;
+    } else if (n->data[dn] >> 12) {
+        b += 13;
+    } else if (n->data[dn] >> 11) {
+        b += 12;
+    } else if (n->data[dn] >> 10) {
+        b += 11;
+    } else if (n->data[dn] >>  9) {
+        b += 10;
+    } else if (n->data[dn] >>  8) {
+        b += 9;
+    } else if (n->data[dn] >>  7) {
+        b += 8;
+    } else if (n->data[dn] >>  6) {
+        b += 7;
+    } else if (n->data[dn] >>  5) {
+        b += 6;
+    } else if (n->data[dn] >>  4) {
+        b += 5;
+    } else if (n->data[dn] >>  3) {
+        b += 4;
+    } else if (n->data[dn] >>  2) {
+        b += 3;
+    } else if (n->data[dn] >>  1) {
+        b += 2;
+    } else if (n->data[dn] & 0x1) {
+        b += 1;
+    }
+#endif
 
     return b;
 }
@@ -802,6 +925,9 @@ kryptos_mp_value_t *kryptos_assign_hex_value_to_mp(kryptos_mp_value_t **dest,
     const kryptos_u8_t *vp, *vp_end;
     ssize_t d;
     kryptos_u8_t nb;
+#ifdef KRYPTOS_MP_U32_DIGIT
+    size_t w;
+#endif
 
     if (dest == NULL || value == NULL || value_size == 0) {
         return NULL;
@@ -823,6 +949,7 @@ kryptos_mp_value_t *kryptos_assign_hex_value_to_mp(kryptos_mp_value_t **dest,
         d = (value_size >> 1) - 1;
     }
 
+#ifndef KRYPTOS_MP_U32_DIGIT
     while (vp < vp_end && d >= 0) {
         nb = 0;
 
@@ -835,6 +962,28 @@ kryptos_mp_value_t *kryptos_assign_hex_value_to_mp(kryptos_mp_value_t **dest,
         vp += 2;
         d--;
     }
+#else
+    w = 0;
+
+    while (vp < vp_end && d >= 0) {
+        nb = 0;
+
+        if ((vp + 1) != vp_end) {
+            nb = kryptos_mp_xnb(*(vp + 1));
+        }
+
+        (*dest)->data[d] = (*dest)->data[d] << 8 | ((kryptos_mp_xnb(*vp) << 4) | nb);
+
+        w = (w + 1) % sizeof(kryptos_mp_digit_t);
+
+        if (w == 0) {
+            d--;
+        }
+
+        vp += 2;
+    }
+
+#endif
 
     return (*dest);
 }
@@ -1036,6 +1185,8 @@ const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const k
     }\
 }
 
+#ifndef KRYPTOS_MP_U32_DIGIT
+
     for (d = bb->data_size - 1; d >= 0; d--) {
         kryptos_mp_get_gt_bitcmp(aa, bb, d, 7, x, y);
         kryptos_mp_get_gt_bitcmp(aa, bb, d, 6, x, y);
@@ -1046,6 +1197,45 @@ const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const k
         kryptos_mp_get_gt_bitcmp(aa, bb, d, 1, x, y);
         kryptos_mp_get_gt_bitcmp(aa, bb, d, 0, x, y);
     }
+
+#else
+
+    for (d = bb->data_size - 1; d >= 0; d--) {
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 31, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 30, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 29, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 28, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 27, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 26, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 25, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 24, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 23, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 22, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 21, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 20, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 19, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 18, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 17, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 16, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 15, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 14, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 13, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 12, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 11, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d, 10, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d,  9, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d,  8, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d,  7, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d,  6, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d,  5, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d,  4, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d,  3, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d,  2, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d,  1, x, y);
+        kryptos_mp_get_gt_bitcmp(aa, bb, d,  0, x, y);
+    }
+
+#endif
 
 #undef kryptos_mp_get_gt_bitcmp
 
@@ -1087,7 +1277,11 @@ kryptos_mp_value_t *kryptos_mp_pow(const kryptos_mp_value_t *g, const kryptos_mp
 
 void kryptos_print_mp(const kryptos_mp_value_t *v) {
     ssize_t d;
+#ifndef KRYPTOS_MP_U32_DIGIT
     for (d = v->data_size - 1; d >= 0; d--) printf("%.2X", v->data[d]);
+#else
+    for (d = v->data_size - 1; d >= 0; d--) printf("%.8X", v->data[d]);
+#endif
     printf("\n");
 }
 

@@ -18,7 +18,7 @@ CUTE_TEST_CASE(kryptos_mp_new_value_tests)
     mp = kryptos_new_mp_value(1024);
     CUTE_ASSERT(mp != NULL);
     CUTE_ASSERT(mp->data != NULL);
-    CUTE_ASSERT(mp->data_size == 128);
+    CUTE_ASSERT(kryptos_mp_byte2bit(mp->data_size) == 1024);
     for (d = 0; d < mp->data_size; d++) {
         CUTE_ASSERT(mp->data[d] == 0);
     }
@@ -30,7 +30,8 @@ CUTE_TEST_CASE(kryptos_mp_hex_value_as_mp_tests)
     kryptos_mp_value_t *mp;
     mp = kryptos_hex_value_as_mp("FFEEDDCCBBAA00112233445566778899", 32);
     CUTE_ASSERT(mp != NULL);
-    CUTE_ASSERT(mp->data_size == 16);
+    CUTE_ASSERT(kryptos_mp_byte2bit(mp->data_size) == 128);
+#ifndef KRYPTOS_MP_U32_DIGIT
     CUTE_ASSERT(mp->data[ 0] == 0x99);
     CUTE_ASSERT(mp->data[ 1] == 0x88);
     CUTE_ASSERT(mp->data[ 2] == 0x77);
@@ -47,6 +48,12 @@ CUTE_TEST_CASE(kryptos_mp_hex_value_as_mp_tests)
     CUTE_ASSERT(mp->data[13] == 0xDD);
     CUTE_ASSERT(mp->data[14] == 0xEE);
     CUTE_ASSERT(mp->data[15] == 0xFF);
+#else
+    CUTE_ASSERT(mp->data[0] == 0x66778899);
+    CUTE_ASSERT(mp->data[1] == 0x22334455);
+    CUTE_ASSERT(mp->data[2] == 0xBBAA0011);
+    CUTE_ASSERT(mp->data[3] == 0xFFEEDDCC);
+#endif
     kryptos_del_mp_value(mp);
 CUTE_TEST_CASE_END
 
@@ -110,7 +117,7 @@ CUTE_TEST_CASE(kryptos_assign_mp_value_tests)
     a = kryptos_assign_mp_value(&a, b);
     CUTE_ASSERT(a != NULL);
 
-    CUTE_ASSERT(a->data_size == 20);
+    CUTE_ASSERT(kryptos_mp_byte2bit(a->data_size) == 160);
 
     CUTE_ASSERT(memcmp(a->data, b->data, b->data_size) == 0);
     for (d = b->data_size; d < a->data_size; d++) {
@@ -126,28 +133,42 @@ CUTE_TEST_CASE(kryptos_assign_hex_value_to_mp_tests)
     // INFO(Rafael): mp == NULL.
     mp = kryptos_assign_hex_value_to_mp(&mp, "DEADBEEF", 8);
     CUTE_ASSERT(mp != NULL);
-    CUTE_ASSERT(mp->data_size == 4);
+    CUTE_ASSERT(kryptos_mp_byte2bit(mp->data_size) == 32);
+#ifndef KRYPTOS_MP_U32_DIGIT
     CUTE_ASSERT(mp->data[0] == 0xEF);
     CUTE_ASSERT(mp->data[1] == 0xBE);
     CUTE_ASSERT(mp->data[2] == 0xAD);
     CUTE_ASSERT(mp->data[3] == 0xDE);
+#else
+    CUTE_ASSERT(mp->data[0] == 0xDEADBEEF);
+#endif
 
     kryptos_del_mp_value(mp);
 
     // INFO(Rafael): mp != NULL && mp->data_size < hex-value-bitsize
     mp = kryptos_new_mp_value(16);
     CUTE_ASSERT(mp != NULL);
-    CUTE_ASSERT(mp->data_size == 2);
+#ifndef KRYPTOS_MP_U32_DIGIT
+    CUTE_ASSERT(kryptos_mp_byte2bit(mp->data_size) == 16);
+#else
+    CUTE_ASSERT(kryptos_mp_byte2bit(mp->data_size) == 32);
+#endif
+#ifndef KRYPTOS_MP_U32_DIGIT
     mp = kryptos_assign_hex_value_to_mp(&mp, "DEADBEEF", 8);
     CUTE_ASSERT(mp->data[0] == 0xAD);
     CUTE_ASSERT(mp->data[1] == 0xDE);
+#else
+    mp = kryptos_assign_hex_value_to_mp(&mp, "DEADDEADBEEF", 8);
+    CUTE_ASSERT(mp->data[0] == 0xDEADDEAD);
+#endif
     kryptos_del_mp_value(mp);
 
     // INFO(Rafael): mp != NULL && mp->data_size > hex-value-bitsize
     mp = kryptos_new_mp_value(64);
     CUTE_ASSERT(mp != NULL);
-    CUTE_ASSERT(mp->data_size == 8);
+    CUTE_ASSERT(kryptos_mp_byte2bit(mp->data_size) == 64);
     mp = kryptos_assign_hex_value_to_mp(&mp, "DEADBEEF", 8);
+#ifndef KRYPTOS_MP_U32_DIGIT
     CUTE_ASSERT(mp->data[0] == 0xEF);
     CUTE_ASSERT(mp->data[1] == 0xBE);
     CUTE_ASSERT(mp->data[2] == 0xAD);
@@ -156,6 +177,10 @@ CUTE_TEST_CASE(kryptos_assign_hex_value_to_mp_tests)
     CUTE_ASSERT(mp->data[5] == 0x00);
     CUTE_ASSERT(mp->data[6] == 0x00);
     CUTE_ASSERT(mp->data[7] == 0x00);
+#else
+    CUTE_ASSERT(mp->data[1] == 0xDEADBEEF);
+    CUTE_ASSERT(mp->data[0] == 0x0);
+#endif
     kryptos_del_mp_value(mp);
 CUTE_TEST_CASE_END
 
@@ -714,14 +739,14 @@ CUTE_TEST_CASE(kryptos_mp_is_neg_tests)
     };
     struct is_neg_tests_ctx test_vector[] = {
         {                "2", 0 },
-        {               "FE", 1 },
+        {               "FE", 0 },
         {             "0002", 0 },
-        {             "FFFE", 1 },
+        {             "FFFE", 0 },
         {         "0000000A", 0 },
-        {         "FFFFFFF6", 1 },
-        {         "21524111", 0 },
+        {         "FFFFFFF6", 0 },
+        {         "21524111", 1 },
         {         "DEADBEEF", 1 },
-        { "2152411021524111", 0 },
+        { "2152411021524111", 1 },
         { "DEADBEEFDEADBEEF", 1 }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;

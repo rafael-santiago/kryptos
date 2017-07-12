@@ -34,7 +34,7 @@ int kryptos_mp_eq(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
 
 const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
 
-#define kryptos_mp_is_neg(a) ( ((a)->data[(a)->data_size - 1] >> 7) )
+#define kryptos_mp_is_neg(a) ( ((a)->data[0] & 0x1) )
 
 #define kryptos_mp_ne(a, b) ( kryptos_mp_eq((a), (b)) == 0 )
 
@@ -103,5 +103,19 @@ kryptos_mp_value_t *kryptos_mp_signed_mul(kryptos_mp_value_t **dest, const krypt
 ssize_t kryptos_mp_bitcount(const kryptos_mp_value_t *n);
 
 kryptos_mp_value_t *kryptos_mp_mul_byte(kryptos_mp_value_t **x, const kryptos_u8_t byte);
+
+#ifndef KRYPTOS_MP_U32_DIGIT
+
+#define kryptos_mp_bit2byte(b) ( (b) >> 3 )
+
+#define kryptos_mp_byte2bit(b) ( (b) << 3 )
+
+#else
+
+#define kryptos_mp_bit2byte(b) ( (b) >> 5 )
+
+#define kryptos_mp_byte2bit(b) ( (b) << 5 )
+
+#endif
 
 #endif

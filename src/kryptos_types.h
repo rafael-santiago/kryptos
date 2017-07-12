@@ -133,9 +133,17 @@ typedef void (*kryptos_hash_func)(kryptos_task_ctx **ktask, const int to_hex);
 
 typedef size_t (*kryptos_hash_size_func)(void);
 
+#define KRYPTOS_MP_U32_DIGIT 1
+
+#ifndef KRYPTOS_MP_U32_DIGIT
+typedef kryptos_u8_t kryptos_mp_digit_t;
+#else
+typedef kryptos_u32_t kryptos_mp_digit_t;
+#endif
+
 typedef struct kryptos_mp_value {
     size_t data_size;
-    kryptos_u8_t *data;
+    kryptos_mp_digit_t *data;
 }kryptos_mp_value_t;
 
 #define KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(cipher_name)\
