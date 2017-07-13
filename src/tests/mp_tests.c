@@ -737,18 +737,33 @@ CUTE_TEST_CASE(kryptos_mp_is_neg_tests)
         kryptos_u8_t *v;
         int is_neg;
     };
+#ifndef KRYPTOS_MP_U32_DIGIT
     struct is_neg_tests_ctx test_vector[] = {
         {                "2", 0 },
-        {               "FE", 0 },
+        {               "FE", 1 },
         {             "0002", 0 },
-        {             "FFFE", 0 },
+        {             "FFFE", 1 },
         {         "0000000A", 0 },
-        {         "FFFFFFF6", 0 },
-        {         "21524111", 1 },
+        {         "FFFFFFF6", 1 },
+        {         "21524111", 0 },
         {         "DEADBEEF", 1 },
-        { "2152411021524111", 1 },
+        { "2152411021524111", 0 },
         { "DEADBEEFDEADBEEF", 1 }
     };
+#else
+    struct is_neg_tests_ctx test_vector[] = {
+        {         "00000002", 0 },
+        {         "FFFFFFFE", 1 },
+        {         "00000002", 0 },
+        {         "FFFFFFFE", 1 },
+        {         "0000000A", 0 },
+        {         "FFFFFFF6", 1 },
+        {         "21524111", 0 },
+        {         "DEADBEEF", 1 },
+        { "2152411021524111", 0 },
+        { "DEADBEEFDEADBEEF", 1 }
+    };
+#endif
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     kryptos_mp_value_t *v;
     for (tv = 0; tv < tv_nr; tv++) {

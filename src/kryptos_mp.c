@@ -406,17 +406,32 @@ kryptos_mp_value_t *kryptos_assign_mp_value(kryptos_mp_value_t **dest,
 kryptos_mp_value_t *kryptos_hex_value_as_mp(const kryptos_u8_t *value, const size_t value_size) {
     kryptos_mp_value_t *mp;
     const kryptos_u8_t *vp, *vp_end;
-    size_t d;
+    ssize_t d;
     kryptos_u8_t nb;
 #ifdef KRYPTOS_MP_U32_DIGIT
-    size_t w;
+    size_t w, v;
+    kryptos_u8_t *padded_value = NULL;
 #endif
 
     if (value == NULL || value_size == 0) {
         return NULL;
     }
 
+#ifndef KRYPTOS_MP_U32_DIGIT
+
     mp = kryptos_new_mp_value(value_size << 2);
+
+#else
+
+    v = value_size;
+
+    while ((v % 8) != 0) {
+        v++;
+    }
+
+    mp = kryptos_new_mp_value(v << 2);
+
+#endif
 
     if (mp == NULL) {
         return NULL;
@@ -451,13 +466,22 @@ kryptos_mp_value_t *kryptos_hex_value_as_mp(const kryptos_u8_t *value, const siz
 #else
     w = 0;
 
+    if (v != value_size) {
+        padded_value = (kryptos_u8_t *) kryptos_newseg(v + 1);
+        memset(padded_value, 0, v + 1);
+        memset(padded_value, '0', v);
+        memcpy(padded_value + (v - value_size), value, value_size);
+        vp = padded_value;
+        vp_end = vp + v;
+    }
+
     while (vp < vp_end && d >= 0) {
-        nb = kryptos_mp_xnb(*vp);
+        nb = kryptos_mp_xnb(*(vp));
 
         mp->data[d] <<= 4;
 
         if ((vp + 1) != vp_end) {
-            nb = nb << 4 | kryptos_mp_xnb(*(vp + 1));
+            nb = (nb << 4) | kryptos_mp_xnb(*(vp + 1));
             mp->data[d] <<= 4;
         }
 
@@ -472,6 +496,9 @@ kryptos_mp_value_t *kryptos_hex_value_as_mp(const kryptos_u8_t *value, const siz
         vp += 2;
     }
 
+    if (padded_value != NULL) {
+        kryptos_freeseg(padded_value);
+    }
 #endif
 
     return mp;
@@ -600,7 +627,11 @@ kryptos_mp_multibyte_add_epilogue:
 
 kryptos_mp_value_t *kryptos_mp_add(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
     ssize_t d, s, sn;
+#ifndef KRYPTOS_MP_U32_DIGIT
     kryptos_u16_t bsum;
+#else
+    kryptos_u64_t bsum;
+#endif
     kryptos_u8_t c;
     kryptos_mp_value_t *sum;
     const kryptos_mp_value_t *a, *b;
@@ -617,6 +648,8 @@ kryptos_mp_value_t *kryptos_mp_add(kryptos_mp_value_t **dest, const kryptos_mp_v
 
     kryptos_mp_max_min(a, b, (*dest), src);
 
+#ifndef KRYPTOS_MP_U32_DIGIT
+
     if (a->data_size >= KRYPTOS_MP_MULTIBYTE_FLOOR) {
         // INFO(Rafael): We can process the data bytes as 32-bit groups. So, for example, if we have 128 bytes to sum
         //               96 iterations will be avoided.
@@ -625,9 +658,13 @@ kryptos_mp_value_t *kryptos_mp_add(kryptos_mp_value_t **dest, const kryptos_mp_v
         }
     }
 
-    // WARN(Rafael): Stop growing the dest. From now onit will be set to the maximum data_size.
-    //sum = kryptos_new_mp_value((src->data_size + (*dest)->data_size) << 3);
-    sum = kryptos_new_mp_value(a->data_size << 3);
+    sum = kryptos_new_mp_value(kryptos_mp_byte2bit(a->data_size));
+
+#else
+
+    sum = kryptos_new_mp_value(kryptos_mp_byte2bit((src->data_size + (*dest)->data_size)));
+
+#endif
 
     if (sum == NULL) {
         return NULL;
@@ -637,9 +674,15 @@ kryptos_mp_value_t *kryptos_mp_add(kryptos_mp_value_t **dest, const kryptos_mp_v
     c = 0;
 
     while (d < a->data_size) {
+#ifndef KRYPTOS_MP_U32_DIGIT
         bsum = a->data[d] + ( (d < b->data_size) ? b->data[d] : 0 ) + c;
         c = (bsum > 0xFF);
         sum->data[s] = bsum & 0xFF;
+#else
+        bsum = (kryptos_u64_t)a->data[d] + (kryptos_u64_t)((d < b->data_size) ? b->data[d] : 0) + c;
+        c = (bsum > 0xFFFFFFFF);
+        sum->data[s] = bsum & 0xFFFFFFFF;
+#endif
         s++;
         d++;
     }
@@ -656,7 +699,8 @@ kryptos_mp_add_epilogue:
     (*dest)->data_size = (sn < sum->data_size) ? sn + 1 : sum->data_size;
     kryptos_freeseg((*dest)->data);
 
-    (*dest)->data = (kryptos_u8_t *) kryptos_newseg((*dest)->data_size);
+    (*dest)->data = (kryptos_u8_t *) kryptos_newseg((*dest)->data_size * sizeof(kryptos_mp_digit_t));
+
     if ((*dest)->data != NULL) {
         for (s = sn; s >= 0; s--) {
             (*dest)->data[s] = sum->data[s];
