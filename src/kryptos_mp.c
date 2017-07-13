@@ -1375,24 +1375,40 @@ static ssize_t kryptos_mp_max_used_byte(const kryptos_mp_value_t *x) {
     return b;
 }
 
-kryptos_mp_value_t *kryptos_mp_mul_byte(kryptos_mp_value_t **x, const kryptos_u8_t byte) {
+kryptos_mp_value_t *kryptos_mp_mul_digit(kryptos_mp_value_t **x, const kryptos_mp_digit_t digit) {
     ssize_t d;
+#ifndef KRYPTOS_MP_U32_DIGIT
     kryptos_u8_t mc = 0;
     short bmul;
+#else
+    kryptos_u32_t mc = 0;
+    long long bmul;
+#endif
 
     if (x == NULL) {
         return NULL;
     }
 
     for (d = 0; d < (*x)->data_size; d++) {
-        bmul = (*x)->data[d] * byte + mc;
+#ifndef KRYPTOS_MP_U32_DIGIT
+        bmul = (*x)->data[d] * digit + mc;
         mc = (bmul >> 8);
         (*x)->data[d] = (bmul & 0xFF);
+#else
+        bmul = (kryptos_u64_t)(*x)->data[d] * (kryptos_u64_t)digit + (kryptos_u64_t)mc;
+        mc = (bmul >> 32);
+        (*x)->data[d] = (bmul & 0xFFFFFFFF);
+#endif
     }
 
     if (mc > 0) {
+#ifndef KRYPTOS_MP_U32_DIGIT
         (*x) = kryptos_mp_lsh(x, 8);
         (*x) = kryptos_mp_rsh(x, 8);
+#else
+        (*x) = kryptos_mp_lsh(x, 32);
+        (*x) = kryptos_mp_rsh(x, 32);
+#endif
         (*x)->data[(*x)->data_size - 1] = mc;
     }
 
@@ -1576,7 +1592,7 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
             q->data[j] = qtemp & 0xFF;
 
             b = kryptos_assign_mp_value(&b, yn);
-            b = kryptos_mp_mul_byte(&b, q->data[j]);
+            b = kryptos_mp_mul_digit(&b, q->data[j]);
             b = kryptos_mp_lsh(&b, 8 * d);
 
             is_less = kryptos_mp_lt(xn, b);

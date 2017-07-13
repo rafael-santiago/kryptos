@@ -94,7 +94,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_add_tests);
     CUTE_RUN_TEST(kryptos_mp_sub_tests);
     CUTE_RUN_TEST(kryptos_mp_mul_tests);
-    //CUTE_RUN_TEST(kryptos_mp_mul_byte_tests);
+    CUTE_RUN_TEST(kryptos_mp_mul_digit_tests);
     //CUTE_RUN_TEST(kryptos_mp_not_tests);
     //CUTE_RUN_TEST(kryptos_mp_inv_signal_tests);
     //CUTE_RUN_TEST(kryptos_mp_signed_add_tests);

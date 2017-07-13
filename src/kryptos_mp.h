@@ -110,7 +110,7 @@ kryptos_mp_value_t *kryptos_mp_signed_mul(kryptos_mp_value_t **dest, const krypt
 
 ssize_t kryptos_mp_bitcount(const kryptos_mp_value_t *n);
 
-kryptos_mp_value_t *kryptos_mp_mul_byte(kryptos_mp_value_t **x, const kryptos_u8_t byte);
+kryptos_mp_value_t *kryptos_mp_mul_digit(kryptos_mp_value_t **x, const kryptos_mp_digit_t digit);
 
 #ifndef KRYPTOS_MP_U32_DIGIT
 

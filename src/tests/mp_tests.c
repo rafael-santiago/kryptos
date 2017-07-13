@@ -1031,13 +1031,13 @@ CUTE_TEST_CASE(kryptos_mp_mul_tests)
 
 CUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_mp_mul_byte_tests)
-    struct mul_byte_tests_ctx {
+CUTE_TEST_CASE(kryptos_mp_mul_digit_tests)
+    struct mul_digit_tests_ctx {
         kryptos_u8_t *n;
-        kryptos_u8_t b;
+        kryptos_u8_t d;
         kryptos_u8_t *e;
     };
-    struct mul_byte_tests_ctx test_vector[] = {
+    struct mul_digit_tests_ctx test_vector[] = {
         { "0000000022", 0x02, "000000000044" },
         { "00000000FF", 0x50, "000000004FB0" },
         { "FFFFFFFFFF", 0x99, "98FFFFFFFF67" }
@@ -1048,7 +1048,7 @@ CUTE_TEST_CASE(kryptos_mp_mul_byte_tests)
         n = kryptos_hex_value_as_mp(test_vector[tv].n, strlen(test_vector[tv].n));
         e = kryptos_hex_value_as_mp(test_vector[tv].e, strlen(test_vector[tv].e));
         CUTE_ASSERT(n != NULL && e != NULL);
-        n = kryptos_mp_mul_byte(&n, test_vector[tv].b);
+        n = kryptos_mp_mul_digit(&n, test_vector[tv].d);
         CUTE_ASSERT(n != NULL);
         CUTE_ASSERT(kryptos_mp_eq(n, e) == 1);
         kryptos_del_mp_value(n);
