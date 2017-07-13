@@ -1108,9 +1108,16 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
     kryptos_mp_value_t *m;
     const kryptos_mp_value_t *x, *y;
     ssize_t xd, yd;
+#ifndef KRYPTOS_MP_U32_DIGIT
     short bmul;
     kryptos_u16_t bsum;
     kryptos_u8_t mc, ac;
+#else
+    long long bmul;
+    kryptos_u64_t bsum;
+    kryptos_u32_t mc;
+    kryptos_u8_t ac;
+#endif
 
     if (src == NULL || dest == NULL) {
         return NULL;
@@ -1124,15 +1131,17 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
 
     kryptos_mp_max_min(x, y, (*dest), src);
 
+#ifndef KRYPTOS_MP_U32_DIGIT
     if (x->data_size >= KRYPTOS_MP_MULTIBYTE_FLOOR) {
         if ((m = kryptos_mp_multibyte_mul(x, y)) != NULL) {
             goto kryptos_mp_mul_epilogue;
         }
     }
+#endif
 
     // CLUE(Rafael): Encantamentos baseados em algumas propriedades que talvez a tia Tetéia não quis te contar.
 
-    m = kryptos_new_mp_value(((*dest)->data_size + src->data_size + 1) << 3);
+    m = kryptos_new_mp_value(kryptos_mp_byte2bit((*dest)->data_size + src->data_size + 1));
 
     if (m == NULL) {
         // WARN(Rafael): Better let a memory leak than return a wrong result.
@@ -1144,7 +1153,7 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
     for (yd = 0, r = 0; yd < y->data_size; yd++, r++) {
         mc = 0;
         ac = 0;
-
+#ifndef KRYPTOS_MP_U32_DIGIT
         for (xd = 0; xd < x->data_size; xd++) {
             bmul = y->data[yd] * x->data[xd] + mc;
             mc = (bmul >> 8);
@@ -1158,6 +1167,19 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
         if ((xd + r) < m->data_size) {
             m->data[xd + r] = (m->data[xd + r] + mc + ac) & 0xFF;
         }
+#else
+        for (xd = 0; xd < x->data_size; xd++) {
+            bmul = (kryptos_u64_t)y->data[yd] * (kryptos_u64_t)x->data[xd] + (kryptos_u64_t)mc;
+            mc = (bmul >> 32);
+            bsum = m->data[xd + r] + (bmul & 0xFFFFFFFF) + ac;
+            ac = (bsum > 0xFFFFFFFF);
+            m->data[xd + r] = (bsum & 0xFFFFFFFF);
+        }
+
+        if ((xd + r) < m->data_size) {
+            m->data[xd + r] = (m->data[xd + r] + mc + ac) & 0xFFFFFFFF;
+        }
+#endif
     }
 
 kryptos_mp_mul_epilogue:
@@ -1168,7 +1190,7 @@ kryptos_mp_mul_epilogue:
     kryptos_del_mp_value((*dest));
     (*dest) = NULL;
 
-    (*dest) = kryptos_new_mp_value((xd + 1) << 3);
+    (*dest) = kryptos_new_mp_value(kryptos_mp_byte2bit(xd + 1));
 
     for (yd = xd; yd >= 0; yd--) {
         (*dest)->data[yd] = m->data[yd];
