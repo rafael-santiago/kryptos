@@ -16,6 +16,8 @@
 #include <ctype.h>
 #include <stdio.h>
 
+#include <inttypes.h>
+
 #define kryptos_mp_xnb(n) ( isdigit((n)) ? ( (n) - 48 ) : ( toupper((n)) - 55 )  )
 
 static kryptos_u8_t nbxlt[] = {
@@ -891,8 +893,13 @@ kryptos_mp_multibyte_sub_epilogue:
 
 kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
     ssize_t d, s, sn, dn;
+#ifndef KRYPTOS_MP_U32_DIGIT
     kryptos_u16_t bsub;
     kryptos_u8_t c;
+#else
+    kryptos_u64_t bsub;
+    kryptos_u32_t c;
+#endif
     kryptos_mp_value_t *delta;
 
     if (dest == NULL || src == NULL) {
@@ -905,17 +912,10 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
         return (*dest);
     }
 
-/*
-    if ((*dest)->data_size >= KRYPTOS_MP_MULTIBYTE_FLOOR) {
-        if ((delta = kryptos_mp_multibyte_sub((*dest), src)) != NULL) {
-            goto kryptos_mp_sub_epilogue;
-        }
-    }
-*/
     dn = ((*dest)->data_size > src->data_size) ? (*dest)->data_size : src->data_size;
 
     // INFO(Rafael): Since we are subtracting there is no necessity of increasing the resultant delta.
-    delta = kryptos_new_mp_value(dn << 3);
+    delta = kryptos_new_mp_value(kryptos_mp_byte2bit(dn));
 
     if (delta == NULL) {
         return NULL;
@@ -923,22 +923,39 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
 
     d = s = 0;
     c = 0;
-    //dn = ((*dest)->data_size > src->data_size) ? (*dest)->data_size : src->data_size;
 
     while (d < dn) {
+#ifndef KRYPTOS_MP_U32_DIGIT
         bsub = ( (d < (*dest)->data_size) ? (*dest)->data[d] : 0 ) - ( (d < src->data_size) ? src->data[d] : 0 ) + c;
-//        printf("X = %x / Y = %x / c = %x / BSUB = %x / BYTE-SUB = %x\n", (*dest)->data[d], src->data[d], c, bsub, bsub & 0xFF);
         c += bsub >> 8;
         delta->data[s] = bsub & 0xFF;
+#else
+        bsub = ( (d < (*dest)->data_size) ? (*dest)->data[d] : 0 ) - ( (d < src->data_size) ? src->data[d] : 0 ) + c;
+        c += bsub >> 32;
+        delta->data[s] = bsub & 0xFFFFFFFF;
+#endif
         s++;
         d++;
     }
 
+#ifndef KRYPTOS_MP_U32_DIGIT
     if (c == 0xFF && s < delta->data_size) {
         // INFO(Rafael): Here in this code I am not really concerned about signals, the numbers are expressed with 2^b bits.
         //               However, we will sign that the src was greater than dest by setting the most significant nibble to 0xF.
         delta->data[s] = 0xFF;
     }
+#else
+    if (c == 0xFFFFFFFF && s < delta->data_size) {
+        // INFO(Rafael): Here in this code I am not really concerned about signals, the numbers are expressed with 2^b bits.
+        //               However, we will sign that the src was greater than dest by setting the most significant nibble to 0xF.
+        delta->data[s] = 0xFFFFFFFF;
+    }
+
+    if (delta->data_size > 1 && delta->data[delta->data_size - 1] == 0x1) {
+        // INFO(Rafael): Avoiding the unwanted carry "propagation".
+        delta->data[delta->data_size - 1] = 0;
+    }
+#endif
 
 kryptos_mp_sub_epilogue:
 
@@ -948,7 +965,7 @@ kryptos_mp_sub_epilogue:
     (*dest)->data_size = (sn < delta->data_size) ? sn + 1 : delta->data_size;
     kryptos_freeseg((*dest)->data);
 
-    (*dest)->data = (kryptos_u8_t *) kryptos_newseg((*dest)->data_size);
+    (*dest)->data = (kryptos_u8_t *) kryptos_newseg((*dest)->data_size * sizeof(kryptos_mp_digit_t));
     memset((*dest)->data, 0, (*dest)->data_size);
     if ((*dest)->data != NULL) {
         for (s = sn; s >= 0; s--) {
