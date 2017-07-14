@@ -966,7 +966,7 @@ kryptos_mp_sub_epilogue:
     kryptos_freeseg((*dest)->data);
 
     (*dest)->data = (kryptos_u8_t *) kryptos_newseg((*dest)->data_size * sizeof(kryptos_mp_digit_t));
-    memset((*dest)->data, 0, (*dest)->data_size);
+    memset((*dest)->data, 0, (*dest)->data_size * sizeof(kryptos_mp_digit_t));
     if ((*dest)->data != NULL) {
         for (s = sn; s >= 0; s--) {
             (*dest)->data[s] = delta->data[s];
@@ -1913,11 +1913,12 @@ kryptos_mp_value_t *kryptos_mp_div_2p(const kryptos_mp_value_t *x, const kryptos
 
     if (r != NULL) {
         (*r) = NULL;
-        if ((p = kryptos_new_mp_value(8)) == NULL) {
+        if ((p = kryptos_new_mp_value(kryptos_mp_byte2bit(8))) == NULL) {
             goto kryptos_mp_div_2p_epilogue;
         }
 
         p->data[0] = 1;
+
         if ((p = kryptos_mp_lsh(&p, power)) == NULL) {
             goto kryptos_mp_div_2p_epilogue;
         }
@@ -1938,14 +1939,14 @@ kryptos_mp_value_t *kryptos_mp_div_2p(const kryptos_mp_value_t *x, const kryptos
             ;
 
         if (dn >= 0) {
-            (*r) = kryptos_new_mp_value((dn + 1) << 3);
+            (*r) = kryptos_new_mp_value(kryptos_mp_byte2bit(dn + 1));
             if ((*r) != NULL) {
                 for (d = 0; d <= dn; d++) {
                     (*r)->data[d] = tr->data[d];
                 }
             }
         } else {
-            (*r) = kryptos_new_mp_value(8);
+            (*r) = kryptos_new_mp_value(kryptos_mp_byte2bit(8));
         }
 
     }
@@ -2410,7 +2411,7 @@ kryptos_mp_value_t *kryptos_mp_lsh(kryptos_mp_value_t **a, const int level) {
         return NULL;
     }
 
-    t = kryptos_new_mp_value((((*a)->data_size) << 3) + level);
+    t = kryptos_new_mp_value(kryptos_mp_byte2bit((*a)->data_size) + level);
 
     if (t == NULL) {
         goto kryptos_mp_lsh_epilogue;
@@ -2421,7 +2422,11 @@ kryptos_mp_value_t *kryptos_mp_lsh(kryptos_mp_value_t **a, const int level) {
     for (l = 0; l < level; l++) {
         cb = lc = 0;
         for (d = 0; d < t->data_size; d++, lc = cb) {
+#ifndef KRYPTOS_MP_U32_DIGIT
             cb = t->data[d] >> 7;
+#else
+            cb = t->data[d] >> 31;
+#endif
             t->data[d] = (t->data[d] << 1) | lc;
         }
     }
@@ -2445,14 +2450,18 @@ kryptos_mp_value_t *kryptos_mp_rsh_op(kryptos_mp_value_t **a, const int level, c
         return NULL;
     }
 
-    t = kryptos_new_mp_value((((*a)->data_size) << 3));
+    t = kryptos_new_mp_value(kryptos_mp_byte2bit((*a)->data_size));
 
     if (t == NULL) {
         return NULL;
     }
 
     if (signed_op) {
+#ifndef KRYPTOS_MP_U32_DIGIT
         signal = (kryptos_mp_is_neg(*a)) << 7;
+#else
+        signal = (kryptos_mp_is_neg(*a)) << 31;
+#endif
     }
 
     t = kryptos_assign_mp_value(&t, *a);
@@ -2461,7 +2470,11 @@ kryptos_mp_value_t *kryptos_mp_rsh_op(kryptos_mp_value_t **a, const int level, c
         cb = lc = 0;
         for (d = t->data_size - 1; d >= 0; d--, lc = cb) {
             cb = t->data[d] & 1;
+#ifndef KRYPTOS_MP_U32_DIGIT
             t->data[d] = (t->data[d] >> 1) | (lc << 7);
+#else
+            t->data[d] = (t->data[d] >> 1) | (lc << 31);
+#endif
         }
         t->data[t->data_size - 1] |= signal;
     }
@@ -2470,7 +2483,7 @@ kryptos_mp_rsh_epilogue:
 
     kryptos_del_mp_value(*a);
 
-    (*a) = kryptos_new_mp_value(t->data_size << 3);
+    (*a) = kryptos_new_mp_value(kryptos_mp_byte2bit(t->data_size));
 
     d = 0;
     while (d < t->data_size) {

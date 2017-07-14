@@ -1820,10 +1820,17 @@ CUTE_TEST_CASE(kryptos_mp_signed_rsh_tests)
         kryptos_u8_t *e;
     };
     struct signed_rsh_tests_ctx test_vector[] = {
+#ifndef KRYPTOS_MP_U32_DIGIT
         {        "FEF2",  1,       "FF79" },
         {        "7FF2",  1,       "3FF9" },
         {        "FFFF", 10,       "FFFF" },
         {        "00FF",  3,       "001F" }
+#else
+        {        "FFFFFEF2",  1, "FFFFFF79" },
+        {        "7FFFFFF2",  1, "3FFFFFF9" },
+        {        "FFFFFFFF", 10, "FFFFFFFF" },
+        {        "000000FF",  3, "0000001F" }
+#endif
     };
     size_t test_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;
     kryptos_mp_value_t *a, *e;
