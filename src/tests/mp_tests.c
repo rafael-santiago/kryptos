@@ -779,6 +779,7 @@ CUTE_TEST_CASE(kryptos_mp_add_tests)
     struct add_tests_ctx {
         kryptos_u8_t *a, *b, *e;
     };
+#ifndef KRYPTOS_MP_U32_DIGIT
     struct add_tests_ctx test_vector[] = {
         {       "01",       "01",        "02" },
         {       "02",       "0A",        "0C" },
@@ -805,6 +806,34 @@ CUTE_TEST_CASE(kryptos_mp_add_tests)
                                                       "FFFFFFFFFFFFFFFFFFFF"
                                                       "FFFFFFFFFFFFEE600"   }
     };
+#else
+    struct add_tests_ctx test_vector[] = {
+        {       "01",       "01",        "02" },
+        {       "02",       "0A",        "0C" },
+        {     "DEAD",     "BEEF",     "19D9C" },
+        {     "6671",       "00",      "6671" },
+        { "DEADBEEF",     "BEEF",  "DEAE7DDE" },
+        { "DEADBEEF", "DEADBEEF", "1BD5B7DDE" },
+        { "FFFFFFFFFFFFFFFFFFFF"
+          "FFFFFFFFFFFFFFFFFFFF"
+          "FFFFFFFFFFFFFFFFFFFF"
+          "FFFFFFFFFFFFFFFFFFFF"
+          "FFFFFFFFFFFFFFFFFFFF"
+          "FFFFFFFFFFFF7300",
+                                "FFFFFFFFFFFFFFFFFFFF"
+                                "FFFFFFFFFFFFFFFFFFFF"
+                                "FFFFFFFFFFFFFFFFFFFF"
+                                "FFFFFFFFFFFFFFFFFFFF"
+                                "FFFFFFFFFFFFFFFFFFFF"
+                                "FFFFFFFFFFFF7300",
+                                                      "1FFFFFFFFFFFFFFFFFFF"
+                                                      "FFFFFFFFFFFFFFFFFFFF"
+                                                      "FFFFFFFFFFFFFFFFFFFF"
+                                                      "FFFFFFFFFFFFFFFFFFFF"
+                                                      "FFFFFFFFFFFFFFFFFFFF"
+                                                      "FFFFFFFFFFFFEE600"   }
+    };
+#endif
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
 
     // INFO(Rafael): (null) = (null) + 1;
@@ -866,6 +895,7 @@ CUTE_TEST_CASE(kryptos_mp_sub_tests)
     struct sub_tests_ctx {
         kryptos_u8_t *a, *b, *e;
     };
+#ifndef KRYPTOS_MP_U32_DIGIT
     struct sub_tests_ctx test_vector[] = {
         {               "01",        "1",                "0" },
         {               "06",       "02",               "04" },
@@ -943,8 +973,91 @@ CUTE_TEST_CASE(kryptos_mp_sub_tests)
                                       "EA213BC00BE620AA"
                                       "0753B68FFACFB109"
                                       "110CC071E13FF388"
-                                      "4ECFE7F6" }
+                                      "4ECFE7F6" },
+        { "4083FB324A10B35102CBB276A0348322", "4083FB321A15F35FA412BEF100000000", "2FFABFF15EB8F385A0348322" }
     };
+#else
+    struct sub_tests_ctx test_vector[] = {
+        {               "01",        "1",                "0" },
+        {               "06",       "02",               "04" },
+        {             "2001",     "1006",              "FFB" },
+        {             "DEAD",     "BEEF",             "1FBE" },
+        {             "BEEF",     "DEAD",         "FFFFE042" },
+        {               "01",       "02",         "FFFFFFFF" },
+        {         "DEADBEEF", "BEEFDEAD",         "1FBDE042" },
+        {                "5",     "1006",         "FFFFEFFF" },
+        {               "10",     "1006",         "FFFFF00A" },
+        { "BABABABABABABABA",       "FD", "BABABABABABAB9BD" },
+        { "2B2CC74FC1B75D0F"
+          "9C18DC99223085A5"
+          "EB12D039DFB91475"
+          "E99E4B1A7E4F3BF9"
+          "D1741969150D072D"
+          "5956A0D5668FB0A8"
+          "04A75FE572E9AD34"
+          "5F3AA6BBF5F2DE06"
+          "3D8556760F474F5C"
+          "6B4CB525D1B36383"
+          "15ACE084993BCE2B"
+          "5D87BA2EF383F8E8"
+          "783BC43BD2564E3D"
+          "58318D6F2D712361"
+          "6EF11F5D696EE176"
+          "34BE105678DBDD80"
+          "AEF23E5FBBBD04F5"
+          "3A50430D72A2A149"
+          "BDB4D5DD68B5C2FF"
+          "F0EA213BC00BE620"
+          "AA0753B68FFACFB1"
+          "09110CC071E13FF3"
+          "884ECFE7F6", "2ACA8449BD982E18"
+                        "C8C4000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000000000"
+                        "0000000000", "624306041F2EF6D3"
+                                      "54DC99223085A5EB"
+                                      "12D039DFB91475E9"
+                                      "9E4B1A7E4F3BF9D1"
+                                      "741969150D072D59"
+                                      "56A0D5668FB0A804"
+                                      "A75FE572E9AD345F"
+                                      "3AA6BBF5F2DE063D"
+                                      "8556760F474F5C6B"
+                                      "4CB525D1B3638315"
+                                      "ACE084993BCE2B5D"
+                                      "87BA2EF383F8E878"
+                                      "3BC43BD2564E3D58"
+                                      "318D6F2D7123616E"
+                                      "F11F5D696EE17634"
+                                      "BE105678DBDD80AE"
+                                      "F23E5FBBBD04F53A"
+                                      "50430D72A2A149BD"
+                                      "B4D5DD68B5C2FFF0"
+                                      "EA213BC00BE620AA"
+                                      "0753B68FFACFB109"
+                                      "110CC071E13FF388"
+                                      "4ECFE7F6" },
+        { "4083FB324A10B35102CBB276A0348322", "4083FB321A15F35FA412BEF100000000", "2FFABFF15EB8F385A0348322" }
+    };
+#endif
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     ssize_t x;
 
@@ -1060,6 +1173,7 @@ CUTE_TEST_CASE(kryptos_mp_not_tests)
     struct not_tests_ctx {
         kryptos_u8_t *n, *en;
     };
+#ifndef KRYPTOS_MP_U32_DIGIT
     struct not_tests_ctx test_vector[] = {
         {               "FE",                "1" },
         {                "1",               "FE" },
@@ -1070,6 +1184,18 @@ CUTE_TEST_CASE(kryptos_mp_not_tests)
         { "FFFFFFFFFFFFFFFE", "0000000000000001" },
         { "0000000000000001", "FFFFFFFFFFFFFFFE" }
     };
+#else
+    struct not_tests_ctx test_vector[] = {
+        {               "FE",         "FFFFFF01" },
+        {                "1",         "FFFFFFFE" },
+        {             "FFFE",         "FFFF0001" },
+        {             "0001",         "FFFFFFFE" },
+        {         "FFFFFFFE",         "00000001" },
+        {         "00000001",         "FFFFFFFE" },
+        { "FFFFFFFFFFFFFFFE", "0000000000000001" },
+        { "0000000000000001", "FFFFFFFFFFFFFFFE" }
+    };
+#endif
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     kryptos_mp_value_t *n, *en;
     for (tv = 0; tv < tv_nr; tv++) {
@@ -1088,8 +1214,10 @@ CUTE_TEST_CASE(kryptos_mp_inv_signal_tests)
     struct inv_signal_tests_ctx {
         kryptos_u8_t *n, *en;
     };
+
     // INFO(Rafael): This is equivalent to the "signed char" range (-128 to 128).
     //               We could continue testing beyond the infinity but I am in a rush.
+#ifndef KRYPTOS_MP_U32_DIGIT
     struct inv_signal_tests_ctx test_vector[] = {
         { "FF", "01" }, { "FE", "02" }, { "FD", "03" }, { "FC", "04" }, { "FB", "05" }, { "FA", "06" }, { "F9", "07" },
         { "F8", "08" }, { "F7", "09" }, { "F6", "0A" }, { "F5", "0B" }, { "F4", "0C" }, { "F3", "0D" }, { "F2", "0E" },
@@ -1111,6 +1239,29 @@ CUTE_TEST_CASE(kryptos_mp_inv_signal_tests)
         { "88", "78" }, { "87", "79" }, { "86", "7A" }, { "85", "7B" }, { "84", "7C" }, { "83", "7D" }, { "82", "7E" },
         { "81", "7F" }, { "80", "80" }
     };
+#else
+    struct inv_signal_tests_ctx test_vector[] = {
+        { "FF", "FFFFFF01" }, { "FE", "FFFFFF02" }, { "FD", "FFFFFF03" }, { "FC", "FFFFFF04" }, { "FB", "FFFFFF05" }, { "FA", "FFFFFF06" }, { "F9", "FFFFFF07" },
+        { "F8", "FFFFFF08" }, { "F7", "FFFFFF09" }, { "F6", "FFFFFF0A" }, { "F5", "FFFFFF0B" }, { "F4", "FFFFFF0C" }, { "F3", "FFFFFF0D" }, { "F2", "FFFFFF0E" },
+        { "F1", "FFFFFF0F" }, { "F0", "FFFFFF10" }, { "EF", "FFFFFF11" }, { "EE", "FFFFFF12" }, { "ED", "FFFFFF13" }, { "EC", "FFFFFF14" }, { "EB", "FFFFFF15" },
+        { "EA", "FFFFFF16" }, { "E9", "FFFFFF17" }, { "E8", "FFFFFF18" }, { "E7", "FFFFFF19" }, { "E6", "FFFFFF1A" }, { "E5", "FFFFFF1B" }, { "E4", "FFFFFF1C" },
+        { "E3", "FFFFFF1D" }, { "E2", "FFFFFF1E" }, { "E1", "FFFFFF1F" }, { "E0", "FFFFFF20" }, { "DF", "FFFFFF21" }, { "DE", "FFFFFF22" }, { "DD", "FFFFFF23" },
+        { "DC", "FFFFFF24" }, { "DB", "FFFFFF25" }, { "DA", "FFFFFF26" }, { "D9", "FFFFFF27" }, { "D8", "FFFFFF28" }, { "D7", "FFFFFF29" }, { "D6", "FFFFFF2A" },
+        { "D5", "FFFFFF2B" }, { "D4", "FFFFFF2C" }, { "D3", "FFFFFF2D" }, { "D2", "FFFFFF2E" }, { "D1", "FFFFFF2F" }, { "D0", "FFFFFF30" }, { "CF", "FFFFFF31" },
+        { "CE", "FFFFFF32" }, { "CD", "FFFFFF33" }, { "CC", "FFFFFF34" }, { "CB", "FFFFFF35" }, { "CA", "FFFFFF36" }, { "C9", "FFFFFF37" }, { "C8", "FFFFFF38" },
+        { "C7", "FFFFFF39" }, { "C6", "FFFFFF3A" }, { "C5", "FFFFFF3B" }, { "C4", "FFFFFF3C" }, { "C3", "FFFFFF3D" }, { "C2", "FFFFFF3E" }, { "C1", "FFFFFF3F" },
+        { "C0", "FFFFFF40" }, { "BF", "FFFFFF41" }, { "BE", "FFFFFF42" }, { "BD", "FFFFFF43" }, { "BC", "FFFFFF44" }, { "BB", "FFFFFF45" }, { "BA", "FFFFFF46" },
+        { "B9", "FFFFFF47" }, { "B8", "FFFFFF48" }, { "B7", "FFFFFF49" }, { "B6", "FFFFFF4A" }, { "B5", "FFFFFF4B" }, { "B4", "FFFFFF4C" }, { "B3", "FFFFFF4D" },
+        { "B2", "FFFFFF4E" }, { "B1", "FFFFFF4F" }, { "B0", "FFFFFF50" }, { "AF", "FFFFFF51" }, { "AE", "FFFFFF52" }, { "AD", "FFFFFF53" }, { "AC", "FFFFFF54" },
+        { "AB", "FFFFFF55" }, { "AA", "FFFFFF56" }, { "A9", "FFFFFF57" }, { "A8", "FFFFFF58" }, { "A7", "FFFFFF59" }, { "A6", "FFFFFF5A" }, { "A5", "FFFFFF5B" },
+        { "A4", "FFFFFF5C" }, { "A3", "FFFFFF5D" }, { "A2", "FFFFFF5E" }, { "A1", "FFFFFF5F" }, { "A0", "FFFFFF60" }, { "9F", "FFFFFF61" }, { "9E", "FFFFFF62" },
+        { "9D", "FFFFFF63" }, { "9C", "FFFFFF64" }, { "9B", "FFFFFF65" }, { "9A", "FFFFFF66" }, { "99", "FFFFFF67" }, { "98", "FFFFFF68" }, { "97", "FFFFFF69" },
+        { "96", "FFFFFF6A" }, { "95", "FFFFFF6B" }, { "94", "FFFFFF6C" }, { "93", "FFFFFF6D" }, { "92", "FFFFFF6E" }, { "91", "FFFFFF6F" }, { "90", "FFFFFF70" },
+        { "8F", "FFFFFF71" }, { "8E", "FFFFFF72" }, { "8D", "FFFFFF73" }, { "8C", "FFFFFF74" }, { "8B", "FFFFFF75" }, { "8A", "FFFFFF76" }, { "89", "FFFFFF77" },
+        { "88", "FFFFFF78" }, { "87", "FFFFFF79" }, { "86", "FFFFFF7A" }, { "85", "FFFFFF7B" }, { "84", "FFFFFF7C" }, { "83", "FFFFFF7D" }, { "82", "FFFFFF7E" },
+        { "81", "FFFFFF7F" }, { "80", "FFFFFF80" }
+    };
+#endif
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     kryptos_mp_value_t *n, *en;
     for (tv = 0; tv < tv_nr; tv++) {
@@ -1439,7 +1590,7 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
 
     for (tv = 0; tv < tv_nr; tv++) {
 
-/*printf("*** %s / %s\n", test_vector[tv].x, test_vector[tv].y);*/
+printf("*** %s / %s\n", test_vector[tv].x, test_vector[tv].y);
 
         x = kryptos_hex_value_as_mp(test_vector[tv].x, strlen(test_vector[tv].x));
         y = kryptos_hex_value_as_mp(test_vector[tv].y, strlen(test_vector[tv].y));
@@ -1452,7 +1603,7 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
 
         CUTE_ASSERT(q != NULL);
         CUTE_ASSERT(r != NULL);
-/*
+
 printf("Q  = ");
 for (d = q->data_size - 1; d >= 0; d--) printf("%.2X ", q->data[d]);
 printf("\n");
@@ -1468,7 +1619,7 @@ printf("\n");
 printf("ER = ");
 for (d = er->data_size - 1; d >= 0; d--) printf("%.2X ", er->data[d]);
 printf("\n--\n");
-*/
+
         CUTE_ASSERT(kryptos_mp_eq(q, eq) == 1);
         CUTE_ASSERT(kryptos_mp_eq(r, er) == 1);
 
@@ -1845,7 +1996,8 @@ CUTE_TEST_CASE(kryptos_mp_signed_rsh_tests)
         a = kryptos_mp_signed_rsh(&a, test_vector[t].l);
 
         CUTE_ASSERT(a != NULL);
-
+        printf("a = "); kryptos_print_mp(a);
+        printf("e = "); kryptos_print_mp(e);
         CUTE_ASSERT(kryptos_mp_eq(a, e) == 1);
 
         kryptos_del_mp_value(a);
