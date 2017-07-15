@@ -1420,9 +1420,9 @@ kryptos_mp_value_t *kryptos_mp_mul_digit(kryptos_mp_value_t **x, const kryptos_m
 
 #ifndef KRYPTOS_MP_SLOWER_MP_DIV
 
-#define KRYPTOS_MP_DIV_DEBUG_INFO
+//#define KRYPTOS_MP_DIV_DEBUG_INFO
 
-#undef KRYPTOS_MP_DIV_APPLY_NORMALIZATION
+#define KRYPTOS_MP_DIV_APPLY_NORMALIZATION
 
 kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp_value_t *y, kryptos_mp_value_t **r) {
     kryptos_mp_value_t *q = NULL, *xn = NULL, *yn = NULL, *b = NULL;
@@ -1533,68 +1533,14 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
     }
 # else
     if (yn->data[n - 1] < 0x80000000) {
-        if ((yn->data[n - 1] & 0x00000001) == 0x00000001) {
-            shlv_nm = 31;
-        } else if ((yn->data[n - 1] & 0x00000002) == 0x00000002) {
-            shlv_nm = 30;
-        } else if ((yn->data[n - 1] & 0x00000004) == 0x00000004) {
-            shlv_nm = 29;
-        } else if ((yn->data[n - 1] & 0x00000008) == 0x00000008) {
-            shlv_nm = 28;
-        } else if ((yn->data[n - 1] & 0x00000010) == 0x00000010) {
-            shlv_nm = 27;
-        } else if ((yn->data[n - 1] & 0x00000020) == 0x00000020) {
-            shlv_nm = 26;
-        } else if ((yn->data[n - 1] & 0x00000040) == 0x00000040) {
-            shlv_nm = 25;
-        } else if ((yn->data[n - 1] & 0x00000080) == 0x00000080) {
-            shlv_nm = 24;
-        } else if ((yn->data[n - 1] & 0x00000100) == 0x00000100) {
-            shlv_nm = 23;
-        } else if ((yn->data[n - 1] & 0x00000200) == 0x00000200) {
-            shlv_nm = 22;
-        } else if ((yn->data[n - 1] & 0x00000400) == 0x00000400) {
-            shlv_nm = 21;
-        } else if ((yn->data[n - 1] & 0x00000800) == 0x00000800) {
-            shlv_nm = 20;
-        } else if ((yn->data[n - 1] & 0x00001000) == 0x00001000) {
-            shlv_nm = 19;
-        } else if ((yn->data[n - 1] & 0x00002000) == 0x00002000) {
-            shlv_nm = 18;
-        } else if ((yn->data[n - 1] & 0x00004000) == 0x00004000) {
-            shlv_nm = 17;
-        } else if ((yn->data[n - 1] & 0x00008000) == 0x00008000) {
-            shlv_nm = 16;
-        } else if ((yn->data[n - 1] & 0x00010000) == 0x00010000) {
-            shlv_nm = 15;
-        } else if ((yn->data[n - 1] & 0x00020000) == 0x00020000) {
-            shlv_nm = 14;
-        } else if ((yn->data[n - 1] & 0x00040000) == 0x00040000) {
-            shlv_nm = 13;
-        } else if ((yn->data[n - 1] & 0x00080000) == 0x00080000) {
-            shlv_nm = 12;
-        } else if ((yn->data[n - 1] & 0x00100000) == 0x00100000) {
-            shlv_nm = 11;
-        } else if ((yn->data[n - 1] & 0x00200000) == 0x00200000) {
-            shlv_nm = 10;
-        } else if ((yn->data[n - 1] & 0x00400000) == 0x00400000) {
-            shlv_nm = 9;
-        } else if ((yn->data[n - 1] & 0x00800000) == 0x00800000) {
-            shlv_nm = 8;
-        } else if ((yn->data[n - 1] & 0x01000000) == 0x01000000) {
-            shlv_nm = 7;
-        } else if ((yn->data[n - 1] & 0x02000000) == 0x02000000) {
-            shlv_nm = 6;
-        } else if ((yn->data[n - 1] & 0x04000000) == 0x04000000) {
-            shlv_nm = 5;
-        } else if ((yn->data[n - 1] & 0x08000000) == 0x08000000) {
-            shlv_nm = 4;
-        } else if ((yn->data[n - 1] & 0x10000000) == 0x10000000) {
-            shlv_nm = 3;
-        } else if ((yn->data[n - 1] & 0x20000000) == 0x20000000) {
-            shlv_nm = 2;
-        } else if ((yn->data[n - 1] & 0x40000000) == 0x40000000) {
-            shlv_nm = 1;
+        while (yn->data[n - 1] < 0x80000000) {
+            shlv_nm++;
+            xn = kryptos_mp_lsh(&xn, 1);
+            yn = kryptos_mp_lsh(&yn, 1);
+            n = yn->data_size;
+            while (yn->data[n - 1] == 0 && n >= 1) {
+                n--;
+            }
         }
     }
 # endif
@@ -1630,10 +1576,8 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
     if (kryptos_mp_lt(xn, yn)) {
         goto kryptos_mp_div_epilogue;
     }
-printf("xn = "); kryptos_print_mp(xn);
-printf("yn = "); kryptos_print_mp(yn);
     for (j = m - 1; j >= 0; j--) {
-
+        //printf("q' = "); kryptos_print_mp(q);
         xi = n + j;
 
         while (xi >= xn->data_size) {
