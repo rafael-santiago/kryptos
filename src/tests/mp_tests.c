@@ -1996,8 +1996,7 @@ CUTE_TEST_CASE(kryptos_mp_signed_rsh_tests)
         a = kryptos_mp_signed_rsh(&a, test_vector[t].l);
 
         CUTE_ASSERT(a != NULL);
-        printf("a = "); kryptos_print_mp(a);
-        printf("e = "); kryptos_print_mp(e);
+
         CUTE_ASSERT(kryptos_mp_eq(a, e) == 1);
 
         kryptos_del_mp_value(a);

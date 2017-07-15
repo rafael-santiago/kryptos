@@ -2552,7 +2552,11 @@ kryptos_mp_value_t *kryptos_mp_rsh_op(kryptos_mp_value_t **a, const int level, c
     ssize_t d, dn;
     kryptos_u8_t cb, lc;
     kryptos_mp_value_t *t = NULL;
+#ifndef KRYPTOS_MP_U32_DIGIT
     kryptos_u8_t signal = 0;
+#else
+    kryptos_u32_t signal = 0;
+#endif
 
     if (a == NULL || (*a) == NULL) {
         return NULL;
