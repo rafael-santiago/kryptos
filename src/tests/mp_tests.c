@@ -1590,7 +1590,7 @@ CUTE_TEST_CASE(kryptos_mp_div_tests)
 
     for (tv = 0; tv < tv_nr; tv++) {
 
-printf("*** %s / %s\n", test_vector[tv].x, test_vector[tv].y);
+/*printf("*** %s / %s\n", test_vector[tv].x, test_vector[tv].y);*/
 
         x = kryptos_hex_value_as_mp(test_vector[tv].x, strlen(test_vector[tv].x));
         y = kryptos_hex_value_as_mp(test_vector[tv].y, strlen(test_vector[tv].y));
@@ -1603,7 +1603,7 @@ printf("*** %s / %s\n", test_vector[tv].x, test_vector[tv].y);
 
         CUTE_ASSERT(q != NULL);
         CUTE_ASSERT(r != NULL);
-
+/*
 printf("Q  = ");
 for (d = q->data_size - 1; d >= 0; d--) printf("%.2X ", q->data[d]);
 printf("\n");
@@ -1619,7 +1619,7 @@ printf("\n");
 printf("ER = ");
 for (d = er->data_size - 1; d >= 0; d--) printf("%.2X ", er->data[d]);
 printf("\n--\n");
-
+*/
         CUTE_ASSERT(kryptos_mp_eq(q, eq) == 1);
         CUTE_ASSERT(kryptos_mp_eq(r, er) == 1);
 

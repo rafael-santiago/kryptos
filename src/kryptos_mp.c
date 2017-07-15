@@ -1420,12 +1420,13 @@ kryptos_mp_value_t *kryptos_mp_mul_digit(kryptos_mp_value_t **x, const kryptos_m
 
 #ifndef KRYPTOS_MP_SLOWER_MP_DIV
 
-//#define KRYPTOS_MP_DIV_DEBUG_INFO
+#undef KRYPTOS_MP_DIV_DEBUG_INFO
 
-#define KRYPTOS_MP_DIV_APPLY_NORMALIZATION
+#define KRYPTOS_MP_DIV_APPLY_NORMALIZATION 1
 
 kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp_value_t *y, kryptos_mp_value_t **r) {
     kryptos_mp_value_t *q = NULL, *xn = NULL, *yn = NULL, *b = NULL;
+    kryptos_mp_value_t *t = NULL;
     ssize_t d, dn;
     ssize_t n, m, j, xi;
 #ifndef KRYPTOS_MP_U32_DIGIT
@@ -1477,12 +1478,13 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
         return kryptos_hex_value_as_mp("0", 1);
     }
 
-    //m = x->data_size << 3;
     m = kryptos_mp_byte2bit(x->data_size);
 
+#ifndef KRYPTOS_MP_U32_DIGIT
     while (m % 64) {
         m++;
     }
+#endif
 
     if ((xn = kryptos_new_mp_value(m)) == NULL) {
         goto kryptos_mp_div_epilogue;
@@ -1561,14 +1563,33 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
 
 #ifndef KRYPTOS_MP_U32_DIGIT
     b = kryptos_mp_lsh(&b, 8 * m);
-#else
-    b = kryptos_mp_lsh(&b, 32 * m);
-#endif
-
     while (kryptos_mp_ge(xn, b)) {
         q->data[m]++;
         xn = kryptos_mp_sub(&xn, b);
     }
+#else
+    b = kryptos_mp_lsh(&b, 32 * m);
+    if (kryptos_mp_ge(xn, b)) {
+        t = kryptos_assign_mp_value(&t, xn);
+    }
+
+    while (kryptos_mp_ge(xn, b) && q->data[m] < 0xFF) {
+        q->data[m]++;
+        xn = kryptos_mp_sub(&xn, b);
+    }
+
+    // TODO(Rafael): Verify better if this dirty trick (a.k.a. [in academic slang] heuristic) really works.
+    if (q->data[m] == 0xFF && kryptos_mp_ge(xn, b)) {
+        q->data[m] = 0;
+        kryptos_del_mp_value(xn);
+        xn = t;
+        t = NULL;
+        m++;
+    } else if (t != NULL) {
+        kryptos_del_mp_value(t);
+        t = NULL;
+    }
+#endif
 
     kryptos_del_mp_value(b);
     b = NULL;
@@ -1576,6 +1597,7 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
     if (kryptos_mp_lt(xn, yn)) {
         goto kryptos_mp_div_epilogue;
     }
+
     for (j = m - 1; j >= 0; j--) {
         //printf("q' = "); kryptos_print_mp(q);
         xi = n + j;
