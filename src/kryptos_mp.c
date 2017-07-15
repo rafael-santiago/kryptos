@@ -1422,7 +1422,11 @@ kryptos_mp_value_t *kryptos_mp_mul_digit(kryptos_mp_value_t **x, const kryptos_m
 
 #undef KRYPTOS_MP_DIV_DEBUG_INFO
 
-#define KRYPTOS_MP_DIV_APPLY_NORMALIZATION 1
+#ifdef KRYPTOS_MP_U32_DIGIT
+# define KRYPTOS_MP_DIV_APPLY_NORMALIZATION 1
+#else
+# undef KRYPTOS_MP_DIV_APPLY_NORMALIZATION
+#endif
 
 kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp_value_t *y, kryptos_mp_value_t **r) {
     kryptos_mp_value_t *q = NULL, *xn = NULL, *yn = NULL, *b = NULL;
@@ -1534,15 +1538,13 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
         }
     }
 # else
-    if (yn->data[n - 1] < 0x80000000) {
-        while (yn->data[n - 1] < 0x80000000) {
-            shlv_nm++;
-            xn = kryptos_mp_lsh(&xn, 1);
-            yn = kryptos_mp_lsh(&yn, 1);
-            n = yn->data_size;
-            while (yn->data[n - 1] == 0 && n >= 1) {
-                n--;
-            }
+    while (yn->data[n - 1] < 0x80000000) {
+        shlv_nm++;
+        xn = kryptos_mp_lsh(&xn, 1);
+        yn = kryptos_mp_lsh(&yn, 1);
+        n = yn->data_size;
+        while (yn->data[n - 1] == 0 && n >= 1) {
+            n--;
         }
     }
 # endif
