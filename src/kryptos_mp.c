@@ -2078,7 +2078,6 @@ kryptos_mp_div_2p_epilogue:
 kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const kryptos_mp_value_t *e, const kryptos_mp_value_t *n) {
     kryptos_mp_value_t *A = NULL, *mod = NULL, *div = NULL;
     ssize_t t;
-    int is_odd;
 
     if (m == NULL || e == NULL || n == NULL) {
         return NULL;
@@ -2087,8 +2086,6 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
     if ((A = kryptos_hex_value_as_mp("1", 1)) == NULL) {
         return NULL;
     }
-
-    is_odd = kryptos_mp_is_odd(n);
 
 #define kryptos_mp_me_mod_n_mont(e, t, bn, A, m, n, mod) {\
     A = kryptos_mp_mul(&A, A);\
