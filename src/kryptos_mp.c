@@ -2642,8 +2642,16 @@ kryptos_mp_value_t *kryptos_mp_gen_prime(const size_t bitsize) {
     kryptos_mp_value_t *pn = NULL, *_2 = NULL, *p = NULL;
     ssize_t d;
     int is_prime = 0;
+#ifdef KRYPTOS_MP_U32_DIGIT
+    size_t bytesize = 0;
+#endif
 
+#ifndef KRYPTOS_MP_U32_DIGIT
     pn = kryptos_new_mp_value(bitsize);
+#else
+    bytesize = kryptos_mp_bit2byte(bitsize);
+    pn = kryptos_new_mp_value(kryptos_mp_byte2bit(bytesize));
+#endif
     _2 = kryptos_hex_value_as_mp("2", 1);
 
     if (pn == NULL || _2 == NULL) {
@@ -2651,24 +2659,43 @@ kryptos_mp_value_t *kryptos_mp_gen_prime(const size_t bitsize) {
     }
 
     while (!is_prime) {
+
         for (d = 0; d < pn->data_size; d++) {
+#ifndef KRYPTOS_MP_U32_DIGIT
             pn->data[d] = kryptos_get_random_byte();
+#else
+            pn->data[d] = ((kryptos_u32_t)kryptos_get_random_byte() << 24) |
+                          ((kryptos_u32_t)kryptos_get_random_byte() << 16) |
+                          ((kryptos_u32_t)kryptos_get_random_byte() <<  8) |
+                          kryptos_get_random_byte();
+#endif
         }
 
         pn->data[0] |= 0x1;
 
-/*
+#ifdef KRYPTOS_MP_U32_DIGIT
+
         d = 0;
 
-        while (!(is_prime = kryptos_mp_gen_prime_small_primes_test(pn, &p)) && d < 0xffffffff) {
-            //if (p == NULL) {
+        while (!(is_prime = kryptos_mp_gen_prime_small_primes_test(pn, NULL)) && d < 0xFF) {
+            if (p == NULL) {
                 pn = kryptos_mp_add(&pn, _2);
-            //} else {
-            //    pn = kryptos_mp_add(&pn, p);
-            //    pn->data[0] |= 0x1;
-            //}
-            kryptos_del_mp_value(p);
-            p = NULL;
+            } else {
+                pn = kryptos_mp_add(&pn, p);
+                pn->data[0] |= 0x1;
+                kryptos_del_mp_value(p);
+                p = NULL;
+            }
+
+            if (!is_prime) {
+                continue;
+            }
+
+            is_prime = kryptos_mp_fermat_test(pn, 2);
+
+            if (!is_prime) {
+                pn = kryptos_mp_add(&pn, _2);
+            }
             d++;
         }
 
@@ -2676,12 +2703,7 @@ kryptos_mp_value_t *kryptos_mp_gen_prime(const size_t bitsize) {
             continue;
         }
 
-        is_prime = kryptos_mp_fermat_test(pn, 2);
-
-        if (!is_prime) {
-            continue;
-        }
-*/
+#endif
         is_prime = kryptos_mp_miller_rabin_test(pn, 5);
     }
 

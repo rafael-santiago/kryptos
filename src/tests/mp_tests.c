@@ -2048,8 +2048,14 @@ CUTE_TEST_CASE_END
 CUTE_TEST_CASE(kryptos_mp_gen_prime_tests)
     kryptos_mp_value_t *p = kryptos_mp_gen_prime(16);
     ssize_t d;
+    size_t expected_bitsize;
     CUTE_ASSERT(p != NULL);
-    CUTE_ASSERT((p->data_size << 3) == 16);
+    // WARN(Rafael): Important check the bitsize by using the bit2byte macro because it depends on the current radix base.
+    expected_bitsize = kryptos_mp_bit2byte(16);
+    if (expected_bitsize == 0) {
+        expected_bitsize = 1;
+    }
+    CUTE_ASSERT(p->data_size == expected_bitsize);
     printf(" *** Your luck number is: "); kryptos_print_mp(p);
     printf(" *** Watch for it everywhere...\n");
     kryptos_del_mp_value(p);

@@ -112,7 +112,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_fermat_test_tests);
     CUTE_RUN_TEST(kryptos_mp_miller_rabin_test_tests);
     CUTE_RUN_TEST(kryptos_mp_is_prime_tests);
-    //CUTE_RUN_TEST(kryptos_mp_gen_prime_tests);
+    CUTE_RUN_TEST(kryptos_mp_gen_prime_tests);
     //CUTE_RUN_TEST(kryptos_mp_montgomery_reduction_tests);
     //CUTE_RUN_TEST(kryptos_mp_gcd_tests);
     //CUTE_RUN_TEST(kryptos_mp_modinv_tests);
