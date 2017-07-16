@@ -2135,6 +2135,32 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
         }
     } else {*/
         for (t = e->data_size - 1; t >= 0; t--) {
+#ifdef KRYPTOS_MP_U32_DIGIT
+            kryptos_mp_me_mod_n(e, t, 31, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 30, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 29, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 28, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 27, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 26, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 25, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 24, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 23, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 22, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 21, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 20, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 19, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 18, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 17, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 16, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 15, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 14, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 13, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 12, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 11, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t, 10, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t,  9, A, m, n, div, mod);
+            kryptos_mp_me_mod_n(e, t,  8, A, m, n, div, mod);
+#endif
             kryptos_mp_me_mod_n(e, t, 7, A, m, n, div, mod);
             kryptos_mp_me_mod_n(e, t, 6, A, m, n, div, mod);
             kryptos_mp_me_mod_n(e, t, 5, A, m, n, div, mod);
