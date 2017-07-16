@@ -1423,6 +1423,7 @@ kryptos_mp_value_t *kryptos_mp_mul_digit(kryptos_mp_value_t **x, const kryptos_m
 #undef KRYPTOS_MP_DIV_DEBUG_INFO
 
 #ifdef KRYPTOS_MP_U32_DIGIT
+// WARN(Rafael): For radix 2^32 is better apply normalization, otherwise the things can slow down in some cases.
 # define KRYPTOS_MP_DIV_APPLY_NORMALIZATION 1
 #else
 # undef KRYPTOS_MP_DIV_APPLY_NORMALIZATION
@@ -1575,6 +1576,7 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
         t = kryptos_assign_mp_value(&t, xn);
     }
 
+# ifdef KRYPTOS_MP_DIV_APPLY_NORMALIZATION
     while (kryptos_mp_ge(xn, b) && q->data[m] < 0xFF) {
         q->data[m]++;
         xn = kryptos_mp_sub(&xn, b);
@@ -1591,6 +1593,13 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
         kryptos_del_mp_value(t);
         t = NULL;
     }
+# else
+    while (kryptos_mp_ge(xn, b)) { // WARN(Rafael): This is slower!
+        q->data[m]++;
+        xn = kryptos_mp_sub(&xn, b);
+    }
+# endif
+
 #endif
 
     kryptos_del_mp_value(b);
