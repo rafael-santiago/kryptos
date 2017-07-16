@@ -1346,6 +1346,32 @@ kryptos_mp_value_t *kryptos_mp_pow(const kryptos_mp_value_t *g, const kryptos_mp
 }
 
     for (t = e->data_size - 1; t >= 0; t--) {
+#ifdef KRYPTOS_MP_U32_DIGIT
+        kryptos_mp_pow_step(e, t, 31, A, g);
+        kryptos_mp_pow_step(e, t, 30, A, g);
+        kryptos_mp_pow_step(e, t, 29, A, g);
+        kryptos_mp_pow_step(e, t, 28, A, g);
+        kryptos_mp_pow_step(e, t, 27, A, g);
+        kryptos_mp_pow_step(e, t, 26, A, g);
+        kryptos_mp_pow_step(e, t, 25, A, g);
+        kryptos_mp_pow_step(e, t, 24, A, g);
+        kryptos_mp_pow_step(e, t, 23, A, g);
+        kryptos_mp_pow_step(e, t, 22, A, g);
+        kryptos_mp_pow_step(e, t, 21, A, g);
+        kryptos_mp_pow_step(e, t, 20, A, g);
+        kryptos_mp_pow_step(e, t, 19, A, g);
+        kryptos_mp_pow_step(e, t, 18, A, g);
+        kryptos_mp_pow_step(e, t, 17, A, g);
+        kryptos_mp_pow_step(e, t, 16, A, g);
+        kryptos_mp_pow_step(e, t, 15, A, g);
+        kryptos_mp_pow_step(e, t, 14, A, g);
+        kryptos_mp_pow_step(e, t, 13, A, g);
+        kryptos_mp_pow_step(e, t, 12, A, g);
+        kryptos_mp_pow_step(e, t, 11, A, g);
+        kryptos_mp_pow_step(e, t, 10, A, g);
+        kryptos_mp_pow_step(e, t,  9, A, g);
+        kryptos_mp_pow_step(e, t,  8, A, g);
+#endif
         kryptos_mp_pow_step(e, t, 7, A, g);
         kryptos_mp_pow_step(e, t, 6, A, g);
         kryptos_mp_pow_step(e, t, 5, A, g);
