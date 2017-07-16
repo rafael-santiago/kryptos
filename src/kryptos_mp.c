@@ -2273,7 +2273,7 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
 
     pn = 1;
     n_div = kryptos_mp_div_2p(n_1, pn, &n_mod);
-    if ((k = kryptos_new_mp_value(32)) == NULL) {
+    if ((k = kryptos_new_mp_value(kryptos_mp_byte2bit(4))) == NULL) {
         is_prime = 0;
         goto kryptos_mp_miller_rabin_test_epilogue;
     }
@@ -2281,10 +2281,14 @@ int kryptos_mp_miller_rabin_test(const kryptos_mp_value_t *n, const int sn) {
     do {
         // INFO(Rafael): Initially always should enter into this loop because n - 1 mod 2^1 is zero (n should be > 2 and odd).
         m = kryptos_assign_mp_value(&m, n_div); // temp m.
+#ifndef KRYPTOS_MP_U32_DIGIT
         k->data[3] = pn >> 24;
         k->data[2] = (pn >> 16) & 0xFF;
         k->data[1] = (pn >>  8) & 0xFF;
         k->data[0] = pn & 0xFF;
+#else
+        k->data[0] = pn;
+#endif
         if (m == NULL) {
             is_prime = 0;
             goto kryptos_mp_miller_rabin_test_epilogue;
