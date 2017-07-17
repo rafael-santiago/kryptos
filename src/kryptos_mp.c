@@ -2121,6 +2121,32 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
 /*
     if (kryptos_mp_is_odd(n)) {
         for (t = e->data_size - 1; t >= 0; t--) {
+#ifdef KRYPTOS_MP_U32_DIGIT
+            kryptos_mp_me_mod_n_mont(e, t, 31, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 30, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 29, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 28, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 27, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 26, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 25, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 24, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 23, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 22, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 21, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 20, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 19, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 18, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 17, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 16, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 15, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 14, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 13, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 12, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 11, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t, 10, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t,  9, A, m, n, mod);
+            kryptos_mp_me_mod_n_mont(e, t,  8, A, m, n, mod);
+#endif
             kryptos_mp_me_mod_n_mont(e, t, 7, A, m, n, mod);
             kryptos_mp_me_mod_n_mont(e, t, 6, A, m, n, mod);
             kryptos_mp_me_mod_n_mont(e, t, 5, A, m, n, mod);
@@ -2791,16 +2817,12 @@ kryptos_mp_value_t *kryptos_mp_montgomery_reduction(const kryptos_mp_value_t *x,
     }
 
     b = kryptos_hex_value_as_mp("1", 1);
-    b = kryptos_mp_lsh(&b, x->data_size << 3);
-//printf("DIV1-BEGIN\n");
+    b = kryptos_mp_lsh(&b, kryptos_mp_byte2bit(x->data_size));
+
     if ((d = kryptos_mp_div(b, y, &r)) == NULL) {
         goto kryptos_mp_montgomery_reduction_epilogue;
     }
-//printf("x = "); kryptos_print_mp(x);
-//printf("d = "); kryptos_print_mp(d);
-//printf("r = "); kryptos_print_mp(r);
-//printf("z = "); kryptos_print_mp(z);
-//printf("DIV1-END\n");
+
     kryptos_del_mp_value(d);
 
     if ((z = kryptos_mp_mul(&z, r)) == NULL) {
@@ -2809,13 +2831,11 @@ kryptos_mp_value_t *kryptos_mp_montgomery_reduction(const kryptos_mp_value_t *x,
 
     kryptos_del_mp_value(r);
     r = NULL;
-//printf("z = ");kryptos_print_mp(z);
-//printf("y = ");kryptos_print_mp(y);
-//printf("DIV2-BEGIN\n");
+
     if ((d = kryptos_mp_div(z, y, &r)) == NULL) {
         goto kryptos_mp_montgomery_reduction_epilogue;
     }
-//printf("DIV2-END\n");
+
     kryptos_del_mp_value(d);
 
     if (r != NULL) {
@@ -2856,7 +2876,7 @@ static kryptos_mp_value_t *kryptos_mp_montgomery_reduction_2kx_mod_y(const krypt
     }
 
     xt = kryptos_assign_mp_value(&xt, x);
-    ks = xt->data_size << 3;
+    ks = kryptos_mp_byte2bit(xt->data_size);
 
     for (k = 0; k < ks; k++) {
         if (kryptos_mp_is_odd(xt)) {
