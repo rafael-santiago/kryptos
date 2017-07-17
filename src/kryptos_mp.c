@@ -393,7 +393,7 @@ kryptos_mp_value_t *kryptos_assign_mp_value(kryptos_mp_value_t **dest,
         (*dest)->data = (kryptos_mp_digit_t *) kryptos_newseg(kryptos_mp_byte2bit(src->data_size));
     }
 
-    memset((*dest)->data, 0, (*dest)->data_size);
+    memset((*dest)->data, 0, (*dest)->data_size * sizeof(kryptos_mp_digit_t));
 
     d = src->data_size - 1;
 
@@ -1389,6 +1389,9 @@ kryptos_mp_value_t *kryptos_mp_pow(const kryptos_mp_value_t *g, const kryptos_mp
 
 void kryptos_print_mp(const kryptos_mp_value_t *v) {
     ssize_t d;
+    if (v == NULL) {
+        return;
+    }
 #ifndef KRYPTOS_MP_U32_DIGIT
     for (d = v->data_size - 1; d >= 0; d--) printf("%.2X", v->data[d]);
 #else
@@ -2950,7 +2953,6 @@ kryptos_mp_value_t *kryptos_mp_gcd(const kryptos_mp_value_t *a, const kryptos_mp
 
     gcd = kryptos_assign_mp_value(&gcd, g);
     gcd = kryptos_mp_mul(&gcd, y);
-
 kryptos_mp_gcd_epilogue:
 
     if (x != NULL) {

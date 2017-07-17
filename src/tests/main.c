@@ -114,7 +114,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_is_prime_tests);
     CUTE_RUN_TEST(kryptos_mp_gen_prime_tests);
     CUTE_RUN_TEST(kryptos_mp_montgomery_reduction_tests);
-    //CUTE_RUN_TEST(kryptos_mp_gcd_tests);
+    CUTE_RUN_TEST(kryptos_mp_gcd_tests);
     //CUTE_RUN_TEST(kryptos_mp_modinv_tests);
 
     // INFO(Rafael): Asymmetric stuff
