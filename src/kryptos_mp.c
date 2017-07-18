@@ -1946,6 +1946,12 @@ kryptos_mp_div_2p_epilogue:
     return q;
 }
 
+// WARN(Rafael): This is a good example of what is and what should be. People always tell us to use Montgomery,
+//               however, it has been showing slower than MP division. So I have decided deactivate it.
+//               Maybe this reduction worth in hardware or other more statical contexts.
+
+#undef KRYPTOS_MP_ME_MOD_N_USE_MONTGOMERY_REDUCTION
+
 kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const kryptos_mp_value_t *e, const kryptos_mp_value_t *n) {
     kryptos_mp_value_t *A = NULL, *mod = NULL, *div = NULL;
     ssize_t t;
@@ -1957,6 +1963,8 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
     if ((A = kryptos_hex_value_as_mp("1", 1)) == NULL) {
         return NULL;
     }
+
+#ifdef KRYPTOS_MP_ME_MOD_N_USE_MONTGOMERY_REDUCTION
 
 #define kryptos_mp_me_mod_n_mont(e, t, bn, A, m, n, mod) {\
     A = kryptos_mp_mul(&A, A);\
@@ -1972,6 +1980,8 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
         mod = NULL;\
     }\
 }
+
+#endif
 
 #define kryptos_mp_me_mod_n(e, t, bn, A, m, n, div, mod) {\
     A = kryptos_mp_mul(&A, A);\
@@ -1989,7 +1999,9 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
         div = mod = NULL;\
     }\
 }
-/*
+
+#ifdef KRYPTOS_MP_ME_MOD_N_USE_MONTGOMERY_REDUCTION
+
     if (kryptos_mp_is_odd(n)) {
         for (t = e->data_size - 1; t >= 0; t--) {
 #ifdef KRYPTOS_MP_U32_DIGIT
@@ -2027,7 +2039,8 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
             kryptos_mp_me_mod_n_mont(e, t, 1, A, m, n, mod);
             kryptos_mp_me_mod_n_mont(e, t, 0, A, m, n, mod);
         }
-    } else {*/
+    } else {
+#endif
         for (t = e->data_size - 1; t >= 0; t--) {
 #ifdef KRYPTOS_MP_U32_DIGIT
             kryptos_mp_me_mod_n(e, t, 31, A, m, n, div, mod);
@@ -2064,9 +2077,11 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
             kryptos_mp_me_mod_n(e, t, 1, A, m, n, div, mod);
             kryptos_mp_me_mod_n(e, t, 0, A, m, n, div, mod);
         }
-/*    }*/
+#ifdef KRYPTOS_MP_ME_MOD_N_USE_MONTGOMERY_REDUCTION
+    }
 
 #undef kryptos_mp_me_mod_n_mont
+#endif
 
 #undef kryptos_mp_me_mod_n
 
