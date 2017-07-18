@@ -50,7 +50,7 @@ static kryptos_u8_t nbxlt[] = {
     (m)->data[  (i)  ] = (v) & 0xFF;\
 }
 
-#define kryptos_mp_abort_when_null(stmt, escape) {\
+#define KRYPTOS_MP_ABORT_WHEN_NULL(stmt, escape) {\
     if ((stmt) == NULL) {\
         goto escape;\
     }\
@@ -2953,6 +2953,7 @@ kryptos_mp_value_t *kryptos_mp_gcd(const kryptos_mp_value_t *a, const kryptos_mp
 
     gcd = kryptos_assign_mp_value(&gcd, g);
     gcd = kryptos_mp_mul(&gcd, y);
+
 kryptos_mp_gcd_epilogue:
 
     if (x != NULL) {
@@ -3191,23 +3192,23 @@ kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *u, const kryptos
 
     // TODO(Rafael): If the v is prime use the Fermat's little theorem instead of the Extended Euclidean.
 
-    kryptos_mp_abort_when_null(_1 = kryptos_hex_value_as_mp("1", 1), kryptos_mp_modinv_epilogue);
-    kryptos_mp_abort_when_null(_0 = kryptos_hex_value_as_mp("0", 1), kryptos_mp_modinv_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(_1 = kryptos_hex_value_as_mp("1", 1), kryptos_mp_modinv_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(_0 = kryptos_hex_value_as_mp("0", 1), kryptos_mp_modinv_epilogue);
 
-    kryptos_mp_abort_when_null(u1 = kryptos_assign_mp_value(&u1, _1), kryptos_mp_modinv_epilogue);
-    kryptos_mp_abort_when_null(u3 = kryptos_assign_mp_value(&u3, u), kryptos_mp_modinv_epilogue);
-    kryptos_mp_abort_when_null(v1 = kryptos_assign_mp_value(&v1, _0), kryptos_mp_modinv_epilogue);
-    kryptos_mp_abort_when_null(v3 = kryptos_assign_mp_value(&v3, v), kryptos_mp_modinv_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(u1 = kryptos_assign_mp_value(&u1, _1), kryptos_mp_modinv_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(u3 = kryptos_assign_mp_value(&u3, u), kryptos_mp_modinv_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(v1 = kryptos_assign_mp_value(&v1, _0), kryptos_mp_modinv_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(v3 = kryptos_assign_mp_value(&v3, v), kryptos_mp_modinv_epilogue);
 
     while (kryptos_mp_ne(v3, _0)) {
-        kryptos_mp_abort_when_null(q = kryptos_mp_div(u3, v3, &t3), kryptos_mp_modinv_epilogue);
-        kryptos_mp_abort_when_null(t1 = kryptos_assign_mp_value(&t1, q), kryptos_mp_modinv_epilogue);
-        kryptos_mp_abort_when_null(t1 = kryptos_mp_mul(&t1, v1), kryptos_mp_modinv_epilogue);
-        kryptos_mp_abort_when_null(t1 = kryptos_mp_add(&t1, u1), kryptos_mp_modinv_epilogue);
-        kryptos_mp_abort_when_null(u1 = kryptos_assign_mp_value(&u1, v1), kryptos_mp_modinv_epilogue);
-        kryptos_mp_abort_when_null(v1 = kryptos_assign_mp_value(&v1, t1), kryptos_mp_modinv_epilogue);
-        kryptos_mp_abort_when_null(u3 = kryptos_assign_mp_value(&u3, v3), kryptos_mp_modinv_epilogue);
-        kryptos_mp_abort_when_null(v3 = kryptos_assign_mp_value(&v3, t3), kryptos_mp_modinv_epilogue);
+        KRYPTOS_MP_ABORT_WHEN_NULL(q = kryptos_mp_div(u3, v3, &t3), kryptos_mp_modinv_epilogue);
+        KRYPTOS_MP_ABORT_WHEN_NULL(t1 = kryptos_assign_mp_value(&t1, q), kryptos_mp_modinv_epilogue);
+        KRYPTOS_MP_ABORT_WHEN_NULL(t1 = kryptos_mp_mul(&t1, v1), kryptos_mp_modinv_epilogue);
+        KRYPTOS_MP_ABORT_WHEN_NULL(t1 = kryptos_mp_add(&t1, u1), kryptos_mp_modinv_epilogue);
+        KRYPTOS_MP_ABORT_WHEN_NULL(u1 = kryptos_assign_mp_value(&u1, v1), kryptos_mp_modinv_epilogue);
+        KRYPTOS_MP_ABORT_WHEN_NULL(v1 = kryptos_assign_mp_value(&v1, t1), kryptos_mp_modinv_epilogue);
+        KRYPTOS_MP_ABORT_WHEN_NULL(u3 = kryptos_assign_mp_value(&u3, v3), kryptos_mp_modinv_epilogue);
+        KRYPTOS_MP_ABORT_WHEN_NULL(v3 = kryptos_assign_mp_value(&v3, t3), kryptos_mp_modinv_epilogue);
         kryptos_del_mp_value(q);
         kryptos_del_mp_value(t3);
         q = t3 = NULL;
@@ -3216,10 +3217,10 @@ kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *u, const kryptos
 
     if (kryptos_mp_eq(u3, _1)) {
         if (iter < 0) {
-            kryptos_mp_abort_when_null(inv = kryptos_assign_mp_value(&inv, v), kryptos_mp_modinv_epilogue);
-            kryptos_mp_abort_when_null(inv = kryptos_mp_sub(&inv, u1), kryptos_mp_modinv_epilogue);
+            KRYPTOS_MP_ABORT_WHEN_NULL(inv = kryptos_assign_mp_value(&inv, v), kryptos_mp_modinv_epilogue);
+            KRYPTOS_MP_ABORT_WHEN_NULL(inv = kryptos_mp_sub(&inv, u1), kryptos_mp_modinv_epilogue);
         } else {
-            kryptos_mp_abort_when_null(inv = kryptos_assign_mp_value(&inv, u1), kryptos_mp_modinv_epilogue);
+            KRYPTOS_MP_ABORT_WHEN_NULL(inv = kryptos_assign_mp_value(&inv, u1), kryptos_mp_modinv_epilogue);
         }
     }
 
@@ -3467,25 +3468,25 @@ kryptos_mp_value_t *kryptos_mp_signed_mul(kryptos_mp_value_t **dest, const krypt
         return NULL;
     }
 
-    kryptos_mp_abort_when_null(d = kryptos_assign_mp_value(&d, *dest), kryptos_mp_signed_mul_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(d = kryptos_assign_mp_value(&d, *dest), kryptos_mp_signed_mul_epilogue);
 
-    kryptos_mp_abort_when_null(s = kryptos_assign_mp_value(&s, src), kryptos_mp_signed_mul_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(s = kryptos_assign_mp_value(&s, src), kryptos_mp_signed_mul_epilogue);
 
     if ((is_d_neg = kryptos_mp_is_neg(d)) == 1) {
-        kryptos_mp_abort_when_null(d = kryptos_mp_inv_signal(d), kryptos_mp_signed_mul_epilogue);
+        KRYPTOS_MP_ABORT_WHEN_NULL(d = kryptos_mp_inv_signal(d), kryptos_mp_signed_mul_epilogue);
     }
 
     if ((is_s_neg = kryptos_mp_is_neg(s)) == 1) {
-        kryptos_mp_abort_when_null(s = kryptos_mp_inv_signal(s), kryptos_mp_signed_mul_epilogue);
+        KRYPTOS_MP_ABORT_WHEN_NULL(s = kryptos_mp_inv_signal(s), kryptos_mp_signed_mul_epilogue);
     }
 
-    kryptos_mp_abort_when_null(d = kryptos_mp_mul(&d, s), kryptos_mp_signed_mul_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(d = kryptos_mp_mul(&d, s), kryptos_mp_signed_mul_epilogue);
 
     if (is_d_neg != is_s_neg) {
-        kryptos_mp_abort_when_null(d = kryptos_mp_inv_signal(d), kryptos_mp_signed_mul_epilogue);
+        KRYPTOS_MP_ABORT_WHEN_NULL(d = kryptos_mp_inv_signal(d), kryptos_mp_signed_mul_epilogue);
     }
 
-    kryptos_mp_abort_when_null((*dest) = kryptos_assign_mp_value(dest, d), kryptos_mp_signed_mul_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL((*dest) = kryptos_assign_mp_value(dest, d), kryptos_mp_signed_mul_epilogue);
 
 kryptos_mp_signed_mul_epilogue:
 
@@ -3505,14 +3506,14 @@ static int kryptos_mp_gen_prime_small_primes_test(const kryptos_mp_value_t *n, k
     kryptos_mp_value_t *p = NULL, *q = NULL, *r = NULL, *_0 = NULL;
     int test = 0;
 
-    kryptos_mp_abort_when_null(_0 = kryptos_hex_value_as_mp("0", 1), kryptos_mp_gen_prime_small_primes_test_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(_0 = kryptos_hex_value_as_mp("0", 1), kryptos_mp_gen_prime_small_primes_test_epilogue);
 
     for (sp = 0; sp < g_kryptos_mp_small_primes_nr; sp++) {
-        kryptos_mp_abort_when_null(p = kryptos_hex_value_as_mp(g_kryptos_mp_small_primes[sp],
+        KRYPTOS_MP_ABORT_WHEN_NULL(p = kryptos_hex_value_as_mp(g_kryptos_mp_small_primes[sp],
                                                                strlen(g_kryptos_mp_small_primes[sp])),
                                    kryptos_mp_gen_prime_small_primes_test_epilogue);
 
-        kryptos_mp_abort_when_null(q = kryptos_mp_div(n, p, &r), kryptos_mp_gen_prime_small_primes_test_epilogue);
+        KRYPTOS_MP_ABORT_WHEN_NULL(q = kryptos_mp_div(n, p, &r), kryptos_mp_gen_prime_small_primes_test_epilogue);
         if (kryptos_mp_eq(r, _0)) {
             if (prime != NULL) {
                 *prime = p;
@@ -3562,4 +3563,4 @@ kryptos_mp_gen_prime_small_primes_test_epilogue:
 
 #undef kryptos_mp_put_u32_into_mp
 
-#undef kryptos_mp_abort_when_null
+#undef KRYPTOS_MP_ABORT_WHEN_NULL
