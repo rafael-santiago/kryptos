@@ -116,18 +116,18 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     // INFO(Rafael): Asymmetric stuff
 
-    //CUTE_RUN_TEST(kryptos_dh_get_modp_tests);
-    //CUTE_RUN_TEST(kryptos_dh_get_random_s_tests);
-    //CUTE_RUN_TEST(kryptos_dh_eval_t_tests);
+    CUTE_RUN_TEST(kryptos_dh_get_modp_tests);
+    CUTE_RUN_TEST(kryptos_dh_get_random_s_tests);
+    CUTE_RUN_TEST(kryptos_dh_eval_t_tests);
 
-    //if (CUTE_GET_OPTION("skip-dh-xchg-tests") == NULL) {
-        //CUTE_RUN_TEST(kryptos_dh_standard_key_exchange_bare_bone_tests);
+    if (CUTE_GET_OPTION("skip-dh-xchg-tests") == NULL) {
+        CUTE_RUN_TEST(kryptos_dh_standard_key_exchange_bare_bone_tests);
         //CUTE_RUN_TEST(kryptos_dh_process_stdxchg_tests);
         //CUTE_RUN_TEST(kryptos_dh_mk_key_pair_tests);
         //CUTE_RUN_TEST(kryptos_dh_process_modxchg_tests);
-    //} else {
-        //printf("WARN: The Diffie-Hellman-Merkle exchange tests were skipped.\n");
-    //}
+    } else {
+        printf("WARN: The Diffie-Hellman-Merkle exchange tests were skipped.\n");
+    }
 
 //    CUTE_RUN_TEST(poke_bloody_poke);
 

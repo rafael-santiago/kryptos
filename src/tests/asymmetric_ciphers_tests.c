@@ -39,7 +39,7 @@ CUTE_TEST_CASE(kryptos_dh_get_modp_tests)
         CUTE_ASSERT(kryptos_dh_get_modp(test_vector[t].bits, &p, &g) == kKryptosSuccess);
         CUTE_ASSERT(p != NULL);
         CUTE_ASSERT(g != NULL);
-        CUTE_ASSERT((p->data_size << 3) == test_vector[t].expected_bitsize);
+        CUTE_ASSERT(p->data_size == kryptos_mp_bit2byte(test_vector[t].expected_bitsize));
         kryptos_del_mp_value(p);
         kryptos_del_mp_value(g);
     }
@@ -131,6 +131,9 @@ CUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     CUTE_ASSERT(kryptos_dh_eval_t(&kab_bob, t_alice, s_bob, p) == kKryptosSuccess);
     CUTE_ASSERT(kab_bob != NULL);
 
+    printf(" *** Alice KAB = "); kryptos_print_mp(kab_alice);
+    printf(" *** Bob KAB   = "); kryptos_print_mp(kab_bob);
+
     CUTE_ASSERT(kryptos_mp_eq(kab_alice, kab_bob) == 1);
 
     kryptos_del_mp_value(g);
@@ -188,8 +191,8 @@ CUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
     CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     CUTE_ASSERT(alice->k != NULL);
 
-//    printf("Alice KAB = "); print_mp(alice->k);
-//    printf("Bob KAB = "); print_mp(bob->k);
+    printf("Alice KAB = "); kryptos_print_mp(alice->k);
+    printf("Bob KAB = "); kryptos_print_mp(bob->k);
 
     CUTE_ASSERT(kryptos_mp_eq(alice->k, bob->k) == 1);
 

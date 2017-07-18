@@ -239,8 +239,8 @@ void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8
     (*data)->result = kryptos_pem_put_data(k_pub,
                                            k_pub_size,
                                            KRYPTOS_DH_PEM_HDR_PARAM_P,
-                                           (*data)->p->data,
-                                           (*data)->p->data_size);
+                                           (kryptos_u8_t *)(*data)->p->data,
+                                           (*data)->p->data_size * sizeof(kryptos_mp_digit_t));
     if (!kryptos_last_task_succeed(*data)) {
         (*data)->result_verbose = "Unable to export p into the public buffer.";
         return;
@@ -249,8 +249,8 @@ void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8
     (*data)->result = kryptos_pem_put_data(k_pub,
                                            k_pub_size,
                                            KRYPTOS_DH_PEM_HDR_PARAM_G,
-                                           (*data)->g->data,
-                                           (*data)->g->data_size);
+                                           (kryptos_u8_t *)(*data)->g->data,
+                                           (*data)->g->data_size * sizeof(kryptos_mp_digit_t));
     if (!kryptos_last_task_succeed(*data)) {
         (*data)->result_verbose = "Unable to export g into the public buffer.";
         return;
@@ -259,8 +259,8 @@ void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8
     (*data)->result = kryptos_pem_put_data(k_pub,
                                            k_pub_size,
                                            KRYPTOS_DH_PEM_HDR_PARAM_T,
-                                           (*data)->t->data,
-                                           (*data)->t->data_size);
+                                           (kryptos_u8_t *)(*data)->t->data,
+                                           (*data)->t->data_size * sizeof(kryptos_mp_digit_t));
     if (!kryptos_last_task_succeed(*data)) {
         (*data)->result_verbose = "Unable to export t into the public buffer.";
         return;
@@ -276,8 +276,8 @@ void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8
     (*data)->result = kryptos_pem_put_data(k_priv,
                                            k_priv_size,
                                            KRYPTOS_DH_PEM_HDR_PARAM_S,
-                                           (*data)->s->data,
-                                           (*data)->s->data_size);
+                                           (kryptos_u8_t *)(*data)->s->data,
+                                           (*data)->s->data_size * sizeof(kryptos_mp_digit_t));
 
     // INFO(Rafael): P is public but it is also relevant during the "decryption" at receiver's side. So let's simplify the
     //               things to him/her putting all together in one place.
@@ -285,8 +285,8 @@ void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8
     (*data)->result = kryptos_pem_put_data(k_priv,
                                            k_priv_size,
                                            KRYPTOS_DH_PEM_HDR_PARAM_P,
-                                           (*data)->p->data,
-                                           (*data)->p->data_size);
+                                           (kryptos_u8_t *)(*data)->p->data,
+                                           (*data)->p->data_size * sizeof(kryptos_mp_digit_t));
 
     if (!kryptos_last_task_succeed(*data)) {
         (*data)->result_verbose = "Unable to export s into the private buffer.";
@@ -358,8 +358,8 @@ void kryptos_dh_process_modxchg(struct kryptos_dh_xchg_ctx **data) {
         (*data)->result = kryptos_pem_put_data(&(*data)->out,
                                                &(*data)->out_size,
                                                KRYPTOS_DH_PEM_HDR_PARAM_U,
-                                               u->data,
-                                               u->data_size);
+                                               (kryptos_u8_t *)u->data,
+                                               u->data_size * sizeof(kryptos_mp_digit_t));
 
         if (!kryptos_last_task_succeed(*data)) {
             (*data)->result_verbose = "Unable to export u into the output buffer.";
@@ -478,8 +478,8 @@ void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data) {
             (*data)->result = kryptos_pem_put_data(&(*data)->out,
                                                    &(*data)->out_size,
                                                    KRYPTOS_DH_PEM_HDR_PARAM_P,
-                                                   (*data)->p->data,
-                                                   (*data)->p->data_size);
+                                                   (kryptos_u8_t *)(*data)->p->data,
+                                                   (*data)->p->data_size * sizeof(kryptos_mp_digit_t));
             if (!kryptos_last_task_succeed(*data)) {
                 (*data)->result_verbose = "Unable to pack p into a PEM.";
                 return;
@@ -488,8 +488,8 @@ void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data) {
             (*data)->result = kryptos_pem_put_data(&(*data)->out,
                                                    &(*data)->out_size,
                                                    KRYPTOS_DH_PEM_HDR_PARAM_G,
-                                                   (*data)->g->data,
-                                                   (*data)->g->data_size);
+                                                   (kryptos_u8_t *)(*data)->g->data,
+                                                   (*data)->g->data_size * sizeof(kryptos_mp_digit_t));
             if (!kryptos_last_task_succeed(*data)) {
                 (*data)->result_verbose = "Unable to pack g into a PEM.";
                 return;
@@ -506,8 +506,8 @@ void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data) {
         (*data)->result = kryptos_pem_put_data(&(*data)->out,
                                                &(*data)->out_size,
                                                KRYPTOS_DH_PEM_HDR_PARAM_T,
-                                               (*data)->t->data,
-                                               (*data)->t->data_size);
+                                               (kryptos_u8_t *)(*data)->t->data,
+                                               (*data)->t->data_size * sizeof(kryptos_mp_digit_t));
 
         if (!kryptos_last_task_succeed(*data)) {
             (*data)->result_verbose = "Unable to pack t into a PEM.";
@@ -578,6 +578,7 @@ kryptos_task_result_t kryptos_dh_get_random_s(kryptos_mp_value_t **s, const kryp
     kryptos_mp_value_t *p_2 = NULL, *_2 = NULL;
     kryptos_task_result_t result = kKryptosProcessError;
     ssize_t d;
+    kryptos_mp_digit_t mask = 0;
 
     if (p == NULL || s == NULL) {
         return kKryptosInvalidParams;
@@ -595,15 +596,31 @@ kryptos_task_result_t kryptos_dh_get_random_s(kryptos_mp_value_t **s, const kryp
         goto kryptos_dh_get_random_s_epilogue;
     }
 
-    (*s) = kryptos_new_mp_value((s_bits == 0 || (s_bits >> 3) > p->data_size) ? p->data_size << 3 : s_bits);
+    (*s) = kryptos_new_mp_value((s_bits == 0 || kryptos_mp_bit2byte(s_bits) > p->data_size) ? kryptos_mp_byte2bit(p->data_size) : s_bits);
 
     if ((*s) == NULL) {
         goto kryptos_dh_get_random_s_epilogue;
     }
 
+#ifndef KRYPTOS_MP_U32_DIGIT
+    mask = 0xFF;
+#else
+    mask = 0xFFFFFFFF;
+    if (s_bits < 32) {
+        mask = mask >> (32 - s_bits);
+    }
+#endif
+
     do {
         for (d = 0; d < (*s)->data_size; d++) {
+#ifndef KRYPTOS_MP_U32_DIGIT
             (*s)->data[d] = kryptos_get_random_byte();
+#else
+            (*s)->data[d] = (kryptos_get_random_byte() << 24 |
+                             kryptos_get_random_byte() << 16 |
+                             kryptos_get_random_byte() <<  8 |
+                             kryptos_get_random_byte()) & mask;
+#endif
         }
     } while (kryptos_mp_gt(*s, p_2) || kryptos_mp_lt(*s, _2));
 
@@ -671,13 +688,13 @@ static kryptos_task_result_t kryptos_dh_ld_parameter_from_input(const kryptos_u8
         return kKryptosProcessError;
     }
 
-    (*number) = kryptos_new_mp_value(pem_data_size << 3);
+    (*number) = kryptos_new_mp_value(kryptos_mp_byte2bit(pem_data_size));
     if ((*number) == NULL) {
         return kKryptosProcessError;
     }
 
     memcpy((*number)->data, pem_data, pem_data_size);
-    (*number)->data_size = pem_data_size;
+    (*number)->data_size = pem_data_size / sizeof(kryptos_mp_digit_t);
     memset(pem_data, 0, pem_data_size);
     kryptos_freeseg(pem_data);
     pem_data_size = 0;

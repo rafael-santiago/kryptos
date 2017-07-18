@@ -236,7 +236,7 @@ kryptos_mp_value_t *kryptos_new_mp_value(const size_t bitsize) {
         mp->data_size = 1;
     }
 
-    mp->data = (kryptos_u8_t *) kryptos_newseg(mp->data_size * sizeof(kryptos_mp_digit_t));
+    mp->data = (kryptos_mp_digit_t *) kryptos_newseg(mp->data_size * sizeof(kryptos_mp_digit_t));
     memset(mp->data, 0, mp->data_size * sizeof(kryptos_mp_digit_t));
 
     return mp;
@@ -582,7 +582,7 @@ kryptos_mp_add_epilogue:
     (*dest)->data_size = (sn < sum->data_size) ? sn + 1 : sum->data_size;
     kryptos_freeseg((*dest)->data);
 
-    (*dest)->data = (kryptos_u8_t *) kryptos_newseg((*dest)->data_size * sizeof(kryptos_mp_digit_t));
+    (*dest)->data = (kryptos_mp_digit_t *) kryptos_newseg((*dest)->data_size * sizeof(kryptos_mp_digit_t));
 
     if ((*dest)->data != NULL) {
         for (s = sn; s >= 0; s--) {
@@ -835,7 +835,7 @@ kryptos_mp_sub_epilogue:
     (*dest)->data_size = (sn < delta->data_size) ? sn + 1 : delta->data_size;
     kryptos_freeseg((*dest)->data);
 
-    (*dest)->data = (kryptos_u8_t *) kryptos_newseg((*dest)->data_size * sizeof(kryptos_mp_digit_t));
+    (*dest)->data = (kryptos_mp_digit_t *) kryptos_newseg((*dest)->data_size * sizeof(kryptos_mp_digit_t));
     memset((*dest)->data, 0, (*dest)->data_size * sizeof(kryptos_mp_digit_t));
     if ((*dest)->data != NULL) {
         for (s = sn; s >= 0; s--) {
@@ -1989,7 +1989,7 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
     kryptos_del_mp_value(A);\
     kryptos_del_mp_value(div);\
     A = mod;\
-    div = mod = NULL;\
+     div = mod = NULL;\
     if ( ( ((e)->data[t] & (1 << (bn))) >> (bn) ) ) {\
         A = kryptos_mp_mul(&A, m);\
         div = kryptos_mp_div(A, n, &mod);\
