@@ -1276,6 +1276,7 @@ CUTE_TEST_CASE(kryptos_mp_inv_signal_tests)
     }
 CUTE_TEST_CASE_END
 
+/*
 CUTE_TEST_CASE(kryptos_mp_signed_add_tests)
     struct signed_add_tests_ctx {
         int a_neg;
@@ -1447,6 +1448,7 @@ CUTE_TEST_CASE(kryptos_mp_signed_mul_tests)
         kryptos_del_mp_value(p);
     }
 CUTE_TEST_CASE_END
+*/
 
 CUTE_TEST_CASE(kryptos_mp_div_tests)
     kryptos_mp_value_t *x, *y, *q, *r, *eq, *er;
