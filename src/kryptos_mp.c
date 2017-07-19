@@ -1316,12 +1316,16 @@ kryptos_mp_value_t *kryptos_mp_mul_digit(kryptos_mp_value_t **x, const kryptos_m
 
 #ifndef KRYPTOS_MP_SLOWER_MP_DIV
 
+// WARN(Rafael): You should define KRYPTOS_MP_U32_DIGIT (btw, this is the default). The kryptos_mp_div_tests case
+//               when using radix 2^32, in a SMP, takes ~0m0.265s against ~0m5.768s with radix 2^8.
+
 #undef KRYPTOS_MP_DIV_DEBUG_INFO
 
 #ifdef KRYPTOS_MP_U32_DIGIT
 // WARN(Rafael): For radix 2^32 is better apply normalization, otherwise the things can slow down in some cases.
 # define KRYPTOS_MP_DIV_APPLY_NORMALIZATION 1
 #else
+// WARN(Rafael): The normalization for 2^8 does not seem to worth.
 # undef KRYPTOS_MP_DIV_APPLY_NORMALIZATION
 #endif
 
@@ -1334,6 +1338,7 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
     kryptos_u16_t qtemp;
 #else
     kryptos_u64_t qtemp;
+    int dec_nr;
 #endif
     int is_zero = 0, is_less;
 #ifdef KRYPTOS_MP_DIV_APPLY_NORMALIZATION
@@ -1550,6 +1555,9 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
         if (qtemp > 0xFFFFFFFF) {
             qtemp = 0xFF;
         }
+
+        dec_nr = 0;
+
 #endif
 
 #ifdef KRYPTOS_MP_DIV_DEBUG_INFO
@@ -1569,7 +1577,6 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
 #else
             q->data[j] = qtemp & 0xFFFFFFFF;
 #endif
-
             b = kryptos_assign_mp_value(&b, yn);
             b = kryptos_mp_mul_digit(&b, q->data[j]);
 #ifndef KRYPTOS_MP_U32_DIGIT
@@ -1580,6 +1587,21 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
             is_less = kryptos_mp_lt(xn, b);
 
             if (is_less) {
+#ifdef KRYPTOS_MP_U32_DIGIT
+                dec_nr++;
+
+                //  INFO(Rafael): dec_nr == 0xFF is another way of saying that the current fraction from "xn" cannot be
+                //                divided by "yn" (Maybe 0xFF be overkill). In this case we need to "go down" one more
+                //                digit, however, this long division is driven by computers not by humans, here
+                //                "to go down" means "let's trying to solve it in the next iteration when the shift
+                //                level is less than the current one".
+                if (dec_nr == 0xFF) {
+                    q->data[j] = 0;
+                    // WARN(Rafael): "break" and then call a "sub" with "b == 0"?? Are you programming for
+                    //                the sake of the CPU or for the sake of newbie students? =D
+                    goto kryptos_mp_div_end_of_iteration;
+                }
+#endif
                 qtemp--;
                 kryptos_del_mp_value(b);
                 b = NULL;
@@ -1601,6 +1623,8 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
 #ifdef KRYPTOS_MP_DIV_DEBUG_INFO
         printf("\txn- = "); kryptos_print_mp(xn);
 #endif
+
+kryptos_mp_div_end_of_iteration:
 
         if (b != NULL) {
             kryptos_del_mp_value(b);

@@ -19,7 +19,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     //               At first glance you should consider the utility that it implements into the library.
 
     // INFO(Rafael): Generic/shared stuff.
-    CUTE_RUN_TEST(kryptos_padding_tests);
+    /*CUTE_RUN_TEST(kryptos_padding_tests);
     CUTE_RUN_TEST(kryptos_get_random_block_tests);
     CUTE_RUN_TEST(kryptos_block_parser_tests);
     CUTE_RUN_TEST(kryptos_endianess_utils_tests);
@@ -99,9 +99,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_inv_signal_tests);
     CUTE_RUN_TEST(kryptos_mp_lsh_tests);
     CUTE_RUN_TEST(kryptos_mp_rsh_tests);
-    CUTE_RUN_TEST(kryptos_mp_signed_rsh_tests);
+    CUTE_RUN_TEST(kryptos_mp_signed_rsh_tests);*/
     CUTE_RUN_TEST(kryptos_mp_div_tests);
-    CUTE_RUN_TEST(kryptos_mp_div_2p_tests);
+    /*CUTE_RUN_TEST(kryptos_mp_div_2p_tests);
     CUTE_RUN_TEST(kryptos_mp_pow_tests);
     CUTE_RUN_TEST(kryptos_mp_is_odd_tests);
     CUTE_RUN_TEST(kryptos_mp_is_even_tests);
@@ -118,10 +118,10 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     CUTE_RUN_TEST(kryptos_dh_get_modp_tests);
     CUTE_RUN_TEST(kryptos_dh_get_random_s_tests);
-    CUTE_RUN_TEST(kryptos_dh_eval_t_tests);
+    CUTE_RUN_TEST(kryptos_dh_eval_t_tests);*/
 
     if (CUTE_GET_OPTION("skip-dh-xchg-tests") == NULL) {
-        CUTE_RUN_TEST(kryptos_dh_standard_key_exchange_bare_bone_tests);
+        //CUTE_RUN_TEST(kryptos_dh_standard_key_exchange_bare_bone_tests);
         //CUTE_RUN_TEST(kryptos_dh_process_stdxchg_tests);
         //CUTE_RUN_TEST(kryptos_dh_mk_key_pair_tests);
         //CUTE_RUN_TEST(kryptos_dh_process_modxchg_tests);

@@ -108,11 +108,13 @@ CUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     CUTE_ASSERT(g != NULL);
 
     // INFO(Rafael): Alice picks one random value sa 1 <= sa <= p - 2.
-    s_alice = kryptos_hex_value_as_mp("AA", 2); // WARN(Rafael): The Eve's dream.
+    //s_alice = kryptos_hex_value_as_mp("AA", 2); // WARN(Rafael): The Eve's dream.
+    s_alice = kryptos_hex_value_as_mp("53", 2); // WARN(Rafael): The Eve's dream.
     CUTE_ASSERT(s_alice != NULL);
 
     // INFO(Rafael): Bob picks one random value sb 1 <= sb <= p - 2.
-    s_bob = kryptos_hex_value_as_mp("BB", 2); // WARN(Rafael): The Eve's dream.
+    //s_bob = kryptos_hex_value_as_mp("BB", 2); // WARN(Rafael): The Eve's dream.
+    s_bob = kryptos_hex_value_as_mp("7A", 2); // WARN(Rafael): The Eve's dream.
     CUTE_ASSERT(s_bob != NULL);
 
     // INFO(Rafael): Alice calculates ta = g^sa mod p and she also sends her result to Bob.
@@ -153,7 +155,7 @@ CUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
 
     kryptos_dh_init_xchg_ctx(alice);
     kryptos_dh_init_xchg_ctx(bob);
-
+printf("Alice:\n");
     // INFO(Rafael): Alice will start the protocol. So she picks a pre-computed DH group.
     CUTE_ASSERT(kryptos_dh_get_modp(kKryptosDHGroup1536, &alice->p, &alice->g) == kKryptosSuccess);
 
@@ -165,7 +167,7 @@ CUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
     CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     CUTE_ASSERT(alice->s != NULL);
     CUTE_ASSERT(alice->out != NULL);
-
+printf("Bob:\n");
     // INFO(Rafael): Now Alice got PEM data that she must send to Bob.
     bob->in = alice->out;
     bob->in_size = alice->out_size;
@@ -180,7 +182,7 @@ CUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
     CUTE_ASSERT(bob->s != NULL);
     CUTE_ASSERT(bob->out != NULL);
     CUTE_ASSERT(bob->k != NULL);
-
+printf("Alice:\n");
     // INFO(Rafael): Now Bob got the value of t encoded as a PEM, so he sends it to Alice.
     alice->in = bob->out;
     alice->in_size = bob->out_size;
