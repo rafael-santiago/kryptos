@@ -16,7 +16,7 @@
 #include <ctype.h>
 #include <stdio.h>
 
-//#include <inttypes.h>
+#include <inttypes.h>
 
 #define kryptos_mp_xnb(n) ( isdigit((n)) ? ( (n) - 48 ) : ( toupper((n)) - 55 )  )
 
@@ -773,6 +773,7 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
     kryptos_u32_t c;
 #endif
     kryptos_mp_value_t *delta;
+    int is_zero = 0;
 
     if (dest == NULL || src == NULL) {
         return NULL;
@@ -782,6 +783,28 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
         (*dest) = kryptos_new_mp_value(kryptos_mp_byte2bit(src->data_size));
         memcpy((*dest)->data, src->data, src->data_size * sizeof(kryptos_mp_digit_t));
         return (*dest);
+    }
+
+    // INFO(Rafael): Checking for src == 0 or dest == 0.
+
+    is_zero = 1;
+    for (d = 0; d < src->data_size && is_zero; d++) {
+        is_zero = (src->data[d] == 0);
+    }
+
+    if (is_zero) {
+        return (*dest);
+    }
+
+    is_zero = 1;
+    for (d = 0; d < (*dest)->data_size && is_zero; d++) {
+        is_zero = ((*dest)->data[d] == 0);
+    }
+
+    if (is_zero) {
+        kryptos_del_mp_value(*dest);
+        *dest = NULL;
+        return kryptos_assign_mp_value(dest, src);
     }
 
     dn = ((*dest)->data_size > src->data_size) ? (*dest)->data_size : src->data_size;
@@ -1584,6 +1607,13 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
 #else
             b = kryptos_mp_lsh(&b, 32 * d);
 #endif
+
+#ifdef KRYPTOS_MP_DIV_DEBUG_INFO
+            printf("\t\tis less??\n");
+            printf("\t\txn = "); kryptos_print_mp(xn);
+            printf("\t\tb  = "); kryptos_print_mp(b);
+#endif
+
             is_less = kryptos_mp_lt(xn, b);
 
             if (is_less) {
