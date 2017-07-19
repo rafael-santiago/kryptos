@@ -16,7 +16,7 @@
 #include <ctype.h>
 #include <stdio.h>
 
-#include <inttypes.h>
+//#include <inttypes.h>
 
 #define kryptos_mp_xnb(n) ( isdigit((n)) ? ( (n) - 48 ) : ( toupper((n)) - 55 )  )
 
@@ -1593,7 +1593,7 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
                 //  INFO(Rafael): dec_nr == 0xFF is another way of saying that the current fraction from "xn" cannot be
                 //                divided by "yn" (Maybe 0xFF be overkill). In this case we need to "go down" one more
                 //                digit, however, this long division is driven by computers not by humans, here
-                //                "to go down" means "let's trying to solve it in the next iteration when the shift
+                //                "to go down" means "let's try to solve it in the next iterations when the shift
                 //                level is less than the current one".
                 if (dec_nr == 0xFF) {
                     q->data[j] = 0;

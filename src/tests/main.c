@@ -122,7 +122,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     if (CUTE_GET_OPTION("skip-dh-xchg-tests") == NULL) {
         CUTE_RUN_TEST(kryptos_dh_standard_key_exchange_bare_bone_tests);
-        //CUTE_RUN_TEST(kryptos_dh_process_stdxchg_tests);
+        CUTE_RUN_TEST(kryptos_dh_process_stdxchg_tests);
         //CUTE_RUN_TEST(kryptos_dh_mk_key_pair_tests);
         //CUTE_RUN_TEST(kryptos_dh_process_modxchg_tests);
     } else {

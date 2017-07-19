@@ -431,8 +431,6 @@ void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data) {
             return;
         }
 
-        printf("p = "); kryptos_print_mp((*data)->p);
-
         // INFO(Rafael): Parsing g.
         (*data)->result = kryptos_dh_ld_parameter_from_input(KRYPTOS_DH_PEM_HDR_PARAM_G,
                                                              (*data)->in, (*data)->in_size, &(*data)->g);
@@ -441,12 +439,7 @@ void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data) {
             return;
         }
 
-        printf("g = "); kryptos_print_mp((*data)->g);
-
         at_sender_side = 0;
-    } else {
-        printf("p = "); kryptos_print_mp((*data)->p);
-        printf("g = "); kryptos_print_mp((*data)->g);
     }
 
     if ((*data)->t == NULL && (*data)->in != NULL) {
@@ -457,7 +450,6 @@ void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data) {
             (*data)->result_verbose = "Unable to get " KRYPTOS_DH_PEM_HDR_PARAM_T ".";
             return;
         }
-        printf("t = "); kryptos_print_mp((*data)->t);
     }
 
 #define kryptos_dh_process_stdxchg_eval_k(data) {\
@@ -470,8 +462,6 @@ void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data) {
 
     if ((*data)->s == NULL) {
         (*data)->result = kryptos_dh_get_random_s(&(*data)->s, (*data)->p, (*data)->s_bits);
-
-        printf("s = "); kryptos_print_mp((*data)->s);
 
         if (!kryptos_last_task_succeed(*data)) {
             (*data)->result_verbose = "Unable to get s.";
@@ -513,7 +503,6 @@ void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data) {
         }
 
         (*data)->result = kryptos_dh_eval_t(&(*data)->t, (*data)->g, (*data)->s, (*data)->p);
-        printf("t = "); kryptos_print_mp((*data)->t);
         (*data)->result = kryptos_pem_put_data(&(*data)->out,
                                                &(*data)->out_size,
                                                KRYPTOS_DH_PEM_HDR_PARAM_T,

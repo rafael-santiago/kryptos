@@ -153,7 +153,7 @@ CUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
 
     kryptos_dh_init_xchg_ctx(alice);
     kryptos_dh_init_xchg_ctx(bob);
-printf("Alice:\n");
+
     // INFO(Rafael): Alice will start the protocol. So she picks a pre-computed DH group.
     CUTE_ASSERT(kryptos_dh_get_modp(kKryptosDHGroup1536, &alice->p, &alice->g) == kKryptosSuccess);
 
@@ -165,7 +165,7 @@ printf("Alice:\n");
     CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     CUTE_ASSERT(alice->s != NULL);
     CUTE_ASSERT(alice->out != NULL);
-printf("Bob:\n");
+
     // INFO(Rafael): Now Alice got PEM data that she must send to Bob.
     bob->in = alice->out;
     bob->in_size = alice->out_size;
@@ -180,7 +180,7 @@ printf("Bob:\n");
     CUTE_ASSERT(bob->s != NULL);
     CUTE_ASSERT(bob->out != NULL);
     CUTE_ASSERT(bob->k != NULL);
-printf("Alice:\n");
+
     // INFO(Rafael): Now Bob got the value of t encoded as a PEM, so he sends it to Alice.
     alice->in = bob->out;
     alice->in_size = bob->out_size;
@@ -191,8 +191,8 @@ printf("Alice:\n");
     CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     CUTE_ASSERT(alice->k != NULL);
 
-    printf("Alice KAB = "); kryptos_print_mp(alice->k);
-    printf("Bob KAB = "); kryptos_print_mp(bob->k);
+    printf(" *** Alice KAB = "); kryptos_print_mp(alice->k);
+    printf(" *** Bob   KAB = "); kryptos_print_mp(bob->k);
 
     CUTE_ASSERT(kryptos_mp_eq(alice->k, bob->k) == 1);
 
