@@ -108,13 +108,11 @@ CUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     CUTE_ASSERT(g != NULL);
 
     // INFO(Rafael): Alice picks one random value sa 1 <= sa <= p - 2.
-    //s_alice = kryptos_hex_value_as_mp("AA", 2); // WARN(Rafael): The Eve's dream.
-    s_alice = kryptos_hex_value_as_mp("53", 2); // WARN(Rafael): The Eve's dream.
+    s_alice = kryptos_hex_value_as_mp("AA", 2); // WARN(Rafael): The Eve's dream.
     CUTE_ASSERT(s_alice != NULL);
 
     // INFO(Rafael): Bob picks one random value sb 1 <= sb <= p - 2.
-    //s_bob = kryptos_hex_value_as_mp("BB", 2); // WARN(Rafael): The Eve's dream.
-    s_bob = kryptos_hex_value_as_mp("7A", 2); // WARN(Rafael): The Eve's dream.
+    s_bob = kryptos_hex_value_as_mp("BB", 2); // WARN(Rafael): The Eve's dream.
     CUTE_ASSERT(s_bob != NULL);
 
     // INFO(Rafael): Alice calculates ta = g^sa mod p and she also sends her result to Bob.
