@@ -1587,8 +1587,6 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
         printf("%X\n", qtemp);
 #endif
 
-        d = j;
-
 #ifdef KRYPTOS_MP_DIV_DEBUG_INFO
         printf("\t-- is_less loop begin.\n");
 #endif
@@ -1603,9 +1601,9 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
             b = kryptos_assign_mp_value(&b, yn);
             b = kryptos_mp_mul_digit(&b, q->data[j]);
 #ifndef KRYPTOS_MP_U32_DIGIT
-            b = kryptos_mp_lsh(&b, 8 * d);
+            b = kryptos_mp_lsh(&b, 8 * j);
 #else
-            b = kryptos_mp_lsh(&b, 32 * d);
+            b = kryptos_mp_lsh(&b, 32 * j);
 #endif
 
 #ifdef KRYPTOS_MP_DIV_DEBUG_INFO
@@ -1635,7 +1633,6 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
                 qtemp--;
                 kryptos_del_mp_value(b);
                 b = NULL;
-                j = d;
 #ifdef KRYPTOS_MP_DIV_DEBUG_INFO
                 printf("\t\tis_less == 1, qtemp = %X\n", qtemp);
 #endif

@@ -321,6 +321,9 @@ CUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
     CUTE_ASSERT(bob->out == NULL && bob->out_size == 0); // INFO(Rafael): Bob does not need to send any data to Alice.
     CUTE_ASSERT(bob->k != NULL);
 
+    printf(" *** Alice KAB = "); kryptos_print_mp(alice->k);
+    printf(" *** Bob   KAB = "); kryptos_print_mp(bob->k);
+
     // INFO(Rafael): Alice and Bob must agree each other about K.
 
     CUTE_ASSERT(kryptos_mp_eq(alice->k, bob->k) == 1);
