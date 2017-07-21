@@ -129,5 +129,5 @@ The default build options are defined into the file ``src/tests/.ivk``. The **Ta
 
 ## Are you searching for some build information not detailed here?
 
-Please let me know more by opening an [issue](https://github.com/kryptos/issues). Thank you!
+Please let me know more by opening an [issue](https://github.com/rafael-santiago/kryptos/issues). Thank you!
 
