@@ -122,10 +122,6 @@ The default build options are defined into the file ``src/tests/.ivk``. The **Ta
 | ``--libraries=../../lib,cutest/src/lib`` | Defines paths of additional libraries.                                       |
 | ``--ldflags=-lkryptos,-lcutest``         | Defines the default linker flags.                                            |
 | ``--includes=../,cutest/src``            | Defines paths of additional include directories.                             |
-| ``--bin-output-dir=../lib``              | Defines where the ar file will be generated.                                 |
-| ``--obj-output-dir=o``                   | Defines where the object files will be generated.                            |
-| ``--includes=./``                        | Defines the additional includes directories. This is a comma separated list. |
-| ``--quick-dh-tests``                     | It speed up the Diffie-Hellman-Merkle tests.                                 |
 
 ## Are you searching for some build information not detailed here?
 
