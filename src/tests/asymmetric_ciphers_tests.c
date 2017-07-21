@@ -336,3 +336,16 @@ CUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
     kryptos_freeseg(k_priv_bob);
 
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rsa_mk_key_pair_tests)
+    kryptos_u8_t *k_pub = NULL, *k_priv = NULL;
+    size_t k_pub_size, k_priv_size;
+    kryptos_rsa_mk_key_pair(80, &k_pub, &k_pub_size, &k_priv, &k_priv_size);
+    CUTE_ASSERT(k_pub != NULL && k_priv != NULL);
+    printf("*** RSA PUBLIC KEY:\n\n");
+    printf("%s", k_pub);
+    printf("\n*** RSA PRIVATE KEY:\n\n");
+    printf("%s", k_priv);
+    kryptos_freeseg(k_pub);
+    kryptos_freeseg(k_priv);
+CUTE_TEST_CASE_END

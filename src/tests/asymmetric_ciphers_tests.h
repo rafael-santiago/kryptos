@@ -24,4 +24,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_dh_mk_key_pair_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_dh_process_modxchg_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_rsa_mk_key_pair_tests);
+
 #endif

@@ -2249,7 +2249,10 @@ CUTE_TEST_CASE(kryptos_mp_gcd_tests)
                                              "E28D20DE9D804032DB83D29A5EA0A6E8"
                                              "47AAEEB7208AC801120D9034E9C6E7D8"
                                              "E43B497E067005EB2FA17B8BA3FB27FE"
-                                             "9EB96EC25D101DD64AE7A363328",         "3" }
+                                             "9EB96EC25D101DD64AE7A363328",         "3" },
+    // TODO(Rafael): Take a look in kryptos_mp_gcd() using radix base 2^32.
+    //               Because it is returning 1 instead of 11.
+//        { "00000038000000B7", "8640EF6BCEBAECE8", "B" }
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     kryptos_mp_value_t *x, *y, *g, *eg;
