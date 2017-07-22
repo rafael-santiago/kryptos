@@ -88,6 +88,8 @@ CUTE_DECLARE_TEST_CASE(kryptos_mp_bitcount_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_mp_mul_digit_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_raw_buffer_as_mp_tests);
+
 //CUTE_DECLARE_TEST_CASE(poke_bloody_poke);
 
 #endif

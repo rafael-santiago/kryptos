@@ -1726,6 +1726,8 @@ kryptos_mp_div_epilogue:
 
 #else
 
+#ifndef KRYPTOS_MP_U32_DIGIT
+
 kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp_value_t *y, kryptos_mp_value_t **r) {
     kryptos_mp_value_t *q = NULL;
     kryptos_mp_value_t *i = NULL;
@@ -1925,6 +1927,8 @@ kryptos_mp_div_epilogue:
 
     return q;
 }
+
+#endif
 
 #endif
 
@@ -3484,6 +3488,45 @@ kryptos_mp_gen_prime_small_primes_test_epilogue:
     }
 
     return test;
+}
+
+kryptos_mp_value_t *kryptos_raw_buffer_as_mp(const kryptos_u8_t *buf, const size_t buf_size) {
+    kryptos_mp_value_t *mp = NULL;
+    kryptos_u8_t *hex = NULL, *hp, *hp_end;
+    size_t hex_size;
+    const kryptos_u8_t *bp, *bp_end;
+
+    if (buf == NULL || buf_size == 0) {
+        return NULL;
+    }
+
+    hex_size = buf_size << 1;
+    hex = kryptos_newseg(hex_size + 1);
+
+    if (hex == NULL) {
+        return NULL;
+    }
+
+    bp = buf;
+    bp_end = bp + buf_size;
+
+    hp = hex;
+    hp_end = hp + hex_size;
+    *hp_end = 0;
+
+    while (bp != bp_end && hp != hp_end) {
+        *hp = kryptos_mp_nbx(*bp & 0xF);
+        *(hp + 1) = kryptos_mp_nbx(*bp >> 4);
+        hp += 2;
+        bp++;
+    }
+
+    mp = kryptos_hex_value_as_mp(hex, hex_size);
+
+    memset(hex, 0, hex_size);
+    kryptos_freeseg(hex);
+
+    return mp;
 }
 
 #undef kryptos_mp_xnb

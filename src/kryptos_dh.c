@@ -193,10 +193,6 @@ KRYPTOS_DH_GROUPS_END
 static void kryptos_dh_get_random_modp_entry(const struct kryptos_dh_modp_group_ctx *entries,
                                              kryptos_mp_value_t **p, kryptos_mp_value_t **g);
 
-static kryptos_task_result_t kryptos_dh_ld_parameter_from_input(const kryptos_u8_t *hdr,
-                                                                const kryptos_u8_t *in, const size_t in_size,
-                                                                kryptos_mp_value_t **number);
-
 void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8_t **k_priv, size_t *k_priv_size,
                             struct kryptos_dh_xchg_ctx **data) {
 
@@ -307,7 +303,7 @@ void kryptos_dh_process_modxchg(struct kryptos_dh_xchg_ctx **data) {
         return;
     }
 
-    (*data)->result = kryptos_dh_ld_parameter_from_input(KRYPTOS_DH_PEM_HDR_PARAM_U, (*data)->in, (*data)->in_size, &u);
+    (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_U, (*data)->in, (*data)->in_size, &u);
 
     if (!kryptos_last_task_succeed(*data)) {
         // INFO(Rafael): This means that the user wants calculates K and also U (U will be sent to someone, calm down not you).
@@ -315,22 +311,22 @@ void kryptos_dh_process_modxchg(struct kryptos_dh_xchg_ctx **data) {
 
         // INFO(Rafael): Loading the receiver public key info...
 
-        (*data)->result = kryptos_dh_ld_parameter_from_input(KRYPTOS_DH_PEM_HDR_PARAM_P, (*data)->in, (*data)->in_size,
-                                                             &(*data)->p);
+        (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_P, (*data)->in, (*data)->in_size,
+                                                  &(*data)->p);
         if (!kryptos_last_task_succeed(*data)) {
             (*data)->result_verbose = "Unable to get p from input.";
             return;
         }
 
-        (*data)->result = kryptos_dh_ld_parameter_from_input(KRYPTOS_DH_PEM_HDR_PARAM_G, (*data)->in, (*data)->in_size,
-                                                             &(*data)->g);
+        (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_G, (*data)->in, (*data)->in_size,
+                                                  &(*data)->g);
         if (!kryptos_last_task_succeed(*data)) {
             (*data)->result_verbose = "Unable to get g from input.";
             return;
         }
 
-        (*data)->result = kryptos_dh_ld_parameter_from_input(KRYPTOS_DH_PEM_HDR_PARAM_T, (*data)->in, (*data)->in_size,
-                                                             &(*data)->t);
+        (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_T, (*data)->in, (*data)->in_size,
+                                                  &(*data)->t);
         if (!kryptos_last_task_succeed(*data)) {
             (*data)->result_verbose = "Unable to get t from input.";
             return;
@@ -385,15 +381,15 @@ void kryptos_dh_process_modxchg(struct kryptos_dh_xchg_ctx **data) {
     } else {
         // INFO(Rafael): The caller is the receiver. Loading the receiver private key info...
 
-        (*data)->result = kryptos_dh_ld_parameter_from_input(KRYPTOS_DH_PEM_HDR_PARAM_P, (*data)->in, (*data)->in_size,
-                                                             &(*data)->p);
+        (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_P, (*data)->in, (*data)->in_size,
+                                                  &(*data)->p);
         if (!kryptos_last_task_succeed(*data)) {
             (*data)->result_verbose = "Unable to get p from input.";
             return;
         }
 
-        (*data)->result = kryptos_dh_ld_parameter_from_input(KRYPTOS_DH_PEM_HDR_PARAM_S, (*data)->in, (*data)->in_size,
-                                                             &(*data)->s);
+        (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_S, (*data)->in, (*data)->in_size,
+                                                  &(*data)->s);
         if (!kryptos_last_task_succeed(*data)) {
             (*data)->result_verbose = "Unable to get s from input.";
             return;
@@ -424,16 +420,16 @@ void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data) {
         // INFO(Rafael): The p, g and t must have in the input buffer. Otherwise it will fail.
 
         // INFO(Rafael): Parsing p.
-        (*data)->result = kryptos_dh_ld_parameter_from_input(KRYPTOS_DH_PEM_HDR_PARAM_P,
-                                                             (*data)->in, (*data)->in_size, &(*data)->p);
+        (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_P,
+                                                  (*data)->in, (*data)->in_size, &(*data)->p);
         if (!kryptos_last_task_succeed(*data)) {
             (*data)->result_verbose = "Unable to get " KRYPTOS_DH_PEM_HDR_PARAM_P ".";
             return;
         }
 
         // INFO(Rafael): Parsing g.
-        (*data)->result = kryptos_dh_ld_parameter_from_input(KRYPTOS_DH_PEM_HDR_PARAM_G,
-                                                             (*data)->in, (*data)->in_size, &(*data)->g);
+        (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_G,
+                                                  (*data)->in, (*data)->in_size, &(*data)->g);
         if (!kryptos_last_task_succeed(*data)) {
             (*data)->result_verbose = "Unable to get " KRYPTOS_DH_PEM_HDR_PARAM_G ".";
             return;
@@ -444,8 +440,8 @@ void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data) {
 
     if ((*data)->t == NULL && (*data)->in != NULL) {
         // INFO(Rafael): Parsing t.
-        (*data)->result = kryptos_dh_ld_parameter_from_input(KRYPTOS_DH_PEM_HDR_PARAM_T,
-                                                             (*data)->in, (*data)->in_size, &(*data)->t);
+        (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_T,
+                                                  (*data)->in, (*data)->in_size, &(*data)->t);
         if (!kryptos_last_task_succeed(*data)) {
             (*data)->result_verbose = "Unable to get " KRYPTOS_DH_PEM_HDR_PARAM_T ".";
             return;
@@ -674,32 +670,6 @@ kryptos_dh_get_modp_epilogue:
     }
 
     return result;
-}
-
-static kryptos_task_result_t kryptos_dh_ld_parameter_from_input(const kryptos_u8_t *hdr,
-                                                                const kryptos_u8_t *in, const size_t in_size,
-                                                                kryptos_mp_value_t **number) {
-    kryptos_u8_t *pem_data;
-    size_t pem_data_size;
-
-    pem_data = kryptos_pem_get_data(hdr, in, in_size, &pem_data_size);
-
-    if (pem_data == NULL) {
-        return kKryptosProcessError;
-    }
-
-    (*number) = kryptos_new_mp_value(kryptos_mp_byte2bit(pem_data_size));
-    if ((*number) == NULL) {
-        return kKryptosProcessError;
-    }
-
-    memcpy((*number)->data, pem_data, pem_data_size);
-    (*number)->data_size = pem_data_size / sizeof(kryptos_mp_digit_t);
-    memset(pem_data, 0, pem_data_size);
-    kryptos_freeseg(pem_data);
-    pem_data_size = 0;
-
-    return kKryptosSuccess;
 }
 
 static void kryptos_dh_get_random_modp_entry(const struct kryptos_dh_modp_group_ctx *entries,

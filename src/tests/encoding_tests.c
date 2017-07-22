@@ -279,3 +279,26 @@ CUTE_TEST_CASE(kryptos_pem_put_data_tests)
     CUTE_ASSERT(strcmp(pem_buf, expected_buffer) == 0);
     kryptos_freeseg(pem_buf);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_pem_get_mp_data_tests)
+    kryptos_mp_value_t *mp = NULL;
+    kryptos_mp_value_t *emp = NULL;
+    kryptos_u8_t *pem_buf = NULL;
+    size_t pem_buf_size = 0;
+
+    emp = kryptos_hex_value_as_mp("00112233", 8);
+
+    CUTE_ASSERT(emp != NULL);
+
+    CUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "MULTIPRECISION VALUE",
+                                     (kryptos_u8_t *)emp->data,
+                                      emp->data_size * sizeof(kryptos_mp_digit_t)) == kKryptosSuccess);
+
+    CUTE_ASSERT(kryptos_pem_get_mp_data("MULTIPRECISION VALUE", pem_buf, pem_buf_size, &mp) == kKryptosSuccess);
+
+    CUTE_ASSERT(kryptos_mp_eq(mp, emp) == 1);
+
+    kryptos_freeseg(pem_buf);
+    kryptos_del_mp_value(emp);
+    kryptos_del_mp_value(mp);
+CUTE_TEST_CASE_END

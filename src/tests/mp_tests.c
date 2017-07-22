@@ -2337,3 +2337,25 @@ CUTE_TEST_CASE(kryptos_mp_montgomery_reduction_tests)
         kryptos_del_mp_value(e);
     }
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_raw_buffer_as_mp_tests)
+    kryptos_mp_value_t *mp = NULL;
+    kryptos_mp_value_t *emp = NULL;
+
+    CUTE_ASSERT(kryptos_raw_buffer_as_mp(NULL, 0) == NULL);
+
+    CUTE_ASSERT(kryptos_raw_buffer_as_mp((kryptos_u8_t *) 0x1, 0) == NULL);
+
+    emp = kryptos_hex_value_as_mp("00112233445566778899AABBCCDDEEFF", 32);
+
+    CUTE_ASSERT(emp != NULL);
+
+    mp = kryptos_raw_buffer_as_mp("\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xAA\xBB\xCC\xDD\xEE\xFF", 16);
+
+    CUTE_ASSERT(mp != NULL);
+
+    CUTE_ASSERT(kryptos_mp_eq(mp, emp) == 1);
+
+    kryptos_del_mp_value(mp);
+    kryptos_del_mp_value(emp);
+CUTE_TEST_CASE_END

@@ -9,9 +9,15 @@
 #include <kryptos_mp.h>
 #include <kryptos_random.h>
 #include <kryptos_pem.h>
-#include <stdio.h>
+#include <kryptos_task_check.h>
+#include <kryptos_memory.h>
+#include <string.h>
 
 static kryptos_mp_value_t *kryptos_rsa_eval_e(const kryptos_mp_value_t *euler_phi_f);
+
+static void kryptos_rsa_encrypt(kryptos_task_ctx **ktask);
+
+static void kryptos_rsa_decrypt(kryptos_task_ctx **ktask);
 
 kryptos_task_result_t kryptos_rsa_mk_key_pair(const size_t bits, kryptos_u8_t **k_pub, size_t *k_pub_size,
                                               kryptos_u8_t **k_priv, size_t *k_priv_size) {
@@ -210,4 +216,144 @@ kryptos_rsa_eval_e_epilogue:
 }
 
 void kryptos_rsa_cipher(kryptos_task_ctx **ktask) {
+    if (ktask == NULL) {
+        return;
+    }
+
+    if (kryptos_task_check(ktask) == 0) {
+        return;
+    }
+
+    if ((*ktask)->action == kKryptosEncrypt) {
+        kryptos_rsa_encrypt(ktask);
+    } else {
+        kryptos_rsa_decrypt(ktask);
+    }
+}
+
+static void kryptos_rsa_encrypt(kryptos_task_ctx **ktask) {
+    kryptos_mp_value_t *e = NULL, *n = NULL, *m = NULL, *c = NULL;
+
+    (*ktask)->result = kryptos_pem_get_mp_data(KRYPTOS_RSA_PEM_HDR_PARAM_N, (*ktask)->key, (*ktask)->key_size, &n);
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        return;
+    }
+
+    if ((*ktask)->in_size > n->data_size) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "RSA input is too long.";
+        goto kryptos_rsa_encrypt_epilogue;
+    }
+
+    (*ktask)->result = kryptos_pem_get_mp_data(KRYPTOS_RSA_PEM_HDR_PARAM_E, (*ktask)->key, (*ktask)->key_size, &e);
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        goto kryptos_rsa_encrypt_epilogue;
+    }
+
+    m = kryptos_raw_buffer_as_mp((*ktask)->in, (*ktask)->in_size);
+
+    if (m == NULL) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Error while reading the input buffer.";
+        goto kryptos_rsa_encrypt_epilogue;
+    }
+
+    c = kryptos_mp_me_mod_n(m, e, n);
+
+    if (c == NULL) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Error while encrypting.";
+        goto kryptos_rsa_encrypt_epilogue;
+    }
+
+    (*ktask)->out = NULL;
+    (*ktask)->out_size = 0;
+    (*ktask)->result = kryptos_pem_put_data(&(*ktask)->out, &(*ktask)->out_size,
+                                            KRYPTOS_RSA_PEM_HDR_PARAM_C,
+                                            (kryptos_u8_t *)c->data, c->data_size * sizeof(kryptos_mp_digit_t));
+
+kryptos_rsa_encrypt_epilogue:
+
+    if (n != NULL) {
+        kryptos_del_mp_value(n);
+    }
+
+    if (e != NULL) {
+        kryptos_del_mp_value(e);
+    }
+
+    if (m != NULL) {
+        kryptos_del_mp_value(m);
+    }
+
+    if (c != NULL) {
+        kryptos_del_mp_value(c);
+    }
+}
+
+static void kryptos_rsa_decrypt(kryptos_task_ctx **ktask) {
+    kryptos_mp_value_t *d = NULL, *n = NULL, *c = NULL, *m = NULL;
+
+    (*ktask)->result = kryptos_pem_get_mp_data(KRYPTOS_RSA_PEM_HDR_PARAM_N, (*ktask)->key, (*ktask)->key_size, &n);
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        return;
+    }
+
+    (*ktask)->result = kryptos_pem_get_mp_data(KRYPTOS_RSA_PEM_HDR_PARAM_D, (*ktask)->key, (*ktask)->key_size, &d);
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        goto kryptos_rsa_decrypt_epilogue;
+    }
+
+    (*ktask)->result = kryptos_pem_get_mp_data(KRYPTOS_RSA_PEM_HDR_PARAM_C, (*ktask)->in, (*ktask)->in_size, &c);
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        goto kryptos_rsa_decrypt_epilogue;
+    }
+
+    if (c == NULL) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "NULL input.";
+        goto kryptos_rsa_decrypt_epilogue;
+    }
+
+    m = kryptos_mp_me_mod_n(c, d, n);
+
+    if (m == NULL) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Error while decrypting.";
+        goto kryptos_rsa_decrypt_epilogue;
+    }
+
+    (*ktask)->out_size = m->data_size * sizeof(kryptos_mp_digit_t);
+    (*ktask)->out = (kryptos_u8_t *) kryptos_newseg((*ktask)->out_size);
+
+    if ((*ktask)->out == NULL) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "No memory to produce the output.";
+        goto kryptos_rsa_decrypt_epilogue;
+    }
+
+    memcpy((*ktask)->out, m->data, (*ktask)->out_size);
+
+kryptos_rsa_decrypt_epilogue:
+
+    if (n != NULL) {
+        kryptos_del_mp_value(n);
+    }
+
+    if (d != NULL) {
+        kryptos_del_mp_value(d);
+    }
+
+    if (c != NULL) {
+        kryptos_del_mp_value(c);
+    }
+
+    if (m != NULL) {
+        kryptos_del_mp_value(m);
+    }
 }

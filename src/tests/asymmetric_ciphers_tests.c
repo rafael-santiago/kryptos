@@ -132,7 +132,7 @@ CUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     CUTE_ASSERT(kab_bob != NULL);
 
     printf(" *** Alice KAB = "); kryptos_print_mp(kab_alice);
-    printf(" *** Bob KAB   = "); kryptos_print_mp(kab_bob);
+    printf(" *** Bob   KAB = "); kryptos_print_mp(kab_bob);
 
     CUTE_ASSERT(kryptos_mp_eq(kab_alice, kab_bob) == 1);
 

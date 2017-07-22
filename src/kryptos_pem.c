@@ -8,6 +8,7 @@
 #include <kryptos_pem.h>
 #include <kryptos.h>
 #include <kryptos_memory.h>
+#include <kryptos_mp.h>
 #include <string.h>
 
 #define KRYPTOS_PEM_BEGIN_PFX "-----BEGIN "
@@ -172,6 +173,33 @@ kryptos_pem_get_data_epilogue:
 
     return ktask->out;
 }
+
+kryptos_task_result_t kryptos_pem_get_mp_data(const kryptos_u8_t *hdr,
+                                              const kryptos_u8_t *in, const size_t in_size,
+                                              kryptos_mp_value_t **number) {
+    kryptos_u8_t *pem_data;
+    size_t pem_data_size;
+
+    pem_data = kryptos_pem_get_data(hdr, in, in_size, &pem_data_size);
+
+    if (pem_data == NULL) {
+        return kKryptosProcessError;
+    }
+
+    (*number) = kryptos_new_mp_value(kryptos_mp_byte2bit(pem_data_size));
+    if ((*number) == NULL) {
+        return kKryptosProcessError;
+    }
+
+    memcpy((*number)->data, pem_data, pem_data_size);
+    (*number)->data_size = pem_data_size / sizeof(kryptos_mp_digit_t);
+    memset(pem_data, 0, pem_data_size);
+    kryptos_freeseg(pem_data);
+    pem_data_size = 0;
+
+    return kKryptosSuccess;
+}
+
 
 static kryptos_u8_t *kryptos_pem_header(const kryptos_u8_t *pfx, const kryptos_u8_t *header, const kryptos_u8_t *sfx) {
     size_t header_size = 0;

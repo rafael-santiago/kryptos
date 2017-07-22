@@ -16,4 +16,8 @@ kryptos_u8_t *kryptos_pem_get_data(const kryptos_u8_t *header, const kryptos_u8_
 kryptos_task_result_t kryptos_pem_put_data(kryptos_u8_t **pem_buf, size_t *pem_buf_size,
                                            const kryptos_u8_t *header, const kryptos_u8_t *data, const size_t data_size);
 
+kryptos_task_result_t kryptos_pem_get_mp_data(const kryptos_u8_t *hdr,
+                                              const kryptos_u8_t *in, const size_t in_size,
+                                              kryptos_mp_value_t **number);
+
 #endif

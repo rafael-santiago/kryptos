@@ -16,6 +16,8 @@
 
 #define KRYPTOS_RSA_PEM_HDR_PARAM_D "RSA PARAM D"
 
+#define KRYPTOS_RSA_PEM_HDR_PARAM_C "RSA PARAM C"
+
 kryptos_task_result_t kryptos_rsa_mk_key_pair(const size_t bits, kryptos_u8_t **k_pub, size_t *k_pub_size,
                                               kryptos_u8_t **k_priv, size_t *k_priv_size);
 

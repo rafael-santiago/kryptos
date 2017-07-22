@@ -20,4 +20,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_pem_get_data_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_pem_put_data_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_pem_get_mp_data_tests);
+
 #endif

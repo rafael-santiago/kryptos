@@ -102,6 +102,8 @@ ssize_t kryptos_mp_bitcount(const kryptos_mp_value_t *n);
 
 kryptos_mp_value_t *kryptos_mp_mul_digit(kryptos_mp_value_t **x, const kryptos_mp_digit_t digit);
 
+kryptos_mp_value_t *kryptos_raw_buffer_as_mp(const kryptos_u8_t *buf, const size_t buf_size);
+
 #ifndef KRYPTOS_MP_U32_DIGIT
 
 #define kryptos_mp_bit2byte(b) ( (b) >> 3 )
