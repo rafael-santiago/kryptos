@@ -843,11 +843,12 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
     if (c == 0xFFFFFFFF && s < delta->data_size) {
         delta->data[s] = 0xFFFFFFFF;
     }
-
+/*
     if (delta->data_size > 1 && delta->data[delta->data_size - 1] == 0x1) {
         // INFO(Rafael): Avoiding the unwanted carry "propagation".
         delta->data[delta->data_size - 1] = 0;
     }
+*/
 #endif
 
 kryptos_mp_sub_epilogue:
