@@ -69,6 +69,13 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     // INFO(Rafael): HMAC tests.
     CUTE_RUN_TEST(kryptos_hmac_tests);
 
+    // INFO(Rafael): Encoding stuff.
+    CUTE_RUN_TEST(kryptos_base64_tests);
+    CUTE_RUN_TEST(kryptos_uuencode_tests);
+    CUTE_RUN_TEST(kryptos_huffman_tests);
+    CUTE_RUN_TEST(kryptos_pem_get_data_tests);
+    CUTE_RUN_TEST(kryptos_pem_put_data_tests);
+
     // INFO(Rafael): Multiprecision stuff.
     CUTE_RUN_TEST(kryptos_mp_new_value_tests);
     CUTE_RUN_TEST(kryptos_mp_hex_value_as_mp_tests);
@@ -108,12 +115,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_modinv_tests);
     CUTE_RUN_TEST(kryptos_raw_buffer_as_mp_tests);
 
-    // INFO(Rafael): Encoding stuff.
-    CUTE_RUN_TEST(kryptos_base64_tests);
-    CUTE_RUN_TEST(kryptos_uuencode_tests);
-    CUTE_RUN_TEST(kryptos_huffman_tests);
-    CUTE_RUN_TEST(kryptos_pem_get_data_tests);
-    CUTE_RUN_TEST(kryptos_pem_put_data_tests);
+    // INFO(Rafael): This encoding function depends on multiprecision stuff, this is because we need
+    //               to test it later than other encoding stuff.
+
     CUTE_RUN_TEST(kryptos_pem_get_mp_data_tests);
 
     // INFO(Rafael): Asymmetric stuff
@@ -132,6 +136,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     }
 
     CUTE_RUN_TEST(kryptos_rsa_mk_key_pair_tests);
+    CUTE_RUN_TEST(kryptos_rsa_cipher_tests);
+    CUTE_RUN_TEST(kryptos_rsa_cipher_c99_tests);
 
 //    CUTE_RUN_TEST(poke_bloody_poke);
 

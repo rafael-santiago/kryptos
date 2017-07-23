@@ -143,6 +143,7 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
 
 static int kryptos_task_check_rsa_params(kryptos_task_ctx **ktask) {
     kryptos_u8_t *data = NULL;
+    size_t dsize = 0;
 
     if ((*ktask)->key == NULL || (*ktask)->key_size == 0) {
         (*ktask)->result = kKryptosKeyError;
@@ -151,10 +152,10 @@ static int kryptos_task_check_rsa_params(kryptos_task_ctx **ktask) {
     }
 
     if ((*ktask)->action == kKryptosEncrypt) {
-        data = kryptos_pem_get_data(KRYPTOS_RSA_PEM_HDR_PARAM_E, (*ktask)->key, (*ktask)->key_size, NULL);
+        data = kryptos_pem_get_data(KRYPTOS_RSA_PEM_HDR_PARAM_E, (*ktask)->key, (*ktask)->key_size, &dsize);
         if (data != NULL) {
             kryptos_freeseg(data);
-            data = kryptos_pem_get_data(KRYPTOS_RSA_PEM_HDR_PARAM_N, (*ktask)->key, (*ktask)->key_size, NULL);
+            data = kryptos_pem_get_data(KRYPTOS_RSA_PEM_HDR_PARAM_N, (*ktask)->key, (*ktask)->key_size, &dsize);
         }
 
         if (data == NULL) {
@@ -165,10 +166,10 @@ static int kryptos_task_check_rsa_params(kryptos_task_ctx **ktask) {
             kryptos_freeseg(data);
         }
     } else {
-        data = kryptos_pem_get_data(KRYPTOS_RSA_PEM_HDR_PARAM_D, (*ktask)->key, (*ktask)->key_size, NULL);
+        data = kryptos_pem_get_data(KRYPTOS_RSA_PEM_HDR_PARAM_D, (*ktask)->key, (*ktask)->key_size, &dsize);
         if (data != NULL) {
             kryptos_freeseg(data);
-            data = kryptos_pem_get_data(KRYPTOS_RSA_PEM_HDR_PARAM_N, (*ktask)->key, (*ktask)->key_size, NULL);
+            data = kryptos_pem_get_data(KRYPTOS_RSA_PEM_HDR_PARAM_N, (*ktask)->key, (*ktask)->key_size, &dsize);
         }
 
         if (data == NULL) {

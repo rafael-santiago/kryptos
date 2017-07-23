@@ -131,7 +131,7 @@ kryptos_u8_t *kryptos_pem_get_data(const kryptos_u8_t *header, const kryptos_u8_
     kryptos_task_init_as_null(ktask);
     ktask->result = kKryptosProcessError;
 
-    if (header == NULL || buf == NULL || buf_size == 0) {
+    if (header == NULL || buf == NULL || buf_size == 0 || data_size == NULL) {
         goto kryptos_pem_get_data_epilogue;
     }
 

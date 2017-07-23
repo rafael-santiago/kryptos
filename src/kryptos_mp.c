@@ -3515,8 +3515,8 @@ kryptos_mp_value_t *kryptos_raw_buffer_as_mp(const kryptos_u8_t *buf, const size
     *hp_end = 0;
 
     while (bp != bp_end && hp != hp_end) {
-        *hp = kryptos_mp_nbx(*bp & 0xF);
-        *(hp + 1) = kryptos_mp_nbx(*bp >> 4);
+        *hp = kryptos_mp_nbx(*bp >> 4);
+        *(hp + 1) = kryptos_mp_nbx(*bp & 0x0F);
         hp += 2;
         bp++;
     }

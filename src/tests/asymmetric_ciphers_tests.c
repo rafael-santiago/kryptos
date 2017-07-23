@@ -342,10 +342,140 @@ CUTE_TEST_CASE(kryptos_rsa_mk_key_pair_tests)
     size_t k_pub_size, k_priv_size;
     kryptos_rsa_mk_key_pair(80, &k_pub, &k_pub_size, &k_priv, &k_priv_size);
     CUTE_ASSERT(k_pub != NULL && k_priv != NULL);
-    printf("*** RSA PUBLIC KEY:\n\n");
+    printf(" *** RSA PUBLIC KEY:\n\n");
     printf("%s", k_pub);
-    printf("\n*** RSA PRIVATE KEY:\n\n");
+    printf("\n *** RSA PRIVATE KEY:\n\n");
     printf("%s", k_priv);
     kryptos_freeseg(k_pub);
     kryptos_freeseg(k_priv);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rsa_cipher_tests)
+    kryptos_u8_t *k_pub_bob = "-----BEGIN RSA PARAM N-----\n"
+                              "1fqzrUbRB0Y1e0/4Mhxk5RaD0EFJs8JpEY6cwh2RQguccjk9yxeT4vF353cMUQQ17/GWGpz8glbKdCBI1j1SGw==\n"
+                              "-----END RSA PARAM N-----\n"
+                              "-----BEGIN RSA PARAM E-----\n"
+                              "vyc/zlnghHEj1seRh3gDaY6NMRvenL3STs7DGOVcOqUHUt9K27WV0mzX3D7/D0+4lDarkXCpFWBSUCVjiBD7Cw==\n"
+                              "-----END RSA PARAM E-----\n";
+
+    kryptos_u8_t *k_priv_bob = "-----BEGIN RSA PARAM N-----\n"
+                               "1fqzrUbRB0Y1e0/4Mhxk5RaD0EFJs8JpEY6cwh2RQguccjk9yxeT4vF353cMUQQ17/GWGpz8glbKdCBI1j1SGw==\n"
+                               "-----END RSA PARAM N-----\n"
+                               "-----BEGIN RSA PARAM D-----\n"
+                               "31VGxn2s64+kcfyrAP6xeqr3ak9C72nGXf+NALlQnYOpVHH7V3agnX3U05xsc3DLReFS0Giz0N/736IUGqonCA==\n"
+                               "-----END RSA PARAM D-----\n";
+
+    kryptos_task_ctx a_kt, *a_ktask = &a_kt;
+    kryptos_task_ctx b_kt, *b_ktask = &b_kt;
+    kryptos_u8_t *m = "Hello Bob!\x00\x00\x00\x00\x00\x00";
+    size_t m_size = 16;
+
+    kryptos_task_init_as_null(a_ktask);
+    kryptos_task_init_as_null(b_ktask);
+
+    // INFO(Rafael): Alice sends a new message to Bob, so she picks Bob's public key.
+
+    a_ktask->key = k_pub_bob;
+    a_ktask->key_size = strlen(k_pub_bob);
+    a_ktask->in = m;
+    a_ktask->in_size = m_size;
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+
+    a_ktask->cipher = kKryptosCipherRSA;
+    kryptos_task_set_encrypt_action(a_ktask);
+    kryptos_rsa_cipher(&a_ktask);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 1);
+
+    printf(" *** CIPHERTEXT:\n\n%s\n\n", a_ktask->out);
+
+    // INFO(Rafael): Now Alice sends the encrypted buffer to Bob.
+
+    b_ktask->in = a_ktask->out;
+    b_ktask->in_size = a_ktask->out_size;
+
+    // INFO(Rafael): Bob uses his private key to get the original message.
+
+    b_ktask->key = k_priv_bob;
+    b_ktask->key_size = strlen(k_priv_bob);
+
+    b_ktask->cipher = kKryptosCipherRSA;
+    kryptos_task_set_decrypt_action(b_ktask);
+    kryptos_rsa_cipher(&b_ktask);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(b_ktask) == 1);
+
+    CUTE_ASSERT(b_ktask->out != NULL);
+
+    printf(" *** PLAINTEXT:\n\n'%s'\n\n", b_ktask->out);
+
+    CUTE_ASSERT(b_ktask->out_size == m_size);
+    CUTE_ASSERT(memcmp(b_ktask->out, m, m_size) == 0);
+
+    kryptos_task_free(a_ktask, KRYPTOS_TASK_OUT);
+    kryptos_task_free(b_ktask, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
+#ifdef KRYPTOS_C99
+    kryptos_u8_t *k_pub_alice = "-----BEGIN RSA PARAM N-----\n"
+                                "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
+                                "-----END RSA PARAM N-----\n"
+                                "-----BEGIN RSA PARAM E-----\n"
+                                "Q9mxxs0+nosV5jzwUs1UmYEhXLrYAszE9q0S3hljhpXD9ANvkzCUC5nM8FZ3+44V1IrPhIYZYDwfSrGlhwG4Aw==\n"
+                                "-----END RSA PARAM E-----\n";
+
+    kryptos_u8_t *k_priv_alice = "-----BEGIN RSA PARAM N-----\n"
+                                 "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
+                                 "-----END RSA PARAM N-----\n"
+                                 "-----BEGIN RSA PARAM D-----\n"
+                                 "K04+KEU3GyG2ABjJu+sTqV5yH8mgO8aIPdygWvBq9GzJfTmLt18cck2pc7y6lmYLsl+NxgFo7KTliwXAjU3eGg==\n"
+                                 "-----END RSA PARAM D-----\n";
+
+    kryptos_task_ctx a_kt, *a_ktask = &a_kt;
+    kryptos_task_ctx b_kt, *b_ktask = &b_kt;
+    kryptos_u8_t *m = "Hello Alice!\x00\x00\x00\x00";
+    size_t m_size = 16;
+
+    kryptos_task_init_as_null(a_ktask);
+    kryptos_task_init_as_null(b_ktask);
+
+    // INFO(Rafael): Bob sends a new message to Alice, so he picks Alice's public key.
+
+    kryptos_task_set_in(b_ktask, m, m_size);
+    kryptos_task_set_encrypt_action(b_ktask);
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+
+    kryptos_run_cipher(rsa, b_ktask, k_pub_alice, strlen(k_pub_alice));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(b_ktask) == 1);
+
+    printf(" *** CIPHERTEXT:\n\n%s\n\n", b_ktask->out);
+
+    // INFO(Rafael): Now Bob sends the encrypted buffer to Alice.
+
+    kryptos_task_set_in(a_ktask, b_ktask->out, b_ktask->out_size);
+
+    // INFO(Rafael): Alice uses her private key to get the original message.
+
+    kryptos_task_set_decrypt_action(a_ktask);
+    kryptos_run_cipher(rsa, a_ktask, k_priv_alice, strlen(k_priv_alice));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 1);
+
+    CUTE_ASSERT(a_ktask->out != NULL);
+
+    printf(" *** PLAINTEXT:\n\n'%s'\n\n", a_ktask->out);
+
+    CUTE_ASSERT(a_ktask->out_size == m_size);
+    CUTE_ASSERT(memcmp(a_ktask->out, m, m_size) == 0);
+
+    kryptos_task_free(a_ktask, KRYPTOS_TASK_OUT);
+    kryptos_task_free(b_ktask, KRYPTOS_TASK_OUT);
+#else
+    printf("WARN: No c99 support, this test was skipped.\n");
+#endif
+CUTE_TEST_CASE_END
+

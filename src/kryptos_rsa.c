@@ -11,6 +11,7 @@
 #include <kryptos_pem.h>
 #include <kryptos_task_check.h>
 #include <kryptos_memory.h>
+#include <kryptos_endianess_utils.h>
 #include <string.h>
 
 static kryptos_mp_value_t *kryptos_rsa_eval_e(const kryptos_mp_value_t *euler_phi_f);
@@ -215,6 +216,17 @@ kryptos_rsa_eval_e_epilogue:
     return e;
 }
 
+void kryptos_rsa_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, size_t key_size) {
+    if (ktask == NULL) {
+        return;
+    }
+
+    ktask->cipher = kKryptosCipherRSA;
+
+    ktask->key = key;
+    ktask->key_size = key_size;
+}
+
 void kryptos_rsa_cipher(kryptos_task_ctx **ktask) {
     if (ktask == NULL) {
         return;
@@ -295,6 +307,9 @@ kryptos_rsa_encrypt_epilogue:
 
 static void kryptos_rsa_decrypt(kryptos_task_ctx **ktask) {
     kryptos_mp_value_t *d = NULL, *n = NULL, *c = NULL, *m = NULL;
+    ssize_t xd;
+    ssize_t o_size;
+    kryptos_u8_t *o = NULL;
 
     (*ktask)->result = kryptos_pem_get_mp_data(KRYPTOS_RSA_PEM_HDR_PARAM_N, (*ktask)->key, (*ktask)->key_size, &n);
 
@@ -330,6 +345,7 @@ static void kryptos_rsa_decrypt(kryptos_task_ctx **ktask) {
 
     (*ktask)->out_size = m->data_size * sizeof(kryptos_mp_digit_t);
     (*ktask)->out = (kryptos_u8_t *) kryptos_newseg((*ktask)->out_size);
+    memset((*ktask)->out, 0, (*ktask)->out_size);
 
     if ((*ktask)->out == NULL) {
         (*ktask)->result = kKryptosProcessError;
@@ -337,7 +353,16 @@ static void kryptos_rsa_decrypt(kryptos_task_ctx **ktask) {
         goto kryptos_rsa_decrypt_epilogue;
     }
 
-    memcpy((*ktask)->out, m->data, (*ktask)->out_size);
+    o = (*ktask)->out;
+    o_size = (*ktask)->out_size;
+
+    for (xd = m->data_size - 1; xd >= 0; xd--, o += sizeof(kryptos_mp_digit_t), o_size -= sizeof(kryptos_mp_digit_t)) {
+#ifdef KRYPTOS_MP_U32_DIGIT
+        kryptos_cpy_u32_as_big_endian(o, o_size, m->data[xd]);
+#else
+        *o = m->data[xd];
+#endif
+    }
 
 kryptos_rsa_decrypt_epilogue:
 
