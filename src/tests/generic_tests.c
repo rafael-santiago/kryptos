@@ -247,6 +247,20 @@ CUTE_TEST_CASE(kryptos_task_check_tests)
     kryptos_u8_t *iv = "bluh";
     kryptos_task_ctx t;
     kryptos_task_ctx *ktask = &t;
+    kryptos_u8_t *k_pub = "-----BEGIN RSA PARAM N-----\n"
+                          "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
+                          "-----END RSA PARAM N-----\n"
+                          "-----BEGIN RSA PARAM E-----\n"
+                          "Q9mxxs0+nosV5jzwUs1UmYEhXLrYAszE9q0S3hljhpXD9ANvkzCUC5nM8FZ3+44V1IrPhIYZYDwfSrGlhwG4Aw==\n"
+                          "-----END RSA PARAM E-----\n";
+
+    kryptos_u8_t *k_priv = "-----BEGIN RSA PARAM N-----\n"
+                           "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
+                           "-----END RSA PARAM N-----\n"
+                           "-----BEGIN RSA PARAM D-----\n"
+                           "K04+KEU3GyG2ABjJu+sTqV5yH8mgO8aIPdygWvBq9GzJfTmLt18cck2pc7y6lmYLsl+NxgFo7KTliwXAjU3eGg==\n"
+                           "-----END RSA PARAM D-----\n";
+
 
     t.cipher = -1;
     t.mode = kKryptosECB;
@@ -341,6 +355,32 @@ CUTE_TEST_CASE(kryptos_task_check_tests)
     CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
     CUTE_ASSERT(t.result == kKryptosSuccess);
     CUTE_ASSERT(t.result_verbose == NULL);
+
+    t.cipher = kKryptosCipherRSA;
+    t.key = NULL;
+    t.key_size = 0;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.action = kKryptosEncrypt;
+    t.key = k_priv;
+    t.key_size = strlen(k_priv);
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosKeyError);
+
+    t.key = k_pub;
+    t.key_size = strlen(k_pub);
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    CUTE_ASSERT(t.result == kKryptosSuccess);
+
+    t.action = kKryptosDecrypt;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosKeyError);
+
+    t.key = k_priv;
+    t.key_size = strlen(k_priv);
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    CUTE_ASSERT(t.result == kKryptosSuccess);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_hex_tests)

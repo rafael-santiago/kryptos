@@ -236,10 +236,19 @@ void kryptos_rsa_cipher(kryptos_task_ctx **ktask) {
         return;
     }
 
+    if ((*ktask)->in == NULL || (*ktask)->in_size == 0) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Null input buffer.";
+        return;
+    }
+
     if ((*ktask)->action == kKryptosEncrypt) {
         kryptos_rsa_encrypt(ktask);
-    } else {
+    } else if ((*ktask)->action == kKryptosDecrypt) {
         kryptos_rsa_decrypt(ktask);
+    } else {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Invalid action.";
     }
 }
 
