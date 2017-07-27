@@ -11,7 +11,9 @@
 #include <kryptos_random.h>
 #include <kryptos_padding.h>
 #include <kryptos.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 #define KRYPTOS_SAFERK64_MAX_ROUND 800
 

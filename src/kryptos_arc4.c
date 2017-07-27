@@ -8,8 +8,9 @@
 #include <kryptos_arc4.h>
 #include <kryptos_task_check.h>
 #include <kryptos_memory.h>
-#include <ctype.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 #define kryptos_arc4stream(s) ( s->i = (s->i + 1) % 256,\
                                 s->j = (s->j + s->S[s->i]) % 256,\

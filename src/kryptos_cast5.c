@@ -11,7 +11,9 @@
 #include <kryptos_padding.h>
 #include <kryptos_task_check.h>
 #include <kryptos.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 #define kryptos_cast5_shl(x, s) ( (x) << (s) | (x) >> ( (sizeof(x) << 3) - (s) ) )
 

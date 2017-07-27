@@ -8,7 +8,9 @@
 #include <kryptos_seal.h>
 #include <kryptos_task_check.h>
 #include <kryptos_memory.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 // INFO(Rafael): Macro version of functions f(), g() and h() from SHA-1.
 #define kryptos_seal_f(B, C, D) (kryptos_u32_t) ( ( (B) & (C) ) | ( ( ~(B) ) &  (D) ) )
@@ -59,8 +61,8 @@ static void kryptos_seal_ga(kryptos_u32_t a[5], int i, kryptos_u32_t o[5]);
 static void kryptos_seal_ld_userkey(kryptos_u32_t *state, const size_t state_size,
                                     const kryptos_u8_t *key, const size_t key_size);
 
-static int kryptos_seal_keystream(const kryptos_u8_t *userkey, const size_t userkey_size,
-                                  struct kryptos_seal_keystream_ctx *kstream);
+static void kryptos_seal_keystream(const kryptos_u8_t *userkey, const size_t userkey_size,
+                                   struct kryptos_seal_keystream_ctx *kstream);
 
 static void kryptos_seal_xor(const kryptos_u32_t *in,
                              const kryptos_u32_t *key,
@@ -159,8 +161,8 @@ static void kryptos_seal_ld_userkey(kryptos_u32_t *state, const size_t state_siz
     }
 }
 
-static int kryptos_seal_keystream(const kryptos_u8_t *userkey, const size_t userkey_size,
-                                  struct kryptos_seal_keystream_ctx *kstream) {
+static void kryptos_seal_keystream(const kryptos_u8_t *userkey, const size_t userkey_size,
+                                   struct kryptos_seal_keystream_ctx *kstream) {
     int i, l, p;
     int until;
     kryptos_u32_t T[512], S[256], R[ 4 * ((KRYPTOS_SEALMAXL - 1) / 8192) - 1], a[5], P, Q, o[5], LL;
@@ -168,12 +170,12 @@ static int kryptos_seal_keystream(const kryptos_u8_t *userkey, const size_t user
 
     if ((kstream->L >> 5) > KRYPTOS_SEALMAXL) {
         // INFO(Rafael): L > 2^19.
-        return 0;
+        return;
     }
 
     if (kstream->version != kKryptosSEAL20 && kstream->version != kKryptosSEAL30) {
         //  INFO(Rafael): Unknown version.
-        return 0;
+        return;
     }
 
     //  INFO(Rafael): Making the user key a 160-bit value.
@@ -334,7 +336,7 @@ static void kryptos_seal_xor(const kryptos_u32_t *in,
                              kryptos_u32_t *out) {
     size_t k;
     //  INFO(Rafael): The additive stuff.
-    for (k = 0; k < key_size; out[k] = in[k] ^ key[k++])
+    for (k = 0; k < key_size; out[k] = in[k] ^ key[k], k++)
         ;
 }
 

@@ -11,7 +11,9 @@
 #include <kryptos_padding.h>
 #include <kryptos_task_check.h>
 #include <kryptos.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 #define KRYPTOS_BLOWFISH_MAX_KEY_NR 14
 

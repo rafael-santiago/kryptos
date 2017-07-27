@@ -7,7 +7,9 @@
  */
 #include <kryptos_base64.h>
 #include <kryptos_memory.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 static kryptos_u8_t kryptos_base64_state[] = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
@@ -128,7 +130,7 @@ static kryptos_u8_t *kryptos_base64_decode_buffer(const kryptos_u8_t *buffer, co
     const kryptos_u8_t *bp, *bp_end;
     kryptos_u8_t *out, *out_p, *out_end;
     kryptos_u32_t block;
-    size_t block_size, pad_size = 0;
+    size_t pad_size = 0;
 
     if (buffer == NULL || buffer_size == 0) {
         *out_size = 0;

@@ -11,7 +11,9 @@
 #include <kryptos_padding.h>
 #include <kryptos_task_check.h>
 #include <kryptos.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 #define kryptos_idea_get_byte_from_u32(x, b) ( (x) << (24 - (8 * abs(3 - (b) ) ) ) >> 24 )
 

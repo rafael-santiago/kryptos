@@ -10,7 +10,9 @@
 #include <kryptos_endianess_utils.h>
 #include <kryptos_memory.h>
 #include <kryptos_hex.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 // INFO(Rafael): MD4 round functions. Maybe some of them could be simplified a little. If speed is a real critical
 //               issue to your state of things.

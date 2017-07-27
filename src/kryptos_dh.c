@@ -9,7 +9,9 @@
 #include <kryptos_random.h>
 #include <kryptos_pem.h>
 #include <kryptos.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 struct kryptos_dh_modp_group_entry_ctx {
     kryptos_u8_t *p;
@@ -295,8 +297,6 @@ void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8
 void kryptos_dh_process_modxchg(struct kryptos_dh_xchg_ctx **data) {
     // INFO(Rafael): This modified implementation eliminates (or at least mitigates) man-in-the-middle attacks.
 
-    kryptos_u8_t *pem_data = NULL;
-    size_t pem_data_size;
     kryptos_mp_value_t *u = NULL;
 
     if (data == NULL) {
@@ -638,7 +638,7 @@ kryptos_task_result_t kryptos_dh_get_modp(const kryptos_dh_modp_group_bits_t bit
                                           kryptos_mp_value_t **p, kryptos_mp_value_t **g) {
     kryptos_task_result_t result = kKryptosSuccess;
 
-    if (bits < 0 || bits > kKryptosDHGroupNr || p == NULL || g == NULL) {
+    if (bits > kKryptosDHGroupNr || p == NULL || g == NULL) {
         result = kKryptosInvalidParams;
         goto kryptos_dh_get_modp_epilogue;
     }

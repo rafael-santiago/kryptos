@@ -9,7 +9,9 @@
 #include <kryptos.h>
 #include <kryptos_memory.h>
 #include <kryptos_mp.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 #define KRYPTOS_PEM_BEGIN_PFX "-----BEGIN "
 
@@ -70,7 +72,7 @@ kryptos_task_result_t kryptos_pem_put_data(kryptos_u8_t **pem_buf, size_t *pem_b
 
     new_pem_buf_size = header_begin_size + header_end_size + old_pem_buf_size;
 
-    ktask->in = (kryptos_u8_t *) data; // INFO(Rafael): Yes, I know, shut up.
+    ktask->in = (kryptos_u8_t *)(intptr_t)data; // INFO(Rafael): Yes, I know, shut up.
     ktask->in_size = data_size;
     ktask->encoder = kKryptosEncodingBASE64;
 

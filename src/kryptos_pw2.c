@@ -5,8 +5,8 @@
  * the terms of the GNU General Public License version 2.
  *
  */
+#include <kryptos_types.h>
 #include <kryptos_pw2.h>
-#include <stdlib.h>
 
 // TIP(Rafael): Here "-2147483648" denotes our infinity, nan. The kryptos_pw2() was written for being used on a mod
 //              division, i.e.: x % kryptos_pw2(exp); The "x" must be less than or equals to kryptos_pw2_lt_nr.

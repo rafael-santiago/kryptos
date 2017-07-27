@@ -10,7 +10,9 @@
 #include <kryptos_endianess_utils.h>
 #include <kryptos_memory.h>
 #include <kryptos_hex.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 #define kryptos_ripemd_f0(x, y, z) ( (x) ^ (y) ^ (z) )
 

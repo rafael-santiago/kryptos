@@ -1,0 +1,45 @@
+#
+#                                Copyright (C) 2017 by Rafael Santiago
+#
+# This is a free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+#
+
+include on freebsd ~/toolsets/freebsd/freebsd-module.hsl
+include on linux ~/toolsets/linux/linux-module.hsl
+
+var includes type list;
+var cflags type list;
+var libraries type list;
+var ldflags type list;
+
+var LKMTOOL type string;
+
+project kryptos-test-mod : toolset $LKMTOOL : "main.c", $includes, $cflags, $libraries, $ldflags, "kryptos_test";
+
+kryptos-test-mod.preloading() {
+    if (hefesto.sys.os_name() == "freebsd") {
+        $LKMTOOL = "freebsd-kld";
+    } else if (hefesto.sys.os_name() == "linux") {
+        $LKMTOOL = "linux-lkm";
+    }
+}
+
+kryptos-test-mod.prologue() {
+    $includes.add_item("../../");
+    $includes.add_item(hefesto.sys.pwd());
+    $includes.add_item(hefesto.sys.make_path(hefesto.sys.pwd(), hefesto.sys.os_name()));
+    # INFO(Rafael): Only define KRYPTOS_KERNEL_MODE will guide the compiler across the building of the kryptos kernel mode version.
+    #               Notice that no .ar file is generated. When adding the path "../.." to the includes list the object files from
+    #               kryptos are automatically linked together.
+    $cflags.add_item("-DKRYPTOS_KERNEL_MODE=1");
+}
+
+kryptos-test-mod.epilogue() {
+    if (hefesto.sys.last_forge_result() == 0) {
+        hefesto.sys.echo("*** Test module successfully compiled.\n");
+    } else {
+        hefesto.sys.echo("~~~ Error during test module compilation.\n");
+    }
+}

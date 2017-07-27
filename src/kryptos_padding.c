@@ -14,11 +14,15 @@
 
 kryptos_u8_t *kryptos_ansi_x923_padding(const kryptos_u8_t *buffer, size_t *buffer_size,
                                         const size_t block_size_in_bytes, const int randomize) {
-    kryptos_u8_t *bpad = NULL, byte;
-    size_t padded_size = 0, p;
+    kryptos_u8_t *bpad = NULL;
+    size_t padded_size = 0;
+#ifdef KRYPTOS_USER_MODE
+    kryptos_u8_t byte;
+    size_t p;
+#endif
 
     if (buffer_size == NULL || block_size_in_bytes == 0 || *buffer_size == 0) {
-        return (kryptos_u8_t *)buffer;
+        return NULL;
     }
 
     padded_size = *buffer_size;

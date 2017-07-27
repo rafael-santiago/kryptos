@@ -6,7 +6,9 @@
  *
  */
 #include <kryptos_endianess_utils.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 #define kryptos_u32_rev(w) ( ((w) << 24) | (((w) & 0x0000ff00) << 8) | (((w) & 0x00ff0000) >> 8) | ((w) >> 24) )
 
@@ -32,7 +34,7 @@ kryptos_u32_t kryptos_get_u32_as_big_endian(const kryptos_u8_t *data, const size
                 (kryptos_u32_t)(*(data + 2)) <<  8 |
                 (kryptos_u32_t)(*(data + 3));
     } else {
-        value = *(kryptos_u32_t *)data;
+        value = *(const kryptos_u32_t *)data;
     }
 
     return value;
@@ -74,7 +76,7 @@ kryptos_u16_t kryptos_get_u16_as_big_endian(const kryptos_u8_t *data, const size
         value = (kryptos_u16_t)(*(data)) <<  8 |
                 (kryptos_u16_t)(*(data + 1));
     } else {
-        value = *(kryptos_u16_t *)data;
+        value = *(const kryptos_u16_t *)data;
     }
 
     return value;

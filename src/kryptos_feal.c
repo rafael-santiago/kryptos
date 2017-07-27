@@ -11,7 +11,9 @@
 #include <kryptos_random.h>
 #include <kryptos_padding.h>
 #include <kryptos.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 #define KRYPTOS_FEAL_MAX 801
 
@@ -128,7 +130,6 @@ static void kryptos_feal_ld_user_key(kryptos_u32_t key[2], const kryptos_u8_t *u
 
 static void kryptos_feal_expand_key(const kryptos_u8_t *key, const size_t key_size, struct kryptos_feal_subkeys *sks) {
     size_t r, r_nr;
-    kryptos_u8_t t;
     kryptos_u32_t D[KRYPTOS_FEAL_MAX], A[KRYPTOS_FEAL_MAX], B[KRYPTOS_FEAL_MAX];
     kryptos_u32_t user_key[2];
 

@@ -10,7 +10,9 @@
 #include <kryptos_endianess_utils.h>
 #include <kryptos_hex.h>
 #include <kryptos_memory.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 #define kryptos_sha384_512_CH(x, y, z) ( ( (x) & (y) ) ^ ( (~(x)) & (z) ) )
 

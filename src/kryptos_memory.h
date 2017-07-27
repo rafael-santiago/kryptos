@@ -9,7 +9,10 @@
 #define KRYPTOS_KRYPTOS_MEMORY_H 1
 
 #include <kryptos_types.h>
-#include <stdlib.h>
+
+#ifndef KRYPTOS_KERNEL_MODE
+# include <stdlib.h>
+#endif
 
 void *kryptos_newseg(const size_t ssize);
 

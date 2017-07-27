@@ -7,7 +7,9 @@
  */
 #include <kryptos_huffman.h>
 #include <kryptos_memory.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 // WARN(Rafael): The aim of this module is to provide a way of increasing the entropy. Common worries such as not bloat
 //               the deflated output with the encoding tree is not a real issue here.

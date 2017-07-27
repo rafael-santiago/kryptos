@@ -10,7 +10,9 @@
 #include <kryptos_memory.h>
 #include <kryptos_endianess_utils.h>
 #include <kryptos_hex.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 #define kryptos_sha1_Sn(x, n) ( (x) << (n) | (x) >> ((sizeof((x)) << 3) - (n)) )
 

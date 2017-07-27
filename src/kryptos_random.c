@@ -7,8 +7,10 @@
  */
 #include <kryptos_random.h>
 #include <kryptos_memory.h>
-#include <fcntl.h>
-#include <unistd.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <fcntl.h>
+# include <unistd.h>
+#endif
 
 void *kryptos_get_random_block(const size_t size_in_bytes) {
     void *block = NULL;
@@ -44,12 +46,10 @@ kryptos_get_random_block_epilogue:
     if (fd != -1) {
         close(fd);
     }
-
-    return block;
 #elif  defined(KRYPTOS_KERNEL_MODE)
     // TODO(Rafael): Use get_random_bytes(). [Do not read from /dev/urandom or /dev/random it would be nasty!!!]
 #endif
-    return NULL;
+    return block;
 }
 
 kryptos_u8_t kryptos_get_random_byte(void) {

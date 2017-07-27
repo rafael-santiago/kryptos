@@ -1,5 +1,6 @@
 src/o/
 lib/
+*.o
 src/.Forgefile*
 src/tests/bin/
 src/tests/o

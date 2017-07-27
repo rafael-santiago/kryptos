@@ -6,7 +6,9 @@
  *
  */
 #include <kryptos_hash_common.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 // INFO(Rafael): The following functions are useful for hash algorithms that use Merkle-Damgard construction.
 

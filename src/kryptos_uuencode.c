@@ -7,7 +7,9 @@
  */
 #include <kryptos_uuencode.h>
 #include <kryptos_memory.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 #define KRYPTOS_UUENCODE_BYTES_PER_LINE 60
 

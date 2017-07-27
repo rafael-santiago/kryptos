@@ -12,11 +12,13 @@
 #include <kryptos_task_check.h>
 #include <kryptos_pw2.h>
 #include <kryptos.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 #define kryptos_rc2_get_byte(x, b) (kryptos_u16_t) ( ( (x)  >> (8 - (b << 3)) ) & 0xff )
 
-#define kryptos_rc2_rol(x, s) (kryptos_u16_t) ( (x) << (s) | (x) >> (sizeof(x) << 3) - (s) )
+#define kryptos_rc2_rol(x, s) (kryptos_u16_t) ( (x) << (s) | (x) >> ( (sizeof(x) << 3) - (s) ) )
 
 #define kryptos_rc2_rollevel(i) ( (i) == 0 ? 1 : (i) == 1 ? 2 : (i) == 2 ? 3 : (i) == 3 ? 5 : -1 )
 
@@ -37,7 +39,7 @@
                                          kryptos_rc2_mashr(r, 2, k),\
                                          kryptos_rc2_mashr(r, 3, k) )
 
-#define kryptos_rc2_ror(x, s) (kryptos_u16_t) ( (x) >> (s) | (x) << (sizeof(x) << 3) - (s) )
+#define kryptos_rc2_ror(x, s) (kryptos_u16_t) ( (x) >> (s) | (x) << ( (sizeof(x) << 3) - (s) ) )
 
 #define kryptos_rc2_rmixupr(r, i, k, j) ( (r)[(i)] = kryptos_rc2_ror((r)[(i)], kryptos_rc2_rollevel(i)),\
                                           (r)[(i)] = (r)[(i)] - (k)[(j)] - ((r)[((i) + 3) % 4] & (r)[((i) + 2) % 4]) -\

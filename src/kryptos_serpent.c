@@ -11,7 +11,9 @@
 #include <kryptos_random.h>
 #include <kryptos_padding.h>
 #include <kryptos.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 #define kryptos_serpent_get_u8_from_u32(w,b) ( (kryptos_u8_t) ( (w) >> (24 - ((b) << 3)) )
 

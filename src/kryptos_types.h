@@ -8,16 +8,29 @@
 #ifndef KRYPTOS_KRYPTOS_TYPES_H
 #define KRYPTOS_KRYPTOS_TYPES_H 1
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <stddef.h>
+# ifndef KRYPTOS_KERNEL_MODE
+#  include <stdlib.h>
+#  include <stdint.h>
+#  include <stddef.h>
+# else
+#  ifdef __FreeBSD__
+#   include <sys/cdefs.h>
+#   include <sys/param.h>
+#   include <sys/module.h>
+#   include <sys/kernel.h>
+#   include <sys/systm.h>
+#   include <sys/malloc.h>
+#  endif
+# endif
 
 #ifdef __FreeBSD__
-# include <unistd.h>
+# ifndef KRYPTOS_KERNEL_MODE
+#  include <unistd.h>
 // TODO(Rafael): Find a better way of detecting c99 capabilities in FreeBSD.
-#  if __ISO_C_VISIBLE >= 1999L
-#   define __STDC_VERSION__ 19901L
-#  endif
+#   if __ISO_C_VISIBLE >= 1999L
+#    define __STDC_VERSION__ 19901L
+#   endif
+# endif
 #endif
 
 #ifndef NO_KRYPTOS_C99_SUPPORT
@@ -147,7 +160,7 @@ typedef size_t (*kryptos_hash_size_func)(void);
 //               be used. Anyway, if you want to use kryptos in a 8-bit processor, undefine the following macro
 //               is the starting point.
 
-#define KRYPTOS_MP_U32_DIGIT 1
+//#define KRYPTOS_MP_U32_DIGIT 1
 
 #ifndef KRYPTOS_MP_U32_DIGIT
 typedef kryptos_u8_t kryptos_mp_digit_t;
@@ -231,8 +244,8 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
 void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
     struct cipher_subkeys_struct cipher_subkeys_struct_var;\
     cipher_block_processor_t cipher_block_processor;\
-    kryptos_u8_t *in_p, *in_end, *out_p;\
-    kryptos_u8_t *outblock, *outblock_p, *inblock, *inblock_p;\
+    kryptos_u8_t *in_p = NULL, *in_end = NULL, *out_p = NULL;\
+    kryptos_u8_t *outblock = NULL, *outblock_p = NULL, *inblock = NULL, *inblock_p = NULL;\
     size_t in_size;\
     if (kryptos_task_check(ktask) == 0) {\
         return;\

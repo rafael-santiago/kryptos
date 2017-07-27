@@ -11,7 +11,9 @@
 #include <kryptos_padding.h>
 #include <kryptos_task_check.h>
 #include <kryptos.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 #define kryptos_camellia_rotl(x, s) ( (x) << (s) | (x) >> ( 32 - (s) ) )
 
@@ -488,33 +490,29 @@ static void kryptos_camellia_keyexp_192_256(const kryptos_u8_t *key, const size_
     kryptos_u32_t T[4], fout[2];
     kryptos_u32_t KA[4], KB[4], K256[8], K192[6];
 
-    switch (sks->keysize) {
-        case kKryptosCAMELLIA192:
-            kryptos_camellia_ld_192_user_key(K192, key, key_size);
-            KL[0] = K192[0];
-            KL[1] = K192[1];
-            KL[2] = K192[2];
-            KL[3] = K192[3];
-            KR[0] = K192[4];
-            KR[1] = K192[5];
-            KR[2] = ~KR[0];
-            KR[3] = ~KR[1];
-            K192[0] = K192[1] = K192[2] = K192[3] = K192[4] = K192[5] = 0;
-            break;
-
-        case kKryptosCAMELLIA256:
-            kryptos_camellia_ld_256_user_key(K256, key, key_size);
-            KL[0] = K256[0];
-            KL[1] = K256[1];
-            KL[2] = K256[2];
-            KL[3] = K256[3];
-            KR[0] = K256[4];
-            KR[1] = K256[5];
-            KR[2] = K256[6];
-            KR[3] = K256[7];
-            K256[0] = K256[1] = K256[2] = K256[3] = K256[4] = K256[5] = 
-            K256[6] = K256[7] = 0;
-            break;
+    if (sks->keysize == kKryptosCAMELLIA192) {
+        kryptos_camellia_ld_192_user_key(K192, key, key_size);
+        KL[0] = K192[0];
+        KL[1] = K192[1];
+        KL[2] = K192[2];
+        KL[3] = K192[3];
+        KR[0] = K192[4];
+        KR[1] = K192[5];
+        KR[2] = ~KR[0];
+        KR[3] = ~KR[1];
+        K192[0] = K192[1] = K192[2] = K192[3] = K192[4] = K192[5] = 0;
+    } else if (sks->keysize == kKryptosCAMELLIA256) {
+        kryptos_camellia_ld_256_user_key(K256, key, key_size);
+        KL[0] = K256[0];
+        KL[1] = K256[1];
+        KL[2] = K256[2];
+        KL[3] = K256[3];
+        KR[0] = K256[4];
+        KR[1] = K256[5];
+        KR[2] = K256[6];
+        KR[3] = K256[7];
+        K256[0] = K256[1] = K256[2] = K256[3] = K256[4] = K256[5] = 
+        K256[6] = K256[7] = 0;
     }
 
     T[0] = KL[0] ^ KR[0];

@@ -8,8 +8,10 @@
 #include <kryptos_hmac.h>
 #include <kryptos.h>
 #include <kryptos_memory.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <stdlib.h>
+# include <string.h>
+#endif
 
 #define KRYPTOS_HMAC_IPAD 0x36
 

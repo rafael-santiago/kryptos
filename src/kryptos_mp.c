@@ -12,11 +12,14 @@
 #include <kryptos_mp.h>
 #include <kryptos_memory.h>
 #include <kryptos_random.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-
-#include <inttypes.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+# include <ctype.h>
+# include <stdio.h>
+//# include <inttypes.h>
+#else
+# include <kryptos_userland_funcs.h>
+#endif
 
 #define kryptos_mp_xnb(n) ( isdigit((n)) ? ( (n) - 48 ) : ( toupper((n)) - 55 )  )
 
@@ -198,13 +201,15 @@ static kryptos_u8_t *g_kryptos_mp_small_primes[] = {
 
 static size_t g_kryptos_mp_small_primes_nr = sizeof(g_kryptos_mp_small_primes) / sizeof(g_kryptos_mp_small_primes[0]);
 
+#ifndef KRYPTOS_MP_U32_DIGIT
+
 static kryptos_mp_value_t *kryptos_mp_pad_for_multibyte(const kryptos_mp_value_t *v);
 
 static kryptos_mp_value_t *kryptos_mp_multibyte_add(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
 
-static kryptos_mp_value_t *kryptos_mp_multibyte_sub(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
-
 static kryptos_mp_value_t *kryptos_mp_multibyte_mul(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
+
+#endif
 
 static kryptos_mp_value_t *kryptos_mp_montgomery_reduction_2kx_mod_y(const kryptos_mp_value_t *x,
                                                                      const kryptos_mp_value_t *y);
@@ -249,11 +254,11 @@ void kryptos_del_mp_value(kryptos_mp_value_t *mp) {
 
     if (mp->data != NULL) {
         memset(mp->data, 0, mp->data_size);
-        free(mp->data);
+        kryptos_freeseg(mp->data);
         mp->data_size = 0;
     }
 
-    free(mp);
+    kryptos_freeseg(mp);
 }
 
 kryptos_mp_value_t *kryptos_assign_mp_value(kryptos_mp_value_t **dest,
@@ -442,6 +447,8 @@ kryptos_u8_t *kryptos_mp_value_as_hex(const kryptos_mp_value_t *value, size_t *h
     return hex;
 }
 
+#ifndef KRYPTOS_MP_U32_DIGIT
+
 static kryptos_mp_value_t *kryptos_mp_pad_for_multibyte(const kryptos_mp_value_t *v) {
     ssize_t s = v->data_size;
     kryptos_mp_value_t *p = NULL;
@@ -464,7 +471,7 @@ static kryptos_mp_value_t *kryptos_mp_multibyte_add(const kryptos_mp_value_t *a,
     kryptos_mp_value_t *a4 = NULL, *b4 = NULL, *sum = NULL;
     kryptos_u64_t u64sum;
     kryptos_u8_t c;
-    ssize_t i, sn, s;
+    ssize_t i, s;
 
     if ((a4 = kryptos_mp_pad_for_multibyte(a)) == NULL) {
         goto kryptos_mp_multibyte_add_epilogue;
@@ -507,6 +514,8 @@ kryptos_mp_multibyte_add_epilogue:
 
     return sum;
 }
+
+#endif
 
 kryptos_mp_value_t *kryptos_mp_add(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
     ssize_t d, s, sn;
@@ -574,7 +583,9 @@ kryptos_mp_value_t *kryptos_mp_add(kryptos_mp_value_t **dest, const kryptos_mp_v
         sum->data[s] = c;
     }
 
+#ifndef KRYPTOS_MP_U32_DIGIT
 kryptos_mp_add_epilogue:
+#endif
 
     for (sn = sum->data_size - 1; sn >= 0 && sum->data[sn] == 0; sn--)
         ;
@@ -851,7 +862,7 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
 */
 #endif
 
-kryptos_mp_sub_epilogue:
+//kryptos_mp_sub_epilogue:
 
     for (sn = delta->data_size - 1; sn >= 0 && delta->data[sn] == 0; sn--)
         ;
@@ -943,6 +954,8 @@ kryptos_mp_value_t *kryptos_assign_hex_value_to_mp(kryptos_mp_value_t **dest,
     return (*dest);
 }
 
+#ifndef KRYPTOS_MP_U32_DIGIT
+
 static kryptos_mp_value_t *kryptos_mp_multibyte_mul(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b) {
     kryptos_mp_value_t *a4 = NULL, *b4 = NULL, *mul = NULL;
     kryptos_u64_t u64mul, u64sum;
@@ -996,6 +1009,8 @@ kryptos_mp_multibyte_mul_epilogue:
 
     return mul;
 }
+
+#endif
 
 kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
     size_t r;
@@ -1076,7 +1091,9 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
 #endif
     }
 
+#ifndef KRYPTOS_MP_U32_DIGIT
 kryptos_mp_mul_epilogue:
+#endif
 
     for (xd = m->data_size - 1; xd >= 0 && m->data[xd] == 0; xd--)
         ;
@@ -1291,12 +1308,12 @@ void kryptos_print_mp(const kryptos_mp_value_t *v) {
     printf("\n");
 }
 
-static ssize_t kryptos_mp_max_used_byte(const kryptos_mp_value_t *x) {
+/*static ssize_t kryptos_mp_max_used_byte(const kryptos_mp_value_t *x) {
     ssize_t b;
     for (b = x->data_size - 1; b >= 0 && x->data[b] == 0; b--)
         ;
     return b;
-}
+}*/
 
 kryptos_mp_value_t *kryptos_mp_mul_digit(kryptos_mp_value_t **x, const kryptos_mp_digit_t digit) {
     ssize_t d;
@@ -2547,7 +2564,7 @@ kryptos_mp_lsh_epilogue:
 
 kryptos_mp_value_t *kryptos_mp_rsh_op(kryptos_mp_value_t **a, const int level, const int signed_op) {
     int l;
-    ssize_t d, dn;
+    ssize_t d;
     kryptos_u8_t cb, lc;
     kryptos_mp_value_t *t = NULL;
 #ifndef KRYPTOS_MP_U32_DIGIT
@@ -2589,7 +2606,7 @@ kryptos_mp_value_t *kryptos_mp_rsh_op(kryptos_mp_value_t **a, const int level, c
         t->data[t->data_size - 1] |= signal;
     }
 
-kryptos_mp_rsh_epilogue:
+//kryptos_mp_rsh_epilogue:
 
     kryptos_del_mp_value(*a);
 
@@ -2749,7 +2766,6 @@ kryptos_mp_gen_prime_2k1_epilogue:
 kryptos_mp_value_t *kryptos_mp_montgomery_reduction(const kryptos_mp_value_t *x, const kryptos_mp_value_t *y) {
     // INFO(Rafael): This calculates ZR mod Y.
     kryptos_mp_value_t *z = NULL, *r = NULL, *b = NULL, *d = NULL;
-    kryptos_u8_t buf[255];
     ssize_t rdn, rd;
 
     if (x == NULL || y == NULL) {

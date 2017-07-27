@@ -35,7 +35,7 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
         goto kryptos_task_check_error;
     }
 
-    if ((*ktask)->cipher < 0 || (*ktask)->cipher >= kKryptosCipherNr) {
+    if ((*ktask)->cipher >= kKryptosCipherNr) {
         (*ktask)->result = kKryptosInvalidCipher;
         (*ktask)->result_verbose = "Invalid cipher.";
         goto kryptos_task_check_error;
@@ -80,7 +80,6 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
         goto kryptos_task_check_error;
     }
 
-kryptos_task_check_success:
     (*ktask)->result = kKryptosSuccess;
     (*ktask)->result_verbose = NULL;
     return 1;
@@ -135,6 +134,9 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
 
         case kKryptosCipherSERPENT:
             return ((*ktask)->iv_size == KRYPTOS_SERPENT_BLOCKSIZE);
+            break;
+
+        default: // WARN(Rafael): Only to shut up the cumbersome compiler warning.
             break;
     }
 

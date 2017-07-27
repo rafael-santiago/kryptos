@@ -12,7 +12,9 @@
 #include <kryptos_task_check.h>
 #include <kryptos_memory.h>
 #include <kryptos_endianess_utils.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 static kryptos_mp_value_t *kryptos_rsa_eval_e(const kryptos_mp_value_t *euler_phi_f);
 
@@ -99,7 +101,7 @@ kryptos_task_result_t kryptos_rsa_mk_key_pair(const size_t bits, kryptos_u8_t **
             kryptos_del_mp_value(q);
             kryptos_del_mp_value(e);
             kryptos_del_mp_value(n);
-            euler_phi_f = n = p = q = e = n = NULL;
+            euler_phi_f = n = p = q = e = NULL;
         }
     } while (eval_again);
 
