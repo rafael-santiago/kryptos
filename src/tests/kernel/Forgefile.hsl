@@ -30,7 +30,7 @@ kryptos-test-mod.prologue() {
     $includes.add_item("../../");
     $includes.add_item(hefesto.sys.pwd());
     $includes.add_item(hefesto.sys.make_path(hefesto.sys.pwd(), hefesto.sys.os_name()));
-    # INFO(Rafael): Only define KRYPTOS_KERNEL_MODE will guide the compiler across the building of the kryptos kernel mode version.
+    # INFO(Rafael): Only define KRYPTOS_KERNEL_MODE will guide the compiler across the build of the kryptos kernel mode version.
     #               Notice that no .ar file is generated. When adding the path "../.." to the includes list the object files from
     #               kryptos are automatically linked together.
     $cflags.add_item("-DKRYPTOS_KERNEL_MODE=1");
