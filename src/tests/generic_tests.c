@@ -44,7 +44,7 @@ CUTE_TEST_CASE(kryptos_padding_tests)
         CUTE_ASSERT(pad != NULL);
         CUTE_ASSERT(buffer_size == tests[t].expected_buffer_size);
 
-//        for (old_size = 0; old_size < tests[t].buffer_size; old_size++) {
+//        for (old_size = 0; old_size < buffer_size; old_size++) {
 //            printf(" %.2x ", pad[old_size]);
 //        }
 //        printf("\n");

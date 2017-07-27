@@ -26,7 +26,6 @@ kryptos_u8_t *kryptos_ansi_x923_padding(const kryptos_u8_t *buffer, size_t *buff
     //  INFO(Rafael): We will always pad.
     if ((padded_size % block_size_in_bytes) == 0) {
         padded_size++;
-
     }
 
     while ((padded_size % block_size_in_bytes) != 0) {
@@ -38,7 +37,7 @@ kryptos_u8_t *kryptos_ansi_x923_padding(const kryptos_u8_t *buffer, size_t *buff
 #ifdef KRYPTOS_USER_MODE
     memcpy(bpad, buffer, *buffer_size);
     if (randomize == 0) {
-        memset(bpad + (*buffer_size) + 1, 0, padded_size - *buffer_size - 1);
+        memset(bpad + (*buffer_size), 0, padded_size - *buffer_size - 1);
     } else {
         for (p = (*buffer_size); p < padded_size - 1; p++) {
             byte = kryptos_get_random_byte();

@@ -128,7 +128,7 @@ typedef void (*kryptos_aes_block_processor)(kryptos_u8_t *block, struct kryptos_
 
 static void kryptos_aes_sto_u32_into_byte_matrix(const kryptos_u32_t word[4], struct kryptos_128bit_u8_matrix *u8m);
 
-static kryptos_u8_t kryptos_aes_subbytes(const kryptos_u32_t value, const size_t byte, const kryptos_u8_t sbox[16][16]);
+static kryptos_u8_t kryptos_aes_subbytes(const kryptos_u32_t value, const size_t byte, kryptos_u8_t sbox[16][16]);
 
 static void kryptos_aes_ld_user_key(kryptos_u32_t key[4], const kryptos_u8_t *user_key, const size_t user_key_size);
 
@@ -172,7 +172,7 @@ static void kryptos_aes_sto_u32_into_byte_matrix(const kryptos_u32_t word[4], st
     i = j = k = c = 0;
 }
 
-static kryptos_u8_t kryptos_aes_subbytes(const kryptos_u32_t value, const size_t byte, const kryptos_u8_t sbox[16][16]) {
+static kryptos_u8_t kryptos_aes_subbytes(const kryptos_u32_t value, const size_t byte, kryptos_u8_t sbox[16][16]) {
     kryptos_u8_t b;
     kryptos_u8_t eval;
     b = kryptos_aes_get_u8_from_u32(value, byte);

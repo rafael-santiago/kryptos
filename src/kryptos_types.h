@@ -9,6 +9,16 @@
 #define KRYPTOS_KRYPTOS_TYPES_H 1
 
 #include <stdlib.h>
+#include <stdint.h>
+#include <stddef.h>
+
+#ifdef __FreeBSD__
+# include <unistd.h>
+// TODO(Rafael): Find a better way of detecting c99 capabilities in FreeBSD.
+#  if __ISO_C_VISIBLE >= 1999L
+#   define __STDC_VERSION__ 19901L
+#  endif
+#endif
 
 #ifndef NO_KRYPTOS_C99_SUPPORT
 # ifdef __STDC_VERSION__

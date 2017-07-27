@@ -37,10 +37,11 @@ kryptos-tests.prologue() {
     $ldflags = hefesto.sys.get_option("ldflags");
 
     $ldflags.add_item("-lpthread");
-    $ldflags.add_item("-ldl");
 
     if (hefesto.sys.os_name() == "freebsd") {
         $ldflags.add_item("-lexecinfo");
+    } else if (hefesto.sys.os_name() == "linux") {
+        $ldflags.add_item("-ldl");
     }
 
     if (isdir("/usr/local/include")) {

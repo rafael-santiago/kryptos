@@ -140,7 +140,6 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_rsa_cipher_c99_tests);
 
 //    CUTE_RUN_TEST(poke_bloody_poke);
-
 CUTE_TEST_CASE_END
 
 CUTE_MAIN(kryptos_test_monkey);
