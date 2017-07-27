@@ -160,7 +160,7 @@ typedef size_t (*kryptos_hash_size_func)(void);
 //               be used. Anyway, if you want to use kryptos in a 8-bit processor, undefine the following macro
 //               is the starting point.
 
-//#define KRYPTOS_MP_U32_DIGIT 1
+#define KRYPTOS_MP_U32_DIGIT 1
 
 #ifndef KRYPTOS_MP_U32_DIGIT
 typedef kryptos_u8_t kryptos_mp_digit_t;
