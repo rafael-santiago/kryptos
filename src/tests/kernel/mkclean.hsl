@@ -1,0 +1,56 @@
+#
+#                                Copyright (C) 2017 by Rafael Santiago
+#
+# This is a free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+#
+
+include ~/fsutil.hsl
+
+function mkclean(dirs type list) : result type none {
+    var cwd type string;
+    $cwd = hefesto.sys.pwd();
+
+    var d type int;
+    $d = 0;
+
+    while ($d < $dirs.count()) {
+        var dirpath type string;
+        $dirpath = $dirs.item($d);
+        hefesto.sys.echo("*** Scanning '" + $dirpath + "'...\n");
+        recurr_mkclean($dirpath);
+        $d = $d + 1;
+    }
+
+    hefesto.sys.cd($cwd);
+}
+
+local function recurr_mkclean(path type string) : result type none {
+    var cwd type string;
+    $cwd = hefesto.sys.pwd();
+
+    if (hefesto.sys.cd($path)) {
+
+        var objs type list;
+        $objs.ls(".*\\.o$");
+
+        var o type int;
+        while ($o < $objs.count()) {
+            var filepath type string;
+            $filepath = $objs.item($o);
+
+            hefesto.sys.echo("\t - removing '" + $filepath + "'... ");
+
+            if (hefesto.sys.rm($filepath) == 0) {
+                hefesto.sys.echo("removed.\n");
+            } else {
+                hefesto.sys.echo("not removed.\n");
+            }
+
+            $o = $o + 1;
+        }
+
+        hefesto.sys.cd($cwd);
+    }
+}

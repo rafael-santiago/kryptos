@@ -8,6 +8,7 @@
 
 include on freebsd ~/toolsets/freebsd/freebsd-module.hsl
 include on linux ~/toolsets/linux/linux-module.hsl
+include mkclean.hsl
 
 var includes type list;
 var cflags type list;
@@ -30,6 +31,16 @@ kryptos-test-mod.prologue() {
     $includes.add_item("../../");
     $includes.add_item(hefesto.sys.pwd());
     $includes.add_item(hefesto.sys.make_path(hefesto.sys.pwd(), hefesto.sys.os_name()));
+
+    var option type list;
+    $option = hefesto.sys.get_option("clean");
+
+    if ($option.count() > 0) {
+        mkclean($includes);
+        hefesto.sys.echo("*** All clean!\n");
+        hefesto.project.abort(0);
+    }
+
     # INFO(Rafael): Only define KRYPTOS_KERNEL_MODE will guide the compiler across the build of the kryptos kernel mode version.
     #               Notice that no .ar file is generated. When adding the path "../.." to the includes list the object files from
     #               kryptos are automatically linked together.
