@@ -16,6 +16,7 @@
 #include <kryptos_iv_utils.h>
 #include <kryptos_hex.h>
 #include <kryptos_hash_common.h>
+#include <kstring.h>
 
 int kryptos_padding_tests(void) {
     struct padding_tests_ctx {
@@ -219,10 +220,10 @@ int kryptos_apply_iv_tests(void) {
     size_t s = 27;
     iv = (kryptos_u8_t *) kryptos_newseg(s + 1);
     KUTE_ASSERT(iv != NULL);
-    strncpy(iv, "rofginkoolerautahtsdiordeht", s);
+    memcpy(iv, "rofginkoolerautahtsdiordeht", s);
     block = (kryptos_u8_t *) kryptos_newseg(s);
     KUTE_ASSERT(block != NULL);
-    strncpy(block, "thedroidsthatuarelookingfor", s);
+    memcpy(block, "thedroidsthatuarelookingfor", s);
     KUTE_ASSERT(kryptos_apply_iv(block, iv, s) == block);
     KUTE_ASSERT(kryptos_apply_iv(block, iv, s) == block);
     KUTE_ASSERT(memcmp(block, "thedroidsthatuarelookingfor", 27) == 0);
@@ -275,19 +276,19 @@ int kryptos_task_check_tests(void) {
 
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosInvalidCipher);
-    KUTE_ASSERT(strcmp(t.result_verbose, "Invalid cipher.") == 0);
+    KUTE_ASSERT(memcmp(t.result_verbose, "Invalid cipher.", 15) == 0);
 
     t.cipher = kKryptosCipherARC4;
     t.key = NULL;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
-    KUTE_ASSERT(strcmp(t.result_verbose, "Invalid key data.") == 0);
+    KUTE_ASSERT(memcmp(t.result_verbose, "Invalid key data.", 17) == 0);
 
     t.key = key;
     t.key_size = 0;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
-    KUTE_ASSERT(strcmp(t.result_verbose, "Invalid key data.") == 0);
+    KUTE_ASSERT(memcmp(t.result_verbose, "Invalid key data.", 17) == 0);
 
     t.cipher = kKryptosCipherAES;
     t.action = kKryptosEncrypt;
@@ -296,26 +297,26 @@ int kryptos_task_check_tests(void) {
     t.iv = NULL;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
-    KUTE_ASSERT(strcmp(t.result_verbose, "Invalid iv data.") == 0);
+    KUTE_ASSERT(memcmp(t.result_verbose, "Invalid iv data.", 16) == 0);
 
     t.iv = iv;
     t.iv_size = 0;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
-    KUTE_ASSERT(strcmp(t.result_verbose, "Invalid iv data.") == 0);
+    KUTE_ASSERT(memcmp(t.result_verbose, "Invalid iv data.", 16) == 0);
 
     t.mode = kKryptosECB;
     t.iv_size = 4;
     t.in = NULL;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
-    KUTE_ASSERT(strcmp(t.result_verbose, "No input.") == 0);
+    KUTE_ASSERT(memcmp(t.result_verbose, "No input.", 9) == 0);
 
     t.in = in;
     t.in_size = 0;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
-    KUTE_ASSERT(strcmp(t.result_verbose, "No input.") == 0);
+    KUTE_ASSERT(memcmp(t.result_verbose, "No input.", 9) == 0);
 
     t.in_size = 4;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
@@ -325,13 +326,13 @@ int kryptos_task_check_tests(void) {
     t.mode = kKryptosCipherModeNr;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
-    KUTE_ASSERT(strcmp(t.result_verbose, "Invalid operation mode.") == 0);
+    KUTE_ASSERT(memcmp(t.result_verbose, "Invalid operation mode.", 23) == 0);
 
     t.mode = kKryptosECB;
     t.action = kKryptosActionNr;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
-    KUTE_ASSERT(strcmp(t.result_verbose, "Invalid task action.") == 0);
+    KUTE_ASSERT(memcmp(t.result_verbose, "Invalid task action.", 20) == 0);
 
     t.cipher = kKryptosCipherARC4;
     t.iv = NULL;
@@ -537,9 +538,9 @@ int kryptos_hex_tests(void) {
     kryptos_u8_t buf[9];
     for (t = 0; t < tv_nr; t++) {
         kryptos_u32_to_hex(buf, sizeof(buf), tv[t].u32);
-        KUTE_ASSERT(strcmp(buf, tv[t].u32_expected) == 0);
+        KUTE_ASSERT(kstrcmp(buf, tv[t].u32_expected) == 0);
         kryptos_u64_to_hex(buf, sizeof(buf), tv[t].u64);
-        KUTE_ASSERT(strcmp(buf, tv[t].u64_expected) == 0);
+        KUTE_ASSERT(kstrcmp(buf, tv[t].u64_expected) == 0);
     }
     return 0;
 }
