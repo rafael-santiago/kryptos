@@ -12,6 +12,36 @@
 # include <unistd.h>
 #endif
 
+#if defined(KRYPTOS_KERNEL_MODE) && defined(__FreeBSD__)
+static void get_random_bytes(kryptos_u8_t *buf, const size_t n);
+
+static void get_random_bytes(kryptos_u8_t *buf, const size_t n) {
+    kryptos_u8_t *b, *b_end;
+    uint32_t r;
+    size_t byte;
+
+    if (buf == NULL || n == 0) {
+        return;
+    }
+
+    b = buf;
+    b_end = b + n;
+
+    while (b != b_end) {
+        r = arc4random();
+        for (byte = 0; byte < sizeof(r) && b != b_end; byte++, b++) {
+            *b = r & 0xFF;
+            r = r >> 8;
+        }
+    }
+
+    byte = 0;
+    r = 0;
+    b = NULL;
+    b_end = NULL;
+}
+#endif
+
 void *kryptos_get_random_block(const size_t size_in_bytes) {
     void *block = NULL;
 #if defined(KRYPTOS_USER_MODE)
@@ -47,7 +77,11 @@ kryptos_get_random_block_epilogue:
         close(fd);
     }
 #elif  defined(KRYPTOS_KERNEL_MODE)
-    // TODO(Rafael): Use get_random_bytes(). [Do not read from /dev/urandom or /dev/random it would be nasty!!!]
+    block = kryptos_newseg(size_in_bytes);
+
+    if (block != NULL) {
+        get_random_bytes(block, size_in_bytes);
+    }
 #endif
     return block;
 }
@@ -74,7 +108,7 @@ kryptos_get_random_byte_epilogue:
         close(fd);
     }
 #elif  defined(KRYPTOS_KERNEL_MODE)
-    // TODO(Rafael): Use get_random_bytes(). [Do not read from /dev/urandom or /dev/random it would be nasty!!!]
+    get_random_bytes(&b, 1);
 #endif
     return b;
 }
