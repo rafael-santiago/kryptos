@@ -6,7 +6,6 @@
  *
  */
 #include <kstring.h>
-#include <kryptos_types.h>
 
 int kstrcmp(const char *s1, const char *s2) {
     const char *s1_p, *s2_p;
@@ -27,4 +26,20 @@ int kstrcmp(const char *s1, const char *s2) {
     }
 
     return !(*s1_p == 0 && *s2_p == 0);
+}
+
+size_t kstrlen(const char *s) {
+    size_t len = 0;
+    const char *p = s;
+
+    if (p == NULL) {
+        return 0;
+    }
+
+    while (*p != 0) {
+        len++;
+        p++;
+    }
+
+    return len;
 }

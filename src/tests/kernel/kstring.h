@@ -8,6 +8,10 @@
 #ifndef KRYPTOS_KRYPTOS_TESTS_KERNEL_KSTRING_H
 #define KRYPTOS_KRYPTOS_TESTS_KERNEL_KSTRING_H 1
 
+#include <kryptos_types.h>
+
 int kstrcmp(const char *s1, const char *s2);
+
+size_t kstrlen(const char *s);
 
 #endif

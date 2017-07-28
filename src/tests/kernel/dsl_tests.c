@@ -8,6 +8,7 @@
 #include <dsl_tests.h>
 #include <kutest.h>
 #include <kryptos.h>
+#include <kstring.h>
 
 int kryptos_dsl_tests(void) {
     // WARN(Rafael): The correctness of each available cipher must not be tested here. It
@@ -22,7 +23,7 @@ int kryptos_dsl_tests(void) {
                          "decision is unappealable. He sets the fashions of opinion and taste, dictates "
                          "the limitations of speech and circumscribes conduct with a dead-line."; 
                          //... Everyone can point at least one.
-    size_t data_size = strlen(data);
+    size_t data_size = kstrlen(data);
     kryptos_seal_version_t seal_version;
     size_t seal_n, seal_l;
     int feal_rounds;
