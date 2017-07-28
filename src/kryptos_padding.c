@@ -16,10 +16,8 @@ kryptos_u8_t *kryptos_ansi_x923_padding(const kryptos_u8_t *buffer, size_t *buff
                                         const size_t block_size_in_bytes, const int randomize) {
     kryptos_u8_t *bpad = NULL;
     size_t padded_size = 0;
-#ifdef KRYPTOS_USER_MODE
     kryptos_u8_t byte;
     size_t p;
-#endif
 
     if (buffer_size == NULL || block_size_in_bytes == 0 || *buffer_size == 0) {
         return NULL;
@@ -38,7 +36,6 @@ kryptos_u8_t *kryptos_ansi_x923_padding(const kryptos_u8_t *buffer, size_t *buff
 
     bpad = (kryptos_u8_t *) kryptos_newseg(padded_size);
 
-#ifdef KRYPTOS_USER_MODE
     memcpy(bpad, buffer, *buffer_size);
     if (randomize == 0) {
         memset(bpad + (*buffer_size), 0, padded_size - *buffer_size - 1);
@@ -50,9 +47,6 @@ kryptos_u8_t *kryptos_ansi_x923_padding(const kryptos_u8_t *buffer, size_t *buff
     }
     bpad[padded_size - 1] = (kryptos_u8_t)(padded_size - *buffer_size); // INFO(Rafael): duh!
     *buffer_size = padded_size;
-#else
-    // TODO(Rafael): Kernel mode trinket.
-#endif
 
     return bpad;
 }

@@ -6,7 +6,7 @@
  *
  */
 #include <encoding_tests.h>
-#include <kassert.h>
+#include <kutest.h>
 #include <kryptos_base64.h>
 #include <kryptos_uuencode.h>
 #include <kryptos_huffman.h>

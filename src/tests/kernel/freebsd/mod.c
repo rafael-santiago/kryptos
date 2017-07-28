@@ -6,6 +6,7 @@
  *
  */
 #include <mod.h>
+#include <ktests.h>
 
 int modld(struct module *module, int cmd, void *arg) {
     int exit_code = 0;
@@ -13,10 +14,11 @@ int modld(struct module *module, int cmd, void *arg) {
     switch (cmd) {
         case MOD_LOAD:
             uprintf("*** kryptos test module loaded...\n");
+            exit_code = ktest_monkey();
             break;
 
         case MOD_UNLOAD:
-            uprintf("*** kryptos test module unloaded [exit_code == %d]\n", exit_code);
+            uprintf("*** kryptos test module unloaded\n");
             break;
 
         default:

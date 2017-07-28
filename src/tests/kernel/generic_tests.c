@@ -6,7 +6,7 @@
  *
  */
 #include <generic_tests.h>
-#include <kassert.h>
+#include <kutest.h>
 #include <kryptos_padding.h>
 #include <kryptos_memory.h>
 #include <kryptos_random.h>

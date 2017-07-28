@@ -6,7 +6,7 @@
  *
  */
 #include <dsl_tests.h>
-#include <kassert.h>
+#include <kutest.h>
 #include <kryptos.h>
 
 int kryptos_dsl_tests(void) {

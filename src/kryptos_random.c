@@ -77,10 +77,12 @@ kryptos_get_random_block_epilogue:
         close(fd);
     }
 #elif  defined(KRYPTOS_KERNEL_MODE)
-    block = kryptos_newseg(size_in_bytes);
+    if (size_in_bytes > 0) {
+        block = kryptos_newseg(size_in_bytes);
 
-    if (block != NULL) {
-        get_random_bytes(block, size_in_bytes);
+        if (block != NULL) {
+            get_random_bytes(block, size_in_bytes);
+        }
     }
 #endif
     return block;
