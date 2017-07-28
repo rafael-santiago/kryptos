@@ -26,7 +26,7 @@ void kryptos_u32_to_hex(kryptos_u8_t *buf, const size_t buf_size, const kryptos_
 }
 
 void kryptos_u64_to_hex(kryptos_u8_t *buf, const size_t buf_size, const kryptos_u64_t u64) {
-    if (buf == NULL || buf_size < 9) {
+    if (buf == NULL || buf_size < 17) {
         return;
     }
 

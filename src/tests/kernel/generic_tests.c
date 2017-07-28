@@ -535,7 +535,7 @@ int kryptos_hex_tests(void) {
         { 0x00000000, "00000000", 0x00000000000000FF, "00000000000000FF" },
     };
     size_t tv_nr = sizeof(tv) / sizeof(tv[0]), t;
-    kryptos_u8_t buf[9];
+    kryptos_u8_t buf[20];
     for (t = 0; t < tv_nr; t++) {
         kryptos_u32_to_hex(buf, sizeof(buf), tv[t].u32);
         KUTE_ASSERT(kstrcmp(buf, tv[t].u32_expected) == 0);
