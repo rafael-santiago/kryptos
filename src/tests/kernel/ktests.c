@@ -20,7 +20,7 @@ int ktest_monkey(void) {
     KUTE_RUN_TEST(kryptos_iv_data_flush_tests);
     KUTE_RUN_TEST(kryptos_task_check_tests);
     KUTE_RUN_TEST(kryptos_hex_tests);
-    //KUTE_RUN_TEST(kryptos_hash_common_tests);
+    KUTE_RUN_TEST(kryptos_hash_common_tests);
 
     //KUTE_RUN_TEST(kryptos_dsl_tests);
 
