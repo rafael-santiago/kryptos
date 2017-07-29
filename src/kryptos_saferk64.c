@@ -189,7 +189,11 @@ static void kryptos_saferk64_ld_user_key(kryptos_u32_t key[2], const kryptos_u8_
 
 static void kryptos_saferk64_make_key(const kryptos_u8_t *key, const size_t key_size, struct kryptos_saferk64_subkeys *sks) {
     size_t i, i_nr;
+#ifdef KRYPTOS_KERNEL_MODE
+    static struct kryptos_saferk64_32bit_pair c[KRYPTOS_SAFERK64_MAX_ROUND << 1];
+#else
     struct kryptos_saferk64_32bit_pair c[KRYPTOS_SAFERK64_MAX_ROUND << 1];
+#endif
     kryptos_u32_t K1[2];
     kryptos_u8_t b0, b1, b2, b3, b4, b5, b6, b7;
     kryptos_u8_t e0, e1, e2, e3, e4, e5, e6, e7;
