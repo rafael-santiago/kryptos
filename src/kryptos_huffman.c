@@ -103,6 +103,10 @@ kryptos_u8_t *kryptos_huffman_inflate(const kryptos_u8_t *in, const size_t in_si
 
     out = (kryptos_u8_t *) kryptos_newseg(*out_size + 1);
 
+    if (out == NULL) {
+        goto kryptos_huffman_inflate_epilogue;
+    }
+
     memset(out, 0, *out_size + 1);
 
     out_p = out;
@@ -273,7 +277,7 @@ static void kryptos_huffman_eval_byte_freq(struct kryptos_huffman_freq_ctx freq_
     struct kryptos_huffman_freq_ctx *curr_byte;
     size_t n;
 
-    for (n = 0; n < 255; n++) {
+    for (n = 0; n < 256; n++) {
         freq_table[n].byte = 0;
         freq_table[n].freq = 0;
         freq_table[n].subtree = NULL;
@@ -309,7 +313,7 @@ static void kryptos_huffman_sort_nodes(struct kryptos_huffman_freq_ctx freq_tabl
     while (swp) {
         swp = 0;
 
-        for (n = 0; n < 254 && swp == 0; n++) {
+        for (n = 0; n < 255 && swp == 0; n++) {
             if (freq_table[n].freq > freq_table[n + 1].freq) {
                 aux = freq_table[n];
                 freq_table[n] = freq_table[n + 1];
@@ -332,7 +336,7 @@ static struct kryptos_huffman_tree_ctx *kryptos_huffman_mk_tree(struct kryptos_h
     size_t n;
     struct kryptos_huffman_tree_ctx *subtree = NULL, *htree = NULL;
 
-    for (n = 0; n < 255; n++) {
+    for (n = 0; n < 256; n++) {
         if (freq_table[n].freq > 0) {
             kryptos_huffman_new_tree(freq_table[n].subtree);
             kryptos_huffman_new_tree(freq_table[n].subtree->l);
@@ -340,7 +344,7 @@ static struct kryptos_huffman_tree_ctx *kryptos_huffman_mk_tree(struct kryptos_h
         }
     }
 
-    for (n = 0; n < 254; n++) {
+    for (n = 0; n < 255; n++) {
         if (freq_table[n].freq > 0 && freq_table[n + 1].freq > 0) {
             if (freq_table[n].subtree->r == NULL) {
                 // INFO(Rafael): freq_table[n].subtree->r points.
@@ -413,7 +417,7 @@ static void kryptos_huffman_deltree_recurr(struct kryptos_huffman_tree_ctx *htre
 static void kryptos_huffman_get_codes(struct kryptos_huffman_code_ctx hcodes[256], struct kryptos_huffman_tree_ctx *htree) {
     size_t c;
     kryptos_u8_t path_buff[KRYPTOS_HUFFMAN_MAX_CODE_SIZE];
-    for (c = 0; c < 255; c++) {
+    for (c = 0; c < 256; c++) {
         hcodes[c].data_size = 0;
     }
     kryptos_huffman_scan_codes(hcodes, path_buff, 0, KRYPTOS_HUFFMAN_MAX_CODE_SIZE, htree);
@@ -457,7 +461,7 @@ static size_t kryptos_huffman_eval_deflated_out_size(size_t raw_freq[256], struc
 
     // WARN(Rafael): This function will request more than the enough.
 
-    for (n = 0; n < 255; n++) {
+    for (n = 0; n < 256; n++) {
         if (raw_freq[n] > 0) {
             total_size += raw_freq[n] * hcodes[n].data_size;
         }
@@ -467,7 +471,7 @@ static size_t kryptos_huffman_eval_deflated_out_size(size_t raw_freq[256], struc
         total_size++;
     }
 
-    for (n = 0; n < 255; n++) {
+    for (n = 0; n < 256; n++) {
         if (hcodes[n].data_size != 0) {
             total_size += sizeof(kryptos_u8_t) + hcodes[n].data_size;
         }
@@ -479,7 +483,7 @@ static size_t kryptos_huffman_eval_deflated_out_size(size_t raw_freq[256], struc
 static kryptos_u8_t *kryptos_huffman_dump_tree(kryptos_u8_t *out, const kryptos_u8_t *out_end,
                                                struct kryptos_huffman_code_ctx hcodes[256]) {
     size_t c;
-    for (c = 0; c < 255; c++) {
+    for (c = 0; c < 256; c++) {
         if (hcodes[c].data_size != 0) {
             if ((out + hcodes[c].data_size) > out_end) {
                 // INFO(Rafael): It should never happen.
