@@ -114,6 +114,10 @@ static kryptos_u8_t *kryptos_uuencode_decode_buffer(const kryptos_u8_t *buffer, 
     kryptos_u32_t block;
     ssize_t shlv;
 
+    if (out_size == NULL) {
+        return NULL;
+    }
+
     if (buffer == NULL || buffer_size == 0) {
         *out_size = 0;
         return NULL;
@@ -121,9 +125,13 @@ static kryptos_u8_t *kryptos_uuencode_decode_buffer(const kryptos_u8_t *buffer, 
 
     *out_size = ((buffer_size * 6) / 8) - 4;
 
-    out = (kryptos_u8_t *) kryptos_newseg(*out_size + 1);
+    out = (kryptos_u8_t *) kryptos_newseg(*out_size + KRYPTOS_UUENCODE_BYTES_PER_LINE);
+    if (out == NULL) {
+        *out_size = 0;
+        return NULL;
+    }
     out_p = out;
-    memset(out, 0, *out_size + 1);
+    memset(out, 0, *out_size + KRYPTOS_UUENCODE_BYTES_PER_LINE);
 
     bp = buffer;
     bp_end = bp + buffer_size;
