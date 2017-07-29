@@ -276,7 +276,11 @@ void kryptos_triple_des_setup(kryptos_task_ctx *ktask,
 }
 
 void kryptos_triple_des_cipher(kryptos_task_ctx **ktask) {
+#ifdef KRYPTOS_KERNEL_MODE
+    static struct kryptos_des_subkeys sks1, sks2, sks3;
+#else
     struct kryptos_des_subkeys sks1, sks2, sks3;
+#endif
     kryptos_triple_des_block_processor block_processor;
     kryptos_triple_des_block_processor encrypt_processor = kryptos_triple_des_block_encrypt;
     kryptos_triple_des_block_processor decrypt_processor = kryptos_triple_des_block_decrypt;

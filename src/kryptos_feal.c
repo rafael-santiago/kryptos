@@ -130,7 +130,11 @@ static void kryptos_feal_ld_user_key(kryptos_u32_t key[2], const kryptos_u8_t *u
 
 static void kryptos_feal_expand_key(const kryptos_u8_t *key, const size_t key_size, struct kryptos_feal_subkeys *sks) {
     size_t r, r_nr;
+#ifdef KRYPTOS_KERNEL_MODE
+    static kryptos_u32_t D[KRYPTOS_FEAL_MAX], A[KRYPTOS_FEAL_MAX], B[KRYPTOS_FEAL_MAX];
+#else
     kryptos_u32_t D[KRYPTOS_FEAL_MAX], A[KRYPTOS_FEAL_MAX], B[KRYPTOS_FEAL_MAX];
+#endif
     kryptos_u32_t user_key[2];
 
     kryptos_feal_ld_user_key(user_key, key, key_size);
@@ -162,7 +166,11 @@ static void kryptos_feal_expand_key(const kryptos_u8_t *key, const size_t key_si
 }
 
 static void kryptos_feal_block_encrypt(kryptos_u8_t *block, struct kryptos_feal_subkeys sks) {
+#ifdef KRYPTOS_KERNEL_MODE
+    static kryptos_u32_t L[KRYPTOS_FEAL_MAX], R[KRYPTOS_FEAL_MAX];
+#else
     kryptos_u32_t L[KRYPTOS_FEAL_MAX], R[KRYPTOS_FEAL_MAX];
+#endif
     size_t r;
 
     L[0] = kryptos_get_u32_as_big_endian(block, 4);
@@ -194,7 +202,11 @@ static void kryptos_feal_block_encrypt(kryptos_u8_t *block, struct kryptos_feal_
 }
 
 static void kryptos_feal_block_decrypt(kryptos_u8_t *block, struct kryptos_feal_subkeys sks) {
+#ifdef KRYPTOS_KERNEL_MODE
+    static kryptos_u32_t L[KRYPTOS_FEAL_MAX], R[KRYPTOS_FEAL_MAX];
+#else
     kryptos_u32_t L[KRYPTOS_FEAL_MAX], R[KRYPTOS_FEAL_MAX];
+#endif
     size_t r;
 
     L[sks.rounds] = kryptos_get_u32_as_big_endian(block + 4, 4);
