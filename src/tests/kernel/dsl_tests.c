@@ -432,7 +432,7 @@ int kryptos_dsl_tests(void) {
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 
     // RC2 ECB
-    /*rc2_t1 = 128;
+    rc2_t1 = 128;
 
     kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
@@ -469,7 +469,7 @@ int kryptos_dsl_tests(void) {
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 
     // SAFER K-64 ECB
-    saferk64_rounds = 32;
+    /*saferk64_rounds = 32;
 
     kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
