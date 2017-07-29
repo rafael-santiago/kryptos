@@ -12,6 +12,7 @@
 #include <kryptos_huffman.h>
 #include <kryptos_pem.h>
 #include <kryptos.h>
+#include <kstring.h>
 
 int kryptos_base64_tests(void) {
     kryptos_task_ctx t, *ktask = &t;
@@ -116,7 +117,7 @@ kryptos_u8_t *test_vector[] = {
     kryptos_u8_t *deflated_buffer = NULL, *inflated_buffer = NULL;
 
     for (tv = 0; tv < tv_nr; tv++) {
-        in_size = strlen(test_vector[tv]);
+        in_size = kstrlen(test_vector[tv]);
         deflated_buffer = kryptos_huffman_deflate(test_vector[tv], in_size, &deflated_buffer_size);
         KUTE_ASSERT(deflated_buffer != NULL);
         inflated_buffer = kryptos_huffman_inflate(deflated_buffer, deflated_buffer_size, &inflated_buffer_size);
@@ -139,24 +140,24 @@ int kryptos_pem_get_data_tests(void) {
     size_t data_size = 0;
     kryptos_u8_t *data = NULL;
 
-    data = kryptos_pem_get_data("THE-DROIDS-WE-ARE-LOOKING-FOR", buf, strlen(buf), &data_size);
+    data = kryptos_pem_get_data("THE-DROIDS-WE-ARE-LOOKING-FOR", buf, kstrlen(buf), &data_size);
 
     KUTE_ASSERT(data == NULL);
 
-    data = kryptos_pem_get_data("FOOBAR (0)", buf, strlen(buf), &data_size);
+    data = kryptos_pem_get_data("FOOBAR (0)", buf, kstrlen(buf), &data_size);
 
     KUTE_ASSERT(data != NULL);
     KUTE_ASSERT(data_size == 7);
-    KUTE_ASSERT(strcmp(data, "Foobar0") == 0);
+    KUTE_ASSERT(kstrcmp(data, "Foobar0") == 0);
 
     kryptos_freeseg(data);
 
     data_size = 0;
-    data = kryptos_pem_get_data("FOOBAR (1)", buf, strlen(buf), &data_size);
+    data = kryptos_pem_get_data("FOOBAR (1)", buf, kstrlen(buf), &data_size);
 
     KUTE_ASSERT(data != NULL);
     KUTE_ASSERT(data_size == 7);
-    KUTE_ASSERT(strcmp(data, "Foobar1") == 0);
+    KUTE_ASSERT(kstrcmp(data, "Foobar1") == 0);
 
     kryptos_freeseg(data);
 
@@ -174,14 +175,14 @@ int kryptos_pem_put_data_tests(void) {
                                     "Rm9vYmFyMA==\n"
                                     "-----END FOOBAR (0)-----\n";
 
-    KUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (1)", foobar1, strlen(foobar1)) == kKryptosSuccess);
+    KUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (1)", foobar1, kstrlen(foobar1)) == kKryptosSuccess);
     KUTE_ASSERT(pem_buf != NULL);
-    KUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (1)", foobar0, strlen(foobar0)) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (1)", foobar0, kstrlen(foobar0)) == kKryptosInvalidParams);
     KUTE_ASSERT(pem_buf != NULL);
-    KUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (0)", foobar0, strlen(foobar0)) == kKryptosSuccess);
+    KUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (0)", foobar0, kstrlen(foobar0)) == kKryptosSuccess);
     KUTE_ASSERT(pem_buf != NULL);
-    KUTE_ASSERT(pem_buf_size == strlen(expected_buffer));
-    KUTE_ASSERT(strcmp(pem_buf, expected_buffer) == 0);
+    KUTE_ASSERT(pem_buf_size == kstrlen(expected_buffer));
+    KUTE_ASSERT(kstrcmp(pem_buf, expected_buffer) == 0);
     kryptos_freeseg(pem_buf);
 
     return 0;

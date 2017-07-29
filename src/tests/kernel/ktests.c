@@ -22,10 +22,10 @@ int ktest_monkey(void) {
     KUTE_RUN_TEST(kryptos_hex_tests);
     KUTE_RUN_TEST(kryptos_hash_common_tests);
 
-    KUTE_RUN_TEST(kryptos_dsl_tests);
+    //KUTE_RUN_TEST(kryptos_dsl_tests);
 
-    //KUTE_RUN_TEST(kryptos_base64_tests);
-    //KUTE_RUN_TEST(kryptos_uuencode_tests);
+    KUTE_RUN_TEST(kryptos_base64_tests);
+    KUTE_RUN_TEST(kryptos_uuencode_tests);
     //KUTE_RUN_TEST(kryptos_huffman_tests);
     //KUTE_RUN_TEST(kryptos_pem_get_data_tests);
     //KUTE_RUN_TEST(kryptos_pem_put_data_tests);
