@@ -55,27 +55,27 @@ struct kryptos_huffman_code_ctx {
     size_t data_size;
 };
 
-static void kryptos_huffman_eval_byte_freq(struct kryptos_huffman_freq_ctx freq_table[256], size_t raw_freq[256],
+static void kryptos_huffman_eval_byte_freq(struct kryptos_huffman_freq_ctx *freq_table, size_t *raw_freq,
                                            const kryptos_u8_t *in, const size_t in_size);
 
-static void kryptos_huffman_sort_nodes(struct kryptos_huffman_freq_ctx freq_table[256]);
+static void kryptos_huffman_sort_nodes(struct kryptos_huffman_freq_ctx *freq_table);
 
-static struct kryptos_huffman_tree_ctx *kryptos_huffman_mk_tree(struct kryptos_huffman_freq_ctx freq_table[256]);
+static struct kryptos_huffman_tree_ctx *kryptos_huffman_mk_tree(struct kryptos_huffman_freq_ctx *freq_table);
 
 static void kryptos_huffman_deltree_recurr(struct kryptos_huffman_tree_ctx *htree);
 
-static void kryptos_huffman_get_codes(struct kryptos_huffman_code_ctx hcodes[256], struct kryptos_huffman_tree_ctx *htree);
+static void kryptos_huffman_get_codes(struct kryptos_huffman_code_ctx *hcodes, struct kryptos_huffman_tree_ctx *htree);
 
-static void kryptos_huffman_scan_codes(struct kryptos_huffman_code_ctx hcodes[256],
+static void kryptos_huffman_scan_codes(struct kryptos_huffman_code_ctx *hcodes,
                                        kryptos_u8_t *path_buff,
                                        const size_t path_index,
                                        const size_t path_buff_size, struct kryptos_huffman_tree_ctx *branch);
 
-static size_t kryptos_huffman_eval_deflated_out_size(size_t raw_freq[256], struct kryptos_huffman_code_ctx hcodes[256],
+static size_t kryptos_huffman_eval_deflated_out_size(size_t raw_freq[256], struct kryptos_huffman_code_ctx *hcodes,
                                                      const kryptos_u8_t *in, const size_t in_size);
 
 static kryptos_u8_t *kryptos_huffman_dump_tree(kryptos_u8_t *out, const kryptos_u8_t *out_end,
-                                               struct kryptos_huffman_code_ctx hcodes[256]);
+                                               struct kryptos_huffman_code_ctx *hcodes);
 
 static const kryptos_u8_t *kryptos_huffman_add_node(struct kryptos_huffman_tree_ctx **tree,
                                                     const kryptos_u8_t *in, const kryptos_u8_t *in_end);
@@ -147,7 +147,12 @@ kryptos_u8_t *kryptos_huffman_deflate(const kryptos_u8_t *in, const size_t in_si
     struct kryptos_huffman_freq_ctx freq_table[256];
     size_t raw_freq[256];
     struct kryptos_huffman_tree_ctx *htree = NULL;
+#ifdef KRYPTOS_KERNEL_MODE
+    // INFO(Rafael): Avoiding heap consumption in kernel mode.
+    static struct kryptos_huffman_code_ctx hcodes[256];
+#else
     struct kryptos_huffman_code_ctx hcodes[256];
+#endif
 
     if (in == NULL || in_size == 0 || out_size == NULL) {
         return NULL;
@@ -271,7 +276,7 @@ kryptos_huffman_deflate_epilogue:
     return out;
 }
 
-static void kryptos_huffman_eval_byte_freq(struct kryptos_huffman_freq_ctx freq_table[256], size_t raw_freq[256],
+static void kryptos_huffman_eval_byte_freq(struct kryptos_huffman_freq_ctx *freq_table, size_t *raw_freq,
                                            const kryptos_u8_t *in, const size_t in_size) {
     const kryptos_u8_t *in_p, *in_p_end;
     struct kryptos_huffman_freq_ctx *curr_byte;
@@ -303,7 +308,7 @@ static void kryptos_huffman_eval_byte_freq(struct kryptos_huffman_freq_ctx freq_
     kryptos_huffman_sort_nodes(freq_table);
 }
 
-static void kryptos_huffman_sort_nodes(struct kryptos_huffman_freq_ctx freq_table[256]) {
+static void kryptos_huffman_sort_nodes(struct kryptos_huffman_freq_ctx *freq_table) {
     int swp;
     struct kryptos_huffman_freq_ctx aux;
     size_t n;
@@ -332,7 +337,7 @@ static void kryptos_huffman_sort_nodes(struct kryptos_huffman_freq_ctx freq_tabl
 */
 }
 
-static struct kryptos_huffman_tree_ctx *kryptos_huffman_mk_tree(struct kryptos_huffman_freq_ctx freq_table[256]) {
+static struct kryptos_huffman_tree_ctx *kryptos_huffman_mk_tree(struct kryptos_huffman_freq_ctx *freq_table) {
     size_t n;
     struct kryptos_huffman_tree_ctx *subtree = NULL, *htree = NULL;
 
@@ -414,7 +419,7 @@ static void kryptos_huffman_deltree_recurr(struct kryptos_huffman_tree_ctx *htre
     }
 }
 
-static void kryptos_huffman_get_codes(struct kryptos_huffman_code_ctx hcodes[256], struct kryptos_huffman_tree_ctx *htree) {
+static void kryptos_huffman_get_codes(struct kryptos_huffman_code_ctx *hcodes, struct kryptos_huffman_tree_ctx *htree) {
     size_t c;
     kryptos_u8_t path_buff[KRYPTOS_HUFFMAN_MAX_CODE_SIZE];
     for (c = 0; c < 256; c++) {
@@ -424,7 +429,7 @@ static void kryptos_huffman_get_codes(struct kryptos_huffman_code_ctx hcodes[256
     memset(path_buff, 0, sizeof(path_buff));
 }
 
-static void kryptos_huffman_scan_codes(struct kryptos_huffman_code_ctx hcodes[256],
+static void kryptos_huffman_scan_codes(struct kryptos_huffman_code_ctx *hcodes,
                                        kryptos_u8_t *path_buff,
                                        const size_t path_index,
                                        const size_t path_buff_size, struct kryptos_huffman_tree_ctx *branch) {
@@ -454,7 +459,7 @@ static void kryptos_huffman_scan_codes(struct kryptos_huffman_code_ctx hcodes[25
     }
 }
 
-static size_t kryptos_huffman_eval_deflated_out_size(size_t raw_freq[256], struct kryptos_huffman_code_ctx hcodes[256],
+static size_t kryptos_huffman_eval_deflated_out_size(size_t *raw_freq, struct kryptos_huffman_code_ctx *hcodes,
                                                      const kryptos_u8_t *in, const size_t in_size) {
     size_t total_size = 2 + sizeof(size_t);
     size_t n;
@@ -481,7 +486,7 @@ static size_t kryptos_huffman_eval_deflated_out_size(size_t raw_freq[256], struc
 }
 
 static kryptos_u8_t *kryptos_huffman_dump_tree(kryptos_u8_t *out, const kryptos_u8_t *out_end,
-                                               struct kryptos_huffman_code_ctx hcodes[256]) {
+                                               struct kryptos_huffman_code_ctx *hcodes) {
     size_t c;
     for (c = 0; c < 256; c++) {
         if (hcodes[c].data_size != 0) {

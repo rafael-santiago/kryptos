@@ -102,7 +102,7 @@ int kryptos_uuencode_tests(void) {
 }
 
 int kryptos_huffman_tests(void) {
-kryptos_u8_t *test_vector[] = {
+    kryptos_u8_t *test_vector[] = {
         "AAAAAAAAAABBBBBCCDEEEEEFFFGGGGZZZZYYXXXXXXXX",
 
         "ACAAGATGCCATTGTCCCCCGGCCTCCTGCTGCTGCTGCTCTCCGGGGCCACGGCCACCGCTGCCCTGCC"
