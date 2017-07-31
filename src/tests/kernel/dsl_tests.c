@@ -137,7 +137,7 @@ int kryptos_dsl_tests(void) {
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
 
     // INFO(Rafael): Block ciphers.
-    /*kryptos_task_init_as_null(&task);
+    kryptos_task_init_as_null(&task);
 
     // DES ECB
 
@@ -177,7 +177,7 @@ int kryptos_dsl_tests(void) {
 
     // IDEA ECB
 
-    kryptos_task_set_in(&task, data, data_size);
+    /*kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
 
     kryptos_run_cipher(idea, &task, "idea", 4, kKryptosECB);
