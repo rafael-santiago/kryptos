@@ -177,7 +177,7 @@ int kryptos_dsl_tests(void) {
 
     // IDEA ECB
 
-    /*kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
 
     kryptos_run_cipher(idea, &task, "idea", 4, kKryptosECB);
@@ -213,7 +213,7 @@ int kryptos_dsl_tests(void) {
 
     // BLOWFISH ECB
 
-    kryptos_task_set_in(&task, data, data_size);
+    /*kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
 
     kryptos_run_cipher(blowfish, &task, "blowfish", 8, kKryptosECB);
