@@ -24,14 +24,14 @@ int kryptos_dsl_tests(void) {
                          "the limitations of speech and circumscribes conduct with a dead-line."; 
                          //... Everyone can point at least one.
     size_t data_size = kstrlen(data);
-    kryptos_seal_version_t seal_version;
-    size_t seal_n, seal_l;
-    int feal_rounds;
-    kryptos_camellia_keysize_t camellia_keysize;
-    int rc2_t1;
-    int saferk64_rounds;
-    kryptos_u8_t *triple_des_key2, *triple_des_key3;
-    size_t triple_des_key2_size, triple_des_key3_size;
+    __unused kryptos_seal_version_t seal_version;
+    __unused size_t seal_n, seal_l;
+    __unused int feal_rounds;
+    __unused kryptos_camellia_keysize_t camellia_keysize;
+    __unused int rc2_t1;
+    __unused int saferk64_rounds;
+    __unused kryptos_u8_t *triple_des_key2, *triple_des_key3;
+    __unused size_t triple_des_key2_size, triple_des_key3_size;
 
     kryptos_task_set_ecb_mode(&task);
     KUTE_ASSERT(task.mode == kKryptosECB);
@@ -98,7 +98,7 @@ int kryptos_dsl_tests(void) {
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
 
-    // SEAL 2.0
+    /*// SEAL 2.0
     kryptos_task_set_in(&task, data, data_size);
 
     seal_version = kKryptosSEAL20;
@@ -671,7 +671,7 @@ int kryptos_dsl_tests(void) {
 
     KUTE_ASSERT(task.out_size == data_size);
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
-    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);*/
 #endif
     return 0;
 }
