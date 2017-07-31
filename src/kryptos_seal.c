@@ -42,12 +42,12 @@
  ( (D) = (D) + (T)[( (C) & 0x000007fc ) >> 2], (C) = kryptos_seal_rolr(C, 9) ),\
  ( (A) = (A) + (T)[( (D) & 0x000007fc ) >> 2], (D) = kryptos_seal_rolr(D, 9) ) )
 
-#define KRYPTOS_SEALKEYSTREAMSIZE 		0xffff
-#define KRYPTOS_SEALMAXL          		0xffffff
-#define KRYPTOS_SEAL_Y1                		0x5a827999
-#define KRYPTOS_SEAL_Y2                		0x6ed9eba1
-#define KRYPTOS_SEAL_Y3                		0x8f1bbcdc
-#define KRYPTOS_SEAL_Y4                		0xca62c1d6
+#define KRYPTOS_SEALKEYSTREAMSIZE               0xffff
+#define KRYPTOS_SEALMAXL                        0xffffff
+#define KRYPTOS_SEAL_Y1                         0x5a827999
+#define KRYPTOS_SEAL_Y2                         0x6ed9eba1
+#define KRYPTOS_SEAL_Y3                         0x8f1bbcdc
+#define KRYPTOS_SEAL_Y4                         0xca62c1d6
 
 struct kryptos_seal_keystream_ctx {
     kryptos_u32_t keystream[KRYPTOS_SEALKEYSTREAMSIZE];
@@ -165,7 +165,12 @@ static void kryptos_seal_keystream(const kryptos_u8_t *userkey, const size_t use
                                    struct kryptos_seal_keystream_ctx *kstream) {
     int i, l, p;
     int until;
-    kryptos_u32_t T[512], S[256], R[ 4 * ((KRYPTOS_SEALMAXL - 1) / 8192) - 1], a[5], P, Q, o[5], LL;
+#ifdef KRYPTOS_KERNEL_MODE
+    static kryptos_u32_t T[512], S[256], R[ 4 * ((KRYPTOS_SEALMAXL - 1) / 8192) - 1];
+#else
+    kryptos_u32_t T[512], S[256], R[ 4 * ((KRYPTOS_SEALMAXL - 1) / 8192) - 1];
+#endif
+    kryptos_u32_t a[5], P, Q, o[5], LL;
     kryptos_u32_t n1, n2, n3, n4, A, B, C, D;
 
     if ((kstream->L >> 5) > KRYPTOS_SEALMAXL) {
@@ -342,10 +347,15 @@ static void kryptos_seal_xor(const kryptos_u32_t *in,
 
 void kryptos_seal_cipher(kryptos_task_ctx **ktask) {
     size_t wordsize = 0, w, wt;
-    struct kryptos_seal_keystream_ctx kstream;
     const kryptos_u8_t *in_p, *in_end;
     kryptos_u8_t *out_p;
+#ifdef KRYPTOS_KERNEL_MODE
+    static struct kryptos_seal_keystream_ctx kstream;
+    static kryptos_u32_t inblock[KRYPTOS_SEALKEYSTREAMSIZE], outblock[KRYPTOS_SEALKEYSTREAMSIZE];
+#else
+    struct kryptos_seal_keystream_ctx kstream;
     kryptos_u32_t inblock[KRYPTOS_SEALKEYSTREAMSIZE], outblock[KRYPTOS_SEALKEYSTREAMSIZE];
+#endif
     size_t b, t;
 
     if (kryptos_task_check(ktask) == 0) {

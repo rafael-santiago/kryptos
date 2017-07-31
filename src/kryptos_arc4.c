@@ -77,7 +77,6 @@ void kryptos_arc4_cipher(kryptos_task_ctx **ktask) {
     kryptos_u8_t *in_end, *in_p;
     kryptos_u8_t *out_p;
 #ifdef KRYPTOS_KERNEL_MODE
-    // INFO(Rafael): Let's avoid consume the heap.
     static struct kryptos_arc4_subkey sk;
 #else
     struct kryptos_arc4_subkey sk;

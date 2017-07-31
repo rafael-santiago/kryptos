@@ -98,7 +98,7 @@ int kryptos_dsl_tests(void) {
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
 
-    /*// SEAL 2.0
+    // SEAL 2.0
     kryptos_task_set_in(&task, data, data_size);
 
     seal_version = kKryptosSEAL20;
@@ -137,7 +137,7 @@ int kryptos_dsl_tests(void) {
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
 
     // INFO(Rafael): Block ciphers.
-    kryptos_task_init_as_null(&task);
+    /*kryptos_task_init_as_null(&task);
 
     // DES ECB
 
