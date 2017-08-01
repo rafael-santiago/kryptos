@@ -579,7 +579,7 @@ int kryptos_dsl_tests(void) {
 
     // TRIPLE-DES ECB
 
-    /*kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
 
     triple_des_key2 = "noel";
@@ -671,7 +671,7 @@ int kryptos_dsl_tests(void) {
 
     KUTE_ASSERT(task.out_size == data_size);
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
-    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);*/
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 #endif
     return 0;
 }
