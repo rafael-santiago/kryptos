@@ -425,15 +425,15 @@ struct kryptos_serpent_subkeys {
     kryptos_u32_t k[132];
 };
 
-typedef void (*kryptos_serpent_block_processor)(kryptos_u8_t * block, struct kryptos_serpent_subkeys sks);
+typedef void (*kryptos_serpent_block_processor)(kryptos_u8_t * block, const struct kryptos_serpent_subkeys *sks);
 
 static void kryptos_serpent_ld_user_key(kryptos_u32_t key[8], const kryptos_u8_t *user_key, const size_t user_key_size);
 
 static void kryptos_serpent_key_schedule(const kryptos_u8_t *key, const size_t key_size, struct kryptos_serpent_subkeys *sks);
 
-static void kryptos_serpent_block_encrypt(kryptos_u8_t *block, struct kryptos_serpent_subkeys sks);
+static void kryptos_serpent_block_encrypt(kryptos_u8_t *block, const struct kryptos_serpent_subkeys *sks);
 
-static void kryptos_serpent_block_decrypt(kryptos_u8_t *block, struct kryptos_serpent_subkeys sks);
+static void kryptos_serpent_block_decrypt(kryptos_u8_t *block, const struct kryptos_serpent_subkeys *sks);
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(serpent, kKryptosCipherSERPENT, KRYPTOS_SERPENT_BLOCKSIZE)
 
@@ -449,7 +449,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(serpent,
                                     KRYPTOS_SERPENT_BLOCKSIZE,
                                     serpent_cipher_epilogue,
                                     outblock,
-                                    serpent_block_processor(outblock, sks))
+                                    serpent_block_processor(outblock, &sks))
 
 static void kryptos_serpent_ld_user_key(kryptos_u32_t key[8], const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
@@ -678,7 +678,7 @@ static void kryptos_serpent_key_schedule(const kryptos_u8_t *key, const size_t k
     w = 0;
 }
 
-static void kryptos_serpent_block_encrypt(kryptos_u8_t *block, struct kryptos_serpent_subkeys sks) {
+static void kryptos_serpent_block_encrypt(kryptos_u8_t *block, const struct kryptos_serpent_subkeys *sks) {
     kryptos_u32_t r0, r1, r2, r3, r4;
 
     r0 = kryptos_get_u32_as_little_endian(block, 4);
@@ -686,110 +686,110 @@ static void kryptos_serpent_block_encrypt(kryptos_u8_t *block, struct kryptos_se
     r2 = kryptos_get_u32_as_little_endian(block + 8, 4);
     r3 = kryptos_get_u32_as_little_endian(block + 12, 4);
 
-    r0 = r0 ^ sks.k[0];
-    r1 = r1 ^ sks.k[1];
-    r2 = r2 ^ sks.k[2];
-    r3 = r3 ^ sks.k[3];
+    r0 = r0 ^ sks->k[0];
+    r1 = r1 ^ sks->k[1];
+    r2 = r2 ^ sks->k[2];
+    r3 = r3 ^ sks->k[3];
 
     kryptos_serpent_sbox0(r0, r1, r2, r3, r4);
-    kryptos_serpent_lk(r2, r1, r3, r0, r4, 1, sks.k);
+    kryptos_serpent_lk(r2, r1, r3, r0, r4, 1, sks->k);
 
     kryptos_serpent_sbox1(r2, r1, r3, r0, r4);
-    kryptos_serpent_lk(r4, r3, r0, r2, r1, 2, sks.k);
+    kryptos_serpent_lk(r4, r3, r0, r2, r1, 2, sks->k);
 
     kryptos_serpent_sbox2(r4, r3, r0, r2, r1);
-    kryptos_serpent_lk(r1, r3, r4, r2, r0, 3, sks.k);
+    kryptos_serpent_lk(r1, r3, r4, r2, r0, 3, sks->k);
 
     kryptos_serpent_sbox3(r1, r3, r4, r2, r0);
-    kryptos_serpent_lk(r2, r0, r3, r1, r4, 4, sks.k);
+    kryptos_serpent_lk(r2, r0, r3, r1, r4, 4, sks->k);
 
     kryptos_serpent_sbox4(r2, r0, r3, r1, r4);
-    kryptos_serpent_lk(r0, r3, r1, r4, r2, 5, sks.k);
+    kryptos_serpent_lk(r0, r3, r1, r4, r2, 5, sks->k);
 
     kryptos_serpent_sbox5(r0, r3, r1, r4, r2);
-    kryptos_serpent_lk(r2, r0, r3, r4, r1, 6, sks.k);
+    kryptos_serpent_lk(r2, r0, r3, r4, r1, 6, sks->k);
 
     kryptos_serpent_sbox6(r2, r0, r3, r4, r1);
-    kryptos_serpent_lk(r3, r1, r0, r4, r2, 7, sks.k);
+    kryptos_serpent_lk(r3, r1, r0, r4, r2, 7, sks->k);
 
     kryptos_serpent_sbox7(r3, r1, r0, r4, r2);
-    kryptos_serpent_lk(r2, r0, r4, r3, r1, 8, sks.k);
+    kryptos_serpent_lk(r2, r0, r4, r3, r1, 8, sks->k);
 
     kryptos_serpent_sbox0(r2, r0, r4, r3, r1);
-    kryptos_serpent_lk(r4, r0, r3, r2, r1, 9, sks.k);
+    kryptos_serpent_lk(r4, r0, r3, r2, r1, 9, sks->k);
 
     kryptos_serpent_sbox1(r4, r0, r3, r2, r1);
-    kryptos_serpent_lk(r1, r3, r2, r4, r0, 10, sks.k);
+    kryptos_serpent_lk(r1, r3, r2, r4, r0, 10, sks->k);
 
     kryptos_serpent_sbox2(r1, r3, r2, r4, r0);
-    kryptos_serpent_lk(r0, r3, r1, r4, r2, 11, sks.k);
+    kryptos_serpent_lk(r0, r3, r1, r4, r2, 11, sks->k);
 
     kryptos_serpent_sbox3(r0, r3, r1, r4, r2);
-    kryptos_serpent_lk(r4, r2, r3, r0, r1, 12, sks.k);
+    kryptos_serpent_lk(r4, r2, r3, r0, r1, 12, sks->k);
 
     kryptos_serpent_sbox4(r4, r2, r3, r0, r1);
-    kryptos_serpent_lk(r2, r3, r0, r1, r4, 13, sks.k);
+    kryptos_serpent_lk(r2, r3, r0, r1, r4, 13, sks->k);
 
     kryptos_serpent_sbox5(r2, r3, r0, r1, r4);
-    kryptos_serpent_lk(r4, r2, r3, r1, r0, 14, sks.k);
+    kryptos_serpent_lk(r4, r2, r3, r1, r0, 14, sks->k);
 
     kryptos_serpent_sbox6(r4, r2, r3, r1, r0);
-    kryptos_serpent_lk(r3, r0, r2, r1, r4, 15, sks.k);
+    kryptos_serpent_lk(r3, r0, r2, r1, r4, 15, sks->k);
 
     kryptos_serpent_sbox7(r3, r0, r2, r1, r4);
-    kryptos_serpent_lk(r4, r2, r1, r3, r0, 16, sks.k);
+    kryptos_serpent_lk(r4, r2, r1, r3, r0, 16, sks->k);
 
     kryptos_serpent_sbox0(r4, r2, r1, r3, r0);
-    kryptos_serpent_lk(r1, r2, r3, r4, r0, 17, sks.k);
+    kryptos_serpent_lk(r1, r2, r3, r4, r0, 17, sks->k);
 
     kryptos_serpent_sbox1(r1, r2, r3, r4, r0);
-    kryptos_serpent_lk(r0, r3, r4, r1, r2, 18, sks.k);
+    kryptos_serpent_lk(r0, r3, r4, r1, r2, 18, sks->k);
 
     kryptos_serpent_sbox2(r0, r3, r4, r1, r2);
-    kryptos_serpent_lk(r2, r3, r0, r1, r4, 19, sks.k);
+    kryptos_serpent_lk(r2, r3, r0, r1, r4, 19, sks->k);
 
     kryptos_serpent_sbox3(r2, r3, r0, r1, r4);
-    kryptos_serpent_lk(r1, r4, r3, r2, r0, 20, sks.k);
+    kryptos_serpent_lk(r1, r4, r3, r2, r0, 20, sks->k);
 
     kryptos_serpent_sbox4(r1, r4, r3, r2, r0);
-    kryptos_serpent_lk(r4, r3, r2, r0, r1, 21, sks.k);
+    kryptos_serpent_lk(r4, r3, r2, r0, r1, 21, sks->k);
 
     kryptos_serpent_sbox5(r4, r3, r2, r0, r1);
-    kryptos_serpent_lk(r1, r4, r3, r0, r2, 22, sks.k);
+    kryptos_serpent_lk(r1, r4, r3, r0, r2, 22, sks->k);
 
     kryptos_serpent_sbox6(r1, r4, r3, r0, r2);
-    kryptos_serpent_lk(r3, r2, r4, r0, r1, 23, sks.k);
+    kryptos_serpent_lk(r3, r2, r4, r0, r1, 23, sks->k);
 
     kryptos_serpent_sbox7(r3, r2, r4, r0, r1);
-    kryptos_serpent_lk(r1, r4, r0, r3, r2, 24, sks.k);
+    kryptos_serpent_lk(r1, r4, r0, r3, r2, 24, sks->k);
 
     kryptos_serpent_sbox0(r1, r4, r0, r3, r2);
-    kryptos_serpent_lk(r0, r4, r3, r1, r2, 25, sks.k);
+    kryptos_serpent_lk(r0, r4, r3, r1, r2, 25, sks->k);
 
     kryptos_serpent_sbox1(r0, r4, r3, r1, r2);
-    kryptos_serpent_lk(r2, r3, r1, r0, r4, 26, sks.k);
+    kryptos_serpent_lk(r2, r3, r1, r0, r4, 26, sks->k);
 
     kryptos_serpent_sbox2(r2, r3, r1, r0, r4);
-    kryptos_serpent_lk(r4, r3, r2, r0, r1, 27, sks.k);
+    kryptos_serpent_lk(r4, r3, r2, r0, r1, 27, sks->k);
 
     kryptos_serpent_sbox3(r4, r3, r2, r0, r1);
-    kryptos_serpent_lk(r0, r1, r3, r4, r2, 28, sks.k);
+    kryptos_serpent_lk(r0, r1, r3, r4, r2, 28, sks->k);
 
     kryptos_serpent_sbox4(r0, r1, r3, r4, r2);
-    kryptos_serpent_lk(r1, r3, r4, r2, r0, 29, sks.k);
+    kryptos_serpent_lk(r1, r3, r4, r2, r0, 29, sks->k);
 
     kryptos_serpent_sbox5(r1, r3, r4, r2, r0);
-    kryptos_serpent_lk(r0, r1, r3, r2, r4, 30, sks.k);
+    kryptos_serpent_lk(r0, r1, r3, r2, r4, 30, sks->k);
 
     kryptos_serpent_sbox6(r0, r1, r3, r2, r4);
-    kryptos_serpent_lk(r3, r4, r1, r2, r0, 31, sks.k);
+    kryptos_serpent_lk(r3, r4, r1, r2, r0, 31, sks->k);
 
     kryptos_serpent_sbox7(r3, r4, r1, r2, r0);
 
-    r0 = r0 ^ sks.k[128];
-    r1 = r1 ^ sks.k[129];
-    r2 = r2 ^ sks.k[130];
-    r3 = r3 ^ sks.k[131];
+    r0 = r0 ^ sks->k[128];
+    r1 = r1 ^ sks->k[129];
+    r2 = r2 ^ sks->k[130];
+    r3 = r3 ^ sks->k[131];
 
     kryptos_cpy_u32_as_little_endian(block, 16, r0);
     kryptos_cpy_u32_as_little_endian(block + 4, 12, r1);
@@ -799,7 +799,7 @@ static void kryptos_serpent_block_encrypt(kryptos_u8_t *block, struct kryptos_se
     r0 = r1 = r2 = r3 = r4;
 }
 
-static void kryptos_serpent_block_decrypt(kryptos_u8_t *block, struct kryptos_serpent_subkeys sks) {
+static void kryptos_serpent_block_decrypt(kryptos_u8_t *block, const struct kryptos_serpent_subkeys *sks) {
     kryptos_u32_t r0, r1, r2, r3, r4;
 
     r0 = kryptos_get_u32_as_little_endian(block, 4);
@@ -807,110 +807,110 @@ static void kryptos_serpent_block_decrypt(kryptos_u8_t *block, struct kryptos_se
     r2 = kryptos_get_u32_as_little_endian(block + 8, 4);
     r3 = kryptos_get_u32_as_little_endian(block + 12, 4);
 
-    r0 = r0 ^ sks.k[128];
-    r1 = r1 ^ sks.k[129];
-    r2 = r2 ^ sks.k[130];
-    r3 = r3 ^ sks.k[131];
+    r0 = r0 ^ sks->k[128];
+    r1 = r1 ^ sks->k[129];
+    r2 = r2 ^ sks->k[130];
+    r3 = r3 ^ sks->k[131];
 
     kryptos_serpent_sbox7_1(r0, r1, r2, r3, r4);
-    kryptos_serpent_lk_1(r1, r3, r0, r4, r2, 31, sks.k);
+    kryptos_serpent_lk_1(r1, r3, r0, r4, r2, 31, sks->k);
 
     kryptos_serpent_sbox6_1(r1, r3, r0, r4, r2);
-    kryptos_serpent_lk_1(r0, r2, r4, r1, r3, 30, sks.k);
+    kryptos_serpent_lk_1(r0, r2, r4, r1, r3, 30, sks->k);
 
     kryptos_serpent_sbox5_1(r0, r2, r4, r1, r3);
-    kryptos_serpent_lk_1(r2, r3, r0, r4, r1, 29, sks.k);
+    kryptos_serpent_lk_1(r2, r3, r0, r4, r1, 29, sks->k);
 
     kryptos_serpent_sbox4_1(r2, r3, r0, r4, r1);
-    kryptos_serpent_lk_1(r2, r0, r1, r4, r3, 28, sks.k);
+    kryptos_serpent_lk_1(r2, r0, r1, r4, r3, 28, sks->k);
 
     kryptos_serpent_sbox3_1(r2, r0, r1, r4, r3);
-    kryptos_serpent_lk_1(r1, r2, r3, r4, r0, 27, sks.k);
+    kryptos_serpent_lk_1(r1, r2, r3, r4, r0, 27, sks->k);
 
     kryptos_serpent_sbox2_1(r1, r2, r3, r4, r0);
-    kryptos_serpent_lk_1(r2, r0, r4, r3, r1, 26, sks.k);
+    kryptos_serpent_lk_1(r2, r0, r4, r3, r1, 26, sks->k);
 
     kryptos_serpent_sbox1_1(r2, r0, r4, r3, r1);
-    kryptos_serpent_lk_1(r1, r0, r4, r3, r2, 25, sks.k);
+    kryptos_serpent_lk_1(r1, r0, r4, r3, r2, 25, sks->k);
 
     kryptos_serpent_sbox0_1(r1, r0, r4, r3, r2);
-    kryptos_serpent_lk_1(r4, r2, r0, r1, r3, 24, sks.k);
+    kryptos_serpent_lk_1(r4, r2, r0, r1, r3, 24, sks->k);
 
     kryptos_serpent_sbox7_1(r4, r2, r0, r1, r3);
-    kryptos_serpent_lk_1(r2, r1, r4, r3, r0, 23, sks.k);
+    kryptos_serpent_lk_1(r2, r1, r4, r3, r0, 23, sks->k);
 
     kryptos_serpent_sbox6_1(r2, r1, r4, r3, r0);
-    kryptos_serpent_lk_1(r4, r0, r3, r2, r1, 22, sks.k);
+    kryptos_serpent_lk_1(r4, r0, r3, r2, r1, 22, sks->k);
 
     kryptos_serpent_sbox5_1(r4, r0, r3, r2, r1);
-    kryptos_serpent_lk_1(r0, r1, r4, r3, r2, 21, sks.k);
+    kryptos_serpent_lk_1(r0, r1, r4, r3, r2, 21, sks->k);
 
     kryptos_serpent_sbox4_1(r0, r1, r4, r3, r2);
-    kryptos_serpent_lk_1(r0, r4, r2, r3, r1, 20, sks.k);
+    kryptos_serpent_lk_1(r0, r4, r2, r3, r1, 20, sks->k);
 
     kryptos_serpent_sbox3_1(r0, r4, r2, r3, r1);
-    kryptos_serpent_lk_1(r2, r0, r1, r3, r4, 19, sks.k);
+    kryptos_serpent_lk_1(r2, r0, r1, r3, r4, 19, sks->k);
 
     kryptos_serpent_sbox2_1(r2, r0, r1, r3, r4);
-    kryptos_serpent_lk_1(r0, r4, r3, r1, r2, 18, sks.k);
+    kryptos_serpent_lk_1(r0, r4, r3, r1, r2, 18, sks->k);
 
     kryptos_serpent_sbox1_1(r0, r4, r3, r1, r2);
-    kryptos_serpent_lk_1(r2, r4, r3, r1, r0, 17, sks.k);
+    kryptos_serpent_lk_1(r2, r4, r3, r1, r0, 17, sks->k);
 
     kryptos_serpent_sbox0_1(r2, r4, r3, r1, r0);
-    kryptos_serpent_lk_1(r3, r0, r4, r2, r1, 16, sks.k);
+    kryptos_serpent_lk_1(r3, r0, r4, r2, r1, 16, sks->k);
 
     kryptos_serpent_sbox7_1(r3, r0, r4, r2, r1);
-    kryptos_serpent_lk_1(r0, r2, r3, r1, r4, 15, sks.k);
+    kryptos_serpent_lk_1(r0, r2, r3, r1, r4, 15, sks->k);
 
     kryptos_serpent_sbox6_1(r0, r2, r3, r1, r4);
-    kryptos_serpent_lk_1(r3, r4, r1, r0, r2, 14, sks.k);
+    kryptos_serpent_lk_1(r3, r4, r1, r0, r2, 14, sks->k);
 
     kryptos_serpent_sbox5_1(r3, r4, r1, r0, r2);
-    kryptos_serpent_lk_1(r4, r2, r3, r1, r0, 13, sks.k);
+    kryptos_serpent_lk_1(r4, r2, r3, r1, r0, 13, sks->k);
 
     kryptos_serpent_sbox4_1(r4, r2, r3, r1, r0);
-    kryptos_serpent_lk_1(r4, r3, r0, r1, r2, 12, sks.k);
+    kryptos_serpent_lk_1(r4, r3, r0, r1, r2, 12, sks->k);
 
     kryptos_serpent_sbox3_1(r4, r3, r0, r1, r2);
-    kryptos_serpent_lk_1(r0, r4, r2, r1, r3, 11, sks.k);
+    kryptos_serpent_lk_1(r0, r4, r2, r1, r3, 11, sks->k);
 
     kryptos_serpent_sbox2_1(r0, r4, r2, r1, r3);
-    kryptos_serpent_lk_1(r4, r3, r1, r2, r0, 10, sks.k);
+    kryptos_serpent_lk_1(r4, r3, r1, r2, r0, 10, sks->k);
 
     kryptos_serpent_sbox1_1(r4, r3, r1, r2, r0);
-    kryptos_serpent_lk_1(r0, r3, r1, r2, r4, 9, sks.k);
+    kryptos_serpent_lk_1(r0, r3, r1, r2, r4, 9, sks->k);
 
     kryptos_serpent_sbox0_1(r0, r3, r1, r2, r4);
-    kryptos_serpent_lk_1(r1, r4, r3, r0, r2, 8, sks.k);
+    kryptos_serpent_lk_1(r1, r4, r3, r0, r2, 8, sks->k);
 
     kryptos_serpent_sbox7_1(r1, r4, r3, r0, r2);
-    kryptos_serpent_lk_1(r4, r0, r1, r2, r3, 7, sks.k);
+    kryptos_serpent_lk_1(r4, r0, r1, r2, r3, 7, sks->k);
 
     kryptos_serpent_sbox6_1(r4, r0, r1, r2, r3);
-    kryptos_serpent_lk_1(r1, r3, r2, r4, r0, 6, sks.k);
+    kryptos_serpent_lk_1(r1, r3, r2, r4, r0, 6, sks->k);
 
     kryptos_serpent_sbox5_1(r1, r3, r2, r4, r0);
-    kryptos_serpent_lk_1(r3, r0, r1, r2, r4, 5, sks.k);
+    kryptos_serpent_lk_1(r3, r0, r1, r2, r4, 5, sks->k);
 
     kryptos_serpent_sbox4_1(r3, r0, r1, r2, r4);
-    kryptos_serpent_lk_1(r3, r1, r4, r2, r0, 4, sks.k);
+    kryptos_serpent_lk_1(r3, r1, r4, r2, r0, 4, sks->k);
 
     kryptos_serpent_sbox3_1(r3, r1, r4, r2, r0);
-    kryptos_serpent_lk_1(r4, r3, r0, r2, r1, 3, sks.k);
+    kryptos_serpent_lk_1(r4, r3, r0, r2, r1, 3, sks->k);
 
     kryptos_serpent_sbox2_1(r4, r3, r0, r2, r1);
-    kryptos_serpent_lk_1(r3, r1, r2, r0, r4, 2, sks.k);
+    kryptos_serpent_lk_1(r3, r1, r2, r0, r4, 2, sks->k);
 
     kryptos_serpent_sbox1_1(r3, r1, r2, r0, r4);
-    kryptos_serpent_lk_1(r4, r1, r2, r0, r3, 1, sks.k);
+    kryptos_serpent_lk_1(r4, r1, r2, r0, r3, 1, sks->k);
 
     kryptos_serpent_sbox0_1(r4, r1, r2, r0, r3);
 
-    r2 = r2 ^ sks.k[0];
-    r3 = r3 ^ sks.k[1];
-    r1 = r1 ^ sks.k[2];
-    r4 = r4 ^ sks.k[3];
+    r2 = r2 ^ sks->k[0];
+    r3 = r3 ^ sks->k[1];
+    r1 = r1 ^ sks->k[2];
+    r4 = r4 ^ sks->k[3];
 
     kryptos_cpy_u32_as_little_endian(block, 16, r2);
     kryptos_cpy_u32_as_little_endian(block + 4, 12, r3);
