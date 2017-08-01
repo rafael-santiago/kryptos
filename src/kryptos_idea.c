@@ -25,7 +25,7 @@ struct kryptos_idea_subkeys {
     kryptos_u16_t K[52];
 };
 
-typedef void (*kryptos_idea_block_processor)(kryptos_u8_t *block, struct kryptos_idea_subkeys sks);
+typedef void (*kryptos_idea_block_processor)(kryptos_u8_t *block, const struct kryptos_idea_subkeys *sks);
 
 static void kryptos_idea_128bit_roll(kryptos_u32_t x[4], int degree);
 
@@ -33,13 +33,13 @@ static void kryptos_idea_key_expander(const kryptos_u8_t *key, const size_t key_
 
 static void kryptos_idea_ld_user_key(kryptos_u32_t key[4], const kryptos_u8_t *user_key, const size_t user_key_size);
 
-static void kryptos_idea_block_encrypt(kryptos_u8_t *block, struct kryptos_idea_subkeys sks);
+static void kryptos_idea_block_encrypt(kryptos_u8_t *block, const struct kryptos_idea_subkeys *sks);
 
 static void kryptos_idea_get_inv_multiplier(kryptos_u16_t *inv, kryptos_u16_t value);
 
 static void kryptos_idea_inv_subkeys(struct kryptos_idea_subkeys *sks);
 
-static void kryptos_idea_block_decrypt(kryptos_u8_t *block, struct kryptos_idea_subkeys sks);
+static void kryptos_idea_block_decrypt(kryptos_u8_t *block, const struct kryptos_idea_subkeys *sks);
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(idea, kKryptosCipherIDEA, KRYPTOS_IDEA_BLOCKSIZE)
 
@@ -55,7 +55,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(idea,
                                     KRYPTOS_IDEA_BLOCKSIZE,
                                     idea_cipher_epilogue,
                                     outblock,
-                                    idea_block_processor(outblock, sks))
+                                    idea_block_processor(outblock, &sks))
 
 static void kryptos_idea_128bit_roll(kryptos_u32_t x[4], int degree) {
     kryptos_u32_t xx[4];
@@ -134,7 +134,7 @@ static void kryptos_idea_key_expander(const kryptos_u8_t *key, const size_t key_
     memset(uk, 0L, sizeof(kryptos_u32_t) * 4);
 }
 
-static void kryptos_idea_block_encrypt(kryptos_u8_t *block, struct kryptos_idea_subkeys sks) {
+static void kryptos_idea_block_encrypt(kryptos_u8_t *block, const struct kryptos_idea_subkeys *sks) {
     kryptos_u16_t y1, y2, z1, z2;
     kryptos_u16_t out[4];
     size_t r;
@@ -146,20 +146,20 @@ static void kryptos_idea_block_encrypt(kryptos_u8_t *block, struct kryptos_idea_
 
     for (r = 0; r < 48; r += 6) {
         // INFO(Rafael): Iteration first part.
-        out[0] = kryptos_idea_mul(out[0], sks.K[r]);
-        out[3] = kryptos_idea_mul(out[3], sks.K[r + 3]);
+        out[0] = kryptos_idea_mul(out[0], sks->K[r]);
+        out[3] = kryptos_idea_mul(out[3], sks->K[r + 3]);
         y1 = out[1];
-        out[1] = out[2] + sks.K[r + 2];
-        out[2] = y1 + sks.K[r + 1];
+        out[1] = out[2] + sks->K[r + 2];
+        out[2] = y1 + sks->K[r + 1];
 
         // INFO(Rafael): Iteration second part.
         y1 = out[0] ^ out[1];
         z1 = out[2] ^ out[3];
-        y2  = kryptos_idea_mul(sks.K[r + 4], y1);
+        y2  = kryptos_idea_mul(sks->K[r + 4], y1);
         y2 += z1;
-        y2  = kryptos_idea_mul(y2, sks.K[r + 5]);
+        y2  = kryptos_idea_mul(y2, sks->K[r + 5]);
 
-        z2  = kryptos_idea_mul(sks.K[r + 4], y1);
+        z2  = kryptos_idea_mul(sks->K[r + 4], y1);
         z2 += y2;
 
         out[0] = out[0] ^ y2;
@@ -169,11 +169,11 @@ static void kryptos_idea_block_encrypt(kryptos_u8_t *block, struct kryptos_idea_
     }
 
     // INFO(Rafael): Final T transform
-    out[0] = kryptos_idea_mul(out[0], sks.K[48]);
-    out[3] = kryptos_idea_mul(out[3], sks.K[51]);
+    out[0] = kryptos_idea_mul(out[0], sks->K[48]);
+    out[3] = kryptos_idea_mul(out[3], sks->K[51]);
     y1 = out[1];
-    out[1] = out[2] + sks.K[49];
-    out[2] = y1 + sks.K[50];
+    out[1] = out[2] + sks->K[49];
+    out[2] = y1 + sks->K[50];
 
     kryptos_cpy_u16_as_big_endian(block, 8, out[0]);
     kryptos_cpy_u16_as_big_endian(block + 2, 6, out[1]);
@@ -231,7 +231,7 @@ static void kryptos_idea_inv_subkeys(struct kryptos_idea_subkeys *sks) {
     }
 }
 
-static void kryptos_idea_block_decrypt(kryptos_u8_t *block, struct kryptos_idea_subkeys sks) {
+static void kryptos_idea_block_decrypt(kryptos_u8_t *block, const struct kryptos_idea_subkeys *sks) {
     //  INFO(Rafael): The IDEA was designed to use the same ciphering circuit both on encryption and decryption.
     //                In this case, the subkeys are permutated when performing the decryption.
     //                Here, I am not doing this. My deciphering implementation traverses inversely the subkeys and
@@ -248,22 +248,22 @@ static void kryptos_idea_block_decrypt(kryptos_u8_t *block, struct kryptos_idea_
     out[3] = kryptos_get_u16_as_big_endian(block + 6, 2);
 
     // INFO(Rafael): Initial T transform.
-    out[0] = kryptos_idea_mul(out[0], sks.K[48]);
-    out[3] = kryptos_idea_mul(out[3], sks.K[51]);
+    out[0] = kryptos_idea_mul(out[0], sks->K[48]);
+    out[3] = kryptos_idea_mul(out[3], sks->K[51]);
     y1 = out[1];
-    out[1] = out[2] - sks.K[50];
-    out[2] = y1 - sks.K[49];
+    out[1] = out[2] - sks->K[50];
+    out[2] = y1 - sks->K[49];
 
     for (r = 42; r >= 0; r -= 6) {
         // INFO(Rafael): Iteration first part.
         y1 = out[0] ^ out[1];
         z1 = out[2] ^ out[3];
 
-        y2  = kryptos_idea_mul(sks.K[r + 4], y1);
+        y2  = kryptos_idea_mul(sks->K[r + 4], y1);
         y2 += z1;
-        y2  = kryptos_idea_mul(y2, sks.K[r + 5]);
+        y2  = kryptos_idea_mul(y2, sks->K[r + 5]);
 
-        z2  = kryptos_idea_mul(sks.K[r + 4], y1);
+        z2  = kryptos_idea_mul(sks->K[r + 4], y1);
         z2 += y2;
 
         out[0] = out[0] ^ y2;
@@ -272,11 +272,11 @@ static void kryptos_idea_block_decrypt(kryptos_u8_t *block, struct kryptos_idea_
         out[3] = out[3] ^ z2;
 
         // INFO(Rafael): Iteration second part.
-        out[0] = kryptos_idea_mul(out[0], sks.K[r]);
-        out[3] = kryptos_idea_mul(out[3], sks.K[r + 3]);
+        out[0] = kryptos_idea_mul(out[0], sks->K[r]);
+        out[3] = kryptos_idea_mul(out[3], sks->K[r + 3]);
         y1 = out[1];
-        out[1] = out[2] - sks.K[r + 1];
-        out[2] = y1 - sks.K[r + 2];
+        out[1] = out[2] - sks->K[r + 1];
+        out[2] = y1 - sks->K[r + 2];
     }
 
     kryptos_cpy_u16_as_big_endian(block, 8, out[0]);
