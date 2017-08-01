@@ -543,7 +543,7 @@ int kryptos_dsl_tests(void) {
 
     // SERPENT ECB
 
-    /*kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
 
     kryptos_run_cipher(serpent, &task, "serpent", 7, kKryptosECB);
@@ -579,7 +579,7 @@ int kryptos_dsl_tests(void) {
 
     // TRIPLE-DES ECB
 
-    kryptos_task_set_in(&task, data, data_size);
+    /*kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
 
     triple_des_key2 = "noel";
