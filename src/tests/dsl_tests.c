@@ -400,7 +400,7 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
 
-    // CAMELLIA-192 CBC
+    // CAMELLIA-256 CBC
 
     kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);

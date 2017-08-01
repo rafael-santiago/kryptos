@@ -359,7 +359,7 @@ int kryptos_dsl_tests(void) {
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 
     // CAMELLIA-256 ECB
-    /*camellia_keysize = kKryptosCAMELLIA256;
+    camellia_keysize = kKryptosCAMELLIA256;
 
     kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
@@ -377,7 +377,7 @@ int kryptos_dsl_tests(void) {
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
 
-    // CAMELLIA-192 CBC
+    // CAMELLIA-256 CBC
 
     kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
@@ -393,7 +393,7 @@ int kryptos_dsl_tests(void) {
 
     KUTE_ASSERT(task.out_size == data_size);
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
-    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);*/
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 
     // CAST5 ECB
 
