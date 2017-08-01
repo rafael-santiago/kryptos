@@ -285,7 +285,7 @@ int kryptos_dsl_tests(void) {
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 
     // CAMELLIA-128 ECB
-    /*camellia_keysize = kKryptosCAMELLIA128;
+    camellia_keysize = kKryptosCAMELLIA128;
 
     kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
@@ -322,7 +322,7 @@ int kryptos_dsl_tests(void) {
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 
     // CAMELLIA-192 ECB
-    camellia_keysize = kKryptosCAMELLIA192;
+    /*camellia_keysize = kKryptosCAMELLIA192;
 
     kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
