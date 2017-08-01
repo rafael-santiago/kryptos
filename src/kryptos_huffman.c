@@ -148,7 +148,7 @@ kryptos_u8_t *kryptos_huffman_deflate(const kryptos_u8_t *in, const size_t in_si
     size_t raw_freq[256];
     struct kryptos_huffman_tree_ctx *htree = NULL;
 #ifdef KRYPTOS_KERNEL_MODE
-    // INFO(Rafael): Avoiding heap consumption in kernel mode.
+    // INFO(Rafael): Avoiding stack consumption in kernel mode.
     static struct kryptos_huffman_code_ctx hcodes[256];
 #else
     struct kryptos_huffman_code_ctx hcodes[256];
