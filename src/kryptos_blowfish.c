@@ -19,7 +19,7 @@
 
 // INFO(Rafael): S-boxes and the P-array.
 
-static kryptos_u32_t kryptos_blowfish_sbox0[] = {
+static kryptos_u32_t kryptos_blowfish_sbox0[256] = {
     0xd1310ba6L, 0x98dfb5acL, 0x2ffd72dbL, 0xd01adfb7L, 0xb8e1afedL, 0x6a267e96L,
     0xba7c9045L, 0xf12c7f99L, 0x24a19947L, 0xb3916cf7L, 0x0801f2e2L, 0x858efc16L,
     0x636920d8L, 0x71574e69L, 0xa458fea3L, 0xf4933d7eL, 0x0d95748fL, 0x728eb658L,
@@ -65,7 +65,7 @@ static kryptos_u32_t kryptos_blowfish_sbox0[] = {
     0x53b02d5dL, 0xa99f8fa1L, 0x08ba4799L, 0x6e85076aL
 };
 
-static kryptos_u32_t kryptos_blowfish_sbox1[] = {
+static kryptos_u32_t kryptos_blowfish_sbox1[256] = {
     0x4b7a70e9L, 0xb5b32944L, 0xdb75092eL, 0xc4192623L, 0xad6ea6b0L, 0x49a7df7dL,
     0x9cee60b8L, 0x8fedb266L, 0xecaa8c71L, 0x699a17ffL, 0x5664526cL, 0xc2b19ee1L,
     0x193602a5L, 0x75094c29L, 0xa0591340L, 0xe4183a3eL, 0x3f54989aL, 0x5b429d65L,
@@ -111,7 +111,7 @@ static kryptos_u32_t kryptos_blowfish_sbox1[] = {
     0x153e21e7L, 0x8fb03d4aL, 0xe6e39f2bL, 0xdb83adf7L
 };
 
-static kryptos_u32_t kryptos_blowfish_sbox2[] = {
+static kryptos_u32_t kryptos_blowfish_sbox2[256] = {
     0xe93d5a68L, 0x948140f7L, 0xf64c261cL, 0x94692934L, 0x411520f7L, 0x7602d4f7L,
     0xbcf46b2eL, 0xd4a20068L, 0xd4082471L, 0x3320f46aL, 0x43b7d4b7L, 0x500061afL,
     0x1e39f62eL, 0x97244546L, 0x14214f74L, 0xbf8b8840L, 0x4d95fc1dL, 0x96b591afL,
@@ -157,7 +157,7 @@ static kryptos_u32_t kryptos_blowfish_sbox2[] = {
     0xd79a3234L, 0x92638212L, 0x670efa8eL, 0x406000e0L
 };
 
-static kryptos_u32_t kryptos_blowfish_sbox3[] = {
+static kryptos_u32_t kryptos_blowfish_sbox3[256] = {
     0x3a39ce37L, 0xd3faf5cfL, 0xabc27737L, 0x5ac52d1bL, 0x5cb0679eL, 0x4fa33742L,
     0xd3822740L, 0x99bc9bbeL, 0xd5118e9dL, 0xbf0f7315L, 0xd62d1c7eL, 0xc700c47bL,
     0xb78c1b6bL, 0x21a19045L, 0xb26eb1beL, 0x6a366eb4L, 0x5748ab2fL, 0xbc946e79L,
@@ -203,7 +203,7 @@ static kryptos_u32_t kryptos_blowfish_sbox3[] = {
     0xb74e6132L, 0xce77e25bL, 0x578fdfe3L, 0x3ac372e6L
 };
 
-static kryptos_u32_t kryptos_blowfish_parray[] = {
+static kryptos_u32_t kryptos_blowfish_parray[18] = {
     0x243f6a88L, 0x85a308d3L, 0x13198a2eL, 0x03707344L, 0xa4093822L, 0x299f31d0L,
     0x082efa98L, 0xec4e6c89L, 0x452821e6L, 0x38d01377L, 0xbe5466cfL, 0x34e90c6cL,
     0xc0ac29b7L, 0xc97c50ddL, 0x3f84d5b5L, 0xb5470917L, 0x9216d5d9L, 0x8979fb1bL
@@ -214,20 +214,20 @@ struct kryptos_blowfish_subkeys {
     kryptos_u32_t S1[257], S2[257], S3[257], S4[257];
 };
 
-typedef void (*kryptos_blowfish_block_processor)(kryptos_u8_t *block, struct kryptos_blowfish_subkeys sks);
+typedef void (*kryptos_blowfish_block_processor)(kryptos_u8_t *block, const struct kryptos_blowfish_subkeys *sks);
 
 #define kryptos_blowfish_get_byte_from_u32(w, n) ((w) >> (24 - ((n) << 3)) & 0xff)
 
-#define kryptos_blowfish_F(xl, sks) ( ( ( (sks).S1[kryptos_blowfish_get_byte_from_u32(xl, 0)] +\
-                                               (sks).S2[kryptos_blowfish_get_byte_from_u32(xl, 1)] ) ^\
-                                           (sks).S3[kryptos_blowfish_get_byte_from_u32(xl, 2)] ) +\
-                                             (sks).S4[kryptos_blowfish_get_byte_from_u32(xl, 3)] )
+#define kryptos_blowfish_F(xl, sks) ( ( ( (sks)->S1[kryptos_blowfish_get_byte_from_u32(xl, 0)] +\
+                                               (sks)->S2[kryptos_blowfish_get_byte_from_u32(xl, 1)] ) ^\
+                                           (sks)->S3[kryptos_blowfish_get_byte_from_u32(xl, 2)] ) +\
+                                             (sks)->S4[kryptos_blowfish_get_byte_from_u32(xl, 3)] )
 
-static void kryptos_blowfish_block_encrypt(kryptos_u8_t *block, struct kryptos_blowfish_subkeys sks);
+static void kryptos_blowfish_block_encrypt(kryptos_u8_t *block, const struct kryptos_blowfish_subkeys *sks);
 
-static void kryptos_blowfish_block_decrypt(kryptos_u8_t *block, struct kryptos_blowfish_subkeys sks);
+static void kryptos_blowfish_block_decrypt(kryptos_u8_t *block, const struct kryptos_blowfish_subkeys *sks);
 
-static void kryptos_blowfish_ld_user_key(kryptos_u32_t key[KRYPTOS_BLOWFISH_MAX_KEY_NR],
+static void kryptos_blowfish_ld_user_key(kryptos_u32_t *key,
                                          const kryptos_u8_t *user_key, const size_t user_key_size);
 
 static void kryptos_blowfish_puff_up(const kryptos_u8_t *key, size_t key_size, struct kryptos_blowfish_subkeys *sks);
@@ -246,9 +246,9 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(blowfish,
                                     KRYPTOS_BLOWFISH_BLOCKSIZE,
                                     blowfish_cipher_epilogue,
                                     outblock,
-                                    blowfish_block_processor(outblock, sks))
+                                    blowfish_block_processor(outblock, &sks))
 
-static void kryptos_blowfish_block_encrypt(kryptos_u8_t *block, struct kryptos_blowfish_subkeys sks) {
+static void kryptos_blowfish_block_encrypt(kryptos_u8_t *block, const struct kryptos_blowfish_subkeys *sks) {
     size_t i;
     kryptos_u32_t xl, xr, t;
 
@@ -256,7 +256,7 @@ static void kryptos_blowfish_block_encrypt(kryptos_u8_t *block, struct kryptos_b
     xr = kryptos_get_u32_as_big_endian(block + 4, 4);
 
     for (i = 0; i < 16; i++) {
-        xl = xl ^ sks.P[i];
+        xl = xl ^ sks->P[i];
         xr = kryptos_blowfish_F(xl, sks) ^ xr;
         t  = xr;
         xr = xl;
@@ -267,8 +267,8 @@ static void kryptos_blowfish_block_encrypt(kryptos_u8_t *block, struct kryptos_b
     xr = xl;
     xl = t;
 
-    xr = xr ^ sks.P[16];
-    xl = xl ^ sks.P[17];
+    xr = xr ^ sks->P[16];
+    xl = xl ^ sks->P[17];
 
     kryptos_cpy_u32_as_big_endian(block, 8, xl);
     kryptos_cpy_u32_as_big_endian(block + 4, 4, xr);
@@ -276,7 +276,7 @@ static void kryptos_blowfish_block_encrypt(kryptos_u8_t *block, struct kryptos_b
     xl = xr = t  = 0;
 }
 
-static void kryptos_blowfish_block_decrypt(kryptos_u8_t *block, struct kryptos_blowfish_subkeys sks) {
+static void kryptos_blowfish_block_decrypt(kryptos_u8_t *block, const struct kryptos_blowfish_subkeys *sks) {
     size_t i;
     kryptos_u32_t xl, xr, t;
 
@@ -284,7 +284,7 @@ static void kryptos_blowfish_block_decrypt(kryptos_u8_t *block, struct kryptos_b
     xr = kryptos_get_u32_as_big_endian(block + 4, 4);
 
     for (i = 17; i > 1; i--) {
-        xl = xl ^ sks.P[i];
+        xl = xl ^ sks->P[i];
         xr = kryptos_blowfish_F(xl, sks) ^ xr;
         t  = xr;
         xr = xl;
@@ -295,8 +295,8 @@ static void kryptos_blowfish_block_decrypt(kryptos_u8_t *block, struct kryptos_b
     xr = xl;
     xl = t;
 
-    xr = xr ^ sks.P[1];
-    xl = xl ^ sks.P[0];
+    xr = xr ^ sks->P[1];
+    xl = xl ^ sks->P[0];
 
     kryptos_cpy_u32_as_big_endian(block, 8, xl);
     kryptos_cpy_u32_as_big_endian(block + 4, 4, xr);
@@ -405,7 +405,7 @@ static void kryptos_blowfish_puff_up(const kryptos_u8_t *key, size_t key_size, s
     memset(pl, 0, sizeof(pl));
 
     for (i = 0; i < 521; i++) {
-        kryptos_blowfish_block_encrypt(pl, *sks);
+        kryptos_blowfish_block_encrypt(pl, sks);
         if (i < 9) {
             xl = &sks->P[i << 1];
             xr = &sks->P[(i << 1) + 1];
