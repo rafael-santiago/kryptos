@@ -126,7 +126,7 @@ static kryptos_u8_t kryptos_aes_ltable[256] = {
     153, 227, 165, 103,  74, 237, 222, 197,  49, 254,  24,  13,  99, 140, 128, 192, 247, 112,   7
 };
 
-typedef void (*kryptos_aes_block_processor)(kryptos_u8_t *block, struct kryptos_aes_subkeys sks);
+typedef void (*kryptos_aes_block_processor)(kryptos_u8_t *block, const struct kryptos_aes_subkeys *sks);
 
 static void kryptos_aes_sto_u32_into_byte_matrix(const kryptos_u32_t word[4], struct kryptos_128bit_u8_matrix *u8m);
 
@@ -142,9 +142,9 @@ static kryptos_u32_t kryptos_aes_mix_col(const kryptos_u32_t value);
 
 static kryptos_u32_t kryptos_aes_inv_mix_col(const kryptos_u32_t value);
 
-static void kryptos_aes_block_encrypt(kryptos_u8_t *block, struct kryptos_aes_subkeys sks);
+static void kryptos_aes_block_encrypt(kryptos_u8_t *block, const struct kryptos_aes_subkeys *sks);
 
-static void kryptos_aes_block_decrypt(kryptos_u8_t *block, struct kryptos_aes_subkeys sks);
+static void kryptos_aes_block_decrypt(kryptos_u8_t *block, const struct kryptos_aes_subkeys *sks);
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(aes, kKryptosCipherAES, KRYPTOS_AES_BLOCKSIZE)
 
@@ -160,7 +160,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes,
                                     KRYPTOS_AES_BLOCKSIZE,
                                     aes_cipher_epilogue,
                                     outblock,
-                                    aes_block_processor(outblock, sks))
+                                    aes_block_processor(outblock, &sks))
 
 static void kryptos_aes_sto_u32_into_byte_matrix(const kryptos_u32_t word[4], struct kryptos_128bit_u8_matrix *u8m) {
     size_t i, j, k, c;
@@ -367,7 +367,7 @@ static kryptos_u32_t kryptos_aes_inv_mix_col(const kryptos_u32_t value) {
     return temp;
 }
 
-static void kryptos_aes_block_encrypt(kryptos_u8_t *block, struct kryptos_aes_subkeys sks) {
+static void kryptos_aes_block_encrypt(kryptos_u8_t *block, const struct kryptos_aes_subkeys *sks) {
     struct kryptos_128bit_u8_matrix state;
     size_t i, j, r, k;
     kryptos_u8_t b;
@@ -393,7 +393,7 @@ static void kryptos_aes_block_encrypt(kryptos_u8_t *block, struct kryptos_aes_su
     // INFO(Rafael): AddRoundKey.
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 4; j++) {
-            state.data[i][j] = sks.round[0].data[i][j] ^ state.data[i][j];
+            state.data[i][j] = sks->round[0].data[i][j] ^ state.data[i][j];
         }
     }
 
@@ -441,14 +441,14 @@ static void kryptos_aes_block_encrypt(kryptos_u8_t *block, struct kryptos_aes_su
             // INFO(Rafael): AddRoundKey.
             for (i = 0; i < 4; i++) {
                 for(j = 0; j < 4; j++) {
-                    state.data[j][i] = kryptos_aes_get_u8_from_u32(wblock[i],j) ^ sks.round[r].data[j][i];
+                    state.data[j][i] = kryptos_aes_get_u8_from_u32(wblock[i],j) ^ sks->round[r].data[j][i];
                 }
             }
         } else {
             // INFO(Rafael): AddRoundKey.
             for (i = 0; i < 4; i++) {
                 for(j = 0; j < 4; j++) {
-                    state.data[i][j] = state.data[i][j] ^ sks.round[r].data[i][j];
+                    state.data[i][j] = state.data[i][j] ^ sks->round[r].data[i][j];
                 }
             }
         }
@@ -476,7 +476,7 @@ static void kryptos_aes_block_encrypt(kryptos_u8_t *block, struct kryptos_aes_su
     i = j = r = k = b = 0;
 }
 
-static void kryptos_aes_block_decrypt(kryptos_u8_t *block, struct kryptos_aes_subkeys sks) {
+static void kryptos_aes_block_decrypt(kryptos_u8_t *block, const struct kryptos_aes_subkeys *sks) {
     struct kryptos_128bit_u8_matrix state;
     size_t i, j, r, k;
     kryptos_u8_t b;
@@ -504,7 +504,7 @@ static void kryptos_aes_block_decrypt(kryptos_u8_t *block, struct kryptos_aes_su
             // INFO(Rafael): AddRoundKey.
             for(i = 0; i < 4; i++) {
                 for(j = 0; j < 4; j++) {
-                    state.data[i][j] = state.data[i][j] ^ sks.round[r].data[i][j];
+                    state.data[i][j] = state.data[i][j] ^ sks->round[r].data[i][j];
                 }
             }
 
@@ -528,7 +528,7 @@ static void kryptos_aes_block_decrypt(kryptos_u8_t *block, struct kryptos_aes_su
             // INFO(Rafael): AddRoundKey.
             for(i = 0; i < 4; i++) {
                 for(j = 0; j < 4; j++) {
-                    state.data[i][j] = state.data[i][j] ^ sks.round[r].data[i][j];
+                    state.data[i][j] = state.data[i][j] ^ sks->round[r].data[i][j];
                 }
             }
         }
@@ -565,7 +565,7 @@ static void kryptos_aes_block_decrypt(kryptos_u8_t *block, struct kryptos_aes_su
     // INFO(Rafael): AddRoundKey.
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 4; j++) {
-            state.data[i][j] = sks.round[0].data[i][j] ^ state.data[i][j];
+            state.data[i][j] = sks->round[0].data[i][j] ^ state.data[i][j];
         }
     }
 
