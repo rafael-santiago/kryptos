@@ -163,12 +163,12 @@ struct kryptos_des_subkeys {
  struct kryptos_des_key K[18];
 };
 
-typedef void (*kryptos_des_block_processor)(kryptos_u8_t *block, struct kryptos_des_subkeys sks);
+typedef void (*kryptos_des_block_processor)(kryptos_u8_t *block, const struct kryptos_des_subkeys *sks);
 
 typedef void (*kryptos_triple_des_block_processor)(kryptos_u8_t *block,
-                                                   struct kryptos_des_subkeys sks1,
-                                                   struct kryptos_des_subkeys sks2,
-                                                   struct kryptos_des_subkeys sks3);
+                                                   const struct kryptos_des_subkeys *sks1,
+                                                   const struct kryptos_des_subkeys *sks2,
+                                                   const struct kryptos_des_subkeys *sks3);
 
 #define kryptos_des_getbit_from_u32(w, n) (kryptos_u8_t)( ( ( (w) << (n) ) >> 31 ) + 48 )
 
@@ -180,29 +180,29 @@ static void kryptos_des_expand_user_key(struct kryptos_des_subkeys *sks, const k
 
 static void kryptos_des_ld_user_key(kryptos_u32_t key[2], const kryptos_u8_t *user_key, const size_t user_key_size);
 
-static void kryptos_des_block_encrypt(kryptos_u8_t *block, struct kryptos_des_subkeys sks);
+static void kryptos_des_block_encrypt(kryptos_u8_t *block, const struct kryptos_des_subkeys *sks);
 
-static void kryptos_des_block_decrypt(kryptos_u8_t *block, struct kryptos_des_subkeys sks);
+static void kryptos_des_block_decrypt(kryptos_u8_t *block, const struct kryptos_des_subkeys *sks);
 
 static void kryptos_triple_des_block_encrypt(kryptos_u8_t *block,
-                                             struct kryptos_des_subkeys sks1,
-                                             struct kryptos_des_subkeys sks2,
-                                             struct kryptos_des_subkeys sks3);
+                                             const struct kryptos_des_subkeys *sks1,
+                                             const struct kryptos_des_subkeys *sks2,
+                                             const struct kryptos_des_subkeys *sks3);
 
 static void kryptos_triple_des_block_decrypt(kryptos_u8_t *block,
-                                             struct kryptos_des_subkeys sks1,
-                                             struct kryptos_des_subkeys sks2,
-                                             struct kryptos_des_subkeys sks3);
+                                             const struct kryptos_des_subkeys *sks1,
+                                             const struct kryptos_des_subkeys *sks2,
+                                             const struct kryptos_des_subkeys *sks3);
 
 static void kryptos_triple_des_ede_block_encrypt(kryptos_u8_t *block,
-                                                 struct kryptos_des_subkeys sks1,
-                                                 struct kryptos_des_subkeys sks2,
-                                                 struct kryptos_des_subkeys sks3);
+                                                 const struct kryptos_des_subkeys *sks1,
+                                                 const struct kryptos_des_subkeys *sks2,
+                                                 const struct kryptos_des_subkeys *sks3);
 
 static void kryptos_triple_des_ede_block_decrypt(kryptos_u8_t *block,
-                                                 struct kryptos_des_subkeys sks1,
-                                                 struct kryptos_des_subkeys sks2,
-                                                 struct kryptos_des_subkeys sks3);
+                                                 const struct kryptos_des_subkeys *sks1,
+                                                 const struct kryptos_des_subkeys *sks2,
+                                                 const struct kryptos_des_subkeys *sks3);
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(des, kKryptosCipherDES, KRYPTOS_DES_BLOCKSIZE)
 
@@ -218,7 +218,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(des,
                                     KRYPTOS_DES_BLOCKSIZE,
                                     des_cipher_epilogue,
                                     outblock,
-                                    des_block_processor(outblock, sks))
+                                    des_block_processor(outblock, &sks))
 
 void kryptos_triple_des_ede_setup(kryptos_task_ctx *ktask,
                                   kryptos_u8_t *key1,
@@ -355,7 +355,7 @@ void kryptos_triple_des_cipher(kryptos_task_ctx **ktask) {
                                   &(*ktask)->out_size,
                                   inblock_p,
                                   outblock_p,
-                                  triple_des_cipher_epilogue, block_processor(outblock, sks1, sks2, sks3));
+                                  triple_des_cipher_epilogue, block_processor(outblock, &sks1, &sks2, &sks3));
 
     kryptos_meta_block_processing_epilogue(triple_des_cipher_epilogue,
                                            inblock, inblock_p, in_p, in_end,
@@ -478,7 +478,7 @@ static kryptos_u32_t kryptos_des_f(kryptos_u32_t R, kryptos_u32_t KL, kryptos_u3
     return R;
 }
 
-static void kryptos_des_block_encrypt(kryptos_u8_t *block, struct kryptos_des_subkeys sks) {
+static void kryptos_des_block_encrypt(kryptos_u8_t *block, const struct kryptos_des_subkeys *sks) {
     kryptos_u8_t bits[KRYPTOS_DES_MASTER_SIZE], block_perm[KRYPTOS_DES_MASTER_SIZE];
     kryptos_u32_t L[18], R[18];
     size_t i;
@@ -519,7 +519,7 @@ static void kryptos_des_block_encrypt(kryptos_u8_t *block, struct kryptos_des_su
 
     for (i = 1; i < 17; i++) {
         L[i] = R[i - 1];
-        R[i] = L[i - 1] ^ kryptos_des_f(R[i - 1], sks.K[i - 1].L, sks.K[i - 1].R);
+        R[i] = L[i - 1] ^ kryptos_des_f(R[i - 1], sks->K[i - 1].L, sks->K[i - 1].R);
     }
 
     // INFO(Rafael): Blocks reversion.
@@ -559,7 +559,7 @@ static void kryptos_des_block_encrypt(kryptos_u8_t *block, struct kryptos_des_su
     memset(R, 0, sizeof(R));
 }
 
-static void kryptos_des_block_decrypt(kryptos_u8_t *block, struct kryptos_des_subkeys sks) {
+static void kryptos_des_block_decrypt(kryptos_u8_t *block, const struct kryptos_des_subkeys *sks) {
     kryptos_u8_t bits[KRYPTOS_DES_MASTER_SIZE], block_perm[KRYPTOS_DES_MASTER_SIZE];
     kryptos_u32_t L[18], R[18];
     size_t i;
@@ -598,7 +598,7 @@ static void kryptos_des_block_decrypt(kryptos_u8_t *block, struct kryptos_des_su
     // INFO(Rafael): Start of the 16 DES rounds.
     for (i = 1; i < 17; i++) {
         L[i] = R[i - 1];
-        R[i] = L[i - 1] ^ kryptos_des_f(R[i - 1], sks.K[(19 - i) - 3].L, sks.K[(19 - i) - 3].R);
+        R[i] = L[i - 1] ^ kryptos_des_f(R[i - 1], sks->K[(19 - i) - 3].L, sks->K[(19 - i) - 3].R);
     }
 
     // INFO(Rafael): Applying the blocks reversion.
@@ -639,36 +639,36 @@ static void kryptos_des_block_decrypt(kryptos_u8_t *block, struct kryptos_des_su
 }
 
 static void kryptos_triple_des_block_encrypt(kryptos_u8_t *block,
-                                             struct kryptos_des_subkeys sks1,
-                                             struct kryptos_des_subkeys sks2,
-                                             struct kryptos_des_subkeys sks3) {
+                                             const struct kryptos_des_subkeys *sks1,
+                                             const struct kryptos_des_subkeys *sks2,
+                                             const struct kryptos_des_subkeys *sks3) {
     kryptos_des_block_encrypt(block, sks1);
     kryptos_des_block_encrypt(block, sks2);
     kryptos_des_block_encrypt(block, sks3);
 }
 
 static void kryptos_triple_des_block_decrypt(kryptos_u8_t *block,
-                                             struct kryptos_des_subkeys sks1,
-                                             struct kryptos_des_subkeys sks2,
-                                             struct kryptos_des_subkeys sks3) {
+                                             const struct kryptos_des_subkeys *sks1,
+                                             const struct kryptos_des_subkeys *sks2,
+                                             const struct kryptos_des_subkeys *sks3) {
     kryptos_des_block_decrypt(block, sks3);
     kryptos_des_block_decrypt(block, sks2);
     kryptos_des_block_decrypt(block, sks1);
 }
 
 static void kryptos_triple_des_ede_block_encrypt(kryptos_u8_t *block,
-                                                 struct kryptos_des_subkeys sks1,
-                                                 struct kryptos_des_subkeys sks2,
-                                                 struct kryptos_des_subkeys sks3) {
+                                                 const struct kryptos_des_subkeys *sks1,
+                                                 const struct kryptos_des_subkeys *sks2,
+                                                 const struct kryptos_des_subkeys *sks3) {
     kryptos_des_block_encrypt(block, sks1);
     kryptos_des_block_decrypt(block, sks2);
     kryptos_des_block_encrypt(block, sks3);
 }
 
 static void kryptos_triple_des_ede_block_decrypt(kryptos_u8_t *block,
-                                                 struct kryptos_des_subkeys sks1,
-                                                 struct kryptos_des_subkeys sks2,
-                                                 struct kryptos_des_subkeys sks3) {
+                                                 const struct kryptos_des_subkeys *sks1,
+                                                 const struct kryptos_des_subkeys *sks2,
+                                                 const struct kryptos_des_subkeys *sks3) {
     kryptos_des_block_decrypt(block, sks3);
     kryptos_des_block_encrypt(block, sks2);
     kryptos_des_block_decrypt(block, sks1);
