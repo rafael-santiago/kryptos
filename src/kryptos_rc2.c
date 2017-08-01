@@ -59,7 +59,7 @@
                                           kryptos_rc2_rmashr(r, 0, k) )
 
 // INFO(Rafael): random bytes based on PI-digits.
-static kryptos_u8_t kryptos_rc2_PITABLE[] = {
+static kryptos_u8_t kryptos_rc2_PITABLE[256] = {
     0xd9, 0x78, 0xf9, 0xc4, 0x19, 0xdd, 0xb5, 0xed, 0x28, 0xe9, 0xfd, 0x79, 0x4a, 0xa0, 0xd8, 0x9d,
     0xc6, 0x7e, 0x37, 0x83, 0x2b, 0x76, 0x53, 0x8e, 0x62, 0x4c, 0x64, 0x88, 0x44, 0x8b, 0xfb, 0xa2,
     0x17, 0x9a, 0x59, 0xf5, 0x87, 0xb3, 0x4f, 0x13, 0x61, 0x45, 0x6d, 0x8d, 0x09, 0x81, 0x7d, 0x32,
@@ -83,15 +83,15 @@ struct kryptos_rc2_subkeys {
     int T1;              // INFO(Rafael): This is the effective key size.
 };
 
-typedef void (*kryptos_rc2_block_processor)(kryptos_u8_t *block, struct kryptos_rc2_subkeys sks);
+typedef void (*kryptos_rc2_block_processor)(kryptos_u8_t *block, const struct kryptos_rc2_subkeys *sks);
 
 static void kryptos_rc2_ld_user_key(kryptos_u16_t key[64], const kryptos_u8_t *user_key, const size_t user_key_size);
 
 static void kryptos_rc2_inflate_key(const kryptos_u8_t *key, const size_t key_size, struct kryptos_rc2_subkeys *sks);
 
-static void kryptos_rc2_block_encrypt(kryptos_u8_t *block, struct kryptos_rc2_subkeys sks);
+static void kryptos_rc2_block_encrypt(kryptos_u8_t *block, const struct kryptos_rc2_subkeys *sks);
 
-static void kryptos_rc2_block_decrypt(kryptos_u8_t *block, struct kryptos_rc2_subkeys sks);
+static void kryptos_rc2_block_decrypt(kryptos_u8_t *block, const struct kryptos_rc2_subkeys *sks);
 
 KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(rc2, ktask, kKryptosCipherRC2, KRYPTOS_RC2_BLOCKSIZE, int *T1,
                                        {
@@ -137,7 +137,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(rc2,
                                     KRYPTOS_RC2_BLOCKSIZE,
                                     rc2_cipher_epilogue,
                                     outblock,
-                                    rc2_block_processor(outblock, sks))
+                                    rc2_block_processor(outblock, &sks))
 
 static void kryptos_rc2_ld_user_key(kryptos_u16_t key[64], const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
@@ -323,7 +323,7 @@ static void kryptos_rc2_inflate_key(const kryptos_u8_t *key, const size_t key_si
     memset(K, 0, sizeof(K));
 }
 
-static void kryptos_rc2_block_encrypt(kryptos_u8_t *block, struct kryptos_rc2_subkeys sks) {
+static void kryptos_rc2_block_encrypt(kryptos_u8_t *block, const struct kryptos_rc2_subkeys *sks) {
     size_t ri;
     kryptos_u16_t r[4];
 
@@ -334,28 +334,28 @@ static void kryptos_rc2_block_encrypt(kryptos_u8_t *block, struct kryptos_rc2_su
 
     ri = 0;
 
-    kryptos_rc2_mixinground(r, sks.K, ri);
-    kryptos_rc2_mixinground(r, sks.K, ri);
-    kryptos_rc2_mixinground(r, sks.K, ri);
-    kryptos_rc2_mixinground(r, sks.K, ri);
-    kryptos_rc2_mixinground(r, sks.K, ri);
+    kryptos_rc2_mixinground(r, sks->K, ri);
+    kryptos_rc2_mixinground(r, sks->K, ri);
+    kryptos_rc2_mixinground(r, sks->K, ri);
+    kryptos_rc2_mixinground(r, sks->K, ri);
+    kryptos_rc2_mixinground(r, sks->K, ri);
 
-    kryptos_rc2_mashinground(r, sks.K);
+    kryptos_rc2_mashinground(r, sks->K);
 
-    kryptos_rc2_mixinground(r, sks.K, ri);
-    kryptos_rc2_mixinground(r, sks.K, ri);
-    kryptos_rc2_mixinground(r, sks.K, ri);
-    kryptos_rc2_mixinground(r, sks.K, ri);
-    kryptos_rc2_mixinground(r, sks.K, ri);
-    kryptos_rc2_mixinground(r, sks.K, ri);
+    kryptos_rc2_mixinground(r, sks->K, ri);
+    kryptos_rc2_mixinground(r, sks->K, ri);
+    kryptos_rc2_mixinground(r, sks->K, ri);
+    kryptos_rc2_mixinground(r, sks->K, ri);
+    kryptos_rc2_mixinground(r, sks->K, ri);
+    kryptos_rc2_mixinground(r, sks->K, ri);
 
-    kryptos_rc2_mashinground(r, sks.K);
+    kryptos_rc2_mashinground(r, sks->K);
 
-    kryptos_rc2_mixinground(r, sks.K, ri);
-    kryptos_rc2_mixinground(r, sks.K, ri);
-    kryptos_rc2_mixinground(r, sks.K, ri);
-    kryptos_rc2_mixinground(r, sks.K, ri);
-    kryptos_rc2_mixinground(r, sks.K, ri);
+    kryptos_rc2_mixinground(r, sks->K, ri);
+    kryptos_rc2_mixinground(r, sks->K, ri);
+    kryptos_rc2_mixinground(r, sks->K, ri);
+    kryptos_rc2_mixinground(r, sks->K, ri);
+    kryptos_rc2_mixinground(r, sks->K, ri);
 
     kryptos_cpy_u16_as_big_endian(block, 8, r[0]);
     kryptos_cpy_u16_as_big_endian(block + 2, 6, r[1]);
@@ -366,7 +366,7 @@ static void kryptos_rc2_block_encrypt(kryptos_u8_t *block, struct kryptos_rc2_su
     ri = 0;
 }
 
-static void kryptos_rc2_block_decrypt(kryptos_u8_t *block, struct kryptos_rc2_subkeys sks) {
+static void kryptos_rc2_block_decrypt(kryptos_u8_t *block, const struct kryptos_rc2_subkeys *sks) {
     size_t ri;
     kryptos_u16_t r[4];
 
@@ -377,28 +377,28 @@ static void kryptos_rc2_block_decrypt(kryptos_u8_t *block, struct kryptos_rc2_su
 
     ri = 63;
 
-    kryptos_rc2_rmixinground(r, sks.K, ri);
-    kryptos_rc2_rmixinground(r, sks.K, ri);
-    kryptos_rc2_rmixinground(r, sks.K, ri);
-    kryptos_rc2_rmixinground(r, sks.K, ri);
-    kryptos_rc2_rmixinground(r, sks.K, ri);
+    kryptos_rc2_rmixinground(r, sks->K, ri);
+    kryptos_rc2_rmixinground(r, sks->K, ri);
+    kryptos_rc2_rmixinground(r, sks->K, ri);
+    kryptos_rc2_rmixinground(r, sks->K, ri);
+    kryptos_rc2_rmixinground(r, sks->K, ri);
 
-    kryptos_rc2_rmashinground(r, sks.K);
+    kryptos_rc2_rmashinground(r, sks->K);
 
-    kryptos_rc2_rmixinground(r, sks.K, ri);
-    kryptos_rc2_rmixinground(r, sks.K, ri);
-    kryptos_rc2_rmixinground(r, sks.K, ri);
-    kryptos_rc2_rmixinground(r, sks.K, ri);
-    kryptos_rc2_rmixinground(r, sks.K, ri);
-    kryptos_rc2_rmixinground(r, sks.K, ri);
+    kryptos_rc2_rmixinground(r, sks->K, ri);
+    kryptos_rc2_rmixinground(r, sks->K, ri);
+    kryptos_rc2_rmixinground(r, sks->K, ri);
+    kryptos_rc2_rmixinground(r, sks->K, ri);
+    kryptos_rc2_rmixinground(r, sks->K, ri);
+    kryptos_rc2_rmixinground(r, sks->K, ri);
 
-    kryptos_rc2_rmashinground(r, sks.K);
+    kryptos_rc2_rmashinground(r, sks->K);
 
-    kryptos_rc2_rmixinground(r, sks.K, ri);
-    kryptos_rc2_rmixinground(r, sks.K, ri);
-    kryptos_rc2_rmixinground(r, sks.K, ri);
-    kryptos_rc2_rmixinground(r, sks.K, ri);
-    kryptos_rc2_rmixinground(r, sks.K, ri);
+    kryptos_rc2_rmixinground(r, sks->K, ri);
+    kryptos_rc2_rmixinground(r, sks->K, ri);
+    kryptos_rc2_rmixinground(r, sks->K, ri);
+    kryptos_rc2_rmixinground(r, sks->K, ri);
+    kryptos_rc2_rmixinground(r, sks->K, ri);
 
     kryptos_cpy_u16_as_big_endian(block, 8, r[0]);
     kryptos_cpy_u16_as_big_endian(block + 2, 6, r[1]);
