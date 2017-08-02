@@ -391,6 +391,8 @@ kryptos_ ## encoding_name ## _processor_epilogue:\
 #define KRYPTOS_DECL_HASH_PROCESSOR(hash_name, ktask)\
 void kryptos_ ## hash_name ## _hash(kryptos_task_ctx **ktask, const int to_hex);
 
+#ifndef KRYPTOS_KERNEL_MODE
+
 #define KRYPTOS_IMPL_HASH_PROCESSOR(hash_name,\
                                     ktask,\
                                     hash_ctx_struct, hash_ctx,\
@@ -420,8 +422,43 @@ kryptos_ ## hash_epilogue:\
     memset(&hash_ctx, 0, sizeof(hash_ctx));\
 }
 
+#else
+
+#define KRYPTOS_IMPL_HASH_PROCESSOR(hash_name,\
+                                    ktask,\
+                                    hash_ctx_struct, hash_ctx,\
+                                    hash_epilogue,\
+                                    hash_setup, hash_stmt,\
+                                    to_raw_stmt, to_hex_stmt)\
+void kryptos_ ## hash_name ## _hash(kryptos_task_ctx **ktask, const int to_hex) {\
+    static struct hash_ctx_struct hash_ctx;\
+    if (ktask == NULL) {\
+        return;\
+    }\
+    if ((*ktask)->in == NULL) {\
+        (*ktask)->result = kKryptosInvalidParams;\
+        (*ktask)->result_verbose = "No input was supplied.";\
+        goto kryptos_ ## hash_epilogue;\
+    }\
+    hash_setup;\
+    hash_stmt;\
+    (*ktask)->result = kKryptosSuccess;\
+    (*ktask)->result_verbose = NULL;\
+    if (!to_hex) {\
+        to_raw_stmt;\
+    } else {\
+        to_hex_stmt;\
+    }\
+kryptos_ ## hash_epilogue:\
+    memset(&hash_ctx, 0, sizeof(hash_ctx));\
+}
+
+#endif
+
 #define KRYPTOS_DECL_HASH_MESSAGE_PROCESSOR(hash_name, struct_name, struct_var)\
 static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct_var);
+
+#ifndef KRYPTOS_KERNEL_MODE
 
 #define KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(hash_name,\
                                             struct_name, struct_var,\
@@ -457,6 +494,45 @@ static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct
         hash_do_block_stmt;\
     }\
 }\
+
+#else
+
+#define KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(hash_name,\
+                                            struct_name, struct_var,\
+                                            buffer_size, input_block_size, bits_per_block,\
+                                            hash_init_stmt, hash_do_block_stmt, block_index_decision_table)\
+static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct_var) {\
+    kryptos_u64_t i, l = ctx->total_len >> 3;\
+    static kryptos_u8_t buffer[buffer_size];\
+    hash_init_stmt;\
+    ctx->curr_len = 0;\
+    if (l > 0) {\
+        memset(buffer, 0, sizeof(buffer));\
+        for (i = 0; i <= l; i++) {\
+            if (ctx->curr_len < buffer_size && i != l) {\
+                buffer[ctx->curr_len++] = ctx->message[i];\
+            } else {\
+                kryptos_hash_ld_u8buf_as_u ## bits_per_block  ## _blocks(buffer, ctx->curr_len,\
+                                                    ctx->input.block, input_block_size,\
+                                                    block_index_decision_table);\
+                hash_do_block_stmt;\
+                ctx->curr_len = 0;\
+                memset(buffer, 0, sizeof(buffer));\
+                if (i != l) {\
+                    buffer[ctx->curr_len++] = ctx->message[i];\
+                }\
+            }\
+        }\
+        i = l = 0;\
+    } else {\
+        kryptos_hash_ld_u8buf_as_u ## bits_per_block ## _blocks("", 0,\
+                                            ctx->input.block, input_block_size,\
+                                            block_index_decision_table);\
+        hash_do_block_stmt;\
+    }\
+}\
+
+#endif
 
 #define KRYPTOS_DECL_HASH_SIZE(hash_name)\
 size_t kryptos_ ## hash_name ## _hash_size(void);

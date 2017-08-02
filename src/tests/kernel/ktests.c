@@ -10,6 +10,7 @@
 #include <generic_tests.h>
 #include <dsl_tests.h>
 #include <encoding_tests.h>
+#include <hash_tests.h>
 
 int ktest_monkey(void) {
     KUTE_RUN_TEST(kryptos_padding_tests);
@@ -29,7 +30,6 @@ int ktest_monkey(void) {
     KUTE_RUN_TEST(kryptos_huffman_tests);
     KUTE_RUN_TEST(kryptos_pem_get_data_tests);
     KUTE_RUN_TEST(kryptos_pem_put_data_tests);
-
 
     KUTE_RUN_TEST(kryptos_pem_get_mp_data_tests);
 
