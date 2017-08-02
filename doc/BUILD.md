@@ -1,6 +1,6 @@
 # Build instructions
 
-In this document you find basic information about how to build the ``kryptos`` (a.k.a. libkryptos) besides advanced
+In this document you find basic information about how to build ``kryptos`` (a.k.a. libkryptos) besides advanced
 build commands destinated for contributors.
 
 ## Cloning the kryptos repository
@@ -46,7 +46,7 @@ If you want to contribute, thank you! Maybe the following informations can be us
 
 Run the standard build tons of time can become pretty boring, because it is a kind of slow. When we are developing
 sometimes we need to get a faster feedback. The slowest thing in the kryptos build is the compilation of the HMAC tests.
-It can be explained due to the C macros expansions. However, there is a way of skipping the HMAC tests since the
+It is because the C macros expansions. However, there is a way of skipping the HMAC tests since the
 compile-time and this can be done by calling ``Hefesto`` as follows:
 
 ```
@@ -76,9 +76,9 @@ Sherlock@221B:~/src/kryptos/src# hefesto --quick-dh-tests
 
 ### Stressing the tests in order to see if you have introduced some undefined behavior
 
-Sometimes little bad bugs can corrupt some data but instead of directly break with something it can indirectly
-break a thing that you did not change anything. A good way of detecting this kind of behavior is executing
-the build as follows:
+Sometimes little bad bugs can corrupt some data but instead of directly break something it can indirectly
+introduce a bug into a place where you did not change anything. A good way of detecting this kind of
+behavior is executing the build as follows:
 
 ```
 Sherlock@221B:~/src/kryptos/src# hefesto --stress-tests --runnings-nr=100
