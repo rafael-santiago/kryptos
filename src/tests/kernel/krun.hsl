@@ -1,0 +1,41 @@
+#
+#                                Copyright (C) 2017 by Rafael Santiago
+#
+# This is a free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+#
+
+function krun(modpath type string) : result type int {
+    var exit_code type int;
+
+    $exit_code = install_kernel_module($modpath);
+
+    if ($exit_code == 0) {
+        # INFO(Rafael): If all is ok the test module was inserted into kernel and now is time to remove it.
+        #               If something really wrong have occurred do not mind we will never arrive here, in most of cases....
+        if (remove_kernel_module($modpath) != 0) {
+            hefesto.sys.echo("WARN: error during the test module unloading... you need to restart the system.\n");
+        }
+    }
+
+    result $exit_code;
+}
+
+local function install_kernel_module(modpath type string) : result type int {
+    if (hefesto.sys.os_name() == "freebsd") {
+        result hefesto.sys.run("kldload ./" + $modpath);
+    } else if (hefesto.sys.os_name() == "linux") {
+        result hefesto.sys.run("insmod ./" + $modpath);
+    }
+    result 1;
+}
+
+local function remove_kernel_module(modpath type string) : result type int {
+    if (hefesto.sys.os_name() == "freebsd") {
+        result hefesto.sys.run("kldunload " + $modpath);
+    } else if (hefesto.sys.os_name() == "linux") {
+        result hefesto.sys.run("rmmod " + $modpath);
+    }
+    result 1;
+}
