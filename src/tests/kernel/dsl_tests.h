@@ -8,6 +8,8 @@
 #ifndef KRYPTOS_KRYPTOS_TESTS_KERNEL_DSL_TESTS_H
 #define KRYPTOS_KRYPTOS_TESTS_KERNEL_DSL_TESTS_H 1
 
-int kryptos_dsl_tests(void);
+#include <kutest.h>
+
+KUTE_DECLARE_TEST_CASE(kryptos_dsl_tests);
 
 #endif

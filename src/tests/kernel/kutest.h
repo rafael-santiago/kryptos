@@ -54,4 +54,11 @@
 
 #define KUTE_ASSERT(chk) KUTE_ASSERT_CHECK(#chk, chk)
 
+#define KUTE_TEST_CASE(test) int test(void) {
+
+#define KUTE_TEST_CASE_END      return 0;\
+                           }
+
+#define KUTE_DECLARE_TEST_CASE(test) int test(void)
+
 #endif

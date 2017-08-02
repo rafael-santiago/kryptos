@@ -8,22 +8,24 @@
 #ifndef KRYPTOS_KRYPTOS_TESTS_KERNEL_GENERIC_TESTS_H
 #define KRYPTOS_KRYPTOS_TESTS_KERNEL_GENERIC_TESTS_H 1
 
-int kryptos_padding_tests(void);
+#include <kutest.h>
 
-int kryptos_get_random_block_tests(void);
+KUTE_DECLARE_TEST_CASE(kryptos_padding_tests);
 
-int kryptos_block_parser_tests(void);
+KUTE_DECLARE_TEST_CASE(kryptos_get_random_block_tests);
 
-int kryptos_endianess_utils_tests(void);
+KUTE_DECLARE_TEST_CASE(kryptos_block_parser_tests);
 
-int kryptos_apply_iv_tests(void);
+KUTE_DECLARE_TEST_CASE(kryptos_endianess_utils_tests);
 
-int kryptos_iv_data_flush_tests(void);
+KUTE_DECLARE_TEST_CASE(kryptos_apply_iv_tests);
 
-int kryptos_task_check_tests(void);
+KUTE_DECLARE_TEST_CASE(kryptos_iv_data_flush_tests);
 
-int kryptos_hex_tests(void);
+KUTE_DECLARE_TEST_CASE(kryptos_task_check_tests);
 
-int kryptos_hash_common_tests(void);
+KUTE_DECLARE_TEST_CASE(kryptos_hex_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_hash_common_tests);
 
 #endif

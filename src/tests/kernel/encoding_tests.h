@@ -8,16 +8,18 @@
 #ifndef KRYPTOS_KRYPTOS_TESTS_KERNEL_ENCODING_TESTS_H
 #define KRYPTOS_KRYPTOS_TESTS_KERNEL_ENCODING_TESTS_H 1
 
-int kryptos_base64_tests(void);
+#include <kutest.h>
 
-int kryptos_uuencode_tests(void);
+KUTE_DECLARE_TEST_CASE(kryptos_base64_tests);
 
-int kryptos_huffman_tests(void);
+KUTE_DECLARE_TEST_CASE(kryptos_uuencode_tests);
 
-int kryptos_pem_get_data_tests(void);
+KUTE_DECLARE_TEST_CASE(kryptos_huffman_tests);
 
-int kryptos_pem_put_data_tests(void);
+KUTE_DECLARE_TEST_CASE(kryptos_pem_get_data_tests);
 
-int kryptos_pem_get_mp_data_tests(void);
+KUTE_DECLARE_TEST_CASE(kryptos_pem_put_data_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_pem_get_mp_data_tests);
 
 #endif

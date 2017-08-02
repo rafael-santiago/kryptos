@@ -6,7 +6,7 @@
  *
  */
 #include <encoding_tests.h>
-#include <kutest.h>
+#include <kryptos_types.h>
 #include <kryptos_base64.h>
 #include <kryptos_uuencode.h>
 #include <kryptos_huffman.h>
@@ -14,7 +14,7 @@
 #include <kryptos.h>
 #include <kstring.h>
 
-int kryptos_base64_tests(void) {
+KUTE_TEST_CASE(kryptos_base64_tests)
     kryptos_task_ctx t, *ktask = &t;
 
     struct base64_test {
@@ -55,10 +55,9 @@ int kryptos_base64_tests(void) {
         KUTE_ASSERT(memcmp(t.out, test_vector[tv].in, t.out_size) == 0);
         kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
     }
-    return 0;
-}
+KUTE_TEST_CASE_END
 
-int kryptos_uuencode_tests(void) {
+KUTE_TEST_CASE(kryptos_uuencode_tests)
     kryptos_task_ctx t, *ktask = &t;
 
     struct uuencode_test {
@@ -98,10 +97,9 @@ int kryptos_uuencode_tests(void) {
 
         kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
     }
-    return 0;
-}
+KUTE_TEST_CASE_END
 
-int kryptos_huffman_tests(void) {
+KUTE_TEST_CASE(kryptos_huffman_tests)
     kryptos_u8_t *test_vector[] = {
         "AAAAAAAAAABBBBBCCDEEEEEFFFGGGGZZZZYYXXXXXXXX",
 
@@ -127,10 +125,9 @@ int kryptos_huffman_tests(void) {
         kryptos_freeseg(deflated_buffer);
         kryptos_freeseg(inflated_buffer);
     }
-    return 0;
-}
+KUTE_TEST_CASE_END
 
-int kryptos_pem_get_data_tests(void) {
+KUTE_TEST_CASE(kryptos_pem_get_data_tests)
     kryptos_u8_t *buf = "-----BEGIN FOOBAR (1)-----\n"
                         "Rm9vYmFyMQ==\n"
                         "-----END FOOBAR (1)-----\n"
@@ -160,11 +157,9 @@ int kryptos_pem_get_data_tests(void) {
     KUTE_ASSERT(kstrcmp(data, "Foobar1") == 0);
 
     kryptos_freeseg(data);
+KUTE_TEST_CASE_END
 
-    return 0;
-}
-
-int kryptos_pem_put_data_tests(void) {
+KUTE_TEST_CASE(kryptos_pem_put_data_tests)
     kryptos_u8_t *foobar1 = "Foobar1", *foobar0 = "Foobar0";
     kryptos_u8_t *pem_buf = NULL;
     size_t pem_buf_size = 0;
@@ -184,11 +179,9 @@ int kryptos_pem_put_data_tests(void) {
     KUTE_ASSERT(pem_buf_size == kstrlen(expected_buffer));
     KUTE_ASSERT(kstrcmp(pem_buf, expected_buffer) == 0);
     kryptos_freeseg(pem_buf);
+KUTE_TEST_CASE_END
 
-    return 0;
-}
-
-int kryptos_pem_get_mp_data_tests(void) {
+KUTE_TEST_CASE(kryptos_pem_get_mp_data_tests)
     kryptos_mp_value_t *mp = NULL;
     kryptos_mp_value_t *emp = NULL;
     kryptos_u8_t *pem_buf = NULL;
@@ -209,5 +202,4 @@ int kryptos_pem_get_mp_data_tests(void) {
     kryptos_freeseg(pem_buf);
     kryptos_del_mp_value(emp);
     kryptos_del_mp_value(mp);
-    return 0;
-}
+KUTE_TEST_CASE_END

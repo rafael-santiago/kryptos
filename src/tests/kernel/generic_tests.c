@@ -6,7 +6,6 @@
  *
  */
 #include <generic_tests.h>
-#include <kutest.h>
 #include <kryptos_padding.h>
 #include <kryptos_memory.h>
 #include <kryptos_random.h>
@@ -18,7 +17,7 @@
 #include <kryptos_hash_common.h>
 #include <kstring.h>
 
-int kryptos_padding_tests(void) {
+KUTE_TEST_CASE(kryptos_padding_tests)
     struct padding_tests_ctx {
         const kryptos_u8_t *buffer;
         size_t buffer_size;
@@ -64,10 +63,9 @@ int kryptos_padding_tests(void) {
 
         t++;
     }
-    return 0;
-}
+KUTE_TEST_CASE_END
 
-int kryptos_get_random_block_tests(void) {
+KUTE_TEST_CASE(kryptos_get_random_block_tests)
     void *block = NULL;
     size_t b = 0;
 
@@ -78,10 +76,9 @@ int kryptos_get_random_block_tests(void) {
         KUTE_ASSERT(block != NULL);
         kryptos_freeseg(block);
     }
-    return 0;
-}
+KUTE_TEST_CASE_END
 
-int kryptos_block_parser_tests(void) {
+KUTE_TEST_CASE(kryptos_block_parser_tests)
     kryptos_u8_t *in = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f", *in_p;
     kryptos_u8_t *in_end = NULL;
     kryptos_u8_t *out = NULL;
@@ -168,11 +165,9 @@ int kryptos_block_parser_tests(void) {
     KUTE_ASSERT(kryptos_block_parser(out, 8, in_p, in_end, &in_p) == NULL);
 
     kryptos_freeseg(out);
+KUTE_TEST_CASE_END
 
-    return 0;
-}
-
-int kryptos_endianess_utils_tests(void) {
+KUTE_TEST_CASE(kryptos_endianess_utils_tests)
     kryptos_u8_t *data = NULL;
     kryptos_u32_t deadbeef = 0;
     kryptos_u16_t beef = 0;
@@ -211,10 +206,9 @@ int kryptos_endianess_utils_tests(void) {
     KUTE_ASSERT(      *data == 0xde && *(data + 1) == 0xad && *(data + 2) == 0xbe && *(data + 3) == 0xef &&
                 *(data + 4) == 0xde && *(data + 5) == 0xad && *(data + 6) == 0xbe && *(data + 7) == 0xef);
     kryptos_freeseg(data);
-    return 0;
-}
+KUTE_TEST_CASE_END
 
-int kryptos_apply_iv_tests(void) {
+KUTE_TEST_CASE(kryptos_apply_iv_tests)
     kryptos_u8_t *iv = NULL;
     kryptos_u8_t *block = NULL;
     size_t s = 27;
@@ -229,10 +223,9 @@ int kryptos_apply_iv_tests(void) {
     KUTE_ASSERT(memcmp(block, "thedroidsthatuarelookingfor", 27) == 0);
     kryptos_freeseg(iv);
     kryptos_freeseg(block);
-    return 0;
-}
+KUTE_TEST_CASE_END
 
-int kryptos_iv_data_flush_tests(void) {
+KUTE_TEST_CASE(kryptos_iv_data_flush_tests)
     kryptos_u8_t *y = "hellyeah!";
     kryptos_u8_t *iv = kryptos_newseg(9);
     size_t s = 9;
@@ -240,10 +233,9 @@ int kryptos_iv_data_flush_tests(void) {
     kryptos_iv_data_flush(iv, y, s);
     KUTE_ASSERT(memcmp(iv, "hellyeah!", s) == 0);
     kryptos_freeseg(iv);
-    return 0;
-}
+KUTE_TEST_CASE_END
 
-int kryptos_task_check_tests(void) {
+KUTE_TEST_CASE(kryptos_task_check_tests)
     kryptos_u8_t *key = "blah";
     kryptos_u8_t *in = "bleh";
     kryptos_u8_t *iv = "bluh";
@@ -383,10 +375,9 @@ int kryptos_task_check_tests(void) {
     t.key_size = strlen(k_priv);
     KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
     KUTE_ASSERT(t.result == kKryptosSuccess);
-    return 0;
-}
+KUTE_TEST_CASE_END
 
-int kryptos_hex_tests(void) {
+KUTE_TEST_CASE(kryptos_hex_tests)
     struct test_ctx {
         kryptos_u32_t u32;
         kryptos_u8_t *u32_expected;
@@ -542,10 +533,9 @@ int kryptos_hex_tests(void) {
         kryptos_u64_to_hex(buf, sizeof(buf), tv[t].u64);
         KUTE_ASSERT(kstrcmp(buf, tv[t].u64_expected) == 0);
     }
-    return 0;
-}
+KUTE_TEST_CASE_END
 
-int kryptos_hash_common_tests(void) {
+KUTE_TEST_CASE(kryptos_hash_common_tests)
     size_t index_decision_table32[] = {
          0,  0,  0,  0,
          1,  1,  1,  1,
@@ -702,5 +692,4 @@ int kryptos_hash_common_tests(void) {
                                         curr_len, total_len,
                                         &paddin2times, 120);
     KUTE_ASSERT(paddin2times == 1);
-    return 0;
-}
+KUTE_TEST_CASE_END

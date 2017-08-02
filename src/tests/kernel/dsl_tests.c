@@ -6,11 +6,10 @@
  *
  */
 #include <dsl_tests.h>
-#include <kutest.h>
 #include <kryptos.h>
 #include <kstring.h>
 
-int kryptos_dsl_tests(void) {
+KUTE_TEST_CASE(kryptos_dsl_tests)
     // WARN(Rafael): The correctness of each available cipher must not be tested here. It
     //               should be done within a dedicated test case. Here only the mechanics about
     //               using these ciphers indirectly is tested (when C99 support is present).
@@ -673,5 +672,4 @@ int kryptos_dsl_tests(void) {
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 #endif
-    return 0;
-}
+KUTE_TEST_CASE_END
