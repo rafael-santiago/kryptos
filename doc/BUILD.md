@@ -38,6 +38,15 @@ libkryptos.a
 
 All done!
 
+### Building the kernel mode version
+
+``Kryptos`` has some parts designed to be used in kernel mode. Until now it supports ``FreeBSD``. However, there is no "kernel mode" build.
+The library was written taking in consideration that the users will compile ``kryptos`` together with their own stuff (as monolithic project).
+The only thing that should be done is define the macro ``KRYPTOS_KERNEL_MODE`` and ``kryptos`` will "become" a kernel mode stuff.
+
+You should use some features with care. Personally I find that execute some features in kernel mode is overkill. You should do only the
+most "straightforward" cryptographic stuff in kernel but you are free... But take my point in consideration, okay? ;)
+
 ## Advanced build commands for contributors
 
 If you want to contribute, thank you! Maybe the following informations can be useful to you.
@@ -122,6 +131,16 @@ The default build options are defined into the file ``src/tests/.ivk``. The **Ta
 | ``--libraries=../../lib,cutest/src/lib`` | Defines paths of additional libraries.                                       |
 | ``--ldflags=-lkryptos,-lcutest``         | Defines the default linker flags.                                            |
 | ``--includes=../,cutest/src``            | Defines paths of additional include directories.                             |
+| ``--kernel-mode-tests``                  | Requests the kernel mode tests execution                                     |
+
+### How the kernel mode tests are executed
+
+The kernel mode tests are almost the same of the user mode tests. However, the correctness of the ciphers are not verified since
+it was already done in user mode. The execution is pretty straightforward a loadable kernel module is generated and inserted into
+the kernel. If it was successfully loaded it means that all is ok, otherwise some issues were found.
+
+Beware: A ``LKM`` is inserted into the kernel. Thus, invalid memory accesses, double frees will result in kernel panics. If you
+have made changes and you are not so sure about them, backup your work before continuing and happy kernel hacking! ;)
 
 ## Are you searching for some build information not detailed here?
 

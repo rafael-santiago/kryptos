@@ -62,6 +62,13 @@ kryptos-tests.epilogue() {
         if ($stress_tests.count() == 0) {
             $exit_code = hefesto.sys.run(hefesto.sys.make_path("bin", "kryptos-tests --cutest-leak-check " +
                                                                        hefesto.project.cmdline()));
+
+            var kernel_mode_tests type list;
+            $kernel_mode_tests = hefesto.sys.get_option("kernel-mode-tests");
+            if ($kernel_mode_tests.count() > 0) {
+                $exit_code = forge_kernel_mode_tests();
+            }
+
             if ($exit_code != 0) {
                 hefesto.sys.echo("~~~ TESTS FAILURE.\n");
                 hefesto.project.abort($exit_code);
@@ -127,7 +134,8 @@ local function forge_cutest() : result type none {
     $oldcwd = hefesto.sys.pwd();
 
     if (hefesto.sys.cd("cutest/src")) {
-        hefesto.sys.forge("cutest", "Forgefile.hsl", "--forgefiles=Forgefile.hsl --Forgefile-projects=cutest --obj-output-dir=obj --bin-output-dir=lib");
+        hefesto.sys.forge("cutest",
+                          "Forgefile.hsl", "--forgefiles=Forgefile.hsl --Forgefile-projects=cutest --obj-output-dir=obj --bin-output-dir=lib");
         if (hefesto.sys.last_forge_result() != 0) {
             hefesto.sys.echo("~~~ UNABLE TO BUILD LIBCUTEST.\n");
             hefesto.project.abort(1);
@@ -137,4 +145,20 @@ local function forge_cutest() : result type none {
         hefesto.sys.echo("~~~ UNABLE TO BUILD LIBCUTEST.\n");
         hefesto.project.abort(1);
     }
+}
+
+local function forge_kernel_mode_tests() : result type int {
+    var oldcwd type string;
+    var exit_code type int;
+
+    $oldcwd = hefesto.sys.pwd();
+    $exit_code = 1;
+
+    if (hefesto.sys.cd("kernel")) {
+        $exit_code = hefesto.sys.forge("kryptos-test-mod",
+                                       "Forgefile.hsl", "--forgefiles=Forgefile.hsl --Forgefile-projects=kryptos-test-mod");
+        hefesto.sys.cd($oldcwd);
+    }
+
+    result $exit_code;
 }

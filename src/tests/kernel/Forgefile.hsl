@@ -11,12 +11,12 @@ include on linux ~/toolsets/linux/linux-module.hsl
 include mkclean.hsl
 include krun.hsl
 
-var includes type list;
-var cflags type list;
-var libraries type list;
-var ldflags type list;
+local var includes type list;
+local var cflags type list;
+local var libraries type list;
+local var ldflags type list;
 
-var LKMTOOL type string;
+local var LKMTOOL type string;
 
 project kryptos-test-mod : toolset $LKMTOOL : "main.c", $includes, $cflags, $libraries, $ldflags, "kryptos_test";
 
