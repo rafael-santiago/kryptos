@@ -6,10 +6,6 @@
  *
  */
 #include <hash_tests.h>
-#include <kryptos_types.h>
-#include <kryptos_sha1.h>
-#include <kryptos_sha224_256.h>
-#include <kryptos_sha384_512.h>
 #include <kryptos.h>
 
 KUTE_TEST_CASE(kryptos_hash_tests)
@@ -85,7 +81,53 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
+    // INFO(Rafael): MD4.
+
+    KUTE_ASSERT(kryptos_md4_hash_input_size() == 64);
+    KUTE_ASSERT(kryptos_md4_hash_size() == 16);
+    kryptos_md4_hash(&ktask, 0);
+    KUTE_ASSERT(t.out != NULL);
+    KUTE_ASSERT(t.out_size == kryptos_md4_hash_size());
+    raw_hash = "\xA4\x48\x01\x7A\xAF\x21\xD8\x52\x5F\xC1\x0A\xE8\x7A\xA6\x72\x9D";
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): MD5.
+
+    KUTE_ASSERT(kryptos_md5_hash_input_size() == 64);
+    KUTE_ASSERT(kryptos_md5_hash_size() == 16);
+    kryptos_md5_hash(&ktask, 0);
+    KUTE_ASSERT(t.out != NULL);
+    KUTE_ASSERT(t.out_size == kryptos_md5_hash_size());
+    raw_hash = "\x90\x01\x50\x98\x3C\xD2\x4F\xB0\xD6\x96\x3F\x7D\x28\xE1\x7F\x72";
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): RIPEMD-128.
+
+    KUTE_ASSERT(kryptos_ripemd128_hash_input_size() == 64);
+    KUTE_ASSERT(kryptos_ripemd128_hash_size() == 16);
+    kryptos_ripemd128_hash(&ktask, 0);
+    KUTE_ASSERT(t.out != NULL);
+    KUTE_ASSERT(t.out_size == kryptos_ripemd128_hash_size());
+    raw_hash = "\xC1\x4A\x12\x19\x9C\x66\xE4\xBA\x84\x63\x6B\x0F\x69\x14\x4C\x77";
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): RIPEMD-160.
+
+    KUTE_ASSERT(kryptos_ripemd160_hash_input_size() == 64);
+    KUTE_ASSERT(kryptos_ripemd160_hash_size() == 20);
+    kryptos_ripemd160_hash(&ktask, 0);
+    KUTE_ASSERT(t.out != NULL);
+    KUTE_ASSERT(t.out_size == kryptos_ripemd160_hash_size());
+    raw_hash = "\x8E\xB2\x08\xF7\xE0\x5D\x98\x7A\x9B\x04\x4A\x8E\x98\xC6\xB0\x87\xF1\x5A\x0B\xFC";
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
 KUTE_TEST_CASE_END
+
+// TODO(Rafael): Oh! no!!! Zzzz... :-D
 
 /*
 KUTE_TEST_CASE(kryptos_hmac_tests)
