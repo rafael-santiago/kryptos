@@ -33,5 +33,7 @@ int ktest_monkey(void) {
 
     KUTE_RUN_TEST(kryptos_pem_get_mp_data_tests);
 
+    KUTE_RUN_TEST(kryptos_hash_tests);
+
     return 0;
 }
