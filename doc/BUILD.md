@@ -131,7 +131,7 @@ The default build options are defined into the file ``src/tests/.ivk``. The **Ta
 | ``--libraries=../../lib,cutest/src/lib`` | Defines paths of additional libraries.                                       |
 | ``--ldflags=-lkryptos,-lcutest``         | Defines the default linker flags.                                            |
 | ``--includes=../,cutest/src``            | Defines paths of additional include directories.                             |
-| ``--kernel-mode-tests``                  | Requests the kernel mode tests execution                                     |
+| ``--kernel-mode-tests``                  | Requests the kernel mode tests execution.                                    |
 
 ### How the kernel mode tests are executed
 
