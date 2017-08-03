@@ -315,6 +315,18 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, ripemd128, key, key_size, kKryptosECB, &rc2_T1);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, ripemd160, key, key_size, kKryptosECB, &rc2_T1);
 
+    // INFO(Rafael): RC2/CBC.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, sha1, key, key_size, kKryptosCBC, &rc2_T1);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, sha224, key, key_size, kKryptosCBC, &rc2_T1);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, sha256, key, key_size, kKryptosCBC, &rc2_T1);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, sha384, key, key_size, kKryptosCBC, &rc2_T1);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, sha512, key, key_size, kKryptosCBC, &rc2_T1);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, md4, key, key_size, kKryptosCBC, &rc2_T1);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, md5, key, key_size, kKryptosCBC, &rc2_T1);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, ripemd128, key, key_size, kKryptosCBC, &rc2_T1);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, ripemd160, key, key_size, kKryptosCBC, &rc2_T1);
+
 #undef kryptos_run_hmac_tests
 
 #else
