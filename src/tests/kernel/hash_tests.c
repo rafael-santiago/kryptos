@@ -435,6 +435,18 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, cast5, ripemd128, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, cast5, ripemd160, key, key_size, kKryptosCBC);
 
+    // INFO(Rafael): SAFER-K64/ECB.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, sha1, key, key_size, kKryptosECB, &saferk64_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, sha224, key, key_size, kKryptosECB, &saferk64_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, sha256, key, key_size, kKryptosECB, &saferk64_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, sha384, key, key_size, kKryptosECB, &saferk64_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, sha512, key, key_size, kKryptosECB, &saferk64_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, md4, key, key_size, kKryptosECB, &saferk64_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, md5, key, key_size, kKryptosECB, &saferk64_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, ripemd128, key, key_size, kKryptosECB, &saferk64_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, ripemd160, key, key_size, kKryptosECB, &saferk64_rounds);
+
 
 #undef kryptos_run_hmac_tests
 
