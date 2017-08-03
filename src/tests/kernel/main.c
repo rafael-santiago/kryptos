@@ -44,6 +44,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_pem_get_mp_data_tests);
 
     KUTE_RUN_TEST(kryptos_hash_tests);
+    KUTE_RUN_TEST(kryptos_hmac_tests);
 KUTE_TEST_CASE_END
 
 KUTE_MAIN(ktest_monkey);

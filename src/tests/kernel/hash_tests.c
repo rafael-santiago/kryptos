@@ -139,12 +139,13 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
 #if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)
 
 #define kryptos_run_hmac_tests(t, plaintext, plaintext_size, cname, hname, cipher_args...) {\
-    kryptos_task_set_in(&t, plaintext, plaintext_size);\
     kryptos_task_init_as_null(&t);\
+    kryptos_task_set_in(&t, plaintext, plaintext_size);\
     kryptos_task_set_encrypt_action(&t);\
     kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
     KUTE_ASSERT(t.in != NULL);\
     KUTE_ASSERT(t.out != NULL);\
+    kryptos_task_set_in(&t, t.out, t.out_size);\
     kryptos_task_set_decrypt_action(&t);\
     kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
     KUTE_ASSERT(t.in != NULL);\
