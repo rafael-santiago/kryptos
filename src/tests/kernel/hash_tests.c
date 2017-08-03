@@ -575,6 +575,40 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des, ripemd160, key, key_size, kKryptosCBC,
                            triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
+    // INFO(Rafael): TRIPLE-DES-EDE/ECB.
+
+    triple_des_key2 = "riverintheroad";
+    triple_des_key2_size = 14;
+    triple_des_key3 = "thewayyouusedtodo";
+    triple_des_key3_size = 17;
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des_ede, sha1, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des_ede, sha224, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des_ede, sha256, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des_ede, sha384, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des_ede, sha512, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des_ede, md4, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des_ede, md5, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des_ede, ripemd128, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des_ede, ripemd160, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
 #undef kryptos_run_hmac_tests
 
 #else
