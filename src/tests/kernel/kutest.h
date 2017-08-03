@@ -61,4 +61,34 @@
 
 #define KUTE_DECLARE_TEST_CASE(test) int test(void)
 
+#if defined(__FreeBSD__)
+
+#define KUTE_MAIN(test)\
+static int modld(struct module *module, int cmd, void *arg) {\
+    int exit_code = 0;\
+    switch (cmd) {\
+        case MOD_LOAD:\
+            uprintf("*** kryptos test module loaded...\n");\
+            exit_code = test();\
+            break;\
+        case MOD_UNLOAD:\
+            uprintf("*** kryptos test module unloaded\n");\
+            break;\
+        default:\
+            exit_code = EOPNOTSUPP;\
+            break;\
+    }\
+    return exit_code;\
+}\
+static moduledata_t test ## _mod = {\
+    #test,\
+    modld,\
+    NULL\
+};\
+DECLARE_MODULE(test, test ## _mod, SI_SUB_DRIVERS, SI_ORDER_MIDDLE);
+
+#else
+
+#endif
+
 #endif

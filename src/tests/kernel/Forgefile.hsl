@@ -31,7 +31,6 @@ kryptos-test-mod.preloading() {
 kryptos-test-mod.prologue() {
     $includes.add_item("../../");
     $includes.add_item(hefesto.sys.pwd());
-    $includes.add_item(hefesto.sys.make_path(hefesto.sys.pwd(), hefesto.sys.os_name()));
 
     var option type list;
     $option = hefesto.sys.get_option("clean");
