@@ -210,7 +210,14 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
     // INFO(Rafael): DES/ECB.
 
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, sha1, key, key_size, kKryptosECB);
-
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, sha224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, sha256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, sha384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, sha512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, md4, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, md5, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, ripemd128, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, ripemd160, key, key_size, kKryptosECB);
 
 #undef kryptos_run_hmac_tests
 
