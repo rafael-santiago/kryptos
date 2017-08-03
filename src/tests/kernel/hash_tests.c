@@ -327,6 +327,21 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, ripemd128, key, key_size, kKryptosCBC, &rc2_T1);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, ripemd160, key, key_size, kKryptosCBC, &rc2_T1);
 
+    // INFO(Rafael): CAMELLIA-128/ECB.
+
+    camellia_size = kKryptosCAMELLIA128;
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha1, key, key_size, kKryptosECB, &camellia_size);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha224, key, key_size, kKryptosECB, &camellia_size);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha256, key, key_size, kKryptosECB, &camellia_size);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha384, key, key_size, kKryptosECB, &camellia_size);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha512, key, key_size, kKryptosECB, &camellia_size);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, md4, key, key_size, kKryptosECB, &camellia_size);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, md5, key, key_size, kKryptosECB, &camellia_size);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, ripemd128, key, key_size, kKryptosECB, &camellia_size);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, ripemd160, key, key_size, kKryptosECB, &camellia_size);
+
+
 #undef kryptos_run_hmac_tests
 
 #else
