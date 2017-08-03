@@ -156,7 +156,8 @@ local function forge_kernel_mode_tests() : result type int {
 
     if (hefesto.sys.cd("kernel")) {
         $exit_code = hefesto.sys.forge("kryptos-test-mod",
-                                       "Forgefile.hsl", "--forgefiles=Forgefile.hsl --Forgefile-projects=kryptos-test-mod");
+                                       "Forgefile.hsl", "--forgefiles=Forgefile.hsl --Forgefile-projects=kryptos-test-mod " +
+                                       hefesto.project.cmdline());
         hefesto.sys.cd($oldcwd);
     }
 

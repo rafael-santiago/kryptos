@@ -200,12 +200,11 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
     size_t plaintext_size = kstrlen(plaintext);
-    __unused int feal_rounds = 8, rc2_T1 = 64, saferk64_rounds = 6;
-    __unused kryptos_camellia_keysize_t camellia_size;
-    __unused size_t tv, tv_nr, data_size;
-    __unused kryptos_task_ctx t;
-    __unused kryptos_u8_t *triple_des_key2, *triple_des_key3;
-    __unused size_t triple_des_key2_size, triple_des_key3_size;
+    int feal_rounds = 8, rc2_T1 = 64, saferk64_rounds = 6;
+    kryptos_camellia_keysize_t camellia_size;
+    kryptos_task_ctx t;
+    kryptos_u8_t *triple_des_key2, *triple_des_key3;
+    size_t triple_des_key2_size, triple_des_key3_size;
 
     // INFO(Rafael): DES/ECB.
 

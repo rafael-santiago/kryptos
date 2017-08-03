@@ -41,6 +41,11 @@ kryptos-test-mod.prologue() {
         hefesto.project.abort(0);
     }
 
+    $option = hefesto.sys.get_option("no-hmac-tests");
+    if ($option.count() > 0) {
+        $cflags.add_item("-DKRYPTOS_NO_HMAC_TESTS=1");
+    }
+
     # INFO(Rafael): Only define KRYPTOS_KERNEL_MODE will guide the compiler across the build of the kryptos kernel mode version.
     #               Notice that no .ar file is generated. When adding the path "../.." to the includes list the object files from
     #               kryptos are automatically linked together.
