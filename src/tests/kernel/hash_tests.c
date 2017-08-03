@@ -279,6 +279,18 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, blowfish, ripemd128, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, blowfish, ripemd160, key, key_size, kKryptosCBC);
 
+    // INFO(Rafael): FEAL/ECB.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, sha1, key, key_size, kKryptosECB, &feal_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, sha224, key, key_size, kKryptosECB, &feal_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, sha256, key, key_size, kKryptosECB, &feal_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, sha384, key, key_size, kKryptosECB, &feal_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, sha512, key, key_size, kKryptosECB, &feal_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, md4, key, key_size, kKryptosECB, &feal_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, md5, key, key_size, kKryptosECB, &feal_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, ripemd128, key, key_size, kKryptosECB, &feal_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, ripemd160, key, key_size, kKryptosECB, &feal_rounds);
+
 #undef kryptos_run_hmac_tests
 
 #else
