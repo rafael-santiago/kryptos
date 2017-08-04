@@ -18,6 +18,8 @@
 #include <sys/malloc.h>
 #include <sys/libkern.h>
 
+static int g_kutest_ran_tests = 0;
+
 #define KUTE_ASSERT_CHECK(msg, chk) do {\
     if ((chk) == 0) {\
         uprintf("hmm bad, bad bug in %s at line %d: %s is false.\n", __FILE__, __LINE__, msg);\
@@ -27,6 +29,7 @@
 
 #define KUTE_RUN_TEST(test) do {\
     uprintf("-- running %s...\n", #test);\
+    g_kutest_ran_tests++;\
     if (test() != 0) {\
         return 1;\
     }\
@@ -69,7 +72,11 @@ static int modld(struct module *module, int cmd, void *arg) {\
     switch (cmd) {\
         case MOD_LOAD:\
             uprintf("*** kryptos test module loaded...\n");\
-            exit_code = test();\
+            if ((exit_code = test()) == 0) {\
+                uprintf("*** all tests passed. [%d test(s) ran]\n", g_kutest_ran_tests);\
+            } else {\
+                uprintf("fail: [%d test(s) ran]\n", g_kutest_ran_tests);\
+            }\
             break;\
         case MOD_UNLOAD:\
             uprintf("*** kryptos test module unloaded\n");\
