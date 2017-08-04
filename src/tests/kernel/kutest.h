@@ -47,6 +47,7 @@ static int g_kutest_ran_tests = 0;
 
 #define KUTE_RUN_TEST(test) do {\
     printk(KERN_WARNING "-- running " #test "...\n");\
+    g_kutest_ran_tests++;\
     if (test() != 0) {\
         return 1;\
     }\

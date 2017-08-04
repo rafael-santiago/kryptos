@@ -1300,12 +1300,24 @@ void kryptos_print_mp(const kryptos_mp_value_t *v) {
     if (v == NULL) {
         return;
     }
-#ifndef KRYPTOS_MP_U32_DIGIT
+#if !defined(KRYPTOS_KERNEL_MODE)
+# ifndef KRYPTOS_MP_U32_DIGIT
     for (d = v->data_size - 1; d >= 0; d--) printf("%.2X", v->data[d]);
-#else
+# else
     for (d = v->data_size - 1; d >= 0; d--) printf("%.8X", v->data[d]);
-#endif
+# endif
     printf("\n");
+#else
+# if defined(__FreeBSD__)
+#  ifndef KRYPTOS_MP_U32_DIGIT
+    for (d = v->data_size - 1; d >= 0; d--) uprintf("%.2X", v->data[d]);
+#  else
+    for (d = v->data_size - 1; d >= 0; d--) uprintf("%.8X", v->data[d]);
+#  endif
+    uprintf("\n");
+# elif defined(__linux__)
+# endif
+#endif
 }
 
 /*static ssize_t kryptos_mp_max_used_byte(const kryptos_mp_value_t *x) {
