@@ -19,6 +19,7 @@
 #include <dsl_tests.h>
 #include <encoding_tests.h>
 #include <hash_tests.h>
+#include <mp_tests.h>
 
 KUTE_DECLARE_TEST_CASE(ktest_monkey);
 
@@ -41,10 +42,13 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_pem_get_data_tests);
     KUTE_RUN_TEST(kryptos_pem_put_data_tests);
 
-    KUTE_RUN_TEST(kryptos_pem_get_mp_data_tests);
-
     KUTE_RUN_TEST(kryptos_hash_tests);
     KUTE_RUN_TEST(kryptos_hmac_tests);
+
+    KUTE_RUN_TEST(kryptos_mp_new_value_tests);
+
+
+    KUTE_RUN_TEST(kryptos_pem_get_mp_data_tests);
 KUTE_TEST_CASE_END
 
 KUTE_MAIN(ktest_monkey);
