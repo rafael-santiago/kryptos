@@ -11,8 +11,10 @@
 #include <kryptos_random.h>
 #include <kstring.h>
 
+// WARN(Rafael): Almost all stuff tested here probably will not executed in kernel mode (or at least should not). But if everything
+//               is okay nothing can explode. In this case let's test...
+
 KUTE_TEST_CASE(kryptos_mp_new_value_tests)
-    // INFO(Rafael): This test also includes kryptos_del_mp_value(). Assuming the leak-check system is enabled, of course.
     kryptos_mp_value_t *mp;
     size_t d;
     mp = kryptos_new_mp_value(1024);
@@ -23,7 +25,6 @@ KUTE_TEST_CASE(kryptos_mp_new_value_tests)
         KUTE_ASSERT(mp->data[d] == 0);
     }
     kryptos_del_mp_value(mp);
-    // INFO(Rafael): If something is still wrong the leak system should complain.
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_hex_value_as_mp_tests)
