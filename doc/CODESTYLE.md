@@ -1,4 +1,4 @@
-# Code style guides
+# Code style guide
 
 This is a not exhaustive description of the code style that I have been using for this project. If you are intending to contribute, please,
 read this document first. I personally like some points present in [pike's style](https://doc.cat-v.org/bell_labs/pikestyle).
