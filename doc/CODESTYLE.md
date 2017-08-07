@@ -1,6 +1,6 @@
 # Code style guide
 
-This is a not exhaustive description of the code style that I have been using for this project. If you are intending to contribute, please,
+This is a not exhaustive description of the code style that I have been using for this project. Anyway, if you are intending to contribute, please,
 read this document first. I personally like some points present in [pike's style](https://doc.cat-v.org/bell_labs/pikestyle).
 
 This is not an absolute truth (a.k.a. unicorn) but this is the truth that I have been adopting.
