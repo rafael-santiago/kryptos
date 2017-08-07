@@ -144,7 +144,7 @@ This isn't:
 
 ### Gotos
 
-Well, well, well, polemic is loaded... I use goto stuff is used here. But it is used with care. The main usage of goto is for cleaning up issues. The
+Well, well, well, polemic is loaded... Some goto stuff is used here. But it is used with care. The main usage of goto is for cleaning up issues. The
 rule of thumb here is never perform a goto that goes backward, the goto always need to jump forward.
 
 If you have got reasons for a spaghetti code let's discuss the idea before.
