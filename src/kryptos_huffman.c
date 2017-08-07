@@ -71,7 +71,7 @@ static void kryptos_huffman_scan_codes(struct kryptos_huffman_code_ctx *hcodes,
                                        const size_t path_index,
                                        const size_t path_buff_size, struct kryptos_huffman_tree_ctx *branch);
 
-static size_t kryptos_huffman_eval_deflated_out_size(size_t raw_freq[256], struct kryptos_huffman_code_ctx *hcodes,
+static size_t kryptos_huffman_eval_deflated_out_size(size_t *raw_freq, struct kryptos_huffman_code_ctx *hcodes,
                                                      const kryptos_u8_t *in, const size_t in_size);
 
 static kryptos_u8_t *kryptos_huffman_dump_tree(kryptos_u8_t *out, const kryptos_u8_t *out_end,

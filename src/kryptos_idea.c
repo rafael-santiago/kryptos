@@ -27,11 +27,11 @@ struct kryptos_idea_subkeys {
 
 typedef void (*kryptos_idea_block_processor)(kryptos_u8_t *block, const struct kryptos_idea_subkeys *sks);
 
-static void kryptos_idea_128bit_roll(kryptos_u32_t x[4], int degree);
+static void kryptos_idea_128bit_roll(kryptos_u32_t *x, int degree);
 
 static void kryptos_idea_key_expander(const kryptos_u8_t *key, const size_t key_size, struct kryptos_idea_subkeys *sks);
 
-static void kryptos_idea_ld_user_key(kryptos_u32_t key[4], const kryptos_u8_t *user_key, const size_t user_key_size);
+static void kryptos_idea_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size);
 
 static void kryptos_idea_block_encrypt(kryptos_u8_t *block, const struct kryptos_idea_subkeys *sks);
 
@@ -57,7 +57,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(idea,
                                     outblock,
                                     idea_block_processor(outblock, &sks))
 
-static void kryptos_idea_128bit_roll(kryptos_u32_t x[4], int degree) {
+static void kryptos_idea_128bit_roll(kryptos_u32_t *x, int degree) {
     kryptos_u32_t xx[4];
 
     xx[0] = x[0] >> 31;
@@ -75,7 +75,7 @@ static void kryptos_idea_128bit_roll(kryptos_u32_t x[4], int degree) {
     }
 }
 
-static void kryptos_idea_ld_user_key(kryptos_u32_t key[4], const kryptos_u8_t *user_key, const size_t user_key_size) {
+static void kryptos_idea_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
     //  TIP(Rafael): Let's make a cipher implementation the most self-contained possible. So is easier to
     //               apply improvements here without screwing up the implementation of other ciphers that maybe
     //               we do not have any idea about.

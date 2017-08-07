@@ -44,7 +44,7 @@
 
 #define KRYPTOS_SHA256_HASH_SIZE 32
 
-static kryptos_u32_t kryptos_sha224_256_K[] = {
+static kryptos_u32_t kryptos_sha224_256_K[64] = {
     0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5,
     0x3956C25b, 0x59F111F1, 0x923F82A4, 0xAB1C5ED5,
     0xD807AA98, 0x12835B01, 0x243185BE, 0x550C7DC3,

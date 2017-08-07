@@ -73,7 +73,7 @@ struct kryptos_ripemd_ctx {
     int paddin2times;
 };
 
-static size_t kryptos_ripemd_block_index_decision_table[] = {
+static size_t kryptos_ripemd_block_index_decision_table[64] = {
      0,  0,  0,  0,
      1,  1,  1,  1,
      2,  2,  2,  2,

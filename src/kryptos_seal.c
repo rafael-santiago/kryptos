@@ -56,7 +56,7 @@ struct kryptos_seal_keystream_ctx {
     kryptos_seal_version_t version;
 };
 
-static void kryptos_seal_ga(kryptos_u32_t a[5], int i, kryptos_u32_t o[5]);
+static void kryptos_seal_ga(kryptos_u32_t *a, int i, kryptos_u32_t *o);
 
 static void kryptos_seal_ld_userkey(kryptos_u32_t *state, const size_t state_size,
                                     const kryptos_u8_t *key, const size_t key_size);
@@ -69,7 +69,7 @@ static void kryptos_seal_xor(const kryptos_u32_t *in,
                              const size_t key_size,
                              kryptos_u32_t *out);
 
-static void kryptos_seal_ga(kryptos_u32_t a[5], int i, kryptos_u32_t o[5]) {
+static void kryptos_seal_ga(kryptos_u32_t *a, int i, kryptos_u32_t *o) {
     kryptos_u32_t X[80], A, B, C, D, E, t;
     int w;
 

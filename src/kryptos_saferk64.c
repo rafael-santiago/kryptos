@@ -117,7 +117,7 @@ struct kryptos_saferk64_subkeys {
 
 typedef void (*kryptos_saferk64_block_processor)(kryptos_u8_t *block, const struct kryptos_saferk64_subkeys *sks);
 
-static void kryptos_saferk64_ld_user_key(kryptos_u32_t key[2], const kryptos_u8_t *user_key, const size_t user_key_size);
+static void kryptos_saferk64_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size);
 
 static void kryptos_saferk64_make_key(const kryptos_u8_t *key, const size_t key_size, struct kryptos_saferk64_subkeys *sks);
 
@@ -168,7 +168,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(saferk64,
                                     outblock,
                                     saferk64_block_processor(outblock, &sks))
 
-static void kryptos_saferk64_ld_user_key(kryptos_u32_t key[2], const kryptos_u8_t *user_key, const size_t user_key_size) {
+static void kryptos_saferk64_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
     size_t b, w;
 

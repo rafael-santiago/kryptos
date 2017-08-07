@@ -128,11 +128,11 @@ static kryptos_u8_t kryptos_aes_ltable[256] = {
 
 typedef void (*kryptos_aes_block_processor)(kryptos_u8_t *block, const struct kryptos_aes_subkeys *sks);
 
-static void kryptos_aes_sto_u32_into_byte_matrix(const kryptos_u32_t word[4], struct kryptos_128bit_u8_matrix *u8m);
+static void kryptos_aes_sto_u32_into_byte_matrix(const kryptos_u32_t *word, struct kryptos_128bit_u8_matrix *u8m);
 
 static kryptos_u8_t kryptos_aes_subbytes(const kryptos_u32_t value, const size_t byte, kryptos_u8_t sbox[16][16]);
 
-static void kryptos_aes_ld_user_key(kryptos_u32_t key[4], const kryptos_u8_t *user_key, const size_t user_key_size);
+static void kryptos_aes_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size);
 
 static void kryptos_aes_eval_skeys(const kryptos_u8_t *key, const size_t key_size, struct kryptos_aes_subkeys *sks);
 
@@ -162,7 +162,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes,
                                     outblock,
                                     aes_block_processor(outblock, &sks))
 
-static void kryptos_aes_sto_u32_into_byte_matrix(const kryptos_u32_t word[4], struct kryptos_128bit_u8_matrix *u8m) {
+static void kryptos_aes_sto_u32_into_byte_matrix(const kryptos_u32_t *word, struct kryptos_128bit_u8_matrix *u8m) {
     size_t i, j, k, c;
 
     for (i = 0, k = 0; i < 4; i++) {
@@ -183,7 +183,7 @@ static kryptos_u8_t kryptos_aes_subbytes(const kryptos_u32_t value, const size_t
     return eval;
 }
 
-static void kryptos_aes_ld_user_key(kryptos_u32_t key[4], const kryptos_u8_t *user_key, const size_t user_key_size) {
+static void kryptos_aes_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
     size_t w, b;
     kryptos_ld_user_key_prologue(key, 4, user_key, user_key_size, kp, kp_end, w, b, return);

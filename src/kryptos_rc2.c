@@ -85,7 +85,7 @@ struct kryptos_rc2_subkeys {
 
 typedef void (*kryptos_rc2_block_processor)(kryptos_u8_t *block, const struct kryptos_rc2_subkeys *sks);
 
-static void kryptos_rc2_ld_user_key(kryptos_u16_t key[64], const kryptos_u8_t *user_key, const size_t user_key_size);
+static void kryptos_rc2_ld_user_key(kryptos_u16_t *key, const kryptos_u8_t *user_key, const size_t user_key_size);
 
 static void kryptos_rc2_inflate_key(const kryptos_u8_t *key, const size_t key_size, struct kryptos_rc2_subkeys *sks);
 
@@ -139,7 +139,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(rc2,
                                     outblock,
                                     rc2_block_processor(outblock, &sks))
 
-static void kryptos_rc2_ld_user_key(kryptos_u16_t key[64], const kryptos_u8_t *user_key, const size_t user_key_size) {
+static void kryptos_rc2_ld_user_key(kryptos_u16_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
     size_t w, b;
 

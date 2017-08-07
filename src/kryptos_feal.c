@@ -34,7 +34,7 @@ static kryptos_u8_t kryptos_feal_Sd(kryptos_u8_t T, kryptos_u8_t U, int d);
 
 static kryptos_u32_t kryptos_feal_fK(kryptos_u32_t V, kryptos_u32_t W);
 
-static void kryptos_feal_ld_user_key(kryptos_u32_t key[2], const kryptos_u8_t *user_key, const size_t user_key_size);
+static void kryptos_feal_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size);
 
 static void kryptos_feal_expand_key(const kryptos_u8_t *key, const size_t key_size, struct kryptos_feal_subkeys *sks);
 
@@ -110,7 +110,7 @@ static kryptos_u32_t kryptos_feal_fK(kryptos_u32_t V, kryptos_u32_t W) {
     return ((kryptos_u32_t) U[0] << 24 | (kryptos_u32_t) U[1] << 16 | (kryptos_u32_t) U[2] << 8 | (kryptos_u32_t) U[3]);
 }
 
-static void kryptos_feal_ld_user_key(kryptos_u32_t key[2], const kryptos_u8_t *user_key, const size_t user_key_size) {
+static void kryptos_feal_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
     size_t b, w;
 

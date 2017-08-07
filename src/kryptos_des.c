@@ -172,13 +172,13 @@ typedef void (*kryptos_triple_des_block_processor)(kryptos_u8_t *block,
 
 #define kryptos_des_getbit_from_u32(w, n) (kryptos_u8_t)( ( ( (w) << (n) ) >> 31 ) + 48 )
 
-static kryptos_u32_t kryptos_des_bitseq_to_u32(kryptos_u8_t bitseq[KRYPTOS_DES_MASTER_SIZE]);
+static kryptos_u32_t kryptos_des_bitseq_to_u32(kryptos_u8_t *bitseq);
 
 static kryptos_u32_t kryptos_des_f(kryptos_u32_t R, kryptos_u32_t KL, kryptos_u32_t KR);
 
 static void kryptos_des_expand_user_key(struct kryptos_des_subkeys *sks, const kryptos_u8_t *key, const size_t key_size);
 
-static void kryptos_des_ld_user_key(kryptos_u32_t key[2], const kryptos_u8_t *user_key, const size_t user_key_size);
+static void kryptos_des_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size);
 
 static void kryptos_des_block_encrypt(kryptos_u8_t *block, const struct kryptos_des_subkeys *sks);
 
@@ -367,7 +367,7 @@ void kryptos_triple_des_cipher(kryptos_task_ctx **ktask) {
     encrypt_processor = decrypt_processor = block_processor = NULL;
 }
 
-static kryptos_u32_t kryptos_des_bitseq_to_u32(kryptos_u8_t bitseq[KRYPTOS_DES_MASTER_SIZE]) {
+static kryptos_u32_t kryptos_des_bitseq_to_u32(kryptos_u8_t *bitseq) {
     kryptos_u32_t value = 0L;
     size_t i;
 
@@ -674,7 +674,7 @@ static void kryptos_triple_des_ede_block_decrypt(kryptos_u8_t *block,
     kryptos_des_block_decrypt(block, sks1);
 }
 
-static void kryptos_des_ld_user_key(kryptos_u32_t key[2], const kryptos_u8_t *user_key, const size_t user_key_size) {
+static void kryptos_des_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
     size_t b;
     size_t w;

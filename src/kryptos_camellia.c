@@ -112,14 +112,14 @@ struct kryptos_camellia_subkeys {
 
 typedef void (*kryptos_camellia_block_processor)(kryptos_u8_t *block, const struct kryptos_camellia_subkeys *sks);
 
-static void kryptos_camellia_roll128b(kryptos_u32_t x[4], int s);
+static void kryptos_camellia_roll128b(kryptos_u32_t *x, int s);
 
 static void kryptos_camellia_keyexp_128(const kryptos_u8_t *key, const size_t key_size, struct kryptos_camellia_subkeys *sks);
 
 static void kryptos_camellia_keyexp_192_256(const kryptos_u8_t *key, const size_t key_size,
                                             struct kryptos_camellia_subkeys *sks);
 
-static void kryptos_camellia_F(kryptos_u32_t data[2], kryptos_u32_t kl, kryptos_u32_t kr, kryptos_u32_t out[2]);
+static void kryptos_camellia_F(kryptos_u32_t *data, kryptos_u32_t kl, kryptos_u32_t kr, kryptos_u32_t *out);
 
 static void kryptos_camellia_block_encrypt_128(kryptos_u8_t *block, const struct kryptos_camellia_subkeys *sks);
 
@@ -129,9 +129,9 @@ static void kryptos_camellia_block_encrypt_192_256(kryptos_u8_t *block, const st
 
 static void kryptos_camellia_block_decrypt_192_256(kryptos_u8_t *block, const struct kryptos_camellia_subkeys *sks);
 
-static void kryptos_camellia_FL(kryptos_u32_t data[2], const kryptos_u32_t kl, const kryptos_u32_t kr);
+static void kryptos_camellia_FL(kryptos_u32_t *data, const kryptos_u32_t kl, const kryptos_u32_t kr);
 
-static void kryptos_camellia_FL_1(kryptos_u32_t data[2], const kryptos_u32_t kl, const kryptos_u32_t kr);
+static void kryptos_camellia_FL_1(kryptos_u32_t *data, const kryptos_u32_t kl, const kryptos_u32_t kr);
 
 KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(camellia, ktask, kKryptosCipherCAMELLIA, KRYPTOS_CAMELLIA_BLOCKSIZE,
                                        kryptos_camellia_keysize_t *keysize,
@@ -198,7 +198,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(camellia,
                                     outblock,
                                     camellia_block_processor(outblock, &sks))
 
-static void kryptos_camellia_roll128b(kryptos_u32_t x[4], int s) {
+static void kryptos_camellia_roll128b(kryptos_u32_t *x, int s) {
     kryptos_u32_t t0, t1, t2, t3;
     kryptos_u32_t tt0, tt1, tt2, tt3;
     if (s > 0) {
@@ -225,7 +225,7 @@ static void kryptos_camellia_roll128b(kryptos_u32_t x[4], int s) {
     }
 }
 
-static void kryptos_camellia_ld_128_user_key(kryptos_u32_t key[4], const kryptos_u8_t *user_key, const size_t user_key_size) {
+static void kryptos_camellia_ld_128_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
     size_t w, b;
     kryptos_ld_user_key_prologue(key, 4, user_key, user_key_size, kp, kp_end, w, b, return);
@@ -257,7 +257,7 @@ static void kryptos_camellia_ld_128_user_key(kryptos_u32_t key[4], const kryptos
     kryptos_ld_user_key_epilogue(kryptos_camellia_ld_128_user_key_epilogue, key, w, b, kp, kp_end);
 }
 
-static void kryptos_camellia_ld_192_user_key(kryptos_u32_t key[6], const kryptos_u8_t *user_key, const size_t user_key_size) {
+static void kryptos_camellia_ld_192_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
     size_t w, b;
     kryptos_ld_user_key_prologue(key, 6, user_key, user_key_size, kp, kp_end, w, b, return);
@@ -301,7 +301,7 @@ static void kryptos_camellia_ld_192_user_key(kryptos_u32_t key[6], const kryptos
     kryptos_ld_user_key_epilogue(kryptos_camellia_ld_192_user_key_epilogue, key, w, b, kp, kp_end);
 }
 
-static void kryptos_camellia_ld_256_user_key(kryptos_u32_t key[8], const kryptos_u8_t *user_key, const size_t user_key_size) {
+static void kryptos_camellia_ld_256_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
     size_t w, b;
     kryptos_ld_user_key_prologue(key, 8, user_key, user_key_size, kp, kp_end, w, b, return);
@@ -668,7 +668,7 @@ static void kryptos_camellia_keyexp_192_256(const kryptos_u8_t *key, const size_
     fout[0] = fout[1] = 0L;
 }
 
-static void kryptos_camellia_F(kryptos_u32_t data[2], kryptos_u32_t kl, kryptos_u32_t kr, kryptos_u32_t out[2]) {
+static void kryptos_camellia_F(kryptos_u32_t *data, kryptos_u32_t kl, kryptos_u32_t kr, kryptos_u32_t *out) {
     kryptos_u32_t x[2];
     kryptos_u8_t t1, t2, t3, t4, t5, t6, t7, t8;
     kryptos_u8_t y1, y2, y3, y4, y5, y6, y7, y8;
@@ -1079,12 +1079,12 @@ static void kryptos_camellia_block_decrypt_192_256(kryptos_u8_t *block, const st
     D2[0] = D2[1] = D1[0] = D1[1] = fout[0] = fout[1] = 0x00;
 }
 
-static void kryptos_camellia_FL(kryptos_u32_t data[2], const kryptos_u32_t kl, const kryptos_u32_t kr) {
+static void kryptos_camellia_FL(kryptos_u32_t *data, const kryptos_u32_t kl, const kryptos_u32_t kr) {
     data[1] = data[1] ^ kryptos_camellia_rotl((data[0] & kl), 1);
     data[0] = data[0] ^ (data[1] | kr);
 }
 
-static void kryptos_camellia_FL_1(kryptos_u32_t data[2], const kryptos_u32_t kl, const kryptos_u32_t kr) {
+static void kryptos_camellia_FL_1(kryptos_u32_t *data, const kryptos_u32_t kl, const kryptos_u32_t kr) {
     data[0] = data[0] ^ (data[1] | kr);
     data[1] = data[1] ^ kryptos_camellia_rotl((data[0] & kl), 1);
 }

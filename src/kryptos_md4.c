@@ -54,11 +54,10 @@ struct kryptos_md4_ctx {
     kryptos_u32_t state[4];
     kryptos_u8_t *message;
     kryptos_u64_t curr_len, total_len;
-    int paddin2times; // CLUE(Rafael): A long long time ago I was listening to The Doors and then I named this memory chunk.
-                      //               This also guided the idea behind this flag. :P
+    int paddin2times;
 };
 
-static size_t kryptos_md4_block_index_decision_table[] = {
+static size_t kryptos_md4_block_index_decision_table[64] = {
      0,  0,  0,  0,
      1,  1,  1,  1,
      2,  2,  2,  2,

@@ -427,7 +427,7 @@ struct kryptos_serpent_subkeys {
 
 typedef void (*kryptos_serpent_block_processor)(kryptos_u8_t * block, const struct kryptos_serpent_subkeys *sks);
 
-static void kryptos_serpent_ld_user_key(kryptos_u32_t key[8], const kryptos_u8_t *user_key, const size_t user_key_size);
+static void kryptos_serpent_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size);
 
 static void kryptos_serpent_key_schedule(const kryptos_u8_t *key, const size_t key_size, struct kryptos_serpent_subkeys *sks);
 
@@ -451,7 +451,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(serpent,
                                     outblock,
                                     serpent_block_processor(outblock, &sks))
 
-static void kryptos_serpent_ld_user_key(kryptos_u32_t key[8], const kryptos_u8_t *user_key, const size_t user_key_size) {
+static void kryptos_serpent_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
     size_t w, b;
 
