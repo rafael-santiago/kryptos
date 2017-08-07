@@ -128,7 +128,7 @@ This isn't:
 - Static stuff even used only by one function should be prototyped at the beginning of the module.
 - Not use ``<type> function()`` when defining or prototyping, this is about C. Thus ``<type> function(void)`` is a better choice for us.
 - Try not use char arrays as function parameters, since this is a theoretical fiction in C. Use pointers! I am sure that you are very skilled in it.
-- If you are passing a char pointer, try also pass its size. Specially for non-static functions, since users can mess it them.
+- If you are passing a char pointer, try also pass its size. Specially for non-static functions, since users can mess with them.
 - In kernel mode, try to avoid stack and heap consumption.
 - Never ever perform busy waits in kernel.
 - Also try not complicate the stuff with native incantations for process synchronization, remember that this is a cryptographic library.
