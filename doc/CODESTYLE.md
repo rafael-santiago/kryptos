@@ -132,7 +132,7 @@ This isn't:
 - In kernel mode, try to avoid stack and heap consumption.
 - Never ever perform busy waits in kernel.
 - Also try not complicate the stuff with native incantations for process synchronization, remember that this is a cryptographic library.
-  If you need syncronize something just **inside in this library**, you should review your requirements. They are possibly pretty wrong.
+  If you need syncronize something just **inside this library**, you should review your requirements. They are possibly pretty wrong.
 
 ### Pointers
 
