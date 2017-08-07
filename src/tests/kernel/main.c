@@ -93,6 +93,10 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_dh_mk_key_pair_tests);
     KUTE_RUN_TEST(kryptos_dh_process_modxchg_tests);
 
+    KUTE_RUN_TEST(kryptos_rsa_mk_key_pair_tests);
+    KUTE_RUN_TEST(kryptos_rsa_cipher_tests);
+    KUTE_RUN_TEST(kryptos_rsa_cipher_c99_tests);
+
 KUTE_TEST_CASE_END
 
 KUTE_MAIN(ktest_monkey);

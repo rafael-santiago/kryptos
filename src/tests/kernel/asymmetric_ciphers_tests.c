@@ -10,6 +10,9 @@
 #include <kryptos_pem.h>
 #include <kstring.h>
 
+// WARN(Rafael): All this stuff is a little bit crazy because is not common run asymmetric ciphers into kernel, however if someone wants to do it, the stuff
+//               must be tested in order to avoid problems for the "crazy person"...
+
 KUTE_TEST_CASE(kryptos_dh_get_modp_tests)
     struct modp_test_ctx {
         kryptos_dh_modp_group_bits_t bits;
