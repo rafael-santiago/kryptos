@@ -46,8 +46,8 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_pem_get_data_tests);
     KUTE_RUN_TEST(kryptos_pem_put_data_tests);
 
-    //KUTE_RUN_TEST(kryptos_hash_tests);
-    //KUTE_RUN_TEST(kryptos_hmac_tests);
+    KUTE_RUN_TEST(kryptos_hash_tests);
+    KUTE_RUN_TEST(kryptos_hmac_tests);
 
     //KUTE_RUN_TEST(kryptos_mp_new_value_tests);
     //KUTE_RUN_TEST(kryptos_mp_hex_value_as_mp_tests);
