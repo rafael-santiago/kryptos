@@ -34,6 +34,8 @@ kryptos-test-mod.prologue() {
 
     if (hefesto.sys.os_name() == "linux") {
         $includes.add_item("/usr/include");
+        # INFO(Rafael): By now let's enable it by default in Linux, instead of detecting during compile-time as in FreeBSD.
+        $cflags.add_item("-std=gnu99");
     }
 
     var option type list;
