@@ -1603,7 +1603,11 @@ kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp
         }
 #else
 
+#if defined(__linux__) && defined(KRYPTOS_KERNEL_MODE)
+    do_div(qtemp, (kryptos_u64_t) yn->data[n - 1]);
+#else
         qtemp = qtemp / (kryptos_u64_t) yn->data[n - 1];
+#endif
 
         if (qtemp > 0xFFFFFFFF) {
             qtemp = 0xFF;

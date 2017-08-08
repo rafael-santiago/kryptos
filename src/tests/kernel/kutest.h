@@ -38,6 +38,8 @@ static int g_kutest_ran_tests = 0;
 
 #elif defined(__linux__)
 
+static int g_kutest_ran_tests = 0;
+
 #define KUTE_ASSERT_CHECK(msg, chk) do {\
     if ((chk) == 0) {\
         printk(KERN_WARNING msg " is false.");\
@@ -95,7 +97,25 @@ static moduledata_t test ## _mod = {\
 };\
 DECLARE_MODULE(test, test ## _mod, SI_SUB_DRIVERS, SI_ORDER_MIDDLE);
 
-#else
+#elif defined(__linux__)
+
+#define KUTE_MAIN(test)\
+MODULE_LICENSE("GPL");\
+static int mod_init(void) {\
+    int exit_code = 1;\
+    printk(KERN_WARNING "*** kryptos test module loaded...\n");\
+    if ((exit_code = test()) == 0) {\
+        printk(KERN_WARNING "*** all tests passed. [%d test(s) ran]\n", g_kutest_ran_tests);\
+    } else {\
+        printk(KERN_WARNING "fail: [%d test(s) ran]\n", g_kutest_ran_tests);\
+    }\
+    return exit_code;\
+}\
+static void mod_fini(void) {\
+    printk(KERN_WARNING "*** kryptos test module unloaded\n");\
+}\
+module_init(mod_init);\
+module_exit(mod_fini);
 
 #endif
 

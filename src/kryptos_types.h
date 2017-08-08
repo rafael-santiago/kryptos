@@ -13,7 +13,7 @@
 #  include <stdint.h>
 #  include <stddef.h>
 # else
-#  ifdef __FreeBSD__
+#  if defined(__FreeBSD__)
 #   include <sys/cdefs.h>
 #   include <sys/param.h>
 #   include <sys/module.h>
@@ -21,6 +21,13 @@
 #   include <sys/systm.h>
 #   include <sys/malloc.h>
 #   include <sys/libkern.h>
+#  elif defined(__linux__)
+#   include <bits/wordsize.h>
+#   include <linux/init.h>
+#   include <linux/module.h>
+#   include <linux/slab.h>
+#   include <linux/random.h>
+typedef long intptr_t;
 #  endif
 # endif
 

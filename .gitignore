@@ -4,3 +4,6 @@ lib/
 src/.Forgefile*
 src/tests/bin/
 src/tests/o
+*.cmd
+*\.tmp_versions
+*.mod.c
