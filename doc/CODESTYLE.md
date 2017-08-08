@@ -7,9 +7,9 @@ This is not an absolute truth (a.k.a. unicorn) but this is the truth that I have
 
 ## Comments
 
-It is necessary when is necessary. Try do not think like a blasé "bodisatva coder" what likes to repeat "uh! the code must speaks by itself".
-You are dealing with cryptography, so the things tends to become trickier and complicated. A good comment can save time and avoid misunderstanding
-and improper improvements by other people.
+It is necessary when is necessary. Try do not think like a blasé "bodisatva coder" who likes to repeat "uh! the code must speaks by itself".
+You are dealing with cryptography, so the things tends to become tricky and complicated. A good comment can save time and avoid misunderstanding
+and improper improvements by other developers.
 
 A good way of commenting is by identifying yourself using meaningful short labels. The general idea is: *LABEL(YourNameOrNickname): blah, blah, blah.*.
 Take a look at the **Table 1** to know more about those labels and their proper usage.
@@ -102,7 +102,7 @@ Do not trust in precedence. Try to make the things clearer. If you used to write
 and long expressions. I think that trust in precedence is evidence of naivety. Nothing should obfuscates the correctness.
 In this sense Cryptography is beautiful as Math! Let's reverberate this beauty also here...
 
-So use ``(...)`` when you want to communicate and make clearer your intentions.
+Then you should use ``(...)`` when you want to communicate and make clearer your intentions.
 
 ### Functions
 
@@ -140,7 +140,7 @@ This isn't:
 
 ### "Strings" terminator
 
-``0`` <- This is a "string" terminator. But try not depending on them, if you can pass the amount of bytes pass it!
+``0`` <- This is a "string" terminator. But try not depending on them, if you can pass the amount of bytes, pass it!
 
 ### Gotos
 
@@ -167,7 +167,7 @@ Yes, global macros into a code module should be undefined at the end of the modu
 For unit tests I am using my own [stuff](https://github.com/rafael-santiago/cutest). For kernel mode tests I use a mimic of it versioned under ``src/tests/kernel``.
 
 The default way of naming a test is by using the name of the function currently tested appended with ("_tests"). Try not be so pedant, describing inputs, behaviors
-and all this shit. This just creates mess and boredom.
+and all this shit in the test name. This just creates mess and boredom.
 
 You should test the function, period. Go ahead and test it. Comment if you need and that's alright.
 
@@ -175,3 +175,7 @@ Even code that is not probable of being executed into kernel should be tested in
 exploding after your changes. You should not fear good code, should you?
 
 Otherwise if your code should not be executed in kernel mode, inform it explaining why. Do not let people spend their time on it. Comment.
+
+The correctness of any cipher must be tested with official test vectors. When not possible, the custom test vector should be
+derived from key expansion samples present in the cipher spec written by the algorithm authors. These test vectors should not be
+tested in kernel mode since it was well-tested in user mode.
