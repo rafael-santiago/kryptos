@@ -134,8 +134,8 @@ KUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     uprintf(" *** Alice KAB = "); kryptos_print_mp(kab_alice);
     uprintf(" *** Bob   KAB = "); kryptos_print_mp(kab_bob);
 #elif defined(__linux__)
-    printk(KERN_ERR " *** Alice KAB = "); kryptos_print_mp(kab_alice);
-    printk(KERN_ERR " *** Bob   KAB = "); kryptos_print_mp(kab_bob);
+//    printk(KERN_ERR " *** Alice KAB = "); kryptos_print_mp(kab_alice);
+//    printk(KERN_ERR " *** Bob   KAB = "); kryptos_print_mp(kab_bob);
 #endif
 
     KUTE_ASSERT(kryptos_mp_eq(kab_alice, kab_bob) == 1);
@@ -199,8 +199,8 @@ KUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
     uprintf(" *** Alice KAB = "); kryptos_print_mp(alice->k);
     uprintf(" *** Bob   KAB = "); kryptos_print_mp(bob->k);
 #elif defined(__linux__)
-    printk(KERN_ERR " *** Alice KAB = "); kryptos_print_mp(alice->k);
-    printk(KERN_ERR " *** Bob   KAB = "); kryptos_print_mp(bob->k);
+//    printk(KERN_ERR " *** Alice KAB = "); kryptos_print_mp(alice->k);
+//    printk(KERN_ERR " *** Bob   KAB = "); kryptos_print_mp(bob->k);
 #endif
 
     KUTE_ASSERT(kryptos_mp_eq(alice->k, bob->k) == 1);
@@ -334,8 +334,8 @@ KUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
     uprintf(" *** Alice KAB = "); kryptos_print_mp(alice->k);
     uprintf(" *** Bob   KAB = "); kryptos_print_mp(bob->k);
 #elif defined(__linux__)
-    printk(KERN_ERR " *** Alice KAB = "); kryptos_print_mp(alice->k);
-    printk(KERN_ERR " *** Bob   KAB = "); kryptos_print_mp(bob->k);
+//    printk(KERN_ERR " *** Alice KAB = "); kryptos_print_mp(alice->k);
+//    printk(KERN_ERR " *** Bob   KAB = "); kryptos_print_mp(bob->k);
 #endif
 
     // INFO(Rafael): Alice and Bob must agree each other about K.

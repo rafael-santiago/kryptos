@@ -88,13 +88,13 @@ KUTE_TEST_CASE(ktest_monkey)
 
     KUTE_RUN_TEST(kryptos_pem_get_mp_data_tests);
 
-    //KUTE_RUN_TEST(kryptos_dh_get_modp_tests);
-    //KUTE_RUN_TEST(kryptos_dh_get_random_s_tests);
-    //KUTE_RUN_TEST(kryptos_dh_eval_t_tests);
-    //KUTE_RUN_TEST(kryptos_dh_standard_key_exchange_bare_bone_tests);
-    //KUTE_RUN_TEST(kryptos_dh_process_stdxchg_tests);
-    //KUTE_RUN_TEST(kryptos_dh_mk_key_pair_tests);
-    //KUTE_RUN_TEST(kryptos_dh_process_modxchg_tests);
+    KUTE_RUN_TEST(kryptos_dh_get_modp_tests);
+    KUTE_RUN_TEST(kryptos_dh_get_random_s_tests);
+    KUTE_RUN_TEST(kryptos_dh_eval_t_tests);
+    KUTE_RUN_TEST(kryptos_dh_standard_key_exchange_bare_bone_tests);
+    KUTE_RUN_TEST(kryptos_dh_process_stdxchg_tests);
+    KUTE_RUN_TEST(kryptos_dh_mk_key_pair_tests);
+    KUTE_RUN_TEST(kryptos_dh_process_modxchg_tests);
 
     //KUTE_RUN_TEST(kryptos_rsa_mk_key_pair_tests);
     //KUTE_RUN_TEST(kryptos_rsa_cipher_tests);
