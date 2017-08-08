@@ -1947,8 +1947,8 @@ KUTE_TEST_CASE(kryptos_mp_gen_prime_tests)
     uprintf(" *** Your luck number is: "); kryptos_print_mp(p);
     uprintf(" *** Search for it in everywhere...\n");
 #elif defined(__linux__)
-    printk(KERN_WARNING " *** Your luck number is: "); kryptos_print_mp(p);
-    printk(KERN_WARNING " *** Search for it in everywhere...\n");
+    printk(KERN_ERR " *** Your luck number is: "); kryptos_print_mp(p);
+    printk(KERN_ERR " *** Search for it in everywhere...\n");
 #endif
     kryptos_del_mp_value(p);
     // INFO(Rafael): Well, all we need to do is to believe in this function... To test the return to make sure if the

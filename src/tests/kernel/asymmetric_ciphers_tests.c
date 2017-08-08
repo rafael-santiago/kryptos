@@ -134,8 +134,8 @@ KUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     uprintf(" *** Alice KAB = "); kryptos_print_mp(kab_alice);
     uprintf(" *** Bob   KAB = "); kryptos_print_mp(kab_bob);
 #elif defined(__linux__)
-    printk(KERN_WARNING " *** Alice KAB = "); kryptos_print_mp(kab_alice);
-    printk(KERN_WARNING " *** Bob   KAB = "); kryptos_print_mp(kab_bob);
+    printk(KERN_ERR " *** Alice KAB = "); kryptos_print_mp(kab_alice);
+    printk(KERN_ERR " *** Bob   KAB = "); kryptos_print_mp(kab_bob);
 #endif
 
     KUTE_ASSERT(kryptos_mp_eq(kab_alice, kab_bob) == 1);
@@ -199,8 +199,8 @@ KUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
     uprintf(" *** Alice KAB = "); kryptos_print_mp(alice->k);
     uprintf(" *** Bob   KAB = "); kryptos_print_mp(bob->k);
 #elif defined(__linux__)
-    printk(KERN_WARNING " *** Alice KAB = "); kryptos_print_mp(alice->k);
-    printk(KERN_WARNING " *** Bob   KAB = "); kryptos_print_mp(bob->k);
+    printk(KERN_ERR " *** Alice KAB = "); kryptos_print_mp(alice->k);
+    printk(KERN_ERR " *** Bob   KAB = "); kryptos_print_mp(bob->k);
 #endif
 
     KUTE_ASSERT(kryptos_mp_eq(alice->k, bob->k) == 1);
@@ -334,8 +334,8 @@ KUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
     uprintf(" *** Alice KAB = "); kryptos_print_mp(alice->k);
     uprintf(" *** Bob   KAB = "); kryptos_print_mp(bob->k);
 #elif defined(__linux__)
-    printk(KERN_WARNING " *** Alice KAB = "); kryptos_print_mp(alice->k);
-    printk(KERN_WARNING " *** Bob   KAB = "); kryptos_print_mp(bob->k);
+    printk(KERN_ERR " *** Alice KAB = "); kryptos_print_mp(alice->k);
+    printk(KERN_ERR " *** Bob   KAB = "); kryptos_print_mp(bob->k);
 #endif
 
     // INFO(Rafael): Alice and Bob must agree each other about K.
@@ -362,10 +362,10 @@ KUTE_TEST_CASE(kryptos_rsa_mk_key_pair_tests)
     uprintf("\n *** RSA PRIVATE KEY:\n\n");
     uprintf("%s", k_priv);
 #elif defined(__linux__)
-    printk(KERN_WARNING " *** RSA PUBLIC KEY:\n\n");
-    printk(KERN_WARNING "%s", k_pub);
-    printk(KERN_WARNING "\n *** RSA PRIVATE KEY:\n\n");
-    printk(KERN_WARNING "%s", k_priv);
+    printk(KERN_ERR " *** RSA PUBLIC KEY:\n\n");
+    printk(KERN_ERR "%s", k_pub);
+    printk(KERN_ERR "\n *** RSA PRIVATE KEY:\n\n");
+    printk(KERN_ERR "%s", k_priv);
 #endif
     kryptos_freeseg(k_pub);
     kryptos_freeseg(k_priv);
@@ -404,7 +404,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_tests)
 #if defined(__FreeBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
-    printk(KERN_WARNING " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #endif
 
     a_ktask->cipher = kKryptosCipherRSA;
@@ -416,7 +416,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_tests)
 #if defined(__FreeBSD__)
     uprintf(" *** CIPHERTEXT:\n\n%s\n\n", a_ktask->out);
 #elif defined(__linux__)
-    printk(KERN_WARNING " *** CIPHERTEXT:\n\n%s\n\n", a_ktask->out);
+    printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n\n", a_ktask->out);
 #endif
 
     // INFO(Rafael): Now Alice sends the encrypted buffer to Bob.
@@ -440,7 +440,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_tests)
 #if defined(__FreeBSD__)
     uprintf(" *** PLAINTEXT:\n\n'%s'\n\n", b_ktask->out);
 #elif defined(__linux__)
-    printk(KERN_WARNING " *** PLAINTEXT:\n\n'%s'\n\n", b_ktask->out);
+    printk(KERN_ERR " *** PLAINTEXT:\n\n'%s'\n\n", b_ktask->out);
 #endif
 
     KUTE_ASSERT(b_ktask->out_size == m_size);
@@ -482,7 +482,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
 #if defined(__FreeBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
-    printk(KERN_WARNING " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #endif
 
     kryptos_run_cipher(rsa, b_ktask, k_pub_alice, kstrlen(k_pub_alice));
@@ -492,7 +492,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
 #if defined(__FreeBSD__)
     uprintf(" *** CIPHERTEXT:\n\n%s\n\n", b_ktask->out);
 #elif defined(__linux__)
-    printk(KERN_WARNING " *** CIPHERTEXT:\n\n%s\n\n", b_ktask->out);
+    printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n\n", b_ktask->out);
 #endif
 
     // INFO(Rafael): Now Bob sends the encrypted buffer to Alice.
@@ -511,7 +511,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
 #if defined(__FreeBSD__)
     uprintf(" *** PLAINTEXT:\n\n'%s'\n\n", a_ktask->out);
 #elif defined(__linux__)
-    printk(KERN_WARNING " *** PLAINTEXT:\n\n'%s'\n\n", a_ktask->out);
+    printk(KERN_ERR " *** PLAINTEXT:\n\n'%s'\n\n", a_ktask->out);
 #endif
 
     KUTE_ASSERT(a_ktask->out_size == m_size);
@@ -523,7 +523,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
 # if defined(__FreeBSD__)
     uprintf("WARN: No c99 support, this test was skipped.\n");
 # elif defined(__linux__)
-    printk(KERN_WARNING "WARN: No c99 support, this test was skipped.\n");
+    printk(KERN_ERR "WARN: No c99 support, this test was skipped.\n");
 # endif
 #endif
 KUTE_TEST_CASE_END

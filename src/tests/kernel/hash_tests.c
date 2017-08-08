@@ -651,13 +651,13 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
 #  if defined(__FreeBSD__)
     uprintf("WARN: This test runs only when libkryptos is compiled with C99 support. It will be skipped.\n");
 #  elif defined(__linux__)
-    printk(KERN_WARNING "WARN: This test runs only when libkryptos is compiled with C99 support. It will be skipped.\n");
+    printk(KERN_ERR "WARN: This test runs only when libkryptos is compiled with C99 support. It will be skipped.\n");
 #  endif
 # else
 #   if defined(__FreeBSD__)
     uprintf("WARN: You have requested build this binary without the HMAC tests.\n");
 #   else
-    printk(KERN_WARNING "WARN: You have requested build this binary without the HMAC tests.\n");
+    printk(KERN_ERR "WARN: You have requested build this binary without the HMAC tests.\n");
 #   endif
 # endif // !defined(KRYPTOS_SKIP_HMAC_TESTS)
 #endif // defined(KRYPTOS_C99) && !defined(KRYPTOS_SKIP_HMAC_TESTS)
