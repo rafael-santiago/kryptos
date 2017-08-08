@@ -28,7 +28,7 @@
 KUTE_DECLARE_TEST_CASE(ktest_monkey);
 
 KUTE_TEST_CASE(ktest_monkey)
-    /*KUTE_RUN_TEST(kryptos_padding_tests);
+    KUTE_RUN_TEST(kryptos_padding_tests);
     KUTE_RUN_TEST(kryptos_get_random_block_tests);
     KUTE_RUN_TEST(kryptos_block_parser_tests);
     KUTE_RUN_TEST(kryptos_endianess_utils_tests);
@@ -38,7 +38,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_hex_tests);
     KUTE_RUN_TEST(kryptos_hash_common_tests);
 
-    KUTE_RUN_TEST(kryptos_dsl_tests);
+    /*KUTE_RUN_TEST(kryptos_dsl_tests);
 
     KUTE_RUN_TEST(kryptos_base64_tests);
     KUTE_RUN_TEST(kryptos_uuencode_tests);
