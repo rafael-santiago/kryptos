@@ -39,8 +39,6 @@ typedef long intptr_t;
 #    define __STDC_VERSION__ 19901L
 #   endif
 # endif
-#elif defined(__linux__)
-
 #endif
 
 #ifndef NO_KRYPTOS_C99_SUPPORT
