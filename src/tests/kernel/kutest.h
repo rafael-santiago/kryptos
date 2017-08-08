@@ -43,7 +43,7 @@ static int g_kutest_ran_tests = 0;
 #define KUTE_ASSERT_CHECK(msg, chk) do {\
     if ((chk) == 0) {\
         printk(KERN_ERR msg " is false.");\
-        return 1;\
+        return -EAGAIN;\
     }\
 } while (0)
 
@@ -51,7 +51,7 @@ static int g_kutest_ran_tests = 0;
     printk(KERN_ERR "-- running " #test "...\n");\
     g_kutest_ran_tests++;\
     if (test() != 0) {\
-        return 1;\
+        return -EAGAIN;\
     }\
     printk(KERN_ERR "-- passed.\n");\
 } while (0)
