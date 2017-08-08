@@ -1316,6 +1316,14 @@ void kryptos_print_mp(const kryptos_mp_value_t *v) {
 #  endif
     uprintf("\n");
 # elif defined(__linux__)
+/*
+#  ifndef KRYPTOS_MP_U32_DIGIT
+    for (d = v->data_size - 1; d >= 0; d--) printk(KERN_ERR "%.2X", v->data[d]);
+#  else
+    for (d = v->data_size - 1; d >= 0; d--) printk(KERN_ERR "%.8X", v->data[d]);
+#  endif
+    printk(KERN_ERR "\n");
+*/
 # endif
 #endif
 }
