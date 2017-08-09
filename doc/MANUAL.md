@@ -119,7 +119,7 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 The available modes of operation for the block ciphers are: ``ECB``, ``CBC`` and ``OFB``. So in practice, considering the OFB
 mode, we have 16 stream ciphers instead of only two. More on cipher modes will be treated later.
 
-The way of indicating the desired cipher for a encryption task is by setting the field ``cipher`` from the ``kryptos_task_ctx``
+The way of indicating the desired cipher for an encryption task is by setting the field ``cipher`` from the ``kryptos_task_ctx``
 to the ``Internal ID constant`` listed in **Table 1**.
 
 Similarly the indication of the operation mode is done by setting the field ``mode``. The values could be: ``kKryptosECB``,

@@ -26,6 +26,7 @@ local function install_kernel_module(modpath type string) : result type int {
     if (hefesto.sys.os_name() == "freebsd") {
         result hefesto.sys.run("kldload ./" + $modpath);
     } else if (hefesto.sys.os_name() == "linux") {
+        hefesto.sys.run("dmesg -n4");
         result hefesto.sys.run("insmod ./" + $modpath);
     }
     result 1;
