@@ -97,7 +97,7 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 
 **Table 1**: The available symmetric ciphers.
 
-|    **Cipher*     |      **Type**         |    **Internal ID constant**      |
+|    **Cipher**    |      **Type**         |    **Internal ID constant**      |
 |:----------------:|:---------------------:|:--------------------------------:|
 |   ``ARC4``       |       Stream          |       ``kKryptosCipherARC4``     |
 |   ``SEAL``       |       Stream          |       ``kKryptosCipherSEAL``     |
@@ -130,7 +130,8 @@ The following code is an example of how to use the algorithm ``ARC4`` to encrypt
 ```c
 // arc4-sample.c
 //
-// Compilation: gcc arc4-sample.c -oarc4-sample -I<path to kryptos headers> -L<path to libkryptos.a> -lkryptos
+// Compilation: gcc arc4-sample.c -oarc4-sample -I<path to kryptos headers> -L<path to libkryptos.a>
+//              -lkryptos
 //
 
 #include <kryptos.h>
@@ -203,7 +204,8 @@ It is possible to simplify a little bit more the previous sample by using C macr
 ```c
 // arc4-sample-c99.c
 //
-// Compilation: gcc arc4-sample-c99.c -oarc4-sample-c99 -I<path to kryptos headers> -L<path to libkryptos.a> -lkryptos
+// Compilation: gcc arc4-sample-c99.c -oarc4-sample-c99 -I<path to kryptos headers> -L<path to libkryptos.a>
+//              -lkryptos
 //
 
 #include <kryptos.h>
