@@ -204,8 +204,8 @@ It is possible to simplify a little bit more the previous sample by using C macr
 ```c
 // arc4-sample-c99.c
 //
-// Compilation: gcc arc4-sample-c99.c -oarc4-sample-c99 -I<path to kryptos headers> -L<path to libkryptos.a>
-//              -lkryptos
+// Compilation: gcc arc4-sample-c99.c -oarc4-sample-c99 -I<path to kryptos headers>
+//              -L<path to libkryptos.a> -lkryptos
 //
 
 #include <kryptos.h>
