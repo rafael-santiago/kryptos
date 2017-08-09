@@ -14,6 +14,8 @@ and improper improvements by other developers.
 A good way of commenting is by identifying yourself using meaningful short labels. The general idea is: *LABEL(YourNameOrNickname): blah, blah, blah.*.
 Take a look at the **Table 1** to know more about those labels and their proper usage.
 
+**Table 1**: Recommended comment labels.
+
 |       **Label**        |                                                **What does it mean?**                                                                       |
 |:----------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------:|
 |   ``INFO``             |  instructs someone about something                                                                                                          |
