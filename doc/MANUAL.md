@@ -262,3 +262,149 @@ As you can see the kryptos task manipulation C macros implement a direct and sim
 The general using form of ``kryptos_run_cipher`` macro is:
 
 ``kryptos_run_cipher(<cipher>, <ktask pointer>, key, key_size[, args]...)``
+
+Block ciphers should be used in almost the same way:
+
+```c
+#include <kryptos.h>
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+    kryptos_task_ctx task, *ktask = &task;
+    kryptos_u8_t *key = "foo";
+    kryptos_u8_t *data = "plaintext";
+    size_t data_size = 9;
+
+    printf("Original data: %s\n", data);
+
+    kryptos_task_init_as_null(ktask);
+
+    // INFO(Rafael): Loading the basic information about the task involving the chosen cipher.
+    kryptos_blowfish_setup(ktask, key, strlen(key), kKryptosECB);
+
+    // INFO(Rafael): Since we need to encrypt, we need to inform it.
+    kryptos_task_set_encrypt_action(ktask);
+
+    // INFO(Rafael): Setting up the input information for the desired task.
+    ktask->in = data;
+    ktask->in_size = data_size;
+
+    // INFO(Rafael): Encrypting.
+    kryptos_blowfish_cipher(ktask);
+
+    if (ktask->result == kKryptosSuccess) {
+        printf("Data encrypted!\n");
+
+        kryptos_task_set_decrypt_action(ktask);
+
+        ktask->in = ktask->out;
+        ktask->in_size = ktask->out_size;
+        ktask->out = NULL;
+
+        // INFO(Rafael): Decrypting.
+        kryptos_blowfish_cipher(ktask);
+
+        if (ktask->result == kKryptosSuccess) {
+            printf("Data decrypted: '%s'\n", ktask->out);
+        } else {
+            printf("ERROR: during decryption.\n");
+        }
+
+        // INFO(Rafael): Freeing input and output.
+        kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT);
+    } else {
+        printf("ERROR: during encryption.\n");
+    }
+
+    return 0;
+}
+```
+
+The c99 conventions are handy to produce a smaller and straightfoward code:
+
+```c
+#include <kryptos.h>
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+    kryptos_task_ctx task, *ktask = &task;
+    kryptos_u8_t *key = "foo";
+    kryptos_u8_t *data = "plaintext";
+    size_t data_size = 9;
+
+    printf("Original data: %s\n", data);
+
+    kryptos_task_init_as_null(ktask);
+
+    // INFO(Rafael): Encrypting.
+    kryptos_task_set_in(ktask, data, data_size);
+    kryptos_task_set_encrypt_action(ktask);
+    kryptos_run_cipher(blowfish, ktask, key, strlen(key), kKryptosECB);
+
+    if (kryptos_last_task_succeed(ktask)) {
+        // INFO(Rafael): Decrypting.
+        kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+        kryptos_task_set_decrypt_action(ktask);
+        kryptos_run_cipher(blowfish, ktask, key, strlen(key), kKryptosECB);
+
+        kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT);
+    }
+
+    return 0;
+}
+```
+
+The ECB mode is the weakest mode to be used with block ciphers.
+
+Until now is possible to use block ciphers in three modes: ``ECB``, ``CBC`` and ``OFB``.
+
+The **Table 2** lists the identifiers related with each available operation mode.
+
+**Table 2**: The available operation modes for block ciphers.
+
+| **Operation Mode** |       **Identifier**             |
+|:------------------:|:--------------------------------:|
+|       ``ECB``      |         kKryptosECB              |
+|       ``CBC``      |         kKryptosCBC              |
+|       ``OFB``      |         kKryptosOFB              |
+
+When using CBC and OFB modes you do not have to worry about generating the initialization vector if you do not want to.
+Once the iv field from ``kryptos_task_ctx`` initialized as NULL, a new iv will be generated and used. In addition, after
+encrypting you do not need to worry about transfering the iv as a separated piece of information. The out field from
+``kryptos_task_ctx`` gathers all information that you will need for a later decryption. As you may known there is no
+necessity of an IV be secret. If you use a static IV, in the end you are using a more complicated scheme for ECB mode,
+sadly, this kind of naive "approach" is common. Avoid doing this, it is unresponsible and stupid.
+
+The following code sample uses the SERPENT cipher in CBC mode with the c99 conveniences:
+
+```c
+#include <kryptos.h>
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+    kryptos_task_ctx task, *ktask = &task;
+    kryptos_u8_t *key = "foo";
+    kryptos_u8_t *data = "plaintext";
+    size_t data_size = 9;
+
+    printf("Original data: %s\n", data);
+
+    kryptos_task_init_as_null(ktask);
+
+    // INFO(Rafael): Encrypting.
+    kryptos_task_set_in(ktask, data, data_size);
+    kryptos_task_set_encrypt_action(ktask);
+    kryptos_run_cipher(serpent, ktask, key, strlen(key), kKryptosCBC);
+
+    if (kryptos_last_task_succeed(ktask)) {
+        // INFO(Rafael): Decrypting.
+        kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+        kryptos_task_set_decrypt_action(ktask);
+        kryptos_run_cipher(serpent, ktask, key, strlen(key), kKryptosCBC);
+
+        kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT);
+    }
+
+    return 0;
+}
+```
