@@ -419,7 +419,7 @@ If you want to generate the iv on your own, you need to care about the content o
 the iv_size must store the total in byte of that byte chunk. If you generate na invalid iv the encryption/decryption will
 fail. As a result the kryptos_last_task_succeed(...) will indicate a zero value.
 
-Details about a failure always can be accessed by the field ```result_verbose`` from the ``kryptos_task_ctx`` struct.
+Details about a failure always can be accessed by the field ``result_verbose`` from the ``kryptos_task_ctx`` struct.
 
 Not all block ciphers only need a key, a size of this key and an operation mode. In kryptos we also have block ciphers
 that need more than the standard parameters. In this case the additional parameters are always passed after the operation
@@ -473,3 +473,9 @@ The **Table 3** lists the other ciphers which use additional parameters during t
 | SAFER K-64 |  Rounds total                     |          ``int``                                    | ``kryptos_run_cipher(saferk64, &task, "saferk64", 8, kKryptosECB, &saferk64_rounds)``                |
 |    3DES    |  Key2, Key2 size, Key3, Key3 size | ``unsigned char`` for keys and ``size_t`` for sizes | ``kryptos_run_cipher(triple_des, &task, k1, &k1_size, kKryptosECB, k2, &k2_size, k3, &k3_size)``     |
 |  3DES-EDE  |  Key2, Key2 size, Key3, Key3 size | ``unsigned char`` for keys and ``size_t`` for sizes | ``kryptos_run_cipher(triple_des_ede, &task, k1, &k1_size, kKryptosECB, k2, &k2_size, k3, &k3_size)`` |
+
+### Hashes
+
+Firstly I will show you how to generate hashes without using the c99 conveniences, after we will generate hashes through
+the available macros.
+
