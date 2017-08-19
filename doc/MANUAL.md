@@ -135,6 +135,7 @@ The following code is an example of how to use the algorithm ``ARC4`` to encrypt
 //
 
 #include <kryptos.h>
+#include <string.h>
 #include <stdio.h>
 
 int main(int argc, char **argv) {
@@ -209,6 +210,7 @@ It is possible to simplify a little bit more the previous sample by using C macr
 //
 
 #include <kryptos.h>
+#include <string.h>
 #include <stdio.h>
 
 int main(int argc, char **argv) {
@@ -267,6 +269,7 @@ Block ciphers should be used in almost the same way:
 
 ```c
 #include <kryptos.h>
+#include <string.h>
 #include <stdio.h>
 
 int main(int argc, char **argv) {
@@ -324,6 +327,7 @@ The c99 conventions are handy to produce a smaller and straightfoward code:
 
 ```c
 #include <kryptos.h>
+#include <string.h>
 #include <stdio.h>
 
 int main(int argc, char **argv) {
@@ -379,6 +383,7 @@ The following code sample uses the SERPENT cipher in CBC mode with the c99 conve
 
 ```c
 #include <kryptos.h>
+#include <string.h>
 #include <stdio.h>
 
 int main(int argc, char **argv) {
@@ -408,3 +413,63 @@ int main(int argc, char **argv) {
     return 0;
 }
 ```
+
+If you want to generate the iv on your own, you need to care about the content of the fields ``iv`` and ``iv_size`` from the
+``kryptos_task_ctx`` struct. The iv should point to the chunk of bytes required as iv by the current used cipher and
+the iv_size must store the total in byte of that byte chunk. If you generate na invalid iv the encryption/decryption will
+fail. As a result the kryptos_last_task_succeed(...) will indicate a zero value.
+
+Details about a failure always can be accessed by the field ```result_verbose`` from the ``kryptos_task_ctx`` struct.
+
+Not all block ciphers only need a key, a size of this key and an operation mode. In kryptos we also have block ciphers
+that need more than the standard parameters. In this case the additional parameters are always passed after the operation
+mode and they must be pointers. As sample, let's pick the cipher CAMELLIA. The CAMELLIA algorithm supports key sizes
+of 128, 192 and also 256.
+
+When calling CAMELLIA in kryptos the desired key size should be passed, in the following way (c99):
+
+```c
+#include <kryptos.h>
+#include <string.h>
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+    kryptos_task_ctx task, *ktask = &task;
+    kryptos_u8_t *key = "foo";
+    kryptos_u8_t *data = "plaintext";
+    size_t data_size = 9;
+    kryptos_camellia_keysize_t key_size = kKryptosCAMELLIA192; // Let's use Camellia-192.
+
+    printf("Original data: %s\n", data);
+
+    kryptos_task_init_as_null(ktask);
+
+    // INFO(Rafael): Encrypting.
+    kryptos_task_set_in(ktask, data, data_size);
+    kryptos_task_set_encrypt_action(ktask);
+    kryptos_run_cipher(camellia, ktask, key, strlen(key), kKryptosCBC, &key_size);
+
+    if (kryptos_last_task_succeed(ktask)) {
+        // INFO(Rafael): Decrypting.
+        kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+        kryptos_task_set_decrypt_action(ktask);
+        kryptos_run_cipher(camellia, ktask, key, strlen(key), kKryptosCBC, &key_size);
+
+        kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT);
+    }
+
+    return 0;
+}
+```
+
+The available CAMELLIA key size constants are: ``kKryptosCAMELLIA128``, ``kKryptosCAMELLIA192``, ``kKryptosCAMELLIA256``.
+
+The **Table 3** lists the other ciphers which use additional parameters during their call.
+
+| **Cipher** |              **Parameters**       |            **Parameters data type**                 |                                     **Call example**                                                 |
+|:----------:|:---------------------------------:|----------------------------------------------------:|-----------------------------------------------------------------------------------------------------:|
+|    FEAL    |  Rounds total                     |          ``int``                                    | ``kryptos_run_cipher(feal, &task, "feal", 4, kKryptosCBC, &feal_rounds)``                            |
+|    RC2     |  T1 parameter                     |          ``int``                                    | ``kryptos_run_cipher(rc2, &task, "rc2", 3, kKryptosOFB, &rc2_t1)``                                   |
+| SAFER K-64 |  Rounds total                     |          ``int``                                    | ``kryptos_run_cipher(saferk64, &task, "saferk64", 8, kKryptosECB, &saferk64_rounds)``                |
+|    3DES    |  Key2, Key2 size, Key3, Key3 size | ``unsigned char`` for keys and ``size_t`` for sizes | ``kryptos_run_cipher(triple_des, &task, k1, &k1_size, kKryptosECB, k2, &k2_size, k3, &k3_size)``     |
+|  3DES-EDE  |  Key2, Key2 size, Key3, Key3 size | ``unsigned char`` for keys and ``size_t`` for sizes | ``kryptos_run_cipher(triple_des_ede, &task, k1, &k1_size, kKryptosECB, k2, &k2_size, k3, &k3_size)`` |
