@@ -601,15 +601,16 @@ int main(int argc, char **argv) {
         kryptos_run_cipher_hmac(cast5, sha512, &m, "silent passenger", 16, kKryptosCBC);
 
         if (!kryptos_last_task_succeed(&m) && m.result == kKryptosHMACError) {
-            printf("Nice! The cryptogram corruption was detected. Do not consider this, ask for a retransmission... ;)\n");
-            // INFO(Rafael): Note that we do not need to free the output, because a corruption was detected and due to it
-            //               the decryption process was not performed, since we would not have a valid plaintext.
-            //               On normal conditions, with valid plaintexts you should also combine the bitmask KRYPTOS_TASK_OUT
-            //               in kryptos_task_free() call.
+            printf("Nice! The cryptogram corruption was detected. Do not consider this, "
+                   "ask for a retransmission... ;)\n");
+            // INFO(Rafael): Note that we do not need to free the output, because a corruption was detected
+            //               and due to it the decryption process was not performed, since we would not have
+            //               a valid plaintext. On normal conditions, with valid plaintexts you should also
+            //               combine the bitmask KRYPTOS_TASK_OUT in kryptos_task_free() call.
             //
-            //               The bitmask KRYPTOS_TASK_IV is being passed because the used block cipher was CAST5 in CBC
-            //               with a null iv. CBC asked with a null iv internally asks kryptos to generate a pseudo-random
-            //               one.
+            //               The bitmask KRYPTOS_TASK_IV is being passed because the used block cipher was
+            //               CAST5 in CBC with a null iv. CBC asked with a null iv internally asks kryptos
+            //               to generate a pseudo-random one.
             //
             kryptos_task_free(&m, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
             exit_code = 0;
