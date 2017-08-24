@@ -610,7 +610,7 @@ int main(int argc, char **argv) {
             //
             //               The bitmask KRYPTOS_TASK_IV is being passed because the used block cipher was
             //               CAST5 in CBC with a null IV. CBC requested with a null iv internally asks
-            //               kryptos to generate a pseudo-random IV and it allocates memory.
+            //               kryptos to generate a pseudo-random IV and this action allocates memory.
             //
             kryptos_task_free(&m, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
             exit_code = 0;
