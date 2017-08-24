@@ -642,5 +642,5 @@ As you may have noticed the general form of using the ``kryptos_run_cipher_hmac`
                             <kryptos_task_ctx *>,
                             <block cipher user key>, <block cipher user key size>,
                             <block cipher mode>
-                            [, <block cipher add. args, when the block cipher has some>)``
+                            [, <block cipher add. args, when the block cipher has some>)
 ```
