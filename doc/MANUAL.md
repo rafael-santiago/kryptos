@@ -616,7 +616,7 @@ int main(int argc, char **argv) {
             exit_code = 0;
         } else {
             // INFO(Rafael): It should never happen.
-            printf("Rascals! We was fooled!!\n");
+            printf("Rascals! We were fooled!!\n");
         }
     } else {
         // INFO(Rafael): It should happen.
