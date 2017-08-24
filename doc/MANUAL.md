@@ -1,7 +1,8 @@
 # Manual
 
 **Abstract**: This library was designed to be used in user mode applications and also in kernel mode. The following
-sections will guide the readers through the main aspects of how to use ``kryptos`` in their own stuff.
+sections will guide the readers through the main aspects of how to use ``kryptos`` in their own stuff. This documentation
+considers that the readers have at least a minimal formal knowledge of cryptology.
 
 ## Link101
 
@@ -466,6 +467,8 @@ The available CAMELLIA key size constants are: ``kKryptosCAMELLIA128``, ``kKrypt
 
 The **Table 3** lists the other ciphers which use additional parameters during their call.
 
+**Table 3**: The additional parameters required by some implemented block ciphers.
+
 | **Cipher** |              **Parameters**       |            **Parameters data type**                 |                                     **Call example**                                                 |
 |:----------:|:---------------------------------:|----------------------------------------------------:|-----------------------------------------------------------------------------------------------------:|
 |    FEAL    |  Rounds total                     |          ``int``                                    | ``kryptos_run_cipher(feal, &task, "feal", 4, kKryptosCBC, &feal_rounds)``                            |
@@ -479,3 +482,148 @@ The **Table 3** lists the other ciphers which use additional parameters during t
 Firstly I will show you how to generate hashes without using the c99 conveniences, after we will generate hashes through
 the available macros.
 
+Until now the available hash algorithms follow listed in **Table 4**.
+
+**Table 4**: Currently available hash algorithms.
+
+|  **Algorithm** |        **HASHID**                  |
+|:--------------:|:----------------------------------:|
+|   ``SHA-1``    |       ``sha1``                     |
+|   ``SHA-224``  |       ``sha224``                   |
+|   ``SHA-256``  |       ``sha256``                   |
+|   ``SHA-384``  |       ``sha384``                   |
+|   ``SHA-512``  |       ``sha512``                   |
+|    ``MD4``     |       ``md4``                      |
+|    ``MD5``     |       ``md5``                      |
+| ``RIPEMD-128`` |      ``ripemd128``                 |
+| ``RIPEMD-160`` |      ``ripemd160``                 |
+
+```c
+// bare-bone-hash-sample.c
+// compilation command line: gcc bare-bone-hash-sample.c -obbhs -lkryptos
+
+#include <kryptos.h>
+#include <ctype.h>
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+    kryptos_task_ctx t, *ktask = &t;
+    size_t o;
+
+    // INFO(Rafael): Defining the input that must be "hashed".
+
+    t.in = "abc";
+    t.in_size = 3;
+
+    // INFO(Rafael): Executing the hash algorithm over the input.
+    //               The second parameter when 0 requests a raw byte output.
+
+    kryptos_sha1_hash(&ktask, 0);
+
+    if (ktask->out != NULL) {
+        printf("Raw output: ");
+        for (o = 0; o < ktask->out_size; o++) {
+            printf("%c", isprint(ktask->out[o]) ? ktask->out[o] : '.');
+        }
+        printf("\n");
+
+        // INFO(Rafael): Freeing the output buffer.
+
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+    } else {
+        printf("ERROR: when executing the hash with raw byte output.\n");
+    }
+
+    // INFO(Rafael): Executing again the hash algorithm over the previously defined input.
+    //               The second parameter when 1 requests a hexadecimal output.
+
+    kryptos_sha1_hash(&ktask, 1);
+
+    if (ktask->out != NULL) {
+        printf("Hex output: %s\n", ktask->out);
+
+        // INFO(Rafael): Freeing the output buffer.
+
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+    } else {
+        printf("ERROR: when executing the hash with hexdecimal output.\n");
+    }
+
+    return 0;
+}
+```
+
+According to the presented sample above, you should define the input and its size in bytes in a ``kryptos_task_ctx`` struct.
+To actually execute the desired hash algorithm you should pass a ``kryptos_task_ctx **`` and a flag requesting hexadecimal
+output (1 => hex, 0 => raw byte). The function to be called is ``kryptos_HASHID_hash``, where ``HASHID`` can be found
+in **Table 4**.
+
+### HMACs
+
+``Kryptos`` offers the possibility of easily generate a Message authentication code based on Hashes (HMACs) when
+the ``c99`` capabilities are present.
+
+This feature can be accessed using the macro ``kryptos_run_cipher_hmac``. The following code sample shows how to generate
+a message authenticated taking advantage from the implemented hash algorithms.
+
+```c
+// hmac-sample.c
+// compilation command line: gcc hmac-sample.c -ohmac-sample -lkryptos
+#include <kryptos.h>
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+    kryptos_task_ctx m;
+    int exit_code = 1;
+
+    // INFO(Rafael): Always set everything to null is a good practice.
+
+    kryptos_task_init_as_null(&m);
+
+    // INFO(Rafael): Setting the plaintext.
+
+    kryptos_task_set_in(&m, "As I was saying...", 18);
+
+    // INFO(Rafael): Encrypting with CAST5-CBC and generating our MAC based on SHA-512.
+
+    kryptos_task_set_encrypt_action(&m);
+    kryptos_run_cipher_hmac(cast5, sha512, &m, "silent passenger", 16, kKryptosCBC);
+
+    if (kryptos_last_task_succeed(&m)) {
+        // INFO(Rafael): Let us corrupt the cryptogram on purpose of seeing the decryption fail.
+        //               Do not do it at home! ;)
+
+        m.in[m.in_size >> 1] = ~m.in[m.in_size >> 1];
+        kryptos_task_set_decrypt_action(&m);
+        if (!kryptos_last_task_succeed(&m) && m.result == kKryptosHMACError) {
+            printf("Nice! The cryptogram corruption was detected. Do not consider this, ask for a retransmission... ;)\n");
+            // INFO(Rafael): Note that we do not need to free the output, because a corruption was detected and due to it
+            //               the decryption process was not performed, since we would not have a valid plaintext.
+            //               On normal conditions, with valid plaintexts you should also combine the bitmask KRYPTOS_TASK_OUT
+            //               in kryptos_task_free() call.
+            //
+            //               The bitmask KRYPTOS_TASK_IV is being passed because the used block cipher was CAST5 in CBC
+            //               with a null iv. CBC asked with a null iv internally asks kryptos to generate a pseudo-random
+            //               one.
+            //
+            kryptos_task_free(&m, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+            exit_code = 0;
+        } else {
+            // INFO(Rafael): It should never happen.
+            printf("Rascals! We was fooled!!\n");
+        }
+    } else {
+        // INFO(Rafael): It should happen.
+        printf("ERROR: Hmmmm it should be at least encrypted.\n");
+    }
+
+    // INFO(Rafael): Housekeeping.
+
+    kryptos_task_init_as_null(&m);
+
+    return exit_code;
+}
+```
+
+Even if the decryption has failed and you is sure about of the out field nullity from ``kryptos_task_ctx``, you can
+call ``kryptos_task_free`` passing the bitmask ``KRYPTOS_TASK_OUT`` but I personally dislike this kind of code.
