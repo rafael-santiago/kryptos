@@ -609,8 +609,8 @@ int main(int argc, char **argv) {
             //               also combine the bitmask KRYPTOS_TASK_OUT in kryptos_task_free() call.
             //
             //               The bitmask KRYPTOS_TASK_IV is being passed because the used block cipher was
-            //               CAST5 in CBC with a null iv. CBC requested with a null iv internally asks
-            //               kryptos to generate a pseudo-random one and it allocates memory.
+            //               CAST5 in CBC with a null IV. CBC requested with a null iv internally asks
+            //               kryptos to generate a pseudo-random IV and it allocates memory.
             //
             kryptos_task_free(&m, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
             exit_code = 0;
