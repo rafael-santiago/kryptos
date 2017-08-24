@@ -417,7 +417,7 @@ int main(int argc, char **argv) {
 
 If you want to generate the iv on your own, you need to care about the content of the fields ``iv`` and ``iv_size`` from the
 ``kryptos_task_ctx`` struct. The iv should point to the chunk of bytes required as iv by the current used cipher and
-the iv_size must store the total in byte of that byte chunk. If you generate na invalid iv the encryption/decryption will
+the iv_size must store the total in byte of that byte chunk. If you generate an invalid iv the encryption/decryption will
 fail. As a result the kryptos_last_task_succeed(...) will indicate a zero value.
 
 Details about a failure always can be accessed by the field ``result_verbose`` from the ``kryptos_task_ctx`` struct.
@@ -631,7 +631,7 @@ int main(int argc, char **argv) {
 }
 ```
 
-Even if the decryption has failed and you is sure about of the out field nullity from ``kryptos_task_ctx``, you can
+Even if the decryption has failed and you are sure about of the out field nullity from ``kryptos_task_ctx``, you can
 call ``kryptos_task_free`` passing the bitmask ``KRYPTOS_TASK_OUT`` but I personally dislike this kind of code.
 
 As you may have noticed the general form of using the ``kryptos_run_cipher_hmac`` macro is:
