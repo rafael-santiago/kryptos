@@ -594,7 +594,12 @@ int main(int argc, char **argv) {
         //               Do not do it at home! ;)
 
         m.in[m.in_size >> 1] = ~m.in[m.in_size >> 1];
+
+        // INFO(Rafael): Now trying to decrypt.
+
         kryptos_task_set_decrypt_action(&m);
+        kryptos_run_cipher_hmac(cast5, sha512, &m, "silent passenger", 16, kKryptosCBC);
+
         if (!kryptos_last_task_succeed(&m) && m.result == kKryptosHMACError) {
             printf("Nice! The cryptogram corruption was detected. Do not consider this, ask for a retransmission... ;)\n");
             // INFO(Rafael): Note that we do not need to free the output, because a corruption was detected and due to it
@@ -627,3 +632,14 @@ int main(int argc, char **argv) {
 
 Even if the decryption has failed and you is sure about of the out field nullity from ``kryptos_task_ctx``, you can
 call ``kryptos_task_free`` passing the bitmask ``KRYPTOS_TASK_OUT`` but I personally dislike this kind of code.
+
+As you may have noticed the general form of using the ``kryptos_run_cipher_hmac`` macro is:
+
+```
+    kryptos_run_cipher_hmac(<block cipher>,
+                            <hash algorithm>,
+                            <kryptos_task_ctx *>,
+                            <block cipher user key>, <block cipher user key size>,
+                            <block cipher mode>
+                            [, <block cipher add. args, when the block cipher has some>)``
+```
