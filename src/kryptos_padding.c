@@ -59,7 +59,7 @@ kryptos_u8_t *kryptos_oaep_mgf(const kryptos_u8_t *seed, const size_t seed_size,
                                kryptos_hash_func hash_func,
                                size_t *out_size) {
     kryptos_u8_t *in = NULL, *out = NULL, *op = NULL;
-    size_t in_size, l, o;
+    size_t in_size, o;
     kryptos_u32_t counter;
     kryptos_task_ctx t, *ktask = &t;
 
@@ -81,9 +81,7 @@ kryptos_u8_t *kryptos_oaep_mgf(const kryptos_u8_t *seed, const size_t seed_size,
         goto kryptos_oaep_mgf_epilogue;
     }
 
-    *out_size = len;
-
-    out = (kryptos_u8_t *) kryptos_newseg(*out_size);
+    out = (kryptos_u8_t *) kryptos_newseg(len);
 
     if (out == NULL) {
         *out_size = 0;
@@ -97,10 +95,9 @@ kryptos_u8_t *kryptos_oaep_mgf(const kryptos_u8_t *seed, const size_t seed_size,
     ktask->in = in;
     ktask->in_size = in_size;
 
-    l = 0;
     counter = 0;
 
-    while (l < len) {
+    while (*out_size < len) {
         kryptos_oaep_i2osp(ktask->in + seed_size, counter);
 
         hash_func(&ktask, 0);
@@ -109,11 +106,12 @@ kryptos_u8_t *kryptos_oaep_mgf(const kryptos_u8_t *seed, const size_t seed_size,
             kryptos_freeseg(out);
             out = NULL;
             *out_size = 0;
+            goto kryptos_oaep_mgf_epilogue;
         }
 
-        for (o = 0; o < ktask->out_size; o++) {
+        for (o = 0; o < ktask->out_size && *out_size < len; o++) {
             *op = ktask->out[o];
-            l++;
+            *out_size += 1;
             op++;
         }
 
