@@ -84,7 +84,6 @@ kryptos_u8_t *kryptos_oaep_mgf(const kryptos_u8_t *seed, const size_t seed_size,
     out = (kryptos_u8_t *) kryptos_newseg(len);
 
     if (out == NULL) {
-        *out_size = 0;
         goto kryptos_oaep_mgf_epilogue;
     }
 

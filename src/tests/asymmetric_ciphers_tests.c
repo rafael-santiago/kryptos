@@ -8,6 +8,7 @@
 #include "asymmetric_ciphers_tests.h"
 #include <kryptos.h>
 #include <kryptos_pem.h>
+#include <kryptos_padding.h>
 #include <string.h>
 
 CUTE_TEST_CASE(kryptos_dh_get_modp_tests)
@@ -479,3 +480,52 @@ CUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
 #endif
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_oaep_mgf_tests)
+    // WARN(Rafael): Assuming that SHA-1/256 implementation are working well.
+    struct oaep_mgf_tests {
+        const kryptos_u8_t *seed;
+        const size_t seed_size;
+        const size_t len;
+        kryptos_hash_func hash_func;
+        const kryptos_u8_t *expected_out;
+    };
+    struct oaep_mgf_tests test_vector[] = {
+        { "foo", 3,  3,   kryptos_sha1_hash, "\x1A\xC9\x07"  },
+        { "foo", 3,  5,   kryptos_sha1_hash, "\x1A\xC9\x07\x5C\xD4"  },
+        { "bar", 3,  5,   kryptos_sha1_hash, "\xBC\x0C\x65\x5E\x01"  },
+        { "bar", 3, 50,   kryptos_sha1_hash, "\xBC\x0C\x65\x5E\x01"
+                                             "\x6B\xC2\x93\x1D\x85"
+                                             "\xA2\xE6\x75\x18\x1A"
+                                             "\xDC\xEF\x7F\x58\x1F"
+                                             "\x76\xDF\x27\x39\xDA"
+                                             "\x74\xFA\xAC\x41\x62"
+                                             "\x7B\xE2\xF7\xF4\x15"
+                                             "\xC8\x9E\x98\x3F\xD0"
+                                             "\xCE\x80\xCE\xD9\x87"
+                                             "\x86\x41\xCB\x48\x76" },
+        { "bar", 3, 50, kryptos_sha256_hash, "\x38\x25\x76\xA7\x84"
+                                             "\x10\x21\xCC\x28\xFC"
+                                             "\x4C\x09\x48\x75\x3F"
+                                             "\xB8\x31\x20\x90\xCE"
+                                             "\xA9\x42\xEA\x4C\x4E"
+                                             "\x73\x5D\x10\xDC\x72"
+                                             "\x4B\x15\x5F\x9F\x60"
+                                             "\x69\xF2\x89\xD6\x1D"
+                                             "\xAC\xA0\xCB\x81\x45"
+                                             "\x02\xEF\x04\xEA\xE1" },
+    };
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;
+    kryptos_u8_t *out;
+    size_t out_size;
+
+    for (t = 0; t < test_vector_nr; t++) {
+        out = kryptos_oaep_mgf(test_vector[t].seed, test_vector[t].seed_size,
+                               test_vector[t].len,
+                               test_vector[t].hash_func,
+                               &out_size);
+        CUTE_ASSERT(out != NULL);
+        CUTE_ASSERT(out_size == test_vector[t].len);
+        CUTE_ASSERT(memcmp(out, test_vector[t].expected_out, out_size) == 0);
+        kryptos_freeseg(out);
+    }
+CUTE_TEST_CASE_END
