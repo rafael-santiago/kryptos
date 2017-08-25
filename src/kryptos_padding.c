@@ -146,3 +146,173 @@ static void kryptos_oaep_i2osp(kryptos_u8_t *c, const kryptos_u32_t counter) {
     *(c + 2) = ((counter >>  8) & 0xFF);
     *(c + 3) = counter & 0xFF;
 }
+
+kryptos_u8_t *kryptos_oaep_padding(const kryptos_u8_t *buffer, size_t *buffer_size,
+                                   const size_t k, const kryptos_u8_t *label, const size_t label_size,
+                                   kryptos_hash_func hash_func,
+                                   kryptos_hash_size_func hash_size_func) {
+    kryptos_hash_func hash = kryptos_sha1_hash;
+    kryptos_hash_size_func hash_size = kryptos_sha1_hash_size;
+    kryptos_u8_t *em = NULL, *ps = "", *l = "", *db = NULL, *seed = NULL, *dbmask = NULL, *seedmask = NULL;
+    size_t em_size, ps_size, h_size, l_size = 0, db_size = 0, dbmask_size = 0, x, seedmask_size = 0;
+    kryptos_task_ctx t, *ktask = &t;
+
+    if (buffer == NULL || buffer_size == NULL || *buffer_size == 0 || *buffer_size > k) {
+        return NULL;
+    }
+
+    if (hash_func != NULL && hash_size_func != NULL) {
+        hash = hash_func;
+        hash_size = hash_size_func;
+    }
+
+    if ((h_size = hash_size()) > k) { // INFO(Rafael): In practice it should never happen but let's assure it.
+        return NULL;
+    }
+
+    if (label != NULL && label_size > 0) {
+        l = (kryptos_u8_t *)label;
+        l_size = label_size;
+    }
+
+    // INFO(Rafael).1: Generate a string PS of length k - |M| - 2|H| - 2 of zeroed bytes (PS length can be zero).
+
+    ps_size = k - *buffer_size - (2 * h_size) - 2; // CLUE(Rafael): The usage of parentheses is saying: 'is exactly it'.
+                                                   //               Please do not mess.
+
+    if (ps_size > 0) {
+        ps = (kryptos_u8_t *) kryptos_newseg(ps_size);
+
+        if (ps == NULL) {
+            goto  kryptos_oaep_padding_epilogue;
+        }
+
+        memset(ps, 0, ps_size);
+    }
+
+    // INFO(Rafael).2: Let DB be the concatenation of Hash(L), PS, 0x01 and M.
+
+    db_size = h_size + ps_size + *buffer_size + 1;
+
+    if ((db = (kryptos_u8_t *) kryptos_newseg(db_size)) == NULL) {
+        goto kryptos_oaep_padding_epilogue;
+    }
+
+    kryptos_task_init_as_null(ktask);
+
+    ktask->in = l;
+    ktask->in_size = l_size;
+
+    hash(&ktask, 0);
+
+    if (ktask->result != kKryptosSuccess || ktask->out == NULL) {
+        goto kryptos_oaep_padding_epilogue;
+    }
+
+    if (memcpy(db, ktask->out, ktask->out_size) != db) {
+        goto kryptos_oaep_padding_epilogue;
+    }
+
+    if (ps_size > 0 && (memcpy(db + h_size, ps, ps_size) != (db + h_size))) {
+        goto kryptos_oaep_padding_epilogue;
+    }
+
+    *(db + h_size + ps_size) = 0x01;
+
+    if (memcpy(db + h_size + ps_size + 1, buffer, *buffer_size) != (db + h_size + ps_size + 1)) {
+        goto kryptos_oaep_padding_epilogue;
+    }
+
+    // INFO(Rafael).3: Generate a random seed of |H| length.
+
+    if ((seed = kryptos_get_random_block(h_size)) == NULL) {
+        goto kryptos_oaep_padding_epilogue;
+    }
+
+    // INFO(Rafael).4: Let dbMask be MGF(seed, k - |H| - 1).
+
+    dbmask = kryptos_oaep_mgf(seed, h_size, k - h_size - 1, hash, &dbmask_size);
+
+    if (dbmask == NULL) {
+        goto kryptos_oaep_padding_epilogue;
+    }
+
+    // INFO(Rafael).5: maskedDB = DB ^ dbMask.
+
+    for (x = 0; x < dbmask_size; x++) {
+        db[x] = db[x] ^ dbmask[x];
+    }
+
+    // INFO(Rafael).6: Let seedMask be MGF(maskedDB, |H|).
+
+    seedmask = kryptos_oaep_mgf(db, db_size, h_size, hash, &seedmask_size);
+
+    if (seedmask == NULL) {
+        goto kryptos_oaep_padding_epilogue;
+    }
+
+    // INFO(Rafael).7: maskedSeed = seed ^ seedMask;
+
+    for (x = 0; x < h_size; x++) {
+        seed[x] = seed[x] ^ seedmask[x];
+    }
+
+    // INFO(Rafael).8: Concatenate 0x00, maskedSeed, maskedDB and call it EM.
+
+    em_size = *buffer_size + db_size + h_size + 1;
+
+    em = (kryptos_u8_t *) kryptos_newseg(em_size);
+
+    if (em == NULL) {
+        goto kryptos_oaep_padding_epilogue;
+    }
+
+    *em = 0x00;
+
+    if (memcpy(em + 1, seed, h_size) != (em + 1)) {
+        kryptos_freeseg(em);
+        em = NULL;
+        goto kryptos_oaep_padding_epilogue;
+    }
+
+    if (memcpy(em + h_size + 1, db, db_size) != (em + h_size + 1)) {
+        kryptos_freeseg(em);
+        em = NULL;
+        goto kryptos_oaep_padding_epilogue;
+    }
+
+    *buffer_size = em_size;
+
+kryptos_oaep_padding_epilogue:
+
+    if (ps != NULL) {
+        kryptos_freeseg(ps);
+    }
+
+    if (db != NULL) {
+        kryptos_freeseg(db);
+    }
+
+    if (seed != NULL) {
+        kryptos_freeseg(seed);
+    }
+
+    if (dbmask != NULL) {
+        kryptos_freeseg(dbmask);
+    }
+
+    if (seedmask != NULL) {
+        kryptos_freeseg(seedmask);
+    }
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    kryptos_task_init_as_null(ktask);
+
+    em_size = ps_size = h_size = l_size = db_size = dbmask_size = seedmask_size = 0;
+    hash = NULL;
+    hash_size = NULL;
+    ps = l = NULL;
+
+    return em;
+}
