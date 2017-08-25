@@ -156,6 +156,7 @@ kryptos_u8_t *kryptos_oaep_padding(const kryptos_u8_t *buffer, size_t *buffer_si
     kryptos_u8_t *em = NULL, *ps = "", *l = "", *db = NULL, *seed = NULL, *dbmask = NULL, *seedmask = NULL;
     size_t em_size, ps_size, h_size, l_size = 0, db_size = 0, dbmask_size = 0, x, seedmask_size = 0;
     kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *dest = NULL;
 
     if (buffer == NULL || buffer_size == NULL || *buffer_size == 0 || *buffer_size > k) {
         return NULL;
@@ -213,13 +214,17 @@ kryptos_u8_t *kryptos_oaep_padding(const kryptos_u8_t *buffer, size_t *buffer_si
         goto kryptos_oaep_padding_epilogue;
     }
 
-    if (ps_size > 0 && (memcpy(db + h_size, ps, ps_size) != (db + h_size))) {
+    dest = db + h_size;
+
+    if (ps_size > 0 && (memcpy(dest, ps, ps_size) != dest)) {
         goto kryptos_oaep_padding_epilogue;
     }
 
     *(db + h_size + ps_size) = 0x01;
 
-    if (memcpy(db + h_size + ps_size + 1, buffer, *buffer_size) != (db + h_size + ps_size + 1)) {
+    dest = db + h_size + ps_size + 1;
+
+    if (memcpy(dest, buffer, *buffer_size) != dest) {
         goto kryptos_oaep_padding_epilogue;
     }
 
@@ -269,13 +274,17 @@ kryptos_u8_t *kryptos_oaep_padding(const kryptos_u8_t *buffer, size_t *buffer_si
 
     *em = 0x00;
 
-    if (memcpy(em + 1, seed, h_size) != (em + 1)) {
+    dest = em + 1;
+
+    if (memcpy(dest, seed, h_size) != dest) {
         kryptos_freeseg(em);
         em = NULL;
         goto kryptos_oaep_padding_epilogue;
     }
 
-    if (memcpy(em + h_size + 1, db, db_size) != (em + h_size + 1)) {
+    dest = em + h_size + 1;
+
+    if (memcpy(dest, db, db_size) != dest) {
         kryptos_freeseg(em);
         em = NULL;
         goto kryptos_oaep_padding_epilogue;
@@ -312,7 +321,7 @@ kryptos_oaep_padding_epilogue:
     em_size = ps_size = h_size = l_size = db_size = dbmask_size = seedmask_size = 0;
     hash = NULL;
     hash_size = NULL;
-    ps = l = NULL;
+    ps = l = dest = NULL;
 
     return em;
 }
