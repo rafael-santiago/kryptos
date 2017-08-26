@@ -490,7 +490,7 @@ CUTE_TEST_CASE(kryptos_oaep_mgf_tests)
         const kryptos_u8_t *expected_out;
     };
     struct oaep_mgf_tests test_vector[] = {
-        { "foo", 3,  3,   kryptos_sha1_hash, "\x1A\xC9\x07"  },
+        { "foo", 3,  3,   kryptos_sha1_hash, "\x1A\xC9\x07"          },
         { "foo", 3,  5,   kryptos_sha1_hash, "\x1A\xC9\x07\x5C\xD4"  },
         { "bar", 3,  5,   kryptos_sha1_hash, "\xBC\x0C\x65\x5E\x01"  },
         { "bar", 3, 50,   kryptos_sha1_hash, "\xBC\x0C\x65\x5E\x01"
@@ -512,7 +512,7 @@ CUTE_TEST_CASE(kryptos_oaep_mgf_tests)
                                              "\x4B\x15\x5F\x9F\x60"
                                              "\x69\xF2\x89\xD6\x1D"
                                              "\xAC\xA0\xCB\x81\x45"
-                                             "\x02\xEF\x04\xEA\xE1" },
+                                             "\x02\xEF\x04\xEA\xE1" }
     };
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;
     kryptos_u8_t *out;
@@ -527,5 +527,48 @@ CUTE_TEST_CASE(kryptos_oaep_mgf_tests)
         CUTE_ASSERT(out_size == test_vector[t].len);
         CUTE_ASSERT(memcmp(out, test_vector[t].expected_out, out_size) == 0);
         kryptos_freeseg(out);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_oaep_padding_tests)
+    struct oaep_padding_tests {
+        kryptos_u8_t *buffer;
+        size_t buffer_size;
+        size_t k;
+        kryptos_u8_t *l;
+        size_t l_size;
+        kryptos_hash_func hash;
+        kryptos_hash_size_func hash_size;
+    };
+    struct oaep_padding_tests test_vector[] = {
+        { "foobar", 6, 128, "", 0, kryptos_sha1_hash, kryptos_sha1_hash_size }
+    };
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;
+    kryptos_u8_t *padded_message = NULL, *message = NULL;
+    size_t padded_message_size = 0, message_size = 0;
+
+    for (t = 0; t < test_vector_nr; t++) {
+        padded_message_size = test_vector[t].buffer_size;
+        padded_message = kryptos_apply_oaep_padding(test_vector[t].buffer,
+                                                    &padded_message_size,
+                                                    test_vector[t].k,
+                                                    test_vector[t].l,
+                                                    test_vector[t].l_size,
+                                                    test_vector[t].hash,
+                                                    test_vector[t].hash_size);
+        CUTE_ASSERT(padded_message != NULL);
+        message = kryptos_drop_oaep_padding(padded_message,
+                                            &padded_message_size,
+                                            test_vector[t].k,
+                                            test_vector[t].l,
+                                            test_vector[t].l_size,
+                                            test_vector[t].hash,
+                                            test_vector[t].hash_size);
+
+        CUTE_ASSERT(message != NULL);
+        CUTE_ASSERT(padded_message_size == test_vector[t].buffer_size);
+        CUTE_ASSERT(memcmp(message, test_vector[t].buffer, padded_message_size) == 0);
+        kryptos_freeseg(message);
+        kryptos_freeseg(padded_message);
     }
 CUTE_TEST_CASE_END

@@ -529,6 +529,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
 #endif
 KUTE_TEST_CASE_END
 
+/*
 KUTE_TEST_CASE(kryptos_oaep_mgf_tests)
     // WARN(Rafael): Assuming that SHA-1/256 implementation are working well.
     struct oaep_mgf_tests {
@@ -578,3 +579,4 @@ KUTE_TEST_CASE(kryptos_oaep_mgf_tests)
         kryptos_freeseg(out);
     }
 KUTE_TEST_CASE_END
+*/

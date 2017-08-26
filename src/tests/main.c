@@ -139,6 +139,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_rsa_cipher_tests);
     CUTE_RUN_TEST(kryptos_rsa_cipher_c99_tests);
     CUTE_RUN_TEST(kryptos_oaep_mgf_tests);
+    CUTE_RUN_TEST(kryptos_oaep_padding_tests);
 
 //    CUTE_RUN_TEST(poke_bloody_poke);
 CUTE_TEST_CASE_END
