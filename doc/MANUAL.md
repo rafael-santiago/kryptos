@@ -2,7 +2,7 @@
 
 **Abstract**: This library was designed to be used in user mode applications and also in kernel mode. The following
 sections will guide the readers through the main aspects of how to use ``kryptos`` in their own stuff. This documentation
-considers that the readers have at least a minimal formal knowledge of cryptology.
+considers that the readers have at least a minimal formal knowledge in cryptology.
 
 ## Link101
 
@@ -20,12 +20,12 @@ Also is possible to use ``-lkryptos``, in the following way:
 Watson@221B:~/src/kryptos-test# gcc test.c -L/usr/well-known-place/ -lkryptos
 ```
 
-Of course, you should indicates where the ``kryptos`` headers are. In ``GCC``, ``Clang`` it can be done using the option
+Of course, you should indicate where the ``kryptos`` headers are. In ``GCC``, ``Clang`` it can be done using the option
 ``-I<path>``.
 
 ### Linking kernel mode stuff
 
-For kernel mode, until now kryptos can be used in ``FreeBSD`` and ``Linux``. The main idea was create a tiny library
+For kernel mode, until now, kryptos can be used in ``FreeBSD`` and ``Linux``. The main idea was create a tiny library
 easy to embed in any project. Thus all you need to do is define the C macro ``KRYPTOS_KERNEL_MODE`` during the compilation
 of your code.
 
@@ -45,7 +45,7 @@ You do not need to worry about where this struct is specifically defined in kryp
 ### The kryptos_task_ctx struct
 
 The ``kryptos_task_ctx`` is responsible for storing the plaintext, ciphertext, the current used algorithm, the key parameters
-besides the additional parameters.
+besides the additional parameters when necessary.
 
 There is no field called "plaintext" or "ciphertext". There are the fields ``in`` and ``out``. Then, for encrypting the **plaintext**
 must be stored into ``in``. When decrypting the **ciphertext** also must be stored into ``in``. The resultant data of the two operations
@@ -191,12 +191,12 @@ int main(int argc, char **argv) {
 ```
 
 Maybe you can find curious the lack of the second ``kryptos_arc4_setup()`` call. But this arc4 setup is just for storing
-the user key reference inside the task context. The real keystream generation is performed in every task execution.
+the user key reference inside the task context. The real keystream generation is performed on every task execution.
 Once the user key and some internal control sets defined by ``kryptos_arc4_setup()`` you do not need call it anymore. The
 ``kryptos_arc4_setup()`` sets the ``cipher`` field from ``kryptos_task_ctx`` to ``kKryptosCipherARC4``.
 
 Another curious thing could be the lack of the explicit indication of encryption or decryption intentions, however, ``ARC4``
-is a stream cipher, the encryption and decryption are the same it only depends on the input.
+is a stream cipher, the encryption and decryption are the same. It only depends on the input.
 
 The use of ``kryptos_freeseg()`` in order to free memory is indicated because in kernel mode it can abstract some complications
 to you. In user mode you can call the default libc ``free()`` function, there is no problem with that.
@@ -417,10 +417,10 @@ int main(int argc, char **argv) {
 
 If you want to generate the iv on your own, you need to care about the content of the fields ``iv`` and ``iv_size`` from the
 ``kryptos_task_ctx`` struct. The iv should point to the chunk of bytes required as iv by the current used cipher and
-the iv_size must store the total in byte of that byte chunk. If you generate an invalid iv the encryption/decryption will
+the iv_size must store the total in bytes of that byte chunk. If you generate an invalid iv the encryption/decryption will
 fail. As a result the kryptos_last_task_succeed(...) will indicate a zero value.
 
-Details about a failure always can be accessed by the field ``result_verbose`` from the ``kryptos_task_ctx`` struct.
+Details about a failure always can be accessed by watching the field ``result_verbose`` from the ``kryptos_task_ctx`` struct.
 
 Not all block ciphers only need a key, a size of this key and an operation mode. In kryptos we also have block ciphers
 that need more than the standard parameters. In this case the additional parameters are always passed after the operation
@@ -560,7 +560,7 @@ in **Table 4**.
 
 ### HMACs
 
-``Kryptos`` offers the possibility of easily generate a Message authentication code based on Hashes (HMACs) when
+``Kryptos`` offers the possibility of easily generate a Message Authentication Code based on Hashes (HMACs) when
 the ``c99`` capabilities are present.
 
 This feature can be accessed using the macro ``kryptos_run_cipher_hmac``. The following code sample shows how to generate

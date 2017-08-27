@@ -7,9 +7,9 @@ This is not an absolute truth (a.k.a. unicorn) but this is the truth that I have
 
 ## Comments
 
-It is necessary when is necessary. Try do not think like a blasé "bodisatva coder" who likes to repeat "uh! the code must speaks by itself".
-You are dealing with cryptography, so the things tends to become tricky and complicated. A good comment can save time and avoid misunderstanding
-and improper improvements by other developers.
+It is necessary when is necessary. Try do not think like a blasé "bodisatva coder" who likes to repeat "uh! the code must speak by itself".
+You are dealing with cryptography, so things tend to become tricky and complicated. A good comment can save time and avoid misunderstanding
+and improper improvements by other people.
 
 A good way of commenting is by identifying yourself using meaningful short labels. The general idea is: *LABEL(YourNameOrNickname): blah, blah, blah.*.
 Take a look at the **Table 1** to know more about those labels and their proper usage.
@@ -20,7 +20,7 @@ Take a look at the **Table 1** to know more about those labels and their proper 
 |:----------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------:|
 |   ``INFO``             |  instructs someone about something                                                                                                          |
 |   ``WARN``             |  warns someone about something                                                                                                              |
-|   ``CLUE``, ``TIP``    |  gives the tips of a intricate passage of your work (in other words do not mess with the code just because you cannot instantly understand) |
+|   ``CLUE``, ``TIP``    |  gives the tips of an intricate passage of your work (in other words do not mess with the code just because you cannot instantly understand)|
 |  ``TODO``              |  marks a section of the code as a part to be improved or even developed                                                                     |
 |  ``FIXME``, ``HELPME`` |  you are in trouble and do not know how to dealing with to get the issue solved                                                             |
 |   ``BUG``              |  you have commented some code in order to avoid an evil bug                                                                                 |
@@ -100,7 +100,7 @@ Always use braces.
 
 ### Expressions
 
-Do not trust in precedence. Try to make the things clearer. If you used to write crypto code you may know that everytime we see and write pretty "insame"
+Do not trust in precedence. Try to make the stuff clearer. If you used to write crypto code you may know that everytime we see and write pretty "insame"
 and long expressions. I think that trust in precedence is evidence of naivety. Nothing should obfuscates the correctness.
 In this sense Cryptography is beautiful as Math! Let's reverberate this beauty also here...
 
@@ -169,7 +169,7 @@ Yes, global macros into a code module should be undefined at the end of the modu
 For unit tests I am using my own [stuff](https://github.com/rafael-santiago/cutest). For kernel mode tests I use a mimic of it versioned under ``src/tests/kernel``.
 
 The default way of naming a test is by using the name of the function currently tested appended with ("_tests"). Try not be so pedant, describing inputs, behaviors
-and all this shit in the test name. This just creates mess and boredom.
+and all this kind of shit in the test name. This just creates mess and boredom.
 
 You should test the function, period. Go ahead and test it. Comment if you need and that's alright.
 

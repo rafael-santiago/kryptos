@@ -45,7 +45,7 @@ The library was written taking in consideration that the users will compile ``kr
 The only thing that should be done is define the macro ``KRYPTOS_KERNEL_MODE`` and ``kryptos`` will "become" a kernel mode stuff.
 
 You should use some features with care. Personally I find that execute some features in kernel mode is overkill. You should do only the
-most "straightforward" cryptographic stuff in kernel but you are free... But take my point in consideration, okay? ;)
+most "straightforward" cryptographic stuff in kernel but you are free... But take my point in consideration. ;)
 
 ## Advanced build commands for contributors
 
@@ -72,7 +72,7 @@ Sherlock@221B:~/src/kryptos/src# hefesto --skip-dh-xchg-tests
 
 ### Speeding up the Diffie-Hellman-Merkle exchange tests
 
-The option that you should use is ``--quick-dh-tests`` and this options is enabled by default (take a look in the
+The option that you should use is ``--quick-dh-tests`` and this option is enabled by default (take a look in the
 ``src/.ivk`` file). When you do not specify this build option the unit tests for Diffie-Hellman-Merkle will use ``256-bit``
 secret values. As a result it will take longer to conclude the tests. Otherwise when you specify the build option
 ``--quick-dh-tests`` it will use ``8-bit`` secret values. As a result the test will be fast.
