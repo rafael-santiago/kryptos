@@ -539,9 +539,27 @@ CUTE_TEST_CASE(kryptos_oaep_padding_tests)
         size_t l_size;
         kryptos_hash_func hash;
         kryptos_hash_size_func hash_size;
+        int corrupt_it;
     };
     struct oaep_padding_tests test_vector[] = {
-        { "foobar", 6, 128, "", 0, kryptos_sha1_hash, kryptos_sha1_hash_size }
+        { "foobar", 6, 128, "", 0, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
+        { "alabaster", 9,  96, "L", 1, kryptos_sha224_hash, kryptos_sha224_hash_size, 0 },
+        { "you got a killer scene there, man...", 36, 256, "QoTSA", 5, kryptos_sha256_hash, kryptos_sha256_hash_size, 0 },
+        { "Givin'Up Food For Funk", 22, 512, "TheJ.B.'s", 9, kryptos_sha384_hash, kryptos_sha384_hash_size, 0 },
+        { "stray Cat strut", 15, 1024, "meow!", 5, kryptos_sha512_hash, kryptos_sha512_hash_size, 0 },
+        { "stones in my passway", 20, 128, "RJ", 2, kryptos_md4_hash, kryptos_md4_hash_size, 0 },
+        { "Get Back", 8, 512, "jojo", 4, kryptos_md5_hash, kryptos_md5_hash_size, 0 },
+        { "I Put A Spell On You", 20, 80, "Nina", 4, kryptos_ripemd128_hash, kryptos_ripemd128_hash_size, 0 },
+        { "Space Cadet", 11, 1024, "TheCoyoteWhoSpokeInTongues", 26, kryptos_ripemd160_hash, kryptos_ripemd160_hash_size, 0 },
+        { "Funky President (People It's Bad)", 33, 128, "Mr.Dynamite", 11, kryptos_sha1_hash, kryptos_sha1_hash_size, 1 },
+        { "Boom Boom", 9, 256, "HowHowHowHow", 12, kryptos_sha224_hash, kryptos_sha224_hash_size, 1 },
+        { "First Day Of My Life", 20, 96, "", 0, kryptos_sha256_hash, kryptos_sha256_hash_size, 1 },
+        { "Come On, Let's Go", 17, 1024, "LittleDarling", 13, kryptos_sha384_hash, kryptos_sha384_hash_size, 1 },
+        { "Sexual Healing", 14, 512, "Babe", 4, kryptos_sha512_hash, kryptos_sha512_hash_size, 1 },
+        { "First It Giveth", 15, 128, "...ThanITakeItAway", 18, kryptos_md4_hash, kryptos_md4_hash_size, 1 },
+        { "Easy as It Seems", 16, 2048, "Mavericks", 9, kryptos_md5_hash, kryptos_md5_hash_size, 1 },
+        { "Have You Ever Seen The Rain", 27, 128, "", 0, kryptos_ripemd128_hash, kryptos_ripemd128_hash_size, 1 },
+        { "I Know You Got Soul", 19, 256, "L", 1, kryptos_ripemd160_hash, kryptos_ripemd160_hash_size, 1 }
     };
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;
     kryptos_u8_t *padded_message = NULL, *message = NULL;
@@ -557,6 +575,11 @@ CUTE_TEST_CASE(kryptos_oaep_padding_tests)
                                                     test_vector[t].hash,
                                                     test_vector[t].hash_size);
         CUTE_ASSERT(padded_message != NULL);
+
+        if (test_vector[t].corrupt_it) {
+            padded_message[padded_message_size >> 1] = ~padded_message[padded_message_size >> 1];
+        }
+
         message = kryptos_drop_oaep_padding(padded_message,
                                             &padded_message_size,
                                             test_vector[t].k,
@@ -565,10 +588,15 @@ CUTE_TEST_CASE(kryptos_oaep_padding_tests)
                                             test_vector[t].hash,
                                             test_vector[t].hash_size);
 
-        CUTE_ASSERT(message != NULL);
-        CUTE_ASSERT(padded_message_size == test_vector[t].buffer_size);
-        CUTE_ASSERT(memcmp(message, test_vector[t].buffer, padded_message_size) == 0);
-        kryptos_freeseg(message);
+        if (test_vector[t].corrupt_it) {
+            CUTE_ASSERT(message == NULL);
+        } else {
+            CUTE_ASSERT(message != NULL);
+            CUTE_ASSERT(padded_message_size == test_vector[t].buffer_size);
+            CUTE_ASSERT(memcmp(message, test_vector[t].buffer, padded_message_size) == 0);
+            kryptos_freeseg(message);
+        }
+
         kryptos_freeseg(padded_message);
     }
 CUTE_TEST_CASE_END

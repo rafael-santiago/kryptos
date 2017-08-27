@@ -12,7 +12,7 @@
 #ifdef KRYPTOS_USER_MODE
 #include <string.h>
 #endif
-//#include <stdio.h>
+#include <stdio.h>
 
 static void kryptos_oaep_i2osp(kryptos_u8_t *c, const kryptos_u32_t counter);
 
@@ -147,7 +147,7 @@ static void kryptos_oaep_i2osp(kryptos_u8_t *c, const kryptos_u32_t counter) {
     *(c + 2) = ((counter >>  8) & 0xFF);
     *(c + 3) = counter & 0xFF;
 }
-/*
+
 void print_buffer(const kryptos_u8_t *buf, const size_t buf_size) {
     const kryptos_u8_t *bp = buf;
     const kryptos_u8_t *bp_end = bp + buf_size;
@@ -157,7 +157,7 @@ void print_buffer(const kryptos_u8_t *buf, const size_t buf_size) {
     }
     printf("\n");
 }
-*/
+
 kryptos_u8_t *kryptos_apply_oaep_padding(const kryptos_u8_t *buffer, size_t *buffer_size,
                                          const size_t k, const kryptos_u8_t *label, const size_t label_size,
                                          kryptos_hash_func hash_func,
@@ -168,6 +168,8 @@ kryptos_u8_t *kryptos_apply_oaep_padding(const kryptos_u8_t *buffer, size_t *buf
     size_t em_size, ps_size, h_size, l_size = 0, db_size = 0, dbmask_size = 0, x, seedmask_size = 0;
     kryptos_task_ctx t, *ktask = &t;
     kryptos_u8_t *dest = NULL;
+
+    kryptos_task_init_as_null(ktask);
 
     if (buffer == NULL || buffer_size == NULL || *buffer_size == 0 || *buffer_size > k) {
         return NULL;
@@ -191,7 +193,8 @@ kryptos_u8_t *kryptos_apply_oaep_padding(const kryptos_u8_t *buffer, size_t *buf
 
     ps_size = k - *buffer_size - (2 * h_size) - 2; // CLUE(Rafael): The usage of parentheses is saying: 'is exactly it'.
                                                    //               Please do not mess.
-    if (ps_size > 0) {
+
+    if ((long)ps_size >= 0) {
         ps = (kryptos_u8_t *) kryptos_newseg(ps_size);
 
         if (ps == NULL) {
@@ -199,6 +202,10 @@ kryptos_u8_t *kryptos_apply_oaep_padding(const kryptos_u8_t *buffer, size_t *buf
         }
 
         memset(ps, 0, ps_size);
+    } else {
+        // WARN(Rafael): Too long buffer it will be larger than the modulus byte size.
+        ps_size = 0;
+        goto kryptos_apply_oaep_padding_epilogue;
     }
 
     // INFO(Rafael).2: Let DB be the concatenation of Hash(L), PS, 0x01 and M.
@@ -208,8 +215,6 @@ kryptos_u8_t *kryptos_apply_oaep_padding(const kryptos_u8_t *buffer, size_t *buf
     if ((db = (kryptos_u8_t *) kryptos_newseg(db_size)) == NULL) {
         goto kryptos_apply_oaep_padding_epilogue;
     }
-
-    kryptos_task_init_as_null(ktask);
 
     ktask->in = l;
     ktask->in_size = l_size;
@@ -304,7 +309,7 @@ kryptos_u8_t *kryptos_apply_oaep_padding(const kryptos_u8_t *buffer, size_t *buf
 
 kryptos_apply_oaep_padding_epilogue:
 
-    if (ps != NULL) {
+    if (ps_size > 0 && ps != NULL) {
         kryptos_freeseg(ps);
     }
 
@@ -349,6 +354,8 @@ kryptos_u8_t *kryptos_drop_oaep_padding(const kryptos_u8_t *buffer, size_t *buff
     kryptos_u8_t *dest = NULL, *dest_end = NULL, *dest_p = NULL;
     size_t seedmask_size = 0, h_size = 0, x, dbmask_size = 0, l_size = 0, ps_size = 0, exp_ps_size = 0, m_size = 0;
     kryptos_task_ctx t, *ktask = &t;
+
+    kryptos_task_init_as_null(ktask);
 
     if (buffer == NULL || buffer_size == NULL || *buffer_size == 0) {
         return NULL;
@@ -397,7 +404,9 @@ kryptos_u8_t *kryptos_drop_oaep_padding(const kryptos_u8_t *buffer, size_t *buff
 
     // INFO(Rafael): Now we got into seedmask the original random seed. Having this piece of information we can get dbmask.
 
-    dbmask = kryptos_oaep_mgf(seedmask, h_size, k - h_size - 1, hash, &dbmask_size);
+    // WARN(Rafael): We also could use (k - h_size - 1) instead of (buffer_copy_size - h_size - 1) but I think it is
+    //               trust so much in input.
+    dbmask = kryptos_oaep_mgf(seedmask, h_size, buffer_copy_size - h_size - 1, hash, &dbmask_size);
 
     if (dbmask == NULL) {
         goto kryptos_drop_oaep_padding_epilogue;
@@ -410,8 +419,6 @@ kryptos_u8_t *kryptos_drop_oaep_padding(const kryptos_u8_t *buffer, size_t *buff
     }
 
     // INFO(Rafael): Now dest is pointing to the plain padded structure (DB). Let's check it.
-
-    kryptos_task_init_as_null(ktask);
 
     ktask->in = l;
     ktask->in_size = l_size;
@@ -455,7 +462,8 @@ kryptos_u8_t *kryptos_drop_oaep_padding(const kryptos_u8_t *buffer, size_t *buff
         goto kryptos_drop_oaep_padding_epilogue;
     }
 
-    m = (kryptos_u8_t *) kryptos_newseg(m_size);
+    m = (kryptos_u8_t *) kryptos_newseg(m_size + 1);
+    memset(m, 0, m_size + 1);
 
     if (m == NULL) {
         goto kryptos_drop_oaep_padding_epilogue;
