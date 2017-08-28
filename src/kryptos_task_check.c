@@ -24,6 +24,8 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask);
 
 static int kryptos_task_check_rsa_params(kryptos_task_ctx **ktask);
 
+static int kryptos_task_check_rsa_oaep_additional_params(kryptos_task_ctx **ktask);
+
 int kryptos_task_check(kryptos_task_ctx **ktask) {
     if (ktask == NULL || *ktask == NULL) {
         return 0;
@@ -43,7 +45,8 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
 
     if (( (*ktask)->cipher != kKryptosCipherARC4  &&
           (*ktask)->cipher != kKryptosCipherSEAL  &&
-          (*ktask)->cipher != kKryptosCipherRSA ) && (*ktask)->mode != kKryptosECB  &&
+          (*ktask)->cipher != kKryptosCipherRSA   &&
+          (*ktask)->cipher != kKryptosCipherRSAOAEP ) && (*ktask)->mode != kKryptosECB  &&
                                                       (*ktask)->mode != kKryptosCBC &&
                                                       (*ktask)->mode != kKryptosOFB) {
         (*ktask)->result = kKryptosInvalidParams;
@@ -53,7 +56,8 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
 
     if (( (*ktask)->cipher != kKryptosCipherARC4  &&
           (*ktask)->cipher != kKryptosCipherSEAL  &&
-          (*ktask)->cipher != kKryptosCipherRSA ) && ((*ktask)->mode == kKryptosCBC || (*ktask)->mode == kKryptosOFB) &&
+          (*ktask)->cipher != kKryptosCipherRSA   &&
+          (*ktask)->cipher != kKryptosCipherRSAOAEP ) && ((*ktask)->mode == kKryptosCBC || (*ktask)->mode == kKryptosOFB) &&
                                                                             kryptos_task_check_iv_data(ktask) == 0) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Invalid iv data.";
@@ -68,8 +72,12 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
         goto kryptos_task_check_error;
     }
 
-    if ((*ktask)->cipher == kKryptosCipherRSA) {
+    if ((*ktask)->cipher == kKryptosCipherRSA || (*ktask)->cipher == kKryptosCipherRSAOAEP) {
         if (kryptos_task_check_rsa_params(ktask) == 0) {
+            goto kryptos_task_check_error;
+        }
+
+        if ((*ktask)->cipher == kKryptosCipherRSAOAEP && kryptos_task_check_rsa_oaep_additional_params(ktask) == 0) {
             goto kryptos_task_check_error;
         }
     }
@@ -181,6 +189,40 @@ static int kryptos_task_check_rsa_params(kryptos_task_ctx **ktask) {
         } else {
             kryptos_freeseg(data);
         }
+    }
+
+    return 1;
+}
+
+static int kryptos_task_check_rsa_oaep_additional_params(kryptos_task_ctx **ktask) {
+    // CLUE(Rafael): arg[0] must hold the label pointer.
+    //               arg[1] must hold the label_size pointer.
+
+    if ((*ktask)->arg[0] == NULL && (*ktask)->arg[1] != NULL) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Label token indicated as null but with size greater than zero.";
+        return 0;
+    }
+
+    if ((*ktask)->arg[0] != NULL && (*ktask)->arg[1] == NULL) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Label token indicated as non-null but with size equals to zero.";
+        return 0;
+    }
+
+    // CLUE(Rafael): arg[2] must hold the chosen hash function pointer.
+    //               arg[3] must hold the chosen hash_size function pointer.
+
+    if ((*ktask)->arg[2] == NULL && (*ktask)->arg[3] != NULL) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Hash function indicated as null but Hash_size function is non-null.";
+        return 0;
+    }
+
+    if ((*ktask)->arg[2] != NULL && (*ktask)->arg[3] == NULL) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Hash function indicated as non-null but Hash_size function is null.";
+        return 0;
     }
 
     return 1;

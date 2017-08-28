@@ -25,4 +25,9 @@ void kryptos_rsa_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, size_t key_si
 
 void kryptos_rsa_cipher(kryptos_task_ctx **ktask);
 
+void kryptos_rsa_oeap_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, size_t key_size,
+                            kryptos_u8_t *label, size_t *label_size,
+                            kryptos_hash_func hash,
+                            kryptos_hash_size_func hash_size);
+
 #endif

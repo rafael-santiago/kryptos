@@ -260,7 +260,8 @@ CUTE_TEST_CASE(kryptos_task_check_tests)
                            "-----BEGIN RSA PARAM D-----\n"
                            "K04+KEU3GyG2ABjJu+sTqV5yH8mgO8aIPdygWvBq9GzJfTmLt18cck2pc7y6lmYLsl+NxgFo7KTliwXAjU3eGg==\n"
                            "-----END RSA PARAM D-----\n";
-
+    kryptos_u8_t *label = "L";
+    size_t label_size = 1;
 
     t.cipher = -1;
     t.mode = kKryptosECB;
@@ -379,6 +380,60 @@ CUTE_TEST_CASE(kryptos_task_check_tests)
 
     t.key = k_priv;
     t.key_size = strlen(k_priv);
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    CUTE_ASSERT(t.result == kKryptosSuccess);
+
+    t.cipher = kKryptosCipherRSAOAEP;
+    t.arg[0] = t.arg[1] = t.arg[2] = t.arg[3] = NULL;
+    t.key = NULL;
+    t.key_size = 0;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.action = kKryptosEncrypt;
+    t.key = k_priv;
+    t.key_size = strlen(k_priv);
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosKeyError);
+
+    t.key = k_pub;
+    t.key_size = strlen(k_pub);
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    CUTE_ASSERT(t.result == kKryptosSuccess);
+
+    t.action = kKryptosDecrypt;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosKeyError);
+
+    t.key = k_priv;
+    t.key_size = strlen(k_priv);
+    t.arg[0] = label;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.arg[0] = NULL;
+    t.arg[1] = &label_size;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.arg[1] = NULL;
+    t.arg[2] = (kryptos_hash_func) label;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.arg[2] = NULL;
+    t.arg[3] = (kryptos_hash_size_func) label;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.arg[3] = NULL;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    CUTE_ASSERT(t.result == kKryptosSuccess);
+
+    t.arg[0] = label;
+    t.arg[1] = &label_size;
+    t.arg[2] = (kryptos_hash_func) label;
+    t.arg[3] = (kryptos_hash_size_func) label;
     CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
     CUTE_ASSERT(t.result == kKryptosSuccess);
 CUTE_TEST_CASE_END

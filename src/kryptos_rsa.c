@@ -393,3 +393,22 @@ kryptos_rsa_decrypt_epilogue:
         kryptos_del_mp_value(m);
     }
 }
+
+void kryptos_rsa_oeap_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, size_t key_size,
+                            kryptos_u8_t *label, size_t *label_size,
+                            kryptos_hash_func hash,
+                            kryptos_hash_size_func hash_size) {
+    if (ktask == NULL) {
+        return;
+    }
+
+    ktask->cipher = kKryptosCipherRSAOAEP;
+
+    ktask->key = key;
+    ktask->key_size = key_size;
+
+    ktask->arg[0] = label;
+    ktask->arg[1] = label_size;
+    ktask->arg[2] = hash;
+    ktask->arg[3] = hash_size;
+}

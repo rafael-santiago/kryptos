@@ -99,6 +99,7 @@ typedef enum {
     kKryptosCipherBLOWFISH,
     kKryptosCipherSERPENT,
     kKryptosCipherRSA,
+    kKryptosCipherRSAOAEP,
     kKryptosCipherNr
 }kryptos_cipher_t;
 
