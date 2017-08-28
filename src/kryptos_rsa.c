@@ -9,6 +9,7 @@
 #include <kryptos_mp.h>
 #include <kryptos_random.h>
 #include <kryptos_pem.h>
+#include <kryptos_padding.h>
 #include <kryptos_task_check.h>
 #include <kryptos_memory.h>
 #include <kryptos_endianess_utils.h>
@@ -254,6 +255,94 @@ void kryptos_rsa_cipher(kryptos_task_ctx **ktask) {
     }
 }
 
+void kryptos_rsa_oaep_cipher(kryptos_task_ctx **ktask) {
+    kryptos_u8_t *temp = NULL, *old_in = NULL;
+    size_t old_in_size;
+    kryptos_mp_value_t *n = NULL;
+
+    if (ktask == NULL) {
+        return;
+    }
+
+    if ((*ktask)->action != kKryptosEncrypt && (*ktask)->action != kKryptosDecrypt) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Invalid action.";
+        return;
+    }
+
+    if (kryptos_task_check(ktask) == 0) {
+        return;
+    }
+
+    if ((*ktask)->in == NULL || (*ktask)->in_size == 0) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Null input buffer.";
+        return;
+    }
+
+    if (kryptos_pem_get_mp_data(KRYPTOS_RSA_PEM_HDR_PARAM_N, (*ktask)->key, (*ktask)->key_size, &n) != kKryptosSuccess) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Unable to get the N parameter.";
+        return;
+    }
+
+    if ((*ktask)->action == kKryptosEncrypt) {
+        old_in = (*ktask)->in;
+        old_in_size = (*ktask)->in_size;
+
+        temp = kryptos_apply_oaep_padding((*ktask)->in, &(*ktask)->in_size, kryptos_mp_byte2bit(n->data_size) >> 3,
+                                          (*ktask)->arg[0],
+                                          *(size_t *)(*ktask)->arg[1],
+                                          (kryptos_hash_func)(*ktask)->arg[2],
+                                          (kryptos_hash_size_func)(*ktask)->arg[3]);
+
+        if (temp == NULL) {
+            (*ktask)->result = kKryptosProcessError;
+            (*ktask)->result_verbose = "Error during OAEP padding.";
+            goto kryptos_rsa_oaep_cipher_epilogue;
+        }
+
+        (*ktask)->in = temp;
+        kryptos_rsa_encrypt(ktask);
+    } else {
+        kryptos_rsa_decrypt(ktask);
+
+        if ((*ktask)->result == kKryptosSuccess) {
+            temp = (*ktask)->in;
+
+            (*ktask)->in = kryptos_drop_oaep_padding(temp, &(*ktask)->in_size, kryptos_mp_byte2bit(n->data_size) >> 3,
+                                                     (*ktask)->arg[0],
+                                                     *(size_t *)(*ktask)->arg[1],
+                                                     (kryptos_hash_func)(*ktask)->arg[2],
+                                                     (kryptos_hash_size_func)(*ktask)->arg[3]);
+
+            if ((*ktask)->in == NULL) {
+                (*ktask)->result = kKryptosProcessError;
+                (*ktask)->result_verbose = "The cryptogram is corrupted.";
+                (*ktask)->in_size = 0;
+                // WARN(Rafael): Do not jump to epilogue, temp must be freed.
+            }
+        }
+    }
+
+    if (temp != NULL) {
+        kryptos_freeseg(temp);
+    }
+
+kryptos_rsa_oaep_cipher_epilogue:
+
+    if (n != NULL) {
+        kryptos_del_mp_value(n);
+    }
+
+    if (old_in != NULL) {
+        (*ktask)->in = old_in;
+        (*ktask)->in_size = old_in_size;
+        old_in = NULL;
+        old_in_size = 0;
+    }
+}
+
 static void kryptos_rsa_encrypt(kryptos_task_ctx **ktask) {
     kryptos_mp_value_t *e = NULL, *n = NULL, *m = NULL, *c = NULL;
 
@@ -394,7 +483,7 @@ kryptos_rsa_decrypt_epilogue:
     }
 }
 
-void kryptos_rsa_oeap_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, size_t key_size,
+void kryptos_rsa_oaep_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, size_t key_size,
                             kryptos_u8_t *label, size_t *label_size,
                             kryptos_hash_func hash,
                             kryptos_hash_size_func hash_size) {
