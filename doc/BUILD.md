@@ -132,6 +132,7 @@ The default build options are defined into the file ``src/tests/.ivk``. The **Ta
 | ``--ldflags=-lkryptos,-lcutest``         | Defines the default linker flags.                                            |
 | ``--includes=../,cutest/src``            | Defines paths of additional include directories.                             |
 | ``--kernel-mode-tests``                  | Requests the kernel mode tests execution.                                    |
+| ``--skip-rsa-oaep-tests``                | Skips the RSA-OAEP tests. The tests execution becomes faster.                |
 
 ### How the kernel mode tests are executed
 

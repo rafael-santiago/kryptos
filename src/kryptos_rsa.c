@@ -308,18 +308,18 @@ void kryptos_rsa_oaep_cipher(kryptos_task_ctx **ktask) {
         kryptos_rsa_decrypt(ktask);
 
         if ((*ktask)->result == kKryptosSuccess) {
-            temp = (*ktask)->in;
+            temp = (*ktask)->out;
 
-            (*ktask)->in = kryptos_drop_oaep_padding(temp, &(*ktask)->in_size, kryptos_mp_byte2bit(n->data_size) >> 3,
+            (*ktask)->out = kryptos_drop_oaep_padding(temp, &(*ktask)->out_size, kryptos_mp_byte2bit(n->data_size) >> 3,
                                                      (*ktask)->arg[0],
                                                      *(size_t *)(*ktask)->arg[1],
                                                      (kryptos_hash_func)(*ktask)->arg[2],
                                                      (kryptos_hash_size_func)(*ktask)->arg[3]);
 
-            if ((*ktask)->in == NULL) {
+            if ((*ktask)->out == NULL) {
                 (*ktask)->result = kKryptosProcessError;
                 (*ktask)->result_verbose = "The cryptogram is corrupted.";
-                (*ktask)->in_size = 0;
+                (*ktask)->out_size = 0;
                 // WARN(Rafael): Do not jump to epilogue, temp must be freed.
             }
         }
@@ -352,7 +352,7 @@ static void kryptos_rsa_encrypt(kryptos_task_ctx **ktask) {
         return;
     }
 
-    if ((*ktask)->in_size > n->data_size) {
+    if ((*ktask)->in_size > (kryptos_mp_byte2bit(n->data_size) >> 3)) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "RSA input is too long.";
         goto kryptos_rsa_encrypt_epilogue;
@@ -385,7 +385,6 @@ static void kryptos_rsa_encrypt(kryptos_task_ctx **ktask) {
     (*ktask)->result = kryptos_pem_put_data(&(*ktask)->out, &(*ktask)->out_size,
                                             KRYPTOS_RSA_PEM_HDR_PARAM_C,
                                             (kryptos_u8_t *)c->data, c->data_size * sizeof(kryptos_mp_digit_t));
-
 kryptos_rsa_encrypt_epilogue:
 
     if (n != NULL) {

@@ -141,6 +141,13 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_oaep_mgf_tests);
     CUTE_RUN_TEST(kryptos_oaep_padding_tests);
 
+    if (CUTE_GET_OPTION("skip-rsa-oaep-tests") == NULL) {
+        CUTE_RUN_TEST(kryptos_rsa_oaep_cipher_tests);
+        CUTE_RUN_TEST(kryptos_rsa_oaep_cipher_c99_tests);
+    } else {
+        printf("WARN: The RSA-OAEP tests were skipped.\n");
+    }
+
 //    CUTE_RUN_TEST(poke_bloody_poke);
 CUTE_TEST_CASE_END
 
