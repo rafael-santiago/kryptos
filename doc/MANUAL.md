@@ -660,7 +660,8 @@ mitigates the man-in-the-middle attacks.
 The standard method is shown as following:
 
 ```c
-// compilation: gcc std-dh-sample.c -ostd-dh-sample -lkryptos -L<kryptos.a directory> -I<kryptos includes directory>
+// compilation: gcc std-dh-sample.c -ostd-dh-sample -lkryptos -L<kryptos.a directory>
+//              -I<kryptos includes directory>
 #include <kryptos.h>
 #include <stdio.h>
 #include <string.h>
@@ -724,7 +725,8 @@ int main(int argc, char **argv) {
         goto main_epilogue;
     }
 
-    // INFO(Rafael): Now Bob should send back his output to Alice. Bob already get k, Alice will get it soon.
+    // INFO(Rafael): Now Bob should send back his output to Alice.
+    //               Bob already got k, Alice will get it soon.
 
     printf("INFO: Bob got a k value.\n");
     printf("INFO: Bob -> Alice\n");
