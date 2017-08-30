@@ -92,7 +92,7 @@ new allocated pointer representing the result of the processed input. The ``out_
 All relevant kryptos_task_ctx fields can be handled by C macros but the remaining information of how manipulate the
 ``kryptos_task_ctx`` will be introduced together with the crypto stuff.
 
-### The symmetric stuff
+## The symmetric stuff
 
 Until now, ``kryptos`` has the following symmetric ciphers:
 
@@ -644,3 +644,139 @@ As you may have noticed the general form of using the ``kryptos_run_cipher_hmac`
                             <block cipher mode>
                             [, <block cipher add. args, when the block cipher has some>)
 ```
+
+## Asymmetric stuff
+
+Until now the ``Diffie-Hellman-Merkle`` key exchange scheme and the algorithm ``RSA`` are available.
+
+Firstly let's discusse the ``DHKE`` and after ``RSA``.
+
+### The Diffie-Hellman-Merkle key exchange
+
+This key exchange scheme is implemented in two forms. The first one is the standard way, well-known and presented
+in tons of "crypto-books". The second one is a modified implementation of this protocol, this little modification
+mitigates the man-in-the-middle attacks.
+
+The standard method is shown as following:
+
+```c
+// compilation: gcc std-dh-sample.c -ostd-dh-sample -lkryptos -L<kryptos.a directory> -I<kryptos includes directory>
+#include <kryptos.h>
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char **argv) {
+    struct kryptos_dh_xchg_ctx alice_data, bob_data, *alice = &alice_data, *bob = &bob_data;
+    int exit_code = 1;
+
+    // INFO(Rafael): The actors should initialize their data contexts.
+
+    kryptos_dh_init_xchg_ctx(alice);
+    kryptos_dh_init_xchg_ctx(bob);
+
+    // INFO(Rafael): Inside the kryptos_dh_xchg_ctx there are two meaningful fields called 'p' and 'g'.
+    //               You can generate your own primes if you want to. However, kryptos has built-in
+    //               standarnized primes and generators based on RFC-3526, and in this sample we will
+    //               use them.
+
+    if (kryptos_dh_get_modp(kKryptosDHGroup1536, &alice->p, &alice->g) != kKryptosSuccess) {
+        printf("ERROR: Unexpected error during prime and generator loading.\n");
+        return 1;
+    }
+
+    // INFO(Rafael): Alice define the size in bits of her secret random number.
+    alice->s_bits = 80;
+
+    // INFO(Rafael): Now Alice process the setup data.
+
+    printf("INFO: Alice is processing...\n");
+
+    kryptos_dh_process_stdxchg(&alice);
+
+    if (!kryptos_last_task_succeed(alice) || alice->s == NULL || alice->out == NULL) {
+        printf("ERROR: Error during exchange process. (1)\n");
+        kryptos_clear_dh_xchg_ctx(alice);
+        goto main_epilogue;
+    }
+
+    // INFO(Rafael): The s field inside 'alice' context is [S]ecret, the out field should be sent to bob.
+    //               This data is automatically generated as PEM format.
+    //               Bob receives in his input the Alice's output.
+
+    printf("INFO: Alice -> Bob\n");
+
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+
+    // INFO(Rafael): Bob also defines the size in bits of his secret random number.
+    bob->s_bits = 80;
+
+    // INFO(Rafael): Now Bob pass to kryptos_dh_process_stdxchg() "oracle" his input
+
+    printf("INFO: Bob is processing...\n");
+
+    kryptos_dh_process_stdxchg(&bob);
+
+    if (!kryptos_last_task_succeed(bob) || bob->s == NULL || bob->out == NULL || bob->k == NULL) {
+        printf("ERROR: Error during exchange process. (2)\n");
+        kryptos_clear_dh_xchg_ctx(alice);
+        kryptos_clear_dh_xchg_ctx(bob);
+        goto main_epilogue;
+    }
+
+    // INFO(Rafael): Now Bob should send back his output to Alice. Bob already get k, Alice will get it soon.
+
+    printf("INFO: Bob got a k value.\n");
+    printf("INFO: Bob -> Alice\n");
+
+    alice->in = bob->out;
+    alice->in_size = bob->out_size;
+
+    // INFO(Rafael): Now Alice pass to "oracle" the output received from bob in her input.
+
+    printf("INFO: Alice is processing...\n");
+
+    kryptos_dh_process_stdxchg(&alice);
+
+    printf("INFO: Alice got a k value.\n");
+
+    if (!kryptos_last_task_succeed(alice) || alice->k == NULL) {
+        printf("ERROR: Error during exchange process. (3)\n");
+        kryptos_clear_dh_xchg_ctx(alice);
+        kryptos_clear_dh_xchg_ctx(bob);
+        goto main_epilogue;
+    }
+
+    if (alice->k->data_size == bob->k->data_size &&
+        memcmp(alice->k->data, bob->k->data, alice->k->data_size) == 0) {
+        printf("SUCCESS: Alice and Bob have agreed about a session key.\n");
+    } else {
+        printf("ERROR: The k values between Alice and Bob are not the same.\n");
+    }
+
+    exit_code = 0;
+
+main_epilogue:
+
+    kryptos_clear_dh_xchg_ctx(alice);
+    kryptos_clear_dh_xchg_ctx(bob);
+
+
+    return exit_code;
+}
+```
+
+As you may have seen the standard ``DHKE`` implementation using kryptos involves the usage of a specific structure
+called ``kryptos_dh_xchg_ctx`` and a "oracle" function called ``kryptos_dh_process_stdxchg()``. I like to call it
+"oracle" because this function is smart enough to know the stage of the exchange process. This "oracle" behavior
+avoids the necessity of driving the process with different functions or explicit code.
+
+The calls ``kryptos_init_dh_xchg_ctx()`` and ``kryptos_clear_dh_xchg_ctx()`` are always needed. The first obviously initialize
+the related structures and the second frees any allocated memory inside them.
+
+Even the standard implementation of the ``Diffie-Hellman-Merkle`` protocol seeming secure. It is not strong enough
+against ``mitm`` attacks.
+
+Fortunately, a simple change in this protocol mitigates this kind of attack.
+
+The modified ``Diffie-Hellman-Merkle`` key exchange protocol involves a preparation phase that should be done once.
