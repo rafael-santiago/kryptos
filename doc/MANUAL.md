@@ -685,10 +685,10 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    // INFO(Rafael): Alice define the size in bits of her secret random number.
+    // INFO(Rafael): Alice defines the size in bits of her secret random number.
     alice->s_bits = 80;
 
-    // INFO(Rafael): Now Alice process the setup data.
+    // INFO(Rafael): Now Alice processes the setup data.
 
     printf("INFO: Alice is processing...\n");
 
@@ -712,7 +712,7 @@ int main(int argc, char **argv) {
     // INFO(Rafael): Bob also defines the size in bits of his secret random number.
     bob->s_bits = 80;
 
-    // INFO(Rafael): Now Bob pass to kryptos_dh_process_stdxchg() "oracle" his input
+    // INFO(Rafael): Now Bob passes to kryptos_dh_process_stdxchg() "oracle" his input
 
     printf("INFO: Bob is processing...\n");
 
@@ -734,7 +734,7 @@ int main(int argc, char **argv) {
     alice->in = bob->out;
     alice->in_size = bob->out_size;
 
-    // INFO(Rafael): Now Alice pass to "oracle" the output received from bob in her input.
+    // INFO(Rafael): Now Alice passes to "oracle" the output received from bob in her input.
 
     printf("INFO: Alice is processing...\n");
 
@@ -773,7 +773,7 @@ called ``kryptos_dh_xchg_ctx`` and a "oracle" function called ``kryptos_dh_proce
 "oracle" because this function is smart enough to know the stage of the exchange process. This "oracle" behavior
 avoids the necessity of driving the process with different functions or explicit code.
 
-The calls ``kryptos_init_dh_xchg_ctx()`` and ``kryptos_clear_dh_xchg_ctx()`` are always needed. The first obviously initialize
+The calls ``kryptos_init_dh_xchg_ctx()`` and ``kryptos_clear_dh_xchg_ctx()`` are always needed. The first obviously initializes
 the related structures and the second frees any allocated memory inside them.
 
 Even the standard implementation of the ``Diffie-Hellman-Merkle`` protocol seeming secure. It is not strong enough
