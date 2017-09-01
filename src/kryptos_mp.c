@@ -2186,6 +2186,30 @@ kryptos_mp_value_t *kryptos_mp_me_mod_n(const kryptos_mp_value_t *m, const krypt
 
 }
 
+kryptos_mp_value_t *kryptos_mp_rand(const size_t bits) {
+    kryptos_mp_value_t *r;
+    size_t d;
+
+    r = kryptos_new_mp_value(kryptos_mp_byte2bit(kryptos_mp_bit2byte(bits)));
+
+    if (r == NULL) {
+        return NULL;
+    }
+
+    for (d = 0; d < r->data_size; d++) {
+#ifndef KRYPTOS_MP_U32_DIGIT
+        r->data[d] = kryptos_get_random_byte();
+#else
+        r->data[d] = (kryptos_u32_t) kryptos_get_random_byte() << 24 |
+                     (kryptos_u32_t) kryptos_get_random_byte() << 16 |
+                     (kryptos_u32_t) kryptos_get_random_byte() <<  8 |
+                     (kryptos_u32_t) kryptos_get_random_byte();
+#endif
+    }
+
+    return r;
+}
+
 kryptos_mp_value_t *kryptos_mp_gen_random(const kryptos_mp_value_t *n) {
     kryptos_mp_value_t *r = NULL, *r_div = NULL, *r_mod = NULL;
     ssize_t ri;
@@ -2194,15 +2218,28 @@ kryptos_mp_value_t *kryptos_mp_gen_random(const kryptos_mp_value_t *n) {
         return NULL;
     }
 
-    r = kryptos_new_mp_value(n->data_size << 3);
+    r = kryptos_new_mp_value(kryptos_mp_byte2bit(n->data_size));
 
     if (r == NULL) {
         return NULL;
     }
 
+#ifndef KRYPTOS_MP_DIGIT_U32
+
     for (ri = r->data_size - 1; ri >= 0; ri--) {
         r->data[ri] = kryptos_get_random_byte();
     }
+
+#else
+
+    for (ri = r->data_size - 1; ri >= 0; ri--) {
+        r->data[ri] = (kryptos_u32_t) kryptos_get_random_byte() << 24 |
+                      (kryptos_u32_t) kryptos_get_random_byte() << 16 |
+                      (kryptos_u32_t) kryptos_get_random_byte() <<  8 |
+                      (kryptos_u32_t) kryptos_get_random_byte();
+    }
+
+#endif
 
     if ((r_div = kryptos_mp_div(r, n, &r_mod)) != NULL) {
         kryptos_del_mp_value(r_div);

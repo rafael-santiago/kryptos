@@ -38,4 +38,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_rsa_oaep_cipher_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_elgamal_mk_key_pair_tests);
+
 #endif

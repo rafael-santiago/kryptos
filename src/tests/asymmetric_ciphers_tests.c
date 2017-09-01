@@ -858,3 +858,58 @@ CUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
     printf("WARN: No c99 support, this test was skipped.\n");
 #endif
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_elgamal_mk_key_pair_tests)
+    kryptos_u8_t *k_pub = NULL, *k_priv = NULL, *data = NULL;
+    size_t k_pub_size, k_priv_size, data_size;
+
+    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, NULL, &k_pub_size, &k_priv, &k_priv_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, &k_pub, NULL, &k_priv, &k_priv_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, &k_pub, &k_pub_size, NULL, &k_priv_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, &k_pub, &k_pub_size, &k_priv, NULL) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(8, &k_pub, &k_pub_size, &k_priv, &k_priv_size) == kKryptosInvalidParams);
+
+    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, &k_pub, &k_pub_size, &k_priv, &k_priv_size) == kKryptosSuccess);
+    CUTE_ASSERT(k_pub != NULL && k_pub_size != 0 && k_priv != NULL && k_priv_size != 0);
+
+    printf(" *** ELGAMAL PUBLIC KEY:\n\n");
+    printf("%s", k_pub);
+
+    printf("\n *** ELGAMAL PRIVATE KEY:\n\n");
+    printf("%s", k_priv);
+
+    // INFO(Rafael): Verifying the parameters in public key.
+
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_A, k_pub, k_pub_size, &data_size);
+    CUTE_ASSERT(data != NULL && data_size > 0);
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_P, k_pub, k_pub_size, &data_size);
+    CUTE_ASSERT(data != NULL && data_size > 0);
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_B, k_pub, k_pub_size, &data_size);
+    CUTE_ASSERT(data != NULL && data_size > 0);
+    kryptos_freeseg(data);
+
+    // WARN(Rafael): D parameter cannot be in public key.
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_D, k_pub, k_pub_size, &data_size);
+    CUTE_ASSERT(data == NULL);
+
+    // INFO(Rafael): Verifying the parameters in private key.
+
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_A, k_priv, k_priv_size, &data_size);
+    CUTE_ASSERT(data != NULL && data_size > 0);
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_P, k_priv, k_priv_size, &data_size);
+    CUTE_ASSERT(data != NULL && data_size > 0);
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_D, k_priv, k_priv_size, &data_size);
+    CUTE_ASSERT(data != NULL && data_size > 0);
+    kryptos_freeseg(data);
+
+    kryptos_freeseg(k_pub);
+    kryptos_freeseg(k_priv);
+CUTE_TEST_CASE_END

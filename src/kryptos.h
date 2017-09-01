@@ -40,6 +40,7 @@
 
 #include <kryptos_dh.h>
 #include <kryptos_rsa.h>
+#include <kryptos_elgamal.h>
 
 #define kryptos_task_set_ecb_mode(ktask) ( (ktask)->mode = kKryptosECB )
 
