@@ -444,13 +444,14 @@ static void kryptos_rsa_decrypt(kryptos_task_ctx **ktask) {
 
     (*ktask)->out_size = m->data_size * sizeof(kryptos_mp_digit_t);
     (*ktask)->out = (kryptos_u8_t *) kryptos_newseg((*ktask)->out_size);
-    memset((*ktask)->out, 0, (*ktask)->out_size);
 
     if ((*ktask)->out == NULL) {
         (*ktask)->result = kKryptosProcessError;
         (*ktask)->result_verbose = "No memory to produce the output.";
         goto kryptos_rsa_decrypt_epilogue;
     }
+
+    memset((*ktask)->out, 0, (*ktask)->out_size);
 
     o = (*ktask)->out;
     o_size = (*ktask)->out_size;

@@ -10,6 +10,10 @@
 #include <kryptos_random.h>
 #include <kryptos_mp.h>
 #include <kryptos_pem.h>
+#include <kryptos_endianess_utils.h>
+#ifndef KRYPTOS_KERNEL_MODE
+#include <string.h>
+#endif
 
 static kryptos_task_result_t kryptos_elgamal_generate_p_a_d(const size_t bits,
                                                             kryptos_mp_value_t **p,
@@ -248,7 +252,7 @@ static void kryptos_elgamal_encrypt(kryptos_task_ctx **ktask) {
         goto kryptos_elgamal_encrypt_epilogue;
     }
 
-    // INFO(Rafael): Picking a random value for our ephemeral key.
+    // INFO(Rafael): Picking a random value for building up our ephemeral key.
 
     i = kryptos_elgamal_get_random_mp(&i, bits, p);
 
@@ -371,4 +375,169 @@ kryptos_elgamal_encrypt_epilogue:
 }
 
 static void kryptos_elgamal_decrypt(kryptos_task_ctx **ktask) {
+    kryptos_mp_value_t *x = NULL, *x_mod = NULL, *y = NULL, *p_d_1 = NULL, *p = NULL, *d = NULL, *_1 = NULL, *ke = NULL,
+                       *km_inv = NULL;
+    ssize_t xd, o_size;
+    kryptos_u8_t *o = NULL;
+
+    if (ktask == NULL) {
+        return;
+    }
+
+    _1 = kryptos_hex_value_as_mp("1", 1);
+
+    if (_1 == NULL) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Unable to alocate multiprecision constant.";
+        return;
+    }
+
+    // INFO(Rafael): Reading the P and D parameters from the private key buffer.
+
+    (*ktask)->result = kryptos_pem_get_mp_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_P, (*ktask)->key, (*ktask)->key_size, &p);
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        goto kryptos_elgamal_decrypt_epilogue;
+    }
+
+    (*ktask)->result = kryptos_pem_get_mp_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_D, (*ktask)->key, (*ktask)->key_size, &d);
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        goto kryptos_elgamal_decrypt_epilogue;
+    }
+
+    // INFO(Rafael): Reading the ephemeral key from input.
+
+    (*ktask)->result = kryptos_pem_get_mp_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_E, (*ktask)->in, (*ktask)->in_size, &ke);
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        goto kryptos_elgamal_decrypt_epilogue;
+    }
+
+    // INFO(Rafael): Reading Y from input (the masked cryptogram).
+
+    (*ktask)->result = kryptos_pem_get_mp_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Y, (*ktask)->in, (*ktask)->in_size, &y);
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        goto kryptos_elgamal_decrypt_epilogue;
+    }
+
+    // INFO(Rafael): Calculating p - d - 1, this will be used as an expoent.
+
+    if ((p_d_1 = kryptos_assign_mp_value(&p_d_1, p)) == NULL) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Error while calculating (p - d - 1) exponent.";
+        goto kryptos_elgamal_decrypt_epilogue;
+    }
+
+    if ((p_d_1 = kryptos_mp_sub(&p_d_1, d)) == NULL) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Error while calculating (p - d - 1) expoent.";
+        goto kryptos_elgamal_decrypt_epilogue;
+    }
+
+    if ((p_d_1 = kryptos_mp_sub(&p_d_1, _1)) == NULL) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Error while calculating (p - d - 1) expoent.";
+        goto kryptos_elgamal_decrypt_epilogue;
+    }
+
+    // INFO(Rafael): Applying the Fermat's little theorem. Supported by his theorem we can avoid running
+    //               the Extended Euclidean algorithm to get the inverse of the masking key.
+    //               Fermat rocks!
+
+    // TODO(Rafael): Using the Fermat's little theorem here allow us to eliminate the Beta from the private key buffer.
+    //               Stop exporting it during the key pair generating phase. It became a useless piece of information.
+
+    if ((km_inv = kryptos_mp_me_mod_n(ke, p_d_1, p)) == NULL) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Error while calculating km^-1.";
+        goto kryptos_elgamal_decrypt_epilogue;
+    }
+
+    // INFO(Rafael): Now un-masking the cryptogram.
+
+    if ((y = kryptos_mp_mul(&y, km_inv)) == NULL) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose =  "Error while calculating x.";
+        goto kryptos_elgamal_decrypt_epilogue;
+    }
+
+    if ((x = kryptos_mp_div(y, p, &x_mod)) == NULL || x_mod == NULL) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Error while calculating x mod p.";
+        goto kryptos_elgamal_decrypt_epilogue;
+    }
+
+    // INFO(Rafael): Re-assembling the original message.
+
+    (*ktask)->out_size = x_mod->data_size * sizeof(kryptos_mp_digit_t);
+    (*ktask)->out = (kryptos_u8_t *) kryptos_newseg((*ktask)->out_size);
+
+    if ((*ktask)->out == NULL) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "No memory to produce the output.";
+        goto kryptos_elgamal_decrypt_epilogue;
+    }
+
+    memset((*ktask)->out, 0, (*ktask)->out_size);
+
+    o = (*ktask)->out;
+    o_size = (*ktask)->out_size;
+
+    for (xd = x_mod->data_size - 1; xd >= 0; xd--, o += sizeof(kryptos_mp_digit_t), o_size -= sizeof(kryptos_mp_digit_t)) {
+#ifdef KRYPTOS_MP_U32_DIGIT
+        kryptos_cpy_u32_as_big_endian(o, o_size, x_mod->data[xd]);
+#else
+        *o = x_mod->data[xd];
+#endif
+    }
+
+kryptos_elgamal_decrypt_epilogue:
+
+    if (x != NULL) {
+        kryptos_del_mp_value(x);
+    }
+
+    if (x_mod != NULL) {
+        kryptos_del_mp_value(x_mod);
+    }
+
+    if (y != NULL) {
+        kryptos_del_mp_value(y);
+    }
+
+    if (p_d_1 != NULL) {
+        kryptos_del_mp_value(p_d_1);
+    }
+
+    if (p != NULL) {
+        kryptos_del_mp_value(p);
+    }
+
+    if (d != NULL) {
+        kryptos_del_mp_value(d);
+    }
+
+    if (_1 != NULL) {
+        kryptos_del_mp_value(_1);
+    }
+
+    if (ke != NULL) {
+        kryptos_del_mp_value(ke);
+    }
+
+    if (km_inv != NULL) {
+        kryptos_del_mp_value(km_inv);
+    }
+
+    xd = o_size = 0;
+
+    o = NULL;
+
+    if ((*ktask)->result != kKryptosSuccess && (*ktask)->out != NULL) {
+        kryptos_freeseg((*ktask)->out);
+        (*ktask)->out = NULL;
+        (*ktask)->out_size = 0;
+    }
 }
