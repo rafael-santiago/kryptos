@@ -807,7 +807,9 @@ int main(int argc, char **argv) {
         goto main_epilogue;
     }
 
-    // INFO(Rafael): Bob defines the size in bits of his random secret value and then he makes a key pair based on p, g and s.
+    // INFO(Rafael): Bob defines the size in bits of his random secret value and then he makes a key pair
+    //               based on p, g and s.
+    //
     //               Actually it will generate a fouth value t what should be published by him.
 
     bob->s_bits = 160;
@@ -824,13 +826,17 @@ int main(int argc, char **argv) {
 
     // INFO(Rafael): Bob should make public the data in k_pub_bob and save safely the data in k_priv_bob.
 
-    // INFO(Rafael): Now let's suppose that Alice wants to communicate with Bob. She must put the public key info from
-    //               Bob in her input task buffer and also picks a size in bits for her [s]ecret s value.
+    // INFO(Rafael): Now let's suppose that Alice wants to communicate with Bob. She must put the public key
+    //               info from Bob in her input task buffer and also picks a size in bits for her [s]ecret s
+    //               value.
+
     alice->in = k_pub_bob;
     alice->in_size = k_pub_bob_size;
     alice->s_bits = 160;
 
-    // INFO(Rafael): Notice that she needs to call kryptos_dh_process_modxchg() instead of kryptos_dh_process_stdxchg().
+    // INFO(Rafael): Notice that she needs to call kryptos_dh_process_modxchg() instead of
+    //               kryptos_dh_process_stdxchg().
+
     kryptos_dh_process_modxchg(&alice);
 
     if (!kryptos_last_task_succeed(alice)) {
@@ -839,11 +845,11 @@ int main(int argc, char **argv) {
         goto main_epilogue;
     }
 
-    // INFO(Rafael): Alice has already the session key but she must send to Bob her produced output. Thus, Bob will also
-    //               got the same session key.
+    // INFO(Rafael): Alice has already the session key but she must send to Bob her produced output. Thus,
+    //               Bob will also got the same session key.
 
-    // INFO(Rafael): By his side, Bob must append the received data from Alice with his private key data. This involves
-    //               mere pointer math loved by any true C programmer ;)
+    // INFO(Rafael): By his side, Bob must append the received data from Alice with his private key data.
+    //               This involves mere pointer math loved by any true C programmer ;)
 
     bob->in_size = alice->out_size + k_priv_bob_size;
     bob->in = (kryptos_u8_t *) kryptos_newseg(bob->in_size);
@@ -870,8 +876,8 @@ int main(int argc, char **argv) {
 
     bob->s_bits = 160;
 
-    // INFO(Rafael): Having defined the data from Alice appended with his private key information and also the size in bits
-    //               of his s, all that Bob should do is call kryptos_dh_process_modxchg().
+    // INFO(Rafael): Having defined the data from Alice appended with his private key information and also
+    //               the size in bits of his s, all that Bob should do is call kryptos_dh_process_modxchg().
 
     kryptos_dh_process_modxchg(&bob);
 
@@ -881,8 +887,8 @@ int main(int argc, char **argv) {
         goto main_epilogue;
     }
 
-    // INFO(Rafael): Now all indicates that Alice and Bob have agreed about k and this value can be accessed by them into their
-    //               task contexts by the field 'k'.
+    // INFO(Rafael): Now all indicates that Alice and Bob have agreed about k and this value can be accessed
+    //               by them into their task contexts by the field 'k'.
 
     if (alice->k->data_size == bob->k->data_size &&
         memcmp(alice->k->data, bob->k->data, alice->k->data_size) == 0) {
