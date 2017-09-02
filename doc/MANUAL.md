@@ -889,7 +889,7 @@ int main(int argc, char **argv) {
         goto main_epilogue;
     }
 
-    // INFO(Rafael): Now all indicates that Alice and Bob have agreed about k and this value can be accessed
+    // INFO(Rafael): Now all indicate that Alice and Bob have agreed about k and this value can be accessed
     //               by them into their task contexts by the field 'k'.
 
     if (alice->k->data_size == bob->k->data_size &&
