@@ -660,7 +660,7 @@ mitigates the man-in-the-middle attacks.
 The standard method is shown as following:
 
 ```c
-// compilation: gcc std-dh-sample.c -ostd-dh-sample -lkryptos -L<kryptos.a directory>
+// compilation: gcc std-dh-sample.c -ostd-dh-sample -lkryptos -L<libkryptos.a directory>
 //              -I<kryptos includes directory>
 #include <kryptos.h>
 #include <stdio.h>
@@ -784,6 +784,8 @@ Fortunately, a simple change in this protocol mitigates this kind of attack.
 The modified ``Diffie-Hellman-Merkle`` key exchange protocol involves a preparation phase that should be done once.
 
 ```c
+// compilation: gcc mod-dh-sample.c -omod-dh-sample -lkryptos -L<libkryptos.a directory>
+//              -I<kryptos includes directory>
 #include <kryptos.h>
 #include <string.h>
 #include <stdio.h>
@@ -916,7 +918,7 @@ main_epilogue:
 }
 ```
 
-The nice part about the modified version of the ```Diffie-Hellman-Merkle`` protocol is that we do not have a previous
+The nice part about the modified version of the ``Diffie-Hellman-Merkle`` protocol is that we do not have a previous
 communication that could be hijacked by some attacker. As a result this mitigates a bunch the possibility of mitm attacks.
 Actually, we have only one data exchange during the key agreement and the public part of the generated key can be of
 knowledge of anyone, there is no problem with that.
