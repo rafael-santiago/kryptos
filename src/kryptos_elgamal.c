@@ -11,6 +11,7 @@
 #include <kryptos_mp.h>
 #include <kryptos_pem.h>
 #include <kryptos_endianess_utils.h>
+#include <kryptos_task_check.h>
 #ifndef KRYPTOS_KERNEL_MODE
 #include <string.h>
 #endif
@@ -110,6 +111,42 @@ kryptos_elgamal_mk_key_pair_epilogue:
     }
 
     return result;
+}
+
+void kryptos_elgamal_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, size_t key_size) {
+    if (ktask == NULL) {
+        return;
+    }
+
+    ktask->cipher = kKryptosCipherELGAMAL;
+
+    ktask->key = key;
+    ktask->key_size = key_size;
+}
+
+void kryptos_elgamal_cipher(kryptos_task_ctx **ktask) {
+    if (ktask == NULL) {
+        return;
+    }
+
+    if (kryptos_task_check(ktask) == 0) {
+        return;
+    }
+
+    if ((*ktask)->in == NULL || (*ktask)->in_size == 0) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Null input buffer.";
+        return;
+    }
+
+    if ((*ktask)->action == kKryptosEncrypt) {
+        kryptos_elgamal_encrypt(ktask);
+    } else if ((*ktask)->action == kKryptosDecrypt) {
+        kryptos_elgamal_decrypt(ktask);
+    } else {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Invalid action.";
+    }
 }
 
 static kryptos_task_result_t kryptos_elgamal_generate_p_a_d(const size_t bits,

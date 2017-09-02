@@ -17,6 +17,7 @@
 #include <kryptos_aes.h>
 #include <kryptos_serpent.h>
 #include <kryptos_rsa.h>
+#include <kryptos_elgamal.h>
 #include <kryptos_pem.h>
 #include <kryptos_memory.h>
 
@@ -25,6 +26,8 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask);
 static int kryptos_task_check_rsa_params(kryptos_task_ctx **ktask);
 
 static int kryptos_task_check_rsa_oaep_additional_params(kryptos_task_ctx **ktask);
+
+static int kryptos_task_check_elgamal_params(kryptos_task_ctx **ktask);
 
 int kryptos_task_check(kryptos_task_ctx **ktask) {
     if (ktask == NULL || *ktask == NULL) {
@@ -43,22 +46,25 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
         goto kryptos_task_check_error;
     }
 
-    if (( (*ktask)->cipher != kKryptosCipherARC4  &&
-          (*ktask)->cipher != kKryptosCipherSEAL  &&
-          (*ktask)->cipher != kKryptosCipherRSA   &&
-          (*ktask)->cipher != kKryptosCipherRSAOAEP ) && (*ktask)->mode != kKryptosECB  &&
-                                                      (*ktask)->mode != kKryptosCBC &&
-                                                      (*ktask)->mode != kKryptosOFB) {
+    if (( (*ktask)->cipher != kKryptosCipherARC4      &&
+          (*ktask)->cipher != kKryptosCipherSEAL      &&
+          (*ktask)->cipher != kKryptosCipherRSA       &&
+          (*ktask)->cipher != kKryptosCipherRSAOAEP   &&
+          (*ktask)->cipher != kKryptosCipherELGAMAL ) && (*ktask)->mode != kKryptosECB  &&
+                                                         (*ktask)->mode != kKryptosCBC  &&
+                                                         (*ktask)->mode != kKryptosOFB) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Invalid operation mode.";
         goto kryptos_task_check_error;
     }
 
-    if (( (*ktask)->cipher != kKryptosCipherARC4  &&
-          (*ktask)->cipher != kKryptosCipherSEAL  &&
-          (*ktask)->cipher != kKryptosCipherRSA   &&
-          (*ktask)->cipher != kKryptosCipherRSAOAEP ) && ((*ktask)->mode == kKryptosCBC || (*ktask)->mode == kKryptosOFB) &&
-                                                                            kryptos_task_check_iv_data(ktask) == 0) {
+    if (( (*ktask)->cipher != kKryptosCipherARC4    &&
+          (*ktask)->cipher != kKryptosCipherSEAL    &&
+          (*ktask)->cipher != kKryptosCipherRSA     &&
+          (*ktask)->cipher != kKryptosCipherRSAOAEP &&
+          (*ktask)->cipher != kKryptosCipherELGAMAL ) && ( (*ktask)->mode == kKryptosCBC ||
+                                                           (*ktask)->mode == kKryptosOFB ) &&
+                                                              kryptos_task_check_iv_data(ktask) == 0) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Invalid iv data.";
         goto kryptos_task_check_error;
@@ -78,6 +84,10 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
         }
 
         if ((*ktask)->cipher == kKryptosCipherRSAOAEP && kryptos_task_check_rsa_oaep_additional_params(ktask) == 0) {
+            goto kryptos_task_check_error;
+        }
+    } else if ((*ktask)->cipher == kKryptosCipherELGAMAL) {
+        if (kryptos_task_check_elgamal_params(ktask) == 0) {
             goto kryptos_task_check_error;
         }
     }
@@ -223,6 +233,56 @@ static int kryptos_task_check_rsa_oaep_additional_params(kryptos_task_ctx **ktas
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Hash function indicated as non-null but Hash_size function is null.";
         return 0;
+    }
+
+    return 1;
+}
+
+static int kryptos_task_check_elgamal_params(kryptos_task_ctx **ktask) {
+    kryptos_u8_t *data = NULL;
+    size_t dsize = 0;
+
+    if ((*ktask)->key == NULL || (*ktask)->key_size == 0) {
+        (*ktask)->result = kKryptosKeyError;
+        (*ktask)->result_verbose = "ELGAMAL key not supplied.";
+        return 0;
+    }
+
+    if ((*ktask)->action == kKryptosEncrypt) {
+        data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_P, (*ktask)->key, (*ktask)->key_size, &dsize);
+
+        if (data != NULL) {
+            kryptos_freeseg(data);
+            data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_B, (*ktask)->key, (*ktask)->key_size, &dsize);
+
+            if (data != NULL) {
+                kryptos_freeseg(data);
+                data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_A, (*ktask)->key, (*ktask)->key_size, &dsize);
+            }
+        }
+
+        if (data == NULL) {
+            (*ktask)->result = kKryptosKeyError;
+            (*ktask)->result_verbose = "ELGAMAL public key not supplied.";
+            return 0;
+        } else {
+            kryptos_freeseg(data);
+        }
+    } else if ((*ktask)->action == kKryptosDecrypt) {
+        data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_P, (*ktask)->key, (*ktask)->key_size, &dsize);
+
+        if (data != NULL) {
+            kryptos_freeseg(data);
+            data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_D, (*ktask)->key, (*ktask)->key_size, &dsize);
+        }
+
+        if (data == NULL) {
+            (*ktask)->result = kKryptosKeyError;
+            (*ktask)->result_verbose = "ELGAMAL private key not supplied.";
+            return 0;
+        } else {
+            kryptos_freeseg(data);
+        }
     }
 
     return 1;
