@@ -11,6 +11,118 @@
 #include <kryptos_padding.h>
 #include <string.h>
 
+CUTE_TEST_CASE(kryptos_verify_dl_params_tests)
+    kryptos_mp_value_t *p = NULL, *q = NULL, *g = NULL;
+
+    // INFO(Rafael): It should pass.
+
+    g = kryptos_hex_value_as_mp("3C", 2);
+    q = kryptos_hex_value_as_mp("2F", 2);
+    p = kryptos_hex_value_as_mp("11B", 3);
+
+    CUTE_ASSERT(p != NULL && q != NULL && g != NULL);
+
+    CUTE_ASSERT(kryptos_verify_dl_params(p, q, g) == kKryptosSuccess);
+
+    // INFO(Rafael): It should fail due to g's nullity.
+
+    CUTE_ASSERT(kryptos_verify_dl_params(p, q, NULL) == kKryptosInvalidParams);
+
+    // INFO(Rafael): It should fail due to q's nullity.
+
+    CUTE_ASSERT(kryptos_verify_dl_params(p, NULL, g) == kKryptosInvalidParams);
+
+    // INFO(Rafael): It should fail due to p's nullity.
+
+    CUTE_ASSERT(kryptos_verify_dl_params(NULL, q, g) == kKryptosInvalidParams);
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(g);
+
+    // INFO(Rafael): It should fail due to g.
+
+    g = kryptos_hex_value_as_mp("0", 1);
+    q = kryptos_hex_value_as_mp("2F", 2);
+    p = kryptos_hex_value_as_mp("11B", 3);
+
+    CUTE_ASSERT(p != NULL && q != NULL && g != NULL);
+
+    CUTE_ASSERT(kryptos_verify_dl_params(p, q, g) == kKryptosInvalidParams);
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(g);
+
+    // INFO(Rafael): It should fail due to g.
+
+    g = kryptos_hex_value_as_mp("11C", 3);
+    q = kryptos_hex_value_as_mp("2F", 2);
+    p = kryptos_hex_value_as_mp("11B", 3);
+
+    CUTE_ASSERT(p != NULL && q != NULL && g != NULL);
+
+    CUTE_ASSERT(kryptos_verify_dl_params(p, q, g) == kKryptosInvalidParams);
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(g);
+
+    // INFO(Rafael): It should fail due to q.
+
+    g = kryptos_hex_value_as_mp("3C", 2);
+    q = kryptos_hex_value_as_mp("2A", 2);
+    p = kryptos_hex_value_as_mp("11B", 3);
+
+    CUTE_ASSERT(p != NULL && q != NULL && g != NULL);
+
+    CUTE_ASSERT(kryptos_verify_dl_params(p, q, g) == kKryptosInvalidParams);
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(g);
+
+    // INFO(Rafael): It should fail due to p.
+
+    g = kryptos_hex_value_as_mp("3C", 2);
+    q = kryptos_hex_value_as_mp("2F", 2);
+    p = kryptos_hex_value_as_mp("11A", 3);
+
+    CUTE_ASSERT(p != NULL && q != NULL && g != NULL);
+
+    CUTE_ASSERT(kryptos_verify_dl_params(p, q, g) == kKryptosInvalidParams);
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(g);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_generate_dl_params_tests)
+    // WARN(Rafael): If the kryptos_verify_dl_params() is broken: "you shall not pass".
+    kryptos_mp_value_t *p = NULL, *q = NULL, *g = NULL;
+
+    CUTE_ASSERT(kryptos_generate_dl_params(80, 40, &p, &q, NULL) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_generate_dl_params(80, 40, &p, NULL, &g) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_generate_dl_params(80, 40, NULL, &q, &g) == kKryptosInvalidParams);
+
+    CUTE_ASSERT(kryptos_generate_dl_params(64, 32, &p, &q, &g) == kKryptosSuccess);
+
+    printf(" P = "); kryptos_print_mp(p);
+    printf(" Q = "); kryptos_print_mp(q);
+    printf(" G = "); kryptos_print_mp(g);
+
+    CUTE_ASSERT(p != NULL);
+    CUTE_ASSERT(q != NULL);
+    CUTE_ASSERT(g != NULL);
+
+    // INFO(Rafael): Internally it was checked but let's make sure here too.
+    CUTE_ASSERT(kryptos_verify_dl_params(p, q, g) == kKryptosSuccess);
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(g);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_dh_get_modp_tests)
     struct modp_test_ctx {
         kryptos_dh_modp_group_bits_t bits;
@@ -920,4 +1032,73 @@ CUTE_TEST_CASE(kryptos_elgamal_mk_key_pair_tests)
 
     kryptos_freeseg(k_pub);
     kryptos_freeseg(k_priv);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
+    kryptos_u8_t *k_pub_alice = "-----BEGIN ELGAMAL PARAM A-----\n"
+                                "ZyZbVv15bH/mjyFqrzJJHtus1DBqWCl0gPPxHY6uKHuIShoEtgCMwhODOEvSs9dtnq8ybfn5F8kqCg2oFBh+EA==\n"
+                                "-----END ELGAMAL PARAM A-----\n"
+                                "-----BEGIN ELGAMAL PARAM P-----\n"
+                                "h31a8eU+6pAYQP2mQAJx3gkdStqjDyCnrkhrR6tX9qXX9HaIrU64lm7AcLB+7sov8BNsnV+7XUmmNWqy1+NNOA==\n"
+                                "-----END ELGAMAL PARAM P-----\n"
+                                "-----BEGIN ELGAMAL PARAM B-----\n"
+                                "j4xxfDZdL3LDxZ5g2UX7LHb62rbxrc/q5O7nT8bIBQIPsR5mW/BkPaEzvKHpSm9+ayBNgDvvdbIAOX80ikxsDA==\n"
+                                "-----END ELGAMAL PARAM B-----\n";
+
+    kryptos_u8_t *k_priv_alice = "-----BEGIN ELGAMAL PARAM A-----\n"
+                                 "ZyZbVv15bH/mjyFqrzJJHtus1DBqWCl0gPPxHY6uKHuIShoEtgCMwhODOEvSs9dtnq8ybfn5F8kqCg2oFBh+EA==\n"
+                                 "-----END ELGAMAL PARAM A-----\n"
+                                 "-----BEGIN ELGAMAL PARAM P-----\n"
+                                 "h31a8eU+6pAYQP2mQAJx3gkdStqjDyCnrkhrR6tX9qXX9HaIrU64lm7AcLB+7sov8BNsnV+7XUmmNWqy1+NNOA==\n"
+                                 "-----END ELGAMAL PARAM P-----\n"
+                                 "-----BEGIN ELGAMAL PARAM D-----\n"
+                                 "7na8dcwkX2rHWb2xnUE2mF2Ey4aFKN7KMe9GVUNF6KyZFQVApKYWSncceybQVLkNSUO8rFNuzvmjJ992vDPgKw==\n"
+                                 "-----END ELGAMAL PARAM D-----\n";
+
+    kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
+    kryptos_u8_t *m = "yo no creo en brujas, pero que las hay, las hay\x00\x00\x00\x00\x00\x00"
+                      "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+    size_t m_size = 64;
+
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    // INFO(Rafael): Bob sends a message to Alice.
+
+    bob->key = k_pub_alice;
+    bob->key_size = strlen(k_pub_alice);
+    bob->in = m;
+    bob->in_size = m_size;
+
+    bob->cipher = kKryptosCipherELGAMAL;
+    kryptos_task_set_encrypt_action(bob);
+    kryptos_elgamal_cipher(&bob);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+
+    printf(" *** CIPHERTEXT:\n%s\n\n", bob->out);
+
+    // INFO(Rafael): Bob sends the cryptogram to Alice.
+
+    alice->in = bob->out;
+    alice->in_size = bob->out_size;
+
+    alice->key = k_priv_alice;
+    alice->key_size = strlen(k_priv_alice);
+    alice->cipher = kKryptosCipherELGAMAL;
+    kryptos_task_set_decrypt_action(alice);
+    kryptos_elgamal_cipher(&alice);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+
+    CUTE_ASSERT(alice->out != NULL);
+
+    //printf(" *** PLAINTEXT:\n\n'%s'\n\n", alice->out);
+
+    CUTE_ASSERT(alice->out_size == m_size);
+    CUTE_ASSERT(memcmp(alice->out, m, m_size) == 0);
+
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
 CUTE_TEST_CASE_END

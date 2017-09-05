@@ -154,6 +154,13 @@ static kryptos_task_result_t kryptos_elgamal_generate_p_a_d(const size_t bits,
                                                             kryptos_mp_value_t **a,
                                                             kryptos_mp_value_t **d) {
     kryptos_task_result_t result = kKryptosSuccess;
+    kryptos_mp_value_t *_1 = NULL, *gcd = NULL;
+
+    _1 = kryptos_hex_value_as_mp("1", 1);
+
+    if (_1 == NULL) {
+        return kKryptosProcessError;
+    }
 
     (*p) = kryptos_mp_gen_prime(bits);
 
@@ -161,12 +168,25 @@ static kryptos_task_result_t kryptos_elgamal_generate_p_a_d(const size_t bits,
         return kKryptosProcessError;
     }
 
-    (*a) = kryptos_elgamal_get_random_mp(a, bits, *p);
+    do {
+        if (*a != NULL) {
+            kryptos_del_mp_value(*a);
+        }
 
-    if ((*a) == NULL) {
-        result = kKryptosProcessError;
-        goto kryptos_elgamal_generate_p_a_d_epilogue;
-    }
+        if (gcd != NULL) {
+            kryptos_del_mp_value(gcd);
+            gcd = NULL;
+        }
+
+        (*a) = kryptos_elgamal_get_random_mp(a, bits, *p);
+
+        if ((*a) == NULL) {
+            result = kKryptosProcessError;
+            goto kryptos_elgamal_generate_p_a_d_epilogue;
+        }
+
+        gcd = kryptos_mp_gcd(*a, *p);
+    } while (kryptos_mp_ne(gcd, _1));
 
     (*d) = kryptos_elgamal_get_random_mp(d, bits, *p);
 
@@ -175,6 +195,14 @@ static kryptos_task_result_t kryptos_elgamal_generate_p_a_d(const size_t bits,
     }
 
 kryptos_elgamal_generate_p_a_d_epilogue:
+
+    if (_1 != NULL) {
+        kryptos_del_mp_value(_1);
+    }
+
+    if (gcd != NULL) {
+        kryptos_del_mp_value(gcd);
+    }
 
     if (result != kKryptosSuccess) {
         if ((*p) != NULL) {

@@ -122,6 +122,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     // INFO(Rafael): Asymmetric stuff
 
+    CUTE_RUN_TEST(kryptos_verify_dl_params_tests);
+    CUTE_RUN_TEST(kryptos_generate_dl_params_tests);
+
     CUTE_RUN_TEST(kryptos_dh_get_modp_tests);
     CUTE_RUN_TEST(kryptos_dh_get_random_s_tests);
     CUTE_RUN_TEST(kryptos_dh_eval_t_tests);
@@ -148,7 +151,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
         printf("WARN: The RSA-OAEP tests were skipped.\n");
     }
 
-    CUTE_RUN_TEST(kryptos_elgamal_mk_key_pair_tests);
+    //CUTE_RUN_TEST(kryptos_elgamal_mk_key_pair_tests);
+    //CUTE_RUN_TEST(kryptos_elgamal_cipher_tests);
 
 //    CUTE_RUN_TEST(poke_bloody_poke);
 CUTE_TEST_CASE_END
