@@ -125,6 +125,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_verify_dl_params_tests);
     CUTE_RUN_TEST(kryptos_generate_dl_params_tests);
 
+    CUTE_RUN_TEST(kryptos_dh_mk_domain_params_tests);
+    CUTE_RUN_TEST(kryptos_dh_verify_domain_params_tests);
+    CUTE_RUN_TEST(kryptos_dh_get_modp_from_params_buf_tests);
     CUTE_RUN_TEST(kryptos_dh_get_modp_tests);
     CUTE_RUN_TEST(kryptos_dh_get_random_s_tests);
     CUTE_RUN_TEST(kryptos_dh_eval_t_tests);

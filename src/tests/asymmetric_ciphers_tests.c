@@ -123,6 +123,120 @@ CUTE_TEST_CASE(kryptos_generate_dl_params_tests)
     kryptos_del_mp_value(g);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_dh_mk_domain_params_tests)
+    kryptos_u8_t *params = NULL;
+    size_t params_size = 0;
+    kryptos_u8_t *data = NULL;
+    size_t data_size = 0;
+
+    CUTE_ASSERT(kryptos_dh_mk_domain_params(0, 32, &params, &params_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dh_mk_domain_params(64, 0, &params, &params_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dh_mk_domain_params(64, 32, NULL, &params_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dh_mk_domain_params(64, 32, &params, NULL) == kKryptosInvalidParams);
+
+    CUTE_ASSERT(kryptos_dh_mk_domain_params(64, 32, &params, &params_size) == kKryptosSuccess);
+
+    CUTE_ASSERT(params != NULL);
+    CUTE_ASSERT(params_size > 0);
+
+    printf(" *** DH DOMAIN PARAMETERS:\n\n%s\n", params);
+
+    data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_P, params, params_size, &data_size);
+
+    CUTE_ASSERT(data != NULL);
+
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_Q, params, params_size, &data_size);
+
+    CUTE_ASSERT(data != NULL);
+
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_G, params, params_size, &data_size);
+
+    CUTE_ASSERT(data != NULL);
+
+    kryptos_freeseg(data);
+
+    kryptos_freeseg(params);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_dh_verify_domain_params_tests)
+    kryptos_u8_t *valid_params = "-----BEGIN DH PARAM P-----\n"
+                                 "r0JMxbGO+Cg=\n"
+                                 "-----END DH PARAM P-----\n"
+                                 "-----BEGIN DH PARAM Q-----\n"
+                                 "O/IVlg==\n"
+                                 "-----END DH PARAM Q-----\n"
+                                 "-----BEGIN DH PARAM G-----\n"
+                                 "gEAAVxKjmgI=\n"
+                                 "-----END DH PARAM G-----\n";
+
+    kryptos_u8_t *invalid_params = "-----BEGIN DH PARAM P-----\n"
+                                   "Ko87iBqGQEI=\n"
+                                   "-----END DH PARAM P-----\n"
+                                   "-----BEGIN DH PARAM Q-----\n"
+                                   "Y/hBcA==\n"
+                                   "-----END DH PARAM Q-----\n"
+                                   "-----BEGIN DH PARAM G-----\n"
+                                   "tOOCDE3FHCU=\n"
+                                   "-----END DH PARAM G-----\n";
+
+    CUTE_ASSERT(kryptos_dh_verify_domain_params(valid_params, 0) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dh_verify_domain_params(NULL, 1) == kKryptosInvalidParams);
+
+    CUTE_ASSERT(kryptos_dh_verify_domain_params(valid_params, strlen(valid_params)) == kKryptosSuccess);
+
+    CUTE_ASSERT(kryptos_dh_verify_domain_params(invalid_params, strlen(invalid_params)) == kKryptosInvalidParams);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_dh_get_modp_from_params_buf_tests)
+    kryptos_u8_t *valid_params = "-----BEGIN DH PARAM P-----\n"
+                                 "r0JMxbGO+Cg=\n"
+                                 "-----END DH PARAM P-----\n"
+                                 "-----BEGIN DH PARAM Q-----\n"
+                                 "O/IVlg==\n"
+                                 "-----END DH PARAM Q-----\n"
+                                 "-----BEGIN DH PARAM G-----\n"
+                                 "gEAAVxKjmgI=\n"
+                                 "-----END DH PARAM G-----\n";
+
+    kryptos_u8_t *no_p_param = "-----BEGIN DH PARAM Q-----\n"
+                               "O/IVlg==\n"
+                               "-----END DH PARAM Q-----\n"
+                               "-----BEGIN DH PARAM G-----\n"
+                               "gEAAVxKjmgI=\n"
+                               "-----END DH PARAM G-----\n";
+
+    kryptos_u8_t *no_g_param = "-----BEGIN DH PARAM P-----\n"
+                               "r0JMxbGO+Cg=\n"
+                               "-----END DH PARAM P-----\n"
+                               "-----BEGIN DH PARAM Q-----\n"
+                               "O/IVlg==\n"
+                               "-----END DH PARAM Q-----\n";
+
+    // CLUE(Rafael): It was intentional.
+    kryptos_mp_value_t *p = (kryptos_mp_value_t *)valid_params, *g = (kryptos_mp_value_t *)valid_params;
+
+    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(NULL, 1, &p, &g) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, 0, &p, &g) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, 1, NULL, &g) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, 1, &p, NULL) == kKryptosInvalidParams);
+
+    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, strlen(no_p_param), &p, &g) != kKryptosSuccess);
+    CUTE_ASSERT(p == NULL && g == NULL);
+
+    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_g_param, strlen(no_g_param), &p, &g) != kKryptosSuccess);
+    CUTE_ASSERT(p == NULL && g == NULL);
+
+    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(valid_params, strlen(valid_params), &p, &g) == kKryptosSuccess);
+    CUTE_ASSERT(p != NULL && g != NULL);
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(g);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_dh_get_modp_tests)
     struct modp_test_ctx {
         kryptos_dh_modp_group_bits_t bits;

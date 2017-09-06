@@ -10,6 +10,16 @@
 
 #include <cutest.h>
 
+CUTE_DECLARE_TEST_CASE(kryptos_verify_dl_params_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_generate_dl_params_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_dh_mk_domain_params_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_dh_verify_domain_params_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_dh_get_modp_from_params_buf_tests);
+
 CUTE_DECLARE_TEST_CASE(kryptos_dh_get_modp_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_dh_get_random_s_tests);
@@ -41,9 +51,5 @@ CUTE_DECLARE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_elgamal_mk_key_pair_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_elgamal_cipher_tests);
-
-CUTE_DECLARE_TEST_CASE(kryptos_verify_dl_params_tests);
-
-CUTE_DECLARE_TEST_CASE(kryptos_generate_dl_params_tests);
 
 #endif

@@ -13,6 +13,8 @@
 
 #define KRYPTOS_DH_PEM_HDR_PARAM_P "DH PARAM P"
 
+#define KRYPTOS_DH_PEM_HDR_PARAM_Q "DH PARAM Q"
+
 #define KRYPTOS_DH_PEM_HDR_PARAM_G "DH PARAM G"
 
 #define KRYPTOS_DH_PEM_HDR_PARAM_T "DH PARAM T"
@@ -50,6 +52,15 @@ struct kryptos_dh_xchg_ctx {
     (xc)->result_verbose = NULL;\
     (xc)->result = kKryptosSuccess;\
 }
+
+
+kryptos_task_result_t kryptos_dh_mk_domain_params(const size_t p_bits, const size_t q_bits,
+                                                  kryptos_u8_t **params, size_t *params_size);
+
+kryptos_task_result_t kryptos_dh_verify_domain_params(const kryptos_u8_t *params, const size_t params_size);
+
+kryptos_task_result_t kryptos_dh_get_modp_from_params_buf(const kryptos_u8_t *params, const size_t params_size,
+                                                          kryptos_mp_value_t **p, kryptos_mp_value_t **g);
 
 kryptos_task_result_t kryptos_dh_get_modp(const kryptos_dh_modp_group_bits_t bits,
                                           kryptos_mp_value_t **p, kryptos_mp_value_t **g);

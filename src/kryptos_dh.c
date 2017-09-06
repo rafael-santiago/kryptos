@@ -7,6 +7,7 @@
  */
 #include <kryptos_dh.h>
 #include <kryptos_random.h>
+#include <kryptos_dl_params.h>
 #include <kryptos_pem.h>
 #include <kryptos.h>
 #ifndef KRYPTOS_KERNEL_MODE
@@ -194,6 +195,148 @@ KRYPTOS_DH_GROUPS_END
 
 static void kryptos_dh_get_random_modp_entry(const struct kryptos_dh_modp_group_ctx *entries,
                                              kryptos_mp_value_t **p, kryptos_mp_value_t **g);
+
+kryptos_task_result_t kryptos_dh_mk_domain_params(const size_t p_bits, const size_t q_bits,
+                                                  kryptos_u8_t **params, size_t *params_size) {
+    kryptos_task_result_t result = kKryptosSuccess;
+    kryptos_mp_value_t *p = NULL, *q = NULL, *g = NULL;
+
+    if (params == NULL || params_size == NULL || p_bits == 0 || q_bits == 0) {
+        return kKryptosInvalidParams;
+    }
+
+    (*params) = NULL;
+    *params_size = 0;
+
+    if ((result = kryptos_generate_dl_params(p_bits, q_bits, &p, &q, &g)) == kKryptosSuccess) {
+
+        // INFO(Rafael): The exportation of the q besides the prime p and the primitive element g is
+        //               for verification issues. Since the data will be shared with other people, they will
+        //               be able to verify if the prime and the generator are 'trustable' before actually using
+        //               p and g.
+
+        result = kryptos_pem_put_data(params, params_size, KRYPTOS_DH_PEM_HDR_PARAM_P,
+                                      (kryptos_u8_t *)p->data, p->data_size * sizeof(kryptos_mp_digit_t));
+
+        if (result != kKryptosSuccess) {
+            goto kryptos_dh_mk_domain_params_epilogue;
+        }
+
+        result = kryptos_pem_put_data(params, params_size, KRYPTOS_DH_PEM_HDR_PARAM_Q,
+                                      (kryptos_u8_t *)q->data, q->data_size * sizeof(kryptos_mp_digit_t));
+
+        if (result != kKryptosSuccess) {
+            goto kryptos_dh_mk_domain_params_epilogue;
+        }
+
+        result = kryptos_pem_put_data(params, params_size, KRYPTOS_DH_PEM_HDR_PARAM_G,
+                                      (kryptos_u8_t *)g->data, g->data_size * sizeof(kryptos_mp_digit_t));
+    }
+
+kryptos_dh_mk_domain_params_epilogue:
+
+    if (result != kKryptosSuccess && (*params) != NULL) {
+        kryptos_freeseg(*params);
+        *params_size = 0;
+    }
+
+    if (p != NULL) {
+        kryptos_del_mp_value(p);
+    }
+
+    if (q != NULL) {
+        kryptos_del_mp_value(q);
+    }
+
+    if (g != NULL) {
+        kryptos_del_mp_value(g);
+    }
+
+    return result;
+}
+
+kryptos_task_result_t kryptos_dh_verify_domain_params(const kryptos_u8_t *params, const size_t params_size) {
+    kryptos_task_result_t result = kKryptosSuccess;
+    kryptos_mp_value_t *p = NULL, *q = NULL, *g = NULL;
+
+    if (params == NULL || params_size == 0) {
+        return kKryptosInvalidParams;
+    }
+
+    result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_P, params, params_size, &p);
+
+    if (result != kKryptosSuccess) {
+        result = kKryptosInvalidParams;
+        goto kryptos_dh_verify_domain_params_epilogue;
+    }
+
+    result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_Q, params, params_size, &q);
+
+    if (result != kKryptosSuccess) {
+        result = kKryptosInvalidParams;
+        goto kryptos_dh_verify_domain_params_epilogue;
+    }
+
+    result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_G, params, params_size, &g);
+
+    if (result != kKryptosSuccess) {
+        result = kKryptosInvalidParams;
+        goto kryptos_dh_verify_domain_params_epilogue;
+    }
+
+    result = kryptos_verify_dl_params(p, q, g);
+
+kryptos_dh_verify_domain_params_epilogue:
+
+    if (p != NULL) {
+        kryptos_del_mp_value(p);
+    }
+
+    if (q != NULL) {
+        kryptos_del_mp_value(q);
+    }
+
+    if (g != NULL) {
+        kryptos_del_mp_value(g);
+    }
+
+    return result;
+}
+
+kryptos_task_result_t kryptos_dh_get_modp_from_params_buf(const kryptos_u8_t *params, const size_t params_size,
+                                                          kryptos_mp_value_t **p, kryptos_mp_value_t **g) {
+    kryptos_task_result_t result = kKryptosSuccess;
+
+    if (p == NULL || g == NULL || params == NULL || params_size == 0) {
+        return kKryptosInvalidParams;
+    }
+
+    (*p) = (*g) = NULL;
+
+    result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_P, params, params_size, p);
+
+    if (result != kKryptosSuccess) {
+        goto kryptos_dh_get_modp_from_params_buf_epilogue;
+    }
+
+    result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_G, params, params_size, g);
+
+kryptos_dh_get_modp_from_params_buf_epilogue:
+
+    if (result != kKryptosSuccess) {
+        if ((*p) != NULL) {
+            kryptos_del_mp_value(*p);
+            (*p) = NULL;
+        }
+
+        if ((*g) != NULL) {
+            kryptos_del_mp_value(*g);
+            (*g) = NULL;
+        }
+    }
+
+    return result;
+}
 
 void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8_t **k_priv, size_t *k_priv_size,
                             struct kryptos_dh_xchg_ctx **data) {
