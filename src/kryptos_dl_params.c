@@ -65,6 +65,8 @@ static kryptos_task_result_t kryptos_generate_dl_temp_params(const size_t p_bits
         j_bits = q_bits - p_bits;
     }
 
+    (*p) = NULL;
+
     do {
         if (*p != NULL) {
             kryptos_del_mp_value(*p);
@@ -94,7 +96,6 @@ static kryptos_task_result_t kryptos_generate_dl_temp_params(const size_t p_bits
         (*p) = kryptos_assign_mp_value(p, j);
         (*p) = kryptos_mp_mul(p, *q);
         (*p) = kryptos_mp_add(p, _1);
-
     } while (!kryptos_mp_is_prime(*p));
 
     if (((*g) = kryptos_dl_get_g(g, *p, j)) == NULL) {

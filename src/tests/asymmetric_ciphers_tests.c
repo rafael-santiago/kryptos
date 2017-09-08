@@ -139,7 +139,7 @@ CUTE_TEST_CASE(kryptos_dh_mk_domain_params_tests)
     CUTE_ASSERT(params != NULL);
     CUTE_ASSERT(params_size > 0);
 
-    printf(" *** DH DOMAIN PARAMETERS:\n\n%s\n", params);
+    printf(" *** DH DOMAIN PARAMETERS:\n\n%s", params);
 
     data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_P, params, params_size, &data_size);
 
@@ -217,20 +217,31 @@ CUTE_TEST_CASE(kryptos_dh_get_modp_from_params_buf_tests)
                                "-----END DH PARAM Q-----\n";
 
     // CLUE(Rafael): It was intentional.
-    kryptos_mp_value_t *p = (kryptos_mp_value_t *)valid_params, *g = (kryptos_mp_value_t *)valid_params;
+    kryptos_mp_value_t *p = (kryptos_mp_value_t *)valid_params,
+                       *q = (kryptos_mp_value_t *)valid_params,
+                       *g = (kryptos_mp_value_t *)valid_params;
 
-    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(NULL, 1, &p, &g) == kKryptosInvalidParams);
-    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, 0, &p, &g) == kKryptosInvalidParams);
-    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, 1, NULL, &g) == kKryptosInvalidParams);
-    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, 1, &p, NULL) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(NULL, 1, &p, NULL, &g) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, 0, &p, NULL, &g) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, 1, NULL, NULL, &g) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, 1, &p, &q, NULL) == kKryptosInvalidParams);
 
-    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, strlen(no_p_param), &p, &g) != kKryptosSuccess);
+    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, strlen(no_p_param), &p, NULL, &g) != kKryptosSuccess);
     CUTE_ASSERT(p == NULL && g == NULL);
 
-    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_g_param, strlen(no_g_param), &p, &g) != kKryptosSuccess);
-    CUTE_ASSERT(p == NULL && g == NULL);
+    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_g_param, strlen(no_g_param), &p, &q, &g) != kKryptosSuccess);
+    CUTE_ASSERT(p == NULL && g == NULL && q == NULL);
 
-    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(valid_params, strlen(valid_params), &p, &g) == kKryptosSuccess);
+    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(valid_params, strlen(valid_params), &p, &q, &g) == kKryptosSuccess);
+    CUTE_ASSERT(p != NULL && g != NULL && q != NULL);
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(g);
+
+    p = g = NULL;
+
+    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(valid_params, strlen(valid_params), &p, NULL, &g) == kKryptosSuccess);
     CUTE_ASSERT(p != NULL && g != NULL);
 
     kryptos_del_mp_value(p);
@@ -327,6 +338,30 @@ CUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     kryptos_mp_value_t *s_alice = NULL, *s_bob = NULL;
     kryptos_mp_value_t *t_alice = NULL, *t_bob = NULL;
     kryptos_mp_value_t *kab_alice = NULL, *kab_bob = NULL;
+    kryptos_u8_t *domain_parameters = "-----BEGIN DH PARAM P-----\n"
+                                      "VSsW7ufPMgFn+MceQyQHgBtpq/q/"
+                                      "xLAZ00q/hRh8Of7Wvto1lsS6iBWs"
+                                      "mz4mYiSiOiPZkv6asUoBF8JhxMs4"
+                                      "LHEGaTV0uiRzIPxOABkXDGUnXjwd"
+                                      "EfpwkG3H+EuZK9fINggkkS+cxJ+P"
+                                      "DwkaoMgpwZEZj+ieeeOSnZgKuvaN"
+                                      "pVQ=\n"
+                                      "-----END DH PARAM P-----\n"
+                                      "-----BEGIN DH PARAM Q-----\n"
+                                      "Xdy01wlOrsxucvEv7bz+7VBT9X0=\n"
+                                      "-----END DH PARAM Q-----\n"
+                                      "-----BEGIN DH PARAM G-----\n"
+                                      "PdxLwCCBNeXR4EnVZb30SOHClBpr"
+                                      "bfJkZs3WHyct4mbI71Yo6tqFLXZZ"
+                                      "ozZCnP9ijWpsfz9qsfrcifcixEb0"
+                                      "Ewd+Xf3ne3sHVrFwC/VLCAAi1Ccc"
+                                      "a4GqzyO5juyIdjn2Bx8hWvV4E0G0"
+                                      "jgP58tlcjSNYP2lJj7TGafmyom44"
+                                      "Zxg=\n"
+                                      "-----END DH PARAM G-----\n";
+
+
+    printf("*** Using MODP from RFC-3526.\n\n");
 
     // INFO(Rafael): Alice and Bob agree about a p and g.
     CUTE_ASSERT(kryptos_dh_get_modp(kKryptosDHGroup1536, &p, &g) == kKryptosSuccess);
@@ -372,14 +407,101 @@ CUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     kryptos_del_mp_value(kab_alice);
     kryptos_del_mp_value(kab_bob);
 
+    // INFO(Rafael): Now using the "homemade" domain parameters. They were well generated (strong primes) so let's
+    //               assume that Alice and Bob verified those parameters.
+
+    printf("\n*** Using pre-computed domain parameters.\n\n");
+
+    p = g = NULL;
+
+    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
+                                                    strlen(domain_parameters), &p, NULL, &g) == kKryptosSuccess);
+
+    CUTE_ASSERT(p != NULL);
+    CUTE_ASSERT(g != NULL);
+
+    // INFO(Rafael): Alice picks one random value sa.
+    if (CUTE_GET_OPTION("dh-use-q-size") != NULL) {
+        // INFO(Rafael): Let's use the recommended random value size. This is linked to q size i.e. 160 bits -> [2, q-2].
+        //               This is a bare-bone test so we will explicitly generate a 160-bit random value.
+        s_alice = kryptos_mp_rand(160);
+    } else {
+        s_alice = kryptos_hex_value_as_mp("AA", 2); // WARN(Rafael): The Eve's dream.
+    }
+
+    CUTE_ASSERT(s_alice != NULL);
+
+    // INFO(Rafael): Bob picks one random value sb.
+    if (CUTE_GET_OPTION("dh-use-q-size") != NULL) {
+        // INFO(Rafael): Let's use the recommended random value size. This is linked to q size i.e. 160 bits -> [2, q-2].
+        //               This is a bare-bone test so we will explicitly generate a 160-bit random value.
+        s_bob = kryptos_mp_rand(160);
+    } else {
+        s_bob = kryptos_hex_value_as_mp("BB", 2); // WARN(Rafael): The Eve's dream.
+    }
+
+    CUTE_ASSERT(s_bob != NULL);
+
+    // INFO(Rafael): Alice calculates ta = g^sa mod p and she also sends her result to Bob.
+    CUTE_ASSERT(kryptos_dh_eval_t(&t_alice, g, s_alice, p) == kKryptosSuccess);
+    CUTE_ASSERT(t_alice != NULL);
+
+    // INFO(Rafael): Bob calculates tb = g^sb mod p and he also sends his result to Alice.
+    CUTE_ASSERT(kryptos_dh_eval_t(&t_bob, g, s_bob, p) == kKryptosSuccess);
+    CUTE_ASSERT(t_bob != NULL);
+
+    // INFO(Rafael): Alice calculates kab = tb^sa mod p.
+    CUTE_ASSERT(kryptos_dh_eval_t(&kab_alice, t_bob, s_alice, p) == kKryptosSuccess);
+    CUTE_ASSERT(kab_alice != NULL);
+
+    // INFO(Rafael): Bob calculates kab = ta^sb mod p.
+    CUTE_ASSERT(kryptos_dh_eval_t(&kab_bob, t_alice, s_bob, p) == kKryptosSuccess);
+    CUTE_ASSERT(kab_bob != NULL);
+
+    printf(" *** Alice KAB = "); kryptos_print_mp(kab_alice);
+    printf(" *** Bob   KAB = "); kryptos_print_mp(kab_bob);
+
+    CUTE_ASSERT(kryptos_mp_eq(kab_alice, kab_bob) == 1);
+
+    kryptos_del_mp_value(g);
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(s_alice);
+    kryptos_del_mp_value(s_bob);
+    kryptos_del_mp_value(t_alice);
+    kryptos_del_mp_value(t_bob);
+    kryptos_del_mp_value(kab_alice);
+    kryptos_del_mp_value(kab_bob);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
     // INFO(Rafael): Here we will test the "oracle" mode of the exchange process.
     struct kryptos_dh_xchg_ctx alice_stuff, bob_stuff, *alice = &alice_stuff, *bob = &bob_stuff;
+    kryptos_u8_t *domain_parameters = "-----BEGIN DH PARAM P-----\n"
+                                      "q/1geMTHBhklSLEP9NVV3Z3KH54E"
+                                      "hi8L4/ImBDydLH+WtLacIcNy5bzW"
+                                      "ZYyFbfIKgD+mzbTWYLMkv8MR54O4"
+                                      "5qTMKGCAk/CifUw351HC/UNnBWi+"
+                                      "ZajlIJ1vjegceCWynu9wsoO/9wH1"
+                                      "sCtFJifH0zfMG8i53PB9kUeXa/bo"
+                                      "T5E=\n"
+                                      "-----END DH PARAM P-----\n"
+                                      "-----BEGIN DH PARAM Q-----\n"
+                                      "tx047pscx/Il1QIIVVnlwXD66bI=\n"
+                                      "-----END DH PARAM Q-----\n"
+                                      "-----BEGIN DH PARAM G-----\n"
+                                      "kxvfCyqImE9Gr1F4dhZtPqGOAyjd"
+                                      "wsObgGUueIrI6Pz71dCOyE1Jtmgh"
+                                      "Knl8ygGDb9Xj3MjglpijVi+2th4W"
+                                      "UZrE5BbJlBTza1rPjnvHjODGgy0Y"
+                                      "GzviMegv6kI986kndWqJRfwQ7REi"
+                                      "uTNjasdut36Ejvpj/r98zDZA5gg+"
+                                      "gE0=\n"
+                                      "-----END DH PARAM G-----\n";
 
     kryptos_dh_init_xchg_ctx(alice);
     kryptos_dh_init_xchg_ctx(bob);
+
+    printf("*** Using MODP from RFC-3526.\n\n");
 
     // INFO(Rafael): Alice will start the protocol. So she picks a pre-computed DH group.
     CUTE_ASSERT(kryptos_dh_get_modp(kKryptosDHGroup1536, &alice->p, &alice->g) == kKryptosSuccess);
@@ -428,6 +550,78 @@ CUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
 
     kryptos_clear_dh_xchg_ctx(alice);
     kryptos_clear_dh_xchg_ctx(bob);
+
+    printf("\n*** Using the pre-computed domain parameters.\n\n");
+
+    kryptos_dh_init_xchg_ctx(alice);
+    kryptos_dh_init_xchg_ctx(bob);
+
+    // INFO(Rafael): Alice will start the protocol. So she picks a pre-computed DH group.
+    if (CUTE_GET_OPTION("dh-use-q-size") == NULL) {
+        CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
+                                                        strlen(domain_parameters),
+                                                        &alice->p, NULL, &alice->g) == kKryptosSuccess);
+    } else {
+        CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
+                                                        strlen(domain_parameters),
+                                                        &alice->p, &alice->q, &alice->g) == kKryptosSuccess);
+    }
+
+    CUTE_ASSERT(alice->p != NULL);
+    if (CUTE_GET_OPTION("dh-use-q-size") != NULL) {
+        // INFO(Rafael): This options states that Alice will use a value between [2, q-2], a 160-bit value.
+        CUTE_ASSERT(alice->q != NULL);
+    }
+    CUTE_ASSERT(alice->g != NULL);
+
+    if (CUTE_GET_OPTION("dh-use-q-size") == NULL) {
+        // INFO(Rafael): Mas... Alice é vida loka...
+        alice->s_bits = 8;
+    }
+
+    kryptos_dh_process_stdxchg(&alice);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+    CUTE_ASSERT(alice->s != NULL);
+    CUTE_ASSERT(alice->out != NULL);
+
+    // INFO(Rafael): Now Alice got PEM data that she must send to Bob.
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+
+    if (CUTE_GET_OPTION("dh-use-q-size") == NULL) {
+        // INFO(Rafael): Feito Alice, Bob é também um vida loka!!!
+        bob->s_bits = 8;
+    }
+
+    // INFO(Rafael): Once the PEM data received Bob process it.
+    kryptos_dh_process_stdxchg(&bob);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    CUTE_ASSERT(bob->s != NULL);
+    CUTE_ASSERT(bob->out != NULL);
+    CUTE_ASSERT(bob->k != NULL);
+
+    // INFO(Rafael): Now Bob got the value of t encoded as a PEM, so he sends it to Alice.
+    alice->in = bob->out;
+    alice->in_size = bob->out_size;
+
+    // INFO(Rafael): Alice process the PEM data received from Bob.
+    kryptos_dh_process_stdxchg(&alice);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+    CUTE_ASSERT(alice->k != NULL);
+
+    printf(" *** Alice KAB = "); kryptos_print_mp(alice->k);
+    printf(" *** Bob   KAB = "); kryptos_print_mp(bob->k);
+
+    CUTE_ASSERT(kryptos_mp_eq(alice->k, bob->k) == 1);
+
+    alice->in = NULL;
+    bob->in = NULL;
+
+    kryptos_clear_dh_xchg_ctx(alice);
+    kryptos_clear_dh_xchg_ctx(bob);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_dh_mk_key_pair_tests)
@@ -436,6 +630,27 @@ CUTE_TEST_CASE(kryptos_dh_mk_key_pair_tests)
     size_t k_pub_size, k_priv_size;
     kryptos_u8_t *pem_data;
     size_t pem_data_size;
+    kryptos_u8_t *domain_parameters = "-----BEGIN DH PARAM P-----\n"
+                                      "VSsW7ufPMgFn+MceQyQHgBtpq/q/"
+                                      "xLAZ00q/hRh8Of7Wvto1lsS6iBWs"
+                                      "mz4mYiSiOiPZkv6asUoBF8JhxMs4"
+                                      "LHEGaTV0uiRzIPxOABkXDGUnXjwd"
+                                      "EfpwkG3H+EuZK9fINggkkS+cxJ+P"
+                                      "DwkaoMgpwZEZj+ieeeOSnZgKuvaN"
+                                      "pVQ=\n"
+                                      "-----END DH PARAM P-----\n"
+                                      "-----BEGIN DH PARAM Q-----\n"
+                                      "Xdy01wlOrsxucvEv7bz+7VBT9X0=\n"
+                                      "-----END DH PARAM Q-----\n"
+                                      "-----BEGIN DH PARAM G-----\n"
+                                      "PdxLwCCBNeXR4EnVZb30SOHClBpr"
+                                      "bfJkZs3WHyct4mbI71Yo6tqFLXZZ"
+                                      "ozZCnP9ijWpsfz9qsfrcifcixEb0"
+                                      "Ewd+Xf3ne3sHVrFwC/VLCAAi1Ccc"
+                                      "a4GqzyO5juyIdjn2Bx8hWvV4E0G0"
+                                      "jgP58tlcjSNYP2lJj7TGafmyom44"
+                                      "Zxg=\n"
+                                      "-----END DH PARAM G-----\n";
 
     kryptos_dh_mk_key_pair(NULL, &k_pub_size, &k_priv, &k_priv_size, &kp);
     CUTE_ASSERT(kryptos_last_task_succeed(kp) != 1);
@@ -451,6 +666,8 @@ CUTE_TEST_CASE(kryptos_dh_mk_key_pair_tests)
 
     kryptos_dh_mk_key_pair(&k_pub, &k_pub_size, &k_priv, &k_priv_size, NULL);
     CUTE_ASSERT(kryptos_last_task_succeed(kp) != 1);
+
+    // INFO(Rafael): The following test is based on MODP from RFC-3526. No Q value is expected.
 
     // INFO(Rafael): Preparing our context.
     kryptos_dh_init_xchg_ctx(kp);
@@ -495,12 +712,103 @@ CUTE_TEST_CASE(kryptos_dh_mk_key_pair_tests)
     kryptos_clear_dh_xchg_ctx(kp);
     kryptos_freeseg(k_pub);
     kryptos_freeseg(k_priv);
+
+    // INFO(Rafael): Now we will use domain parameters pre-computed including a q parameter (when --dh-use-q-size is present).
+
+    k_pub = k_priv = NULL;
+
+    // INFO(Rafael): Preparing our context.
+    kryptos_dh_init_xchg_ctx(kp);
+
+    if (CUTE_GET_OPTION("dh-use-q-size") == NULL) {
+        CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
+                                                        strlen(domain_parameters),
+                                                        &kp->p, NULL, &kp->g) == kKryptosSuccess);
+        kp->s_bits = 8;
+    } else {
+        CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
+                                                        strlen(domain_parameters),
+                                                        &kp->p, &kp->q, &kp->g) == kKryptosSuccess);
+    }
+
+    kryptos_dh_mk_key_pair(&k_pub, &k_pub_size, &k_priv, &k_priv_size, &kp);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(kp) == 1);
+    CUTE_ASSERT(k_pub != NULL);
+    CUTE_ASSERT(k_pub_size != 0);
+    CUTE_ASSERT(k_priv != NULL);
+    CUTE_ASSERT(k_priv_size != 0);
+
+    // INFO(Rafael): Verifying the public buffer, this must include: P, G and T also maybe Q but never S.
+
+    pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_P, k_pub, k_pub_size, &pem_data_size);
+    CUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
+    kryptos_freeseg(pem_data);
+
+    if (CUTE_GET_OPTION("dh-use-q-size") != NULL) {
+        pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_Q, k_pub, k_pub_size, &pem_data_size);
+        CUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
+        kryptos_freeseg(pem_data);
+    } else {
+        pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_Q, k_pub, k_pub_size, &pem_data_size);
+        CUTE_ASSERT(pem_data == NULL);
+    }
+
+    pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_G, k_pub, k_pub_size, &pem_data_size);
+    CUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
+    kryptos_freeseg(pem_data);
+
+    pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_T, k_pub, k_pub_size, &pem_data_size);
+    CUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
+    kryptos_freeseg(pem_data);
+
+    pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_S, k_pub, k_pub_size, &pem_data_size);
+    CUTE_ASSERT(pem_data == NULL);
+
+    // INFO(Rafael): Verifying the private buffer, this must include S and also P.
+
+    pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_S, k_priv, k_priv_size, &pem_data_size);
+    CUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
+    kryptos_freeseg(pem_data);
+
+    pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_P, k_priv, k_priv_size, &pem_data_size);
+    CUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
+    kryptos_freeseg(pem_data);
+
+    kryptos_clear_dh_xchg_ctx(kp);
+    kryptos_freeseg(k_pub);
+    kryptos_freeseg(k_priv);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
     struct kryptos_dh_xchg_ctx alice_ctx, *alice = &alice_ctx, bob_ctx, *bob = &bob_ctx;
     kryptos_u8_t *k_pub_bob = NULL, *k_priv_bob = NULL;
     size_t k_pub_bob_size, k_priv_bob_size;
+    kryptos_u8_t *domain_parameters = "-----BEGIN DH PARAM P-----\n"
+                                      "q/1geMTHBhklSLEP9NVV3Z3KH54E"
+                                      "hi8L4/ImBDydLH+WtLacIcNy5bzW"
+                                      "ZYyFbfIKgD+mzbTWYLMkv8MR54O4"
+                                      "5qTMKGCAk/CifUw351HC/UNnBWi+"
+                                      "ZajlIJ1vjegceCWynu9wsoO/9wH1"
+                                      "sCtFJifH0zfMG8i53PB9kUeXa/bo"
+                                      "T5E=\n"
+                                      "-----END DH PARAM P-----\n"
+                                      "-----BEGIN DH PARAM Q-----\n"
+                                      "tx047pscx/Il1QIIVVnlwXD66bI=\n"
+                                      "-----END DH PARAM Q-----\n"
+                                      "-----BEGIN DH PARAM G-----\n"
+                                      "kxvfCyqImE9Gr1F4dhZtPqGOAyjd"
+                                      "wsObgGUueIrI6Pz71dCOyE1Jtmgh"
+                                      "Knl8ygGDb9Xj3MjglpijVi+2th4W"
+                                      "UZrE5BbJlBTza1rPjnvHjODGgy0Y"
+                                      "GzviMegv6kI986kndWqJRfwQ7REi"
+                                      "uTNjasdut36Ejvpj/r98zDZA5gg+"
+                                      "gE0=\n"
+                                      "-----END DH PARAM G-----\n";
+
+    // INFO(Rafael): Using MODP defined in RFC-3526.
+
+    printf("*** Using MODP from RFC-3526.\n\n");
 
     // INFO(Rafael): Bob generates his key pair and send his public key to Alice. This must be done only once.
 
@@ -542,6 +850,85 @@ CUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
     memcpy(bob->in + alice->out_size, k_priv_bob, k_priv_bob_size);
 
     bob->s_bits = 8;
+
+    kryptos_dh_process_modxchg(&bob);
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    CUTE_ASSERT(bob->out == NULL && bob->out_size == 0); // INFO(Rafael): Bob does not need to send any data to Alice.
+    CUTE_ASSERT(bob->k != NULL);
+
+    printf(" *** Alice KAB = "); kryptos_print_mp(alice->k);
+    printf(" *** Bob   KAB = "); kryptos_print_mp(bob->k);
+
+    // INFO(Rafael): Alice and Bob must agree each other about K.
+
+    CUTE_ASSERT(kryptos_mp_eq(alice->k, bob->k) == 1);
+
+    alice->in = NULL;
+
+    kryptos_clear_dh_xchg_ctx(alice);
+    kryptos_clear_dh_xchg_ctx(bob);
+    kryptos_freeseg(k_pub_bob);
+    kryptos_freeseg(k_priv_bob);
+
+    // INFO(Rafael): Using the pre-computed parameters and q (when --dh-use-q-size is present).
+
+    printf("\n*** Using the pre-computed domain parameters.\n\n");
+
+    k_pub_bob = k_priv_bob = NULL;
+
+    kryptos_dh_init_xchg_ctx(bob);
+
+    if (CUTE_GET_OPTION("dh-use-q-size") == NULL) {
+        CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
+                                                        strlen(domain_parameters),
+                                                        &bob->p, NULL, &bob->g) == kKryptosSuccess);
+        bob->s_bits = 8;
+    } else {
+        CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
+                                                        strlen(domain_parameters),
+                                                        &bob->p, &bob->q, &bob->g) == kKryptosSuccess);
+    }
+
+    kryptos_dh_mk_key_pair(&k_pub_bob, &k_pub_bob_size, &k_priv_bob, &k_priv_bob_size, &bob);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    CUTE_ASSERT(k_pub_bob != NULL);
+    CUTE_ASSERT(k_pub_bob_size != 0);
+    CUTE_ASSERT(k_priv_bob != NULL);
+    CUTE_ASSERT(k_priv_bob_size != 0);
+
+    kryptos_clear_dh_xchg_ctx(bob);
+
+    // INFO(Rafael): Now, Alice wants to communicate with Bob...
+
+    kryptos_dh_init_xchg_ctx(alice);
+
+    alice->in = k_pub_bob;
+    alice->in_size = k_pub_bob_size;
+
+    if (CUTE_GET_OPTION("dh-use-q-size") == NULL) {
+        alice->s_bits = 8;
+    }
+
+    kryptos_dh_process_modxchg(&alice);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+    CUTE_ASSERT(alice->out != NULL && alice->out_size != 0);
+    CUTE_ASSERT(alice->k != NULL);
+
+    // INFO(Rafael): Alice gets the private key session K and also the public value U. She sends U to Bob.
+    //               In order to successfully calculate the session K He also includes in his input his private key info.
+
+    bob->in_size = alice->out_size + k_priv_bob_size;
+    bob->in = (kryptos_u8_t *) kryptos_newseg(bob->in_size);
+    CUTE_ASSERT(bob->in != NULL);
+    memcpy(bob->in, alice->out, alice->out_size);
+    memcpy(bob->in + alice->out_size, k_priv_bob, k_priv_bob_size);
+
+    bob->s_bits = 8; // INFO(Rafael): The nice part of this modified protocol is the possibility of fastening the K computation
+                     //               at receiver's side (the private key owner). It is possible to select a pretty small
+                     //               bit size for the secret value s. When of course the sender has used the recommended
+                     //               size for s (stated by q).
 
     kryptos_dh_process_modxchg(&bob);
     CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);

@@ -209,11 +209,10 @@ kryptos_task_result_t kryptos_dh_mk_domain_params(const size_t p_bits, const siz
     *params_size = 0;
 
     if ((result = kryptos_generate_dl_params(p_bits, q_bits, &p, &q, &g)) == kKryptosSuccess) {
-
         // INFO(Rafael): The exportation of the q besides the prime p and the primitive element g is
         //               for verification issues. Since the data will be shared with other people, they will
-        //               be able to verify if the prime and the generator are 'trustable' before actually using
-        //               p and g.
+        //               be able to verify if the prime and the generator are 'trustable' before actually accepting
+        //               them.
 
         result = kryptos_pem_put_data(params, params_size, KRYPTOS_DH_PEM_HDR_PARAM_P,
                                       (kryptos_u8_t *)p->data, p->data_size * sizeof(kryptos_mp_digit_t));
@@ -304,7 +303,8 @@ kryptos_dh_verify_domain_params_epilogue:
 }
 
 kryptos_task_result_t kryptos_dh_get_modp_from_params_buf(const kryptos_u8_t *params, const size_t params_size,
-                                                          kryptos_mp_value_t **p, kryptos_mp_value_t **g) {
+                                                          kryptos_mp_value_t **p, kryptos_mp_value_t **q,
+                                                          kryptos_mp_value_t **g) {
     kryptos_task_result_t result = kKryptosSuccess;
 
     if (p == NULL || g == NULL || params == NULL || params_size == 0) {
@@ -313,10 +313,21 @@ kryptos_task_result_t kryptos_dh_get_modp_from_params_buf(const kryptos_u8_t *pa
 
     (*p) = (*g) = NULL;
 
+    if (q != NULL) {
+        (*q) = NULL;
+    }
+
     result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_P, params, params_size, p);
 
     if (result != kKryptosSuccess) {
         goto kryptos_dh_get_modp_from_params_buf_epilogue;
+    }
+
+    if (q != NULL) {
+        result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_Q, params, params_size, q);
+        if (result != kKryptosSuccess) {
+            goto kryptos_dh_get_modp_from_params_buf_epilogue;
+        }
     }
 
     result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_G, params, params_size, g);
@@ -327,6 +338,11 @@ kryptos_dh_get_modp_from_params_buf_epilogue:
         if ((*p) != NULL) {
             kryptos_del_mp_value(*p);
             (*p) = NULL;
+        }
+
+        if (q != NULL && (*q) != NULL) {
+            kryptos_del_mp_value(*q);
+            (*q) = NULL;
         }
 
         if ((*g) != NULL) {
@@ -361,7 +377,7 @@ void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8
         kryptos_del_mp_value((*data)->s);
     }
 
-    (*data)->result = kryptos_dh_get_random_s(&(*data)->s, (*data)->p, (*data)->s_bits);
+    (*data)->result = kryptos_dh_get_random_s(&(*data)->s, ((*data)->q == NULL) ? (*data)->p : (*data)->q, (*data)->s_bits);
     if (!kryptos_last_task_succeed(*data)) {
         (*data)->result_verbose = "Error while generating s.";
         return;
@@ -385,6 +401,18 @@ void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8
     if (!kryptos_last_task_succeed(*data)) {
         (*data)->result_verbose = "Unable to export p into the public buffer.";
         return;
+    }
+
+    if ((*data)->q != NULL) {
+        (*data)->result = kryptos_pem_put_data(k_pub,
+                                               k_pub_size,
+                                               KRYPTOS_DH_PEM_HDR_PARAM_Q,
+                                               (kryptos_u8_t *)(*data)->q->data,
+                                               (*data)->q->data_size * sizeof(kryptos_mp_digit_t));
+        if (!kryptos_last_task_succeed(*data)) {
+            (*data)->result_verbose = "Unable to export q into the public buffer.";
+            return;
+        }
     }
 
     (*data)->result = kryptos_pem_put_data(k_pub,
@@ -420,6 +448,11 @@ void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8
                                            (kryptos_u8_t *)(*data)->s->data,
                                            (*data)->s->data_size * sizeof(kryptos_mp_digit_t));
 
+    if (!kryptos_last_task_succeed(*data)) {
+        (*data)->result_verbose = "Unable to export s into the private buffer.";
+        return;
+    }
+
     // INFO(Rafael): P is public but it is also relevant during the "decryption" at receiver's side. So let's simplify the
     //               things to him/her putting all together in one place.
 
@@ -430,7 +463,7 @@ void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8
                                            (*data)->p->data_size * sizeof(kryptos_mp_digit_t));
 
     if (!kryptos_last_task_succeed(*data)) {
-        (*data)->result_verbose = "Unable to export s into the private buffer.";
+        (*data)->result_verbose = "Unable to export p into the private buffer.";
     }
 
     kryptos_del_mp_value((*data)->s);
@@ -461,6 +494,13 @@ void kryptos_dh_process_modxchg(struct kryptos_dh_xchg_ctx **data) {
             return;
         }
 
+        // INFO(Rafael): Trying to parse q. Notice that here is assumed that since q was also passed, the
+        //               user has already verified and accepted the <p, q, g> parameters using
+        //               kryptos_dh_verify_domain_params().
+
+        kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_Q,
+                                (*data)->in, (*data)->in_size, &(*data)->q);
+
         (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_G, (*data)->in, (*data)->in_size,
                                                   &(*data)->g);
         if (!kryptos_last_task_succeed(*data)) {
@@ -477,7 +517,7 @@ void kryptos_dh_process_modxchg(struct kryptos_dh_xchg_ctx **data) {
 
         // INFO(Rafael): The sender will pick a random s.
 
-        (*data)->result = kryptos_dh_get_random_s(&(*data)->s, (*data)->p, (*data)->s_bits);
+        (*data)->result = kryptos_dh_get_random_s(&(*data)->s, ((*data)->q == NULL) ? (*data)->p : (*data)->q, (*data)->s_bits);
         if (!kryptos_last_task_succeed(*data)) {
             (*data)->result_verbose = "Error while generating s.";
             return;
@@ -516,6 +556,10 @@ void kryptos_dh_process_modxchg(struct kryptos_dh_xchg_ctx **data) {
         }
 
         kryptos_del_mp_value((*data)->p);
+        if ((*data)->q != NULL) {
+            kryptos_del_mp_value((*data)->q);
+            (*data)-> q = NULL;
+        }
         kryptos_del_mp_value((*data)->g);
         kryptos_del_mp_value((*data)->t);
         kryptos_del_mp_value((*data)->s);
@@ -570,6 +614,13 @@ void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data) {
             return;
         }
 
+        // INFO(Rafael): Trying to parse q. Notice that here is assumed that since q was also passed, the
+        //               user has already verified and accepted the <p, q, g> parameters using
+        //               kryptos_dh_verify_domain_params().
+
+        kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_Q,
+                                (*data)->in, (*data)->in_size, &(*data)->q);
+
         // INFO(Rafael): Parsing g.
         (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_DH_PEM_HDR_PARAM_G,
                                                   (*data)->in, (*data)->in_size, &(*data)->g);
@@ -600,7 +651,7 @@ void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data) {
 }
 
     if ((*data)->s == NULL) {
-        (*data)->result = kryptos_dh_get_random_s(&(*data)->s, (*data)->p, (*data)->s_bits);
+        (*data)->result = kryptos_dh_get_random_s(&(*data)->s, ((*data)->q == NULL) ? (*data)->p : (*data)->q, (*data)->s_bits);
 
         if (!kryptos_last_task_succeed(*data)) {
             (*data)->result_verbose = "Unable to get s.";
@@ -622,6 +673,18 @@ void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data) {
             if (!kryptos_last_task_succeed(*data)) {
                 (*data)->result_verbose = "Unable to pack p into a PEM.";
                 return;
+            }
+
+            if ((*data)->q != NULL) {
+                (*data)->result = kryptos_pem_put_data(&(*data)->out,
+                                                       &(*data)->out_size,
+                                                       KRYPTOS_DH_PEM_HDR_PARAM_Q,
+                                                       (kryptos_u8_t *)(*data)->q->data,
+                                                       (*data)->q->data_size * sizeof(kryptos_mp_digit_t));
+                if (!kryptos_last_task_succeed(*data)) {
+                    (*data)->result_verbose = "Unable to pack q into a PEM.";
+                    return;
+                }
             }
 
             (*data)->result = kryptos_pem_put_data(&(*data)->out,
@@ -669,6 +732,10 @@ void kryptos_clear_dh_xchg_ctx(struct kryptos_dh_xchg_ctx *data) {
 
     if (data->p != NULL) {
         kryptos_del_mp_value(data->p);
+    }
+
+    if (data->q != NULL) {
+        kryptos_del_mp_value(data->q);
     }
 
     if (data->g != NULL) {

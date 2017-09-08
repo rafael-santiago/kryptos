@@ -133,6 +133,7 @@ The default build options are defined into the file ``src/tests/.ivk``. The **Ta
 | ``--includes=../,cutest/src``            | Defines paths of additional include directories.                             |
 | ``--kernel-mode-tests``                  | Requests the kernel mode tests execution.                                    |
 | ``--skip-rsa-oaep-tests``                | Skips the RSA-OAEP tests. The tests execution becomes faster.                |
+| ``--dh-use-q-size``                      | Enables the DH tests to use recommended bit sizes for s parameters (slower)  |
 
 ### How the kernel mode tests are executed
 
