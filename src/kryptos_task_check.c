@@ -257,7 +257,7 @@ static int kryptos_task_check_elgamal_params(kryptos_task_ctx **ktask) {
 
             if (data != NULL) {
                 kryptos_freeseg(data);
-                data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_A, (*ktask)->key, (*ktask)->key_size, &dsize);
+                data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_G, (*ktask)->key, (*ktask)->key_size, &dsize);
             }
         }
 

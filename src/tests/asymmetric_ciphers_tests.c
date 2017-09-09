@@ -925,10 +925,7 @@ CUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
     memcpy(bob->in, alice->out, alice->out_size);
     memcpy(bob->in + alice->out_size, k_priv_bob, k_priv_bob_size);
 
-    bob->s_bits = 8; // INFO(Rafael): The nice part of this modified protocol is the possibility of fastening the K computation
-                     //               at receiver's side (the private key owner). It is possible to select a pretty small
-                     //               bit size for the secret value s. When of course the sender has used the recommended
-                     //               size for s (stated by q).
+    // INFO(Rafael): At Bob's size s_bits does not mind because S will be loaded from the private key.
 
     kryptos_dh_process_modxchg(&bob);
     CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
@@ -1484,13 +1481,12 @@ CUTE_TEST_CASE(kryptos_elgamal_mk_key_pair_tests)
     kryptos_u8_t *k_pub = NULL, *k_priv = NULL, *data = NULL;
     size_t k_pub_size, k_priv_size, data_size;
 
-    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, NULL, &k_pub_size, &k_priv, &k_priv_size) == kKryptosInvalidParams);
-    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, &k_pub, NULL, &k_priv, &k_priv_size) == kKryptosInvalidParams);
-    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, &k_pub, &k_pub_size, NULL, &k_priv_size) == kKryptosInvalidParams);
-    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, &k_pub, &k_pub_size, &k_priv, NULL) == kKryptosInvalidParams);
-    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(8, &k_pub, &k_pub_size, &k_priv, &k_priv_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, 20, NULL, &k_pub_size, &k_priv, &k_priv_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, 20, &k_pub, NULL, &k_priv, &k_priv_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, 20, &k_pub, &k_pub_size, NULL, &k_priv_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, 20, &k_pub, &k_pub_size, &k_priv, NULL) == kKryptosInvalidParams);
 
-    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, &k_pub, &k_pub_size, &k_priv, &k_priv_size) == kKryptosSuccess);
+    CUTE_ASSERT(kryptos_elgamal_mk_key_pair(80, 40, &k_pub, &k_pub_size, &k_priv, &k_priv_size) == kKryptosSuccess);
     CUTE_ASSERT(k_pub != NULL && k_pub_size != 0 && k_priv != NULL && k_priv_size != 0);
 
     printf(" *** ELGAMAL PUBLIC KEY:\n\n");
@@ -1501,11 +1497,15 @@ CUTE_TEST_CASE(kryptos_elgamal_mk_key_pair_tests)
 
     // INFO(Rafael): Verifying the parameters in public key.
 
-    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_A, k_pub, k_pub_size, &data_size);
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_P, k_pub, k_pub_size, &data_size);
     CUTE_ASSERT(data != NULL && data_size > 0);
     kryptos_freeseg(data);
 
-    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_P, k_pub, k_pub_size, &data_size);
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Q, k_pub, k_pub_size, &data_size);
+    CUTE_ASSERT(data != NULL && data_size > 0);
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_G, k_pub, k_pub_size, &data_size);
     CUTE_ASSERT(data != NULL && data_size > 0);
     kryptos_freeseg(data);
 
@@ -1518,10 +1518,6 @@ CUTE_TEST_CASE(kryptos_elgamal_mk_key_pair_tests)
     CUTE_ASSERT(data == NULL);
 
     // INFO(Rafael): Verifying the parameters in private key.
-
-    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_A, k_priv, k_priv_size, &data_size);
-    CUTE_ASSERT(data != NULL && data_size > 0);
-    kryptos_freeseg(data);
 
     data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_P, k_priv, k_priv_size, &data_size);
     CUTE_ASSERT(data != NULL && data_size > 0);
@@ -1536,31 +1532,31 @@ CUTE_TEST_CASE(kryptos_elgamal_mk_key_pair_tests)
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
-    kryptos_u8_t *k_pub_alice = "-----BEGIN ELGAMAL PARAM A-----\n"
-                                "ZyZbVv15bH/mjyFqrzJJHtus1DBqWCl0gPPxHY6uKHuIShoEtgCMwhODOEvSs9dtnq8ybfn5F8kqCg2oFBh+EA==\n"
-                                "-----END ELGAMAL PARAM A-----\n"
-                                "-----BEGIN ELGAMAL PARAM P-----\n"
-                                "h31a8eU+6pAYQP2mQAJx3gkdStqjDyCnrkhrR6tX9qXX9HaIrU64lm7AcLB+7sov8BNsnV+7XUmmNWqy1+NNOA==\n"
+    kryptos_u8_t *k_pub_alice = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                "kW+7WMY/t+ksDA8wN05Xik1hnRv7lLrV19fFLPfguqAM0em5kJsEP4Y57byre/U0dMt8fSqzAI+PtScC\n"
                                 "-----END ELGAMAL PARAM P-----\n"
+                                "-----BEGIN ELGAMAL PARAM Q-----\n"
+                                "1/qPyUr0rD4=\n"
+                                "-----END ELGAMAL PARAM Q-----\n"
+                                "-----BEGIN ELGAMAL PARAM G-----\n"
+                                "2K1E/hpeAd4igi3RwZnibVM5ZUyNeAJtkfqLp0L+wG0MlOT04lnC/JAeJUXY97wgw/IQpJNmY+4++tcA\n"
+                                "-----END ELGAMAL PARAM G-----\n"
                                 "-----BEGIN ELGAMAL PARAM B-----\n"
-                                "j4xxfDZdL3LDxZ5g2UX7LHb62rbxrc/q5O7nT8bIBQIPsR5mW/BkPaEzvKHpSm9+ayBNgDvvdbIAOX80ikxsDA==\n"
+                                "qAE80AtRrkkiL98tqV40En1FsSb2D8AFi68Ng8jwgBWLnlTrAoxliMK747CVBef4lExUSyv3CpeJ4MEB\n"
                                 "-----END ELGAMAL PARAM B-----\n";
 
-    kryptos_u8_t *k_priv_alice = "-----BEGIN ELGAMAL PARAM A-----\n"
-                                 "ZyZbVv15bH/mjyFqrzJJHtus1DBqWCl0gPPxHY6uKHuIShoEtgCMwhODOEvSs9dtnq8ybfn5F8kqCg2oFBh+EA==\n"
-                                 "-----END ELGAMAL PARAM A-----\n"
-                                 "-----BEGIN ELGAMAL PARAM P-----\n"
-                                 "h31a8eU+6pAYQP2mQAJx3gkdStqjDyCnrkhrR6tX9qXX9HaIrU64lm7AcLB+7sov8BNsnV+7XUmmNWqy1+NNOA==\n"
+    kryptos_u8_t *k_priv_alice = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                 "kW+7WMY/t+ksDA8wN05Xik1hnRv7lLrV19fFLPfguqAM0em5kJsEP4Y57byre/U0dMt8fSqzAI+PtScC\n"
                                  "-----END ELGAMAL PARAM P-----\n"
                                  "-----BEGIN ELGAMAL PARAM D-----\n"
-                                 "7na8dcwkX2rHWb2xnUE2mF2Ey4aFKN7KMe9GVUNF6KyZFQVApKYWSncceybQVLkNSUO8rFNuzvmjJ992vDPgKw==\n"
+                                 "8KUZ47r90x0=\n"
                                  "-----END ELGAMAL PARAM D-----\n";
 
     kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
-    kryptos_u8_t *m = "yo no creo en brujas, pero que las hay, las hay\x00\x00\x00\x00\x00\x00"
-                      "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
-    size_t m_size = 64;
+    kryptos_u8_t *m = "yo no creo en brujas, pero que las hay, las hay.\x00\x00\x00\x00\x00\x00\x00\x00";
+    size_t m_size = 56;
 
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
@@ -1578,7 +1574,7 @@ CUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
 
     CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
 
-    printf(" *** CIPHERTEXT:\n%s\n\n", bob->out);
+    printf(" *** CIPHERTEXT:\n\n%s\n\n", bob->out);
 
     // INFO(Rafael): Bob sends the cryptogram to Alice.
 
@@ -1595,7 +1591,7 @@ CUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
 
     CUTE_ASSERT(alice->out != NULL);
 
-    //printf(" *** PLAINTEXT:\n\n'%s'\n\n", alice->out);
+    printf(" *** PLAINTEXT:\n\n'%s'\n\n", alice->out);
 
     CUTE_ASSERT(alice->out_size == m_size);
     CUTE_ASSERT(memcmp(alice->out, m, m_size) == 0);

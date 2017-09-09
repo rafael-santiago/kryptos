@@ -262,24 +262,24 @@ CUTE_TEST_CASE(kryptos_task_check_tests)
                                "-----END RSA PARAM D-----\n";
     kryptos_u8_t *label = "L";
     size_t label_size = 1;
-    kryptos_u8_t *elgamal_k_pub = "-----BEGIN ELGAMAL PARAM A-----\n"
-                                  "De9oAQ==\n"
-                                  "-----END ELGAMAL PARAM A-----\n"
-                                  "-----BEGIN ELGAMAL PARAM P-----\n"
-                                  "ybGVaA==\n"
+    kryptos_u8_t *elgamal_k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                  "LWy0fB4Y6Bc=\n"
                                   "-----END ELGAMAL PARAM P-----\n"
+                                  "-----BEGIN ELGAMAL PARAM Q-----\n"
+                                  "DYBegQ==\n"
+                                  "-----END ELGAMAL PARAM Q-----\n"
+                                  "-----BEGIN ELGAMAL PARAM G-----\n"
+                                  "7LbbqIYLtgg=\n"
+                                  "-----END ELGAMAL PARAM G-----\n"
                                   "-----BEGIN ELGAMAL PARAM B-----\n"
-                                  "r8SiTA==\n"
+                                  "zVTveNNhyhc=\n"
                                   "-----END ELGAMAL PARAM B-----\n";
 
-    kryptos_u8_t *elgamal_k_priv = "-----BEGIN ELGAMAL PARAM A-----\n"
-                                   "De9oAQ==\n"
-                                   "-----END ELGAMAL PARAM A-----\n"
-                                   "-----BEGIN ELGAMAL PARAM P-----\n"
-                                   "ybGVaA==\n"
+    kryptos_u8_t *elgamal_k_priv = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                   "LWy0fB4Y6Bc=\n"
                                    "-----END ELGAMAL PARAM P-----\n"
                                    "-----BEGIN ELGAMAL PARAM D-----\n"
-                                   "DkMmPA==\n"
+                                   "Wnb/HA==\n"
                                    "-----END ELGAMAL PARAM D-----\n";
 
     t.cipher = -1;
