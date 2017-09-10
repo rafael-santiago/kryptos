@@ -334,7 +334,7 @@ CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     // INFO(Rafael): Here only the standard exchange implementation is simulated.
-    kryptos_mp_value_t *g = NULL, *p = NULL;
+    kryptos_mp_value_t *g = NULL, *p = NULL, *q = NULL;
     kryptos_mp_value_t *s_alice = NULL, *s_bob = NULL;
     kryptos_mp_value_t *t_alice = NULL, *t_bob = NULL;
     kryptos_mp_value_t *kab_alice = NULL, *kab_bob = NULL;
@@ -359,6 +359,7 @@ CUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
                                       "jgP58tlcjSNYP2lJj7TGafmyom44"
                                       "Zxg=\n"
                                       "-----END DH PARAM G-----\n";
+    kryptos_mp_value_t *_2 = NULL, *q_2 = NULL;
 
 
     printf("*** Using MODP from RFC-3526.\n\n");
@@ -412,35 +413,72 @@ CUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
 
     printf("\n*** Using pre-computed domain parameters.\n\n");
 
-    p = g = NULL;
-
-    CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
-                                                    strlen(domain_parameters), &p, NULL, &g) == kKryptosSuccess);
-
-    CUTE_ASSERT(p != NULL);
-    CUTE_ASSERT(g != NULL);
+    p = g = s_alice = s_bob = NULL;
 
     // INFO(Rafael): Alice picks one random value sa.
     if (CUTE_GET_OPTION("dh-use-q-size") != NULL) {
-        // INFO(Rafael): Let's use the recommended random value size. This is linked to q size i.e. 160 bits -> [2, q-2].
-        //               This is a bare-bone test so we will explicitly generate a 160-bit random value.
-        s_alice = kryptos_mp_rand(160);
-    } else {
-        s_alice = kryptos_hex_value_as_mp("AA", 2); // WARN(Rafael): The Eve's dream.
-    }
+        CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
+                                                        strlen(domain_parameters), &p, &q, &g) == kKryptosSuccess);
 
-    CUTE_ASSERT(s_alice != NULL);
+
+
+        CUTE_ASSERT(p != NULL);
+        CUTE_ASSERT(q != NULL);
+        CUTE_ASSERT(g != NULL);
+
+        _2 = kryptos_hex_value_as_mp("2", 1);
+        CUTE_ASSERT(_2 != NULL);
+
+        q_2 = kryptos_assign_mp_value(&q_2, q);
+        CUTE_ASSERT(q_2 != NULL);
+
+        q_2 = kryptos_mp_sub(&q_2, _2);
+        CUTE_ASSERT(q_2 != NULL);
+
+        do {
+            if (s_alice != NULL) {
+                kryptos_del_mp_value(s_alice);
+            }
+
+            // INFO(Rafael): Let's use the recommended random value size. This is linked to q size i.e. 160 bits -> [2, q-2].
+            //               This is a bare-bone test so we will explicitly generate a 160-bit random value.
+            s_alice = kryptos_mp_rand(160);
+
+            CUTE_ASSERT(s_alice != NULL);
+        } while (kryptos_mp_lt(s_alice, _2) || kryptos_mp_gt(s_alice, q_2));
+    } else {
+        CUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
+                                                        strlen(domain_parameters), &p, NULL, &g) == kKryptosSuccess);
+
+        CUTE_ASSERT(p != NULL);
+        CUTE_ASSERT(g != NULL);
+
+        s_alice = kryptos_hex_value_as_mp("AA", 2); // WARN(Rafael): The Eve's dream.
+        CUTE_ASSERT(s_alice != NULL);
+    }
 
     // INFO(Rafael): Bob picks one random value sb.
     if (CUTE_GET_OPTION("dh-use-q-size") != NULL) {
-        // INFO(Rafael): Let's use the recommended random value size. This is linked to q size i.e. 160 bits -> [2, q-2].
-        //               This is a bare-bone test so we will explicitly generate a 160-bit random value.
-        s_bob = kryptos_mp_rand(160);
+        do {
+            if (s_bob != NULL) {
+                kryptos_del_mp_value(s_bob);
+            }
+
+            // INFO(Rafael): Let's use the recommended random value size. This is linked to q size i.e. 160 bits -> [2, q-2].
+            //               This is a bare-bone test so we will explicitly generate a 160-bit random value.
+            s_bob = kryptos_mp_rand(160);
+
+            CUTE_ASSERT(s_bob != NULL);
+        } while (kryptos_mp_lt(s_bob, _2) || kryptos_mp_gt(s_bob, q_2));
+
+        kryptos_del_mp_value(_2);
+        kryptos_del_mp_value(q_2);
+
+        q_2 = _2 = NULL;
     } else {
         s_bob = kryptos_hex_value_as_mp("BB", 2); // WARN(Rafael): The Eve's dream.
+        CUTE_ASSERT(s_bob != NULL);
     }
-
-    CUTE_ASSERT(s_bob != NULL);
 
     // INFO(Rafael): Alice calculates ta = g^sa mod p and she also sends her result to Bob.
     CUTE_ASSERT(kryptos_dh_eval_t(&t_alice, g, s_alice, p) == kKryptosSuccess);
@@ -465,6 +503,9 @@ CUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
 
     kryptos_del_mp_value(g);
     kryptos_del_mp_value(p);
+    if (CUTE_GET_OPTION("dh-use-q-size") != NULL) {
+        kryptos_del_mp_value(q);
+    }
     kryptos_del_mp_value(s_alice);
     kryptos_del_mp_value(s_bob);
     kryptos_del_mp_value(t_alice);

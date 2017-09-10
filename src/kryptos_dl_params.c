@@ -205,7 +205,6 @@ kryptos_task_result_t kryptos_verify_dl_params(const kryptos_mp_value_t *p,
 
     if (kryptos_mp_ne(e, _1)) {
         result = kKryptosInvalidParams;
-        goto kryptos_verify_dl_params_epilogue;
     }
 
 kryptos_verify_dl_params_epilogue:
