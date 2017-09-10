@@ -162,7 +162,7 @@ kryptos_task_result_t kryptos_elgamal_verify_public_key(const kryptos_u8_t *k_pu
         //               "invalid".
         //
         //               A key with a P, any G from the interval [2, P - 2] and a B will work but
-        //               some smart attacker may take advantage from this "sloppiness".
+        //               some smart attacker may take advantage of this "sloppiness".
         //
         result = kKryptosInvalidParams;
         goto kryptos_elgamal_verify_public_key_epilogue;

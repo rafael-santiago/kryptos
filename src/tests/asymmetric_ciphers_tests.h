@@ -54,4 +54,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_elgamal_verify_public_key_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_elgamal_cipher_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_elgamal_cipher_c99_tests);
+
 #endif

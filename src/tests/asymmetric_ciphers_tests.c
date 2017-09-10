@@ -1040,7 +1040,7 @@ CUTE_TEST_CASE(kryptos_rsa_cipher_tests)
 
     CUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 1);
 
-    printf(" *** CIPHERTEXT:\n\n%s\n\n", a_ktask->out);
+    printf(" *** CIPHERTEXT:\n\n%s\n", a_ktask->out);
 
     // INFO(Rafael): Now Alice sends the encrypted buffer to Bob.
 
@@ -1104,7 +1104,7 @@ CUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
 
     CUTE_ASSERT(kryptos_last_task_succeed(b_ktask) == 1);
 
-    printf(" *** CIPHERTEXT:\n\n%s\n\n", b_ktask->out);
+    printf(" *** CIPHERTEXT:\n\n%s\n", b_ktask->out);
 
     // INFO(Rafael): Now Bob sends the encrypted buffer to Alice.
 
@@ -1306,7 +1306,7 @@ CUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
 
     CUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 1);
 
-    printf(" *** CIPHERTEXT:\n\n%s\n\n", a_ktask->out);
+    printf(" *** CIPHERTEXT:\n\n%s\n", a_ktask->out);
 
     // INFO(Rafael): Now Alice sends the encrypted buffer to Bob.
 
@@ -1362,7 +1362,7 @@ CUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
 
     CUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 1);
 
-    printf(" *** CIPHERTEXT:\n\n%s\n\n", a_ktask->out);
+    printf(" *** CIPHERTEXT:\n\n%s\n", a_ktask->out);
 
     // INFO(Rafael): For some reason during the transfer the cryptogram becomes corrupted.
     a_ktask->out[a_ktask->out_size >> 1] = ~a_ktask->out[a_ktask->out_size >> 1];
@@ -1444,7 +1444,7 @@ CUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
 
     CUTE_ASSERT(kryptos_last_task_succeed(b_ktask) == 1);
 
-    printf(" *** CIPHERTEXT:\n\n%s\n\n", b_ktask->out);
+    printf(" *** CIPHERTEXT:\n\n%s\n", b_ktask->out);
 
     // INFO(Rafael): Now Bob sends the encrypted buffer to Alice.
 
@@ -1485,7 +1485,7 @@ CUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
 
     CUTE_ASSERT(kryptos_last_task_succeed(b_ktask) == 1);
 
-    printf(" *** CIPHERTEXT:\n\n%s\n\n", b_ktask->out);
+    printf(" *** CIPHERTEXT:\n\n%s\n", b_ktask->out);
 
     // INFO(Rafael): For some reason during the transfer the cryptogram becomes corrupted.
     b_ktask->out[b_ktask->out_size >> 1] = ~b_ktask->out[b_ktask->out_size >> 1];
@@ -1668,7 +1668,7 @@ CUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
-    // INFO(Rafael): Bob sends a message to Alice.
+    // INFO(Rafael): Bob wants to send a message to Alice.
 
     bob->key = k_pub_alice;
     bob->key_size = strlen(k_pub_alice);
@@ -1681,7 +1681,7 @@ CUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
 
     CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
 
-    printf(" *** CIPHERTEXT:\n\n%s\n\n", bob->out);
+    printf(" *** CIPHERTEXT:\n\n%s\n", bob->out);
 
     // INFO(Rafael): Bob sends the cryptogram to Alice.
 
@@ -1705,4 +1705,72 @@ CUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_elgamal_cipher_c99_tests)
+#ifdef KRYPTOS_C99
+    kryptos_u8_t *k_pub_bob = "-----BEGIN ELGAMAL PARAM P-----\n"
+                              "cxCr4JOOvFjrdQ/JvbFfwtZJOxOjKTgmYRwU0/x8s+vh1BCj2bnhqAY8iDwjssZOjZSFI3WfMat80ngB\n"
+                              "-----END ELGAMAL PARAM P-----\n"
+                              "-----BEGIN ELGAMAL PARAM Q-----\n"
+                              "oQGiaDjNdCc=\n"
+                              "-----END ELGAMAL PARAM Q-----\n"
+                              "-----BEGIN ELGAMAL PARAM G-----\n"
+                              "WKaDp9g2bYqI6BeSdi1giVohhVGslK7o0Zjocu31Sh9YjeW/k7vvR/pQZmZlbgTqNUKUwEroQI/AKpQA\n"
+                              "-----END ELGAMAL PARAM G-----\n"
+                              "-----BEGIN ELGAMAL PARAM B-----\n"
+                              "64Uee8Q42Vj8cxt9zwyrxd5jnQBXsTMIwgLmmQW7SYUblkiZUFbf2EoMbJPdt1BIUGle+z8nZpEyd2kB\n"
+                              "-----END ELGAMAL PARAM B-----\n";
+
+    kryptos_u8_t *k_priv_bob = "-----BEGIN ELGAMAL PARAM P-----\n"
+                               "cxCr4JOOvFjrdQ/JvbFfwtZJOxOjKTgmYRwU0/x8s+vh1BCj2bnhqAY8iDwjssZOjZSFI3WfMat80ngB\n"
+                               "-----END ELGAMAL PARAM P-----\n"
+                               "-----BEGIN ELGAMAL PARAM D-----\n"
+                               "6cAd5Y8akwE=\n"
+                               "-----END ELGAMAL PARAM D-----\n";
+
+    kryptos_u8_t *m = "This Machine Kills Fascists\x00\x00\x00\x00\x00";
+    size_t m_size = 32;
+    kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    // INFO(Rafael): Alice wants to send a message to Bob.
+
+    kryptos_task_set_in(alice, m, m_size);
+    kryptos_task_set_encrypt_action(alice);
+
+    kryptos_run_cipher(elgamal, alice, k_pub_bob, strlen(k_pub_bob));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+
+    printf(" *** CIPHERTEXT:\n\n%s\n", alice->out);
+
+    // INFO(Rafael): All done, Alice sends her cryptogram to Bob.
+    //               Bob receives it and configure his input with the data.
+
+    kryptos_task_set_in(bob, alice->out, alice->out_size);
+
+    // INFO(Rafael): Asks the library for a decryption task and call Elgamal passing his private key.
+    kryptos_task_set_decrypt_action(bob);
+
+    kryptos_run_cipher(elgamal, bob, k_priv_bob, strlen(k_priv_bob));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+
+    CUTE_ASSERT(bob->out != NULL);
+
+    CUTE_ASSERT(bob->out_size == m_size);
+    CUTE_ASSERT(memcmp(bob->out, m, bob->out_size) == 0);
+
+    printf(" *** PLAINTEXT:\n\n'%s'\n\n", bob->out);
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+#else
+    printf("WARN: No c99 support, this test was skipped.\n");
+#endif
 CUTE_TEST_CASE_END
