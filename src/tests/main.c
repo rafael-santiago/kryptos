@@ -155,6 +155,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     }
 
     CUTE_RUN_TEST(kryptos_elgamal_mk_key_pair_tests);
+    CUTE_RUN_TEST(kryptos_elgamal_verify_public_key_tests);
     CUTE_RUN_TEST(kryptos_elgamal_cipher_tests);
 
 //    CUTE_RUN_TEST(poke_bloody_poke);

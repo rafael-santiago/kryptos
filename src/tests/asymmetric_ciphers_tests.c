@@ -1572,6 +1572,72 @@ CUTE_TEST_CASE(kryptos_elgamal_mk_key_pair_tests)
     kryptos_freeseg(k_priv);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_elgamal_verify_public_key_tests)
+    kryptos_u8_t *valid_k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                "q5jud0t7MBc=\n"
+                                "-----END ELGAMAL PARAM P-----\n"
+                                "-----BEGIN ELGAMAL PARAM Q-----\n"
+                                "lS0rXw==\n"
+                                "-----END ELGAMAL PARAM Q-----\n"
+                                "-----BEGIN ELGAMAL PARAM G-----\n"
+                                "V3l+1MA9EwQ=\n"
+                                "-----END ELGAMAL PARAM G-----\n"
+                                "-----BEGIN ELGAMAL PARAM B-----\n"
+                                "i525HXApOwc=\n"
+                                "-----END ELGAMAL PARAM B-----\n";
+
+    kryptos_u8_t *weak_k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                "kW+7WMY/t+ksDA8wN05Xik1hnRv7lLrV19fFLPfguqAM0em5kJsEP4Y57byre/U0dMt8fSqzAI+PtScC\n"
+                                "-----END ELGAMAL PARAM P-----\n"
+                                "-----BEGIN ELGAMAL PARAM G-----\n"
+                                "2K1E/hpeAd4igi3RwZnibVM5ZUyNeAJtkfqLp0L+wG0MlOT04lnC/JAeJUXY97wgw/IQpJNmY+4++tcA\n"
+                                "-----END ELGAMAL PARAM G-----\n"
+                                "-----BEGIN ELGAMAL PARAM B-----\n"
+                                "qAE80AtRrkkiL98tqV40En1FsSb2D8AFi68Ng8jwgBWLnlTrAoxliMK747CVBef4lExUSyv3CpeJ4MEB\n"
+                                "-----END ELGAMAL PARAM B-----\n";
+
+    kryptos_u8_t *no_beta_k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                  "kW+7WMY/t+ksDA8wN05Xik1hnRv7lLrV19fFLPfguqAM0em5kJsEP4Y57byre/U0dMt8fSqzAI+PtScC\n"
+                                  "-----END ELGAMAL PARAM P-----\n"
+                                  "-----BEGIN ELGAMAL PARAM Q-----\n"
+                                  "1/qPyUr0rD4=\n"
+                                  "-----END ELGAMAL PARAM Q-----\n"
+                                  "-----BEGIN ELGAMAL PARAM G-----\n"
+                                  "2K1E/hpeAd4igi3RwZnibVM5ZUyNeAJtkfqLp0L+wG0MlOT04lnC/JAeJUXY97wgw/IQpJNmY+4++tcA\n"
+                                  "-----END ELGAMAL PARAM G-----\n";
+
+    kryptos_u8_t *invalid_q_k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                    "kW+7WMY/t+ksDA8wN05Xik1hnRv7lLrV19fFLPfguqAM0em5kJsEP4Y57byre/U0dMt8fSqzAI+PtScC\n"
+                                    "-----END ELGAMAL PARAM P-----\n"
+                                    "-----BEGIN ELGAMAL PARAM Q-----\n"
+                                    "ticktickbOoM\n"
+                                    "-----END ELGAMAL PARAM Q-----\n"
+                                    "-----BEGIN ELGAMAL PARAM G-----\n"
+                                    "2K1E/hpeAd4igi3RwZnibVM5ZUyNeAJtkfqLp0L+wG0MlOT04lnC/JAeJUXY97wgw/IQpJNmY+4++tcA\n"
+                                    "-----END ELGAMAL PARAM G-----\n"
+                                    "-----BEGIN ELGAMAL PARAM B-----\n"
+                                    "qAE80AtRrkkiL98tqV40En1FsSb2D8AFi68Ng8jwgBWLnlTrAoxliMK747CVBef4lExUSyv3CpeJ4MEB\n"
+                                    "-----END ELGAMAL PARAM B-----\n";
+
+    // INFO(Rafael): NULL key buffer duh!
+    CUTE_ASSERT(kryptos_elgamal_verify_public_key(NULL, 100) == kKryptosInvalidParams);
+
+    // INFO(Rafael): Zeroed key buffer size duh!
+    CUTE_ASSERT(kryptos_elgamal_verify_public_key(valid_k_pub, 0) == kKryptosInvalidParams);
+
+    // INFO(Rafael): Key buffer size with no Q parameter.
+    CUTE_ASSERT(kryptos_elgamal_verify_public_key(weak_k_pub, strlen(weak_k_pub)) == kKryptosInvalidParams);
+
+    // INFO(Rafael): Useless key buffer without the B parameter.
+    CUTE_ASSERT(kryptos_elgamal_verify_public_key(no_beta_k_pub, strlen(no_beta_k_pub)) == kKryptosInvalidParams);
+
+    // INFO(Rafael): Key buffer with an invalid Q.
+    CUTE_ASSERT(kryptos_elgamal_verify_public_key(invalid_q_k_pub, strlen(invalid_q_k_pub)) == kKryptosInvalidParams);
+
+    // INFO(Rafael): Guess what?
+    CUTE_ASSERT(kryptos_elgamal_verify_public_key(valid_k_pub, strlen(valid_k_pub)) == kKryptosSuccess);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
     kryptos_u8_t *k_pub_alice = "-----BEGIN ELGAMAL PARAM P-----\n"
                                 "kW+7WMY/t+ksDA8wN05Xik1hnRv7lLrV19fFLPfguqAM0em5kJsEP4Y57byre/U0dMt8fSqzAI+PtScC\n"

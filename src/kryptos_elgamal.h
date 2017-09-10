@@ -28,6 +28,8 @@ kryptos_task_result_t kryptos_elgamal_mk_key_pair(const size_t p_bits, const siz
                                                   kryptos_u8_t **k_pub, size_t *k_pub_size,
                                                   kryptos_u8_t **k_priv, size_t *k_priv_size);
 
+kryptos_task_result_t kryptos_elgamal_verify_public_key(const kryptos_u8_t *k_pub, const size_t k_pub_size);
+
 void kryptos_elgamal_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, size_t key_size);
 
 void kryptos_elgamal_cipher(kryptos_task_ctx **ktask);

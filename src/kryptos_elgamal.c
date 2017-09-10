@@ -131,6 +131,73 @@ kryptos_elgamal_mk_key_pair_epilogue:
     return result;
 }
 
+kryptos_task_result_t kryptos_elgamal_verify_public_key(const kryptos_u8_t *k_pub, const size_t k_pub_size) {
+    kryptos_mp_value_t *p = NULL, *q = NULL, *g = NULL, *b = NULL;
+    kryptos_task_result_t result = kKryptosInvalidParams;
+
+    if (k_pub == NULL || k_pub_size == 0) {
+        result = kKryptosInvalidParams;
+        return kKryptosInvalidParams;
+    }
+
+    result = kryptos_pem_get_mp_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_B, k_pub, k_pub_size, &b);
+
+    if (result != kKryptosSuccess) {
+        result = kKryptosInvalidParams;
+        goto kryptos_elgamal_verify_public_key_epilogue;
+    }
+
+    result = kryptos_pem_get_mp_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_P, k_pub, k_pub_size, &p);
+
+    if (result != kKryptosSuccess) {
+        result = kKryptosInvalidParams;
+        goto kryptos_elgamal_verify_public_key_epilogue;
+    }
+
+    result = kryptos_pem_get_mp_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Q, k_pub, k_pub_size, &q);
+
+    if (result != kKryptosSuccess) {
+        // WARN(Rafael): It may not be really invalid but without q is impossible ascertain that
+        //               the passed public key can be considered strong, so this function returns
+        //               "invalid".
+        //
+        //               A key with a P, any G from the interval [2, P - 2] and a B will work but
+        //               some smart attacker may take advantage from this "sloppiness".
+        //
+        result = kKryptosInvalidParams;
+        goto kryptos_elgamal_verify_public_key_epilogue;
+    }
+
+    result = kryptos_pem_get_mp_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_G, k_pub, k_pub_size, &g);
+
+    if (result != kKryptosSuccess) {
+        result = kKryptosInvalidParams;
+        goto kryptos_elgamal_verify_public_key_epilogue;
+    }
+
+    result = kryptos_verify_dl_params(p, q, g);
+
+kryptos_elgamal_verify_public_key_epilogue:
+
+    if (p != NULL) {
+        kryptos_del_mp_value(p);
+    }
+
+    if (q != NULL) {
+        kryptos_del_mp_value(q);
+    }
+
+    if (g != NULL) {
+        kryptos_del_mp_value(g);
+    }
+
+    if (b != NULL) {
+        kryptos_del_mp_value(b);
+    }
+
+    return result;
+}
+
 void kryptos_elgamal_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, size_t key_size) {
     if (ktask == NULL) {
         return;
