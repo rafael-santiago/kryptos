@@ -7,6 +7,7 @@
  */
 #include <kryptos_elgamal.h>
 #include <kryptos_dl_params.h>
+#include <kryptos_padding.h>
 #include <kryptos_memory.h>
 #include <kryptos_random.h>
 #include <kryptos_mp.h>
@@ -231,6 +232,110 @@ void kryptos_elgamal_cipher(kryptos_task_ctx **ktask) {
     } else {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Invalid action.";
+    }
+}
+
+void kryptos_elgamal_oaep_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, size_t key_size,
+                                kryptos_u8_t *label, size_t *label_size,
+                                kryptos_hash_func hash,
+                                kryptos_hash_size_func hash_size) {
+    if (ktask == NULL) {
+        return;
+    }
+
+    ktask->cipher = kKryptosCipherELGAMALOAEP;
+
+    ktask->key = key;
+    ktask->key_size = key_size;
+
+    ktask->arg[0] = label;
+    ktask->arg[1] = label_size;
+    ktask->arg[2] = hash;
+    ktask->arg[3] = hash_size;
+}
+
+void kryptos_elgamal_oaep_cipher(kryptos_task_ctx **ktask) {
+    // WARN(Rafael): Even having a probabilistic encryption in essence, I find nice to combine OAEP and Elgamal.
+    kryptos_u8_t *old_in = NULL, *temp = NULL;
+    size_t old_in_size = 0;
+    kryptos_mp_value_t *p = NULL;
+
+    if (ktask == NULL) {
+        return;
+    }
+
+    if ((*ktask)->action != kKryptosEncrypt && (*ktask)->action != kKryptosDecrypt) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Invalid action.";
+        return;
+    }
+
+    if (kryptos_task_check(ktask) == 0) {
+        return;
+    }
+
+    if ((*ktask)->in == NULL || (*ktask)->in_size == 0) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Null input buffer.";
+        return;
+    }
+
+    if (kryptos_pem_get_mp_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_P, (*ktask)->key, (*ktask)->key_size, &p) != kKryptosSuccess) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Unable to get p.";
+        goto kryptos_elgamal_oaep_cipher_epilogue;
+    }
+
+    if ((*ktask)->action == kKryptosEncrypt) {
+        old_in = (*ktask)->in;
+        old_in_size = (*ktask)->in_size;
+
+        temp = kryptos_apply_oaep_padding((*ktask)->in, &(*ktask)->in_size, kryptos_mp_byte2bit(p->data_size) >> 3,
+                                          (*ktask)->arg[0], *(size_t *)(*ktask)->arg[1],
+                                          (kryptos_hash_func)(*ktask)->arg[2], (kryptos_hash_size_func)(*ktask)->arg[3]);
+
+        if (temp == NULL) {
+            (*ktask)->result = kKryptosProcessError;
+            (*ktask)->result_verbose = "Error during OAEP padding.";
+            goto kryptos_elgamal_oaep_cipher_epilogue;
+        }
+
+        (*ktask)->in = temp;
+        kryptos_elgamal_encrypt(ktask);
+    } else {
+        kryptos_elgamal_decrypt(ktask);
+
+        if ((*ktask)->result == kKryptosSuccess) {
+            temp = (*ktask)->out;
+
+            (*ktask)->out = kryptos_drop_oaep_padding(temp, &(*ktask)->out_size, kryptos_mp_byte2bit(p->data_size) >> 3,
+                                                      (*ktask)->arg[0], *(size_t *)(*ktask)->arg[1],
+                                                      (kryptos_hash_func)(*ktask)->arg[2],
+                                                      (kryptos_hash_size_func)(*ktask)->arg[3]);
+
+            if ((*ktask)->out == NULL) {
+                (*ktask)->result = kKryptosProcessError;
+                (*ktask)->result_verbose = "The cryptogram is corrupted.";
+                (*ktask)->out_size = 0;
+            }
+        }
+    }
+
+    if (temp != NULL) {
+        kryptos_freeseg(temp);
+    }
+
+kryptos_elgamal_oaep_cipher_epilogue:
+
+    if (old_in != NULL) {
+        (*ktask)->in = old_in;
+        (*ktask)->in_size = old_in_size;
+        old_in = NULL;
+        old_in_size = 0;
+    }
+
+    if (p != NULL) {
+        kryptos_del_mp_value(p);
     }
 }
 

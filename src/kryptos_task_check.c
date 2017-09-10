@@ -29,6 +29,11 @@ static int kryptos_task_check_rsa_oaep_additional_params(kryptos_task_ctx **ktas
 
 static int kryptos_task_check_elgamal_params(kryptos_task_ctx **ktask);
 
+// WARN(Rafael): If you have changed something in RSA-OAEP additional parameters maybe should be better to implement a
+//               separated function to verify the additional parameters of Elgamal-OAEP.
+
+#define kryptos_task_check_elgamal_oaep_additional_params(ktask) kryptos_task_check_rsa_oaep_additional_params(ktask)
+
 int kryptos_task_check(kryptos_task_ctx **ktask) {
     if (ktask == NULL || *ktask == NULL) {
         return 0;
@@ -86,8 +91,12 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
         if ((*ktask)->cipher == kKryptosCipherRSAOAEP && kryptos_task_check_rsa_oaep_additional_params(ktask) == 0) {
             goto kryptos_task_check_error;
         }
-    } else if ((*ktask)->cipher == kKryptosCipherELGAMAL) {
+    } else if ((*ktask)->cipher == kKryptosCipherELGAMAL || (*ktask)->cipher == kKryptosCipherELGAMALOAEP) {
         if (kryptos_task_check_elgamal_params(ktask) == 0) {
+            goto kryptos_task_check_error;
+        }
+
+        if ((*ktask)->cipher == kKryptosCipherELGAMALOAEP && kryptos_task_check_elgamal_oaep_additional_params(ktask) == 0) {
             goto kryptos_task_check_error;
         }
     }
@@ -287,3 +296,5 @@ static int kryptos_task_check_elgamal_params(kryptos_task_ctx **ktask) {
 
     return 1;
 }
+
+#undef kryptos_task_check_elgamal_oaep_additional_params
