@@ -159,6 +159,13 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_elgamal_cipher_tests);
     CUTE_RUN_TEST(kryptos_elgamal_cipher_c99_tests);
 
+    if (CUTE_GET_OPTION("skip-elgamal-oaep-tests") == NULL) {
+        CUTE_RUN_TEST(kryptos_elgamal_oaep_cipher_tests);
+        CUTE_RUN_TEST(kryptos_elgamal_oaep_cipher_c99_tests);
+    } else {
+        printf("WARN: The Elgamal-OAEP tests were skipped.\n");
+    }
+
 //    CUTE_RUN_TEST(poke_bloody_poke);
 CUTE_TEST_CASE_END
 

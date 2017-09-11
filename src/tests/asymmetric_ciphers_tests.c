@@ -1774,3 +1774,281 @@ CUTE_TEST_CASE(kryptos_elgamal_cipher_c99_tests)
     printf("WARN: No c99 support, this test was skipped.\n");
 #endif
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
+    kryptos_u8_t *k_pub_bob = "-----BEGIN ELGAMAL PARAM P-----\n"
+                              "ub1yArM/5LO8iGWyQoTnXo7eq3kT9JYnO"
+                              "YF1e328owL/2OsFwEzvzEPgvQf3iAjYbh"
+                              "QiTxZsHsUJ0w6NQqAPB2+v+jt7JVqOAt3"
+                              "ovtmRgdHA1LyPf5YIRcHfIajJcIq1uXmu"
+                              "XlNa3w663vwpeB6axF43C3WViqOCnYN8H"
+                              "Jbmaoc=\n"
+                              "-----END ELGAMAL PARAM P-----\n"
+                              "-----BEGIN ELGAMAL PARAM Q-----\n"
+                              "+bUNFB6uJ+3Yif48ULYb0QaNWbI=\n"
+                              "-----END ELGAMAL PARAM Q-----\n"
+                              "-----BEGIN ELGAMAL PARAM G-----\n"
+                              "IDVrez91IjjHsPbVHZjxrgvF0bZ7CzqPy"
+                              "AvelU1scRIrQ3hOexXGShLAT9kJEpHDC7"
+                              "QtWWXXpsKfh6fIxuvexWYgyU50zESlzgz"
+                              "QzU060LrhXvL6BlFt3DIrgWkqiSt9U0J3"
+                              "CnKB9R347kPzQl04K6IWl2qqEGVDknBSM"
+                              "ExqhHg=\n"
+                              "-----END ELGAMAL PARAM G-----\n"
+                              "-----BEGIN ELGAMAL PARAM B-----\n"
+                              "7HXRFK+NOnOrsT6VKqdFNhw8U1qnVU9S8"
+                              "7v6R6XH/BYQxFy30FasKTkMMijXISy5VE"
+                              "zL3YZV+++dN7V7ng31o3nv/R6kX+cQbz/"
+                              "IvrUsCJ5KtPp9+gnORZWHa4uMbZHhDQgY"
+                              "Go6nOv/1AljcG8ZMSNPuMGpGp0fRb77yP"
+                              "IkkY2o=\n"
+                              "-----END ELGAMAL PARAM B-----\n";
+
+    kryptos_u8_t *k_priv_bob = "-----BEGIN ELGAMAL PARAM P-----\n"
+                               "ub1yArM/5LO8iGWyQoTnXo7eq3kT9JYnO"
+                               "YF1e328owL/2OsFwEzvzEPgvQf3iAjYbh"
+                               "QiTxZsHsUJ0w6NQqAPB2+v+jt7JVqOAt3"
+                               "ovtmRgdHA1LyPf5YIRcHfIajJcIq1uXmu"
+                               "XlNa3w663vwpeB6axF43C3WViqOCnYN8H"
+                               "Jbmaoc=\n"
+                               "-----END ELGAMAL PARAM P-----\n"
+                               "-----BEGIN ELGAMAL PARAM D-----\n"
+                               "9Nz8YxvIEqdfeaAoJcNgey2kDWo=\n"
+                               "-----END ELGAMAL PARAM D-----\n";
+
+    kryptos_u8_t *m = "I don't need no make up, I got real scars\x00\x00\x00\x00\x00\x00\x00";
+    size_t m_size = 48;
+    kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
+    kryptos_u8_t *label = "ChocalateJesus";
+    size_t label_size = 14;
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+
+    alice->in = m;
+    alice->in_size = m_size;
+    alice->key = k_pub_bob;
+    alice->key_size = strlen(k_pub_bob);
+    alice->action = kKryptosEncrypt;
+
+    alice->cipher = kKryptosCipherELGAMALOAEP;
+    alice->arg[0] = label;
+    alice->arg[1] = &label_size;
+    alice->arg[2] = kryptos_sha1_hash;
+    alice->arg[3] = kryptos_sha1_hash_size;
+
+    kryptos_elgamal_oaep_cipher(&alice);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+    CUTE_ASSERT(alice->out != NULL);
+
+    printf(" *** CIPHERTEXT:\n\n%s\n", alice->out);
+
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+    bob->key = k_priv_bob;
+    bob->key_size = strlen(k_priv_bob);
+    bob->action = kKryptosDecrypt;
+
+    bob->cipher = kKryptosCipherELGAMALOAEP;
+    bob->arg[0] = label;
+    bob->arg[1] = &label_size;
+    bob->arg[2] = kryptos_sha1_hash;
+    bob->arg[3] = kryptos_sha1_hash_size;
+
+    kryptos_elgamal_oaep_cipher(&bob);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    CUTE_ASSERT(bob->out != NULL);
+
+    CUTE_ASSERT(bob->out_size == m_size);
+    CUTE_ASSERT(memcmp(bob->out, m, m_size) == 0);
+
+    printf(" *** PLAINTEXT:\n\n'%s'\n\n", bob->out);
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Now with a corrupted cryptogram.
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+
+    alice->in = m;
+    alice->in_size = m_size;
+    alice->key = k_pub_bob;
+    alice->key_size = strlen(k_pub_bob);
+    alice->action = kKryptosEncrypt;
+
+    alice->cipher = kKryptosCipherELGAMALOAEP;
+    alice->arg[0] = label;
+    alice->arg[1] = &label_size;
+    alice->arg[2] = kryptos_sha1_hash;
+    alice->arg[3] = kryptos_sha1_hash_size;
+
+    kryptos_elgamal_oaep_cipher(&alice);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+    CUTE_ASSERT(alice->out != NULL);
+
+    printf(" *** CIPHERTEXT:\n\n%s\n", alice->out);
+
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+    bob->key = k_priv_bob;
+    bob->key_size = strlen(k_priv_bob);
+    bob->action = kKryptosDecrypt;
+
+    bob->in[32] = ~(bob->in[32]);
+
+    printf(" ( the cryptogram was intentionally corrupted )\n\n");
+
+    bob->cipher = kKryptosCipherELGAMALOAEP;
+    bob->arg[0] = label;
+    bob->arg[1] = &label_size;
+    bob->arg[2] = kryptos_sha1_hash;
+    bob->arg[3] = kryptos_sha1_hash_size;
+
+    kryptos_elgamal_oaep_cipher(&bob);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 0);
+    CUTE_ASSERT(bob->out_size == 0);
+    CUTE_ASSERT(bob->out == NULL);
+
+    printf(" *** PLAINTEXT:\n\n (null)\n\n");
+
+    printf(" *** Nice, the unexpected cryptogram was successfully detected => '%s'.\n", bob->result_verbose);
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
+#ifdef KRYPTOS_C99
+    kryptos_u8_t *k_pub_alice = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                "I+oUuRaQpiwFa0Saa5pJFGDro22vya7hh"
+                                "9mkyC5bQADl5BuqXT862/mOX5VWz+UNjR"
+                                "XU2tx380GzWp6UQnbhxM0ptehr+VRJvIL"
+                                "/Lzg5j46tWuv3gbBHHDuC1qREmnAbYmuI"
+                                "1TdPRHsqalbMKOir2+WVg/RSkKlUhxwqO"
+                                "Omhc1Y=\n"
+                                "-----END ELGAMAL PARAM P-----\n"
+                                "-----BEGIN ELGAMAL PARAM Q-----\n"
+                                "CRWNcTQc/I9LD6wEhVMdL6Hfa4Y=\n"
+                                "-----END ELGAMAL PARAM Q-----\n"
+                                "-----BEGIN ELGAMAL PARAM G-----\n"
+                                "RzYrWiANW0FFKw53zqXapqj/YeJDHlcnL"
+                                "ubErvtxulWx9HRRBdQW77U2a9LL/WemDo"
+                                "ssouBpJxHQzbzI4awVHRcBcukKgYM693Y"
+                                "F1OnwQVPfy2xdzPdxKcexYNdp5Q1rq6mL"
+                                "5n5/5zhZwZbuRtqampC/bn/BrmODbpwbF"
+                                "6Ppwiw=\n"
+                                "-----END ELGAMAL PARAM G-----\n"
+                                "-----BEGIN ELGAMAL PARAM B-----\n"
+                                "KlBWeqbION6MuCVYZ+6/lmURkupmJX6LW"
+                                "E37/wOH/HbkLoWJhxU3XzRRoRO9rmCZHB"
+                                "HFlPPEJOnPIdyq5m0BOFNNb26c3SlNImO"
+                                "EsQTaV+3/urZ+lwITX7oqnEv6Tyoi+2mz"
+                                "dNQTLzYZH/SCN/ILQb6Jg0ri/QUddywcH"
+                                "GyLFCI=\n"
+                                "-----END ELGAMAL PARAM B-----\n";
+
+    kryptos_u8_t *k_priv_alice = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                 "I+oUuRaQpiwFa0Saa5pJFGDro22vya7hh"
+                                 "9mkyC5bQADl5BuqXT862/mOX5VWz+UNjR"
+                                 "XU2tx380GzWp6UQnbhxM0ptehr+VRJvIL"
+                                 "/Lzg5j46tWuv3gbBHHDuC1qREmnAbYmuI"
+                                 "1TdPRHsqalbMKOir2+WVg/RSkKlUhxwqO"
+                                 "Omhc1Y=\n"
+                                 "-----END ELGAMAL PARAM P-----\n"
+                                 "-----BEGIN ELGAMAL PARAM D-----\n"
+                                 "0VDQAgkcbyRksu/NskgCkva8rn0=\n"
+                                 "-----END ELGAMAL PARAM D-----\n";
+
+    kryptos_u8_t *m = "a right is not what someone gives you; it's what no one can take from you.\x00\x00";
+    size_t m_size = 76;
+    kryptos_u8_t *label = "Elcabong";
+    size_t label_size = 8;
+    kryptos_task_ctx at, bt, *bob = &bt, *alice = &at;
+
+    kryptos_task_init_as_null(bob);
+    kryptos_task_init_as_null(alice);
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+
+    kryptos_task_set_in(bob, m, m_size);
+    kryptos_task_set_encrypt_action(bob);
+    kryptos_run_cipher(elgamal_oaep, bob,
+                       k_pub_alice, strlen(k_pub_alice),
+                       label, &label_size,
+                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    CUTE_ASSERT(bob->out != NULL);
+
+    printf(" *** CIPHERTEXT:\n\n%s\n", bob->out);
+
+    kryptos_task_set_in(alice, bob->out, bob->out_size);
+    kryptos_task_set_decrypt_action(alice);
+    kryptos_run_cipher(elgamal_oaep, alice,
+                       k_priv_alice, strlen(k_priv_alice),
+                       label, &label_size,
+                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+    CUTE_ASSERT(alice->out != NULL);
+
+    CUTE_ASSERT(alice->out_size == m_size);
+    CUTE_ASSERT(alice->out != NULL);
+
+    CUTE_ASSERT(memcmp(alice->out, m, alice->out_size) == 0);
+
+    printf(" *** PLAINTEXT:\n\n'%s'\n\n", alice->out);
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Corrupted cryptogram.
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+
+    kryptos_task_set_in(bob, m, m_size);
+    kryptos_task_set_encrypt_action(bob);
+    kryptos_run_cipher(elgamal_oaep, bob,
+                       k_pub_alice, strlen(k_pub_alice),
+                       label, &label_size,
+                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    CUTE_ASSERT(bob->out != NULL);
+
+    printf(" *** CIPHERTEXT:\n\n%s\n", bob->out);
+
+    kryptos_task_set_in(alice, bob->out, bob->out_size);
+
+    alice->in[32] = ~(alice->in[32]);
+
+    printf(" ( the cryptogram was intentionally corrupted )\n\n");
+
+    kryptos_task_set_decrypt_action(alice);
+    kryptos_run_cipher(elgamal_oaep, alice,
+                       k_priv_alice, strlen(k_priv_alice),
+                       label, &label_size,
+                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
+
+    CUTE_ASSERT(alice->out == NULL);
+    CUTE_ASSERT(alice->out_size == 0);
+
+    printf(" *** PLAINTEXT:\n\n (null)\n\n");
+
+    printf(" *** Nice, the unexpected cryptogram was successfully detected => '%s'.\n", alice->result_verbose);
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+#else
+    printf("WARN: No c99 support, this test was skipped.\n");
+#endif
+CUTE_TEST_CASE_END
