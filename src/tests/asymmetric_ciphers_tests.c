@@ -1365,7 +1365,7 @@ CUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
     printf(" *** CIPHERTEXT:\n\n%s\n", a_ktask->out);
 
     // INFO(Rafael): For some reason during the transfer the cryptogram becomes corrupted.
-    a_ktask->out[a_ktask->out_size >> 1] = ~a_ktask->out[a_ktask->out_size >> 1];
+    a_ktask->out[40] = ~a_ktask->out[40];
     printf(" ( the cryptogram was intentionally corrupted )\n\n");
 
     // INFO(Rafael): Now Alice sends the encrypted buffer to Bob.
@@ -1488,7 +1488,7 @@ CUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
     printf(" *** CIPHERTEXT:\n\n%s\n", b_ktask->out);
 
     // INFO(Rafael): For some reason during the transfer the cryptogram becomes corrupted.
-    b_ktask->out[b_ktask->out_size >> 1] = ~b_ktask->out[b_ktask->out_size >> 1];
+    b_ktask->out[40] = ~b_ktask->out[40];
     printf(" ( the cryptogram was intentionally corrupted )\n\n");
 
     // INFO(Rafael): Now Bob sends the encrypted buffer to Alice.
@@ -1900,7 +1900,7 @@ CUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
     bob->key_size = strlen(k_priv_bob);
     bob->action = kKryptosDecrypt;
 
-    bob->in[32] = ~(bob->in[32]);
+    bob->in[40] = ~(bob->in[40]);
 
     printf(" ( the cryptogram was intentionally corrupted )\n\n");
 
@@ -2027,7 +2027,7 @@ CUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
 
     kryptos_task_set_in(alice, bob->out, bob->out_size);
 
-    alice->in[32] = ~(alice->in[32]);
+    alice->in[40] = ~(alice->in[40]);
 
     printf(" ( the cryptogram was intentionally corrupted )\n\n");
 
