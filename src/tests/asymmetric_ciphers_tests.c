@@ -11,6 +11,71 @@
 #include <kryptos_padding.h>
 #include <string.h>
 
+static int corrupt_cryptogram(const kryptos_u8_t *hdr, kryptos_u8_t *pem_data, const size_t pem_data_size);
+
+static int corrupt_cryptogram(const kryptos_u8_t *hdr, kryptos_u8_t *pem_data, const size_t pem_data_size) {
+    kryptos_u8_t *data = NULL;
+    size_t data_size;
+    kryptos_u8_t *dp, *dp_end, swp = 0, *temp;
+    const kryptos_u8_t *hp, *hp_end;
+    int found = 0;
+
+    dp = pem_data;
+    dp_end = pem_data + pem_data_size;
+
+    hp = hdr;
+    hp_end = hp + strlen(hdr);
+
+    while (dp != dp_end && !found) {
+        found = 1;
+        temp = dp + 1;
+
+        while (found && hp != hp_end && dp != dp_end) {
+            found = (*dp == *hp);
+            dp++;
+            hp++;
+        }
+
+        if (!found) {
+            dp = temp;
+        }
+    }
+
+    if (!found) {
+        return 0;
+    }
+
+    while (*dp != '\n' && dp != dp_end) {
+        dp++;
+    }
+
+    if (dp == dp_end) {
+        return 0;
+    }
+
+    dp++;
+
+    temp = dp;
+    while (*temp != '\n' && temp != dp_end) {
+        temp++;
+    }
+
+    if (temp == dp_end) {
+        return 0;
+    }
+
+    dp_end = dp + ((temp - dp) >> 1);
+
+    while (dp < dp_end) {
+        swp = *dp;
+        *dp = *(dp + 1);
+        *(dp + 1) = swp;
+        dp += 2;
+    }
+
+    return 1;
+}
+
 CUTE_TEST_CASE(kryptos_verify_dl_params_tests)
     kryptos_mp_value_t *p = NULL, *q = NULL, *g = NULL;
 
@@ -1365,7 +1430,9 @@ CUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
     printf(" *** CIPHERTEXT:\n\n%s\n", a_ktask->out);
 
     // INFO(Rafael): For some reason during the transfer the cryptogram becomes corrupted.
-    a_ktask->out[40] = ~a_ktask->out[40];
+
+    CUTE_ASSERT(corrupt_cryptogram(KRYPTOS_RSA_PEM_HDR_PARAM_C, a_ktask->out, a_ktask->out_size) == 1);
+
     printf(" ( the cryptogram was intentionally corrupted )\n\n");
 
     // INFO(Rafael): Now Alice sends the encrypted buffer to Bob.
@@ -1488,7 +1555,9 @@ CUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
     printf(" *** CIPHERTEXT:\n\n%s\n", b_ktask->out);
 
     // INFO(Rafael): For some reason during the transfer the cryptogram becomes corrupted.
-    b_ktask->out[40] = ~b_ktask->out[40];
+
+    CUTE_ASSERT(corrupt_cryptogram(KRYPTOS_RSA_PEM_HDR_PARAM_C, b_ktask->out, b_ktask->out_size) == 1);
+
     printf(" ( the cryptogram was intentionally corrupted )\n\n");
 
     // INFO(Rafael): Now Bob sends the encrypted buffer to Alice.
@@ -1900,7 +1969,7 @@ CUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
     bob->key_size = strlen(k_priv_bob);
     bob->action = kKryptosDecrypt;
 
-    bob->in[40] = ~(bob->in[40]);
+    CUTE_ASSERT(corrupt_cryptogram(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Y, bob->in, bob->in_size) == 1);
 
     printf(" ( the cryptogram was intentionally corrupted )\n\n");
 
@@ -2027,7 +2096,7 @@ CUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
 
     kryptos_task_set_in(alice, bob->out, bob->out_size);
 
-    alice->in[40] = ~(alice->in[40]);
+    CUTE_ASSERT(corrupt_cryptogram(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Y, alice->in, alice->in_size) == 1);
 
     printf(" ( the cryptogram was intentionally corrupted )\n\n");
 
