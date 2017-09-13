@@ -40,7 +40,7 @@ CUTE_DECLARE_TEST_CASE(kryptos_rsa_cipher_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_rsa_cipher_c99_tests);
 
-CUTE_DECLARE_TEST_CASE(kryptos_oaep_mgf_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_padding_mgf_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_oaep_padding_tests);
 

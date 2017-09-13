@@ -144,7 +144,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_rsa_mk_key_pair_tests);
     CUTE_RUN_TEST(kryptos_rsa_cipher_tests);
     CUTE_RUN_TEST(kryptos_rsa_cipher_c99_tests);
-    CUTE_RUN_TEST(kryptos_oaep_mgf_tests);
+    CUTE_RUN_TEST(kryptos_padding_mgf_tests);
     CUTE_RUN_TEST(kryptos_oaep_padding_tests);
 
     if (CUTE_GET_OPTION("skip-rsa-oaep-tests") == NULL) {
