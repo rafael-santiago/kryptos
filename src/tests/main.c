@@ -166,6 +166,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
         printf("WARN: The Elgamal-OAEP tests were skipped.\n");
     }
 
+    CUTE_RUN_TEST(kryptos_pss_encoding_tests);
+
 //    CUTE_RUN_TEST(poke_bloody_poke);
 CUTE_TEST_CASE_END
 
