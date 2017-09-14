@@ -28,8 +28,4 @@ kryptos_u8_t *kryptos_drop_oaep_padding(const kryptos_u8_t *buffer, size_t *buff
                                         kryptos_hash_func hash_func,
                                         kryptos_hash_size_func hash_size_func);
 
-kryptos_u8_t *kryptos_apply_pss_padding(const kryptos_u8_t *buffer, size_t *buffer_size,
-                                        const size_t k, const size_t salt_size,
-                                        kryptos_hash_func hash_func, kryptos_hash_size_func hash_size_func);
-
 #endif
