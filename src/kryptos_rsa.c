@@ -442,27 +442,7 @@ static void kryptos_rsa_decrypt(kryptos_task_ctx **ktask) {
         goto kryptos_rsa_decrypt_epilogue;
     }
 
-    (*ktask)->out_size = m->data_size * sizeof(kryptos_mp_digit_t);
-    (*ktask)->out = (kryptos_u8_t *) kryptos_newseg((*ktask)->out_size);
-
-    if ((*ktask)->out == NULL) {
-        (*ktask)->result = kKryptosProcessError;
-        (*ktask)->result_verbose = "No memory to produce the output.";
-        goto kryptos_rsa_decrypt_epilogue;
-    }
-
-    memset((*ktask)->out, 0, (*ktask)->out_size);
-
-    o = (*ktask)->out;
-    o_size = (*ktask)->out_size;
-
-    for (xd = m->data_size - 1; xd >= 0; xd--, o += sizeof(kryptos_mp_digit_t), o_size -= sizeof(kryptos_mp_digit_t)) {
-#ifdef KRYPTOS_MP_U32_DIGIT
-        kryptos_cpy_u32_as_big_endian(o, o_size, m->data[xd]);
-#else
-        *o = m->data[xd];
-#endif
-    }
+    kryptos_mp_as_raw_buffer(ktask, m, o, o_size, xd, kryptos_rsa_decrypt_epilogue);
 
 kryptos_rsa_decrypt_epilogue:
 
@@ -530,6 +510,12 @@ void kryptos_rsa_sign(kryptos_task_ctx **ktask) {
     if ((*ktask)->result != kKryptosSuccess) {
         (*ktask)->result = kKryptosProcessError;
         (*ktask)->result_verbose = "Unable to get n.";
+        goto kryptos_rsa_sign_epilogue;
+    }
+
+    if ((*ktask)->in_size > (kryptos_mp_byte2bit(n->data_size) >> 3)) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "RSA input is too long.";
         goto kryptos_rsa_sign_epilogue;
     }
 
@@ -603,5 +589,104 @@ kryptos_rsa_sign_epilogue:
 }
 
 void kryptos_rsa_verify(kryptos_task_ctx **ktask) {
+    kryptos_mp_value_t *xp = NULL, *x = NULL, *s = NULL, *e = NULL, *n = NULL;
+    kryptos_u8_t *o = NULL;
+    size_t o_size = 0, xd = 0;
+
+    if (ktask == NULL) {
+        return;
+    }
+
+    (*ktask)->cipher = kKryptosCipherRSA;
+
+    if (kryptos_task_check_verify(ktask) == 0) {
+        return;
+    }
+
+    // INFO(Rafael): Parsing stuff for multiprecision data.
+
+    (*ktask)->result = kryptos_pem_get_mp_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, (*ktask)->in, (*ktask)->in_size, &x);
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Unable to get x.";
+        goto kryptos_rsa_verify_epilogue;
+    }
+
+    (*ktask)->result = kryptos_pem_get_mp_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, (*ktask)->in, (*ktask)->in_size, &s);
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Unable to get s.";
+        goto kryptos_rsa_verify_epilogue;
+    }
+
+    (*ktask)->result = kryptos_pem_get_mp_data(KRYPTOS_RSA_PEM_HDR_PARAM_E, (*ktask)->key, (*ktask)->key_size, &e);
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Unable to get e.";
+        goto kryptos_rsa_verify_epilogue;
+    }
+
+    (*ktask)->result = kryptos_pem_get_mp_data(KRYPTOS_RSA_PEM_HDR_PARAM_N, (*ktask)->key, (*ktask)->key_size, &n);
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Unable to get n.";
+        goto kryptos_rsa_verify_epilogue;
+    }
+
+    // INFO(Rafael): Computing x'. I.e.: Verifying the supplied signature.
+
+    xp = kryptos_mp_me_mod_n(s, e, n);
+
+    if (xp == NULL) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Unable to compute x'.";
+        goto kryptos_rsa_verify_epilogue;
+    }
+
+    (*ktask)->out = NULL;
+    (*ktask)->out_size = 0;
+
+    if (kryptos_mp_ne(x, xp)) {
+        (*ktask)->result = kKryptosInvalidSignature;
+        (*ktask)->result_verbose = "The signature is invalid.";
+        goto kryptos_rsa_verify_epilogue;
+    }
+
+    // INFO(Rafael): Our verification task also offers another service, return a copy of the original x, if it has a
+    //               valid signature.
+
+    kryptos_mp_as_raw_buffer(ktask, x, o, o_size, xd, kryptos_rsa_verify_epilogue);
+
+kryptos_rsa_verify_epilogue:
+
+    if (x != NULL) {
+        kryptos_del_mp_value(x);
+    }
+
+    if (s != NULL) {
+        kryptos_del_mp_value(s);
+    }
+
+    if (e != NULL) {
+        kryptos_del_mp_value(e);
+    }
+
+    if (n != NULL) {
+        kryptos_del_mp_value(n);
+    }
+
+    if (xp != NULL) {
+        kryptos_del_mp_value(xp);
+    }
+
+    if ((*ktask)->result != kKryptosSuccess && (*ktask)->out != NULL) {
+        kryptos_freeseg((*ktask)->out);
+        (*ktask)->out = NULL;
+        (*ktask)->out_size = 0;
+    }
 }
 

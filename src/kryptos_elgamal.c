@@ -692,31 +692,7 @@ static void kryptos_elgamal_decrypt(kryptos_task_ctx **ktask) {
 
     // INFO(Rafael): The hardest part! ;)
 
-    // TODO(Rafael): Maybe let this stupid code snippet as a function or macro, this was firstly done in RSA.. -->
-
-    (*ktask)->out_size = x_mod->data_size * sizeof(kryptos_mp_digit_t);
-    (*ktask)->out = (kryptos_u8_t *) kryptos_newseg((*ktask)->out_size);
-
-    if ((*ktask)->out == NULL) {
-        (*ktask)->result = kKryptosProcessError;
-        (*ktask)->result_verbose = "No memory to produce the output.";
-        goto kryptos_elgamal_decrypt_epilogue;
-    }
-
-    memset((*ktask)->out, 0, (*ktask)->out_size);
-
-    o = (*ktask)->out;
-    o_size = (*ktask)->out_size;
-
-    for (xd = x_mod->data_size - 1; xd >= 0; xd--, o += sizeof(kryptos_mp_digit_t), o_size -= sizeof(kryptos_mp_digit_t)) {
-#ifdef KRYPTOS_MP_U32_DIGIT
-        kryptos_cpy_u32_as_big_endian(o, o_size, x_mod->data[xd]);
-#else
-        *o = x_mod->data[xd];
-#endif
-    }
-
-    // TODO(Rafael): <--------------------------------------------------|
+    kryptos_mp_as_raw_buffer(ktask, x_mod, o, o_size, xd, kryptos_elgamal_decrypt_epilogue);
 
 kryptos_elgamal_decrypt_epilogue:
 
@@ -760,7 +736,4 @@ kryptos_elgamal_decrypt_epilogue:
         kryptos_freeseg((*ktask)->out);
         (*ktask)->out_size = 0;
     }
-
-    o = NULL;
-    o_size = xd = 0;
 }

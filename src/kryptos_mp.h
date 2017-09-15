@@ -107,16 +107,52 @@ kryptos_mp_value_t *kryptos_mp_mul_digit(kryptos_mp_value_t **x, const kryptos_m
 kryptos_mp_value_t *kryptos_raw_buffer_as_mp(const kryptos_u8_t *buf, const size_t buf_size);
 
 #ifndef KRYPTOS_MP_U32_DIGIT
+# define kryptos_mp_bit2byte(b) ( (b) >> 3 )
 
-#define kryptos_mp_bit2byte(b) ( (b) >> 3 )
+# define kryptos_mp_byte2bit(b) ( (b) << 3 )
 
-#define kryptos_mp_byte2bit(b) ( (b) << 3 )
+
+# define kryptos_mp_as_raw_buffer(ktask, m, o, o_size, xd, epilogue) {\
+    (*ktask)->out_size = m->data_size * sizeof(kryptos_mp_digit_t);\
+    (*ktask)->out = (kryptos_u8_t *) kryptos_newseg((*ktask)->out_size);\
+    if ((*ktask)->out == NULL) {\
+        (*ktask)->result = kKryptosProcessError;\
+        (*ktask)->result_verbose = "No memory to produce the output.";\
+        goto epilogue;\
+    }\
+    memset((*ktask)->out, 0, (*ktask)->out_size);\
+    o = (*ktask)->out;\
+    o_size = (*ktask)->out_size;\
+    for (xd = m->data_size - 1; xd >= 0; xd--, o += sizeof(kryptos_mp_digit_t), o_size -= sizeof(kryptos_mp_digit_t)) {\
+        *o = m->data[xd];\
+    }\
+    o = NULL;\
+    o_size = xd = 0;\
+}
 
 #else
 
-#define kryptos_mp_bit2byte(b) ( (b) >> 5 )
+# define kryptos_mp_bit2byte(b) ( (b) >> 5 )
 
-#define kryptos_mp_byte2bit(b) ( (b) << 5 )
+# define kryptos_mp_byte2bit(b) ( (b) << 5 )
+
+# define kryptos_mp_as_raw_buffer(ktask, m, o, o_size, xd, epilogue) {\
+    (*ktask)->out_size = m->data_size * sizeof(kryptos_mp_digit_t);\
+    (*ktask)->out = (kryptos_u8_t *) kryptos_newseg((*ktask)->out_size);\
+    if ((*ktask)->out == NULL) {\
+        (*ktask)->result = kKryptosProcessError;\
+        (*ktask)->result_verbose = "No memory to produce the output.";\
+        goto epilogue;\
+    }\
+    memset((*ktask)->out, 0, (*ktask)->out_size);\
+    o = (*ktask)->out;\
+    o_size = (*ktask)->out_size;\
+    for (xd = m->data_size - 1; xd >= 0; xd--, o += sizeof(kryptos_mp_digit_t), o_size -= sizeof(kryptos_mp_digit_t)) {\
+        kryptos_cpy_u32_as_big_endian(o, o_size, m->data[xd]);\
+    }\
+    o = NULL;\
+    o_size = xd = 0;\
+}
 
 #endif
 
