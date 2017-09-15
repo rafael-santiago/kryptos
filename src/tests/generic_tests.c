@@ -537,6 +537,67 @@ CUTE_TEST_CASE(kryptos_task_check_tests)
     CUTE_ASSERT(t.result == kKryptosSuccess);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_task_check_sign_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *rsa_k_pub = "-----BEGIN RSA PARAM N-----\n"
+                              "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
+                              "-----END RSA PARAM N-----\n"
+                              "-----BEGIN RSA PARAM E-----\n"
+                              "Q9mxxs0+nosV5jzwUs1UmYEhXLrYAszE9q0S3hljhpXD9ANvkzCUC5nM8FZ3+44V1IrPhIYZYDwfSrGlhwG4Aw==\n"
+                              "-----END RSA PARAM E-----\n";
+
+    kryptos_u8_t *rsa_k_priv = "-----BEGIN RSA PARAM N-----\n"
+                               "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
+                               "-----END RSA PARAM N-----\n"
+                               "-----BEGIN RSA PARAM D-----\n"
+                               "K04+KEU3GyG2ABjJu+sTqV5yH8mgO8aIPdygWvBq9GzJfTmLt18cck2pc7y6lmYLsl+NxgFo7KTliwXAjU3eGg==\n"
+                               "-----END RSA PARAM D-----\n";
+
+    CUTE_ASSERT(kryptos_task_check_sign(NULL) == 0);
+
+    // INFO(Rafael): Sign using RSA.
+
+    ktask->cipher = kKryptosCipherAES;
+    ktask->in = NULL;
+    ktask->in_size = 0;
+    ktask->key = NULL;
+    ktask->key_size = 0;
+
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in = "rsa";
+
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in_size = 3;
+
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = rsa_k_pub;
+
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key_size = strlen(ktask->key);
+
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->cipher = kKryptosCipherRSA;
+
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = rsa_k_priv;
+    ktask->key_size = strlen(ktask->key);
+
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 1);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_hex_tests)
     struct test_ctx {
         kryptos_u32_t u32;

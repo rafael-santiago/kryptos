@@ -26,6 +26,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_apply_iv_tests);
     CUTE_RUN_TEST(kryptos_iv_data_flush_tests);
     CUTE_RUN_TEST(kryptos_task_check_tests);
+    CUTE_RUN_TEST(kryptos_task_check_sign_tests);
     CUTE_RUN_TEST(kryptos_hex_tests);
     CUTE_RUN_TEST(kryptos_hash_common_tests);
 

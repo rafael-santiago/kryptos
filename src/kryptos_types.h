@@ -126,6 +126,7 @@ typedef enum {
     kKryptosInvalidParams,
     kKryptosInvalidCipher,
     kKryptosHMACError,
+    kKryptosInvalidSignature,
     kKryptosTaskResultNr
 }kryptos_task_result_t;
 

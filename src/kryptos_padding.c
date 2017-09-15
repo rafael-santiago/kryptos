@@ -502,3 +502,472 @@ kryptos_drop_oaep_padding_epilogue:
     return m;
 }
 
+kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size,
+                                 const size_t k, const size_t salt_size,
+                                 kryptos_hash_func hash_func, kryptos_hash_size_func hash_size_func) {
+
+    kryptos_u8_t *em = NULL, *mp = NULL, *dest = NULL, *salt = NULL, *ps = NULL, *db = NULL, *dbmask = NULL,
+                 *p = NULL, *p_end = NULL;
+    size_t h_size = 0, mp_size = 0, ps_size = 0, db_size = 0, dbmask_size = 0;
+    kryptos_hash_func hash = kryptos_sha1_hash;
+    kryptos_hash_size_func hash_size = kryptos_sha1_hash_size;
+    kryptos_task_ctx ht, *ktask = &ht;
+
+    if (buffer == NULL || buffer_size == NULL) {
+        return NULL;
+    }
+
+    if (hash_func != NULL) {
+        hash = hash_func;
+    }
+
+    if (hash_size_func != NULL) {
+        hash_size = hash_size_func;
+    }
+
+    h_size = hash_size();
+
+    kryptos_task_init_as_null(ktask);
+
+    // WARN(Rafael): Since any hash function limitation tends to be quite huge, I will let this verification out.
+
+    if (*buffer_size < (h_size + salt_size + 2)) {
+        // INFO(Rafael): 'Encoding error'.
+        goto kryptos_apply_pss_padding_epilogue;
+    }
+
+    // INFO(Rafael): Computing 'mHash'.
+
+    ktask->in = (kryptos_u8_t *)buffer;
+    ktask->in_size = *buffer_size;
+
+    hash(&ktask, 0);
+
+    if (ktask->out == NULL || ktask->out_size != h_size) {
+        goto kryptos_apply_pss_padding_epilogue;
+    }
+
+    // INFO(Rafael): Now mHash is known as ktask->out. Let's build up M' = (0x)00 00 00 00 00 00 00 00 || mHash || salt.
+
+    mp_size = 8 + h_size + salt_size;
+
+    mp = (kryptos_u8_t *) kryptos_newseg(mp_size);
+
+    if (mp == NULL) {
+        goto kryptos_apply_pss_padding_epilogue;
+    }
+
+    if (memset(mp, 0, mp_size) != mp) {
+        goto kryptos_apply_pss_padding_epilogue;
+    }
+
+    dest = mp + 8;
+
+    if (memcpy(dest, ktask->out, h_size) != dest) {
+        goto kryptos_apply_pss_padding_epilogue;
+    }
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    if (salt_size > 0) {
+        if ((salt = kryptos_get_random_block(salt_size)) != NULL) {
+            dest += h_size;
+
+            if (memcpy(dest, salt, salt_size) != dest) {
+                goto kryptos_apply_pss_padding_epilogue;
+            }
+        }
+    }
+
+    // INFO(Rafael): Now H = Hash(M') of hLen bytes.
+
+    ktask->in = mp;
+    ktask->in_size = mp_size;
+
+    hash(&ktask, 0);
+
+    if (ktask->out == NULL || ktask->out_size != h_size) {
+        goto kryptos_apply_pss_padding_epilogue;
+    }
+
+    // INFO(Rafael): H is now known as ktask->out and hLen ktask->out_size.
+    //               Let's generate PS with *buffer_size - salt_size - h_size - 2 zeroed bytes.
+
+    ps_size = *buffer_size - salt_size - h_size - 2;
+
+    if (ps_size > 0) {
+        ps = (kryptos_u8_t *) kryptos_newseg(ps_size);
+
+        if (ps == NULL) {
+            goto kryptos_apply_pss_padding_epilogue;
+        }
+
+        if (memset(ps, 0, ps_size) != ps) {
+            goto kryptos_apply_pss_padding_epilogue;
+        }
+    }
+
+    db_size = ps_size + salt_size + 1;
+    db = (kryptos_u8_t *) kryptos_newseg(db_size);
+
+    if (db == NULL) {
+        goto kryptos_apply_pss_padding_epilogue;
+    }
+
+    dest = db;
+
+    if (ps_size > 0) {
+        if (memcpy(dest, ps, ps_size) != dest) {
+            goto kryptos_apply_pss_padding_epilogue;
+        }
+
+        dest += ps_size;
+    }
+
+    *dest = 0x01;
+
+    if (salt_size > 0) {
+        dest += 1;
+
+        if (memcpy(dest, salt, salt_size) != dest) {
+            goto kryptos_apply_pss_padding_epilogue;
+        }
+
+        kryptos_freeseg(salt);
+        salt = NULL;
+    }
+
+    dbmask = kryptos_padding_mgf(ktask->out, ktask->out_size, *buffer_size - h_size - 1, hash, &dbmask_size);
+
+    if (dbmask == NULL) {
+        goto kryptos_apply_pss_padding_epilogue;
+    }
+
+    // INFO(Rafael): maskedDB = DB ^ dbmask
+
+    dest = db;
+
+    p = dbmask;
+    p_end = dbmask + dbmask_size + 1;
+
+    while (p != p_end) {
+        *p = (*p) ^ (*dest);
+        p++;
+        dest++;
+    }
+
+    // INFO(Rafael): 'Set the leftmost 8 * emLen - emBits bits to zero', i.e. the first byte of dbmask is always zero.
+
+    if (ps_size > 0) {
+        *dbmask = 0x00;
+    }
+
+    // INFO(Rafael): 'EM = maskeddb || H || 0xbc.'.
+
+    *buffer_size = dbmask_size + h_size + 1;
+    em = (kryptos_u8_t *) kryptos_newseg(*buffer_size);
+
+    if (em == NULL) {
+        goto kryptos_apply_pss_padding_epilogue;
+    }
+
+    dest = em;
+
+    if (memcpy(dest, dbmask, dbmask_size) != dest) {
+        kryptos_freeseg(em);
+        em = NULL;
+        goto kryptos_apply_pss_padding_epilogue;
+    }
+
+    dest += dbmask_size;
+
+    if (memcpy(dest, ktask->out, h_size) != dest) {
+        kryptos_freeseg(em);
+        em = NULL;
+        goto kryptos_apply_pss_padding_epilogue;
+    }
+
+    dest += h_size;
+
+    *dest = 0xBC;
+
+    // done!
+
+kryptos_apply_pss_padding_epilogue:
+
+    if (dbmask != NULL) {
+        kryptos_freeseg(dbmask);
+    }
+
+    if (db != NULL) {
+        kryptos_freeseg(db);
+    }
+
+    if (ps != NULL) {
+        kryptos_freeseg(ps);
+    }
+
+    if (mp != NULL) {
+        kryptos_freeseg(mp);
+    }
+
+    if (salt != NULL) {
+        kryptos_freeseg(salt);
+    }
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    kryptos_task_init_as_null(ktask);
+
+    hash = NULL;
+    hash_size = NULL;
+
+    h_size = 0;
+
+    kryptos_task_init_as_null(ktask);
+
+    dest = p = p_end = NULL;
+
+    if (em == NULL) {
+        *buffer_size = 0;
+    }
+
+    return em;
+}
+
+const kryptos_u8_t *kryptos_pss_verify(const kryptos_u8_t *m, const size_t m_size,
+                                       const kryptos_u8_t *em, const size_t em_size,
+                                       const size_t k, const size_t salt_size,
+                                       kryptos_hash_func hash_func, kryptos_hash_size_func hash_size_func) {
+    // WARN(Rafael): Since hash function limitation is quite long I will not check if m is greater than it.
+
+    kryptos_task_ctx ht, *ktask = &ht;
+    kryptos_hash_func hash = kryptos_sha1_hash;
+    kryptos_hash_size_func hash_size = kryptos_sha1_hash_size;
+    kryptos_u8_t *mp = NULL, *dbmask = NULL, *h = NULL, *dest = NULL, *db = NULL, *p = NULL, *p_end = NULL, *salt = NULL;
+    size_t h_size = 0, dbmask_size = 0, db_size = 0, mp_size = 0, ps_size = 0;
+    int inconsistent = 1;
+
+    if (m == NULL || m_size == 0 || em == NULL || em_size == 0 || k == 0) {
+        return NULL;
+    }
+
+    if (hash_func != NULL) {
+        hash = hash_func;
+    }
+
+    if (hash_size_func != NULL) {
+        hash_size = hash_size_func;
+    }
+
+    h_size = hash_size();
+
+    kryptos_task_init_as_null(ktask);
+
+    // INFO(Rafael): 'If emLen < hLen + sLen + 2' -> 'inconsistent'.
+
+    if (em_size < (h_size + salt_size + 2)) {
+        goto kryptos_pss_verify_epilogue;
+    }
+
+    // INFO(Rafael): 'If the rightmost octet of EM does not have 0xbc' -> 'inconsistent'.
+
+    if (*(em + em_size - 1) != 0xBC) {
+        goto kryptos_pss_verify_epilogue;
+    }
+
+    // INFO(Rafael): 'Let mHash = Hasm(M)'.
+
+    ktask->in = (kryptos_u8_t *)m;
+    ktask->in_size = m_size;
+
+    hash(&ktask, 0);
+
+    if (ktask->out == NULL || ktask->out_size != h_size) {
+        goto kryptos_pss_verify_epilogue;
+    }
+
+    // INFO(Rafael): Now mHash is known as ktask->out.
+
+    // INFO(Rafael): 'Let maskedDB be the leftmost emLen - hLen - 1 octets of EM, and let H be the next hLen octets'
+
+    dbmask_size = em_size - h_size - 1;
+    dbmask = (kryptos_u8_t *) kryptos_newseg(dbmask_size);
+
+    if (dbmask == NULL) {
+        goto kryptos_pss_verify_epilogue;
+    }
+
+    dest = dbmask;
+
+    if (memcpy(dest, em, dbmask_size) != dest) {
+        goto kryptos_pss_verify_epilogue;
+    }
+
+    h = (kryptos_u8_t *) kryptos_newseg(h_size);
+
+    if (h == NULL) {
+        goto kryptos_pss_verify_epilogue;
+    }
+
+    dest = h;
+
+    if (memcpy(dest, em + dbmask_size, h_size) != dest) {
+        goto kryptos_pss_verify_epilogue;
+    }
+
+    // INFO(Rafael): 'If the 8 * emLen - emBits of the leftmost octet in maskedDB are not all == 0' -> 'inconsistent'.
+    //               Considering (8 * emLen - emBits) always 0.
+
+    // WARN(Rafael): PS should have size zero and this fact, implicitly, must be taken in consideration during further
+    //               verifications.
+    ps_size = em_size - salt_size - h_size - 2;
+
+    if (ps_size > 0 && *dbmask != 0x00) {
+        goto kryptos_pss_verify_epilogue;
+    }
+
+    // INFO(Rafael): 'Let dbMask = MGF(H, emLen - hLen - 1)'.
+
+    db = kryptos_padding_mgf(h, h_size, em_size - h_size - 1, hash, &db_size);
+
+    if (db == NULL) {
+        goto kryptos_pss_verify_epilogue;
+    }
+
+    // INFO(Rafael): 'Let DB = maskedDB ^ dbMask'.
+
+    p = db;
+    p_end = db + db_size + 1;
+    dest = dbmask;
+
+    while (p != p_end) {
+        *p = (*p) ^ (*dest);
+        p++;
+        dest++;
+    }
+
+    // INFO(Rafael): 'Set the letfmost 8 * emLen - emBits of the leftmost octet in DB to zero'. I.e. -> db[0].
+
+    if (ps_size > 0) {
+        *db = 0x00;
+    }
+
+    // INFO(Rafael): 'If the octect at position emLen - hLen - sLen - 1 does not have 0x01' -> 'inconsistent'.
+    if (*(db + em_size - h_size - salt_size - 2) != 0x01) {
+        goto kryptos_pss_verify_epilogue;
+    }
+
+    // INFO(Rafael): 'If the emLen - hLen - sLen - 2 leftmost octets of DB are not zero' -> 'inconsistent'.
+
+    p = db;
+    p_end = db + (em_size - h_size - salt_size - 2);
+
+    while (p != p_end) {
+        if (*p != 0x00) {
+            goto kryptos_pss_verify_epilogue;
+        }
+        p++;
+    }
+
+    // INFO(Rafael): 'Let salt be the last sLen octets of DB'.
+
+    if (salt_size > 0) {
+        salt = (kryptos_u8_t *) kryptos_newseg(salt_size);
+
+        if (salt == NULL) {
+            goto kryptos_pss_verify_epilogue;
+        }
+
+        p = db + (db_size - salt_size);
+
+        dest = salt;
+
+        if (memcpy(dest, p, salt_size) != dest) {
+            goto kryptos_pss_verify_epilogue;
+        }
+    }
+
+    // INFO(Rafael): 'Let M' = (0x)00 00 00 00 00 00 00 00 || mHash || salt.
+    //               Again, mHasm is still in ktask->out.
+
+    mp_size = 8 + ktask->out_size + salt_size;
+    mp = (kryptos_u8_t *) kryptos_newseg(mp_size);
+
+    if (mp == NULL) {
+        goto kryptos_pss_verify_epilogue;
+    }
+
+    dest = mp;
+
+    if (memset(dest, 0, mp_size) != dest) {
+        goto kryptos_pss_verify_epilogue;
+    }
+
+    dest += 8;
+
+    if (memcpy(dest, ktask->out, ktask->out_size) != dest) {
+        goto kryptos_pss_verify_epilogue;
+    }
+
+    dest += ktask->out_size;
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    if (salt != NULL) {
+        if (memcpy(dest, salt, salt_size) != dest) {
+            goto kryptos_pss_verify_epilogue;
+        }
+    }
+
+    // INFO(Rafael): 'Let H' = Hash(M'), an octet of length hLen'.
+
+    ktask->in = mp;
+    ktask->in_size = mp_size;
+
+    hash(&ktask, 0);
+
+    if (ktask->out == NULL || ktask->out_size != h_size) {
+        goto kryptos_pss_verify_epilogue;
+    }
+
+    // INFO(Rafael): Now ktask->out is also known as H'. 'If H = H' ' -> 'consistent'. 'Otherwise' -> 'inconsistent'.
+
+    inconsistent = (memcmp(h, ktask->out, h_size) != 0);
+
+kryptos_pss_verify_epilogue:
+
+    if (mp != NULL) {
+        kryptos_freeseg(mp);
+    }
+
+    if (salt != NULL) {
+        kryptos_freeseg(salt);
+    }
+
+    if (dbmask != NULL) {
+        kryptos_freeseg(dbmask);
+    }
+
+    if (h != NULL) {
+        kryptos_freeseg(h);
+    }
+
+    if (db != NULL) {
+        kryptos_freeseg(db);
+    }
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    kryptos_task_init_as_null(ktask);
+
+    dest = p = p_end = NULL;
+
+    hash = NULL;
+
+    hash_size = NULL;
+
+    h_size = dbmask_size = db_size = mp_size = ps_size = 0;
+
+    return (!inconsistent) ? m : NULL;
+}

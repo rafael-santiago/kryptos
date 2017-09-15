@@ -28,4 +28,13 @@ kryptos_u8_t *kryptos_drop_oaep_padding(const kryptos_u8_t *buffer, size_t *buff
                                         kryptos_hash_func hash_func,
                                         kryptos_hash_size_func hash_size_func);
 
+kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size,
+                                 const size_t k, const size_t salt_size,
+                                 kryptos_hash_func hash_func, kryptos_hash_size_func hash_size_func);
+
+const kryptos_u8_t *kryptos_pss_verify(const kryptos_u8_t *m, const size_t m_size,
+                                       const kryptos_u8_t *em, const size_t em_size,
+                                       const size_t k, const size_t salt_size,
+                                       kryptos_hash_func hash_func, kryptos_hash_size_func hash_size_func);
+
 #endif
