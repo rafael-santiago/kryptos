@@ -591,7 +591,7 @@ kryptos_rsa_sign_epilogue:
 void kryptos_rsa_verify(kryptos_task_ctx **ktask) {
     kryptos_mp_value_t *xp = NULL, *x = NULL, *s = NULL, *e = NULL, *n = NULL;
     kryptos_u8_t *o = NULL;
-    size_t o_size = 0, xd = 0;
+    ssize_t o_size = 0, xd = 0;
 
     if (ktask == NULL) {
         return;

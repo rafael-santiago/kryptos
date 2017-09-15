@@ -9,6 +9,8 @@
 #include <kryptos_mp.h>
 #include <kryptos_memory.h>
 #include <kryptos_random.h>
+#include <kryptos_endianess_utils.h>
+#include <kryptos.h>
 #include <string.h>
 
 CUTE_TEST_CASE(kryptos_mp_new_value_tests)
@@ -2358,4 +2360,32 @@ CUTE_TEST_CASE(kryptos_raw_buffer_as_mp_tests)
 
     kryptos_del_mp_value(mp);
     kryptos_del_mp_value(emp);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_as_raw_buffer_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_mp_value_t *mp = NULL;
+    kryptos_u8_t *o = NULL;
+    ssize_t o_size = 0, d = 0;
+    kryptos_u8_t *expected_buffer = "\xDE\xAD\xBE\xEF\xBE\xEF\xDE\xAD";
+    size_t expected_buffer_size = 8;
+
+    mp = kryptos_raw_buffer_as_mp(expected_buffer, expected_buffer_size);
+    CUTE_ASSERT(mp != NULL);
+
+    kryptos_task_init_as_null(ktask);
+
+    kryptos_mp_as_raw_buffer(&ktask, mp, o, o_size, d, kryptos_mp_as_raw_buffer_tests_epilogue);
+
+    CUTE_ASSERT(ktask->out_size == expected_buffer_size);
+    CUTE_ASSERT(ktask->out != NULL);
+
+    CUTE_ASSERT(memcmp(ktask->out, expected_buffer, ktask->out_size) == 0);
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+    kryptos_del_mp_value(mp);
+
+    return NULL;
+kryptos_mp_as_raw_buffer_tests_epilogue:
+    exit(1);
 CUTE_TEST_CASE_END
