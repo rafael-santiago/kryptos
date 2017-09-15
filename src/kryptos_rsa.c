@@ -503,6 +503,8 @@ void kryptos_rsa_oaep_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, size_t k
 }
 
 void kryptos_rsa_sign(kryptos_task_ctx **ktask) {
+    kryptos_mp_value_t *d = NULL, *n = NULL, *x = NULL, *s = NULL;
+
     if (ktask == NULL) {
         return;
     }
@@ -511,6 +513,92 @@ void kryptos_rsa_sign(kryptos_task_ctx **ktask) {
 
     if (kryptos_task_check_sign(ktask) == 0) {
         return;
+    }
+
+    // INFO(Rafael): Parsing all multiprecision data.
+
+    (*ktask)->result = kryptos_pem_get_mp_data(KRYPTOS_RSA_PEM_HDR_PARAM_D, (*ktask)->key, (*ktask)->key_size, &d);
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Unable to get d.";
+        goto kryptos_rsa_sign_epilogue;
+    }
+
+    (*ktask)->result = kryptos_pem_get_mp_data(KRYPTOS_RSA_PEM_HDR_PARAM_N, (*ktask)->key, (*ktask)->key_size, &n);
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Unable to get n.";
+        goto kryptos_rsa_sign_epilogue;
+    }
+
+    x = kryptos_raw_buffer_as_mp((*ktask)->in, (*ktask)->in_size);
+
+    if (x == NULL) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Unable to get x.";
+        goto kryptos_rsa_sign_epilogue;
+    }
+
+    // INFO(Rafael): Computing the signature.
+
+    s = kryptos_mp_me_mod_n(x, d, n);
+
+    if (s == NULL) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Unable to compute s.";
+        goto kryptos_rsa_sign_epilogue;
+    }
+
+    // INFO(Rafael): Exporting the relevant multiprecision data.
+
+    (*ktask)->out = NULL;
+    (*ktask)->out_size = 0;
+
+    (*ktask)->result = kryptos_pem_put_data(&(*ktask)->out, &(*ktask)->out_size,
+                                            KRYPTOS_RSA_PEM_HDR_PARAM_X,
+                                            (kryptos_u8_t *)x->data, x->data_size * sizeof(kryptos_mp_digit_t));
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Error while exporting the signature data.";
+        goto kryptos_rsa_sign_epilogue;
+    }
+
+    (*ktask)->result = kryptos_pem_put_data(&(*ktask)->out, &(*ktask)->out_size,
+                                            KRYPTOS_RSA_PEM_HDR_PARAM_S,
+                                            (kryptos_u8_t *)s->data, s->data_size * sizeof(kryptos_mp_digit_t));
+
+    if ((*ktask)->result != kKryptosSuccess) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Error while exporting the signature data.";
+    }
+
+kryptos_rsa_sign_epilogue:
+
+    // INFO(Rafael): Some housekeeping.
+
+    if (d != NULL) {
+        kryptos_del_mp_value(d);
+    }
+
+    if (n != NULL) {
+        kryptos_del_mp_value(n);
+    }
+
+    if (x != NULL) {
+        kryptos_del_mp_value(x);
+    }
+
+    if (s != NULL) {
+        kryptos_del_mp_value(s);
+    }
+
+    if ((*ktask)->result != kKryptosSuccess && (*ktask)->out != NULL) {
+        kryptos_freeseg((*ktask)->out);
+        (*ktask)->out = NULL;
+        (*ktask)->out_size = 0;
     }
 }
 
