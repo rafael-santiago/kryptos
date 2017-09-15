@@ -14,4 +14,6 @@ int kryptos_task_check(kryptos_task_ctx **ktask);
 
 int kryptos_task_check_sign(kryptos_task_ctx **ktask);
 
+int kryptos_task_check_verify(kryptos_task_ctx **ktask);
+
 #endif

@@ -160,14 +160,12 @@ int kryptos_task_check_sign(kryptos_task_ctx **ktask) {
 
             kryptos_freeseg(data);
             data = NULL;
-            data_size = 0;
             break;
 
         default:
             (*ktask)->result = kKryptosInvalidParams;
             (*ktask)->result_verbose = "Invalid algorithm.";
             goto kryptos_task_check_sign_error;
-            break;
     }
 
     (*ktask)->result = kKryptosSuccess;
@@ -180,6 +178,80 @@ kryptos_task_check_sign_error:
     if (data != NULL) {
         kryptos_freeseg(data);
     }
+
+    data_size = 0;
+
+    return 0;
+}
+
+int kryptos_task_check_verify(kryptos_task_ctx **ktask) {
+    // CLUE(Rafael): Keep reading the code and you will discover the standard meaning of the word "verify"
+    //               in Cryptology.
+
+    kryptos_u8_t *data = NULL;
+    size_t data_size = 0;
+
+    if (ktask == NULL || *ktask == NULL) {
+        return 0;
+    }
+
+    if ((*ktask)->in == NULL || (*ktask)->in_size == 0) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "No input.";
+        goto kryptos_task_check_verify_error;
+    }
+
+    if ((*ktask)->key == NULL || (*ktask)->key_size == 0) {
+        (*ktask)->result = kKryptosKeyError;
+        (*ktask)->result_verbose = "NULL key.";
+        goto kryptos_task_check_verify_error;
+
+    }
+
+    switch ((*ktask)->cipher) {
+        case kKryptosCipherRSA:
+            data = kryptos_pem_get_data(KRYPTOS_RSA_PEM_HDR_PARAM_E, (*ktask)->key, (*ktask)->key_size, &data_size);
+
+            if (data == NULL || data_size == 0) {
+                (*ktask)->result = kKryptosKeyError;
+                (*ktask)->result_verbose = "Invalid RSA public key.";
+                goto kryptos_task_check_verify_error;
+            }
+
+            kryptos_freeseg(data);
+            data = NULL;
+            data_size = 0;
+
+            data = kryptos_pem_get_data(KRYPTOS_RSA_PEM_HDR_PARAM_N, (*ktask)->key, (*ktask)->key_size, &data_size);
+
+            if (data == NULL || data_size == 0) {
+                (*ktask)->result = kKryptosKeyError;
+                (*ktask)->result_verbose = "Invalid RSA public key.";
+                goto kryptos_task_check_verify_error;
+            }
+
+            kryptos_freeseg(data);
+            data = NULL;
+            break;
+
+        default:
+            (*ktask)->result = kKryptosInvalidParams;
+            (*ktask)->result_verbose = "Invalid algorithm.";
+            goto kryptos_task_check_verify_error;
+    }
+
+    (*ktask)->result = kKryptosSuccess;
+    (*ktask)->result_verbose = NULL;
+
+    return 1;
+
+kryptos_task_check_verify_error:
+
+    if (data != NULL) {
+        kryptos_freeseg(data);
+    }
+
+    data_size = 0;
 
     return 0;
 }

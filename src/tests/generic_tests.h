@@ -26,6 +26,8 @@ CUTE_DECLARE_TEST_CASE(kryptos_task_check_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_task_check_sign_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_task_check_verify_tests);
+
 CUTE_DECLARE_TEST_CASE(kryptos_hex_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_hash_common_tests);
