@@ -112,7 +112,7 @@ kryptos_mp_value_t *kryptos_raw_buffer_as_mp(const kryptos_u8_t *buf, const size
 # define kryptos_mp_byte2bit(b) ( (b) << 3 )
 
 
-# define kryptos_mp_as_raw_buffer(ktask, m, o, o_size, xd, epilogue) {\
+# define kryptos_mp_as_task_out(ktask, m, o, o_size, xd, epilogue) {\
     (*(ktask))->out_size = (m)->data_size * sizeof(kryptos_mp_digit_t);\
     (*(ktask))->out = (kryptos_u8_t *) kryptos_newseg((*(ktask))->out_size);\
     if ((*(ktask))->out == NULL) {\
@@ -136,7 +136,7 @@ kryptos_mp_value_t *kryptos_raw_buffer_as_mp(const kryptos_u8_t *buf, const size
 
 # define kryptos_mp_byte2bit(b) ( (b) << 5 )
 
-# define kryptos_mp_as_raw_buffer(ktask, m, o, o_size, xd, epilogue) {\
+# define kryptos_mp_as_task_out(ktask, m, o, o_size, xd, epilogue) {\
     (*(ktask))->out_size = (m)->data_size * sizeof(kryptos_mp_digit_t);\
     (*(ktask))->out = (kryptos_u8_t *) kryptos_newseg((*(ktask))->out_size);\
     if ((*(ktask))->out == NULL) {\

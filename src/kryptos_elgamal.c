@@ -692,7 +692,7 @@ static void kryptos_elgamal_decrypt(kryptos_task_ctx **ktask) {
 
     // INFO(Rafael): The hardest part! ;)
 
-    kryptos_mp_as_raw_buffer(ktask, x_mod, o, o_size, xd, kryptos_elgamal_decrypt_epilogue);
+    kryptos_mp_as_task_out(ktask, x_mod, o, o_size, xd, kryptos_elgamal_decrypt_epilogue);
 
 kryptos_elgamal_decrypt_epilogue:
 

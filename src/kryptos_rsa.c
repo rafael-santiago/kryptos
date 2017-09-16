@@ -442,7 +442,7 @@ static void kryptos_rsa_decrypt(kryptos_task_ctx **ktask) {
         goto kryptos_rsa_decrypt_epilogue;
     }
 
-    kryptos_mp_as_raw_buffer(ktask, m, o, o_size, xd, kryptos_rsa_decrypt_epilogue);
+    kryptos_mp_as_task_out(ktask, m, o, o_size, xd, kryptos_rsa_decrypt_epilogue);
 
 kryptos_rsa_decrypt_epilogue:
 
@@ -659,7 +659,7 @@ void kryptos_rsa_verify(kryptos_task_ctx **ktask) {
     // INFO(Rafael): Our verification task also offers another service, return a copy of the original x, if it has a
     //               valid signature.
 
-    kryptos_mp_as_raw_buffer(ktask, x, o, o_size, xd, kryptos_rsa_verify_epilogue);
+    kryptos_mp_as_task_out(ktask, x, o, o_size, xd, kryptos_rsa_verify_epilogue);
 
 kryptos_rsa_verify_epilogue:
 

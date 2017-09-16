@@ -2362,7 +2362,7 @@ CUTE_TEST_CASE(kryptos_raw_buffer_as_mp_tests)
     kryptos_del_mp_value(emp);
 CUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_mp_as_raw_buffer_tests)
+CUTE_TEST_CASE(kryptos_mp_as_task_out_tests)
     kryptos_task_ctx t, *ktask = &t;
     kryptos_mp_value_t *mp = NULL;
     kryptos_u8_t *o = NULL;
@@ -2375,7 +2375,7 @@ CUTE_TEST_CASE(kryptos_mp_as_raw_buffer_tests)
 
     kryptos_task_init_as_null(ktask);
 
-    kryptos_mp_as_raw_buffer(&ktask, mp, o, o_size, d, kryptos_mp_as_raw_buffer_tests_epilogue);
+    kryptos_mp_as_task_out(&ktask, mp, o, o_size, d, kryptos_mp_as_raw_buffer_tests_epilogue);
 
     CUTE_ASSERT(ktask->out_size == expected_buffer_size);
     CUTE_ASSERT(ktask->out != NULL);
