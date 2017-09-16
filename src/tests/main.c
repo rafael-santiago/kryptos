@@ -169,7 +169,15 @@ CUTE_TEST_CASE(kryptos_test_monkey)
         printf("WARN: The Elgamal-OAEP tests were skipped.\n");
     }
 
+    // INFO(Rafael): Digital signature stuff.
+
     CUTE_RUN_TEST(kryptos_pss_encoding_tests);
+
+    if (CUTE_GET_OPTION("skip-rsa-signature-tests") == NULL) {
+        CUTE_RUN_TEST(kryptos_rsa_digital_signature_basic_scheme_tests);
+    } else {
+        printf("WARN: The RSA signature tests were skipped.\n");
+    }
 
 //    CUTE_RUN_TEST(poke_bloody_poke);
 CUTE_TEST_CASE_END

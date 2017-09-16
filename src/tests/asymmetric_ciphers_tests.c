@@ -23,12 +23,13 @@ static int corrupt_cryptogram(const kryptos_u8_t *hdr, kryptos_u8_t *pem_data, c
     dp = pem_data;
     dp_end = pem_data + pem_data_size;
 
-    hp = hdr;
-    hp_end = hp + strlen(hdr);
+    hp_end = hdr + strlen(hdr);
 
     while (dp != dp_end && !found) {
         found = 1;
         temp = dp + 1;
+
+        hp = hdr;
 
         while (found && hp != hp_end && dp != dp_end) {
             found = (*dp == *hp);
@@ -2177,4 +2178,184 @@ CUTE_TEST_CASE(kryptos_pss_encoding_tests)
 
         kryptos_freeseg(em);
     }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
+    kryptos_u8_t *k_pub_alice = "-----BEGIN RSA PARAM N-----\n"
+                                "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNo"
+                                "Vg7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
+                                "-----END RSA PARAM N-----\n"
+                                "-----BEGIN RSA PARAM E-----\n"
+                                "o13jdPAiis0sJZeh0OL9jL8Tib/EgoVNLqNXCM966j1qD4yq5KcXgrDezI48lxWDn66cZnppeXGfK8d0ym8U85JsXVgV2a"
+                                "o45ESDnBQFoRSoeQ3p3QVqDzfgViMeHIinMzFxx/OYpSgxpuQq4em4CwrBkqn1DxlRCzNCrdAqiwo=\n"
+                                "-----END RSA PARAM E-----\n";
+
+    kryptos_u8_t *k_priv_alice = "-----BEGIN RSA PARAM N-----\n"
+                                 "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjN"
+                                 "oVg7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
+                                 "-----END RSA PARAM N-----\n"
+                                 "-----BEGIN RSA PARAM D-----\n"
+                                 "D3fMDiyVdMeojcOJuo4rB8CdgjNrxS2M9eORsLeiI6t+AiQpsE9LDlk62xHRAKfvX42RDkrlnr1g6PY3shIuPKcSfqLcl"
+                                 "+Sdvt3NHzRLM8CEgJSWrUu919xo/IUKhFyFdN5ClYwpvaXaK/MVM1AV8gihLHpEsQT9gNfTgwDrVxU=\n"
+                                 "-----END RSA PARAM D-----\n";
+
+    kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
+    kryptos_u8_t *m = "The Bad In Each Other\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+    size_t m_size = 32;
+
+    // INFO(Rafael): Valid signature case.
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    alice->in = m;
+    alice->in_size = m_size;
+    alice->key = k_priv_alice;
+    alice->key_size = strlen(k_priv_alice);
+
+    kryptos_rsa_sign(&alice);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+
+    CUTE_ASSERT(alice->out != NULL);
+
+    printf(" *** SIGNED OUTPUT:\n\n%s\n", alice->out);
+
+    // INFO(Rafael): Once upon a time, Alice sent a signed message to bob.... blah, blah, blah.
+
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+    bob->key = k_pub_alice;
+    bob->key_size = strlen(k_pub_alice);
+
+    kryptos_rsa_verify(&bob);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+
+    CUTE_ASSERT(bob->out != NULL);
+    CUTE_ASSERT(bob->out_size == m_size);
+    CUTE_ASSERT(memcmp(bob->out, m, bob->out_size) == 0);
+
+    printf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Invalid signature cases.
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    alice->in = m;
+    alice->in_size = m_size;
+    alice->key = k_priv_alice;
+    alice->key_size = strlen(k_priv_alice);
+
+    kryptos_rsa_sign(&alice);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+
+    CUTE_ASSERT(alice->out != NULL);
+
+    CUTE_ASSERT(corrupt_cryptogram(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
+
+    printf(" *** SIGNED OUTPUT WITH X PARAMETER CORRUPTED:\n\n%s\n", alice->out);
+
+    // INFO(Rafael): Once upon a time, Bob received a signed message by Alice with X corrupted.
+
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+    bob->key = k_pub_alice;
+    bob->key_size = strlen(k_pub_alice);
+
+    kryptos_rsa_verify(&bob);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 0);
+    CUTE_ASSERT(bob->result == kKryptosInvalidSignature);
+    CUTE_ASSERT(bob->out == NULL);
+    CUTE_ASSERT(bob->out_size == 0);
+
+    printf(" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    alice->in = m;
+    alice->in_size = m_size;
+    alice->key = k_priv_alice;
+    alice->key_size = strlen(k_priv_alice);
+
+    kryptos_rsa_sign(&alice);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+
+    CUTE_ASSERT(alice->out != NULL);
+
+    CUTE_ASSERT(corrupt_cryptogram(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
+
+    printf(" *** SIGNED OUTPUT WITH S PARAMETER CORRUPTED:\n\n%s\n", alice->out);
+
+    // INFO(Rafael): Once upon a time, Bob received a signed message by Alice with S corrupted.
+
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+    bob->key = k_pub_alice;
+    bob->key_size = strlen(k_pub_alice);
+
+    kryptos_rsa_verify(&bob);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 0);
+    CUTE_ASSERT(bob->result == kKryptosInvalidSignature);
+
+    printf(" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    alice->in = m;
+    alice->in_size = m_size;
+    alice->key = k_priv_alice;
+    alice->key_size = strlen(k_priv_alice);
+
+    kryptos_rsa_sign(&alice);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+
+    CUTE_ASSERT(alice->out != NULL);
+
+    CUTE_ASSERT(corrupt_cryptogram(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
+    CUTE_ASSERT(corrupt_cryptogram(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
+
+    printf(" *** SIGNED OUTPUT WITH BOTH X AND S PARAMETERS CORRUPTED:\n\n%s\n", alice->out);
+
+    // INFO(Rafael): Once upon a time, Bob received a signed message by Alice, totally corrupted.
+
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+    bob->key = k_pub_alice;
+    bob->key_size = strlen(k_pub_alice);
+
+    kryptos_rsa_verify(&bob);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 0);
+    CUTE_ASSERT(bob->result == kKryptosInvalidSignature);
+
+    printf(" *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n", bob->result_verbose);
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
 CUTE_TEST_CASE_END

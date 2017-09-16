@@ -62,4 +62,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_pss_encoding_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests);
+
 #endif
