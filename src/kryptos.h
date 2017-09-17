@@ -412,6 +412,23 @@ kryptos_ ## label_name:\
     }\
 }
 
+// TIP(Rafael): Pretty weird name in order to nobody never ever call it directly. :)
+
+#define kryptos_perform_digsig_proto_action(cname, proto_level, ktask, cipher_args...) {\
+    kryptos_ ## cname ## _digital_signature_setup((ktask), cipher_args);\
+    (ktask)->mirror_p = (ktask);\
+    kryptos_ ## cname ## _## proto_level(&(ktask)->mirror_p);\
+    (ktask)->mirror_p = NULL;\
+}
+
+#define kryptos_sign(cname, ktask, cipher_args...) {\
+    kryptos_perform_digsig_proto_action(cname, sign, ktask, cipher_args);\
+}
+
+#define kryptos_verify(cname, ktask, cipher_args...) {\
+    kryptos_perform_digsig_proto_action(cname, verify, ktask, cipher_args);\
+}
+
 #endif // KRYPTOS_C99
 
 #endif // KRYPTOS_KRYPTOS_H

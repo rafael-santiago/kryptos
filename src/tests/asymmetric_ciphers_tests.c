@@ -11,9 +11,9 @@
 #include <kryptos_padding.h>
 #include <string.h>
 
-static int corrupt_cryptogram(const kryptos_u8_t *hdr, kryptos_u8_t *pem_data, const size_t pem_data_size);
+static int corrupt_pem_data(const kryptos_u8_t *hdr, kryptos_u8_t *pem_data, const size_t pem_data_size);
 
-static int corrupt_cryptogram(const kryptos_u8_t *hdr, kryptos_u8_t *pem_data, const size_t pem_data_size) {
+static int corrupt_pem_data(const kryptos_u8_t *hdr, kryptos_u8_t *pem_data, const size_t pem_data_size) {
     kryptos_u8_t *data = NULL;
     size_t data_size;
     kryptos_u8_t *dp, *dp_end, swp = 0, *temp;
@@ -1126,7 +1126,7 @@ CUTE_TEST_CASE(kryptos_rsa_cipher_tests)
 
     CUTE_ASSERT(b_ktask->out != NULL);
 
-    printf(" *** PLAINTEXT:\n\n'%s'\n\n", b_ktask->out);
+    printf(" *** PLAINTEXT:\n\n'%s'\n", b_ktask->out);
 
     CUTE_ASSERT(b_ktask->out_size == m_size);
     CUTE_ASSERT(memcmp(b_ktask->out, m, m_size) == 0);
@@ -1185,7 +1185,7 @@ CUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
 
     CUTE_ASSERT(a_ktask->out != NULL);
 
-    printf(" *** PLAINTEXT:\n\n'%s'\n\n", a_ktask->out);
+    printf(" *** PLAINTEXT:\n\n'%s'\n", a_ktask->out);
 
     CUTE_ASSERT(a_ktask->out_size == m_size);
     CUTE_ASSERT(memcmp(a_ktask->out, m, m_size) == 0);
@@ -1432,7 +1432,7 @@ CUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
 
     // INFO(Rafael): For some reason during the transfer the cryptogram becomes corrupted.
 
-    CUTE_ASSERT(corrupt_cryptogram(KRYPTOS_RSA_PEM_HDR_PARAM_C, a_ktask->out, a_ktask->out_size) == 1);
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_C, a_ktask->out, a_ktask->out_size) == 1);
 
     printf(" ( the cryptogram was intentionally corrupted )\n\n");
 
@@ -1557,7 +1557,7 @@ CUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
 
     // INFO(Rafael): For some reason during the transfer the cryptogram becomes corrupted.
 
-    CUTE_ASSERT(corrupt_cryptogram(KRYPTOS_RSA_PEM_HDR_PARAM_C, b_ktask->out, b_ktask->out_size) == 1);
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_C, b_ktask->out, b_ktask->out_size) == 1);
 
     printf(" ( the cryptogram was intentionally corrupted )\n\n");
 
@@ -1768,7 +1768,7 @@ CUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
 
     CUTE_ASSERT(alice->out != NULL);
 
-    printf(" *** PLAINTEXT:\n\n'%s'\n\n", alice->out);
+    printf(" *** PLAINTEXT:\n\n'%s'\n", alice->out);
 
     CUTE_ASSERT(alice->out_size == m_size);
     CUTE_ASSERT(memcmp(alice->out, m, m_size) == 0);
@@ -1836,7 +1836,7 @@ CUTE_TEST_CASE(kryptos_elgamal_cipher_c99_tests)
     CUTE_ASSERT(bob->out_size == m_size);
     CUTE_ASSERT(memcmp(bob->out, m, bob->out_size) == 0);
 
-    printf(" *** PLAINTEXT:\n\n'%s'\n\n", bob->out);
+    printf(" *** PLAINTEXT:\n\n'%s'\n", bob->out);
 
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
@@ -1970,7 +1970,7 @@ CUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
     bob->key_size = strlen(k_priv_bob);
     bob->action = kKryptosDecrypt;
 
-    CUTE_ASSERT(corrupt_cryptogram(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Y, bob->in, bob->in_size) == 1);
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Y, bob->in, bob->in_size) == 1);
 
     printf(" ( the cryptogram was intentionally corrupted )\n\n");
 
@@ -2097,7 +2097,7 @@ CUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
 
     kryptos_task_set_in(alice, bob->out, bob->out_size);
 
-    CUTE_ASSERT(corrupt_cryptogram(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Y, alice->in, alice->in_size) == 1);
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Y, alice->in, alice->in_size) == 1);
 
     printf(" ( the cryptogram was intentionally corrupted )\n\n");
 
@@ -2181,6 +2181,9 @@ CUTE_TEST_CASE(kryptos_pss_encoding_tests)
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
+    // WARN(Rafael): We could speed up this test just computing the signature once and saving the output buffer for the
+    //               further tests with corrupted data but let's stress up the whole system, if it has something wrong
+    //               this bug could show up we will caught it.
     kryptos_u8_t *k_pub_alice = "-----BEGIN RSA PARAM N-----\n"
                                 "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNo"
                                 "Vg7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
@@ -2261,7 +2264,7 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
 
     CUTE_ASSERT(alice->out != NULL);
 
-    CUTE_ASSERT(corrupt_cryptogram(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
 
     printf(" *** SIGNED OUTPUT WITH X PARAMETER CORRUPTED:\n\n%s\n", alice->out);
 
@@ -2300,7 +2303,7 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
 
     CUTE_ASSERT(alice->out != NULL);
 
-    CUTE_ASSERT(corrupt_cryptogram(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
 
     printf(" *** SIGNED OUTPUT WITH S PARAMETER CORRUPTED:\n\n%s\n", alice->out);
 
@@ -2337,8 +2340,8 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
 
     CUTE_ASSERT(alice->out != NULL);
 
-    CUTE_ASSERT(corrupt_cryptogram(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
-    CUTE_ASSERT(corrupt_cryptogram(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
 
     printf(" *** SIGNED OUTPUT WITH BOTH X AND S PARAMETERS CORRUPTED:\n\n%s\n", alice->out);
 
@@ -2358,4 +2361,146 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
 
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
+    // WARN(Rafael): We could speed up this test just computing the signature once and saving the output buffer for the
+    //               further tests with corrupted data but let's stress up the whole system, if it has something wrong
+    //               this bug could show up we will caught it.
+#ifdef KRYPTOS_C99
+    kryptos_u8_t *k_pub_bob = "-----BEGIN RSA PARAM N-----\n"
+                              "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNoVg"
+                              "7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
+                              "-----END RSA PARAM N-----\n"
+                              "-----BEGIN RSA PARAM E-----\n"
+                              "o13jdPAiis0sJZeh0OL9jL8Tib/EgoVNLqNXCM966j1qD4yq5KcXgrDezI48lxWDn66cZnppeXGfK8d0ym8U85JsXVgV2ao4"
+                              "5ESDnBQFoRSoeQ3p3QVqDzfgViMeHIinMzFxx/OYpSgxpuQq4em4CwrBkqn1DxlRCzNCrdAqiwo=\n"
+                              "-----END RSA PARAM E-----\n";
+
+    kryptos_u8_t *k_priv_bob = "-----BEGIN RSA PARAM N-----\n"
+                               "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNoV"
+                               "g7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
+                               "-----END RSA PARAM N-----\n"
+                               "-----BEGIN RSA PARAM D-----\n"
+                               "D3fMDiyVdMeojcOJuo4rB8CdgjNrxS2M9eORsLeiI6t+AiQpsE9LDlk62xHRAKfvX42RDkrlnr1g6PY3shIuPKcSfqLcl+S"
+                               "dvt3NHzRLM8CEgJSWrUu919xo/IUKhFyFdN5ClYwpvaXaK/MVM1AV8gihLHpEsQT9gNfTgwDrVxU=\n"
+                               "-----END RSA PARAM D-----\n";
+
+    kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
+    kryptos_u8_t *m = "We're gonna steal your mail, on a Friday night... "
+                      "We're gonna steal your mail, by the pale moonlight\x00\x00\x00\x00";
+    size_t m_size = 104;
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+
+    // INFO(Rafael): Bob sign the message.
+
+    kryptos_sign(rsa, bob, m, m_size, k_priv_bob, strlen(k_priv_bob));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    CUTE_ASSERT(bob->out != NULL);
+
+    printf(" *** SIGNED OUTPUT:\n\n%s\n", bob->out);
+
+    // INFO(Rafael): Now Alice simply verify.
+
+    kryptos_verify(rsa, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+    CUTE_ASSERT(alice->out != NULL);
+
+    printf(" *** AUTENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
+
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Corrupted signature cases.
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+
+    kryptos_sign(rsa, bob, m, m_size, k_priv_bob, strlen(k_priv_bob));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    CUTE_ASSERT(bob->out != NULL);
+
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
+
+    printf(" *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", bob->out);
+
+    kryptos_verify(rsa, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
+    CUTE_ASSERT(alice->result == kKryptosInvalidSignature);
+
+    CUTE_ASSERT(alice->out == NULL);
+    CUTE_ASSERT(alice->out_size == 0);
+
+    printf(" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+
+    kryptos_sign(rsa, bob, m, m_size, k_priv_bob, strlen(k_priv_bob));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    CUTE_ASSERT(bob->out != NULL);
+
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
+
+    printf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->out);
+
+    kryptos_verify(rsa, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
+    CUTE_ASSERT(alice->result == kKryptosInvalidSignature);
+
+    CUTE_ASSERT(alice->out == NULL);
+    CUTE_ASSERT(alice->out_size == 0);
+
+    printf(" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+
+    kryptos_sign(rsa, bob, m, m_size, k_priv_bob, strlen(k_priv_bob));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    CUTE_ASSERT(bob->out != NULL);
+
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
+
+    printf(" *** SIGNED OUTPUT WITH BOTH X AND S CORRUPTED:\n\n%s\n", bob->out);
+
+    kryptos_verify(rsa, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
+    CUTE_ASSERT(alice->result == kKryptosInvalidSignature);
+
+    CUTE_ASSERT(alice->out == NULL);
+    CUTE_ASSERT(alice->out_size == 0);
+
+    printf(" *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n", alice->result_verbose);
+
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+#else
+    printf("WARN: No c99 support, this test was skipped.\n");
+#endif
 CUTE_TEST_CASE_END

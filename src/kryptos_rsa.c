@@ -482,6 +482,19 @@ void kryptos_rsa_oaep_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, size_t k
     ktask->arg[3] = hash_size;
 }
 
+void kryptos_rsa_digital_signature_setup(kryptos_task_ctx *ktask, kryptos_u8_t *in, size_t in_size,
+                                         kryptos_u8_t *key, size_t key_size) {
+    if (ktask == NULL) {
+        return;
+    }
+
+    ktask->key = key;
+    ktask->key_size = key_size;
+
+    ktask->in = in;
+    ktask->in_size = in_size;
+}
+
 void kryptos_rsa_sign(kryptos_task_ctx **ktask) {
     kryptos_mp_value_t *d = NULL, *n = NULL, *x = NULL, *s = NULL;
 
