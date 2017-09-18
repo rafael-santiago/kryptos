@@ -15,6 +15,7 @@
 #include <kryptos_iv_utils.h>
 #include <kryptos_hex.h>
 #include <kryptos_hash_common.h>
+#include <kryptos_sha1.h>
 #include <string.h>
 
 CUTE_TEST_CASE(kryptos_padding_tests)
@@ -552,6 +553,7 @@ CUTE_TEST_CASE(kryptos_task_check_sign_tests)
                                "-----BEGIN RSA PARAM D-----\n"
                                "K04+KEU3GyG2ABjJu+sTqV5yH8mgO8aIPdygWvBq9GzJfTmLt18cck2pc7y6lmYLsl+NxgFo7KTliwXAjU3eGg==\n"
                                "-----END RSA PARAM D-----\n";
+    size_t k;
 
     CUTE_ASSERT(kryptos_task_check_sign(NULL) == 0);
 
@@ -563,6 +565,10 @@ CUTE_TEST_CASE(kryptos_task_check_sign_tests)
     ktask->key = NULL;
     ktask->key_size = 0;
 
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->cipher = kKryptosCipherRSA;
     CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
 
@@ -584,15 +590,75 @@ CUTE_TEST_CASE(kryptos_task_check_sign_tests)
     ktask->key_size = strlen(ktask->key);
 
     CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = rsa_k_priv;
+    ktask->key_size = strlen(ktask->key);
+
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 1);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+
+    // INFO(Rafael): Sign using RSA-EMSA-PSS.
+
+    ktask->arg[0] = ktask->arg[1] = ktask->arg[2] = NULL;
+
+    ktask->cipher = kKryptosCipherAES;
+    ktask->in = NULL;
+    ktask->in_size = 0;
+    ktask->key = NULL;
+    ktask->key_size = 0;
+
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
 
-    ktask->cipher = kKryptosCipherRSA;
+    ktask->cipher = kKryptosCipherRSAEMSAPSS;
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in = "rsa";
+
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in_size = 3;
+
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = rsa_k_pub;
+
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key_size = strlen(ktask->key);
 
     CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     CUTE_ASSERT(ktask->result == kKryptosKeyError);
 
     ktask->key = rsa_k_priv;
     ktask->key_size = strlen(ktask->key);
+
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->arg[0] = &k;
+
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 1);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+
+    ktask->arg[2] = kryptos_sha1_hash_size;
+
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->arg[1] = kryptos_sha1_hash;
+    ktask->arg[2] = NULL;
+
+    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->arg[1] = kryptos_sha1_hash;
+    ktask->arg[2] = kryptos_sha1_hash_size;
 
     CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 1);
     CUTE_ASSERT(ktask->result == kKryptosSuccess);
@@ -613,6 +679,7 @@ CUTE_TEST_CASE(kryptos_task_check_verify_tests)
                                "-----BEGIN RSA PARAM D-----\n"
                                "K04+KEU3GyG2ABjJu+sTqV5yH8mgO8aIPdygWvBq9GzJfTmLt18cck2pc7y6lmYLsl+NxgFo7KTliwXAjU3eGg==\n"
                                "-----END RSA PARAM D-----\n";
+    size_t k;
 
     CUTE_ASSERT(kryptos_task_check_sign(NULL) == 0);
 
@@ -623,6 +690,11 @@ CUTE_TEST_CASE(kryptos_task_check_verify_tests)
     ktask->in_size = 0;
     ktask->key = NULL;
     ktask->key_size = 0;
+
+    CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->cipher = kKryptosCipherRSA;
 
     CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
@@ -645,15 +717,76 @@ CUTE_TEST_CASE(kryptos_task_check_verify_tests)
     ktask->key_size = strlen(ktask->key);
 
     CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = rsa_k_pub;
+    ktask->key_size = strlen(ktask->key);
+
+    CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 1);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+
+    // INFO(Rafael): Verify using RSA-EMSA-PSS.
+
+    ktask->arg[0] = ktask->arg[1] = ktask->arg[2] = NULL;
+
+    ktask->cipher = kKryptosCipherAES;
+    ktask->in = NULL;
+    ktask->in_size = 0;
+    ktask->key = NULL;
+    ktask->key_size = 0;
+
+    CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
 
-    ktask->cipher = kKryptosCipherRSA;
+    ktask->cipher = kKryptosCipherRSAEMSAPSS;
+
+    CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in = "rsa";
+
+    CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in_size = 3;
+
+    CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = rsa_k_priv;
+
+    CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key_size = strlen(ktask->key);
 
     CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     CUTE_ASSERT(ktask->result == kKryptosKeyError);
 
     ktask->key = rsa_k_pub;
     ktask->key_size = strlen(ktask->key);
+
+    CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->arg[0] = &k;
+
+    CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 1);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+
+    ktask->arg[1] = kryptos_sha1_hash;
+
+    CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->arg[1] = NULL;
+    ktask->arg[2] = kryptos_sha1_hash_size;
+
+    CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->arg[1] = kryptos_sha1_hash;
+    ktask->arg[2] = kryptos_sha1_hash_size;
 
     CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 1);
     CUTE_ASSERT(ktask->result == kKryptosSuccess);

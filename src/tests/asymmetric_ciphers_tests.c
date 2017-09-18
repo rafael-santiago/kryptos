@@ -2213,6 +2213,8 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
+    alice->cipher = kKryptosCipherRSA;
+
     alice->in = m;
     alice->in_size = m_size;
     alice->key = k_priv_alice;
@@ -2227,6 +2229,8 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     printf(" *** SIGNED OUTPUT:\n\n%s\n", alice->out);
 
     // INFO(Rafael): Once upon a time, Alice sent a signed message to bob.... blah, blah, blah.
+
+    bob->cipher = kKryptosCipherRSA;
 
     bob->in = alice->out;
     bob->in_size = alice->out_size;
@@ -2253,6 +2257,8 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
+    alice->cipher = kKryptosCipherRSA;
+
     alice->in = m;
     alice->in_size = m_size;
     alice->key = k_priv_alice;
@@ -2269,6 +2275,8 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     printf(" *** SIGNED OUTPUT WITH X PARAMETER CORRUPTED:\n\n%s\n", alice->out);
 
     // INFO(Rafael): Once upon a time, Bob received a signed message by Alice with X corrupted.
+
+    bob->cipher = kKryptosCipherRSA;
 
     bob->in = alice->out;
     bob->in_size = alice->out_size;
@@ -2292,6 +2300,8 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
+    alice->cipher = kKryptosCipherRSA;
+
     alice->in = m;
     alice->in_size = m_size;
     alice->key = k_priv_alice;
@@ -2308,6 +2318,8 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     printf(" *** SIGNED OUTPUT WITH S PARAMETER CORRUPTED:\n\n%s\n", alice->out);
 
     // INFO(Rafael): Once upon a time, Bob received a signed message by Alice with S corrupted.
+
+    bob->cipher = kKryptosCipherRSA;
 
     bob->in = alice->out;
     bob->in_size = alice->out_size;
@@ -2329,6 +2341,8 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
+    alice->cipher = kKryptosCipherRSA;
+
     alice->in = m;
     alice->in_size = m_size;
     alice->key = k_priv_alice;
@@ -2346,6 +2360,8 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     printf(" *** SIGNED OUTPUT WITH BOTH X AND S PARAMETERS CORRUPTED:\n\n%s\n", alice->out);
 
     // INFO(Rafael): Once upon a time, Bob received a signed message by Alice, totally corrupted.
+
+    bob->cipher = kKryptosCipherRSA;
 
     bob->in = alice->out;
     bob->in_size = alice->out_size;

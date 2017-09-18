@@ -488,11 +488,41 @@ void kryptos_rsa_digital_signature_setup(kryptos_task_ctx *ktask, kryptos_u8_t *
         return;
     }
 
+    ktask->cipher = kKryptosCipherRSA;
+
     ktask->key = key;
     ktask->key_size = key_size;
 
     ktask->in = in;
     ktask->in_size = in_size;
+}
+
+void kryptos_rsa_emsa_pss_digital_signature_setup(kryptos_task_ctx *ktask, kryptos_u8_t *in, size_t in_size,
+                                                  kryptos_u8_t *key, size_t key_size, size_t *salt_size,
+                                                  kryptos_hash_func hash, kryptos_hash_size_func hash_size) {
+    if (ktask == NULL) {
+        return;
+    }
+
+    ktask->cipher = kKryptosCipherRSAEMSAPSS;
+
+    ktask->key = key;
+    ktask->key_size = key_size;
+
+    ktask->in = in;
+    ktask->in_size = in_size;
+
+    ktask->arg[0] = salt_size;
+    ktask->arg[1] = hash;
+    ktask->arg[2] = hash_size;
+}
+
+void kryptos_rsa_emsa_pss_sign(kryptos_task_ctx **ktask) {
+    kryptos_rsa_sign(ktask);
+}
+
+void kryptos_rsa_emsa_pss_verify(kryptos_task_ctx **ktask) {
+    kryptos_rsa_verify(ktask);
 }
 
 void kryptos_rsa_sign(kryptos_task_ctx **ktask) {
@@ -501,8 +531,6 @@ void kryptos_rsa_sign(kryptos_task_ctx **ktask) {
     if (ktask == NULL) {
         return;
     }
-
-    (*ktask)->cipher = kKryptosCipherRSA;
 
     if (kryptos_task_check_sign(ktask) == 0) {
         return;

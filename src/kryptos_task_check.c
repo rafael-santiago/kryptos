@@ -29,6 +29,12 @@ static int kryptos_task_check_rsa_oaep_additional_params(kryptos_task_ctx **ktas
 
 static int kryptos_task_check_elgamal_params(kryptos_task_ctx **ktask);
 
+static int kryptos_task_check_sign_rsa(kryptos_task_ctx **ktask);
+
+static int kryptos_task_check_verify_rsa(kryptos_task_ctx **ktask);
+
+static int kryptos_task_check_rsa_emsa_pss_additional_params(kryptos_task_ctx **ktask);
+
 // WARN(Rafael): If you have changed something in RSA-OAEP additional parameters maybe should be better to implement a
 //               separated function to verify the additional parameters of Elgamal-OAEP.
 
@@ -117,34 +123,50 @@ kryptos_task_check_error:
 }
 
 int kryptos_task_check_sign(kryptos_task_ctx **ktask) {
-
-    kryptos_u8_t *data = NULL;
-    size_t data_size = 0;
-
     if (ktask == NULL || *ktask == NULL) {
         return 0;
     }
 
+    switch ((*ktask)->cipher) {
+        case kKryptosCipherRSA:
+        case kKryptosCipherRSAEMSAPSS:
+            return kryptos_task_check_sign_rsa(ktask);
+
+        default:
+            (*ktask)->result = kKryptosInvalidParams;
+            (*ktask)->result_verbose = "Invalid algorithm.";
+            break;
+    }
+
+    return 0;
+}
+
+static int kryptos_task_check_sign_rsa(kryptos_task_ctx **ktask) {
+
+    kryptos_u8_t *data = NULL;
+    size_t data_size = 0;
+
     if ((*ktask)->in == NULL || (*ktask)->in_size == 0) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "No input.";
-        goto kryptos_task_check_sign_error;
+        goto kryptos_task_check_sign_rsa_error;
     }
 
     if ((*ktask)->key == NULL || (*ktask)->key_size == 0) {
         (*ktask)->result = kKryptosKeyError;
         (*ktask)->result_verbose = "NULL key.";
-        goto kryptos_task_check_sign_error;
+        goto kryptos_task_check_sign_rsa_error;
     }
 
     switch ((*ktask)->cipher) {
         case kKryptosCipherRSA:
+        case kKryptosCipherRSAEMSAPSS:
             data = kryptos_pem_get_data(KRYPTOS_RSA_PEM_HDR_PARAM_D, (*ktask)->key, (*ktask)->key_size, &data_size);
 
             if (data == NULL || data_size == 0) {
                 (*ktask)->result = kKryptosKeyError;
                 (*ktask)->result_verbose = "Invalid RSA private key.";
-                goto kryptos_task_check_sign_error;
+                goto kryptos_task_check_sign_rsa_error;
             }
 
             kryptos_freeseg(data);
@@ -155,7 +177,7 @@ int kryptos_task_check_sign(kryptos_task_ctx **ktask) {
             if (data == NULL || data_size == 0) {
                 (*ktask)->result = kKryptosKeyError;
                 (*ktask)->result_verbose = "Invalid RSA private key.";
-                goto kryptos_task_check_sign_error;
+                goto kryptos_task_check_sign_rsa_error;
             }
 
             kryptos_freeseg(data);
@@ -165,15 +187,15 @@ int kryptos_task_check_sign(kryptos_task_ctx **ktask) {
         default:
             (*ktask)->result = kKryptosInvalidParams;
             (*ktask)->result_verbose = "Invalid algorithm.";
-            goto kryptos_task_check_sign_error;
+            goto kryptos_task_check_sign_rsa_error;
     }
 
     (*ktask)->result = kKryptosSuccess;
     (*ktask)->result_verbose = NULL;
 
-    return 1;
+    return ((*ktask)->cipher == kKryptosCipherRSA) ? 1 : kryptos_task_check_rsa_emsa_pss_additional_params(ktask);
 
-kryptos_task_check_sign_error:
+kryptos_task_check_sign_rsa_error:
 
     if (data != NULL) {
         kryptos_freeseg(data);
@@ -185,37 +207,53 @@ kryptos_task_check_sign_error:
 }
 
 int kryptos_task_check_verify(kryptos_task_ctx **ktask) {
-    // CLUE(Rafael): Keep reading the code and you will discover the standard meaning of the word "verify"
+    // CLUE(Rafael): Keep reading the code and you will discover the standard meaning of the jargon "verify"
     //               in Cryptology.
-
-    kryptos_u8_t *data = NULL;
-    size_t data_size = 0;
 
     if (ktask == NULL || *ktask == NULL) {
         return 0;
     }
 
+    switch ((*ktask)->cipher) {
+        case kKryptosCipherRSA:
+        case kKryptosCipherRSAEMSAPSS:
+            return kryptos_task_check_verify_rsa(ktask);
+
+        default:
+            (*ktask)->result = kKryptosInvalidParams;
+            (*ktask)->result_verbose = "Invalid algorithm.";
+            break;
+    }
+
+    return 0;
+}
+
+static int kryptos_task_check_verify_rsa(kryptos_task_ctx **ktask) {
+    kryptos_u8_t *data = NULL;
+    size_t data_size = 0;
+
     if ((*ktask)->in == NULL || (*ktask)->in_size == 0) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "No input.";
-        goto kryptos_task_check_verify_error;
+        goto kryptos_task_check_verify_rsa_error;
     }
 
     if ((*ktask)->key == NULL || (*ktask)->key_size == 0) {
         (*ktask)->result = kKryptosKeyError;
         (*ktask)->result_verbose = "NULL key.";
-        goto kryptos_task_check_verify_error;
+        goto kryptos_task_check_verify_rsa_error;
 
     }
 
     switch ((*ktask)->cipher) {
         case kKryptosCipherRSA:
+        case kKryptosCipherRSAEMSAPSS:
             data = kryptos_pem_get_data(KRYPTOS_RSA_PEM_HDR_PARAM_E, (*ktask)->key, (*ktask)->key_size, &data_size);
 
             if (data == NULL || data_size == 0) {
                 (*ktask)->result = kKryptosKeyError;
                 (*ktask)->result_verbose = "Invalid RSA public key.";
-                goto kryptos_task_check_verify_error;
+                goto kryptos_task_check_verify_rsa_error;
             }
 
             kryptos_freeseg(data);
@@ -227,7 +265,7 @@ int kryptos_task_check_verify(kryptos_task_ctx **ktask) {
             if (data == NULL || data_size == 0) {
                 (*ktask)->result = kKryptosKeyError;
                 (*ktask)->result_verbose = "Invalid RSA public key.";
-                goto kryptos_task_check_verify_error;
+                goto kryptos_task_check_verify_rsa_error;
             }
 
             kryptos_freeseg(data);
@@ -237,15 +275,15 @@ int kryptos_task_check_verify(kryptos_task_ctx **ktask) {
         default:
             (*ktask)->result = kKryptosInvalidParams;
             (*ktask)->result_verbose = "Invalid algorithm.";
-            goto kryptos_task_check_verify_error;
+            goto kryptos_task_check_verify_rsa_error;
     }
 
     (*ktask)->result = kKryptosSuccess;
     (*ktask)->result_verbose = NULL;
 
-    return 1;
+    return ((*ktask)->cipher == kKryptosCipherRSA) ? 1 : kryptos_task_check_rsa_emsa_pss_additional_params(ktask);
 
-kryptos_task_check_verify_error:
+kryptos_task_check_verify_rsa_error:
 
     if (data != NULL) {
         kryptos_freeseg(data);
@@ -433,6 +471,28 @@ static int kryptos_task_check_elgamal_params(kryptos_task_ctx **ktask) {
         } else {
             kryptos_freeseg(data);
         }
+    }
+
+    return 1;
+}
+
+static int kryptos_task_check_rsa_emsa_pss_additional_params(kryptos_task_ctx **ktask) {
+    if ((*ktask)->arg[0] == NULL) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "No salt size indicated.";
+        return 0;
+    }
+
+    if ((*ktask)->arg[1] == NULL && (*ktask)->arg[2] != NULL) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "No hash algorithm was indicated but a hash_size function was.";
+        return 0;
+    }
+
+    if ((*ktask)->arg[1] != NULL && (*ktask)->arg[2] == NULL) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Hash algorithm indicated without a valid hash_size function.";
+        return 0;
     }
 
     return 1;
