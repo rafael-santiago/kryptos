@@ -13,6 +13,7 @@
 #include <kryptos_task_check.h>
 #include <kryptos_memory.h>
 #include <kryptos_endianess_utils.h>
+#include <kryptos.h>
 #ifndef KRYPTOS_KERNEL_MODE
 # include <string.h>
 #endif
@@ -527,6 +528,8 @@ void kryptos_rsa_emsa_pss_verify(kryptos_task_ctx **ktask) {
 
 void kryptos_rsa_sign(kryptos_task_ctx **ktask) {
     kryptos_mp_value_t *d = NULL, *n = NULL, *x = NULL, *s = NULL;
+    kryptos_u8_t *old_in = NULL;
+    size_t old_in_size = 0;
 
     if (ktask == NULL) {
         return;
@@ -558,6 +561,20 @@ void kryptos_rsa_sign(kryptos_task_ctx **ktask) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "RSA input is too long.";
         goto kryptos_rsa_sign_epilogue;
+    }
+
+    if ((*ktask)->cipher == kKryptosCipherRSAEMSAPSS) {
+        old_in = (*ktask)->in;
+        old_in_size = (*ktask)->in_size;
+        (*ktask)->in = kryptos_pss_encode(old_in, &(*ktask)->in_size,
+                                          kryptos_mp_byte2bit(n->data_size) >> 3, *(size_t *)(*ktask)->arg[0],
+                                          (kryptos_hash_func)(*ktask)->arg[1], (kryptos_hash_size_func)(*ktask)->arg[2]);
+
+        if ((*ktask)->in == NULL || (*ktask)->in_size == 0) {
+            (*ktask)->result = kKryptosInvalidParams;
+            (*ktask)->result_verbose = "Error during PSS encoding.";
+            goto kryptos_rsa_sign_epilogue;
+        }
     }
 
     x = kryptos_raw_buffer_as_mp((*ktask)->in, (*ktask)->in_size);
@@ -622,6 +639,14 @@ kryptos_rsa_sign_epilogue:
         kryptos_del_mp_value(s);
     }
 
+    if (old_in != NULL) {
+        kryptos_task_free(*ktask, KRYPTOS_TASK_IN);
+        (*ktask)->in = old_in;
+        (*ktask)->in_size = old_in_size;
+        old_in = NULL;
+        old_in_size = 0;
+    }
+
     if ((*ktask)->result != kKryptosSuccess && (*ktask)->out != NULL) {
         kryptos_freeseg((*ktask)->out);
         (*ktask)->out = NULL;
@@ -633,6 +658,7 @@ void kryptos_rsa_verify(kryptos_task_ctx **ktask) {
     kryptos_mp_value_t *xp = NULL, *x = NULL, *s = NULL, *e = NULL, *n = NULL;
     kryptos_u8_t *o = NULL;
     ssize_t o_size = 0, xd = 0;
+    kryptos_task_ctx em_task, *em = NULL;
 
     if (ktask == NULL) {
         return;
@@ -691,16 +717,38 @@ void kryptos_rsa_verify(kryptos_task_ctx **ktask) {
     (*ktask)->out = NULL;
     (*ktask)->out_size = 0;
 
-    if (kryptos_mp_ne(x, xp)) {
-        (*ktask)->result = kKryptosInvalidSignature;
-        (*ktask)->result_verbose = "The signature is invalid.";
-        goto kryptos_rsa_verify_epilogue;
+    if ((*ktask)->cipher == kKryptosCipherRSAEMSAPSS) {
+        // INFO(Rafael): Our verification task also offers another service, return a copy of the original x, if it has a
+        //               valid signature.
+        kryptos_mp_as_task_out(ktask, x, o, o_size, xd, kryptos_rsa_verify_epilogue);
+
+        em = &em_task;
+        kryptos_task_init_as_null(em);
+        kryptos_mp_as_task_out(&em, xp, o, o_size, xd, kryptos_rsa_verify_epilogue);
+
+        if (kryptos_pss_verify((*ktask)->out, (*ktask)->out_size,
+                               em->out, em->out_size,
+                               kryptos_mp_byte2bit(n->data_size) >> 3,
+                               *(size_t *)(*ktask)->arg[0],
+                               (kryptos_hash_func)(*ktask)->arg[1],
+                               (kryptos_hash_size_func)(*ktask)->arg[2]) != (*ktask)->out) {
+            kryptos_task_free(*ktask, KRYPTOS_TASK_OUT);
+            (*ktask)->result = kKryptosInvalidSignature;
+            (*ktask)->result_verbose = "The signature is invalid.";
+        }
+    } else {
+
+        if (kryptos_mp_ne(x, xp)) {
+            (*ktask)->result = kKryptosInvalidSignature;
+            (*ktask)->result_verbose = "The signature is invalid.";
+            goto kryptos_rsa_verify_epilogue;
+        }
+
+        // INFO(Rafael): Our verification task also offers another service, return a copy of the original x, if it has a
+        //               valid signature.
+
+        kryptos_mp_as_task_out(ktask, x, o, o_size, xd, kryptos_rsa_verify_epilogue);
     }
-
-    // INFO(Rafael): Our verification task also offers another service, return a copy of the original x, if it has a
-    //               valid signature.
-
-    kryptos_mp_as_task_out(ktask, x, o, o_size, xd, kryptos_rsa_verify_epilogue);
 
 kryptos_rsa_verify_epilogue:
 
@@ -722,6 +770,12 @@ kryptos_rsa_verify_epilogue:
 
     if (xp != NULL) {
         kryptos_del_mp_value(xp);
+    }
+
+    if ((*ktask)->cipher == kKryptosCipherRSAEMSAPSS && em != NULL) {
+        kryptos_task_free(em, KRYPTOS_TASK_OUT);
+        kryptos_task_init_as_null(em);
+        em = NULL;
     }
 
     if ((*ktask)->result != kKryptosSuccess && (*ktask)->out != NULL) {
