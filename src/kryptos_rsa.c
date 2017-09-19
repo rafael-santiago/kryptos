@@ -557,17 +557,11 @@ void kryptos_rsa_sign(kryptos_task_ctx **ktask) {
         goto kryptos_rsa_sign_epilogue;
     }
 
-    if ((*ktask)->in_size > (kryptos_mp_byte2bit(n->data_size) >> 3)) {
-        (*ktask)->result = kKryptosInvalidParams;
-        (*ktask)->result_verbose = "RSA input is too long.";
-        goto kryptos_rsa_sign_epilogue;
-    }
-
     if ((*ktask)->cipher == kKryptosCipherRSAEMSAPSS) {
         old_in = (*ktask)->in;
         old_in_size = (*ktask)->in_size;
         (*ktask)->in = kryptos_pss_encode(old_in, &(*ktask)->in_size,
-                                          kryptos_mp_byte2bit(n->data_size) >> 3, *(size_t *)(*ktask)->arg[0],
+                                          kryptos_mp_byte2bit(n->data_size), *(size_t *)(*ktask)->arg[0],
                                           (kryptos_hash_func)(*ktask)->arg[1], (kryptos_hash_size_func)(*ktask)->arg[2]);
 
         if ((*ktask)->in == NULL || (*ktask)->in_size == 0) {
@@ -575,6 +569,12 @@ void kryptos_rsa_sign(kryptos_task_ctx **ktask) {
             (*ktask)->result_verbose = "Error during PSS encoding.";
             goto kryptos_rsa_sign_epilogue;
         }
+    }
+
+    if ((*ktask)->in_size > (kryptos_mp_byte2bit(n->data_size) >> 3)) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "RSA input is too long.";
+        goto kryptos_rsa_sign_epilogue;
     }
 
     x = kryptos_raw_buffer_as_mp((*ktask)->in, (*ktask)->in_size);
@@ -728,7 +728,7 @@ void kryptos_rsa_verify(kryptos_task_ctx **ktask) {
 
         if (kryptos_pss_verify((*ktask)->out, (*ktask)->out_size,
                                em->out, em->out_size,
-                               kryptos_mp_byte2bit(n->data_size) >> 3,
+                               kryptos_mp_byte2bit(n->data_size),
                                *(size_t *)(*ktask)->arg[0],
                                (kryptos_hash_func)(*ktask)->arg[1],
                                (kryptos_hash_size_func)(*ktask)->arg[2]) != (*ktask)->out) {

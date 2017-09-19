@@ -2146,7 +2146,14 @@ CUTE_TEST_CASE(kryptos_pss_encoding_tests)
           "====", 1024, 8, kryptos_sha1_hash, kryptos_sha1_hash_size, 1 },
         { "true ethics, from home!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
           "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-          "!!!!", 1024, 7, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 }
+          "!!!!", 1024, 7, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
+        { "We've built a Great Wall around our power\n"
+          "Economic Great Wall around our power\n"
+          "Worldwide Great Wall around our power\n"
+          "Give us your poor,\n"
+          "Your tired and your weak\n"
+          "We'll send'em right back\n"
+          "To their certain death\n", 1024, 4, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 }
     };
     size_t tv_size = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     kryptos_u8_t *em = NULL;

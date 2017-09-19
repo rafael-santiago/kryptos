@@ -533,7 +533,7 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
 
     if (*buffer_size < (h_size + salt_size + 2)) {
         // INFO(Rafael): 'Encoding error'.
-        goto kryptos_apply_pss_padding_epilogue;
+        goto kryptos_pss_encode_epilogue;
     }
 
     // INFO(Rafael): Computing 'mHash'.
@@ -544,7 +544,7 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
     hash(&ktask, 0);
 
     if (ktask->out == NULL || ktask->out_size != h_size) {
-        goto kryptos_apply_pss_padding_epilogue;
+        goto kryptos_pss_encode_epilogue;
     }
 
     // INFO(Rafael): Now mHash is known as ktask->out. Let's build up M' = (0x)00 00 00 00 00 00 00 00 || mHash || salt.
@@ -554,17 +554,17 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
     mp = (kryptos_u8_t *) kryptos_newseg(mp_size);
 
     if (mp == NULL) {
-        goto kryptos_apply_pss_padding_epilogue;
+        goto kryptos_pss_encode_epilogue;
     }
 
     if (memset(mp, 0, mp_size) != mp) {
-        goto kryptos_apply_pss_padding_epilogue;
+        goto kryptos_pss_encode_epilogue;
     }
 
     dest = mp + 8;
 
     if (memcpy(dest, ktask->out, h_size) != dest) {
-        goto kryptos_apply_pss_padding_epilogue;
+        goto kryptos_pss_encode_epilogue;
     }
 
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
@@ -574,7 +574,7 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
             dest += h_size;
 
             if (memcpy(dest, salt, salt_size) != dest) {
-                goto kryptos_apply_pss_padding_epilogue;
+                goto kryptos_pss_encode_epilogue;
             }
         }
     }
@@ -587,7 +587,7 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
     hash(&ktask, 0);
 
     if (ktask->out == NULL || ktask->out_size != h_size) {
-        goto kryptos_apply_pss_padding_epilogue;
+        goto kryptos_pss_encode_epilogue;
     }
 
     // INFO(Rafael): H is now known as ktask->out and hLen ktask->out_size.
@@ -599,11 +599,11 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
         ps = (kryptos_u8_t *) kryptos_newseg(ps_size);
 
         if (ps == NULL) {
-            goto kryptos_apply_pss_padding_epilogue;
+            goto kryptos_pss_encode_epilogue;
         }
 
         if (memset(ps, 0, ps_size) != ps) {
-            goto kryptos_apply_pss_padding_epilogue;
+            goto kryptos_pss_encode_epilogue;
         }
     }
 
@@ -611,14 +611,14 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
     db = (kryptos_u8_t *) kryptos_newseg(db_size);
 
     if (db == NULL) {
-        goto kryptos_apply_pss_padding_epilogue;
+        goto kryptos_pss_encode_epilogue;
     }
 
     dest = db;
 
     if (ps_size > 0) {
         if (memcpy(dest, ps, ps_size) != dest) {
-            goto kryptos_apply_pss_padding_epilogue;
+            goto kryptos_pss_encode_epilogue;
         }
 
         dest += ps_size;
@@ -630,7 +630,7 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
         dest += 1;
 
         if (memcpy(dest, salt, salt_size) != dest) {
-            goto kryptos_apply_pss_padding_epilogue;
+            goto kryptos_pss_encode_epilogue;
         }
 
         kryptos_freeseg(salt);
@@ -640,7 +640,7 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
     dbmask = kryptos_padding_mgf(ktask->out, ktask->out_size, *buffer_size - h_size - 1, hash, &dbmask_size);
 
     if (dbmask == NULL) {
-        goto kryptos_apply_pss_padding_epilogue;
+        goto kryptos_pss_encode_epilogue;
     }
 
     // INFO(Rafael): maskedDB = DB ^ dbmask
@@ -648,10 +648,10 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
     dest = db;
 
     p = dbmask;
-    p_end = dbmask + dbmask_size + 1;
+    p_end = dbmask + dbmask_size;
 
     while (p != p_end) {
-        *p = (*p) ^ (*dest);
+        (*p) = (*p) ^ (*dest);
         p++;
         dest++;
     }
@@ -668,7 +668,7 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
     em = (kryptos_u8_t *) kryptos_newseg(*buffer_size);
 
     if (em == NULL) {
-        goto kryptos_apply_pss_padding_epilogue;
+        goto kryptos_pss_encode_epilogue;
     }
 
     dest = em;
@@ -676,7 +676,7 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
     if (memcpy(dest, dbmask, dbmask_size) != dest) {
         kryptos_freeseg(em);
         em = NULL;
-        goto kryptos_apply_pss_padding_epilogue;
+        goto kryptos_pss_encode_epilogue;
     }
 
     dest += dbmask_size;
@@ -684,7 +684,7 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
     if (memcpy(dest, ktask->out, h_size) != dest) {
         kryptos_freeseg(em);
         em = NULL;
-        goto kryptos_apply_pss_padding_epilogue;
+        goto kryptos_pss_encode_epilogue;
     }
 
     dest += h_size;
@@ -693,7 +693,7 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
 
     // done!
 
-kryptos_apply_pss_padding_epilogue:
+kryptos_pss_encode_epilogue:
 
     if (dbmask != NULL) {
         kryptos_freeseg(dbmask);
@@ -838,7 +838,7 @@ const kryptos_u8_t *kryptos_pss_verify(const kryptos_u8_t *m, const size_t m_siz
     // INFO(Rafael): 'Let DB = maskedDB ^ dbMask'.
 
     p = db;
-    p_end = db + db_size + 1;
+    p_end = db + db_size;
     dest = dbmask;
 
     while (p != p_end) {
