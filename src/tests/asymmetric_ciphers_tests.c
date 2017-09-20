@@ -2858,3 +2858,74 @@ CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_c99_tests)
     printf("WARN: No c99 support, this test was skipped.\n");
 #endif
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_dsa_mk_key_pair_tests)
+    kryptos_u8_t *k_pub = NULL, *k_priv = NULL;
+    size_t k_pub_size = 0, k_priv_size = 0;
+    kryptos_u8_t *data = NULL;
+    size_t dsize = 0;
+
+    CUTE_ASSERT(kryptos_dsa_mk_key_pair(80, 40, NULL, &k_pub_size, &k_priv, &k_priv_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dsa_mk_key_pair(80, 40, &k_pub, NULL, &k_priv, &k_priv_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dsa_mk_key_pair(80, 40, &k_pub, &k_pub_size, NULL, &k_priv_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_dsa_mk_key_pair(80, 40, &k_pub, &k_pub_size, &k_priv, NULL) == kKryptosInvalidParams);
+
+    CUTE_ASSERT(kryptos_dsa_mk_key_pair(80, 40, &k_pub, &k_pub_size, &k_priv, &k_priv_size) == kKryptosSuccess);
+
+    CUTE_ASSERT(k_pub != NULL && k_priv != NULL && k_pub_size > 0 && k_priv_size > 0);
+
+    printf(" *** DSA PUBLIC KEY:\n\n");
+    printf("%s", k_pub);
+
+    printf("\n *** DSA PRIVATE KEY:\n\n");
+    printf("%s", k_priv);
+
+    // INFO(Rafael): Verifying the public exported parameters.
+
+    data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_P, k_pub, k_pub_size, &dsize);
+    CUTE_ASSERT(data != NULL);
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_Q, k_pub, k_pub_size, &dsize);
+    CUTE_ASSERT(data != NULL);
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_G, k_pub, k_pub_size, &dsize);
+    CUTE_ASSERT(data != NULL);
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_E, k_pub, k_pub_size, &dsize);
+    CUTE_ASSERT(data != NULL);
+    kryptos_freeseg(data);
+
+    // WARN(Rafael): D parameter must not be in public key.
+
+    data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_D, k_pub, k_pub_size, &dsize);
+    CUTE_ASSERT(data == NULL);
+
+    // INFO(Rafael): Verifying the private exported parameters.
+
+    data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_P, k_priv, k_priv_size, &dsize);
+    CUTE_ASSERT(data != NULL);
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_Q, k_priv, k_priv_size, &dsize);
+    CUTE_ASSERT(data != NULL);
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_G, k_priv, k_priv_size, &dsize);
+    CUTE_ASSERT(data != NULL);
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_D, k_priv, k_priv_size, &dsize);
+    CUTE_ASSERT(data != NULL);
+    kryptos_freeseg(data);
+
+    // WARN(Rafael): E parameter should not be in private key. It is useless.
+
+    data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_E, k_priv, k_priv_size, &dsize);
+    CUTE_ASSERT(data == NULL);
+
+    kryptos_freeseg(k_pub);
+    kryptos_freeseg(k_priv);
+CUTE_TEST_CASE_END

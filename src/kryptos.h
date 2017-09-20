@@ -41,6 +41,7 @@
 #include <kryptos_dl_params.h>
 #include <kryptos_dh.h>
 #include <kryptos_elgamal.h>
+#include <kryptos_dsa.h>
 
 #include <kryptos_rsa.h>
 

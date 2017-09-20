@@ -183,6 +183,12 @@ CUTE_TEST_CASE(kryptos_test_monkey)
         printf("WARN: The RSA signature tests were skipped.\n");
     }
 
+    if (CUTE_GET_OPTION("skip-dsa-signature-tests") == NULL) {
+        CUTE_RUN_TEST(kryptos_dsa_mk_key_pair_tests);
+    } else {
+        printf("WARN: The DSA signature tests were skipped.\n");
+    }
+
 //    CUTE_RUN_TEST(poke_bloody_poke);
 CUTE_TEST_CASE_END
 
