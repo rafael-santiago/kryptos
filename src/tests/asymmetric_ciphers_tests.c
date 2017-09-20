@@ -2188,9 +2188,6 @@ CUTE_TEST_CASE(kryptos_pss_encoding_tests)
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
-    // WARN(Rafael): We could speed up this test just computing the signature once and saving the output buffer for the
-    //               further tests with corrupted data but let's stress up the whole system, if it has something wrong
-    //               this bug could show up and we will caught it.
     kryptos_u8_t *k_pub_alice = "-----BEGIN RSA PARAM N-----\n"
                                 "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNo"
                                 "Vg7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
@@ -2212,6 +2209,8 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
     kryptos_u8_t *m = "The Bad In Each Other\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
     size_t m_size = 32;
+    kryptos_u8_t *signature = NULL;
+    size_t signature_size = 0;
 
     // INFO(Rafael): Valid signature case.
 
@@ -2254,7 +2253,9 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
 
     printf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
 
-    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    signature = alice->out;
+    signature_size = alice->out_size;
+
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
 
     // INFO(Rafael): Invalid signature cases.
@@ -2264,18 +2265,11 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
-    alice->cipher = kKryptosCipherRSA;
-
-    alice->in = m;
-    alice->in_size = m_size;
-    alice->key = k_priv_alice;
-    alice->key_size = strlen(k_priv_alice);
-
-    kryptos_rsa_sign(&alice);
-
-    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
-
+    alice->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
+    memset(alice->out, 0, signature_size + 1);
     CUTE_ASSERT(alice->out != NULL);
+    alice->out_size = signature_size;
+    CUTE_ASSERT(memcpy(alice->out, signature, signature_size) == alice->out);
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
 
@@ -2304,21 +2298,11 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
 
     printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 
-    kryptos_task_init_as_null(alice);
-    kryptos_task_init_as_null(bob);
-
-    alice->cipher = kKryptosCipherRSA;
-
-    alice->in = m;
-    alice->in_size = m_size;
-    alice->key = k_priv_alice;
-    alice->key_size = strlen(k_priv_alice);
-
-    kryptos_rsa_sign(&alice);
-
-    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
-
+    alice->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
+    memset(alice->out, 0, signature_size + 1);
     CUTE_ASSERT(alice->out != NULL);
+    alice->out_size = signature_size;
+    CUTE_ASSERT(memcpy(alice->out, signature, signature_size) == alice->out);
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
 
@@ -2348,18 +2332,11 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
-    alice->cipher = kKryptosCipherRSA;
-
-    alice->in = m;
-    alice->in_size = m_size;
-    alice->key = k_priv_alice;
-    alice->key_size = strlen(k_priv_alice);
-
-    kryptos_rsa_sign(&alice);
-
-    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
-
+    alice->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
+    memset(alice->out, 0, signature_size + 1);
     CUTE_ASSERT(alice->out != NULL);
+    alice->out_size = signature_size;
+    CUTE_ASSERT(memcpy(alice->out, signature, signature_size) == alice->out);
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
@@ -2384,12 +2361,10 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
 
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+    kryptos_freeseg(signature);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
-    // WARN(Rafael): We could speed up this test just computing the signature once and saving the output buffer for the
-    //               further tests with corrupted data but let's stress up the whole system, if it has something wrong
-    //               this bug could show up and we will caught it.
 #ifdef KRYPTOS_C99
     kryptos_u8_t *k_pub_bob = "-----BEGIN RSA PARAM N-----\n"
                               "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNoVg"
@@ -2413,6 +2388,8 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     kryptos_u8_t *m = "We're gonna steal your mail, on a Friday night... "
                       "We're gonna steal your mail, by the pale moonlight\x00\x00\x00\x00";
     size_t m_size = 104;
+    kryptos_u8_t *signature = NULL;
+    size_t signature_size = 0;
 
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
@@ -2437,7 +2414,9 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
 
     printf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
 
-    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+    signature = bob->out;
+    signature_size = bob->out_size;
+
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
 
     // INFO(Rafael): Corrupted signature cases.
@@ -2447,10 +2426,11 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
 
     printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 
-    kryptos_sign(rsa, bob, m, m_size, k_priv_bob, strlen(k_priv_bob));
-
-    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    bob->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
     CUTE_ASSERT(bob->out != NULL);
+    memset(bob->out, 0, signature_size + 1);
+    bob->out_size = signature_size;
+    CUTE_ASSERT(memcpy(bob->out, signature, signature_size) == bob->out);
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
 
@@ -2474,10 +2454,11 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
 
     printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 
-    kryptos_sign(rsa, bob, m, m_size, k_priv_bob, strlen(k_priv_bob));
-
-    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    bob->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
     CUTE_ASSERT(bob->out != NULL);
+    memset(bob->out, 0, signature_size + 1);
+    bob->out_size = signature_size;
+    CUTE_ASSERT(memcpy(bob->out, signature, signature_size) == bob->out);
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
 
@@ -2501,10 +2482,11 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
 
     printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 
-    kryptos_sign(rsa, bob, m, m_size, k_priv_bob, strlen(k_priv_bob));
-
-    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    bob->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
     CUTE_ASSERT(bob->out != NULL);
+    memset(bob->out, 0, signature_size + 1);
+    bob->out_size = signature_size;
+    CUTE_ASSERT(memcpy(bob->out, signature, signature_size) == bob->out);
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
@@ -2523,15 +2505,13 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_freeseg(signature);
 #else
     printf("WARN: No c99 support, this test was skipped.\n");
 #endif
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_tests)
-    // WARN(Rafael): We could speed up this test just computing the signature once and saving the output buffer for the
-    //               further tests with corrupted data but let's stress up the whole system, if it has something wrong
-    //               this bug could show up and we will caught it.
     kryptos_u8_t *k_pub_alice = "-----BEGIN RSA PARAM N-----\n"
                                 "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNo"
                                 "Vg7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
@@ -2554,6 +2534,8 @@ CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_tests)
     kryptos_u8_t *m = "Every fortress falls.\x00\x00\x00\x00\x00\x00\x00";
     size_t m_size = 28;
     size_t salt_size = 4;
+    kryptos_u8_t *signature = NULL;
+    size_t signature_size = 0;
 
     // INFO(Rafael): Valid signature case.
 
@@ -2600,7 +2582,9 @@ CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_tests)
 
     printf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
 
-    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    signature = alice->out;
+    signature_size = alice->out_size;
+
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
 
     // INFO(Rafael): Invalid signature cases.
@@ -2619,11 +2603,11 @@ CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_tests)
     alice->arg[0] = &salt_size;
     alice->arg[1] = alice->arg[2] = NULL;
 
-    kryptos_rsa_sign(&alice);
-
-    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
-
+    alice->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
     CUTE_ASSERT(alice->out != NULL);
+    memset(alice->out, 0, signature_size + 1);
+    CUTE_ASSERT(memcpy(alice->out, signature, signature_size) == alice->out);
+    alice->out_size = signature_size;
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
 
@@ -2657,20 +2641,11 @@ CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
-    alice->cipher = kKryptosCipherRSAEMSAPSS;
-
-    alice->in = m;
-    alice->in_size = m_size;
-    alice->key = k_priv_alice;
-    alice->key_size = strlen(k_priv_alice);
-    alice->arg[0] = &salt_size;
-    alice->arg[1] = alice->arg[2] = NULL;
-
-    kryptos_rsa_sign(&alice);
-
-    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
-
+    alice->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
     CUTE_ASSERT(alice->out != NULL);
+    memset(alice->out, 0, signature_size + 1);
+    CUTE_ASSERT(memcpy(alice->out, signature, signature_size) == alice->out);
+    alice->out_size = signature_size;
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
 
@@ -2702,20 +2677,11 @@ CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
-    alice->cipher = kKryptosCipherRSAEMSAPSS;
-
-    alice->in = m;
-    alice->in_size = m_size;
-    alice->key = k_priv_alice;
-    alice->key_size = strlen(k_priv_alice);
-    alice->arg[0] = &salt_size;
-    alice->arg[1] = alice->arg[2] = NULL;
-
-    kryptos_rsa_sign(&alice);
-
-    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
-
+    alice->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
     CUTE_ASSERT(alice->out != NULL);
+    memset(alice->out, 0, signature_size + 1);
+    CUTE_ASSERT(memcpy(alice->out, signature, signature_size) == alice->out);
+    alice->out_size = signature_size;
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
@@ -2742,12 +2708,10 @@ CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_tests)
 
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+    kryptos_freeseg(signature);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_c99_tests)
-    // WARN(Rafael): We could speed up this test just computing the signature once and saving the output buffer for the
-    //               further tests with corrupted data but let's stress up the whole system, if it has something wrong
-    //               this bug could show up and we will caught it.
 #ifdef KRYPTOS_C99
     kryptos_u8_t *k_pub_bob = "-----BEGIN RSA PARAM N-----\n"
                               "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNoVg"
@@ -2771,6 +2735,8 @@ CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_c99_tests)
     kryptos_u8_t *m = "We live in a political world, wisdom is thrown in jail\x00\x00";
     size_t m_size = 56;
     size_t salt_size = 8;
+    kryptos_u8_t *signature = NULL;
+    size_t signature_size = 0;
 
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
@@ -2795,7 +2761,10 @@ CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_c99_tests)
 
     printf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
 
-    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+    signature = bob->out;
+    signature_size = bob->out_size;
+
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
 
     // INFO(Rafael): Corrupted signature cases.
@@ -2805,10 +2774,11 @@ CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_c99_tests)
 
     printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 
-    kryptos_sign(rsa_emsa_pss, bob, m, m_size, k_priv_bob, strlen(k_priv_bob), &salt_size, NULL, NULL);
-
-    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    bob->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
     CUTE_ASSERT(bob->out != NULL);
+    memset(bob->out, 0, signature_size + 1);
+    CUTE_ASSERT(memcpy(bob->out, signature, signature_size) == bob->out);
+    bob->out_size = signature_size;
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
 
@@ -2832,10 +2802,11 @@ CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_c99_tests)
 
     printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 
-    kryptos_sign(rsa_emsa_pss, bob, m, m_size, k_priv_bob, strlen(k_priv_bob), &salt_size, NULL, NULL);
-
-    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    bob->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
     CUTE_ASSERT(bob->out != NULL);
+    memset(bob->out, 0, signature_size + 1);
+    CUTE_ASSERT(memcpy(bob->out, signature, signature_size) == bob->out);
+    bob->out_size = signature_size;
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
 
@@ -2859,10 +2830,11 @@ CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_c99_tests)
 
     printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 
-    kryptos_sign(rsa_emsa_pss, bob, m, m_size, k_priv_bob, strlen(k_priv_bob), &salt_size, NULL, NULL);
-
-    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    bob->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
     CUTE_ASSERT(bob->out != NULL);
+    memset(bob->out, 0, signature_size + 1);
+    CUTE_ASSERT(memcpy(bob->out, signature, signature_size) == bob->out);
+    bob->out_size = signature_size;
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
@@ -2881,6 +2853,7 @@ CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_c99_tests)
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_freeseg(signature);
 #else
     printf("WARN: No c99 support, this test was skipped.\n");
 #endif
