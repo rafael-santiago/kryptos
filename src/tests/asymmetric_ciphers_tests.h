@@ -66,4 +66,8 @@ CUTE_DECLARE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_c99_tests);
+
 #endif

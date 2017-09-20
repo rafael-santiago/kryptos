@@ -597,6 +597,20 @@ void kryptos_rsa_sign(kryptos_task_ctx **ktask) {
 
     // INFO(Rafael): Exporting the relevant multiprecision data.
 
+    if ((*ktask)->cipher == kKryptosCipherRSAEMSAPSS) {
+        kryptos_freeseg((*ktask)->in);
+
+        (*ktask)->in = old_in;
+        (*ktask)->in_size = old_in_size;
+
+        old_in = NULL;
+        old_in_size = 0;
+
+        kryptos_del_mp_value(x);
+
+        x = kryptos_raw_buffer_as_mp((*ktask)->in, (*ktask)->in_size);
+    }
+
     (*ktask)->out = NULL;
     (*ktask)->out_size = 0;
 
@@ -640,7 +654,10 @@ kryptos_rsa_sign_epilogue:
     }
 
     if (old_in != NULL) {
-        kryptos_task_free(*ktask, KRYPTOS_TASK_IN);
+        if ((*ktask)->in != NULL) {
+            kryptos_freeseg((*ktask)->in);
+        }
+
         (*ktask)->in = old_in;
         (*ktask)->in_size = old_in_size;
         old_in = NULL;
@@ -648,7 +665,10 @@ kryptos_rsa_sign_epilogue:
     }
 
     if ((*ktask)->result != kKryptosSuccess && (*ktask)->out != NULL) {
-        kryptos_freeseg((*ktask)->out);
+        if ((*ktask)->out != NULL) {
+            kryptos_freeseg((*ktask)->out);
+        }
+
         (*ktask)->out = NULL;
         (*ktask)->out_size = 0;
     }
@@ -663,8 +683,6 @@ void kryptos_rsa_verify(kryptos_task_ctx **ktask) {
     if (ktask == NULL) {
         return;
     }
-
-    (*ktask)->cipher = kKryptosCipherRSA;
 
     if (kryptos_task_check_verify(ktask) == 0) {
         return;
@@ -732,7 +750,11 @@ void kryptos_rsa_verify(kryptos_task_ctx **ktask) {
                                *(size_t *)(*ktask)->arg[0],
                                (kryptos_hash_func)(*ktask)->arg[1],
                                (kryptos_hash_size_func)(*ktask)->arg[2]) != (*ktask)->out) {
-            kryptos_task_free(*ktask, KRYPTOS_TASK_OUT);
+            if ((*ktask)->out != NULL) {
+                kryptos_freeseg((*ktask)->out);
+                (*ktask)->out = NULL;
+                (*ktask)->out_size = 0;
+            }
             (*ktask)->result = kKryptosInvalidSignature;
             (*ktask)->result_verbose = "The signature is invalid.";
         }

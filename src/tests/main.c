@@ -19,6 +19,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     //               At first glance you should consider the utility that it implements into the library.
 
     // INFO(Rafael): Generic/shared stuff.
+
     CUTE_RUN_TEST(kryptos_padding_tests);
     CUTE_RUN_TEST(kryptos_get_random_block_tests);
     CUTE_RUN_TEST(kryptos_block_parser_tests);
@@ -176,6 +177,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     if (CUTE_GET_OPTION("skip-rsa-signature-tests") == NULL) {
         CUTE_RUN_TEST(kryptos_rsa_digital_signature_basic_scheme_tests);
         CUTE_RUN_TEST(kryptos_rsa_digital_signature_basic_scheme_c99_tests);
+        CUTE_RUN_TEST(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_tests);
+        CUTE_RUN_TEST(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_c99_tests);
     } else {
         printf("WARN: The RSA signature tests were skipped.\n");
     }
