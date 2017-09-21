@@ -103,6 +103,7 @@ typedef enum {
     kKryptosCipherELGAMAL,
     kKryptosCipherELGAMALOAEP,
     kKryptosCipherRSAEMSAPSS,
+    kKryptosCipherDSA,
     kKryptosCipherNr
 }kryptos_cipher_t;
 

@@ -20,6 +20,12 @@
 
 #define KRYPTOS_DSA_PEM_HDR_PARAM_D "DSA D"
 
+#define KRYPTOS_DSA_PEM_HDR_PARAM_R "DSA R"
+
+#define KRYPTOS_DSA_PEM_HDR_PARAM_S "DSA S"
+
+#define KRYPTOS_DSA_PEM_HDR_PARAM_X "DSA X"
+
 kryptos_task_result_t kryptos_dsa_mk_key_pair(const size_t p_bits, const size_t q_bits,
                                               kryptos_u8_t **k_pub, size_t *k_pub_size,
                                               kryptos_u8_t **k_priv, size_t *k_priv_size);

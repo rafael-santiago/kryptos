@@ -18,6 +18,7 @@
 #include <kryptos_serpent.h>
 #include <kryptos_rsa.h>
 #include <kryptos_elgamal.h>
+#include <kryptos_dsa.h>
 #include <kryptos_pem.h>
 #include <kryptos_memory.h>
 
@@ -35,10 +36,31 @@ static int kryptos_task_check_verify_rsa(kryptos_task_ctx **ktask);
 
 static int kryptos_task_check_rsa_emsa_pss_additional_params(kryptos_task_ctx **ktask);
 
+static int kryptos_task_check_sign_dsa(kryptos_task_ctx **ktask);
+
+static int kryptos_task_check_verify_dsa(kryptos_task_ctx **ktask);
+
+static int kryptos_task_check_dsa_domain_params(kryptos_task_ctx **ktask);
+
+static int kryptos_task_check_dsa_hash_funcs(kryptos_task_ctx **ktask);
+
 // WARN(Rafael): If you have changed something in RSA-OAEP additional parameters maybe should be better to implement a
 //               separated function to verify the additional parameters of Elgamal-OAEP.
 
 #define kryptos_task_check_elgamal_oaep_additional_params(ktask) kryptos_task_check_rsa_oaep_additional_params(ktask)
+
+#define kryptos_task_check_basic_input_and_key_checks(ktask, escape_stmt) {\
+    if ((*ktask)->in == NULL || (*ktask)->in_size == 0) {\
+        (*ktask)->result = kKryptosInvalidParams;\
+        (*ktask)->result_verbose = "No input.";\
+        escape_stmt;\
+    }\
+    if ((*ktask)->key == NULL || (*ktask)->key_size == 0) {\
+        (*ktask)->result = kKryptosKeyError;\
+        (*ktask)->result_verbose = "NULL key.";\
+        escape_stmt;\
+    }\
+}
 
 int kryptos_task_check(kryptos_task_ctx **ktask) {
     if (ktask == NULL || *ktask == NULL) {
@@ -132,6 +154,9 @@ int kryptos_task_check_sign(kryptos_task_ctx **ktask) {
         case kKryptosCipherRSAEMSAPSS:
             return kryptos_task_check_sign_rsa(ktask);
 
+        case kKryptosCipherDSA:
+            return kryptos_task_check_sign_dsa(ktask);
+
         default:
             (*ktask)->result = kKryptosInvalidParams;
             (*ktask)->result_verbose = "Invalid algorithm.";
@@ -146,17 +171,7 @@ static int kryptos_task_check_sign_rsa(kryptos_task_ctx **ktask) {
     kryptos_u8_t *data = NULL;
     size_t data_size = 0;
 
-    if ((*ktask)->in == NULL || (*ktask)->in_size == 0) {
-        (*ktask)->result = kKryptosInvalidParams;
-        (*ktask)->result_verbose = "No input.";
-        goto kryptos_task_check_sign_rsa_error;
-    }
-
-    if ((*ktask)->key == NULL || (*ktask)->key_size == 0) {
-        (*ktask)->result = kKryptosKeyError;
-        (*ktask)->result_verbose = "NULL key.";
-        goto kryptos_task_check_sign_rsa_error;
-    }
+    kryptos_task_check_basic_input_and_key_checks(ktask, goto kryptos_task_check_sign_rsa_error);
 
     switch ((*ktask)->cipher) {
         case kKryptosCipherRSA:
@@ -219,6 +234,9 @@ int kryptos_task_check_verify(kryptos_task_ctx **ktask) {
         case kKryptosCipherRSAEMSAPSS:
             return kryptos_task_check_verify_rsa(ktask);
 
+        case kKryptosCipherDSA:
+            return kryptos_task_check_verify_dsa(ktask);
+
         default:
             (*ktask)->result = kKryptosInvalidParams;
             (*ktask)->result_verbose = "Invalid algorithm.";
@@ -232,18 +250,7 @@ static int kryptos_task_check_verify_rsa(kryptos_task_ctx **ktask) {
     kryptos_u8_t *data = NULL;
     size_t data_size = 0;
 
-    if ((*ktask)->in == NULL || (*ktask)->in_size == 0) {
-        (*ktask)->result = kKryptosInvalidParams;
-        (*ktask)->result_verbose = "No input.";
-        goto kryptos_task_check_verify_rsa_error;
-    }
-
-    if ((*ktask)->key == NULL || (*ktask)->key_size == 0) {
-        (*ktask)->result = kKryptosKeyError;
-        (*ktask)->result_verbose = "NULL key.";
-        goto kryptos_task_check_verify_rsa_error;
-
-    }
+    kryptos_task_check_basic_input_and_key_checks(ktask, goto kryptos_task_check_verify_rsa_error);
 
     switch ((*ktask)->cipher) {
         case kKryptosCipherRSA:
@@ -498,4 +505,119 @@ static int kryptos_task_check_rsa_emsa_pss_additional_params(kryptos_task_ctx **
     return 1;
 }
 
+static int kryptos_task_check_sign_dsa(kryptos_task_ctx **ktask) {
+    kryptos_u8_t *data;
+    size_t data_size;
+
+    kryptos_task_check_basic_input_and_key_checks(ktask, return 0);
+
+    if (!kryptos_task_check_dsa_hash_funcs(ktask)) {
+        return 0;
+    }
+
+    if (!kryptos_task_check_dsa_domain_params(ktask)) {
+        return 0;
+    }
+
+    data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_D, (*ktask)->key, (*ktask)->key_size, &data_size);
+
+    if (data == NULL) {
+        (*ktask)->result = kKryptosKeyError;
+        (*ktask)->result_verbose = "Unable to get d.";
+        return 0;
+    }
+
+    kryptos_freeseg(data);
+
+    (*ktask)->result = kKryptosSuccess;
+    (*ktask)->result_verbose = NULL;
+
+    return 1;
+}
+
+static int kryptos_task_check_verify_dsa(kryptos_task_ctx **ktask) {
+    kryptos_u8_t *data;
+    size_t data_size;
+
+    kryptos_task_check_basic_input_and_key_checks(ktask, return 0);
+
+    if (!kryptos_task_check_dsa_hash_funcs(ktask)) {
+        return 0;
+    }
+
+    if (!kryptos_task_check_dsa_domain_params(ktask)) {
+        return 0;
+    }
+
+    data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_E, (*ktask)->key, (*ktask)->key_size, &data_size);
+
+    if (data == NULL) {
+        (*ktask)->result = kKryptosKeyError;
+        (*ktask)->result_verbose = "Unable to get e.";
+        return 0;
+    }
+
+    kryptos_freeseg(data);
+
+    (*ktask)->result = kKryptosSuccess;
+    (*ktask)->result_verbose = NULL;
+
+    return 1;
+}
+
+static int kryptos_task_check_dsa_domain_params(kryptos_task_ctx **ktask) {
+    kryptos_u8_t *data;
+    size_t data_size;
+
+    data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_P, (*ktask)->key, (*ktask)->key_size, &data_size);
+
+    if (data == NULL || data_size == 0) {
+        (*ktask)->result = kKryptosKeyError;
+        (*ktask)->result_verbose = "Unable to get p.";
+        return 0;
+    }
+
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_Q, (*ktask)->key, (*ktask)->key_size, &data_size);
+
+    if (data == NULL || data_size == 0) {
+        (*ktask)->result = kKryptosKeyError;
+        (*ktask)->result_verbose = "Unable to get q.";
+        return 0;
+    }
+
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_G, (*ktask)->key, (*ktask)->key_size, &data_size);
+
+    if (data == NULL || data_size == 0) {
+        (*ktask)->result = kKryptosKeyError;
+        (*ktask)->result_verbose = "Unable to get g.";
+        return 0;
+    }
+
+    kryptos_freeseg(data);
+
+    return 1;
+}
+
+static int kryptos_task_check_dsa_hash_funcs(kryptos_task_ctx **ktask) {
+    if ((*ktask)->arg[0] != NULL && (*ktask)->arg[1] == NULL) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Hash function indicated as non-null but Hash_size function is null.";
+        return 0;
+    }
+
+    if ((*ktask)->arg[0] == NULL && (*ktask)->arg[1] != NULL) {
+        (*ktask)->result = kKryptosInvalidParams;
+        (*ktask)->result_verbose = "Hash function indicated as null but Hash_size function is non-null.";
+        return 0;
+    }
+
+    return 1;
+}
+
 #undef kryptos_task_check_elgamal_oaep_additional_params
+
+#undef kryptos_task_check_basic_input_and_key_checks
