@@ -136,7 +136,7 @@ The default build options are defined into the file ``src/tests/.ivk``. The **Ta
 | ``--skip-elgamal-oaep-tests``            | Skips the Elgamal-OAEP tests. The tests execution becomes faster.            |
 | ``--dh-use-q-size``                      | Enables the DH tests to use recommended bit sizes for s parameters (slower)  |
 | ``--skip-rsa-signature-tests``           | Skips the RSA signature tests. The tests execution becomes faster.           |
-| ``--skipe-dsa-signature-tests``          | Skips the DSA signature tests. The tests execution becomes faster.           |
+| ``--skip-dsa-signature-tests``           | Skips the DSA signature tests. The tests execution becomes faster.           |
 
 ### How the kernel mode tests are executed
 
