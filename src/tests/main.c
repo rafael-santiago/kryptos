@@ -177,14 +177,15 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     if (CUTE_GET_OPTION("skip-rsa-signature-tests") == NULL) {
         CUTE_RUN_TEST(kryptos_rsa_digital_signature_basic_scheme_tests);
         CUTE_RUN_TEST(kryptos_rsa_digital_signature_basic_scheme_c99_tests);
-        CUTE_RUN_TEST(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_tests);
-        CUTE_RUN_TEST(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_c99_tests);
+        CUTE_RUN_TEST(kryptos_rsa_emsa_pss_digital_signature_scheme_tests);
+        CUTE_RUN_TEST(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests);
     } else {
         printf("WARN: The RSA signature tests were skipped.\n");
     }
 
     if (CUTE_GET_OPTION("skip-dsa-signature-tests") == NULL) {
         CUTE_RUN_TEST(kryptos_dsa_mk_key_pair_tests);
+        CUTE_RUN_TEST(kryptos_dsa_digital_signature_scheme_tests);
     } else {
         printf("WARN: The DSA signature tests were skipped.\n");
     }

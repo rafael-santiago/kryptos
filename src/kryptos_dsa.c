@@ -402,6 +402,10 @@ kryptos_dsa_sign_epilogue:
         kryptos_del_mp_value(ke);
     }
 
+    if (ke_inv != NULL) {
+        kryptos_del_mp_value(ke_inv);
+    }
+
     if (p != NULL) {
         kryptos_del_mp_value(p);
     }
@@ -424,6 +428,10 @@ kryptos_dsa_sign_epilogue:
 
     if (d != NULL) {
         kryptos_del_mp_value(d);
+    }
+
+    if (h != NULL) {
+        kryptos_del_mp_value(h);
     }
 
     if (div != NULL) {
@@ -571,6 +579,8 @@ void kryptos_dsa_verify(kryptos_task_ctx **ktask) {
 
     h = kryptos_raw_buffer_as_mp(htask->out, htask->out_size);
 
+    kryptos_task_free(htask, KRYPTOS_TASK_OUT);
+
     if (h == NULL) {
         (*ktask)->result = kKryptosProcessError;
         (*ktask)->result_verbose = "Unable to parse h.";
@@ -648,7 +658,18 @@ void kryptos_dsa_verify(kryptos_task_ctx **ktask) {
         goto kryptos_dsa_verify_epilogue;
     }
 
-    v = kryptos_mp_pow(g, u1);
+    kryptos_del_mp_value(mod);
+    mod = NULL;
+
+    // CLUE(Rafael): The idea here is explore the following 'equivalence':
+    //
+    //                          g^u1 * e^u2 mod p == ((g^u1 mod p) * (e^u2 mod p)) mod p.
+    //
+    // g^u1, e^u2 are pretty slow operations, kryptos_mp_me_mod_n() will avoid the exponential growing of those values,
+    // as a result it will speed up the whole process.
+
+    //v = kryptos_mp_pow(g, u1);
+    v = kryptos_mp_me_mod_n(g, u1, p);
 
     if (v == NULL) {
         (*ktask)->result = kKryptosProcessError;
@@ -656,7 +677,8 @@ void kryptos_dsa_verify(kryptos_task_ctx **ktask) {
         goto kryptos_dsa_verify_epilogue;
     }
 
-    e2u2 = kryptos_mp_pow(e, u2);
+    //e2u2 = kryptos_mp_pow(e, u2);
+    e2u2 = kryptos_mp_me_mod_n(e, u2, p);
 
     if (e2u2 == NULL) {
         (*ktask)->result = kKryptosProcessError;
@@ -687,6 +709,12 @@ void kryptos_dsa_verify(kryptos_task_ctx **ktask) {
     v = NULL;
 
     v = kryptos_assign_mp_value(&v, mod);
+
+    if (v == NULL) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "Unable to set v.";
+        goto kryptos_dsa_verify_epilogue;
+    }
 
     kryptos_del_mp_value(mod);
     mod = NULL;
@@ -739,16 +767,17 @@ void kryptos_dsa_verify(kryptos_task_ctx **ktask) {
     }
 
     if (kryptos_mp_eq(v, r)) {
-        kryptos_del_mp_value(h);
-        h = kryptos_raw_buffer_as_mp(x, x_size);
-
         if (h == NULL) {
             (*ktask)->result = kKryptosProcessError;
             (*ktask)->result_verbose = "Error while exporting x.";
             goto kryptos_dsa_verify_epilogue;
         }
 
-        kryptos_mp_as_task_out(ktask, h, o, o_size, xd, kryptos_dsa_verify_epilogue);
+        (*ktask)->out = x;
+        (*ktask)->out_size = x_size;
+
+        x = NULL;
+        x_size = 0;
     } else {
         (*ktask)->result = kKryptosInvalidSignature;
         (*ktask)->result_verbose = "The signature is invalid.";
@@ -802,6 +831,10 @@ kryptos_dsa_verify_epilogue:
 
     if (x != NULL) {
         kryptos_freeseg(x);
+    }
+
+    if (v != NULL) {
+        kryptos_del_mp_value(v);
     }
 
     if (div != NULL) {

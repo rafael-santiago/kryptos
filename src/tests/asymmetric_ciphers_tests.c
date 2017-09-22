@@ -2511,7 +2511,7 @@ CUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
 #endif
 CUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_tests)
+CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     kryptos_u8_t *k_pub_alice = "-----BEGIN RSA PARAM N-----\n"
                                 "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNo"
                                 "Vg7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
@@ -2711,7 +2711,7 @@ CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_tests)
     kryptos_freeseg(signature);
 CUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_basic_scheme_c99_tests)
+CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
 #ifdef KRYPTOS_C99
     kryptos_u8_t *k_pub_bob = "-----BEGIN RSA PARAM N-----\n"
                               "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNoVg"
@@ -2928,4 +2928,121 @@ CUTE_TEST_CASE(kryptos_dsa_mk_key_pair_tests)
 
     kryptos_freeseg(k_pub);
     kryptos_freeseg(k_priv);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
+    kryptos_u8_t *k_pub = "-----BEGIN DSA P-----\n"
+                          "76+T2iexCO+8DyRunM+C/s2"
+                          "ZnFkMkjMc//9s73K5/amsrt"
+                          "OkdSV7lk7pzJ42F+r6ADDUi"
+                          "lrhuACKPIB1njip52eqhqAW"
+                          "saaRlqO4NreuuP6xrklIyjO"
+                          "XsMCyE42lbqPFcz0cQ6dMF8"
+                          "QRMfMoOG2p876TyZ27j+Rcn"
+                          "PW3FkUfdwM=\n"
+                          "-----END DSA P-----\n"
+                          "-----BEGIN DSA Q-----\n"
+                          "A1ZqYQysooTOXh1vSDb97Cc"
+                          "nOw4=\n"
+                          "-----END DSA Q-----\n"
+                          "-----BEGIN DSA G-----\n"
+                          "rjWQKTVIrNOBCEf34l9rg+u"
+                          "TsHpCRqco+LlHmkYUCxgvm6"
+                          "ovn0tItPDhur9P6yL4Laqo4"
+                          "pdRI2amS2AromXKeHF13X3D"
+                          "6VamG1QJRN9atfwoj924M2z"
+                          "9BNjszTI6gNZjSp9pw7Iytu"
+                          "fjsqiA4ZYRysiL9JSWdadW1"
+                          "2Bhp/1xeQA=\n"
+                          "-----END DSA G-----\n"
+                          "-----BEGIN DSA E-----\n"
+                          "2Sl6jikSmoZiUucvseQA9/s"
+                          "hs2HHP2BUVEJ+KysWltx9T6"
+                          "TuT7vSkX7L7ovTbFJEQHI3s"
+                          "ZPtj7GGDpxCPSYHw8KoV4W7"
+                          "1iHLQArwfd0/s5J/GyeCoB1"
+                          "vLi+2T7EdqsF7mXomJfb7WX"
+                          "mF+pvKUoMnJpmVIpSifPkke"
+                          "Q35lzdxSgE=\n"
+                          "-----END DSA E-----\n";
+
+    kryptos_u8_t *k_priv = "-----BEGIN DSA P-----\n"
+                           "76+T2iexCO+8DyRunM+C/s2"
+                           "ZnFkMkjMc//9s73K5/amsrt"
+                           "OkdSV7lk7pzJ42F+r6ADDUi"
+                           "lrhuACKPIB1njip52eqhqAW"
+                           "saaRlqO4NreuuP6xrklIyjO"
+                           "XsMCyE42lbqPFcz0cQ6dMF8"
+                           "QRMfMoOG2p876TyZ27j+Rcn"
+                           "PW3FkUfdwM=\n"
+                           "-----END DSA P-----\n"
+                           "-----BEGIN DSA Q-----\n"
+                           "A1ZqYQysooTOXh1vSDb97Cc"
+                           "nOw4=\n"
+                           "-----END DSA Q-----\n"
+                           "-----BEGIN DSA G-----\n"
+                           "rjWQKTVIrNOBCEf34l9rg+u"
+                           "TsHpCRqco+LlHmkYUCxgvm6"
+                           "ovn0tItPDhur9P6yL4Laqo4"
+                           "pdRI2amS2AromXKeHF13X3D"
+                           "6VamG1QJRN9atfwoj924M2z"
+                           "9BNjszTI6gNZjSp9pw7Iytu"
+                           "fjsqiA4ZYRysiL9JSWdadW1"
+                           "2Bhp/1xeQA=\n"
+                           "-----END DSA G-----\n"
+                           "-----BEGIN DSA D-----\n"
+                           "IuY4TKL6Rp2oJQxMuDY37xo"
+                           "Reg0=\n"
+                           "-----END DSA D-----\n";
+
+    kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
+    kryptos_u8_t *m = "Provisoriamente não cantaremos o amor,\n"
+                      "que se refugiou mais abaixo dos subterrâneos.\n"
+                      "Cantaremos o medo, que estereliza os abraços.\n\n"
+                      "não cantaremos o ódio, porque este não existe,\n"
+                      "existe apenas o medo, nosso pai e nosso companheiro,\n"
+                      "o medo grande dos sertões, dos mares, dos desertos,\n"
+                      "o medo dos soldados, o medo das mães, o medo das igrejas,\n"
+                      "cantaremos o medo dos ditadores, o medo dos democratas,\n"
+                      "cantaremos o medo da morte e o medo de depois da morte.\n"
+                      "Depois morreremos de medo\n"
+                      "e sobre nossos túmulos nascerão flores amarelas e medrosas.";
+    size_t m_size;
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+    m_size = strlen(m);
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    alice->in = m;
+    alice->in_size = m_size;
+    alice->key = k_priv;
+    alice->key_size = strlen(k_priv);
+    alice->cipher = kKryptosCipherDSA;
+
+    kryptos_dsa_sign(&alice);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+    CUTE_ASSERT(alice->out != NULL);
+
+    printf(" *** SIGNED OUTPUT:\n\n%s\n", alice->out);
+
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+    bob->key = k_pub;
+    bob->key_size = strlen(k_pub);
+    bob->cipher = kKryptosCipherDSA;
+
+    kryptos_dsa_verify(&bob);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    CUTE_ASSERT(bob->out != NULL);
+    CUTE_ASSERT(bob->out_size == m_size);
+    CUTE_ASSERT(memcmp(bob->out, m, m_size) == 0);
+
+    printf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
 CUTE_TEST_CASE_END
