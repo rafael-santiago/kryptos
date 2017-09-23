@@ -3043,6 +3043,85 @@ CUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
 
     printf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
 
-    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+    printf(" *** ORIGINAL MESSAGE\n\n'%s'\n\n", m);
+
+    bob->in = (kryptos_u8_t *) kryptos_newseg(alice->out_size + 1);
+    CUTE_ASSERT(bob->in != NULL);
+    memset(bob->in, 0, alice->out_size + 1);
+    memcpy(bob->in, alice->out, alice->out_size);
+    bob->in_size = alice->out_size;
+    bob->key = k_pub;
+    bob->key_size = strlen(bob->key);
+    bob->cipher = kKryptosCipherDSA;
+
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_R, bob->in, bob->in_size) == 1);
+
+    printf(" *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", bob->in);
+
+    kryptos_dsa_verify(&bob);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 0);
+    CUTE_ASSERT(bob->result == kKryptosInvalidSignature);
+    CUTE_ASSERT(bob->out == NULL);
+    CUTE_ASSERT(bob->out_size == 0);
+
+    printf(" *** Nice, the signed output with r corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
+
+    kryptos_task_free(bob, KRYPTOS_TASK_IN);
+
+    printf(" *** ORIGINAL MESSAGE\n\n'%s'\n\n", m);
+
+    bob->in = (kryptos_u8_t *) kryptos_newseg(alice->out_size + 1);
+    CUTE_ASSERT(bob->in != NULL);
+    memset(bob->in, 0, alice->out_size + 1);
+    memcpy(bob->in, alice->out, alice->out_size);
+    bob->in_size = alice->out_size;
+    bob->key = k_pub;
+    bob->key_size = strlen(bob->key);
+    bob->cipher = kKryptosCipherDSA;
+
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_S, bob->in, bob->in_size) == 1);
+
+    printf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->in);
+
+    kryptos_dsa_verify(&bob);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 0);
+    CUTE_ASSERT(bob->result == kKryptosInvalidSignature);
+    CUTE_ASSERT(bob->out == NULL);
+    CUTE_ASSERT(bob->out_size == 0);
+
+    printf(" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
+
+    kryptos_task_free(bob, KRYPTOS_TASK_IN);
+
+    printf(" *** ORIGINAL MESSAGE\n\n'%s'\n\n", m);
+
+    bob->in = (kryptos_u8_t *) kryptos_newseg(alice->out_size + 1);
+    CUTE_ASSERT(bob->in != NULL);
+    memset(bob->in, 0, alice->out_size + 1);
+    memcpy(bob->in, alice->out, alice->out_size);
+    bob->in_size = alice->out_size;
+    bob->key = k_pub;
+    bob->key_size = strlen(bob->key);
+    bob->cipher = kKryptosCipherDSA;
+
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_R, bob->in, bob->in_size) == 1);
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_S, bob->in, bob->in_size) == 1);
+
+    printf(" *** SIGNED OUTPUT WITH BOTH R AND S CORRUPTED:\n\n%s\n", bob->in);
+
+    kryptos_dsa_verify(&bob);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 0);
+    CUTE_ASSERT(bob->result == kKryptosInvalidSignature);
+    CUTE_ASSERT(bob->out == NULL);
+    CUTE_ASSERT(bob->out_size == 0);
+
+    printf(" *** Nice, the signed output with r and s corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
+
+    kryptos_task_free(bob, KRYPTOS_TASK_IN);
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
 CUTE_TEST_CASE_END
