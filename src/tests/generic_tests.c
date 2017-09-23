@@ -718,17 +718,6 @@ CUTE_TEST_CASE(kryptos_task_check_sign_tests)
 
     ktask->key_size = strlen(ktask->key);
 
-    ktask->arg[0] = kryptos_sha1_hash;
-    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
-    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
-
-    ktask->arg[0] = NULL;
-    ktask->arg[1] = kryptos_sha1_hash_size;
-    CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
-    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
-
-    ktask->arg[0] = ktask->arg[1] = NULL;
-
     CUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     CUTE_ASSERT(ktask->result == kKryptosKeyError);
 
@@ -920,17 +909,6 @@ CUTE_TEST_CASE(kryptos_task_check_verify_tests)
     CUTE_ASSERT(ktask->result == kKryptosKeyError);
 
     ktask->key_size = strlen(ktask->key);
-
-    ktask->arg[0] = kryptos_sha1_hash;
-    CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
-    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
-
-    ktask->arg[0] = NULL;
-    ktask->arg[1] = kryptos_sha1_hash_size;
-    CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
-    CUTE_ASSERT(ktask->result == kKryptosInvalidParams);
-
-    ktask->arg[0] = ktask->arg[1] = NULL;
 
     CUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     CUTE_ASSERT(ktask->result == kKryptosKeyError);

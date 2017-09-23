@@ -511,10 +511,6 @@ static int kryptos_task_check_sign_dsa(kryptos_task_ctx **ktask) {
 
     kryptos_task_check_basic_input_and_key_checks(ktask, return 0);
 
-    if (!kryptos_task_check_dsa_hash_funcs(ktask)) {
-        return 0;
-    }
-
     if (!kryptos_task_check_dsa_domain_params(ktask)) {
         return 0;
     }
@@ -540,10 +536,6 @@ static int kryptos_task_check_verify_dsa(kryptos_task_ctx **ktask) {
     size_t data_size;
 
     kryptos_task_check_basic_input_and_key_checks(ktask, return 0);
-
-    if (!kryptos_task_check_dsa_hash_funcs(ktask)) {
-        return 0;
-    }
 
     if (!kryptos_task_check_dsa_domain_params(ktask)) {
         return 0;
@@ -598,22 +590,6 @@ static int kryptos_task_check_dsa_domain_params(kryptos_task_ctx **ktask) {
     }
 
     kryptos_freeseg(data);
-
-    return 1;
-}
-
-static int kryptos_task_check_dsa_hash_funcs(kryptos_task_ctx **ktask) {
-    if ((*ktask)->arg[0] != NULL && (*ktask)->arg[1] == NULL) {
-        (*ktask)->result = kKryptosInvalidParams;
-        (*ktask)->result_verbose = "Hash function indicated as non-null but Hash_size function is null.";
-        return 0;
-    }
-
-    if ((*ktask)->arg[0] == NULL && (*ktask)->arg[1] != NULL) {
-        (*ktask)->result = kKryptosInvalidParams;
-        (*ktask)->result_verbose = "Hash function indicated as null but Hash_size function is non-null.";
-        return 0;
-    }
 
     return 1;
 }
