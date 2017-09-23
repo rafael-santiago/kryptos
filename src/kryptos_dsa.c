@@ -210,6 +210,23 @@ kryptos_dsa_get_random_d_epilogue:
     return r;
 }
 
+void kryptos_dsa_digital_signature_setup(kryptos_task_ctx *ktask, kryptos_u8_t *in, size_t in_size,
+                                         kryptos_u8_t *key, size_t key_size, kryptos_hash_func hash) {
+    if (ktask == NULL) {
+        return;
+    }
+
+    ktask->cipher = kKryptosCipherDSA;
+
+    ktask->in = in;
+    ktask->in_size = in_size;
+
+    ktask->key = key;
+    ktask->key_size = key_size;
+
+    ktask->arg[0] = hash;
+}
+
 void kryptos_dsa_sign(kryptos_task_ctx **ktask) {
     kryptos_mp_value_t *ke = NULL, *ke_inv = NULL, *p = NULL, *g = NULL, *q = NULL, *r = NULL, *s = NULL, *d = NULL, *h = NULL;
     kryptos_mp_value_t *div = NULL, *mod = NULL;

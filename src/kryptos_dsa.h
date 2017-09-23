@@ -34,4 +34,7 @@ void kryptos_dsa_sign(kryptos_task_ctx **ktask);
 
 void kryptos_dsa_verify(kryptos_task_ctx **ktask);
 
+void kryptos_dsa_digital_signature_setup(kryptos_task_ctx *ktask, kryptos_u8_t *in, size_t in_size,
+                                         kryptos_u8_t *key, size_t key_size, kryptos_hash_func hash);
+
 #endif
