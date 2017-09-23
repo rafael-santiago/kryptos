@@ -3126,7 +3126,7 @@ CUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
 CUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_dsa_signature_scheme_c99_tests)
+CUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
 #ifdef KRYPTOS_C99
     kryptos_u8_t *k_pub = "-----BEGIN DSA P-----\n"
                           "76+T2iexCO+8DyRunM+C/s2"
