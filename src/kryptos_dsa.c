@@ -685,7 +685,6 @@ void kryptos_dsa_verify(kryptos_task_ctx **ktask) {
     // g^u1, e^u2 are pretty slow operations, kryptos_mp_me_mod_n() will avoid the exponential growing of those values,
     // as a result it will speed up the whole process.
 
-    //v = kryptos_mp_pow(g, u1);
     v = kryptos_mp_me_mod_n(g, u1, p);
 
     if (v == NULL) {
@@ -694,7 +693,6 @@ void kryptos_dsa_verify(kryptos_task_ctx **ktask) {
         goto kryptos_dsa_verify_epilogue;
     }
 
-    //e2u2 = kryptos_mp_pow(e, u2);
     e2u2 = kryptos_mp_me_mod_n(e, u2, p);
 
     if (e2u2 == NULL) {
@@ -848,6 +846,7 @@ kryptos_dsa_verify_epilogue:
 
     if (x != NULL) {
         kryptos_freeseg(x);
+        x_size = 0;
     }
 
     if (v != NULL) {
@@ -879,7 +878,6 @@ kryptos_dsa_verify_epilogue:
     }
 
     xd = o_size = 0;
-    x_size = 0;
 
     o = NULL;
 }
