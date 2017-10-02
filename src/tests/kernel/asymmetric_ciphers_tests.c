@@ -1292,3 +1292,638 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
 # endif
 #endif
 KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_elgamal_mk_key_pair_tests)
+    kryptos_u8_t *k_pub = NULL, *k_priv = NULL, *data = NULL;
+    size_t k_pub_size, k_priv_size, data_size;
+
+    KUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, 20, NULL, &k_pub_size, &k_priv, &k_priv_size) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, 20, &k_pub, NULL, &k_priv, &k_priv_size) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, 20, &k_pub, &k_pub_size, NULL, &k_priv_size) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_elgamal_mk_key_pair(40, 20, &k_pub, &k_pub_size, &k_priv, NULL) == kKryptosInvalidParams);
+
+    KUTE_ASSERT(kryptos_elgamal_mk_key_pair(80, 40, &k_pub, &k_pub_size, &k_priv, &k_priv_size) == kKryptosSuccess);
+    KUTE_ASSERT(k_pub != NULL && k_pub_size != 0 && k_priv != NULL && k_priv_size != 0);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ELGAMAL PUBLIC KEY:\n\n");
+    uprintf("%s", k_pub);
+
+    uprintf("\n *** ELGAMAL PRIVATE KEY:\n\n");
+    uprintf("%s", k_priv);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ELGAMAL PUBLIC KEY:\n\n");
+    printk(KERN_ERR "%s", k_pub);
+
+    printk(KERN_ERR "\n *** ELGAMAL PRIVATE KEY:\n\n");
+    printk(KERN_ERR "%s", k_priv);
+#endif
+
+    // INFO(Rafael): Verifying the parameters in public key.
+
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_P, k_pub, k_pub_size, &data_size);
+    KUTE_ASSERT(data != NULL && data_size > 0);
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Q, k_pub, k_pub_size, &data_size);
+    KUTE_ASSERT(data != NULL && data_size > 0);
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_G, k_pub, k_pub_size, &data_size);
+    KUTE_ASSERT(data != NULL && data_size > 0);
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_B, k_pub, k_pub_size, &data_size);
+    KUTE_ASSERT(data != NULL && data_size > 0);
+    kryptos_freeseg(data);
+
+    // WARN(Rafael): D parameter cannot be in public key.
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_D, k_pub, k_pub_size, &data_size);
+    KUTE_ASSERT(data == NULL);
+
+    // INFO(Rafael): Verifying the parameters in private key.
+
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_P, k_priv, k_priv_size, &data_size);
+    KUTE_ASSERT(data != NULL && data_size > 0);
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_D, k_priv, k_priv_size, &data_size);
+    KUTE_ASSERT(data != NULL && data_size > 0);
+    kryptos_freeseg(data);
+
+    kryptos_freeseg(k_pub);
+    kryptos_freeseg(k_priv);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_elgamal_verify_public_key_tests)
+    kryptos_u8_t *valid_k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                "q5jud0t7MBc=\n"
+                                "-----END ELGAMAL PARAM P-----\n"
+                                "-----BEGIN ELGAMAL PARAM Q-----\n"
+                                "lS0rXw==\n"
+                                "-----END ELGAMAL PARAM Q-----\n"
+                                "-----BEGIN ELGAMAL PARAM G-----\n"
+                                "V3l+1MA9EwQ=\n"
+                                "-----END ELGAMAL PARAM G-----\n"
+                                "-----BEGIN ELGAMAL PARAM B-----\n"
+                                "i525HXApOwc=\n"
+                                "-----END ELGAMAL PARAM B-----\n";
+
+    kryptos_u8_t *weak_k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                "kW+7WMY/t+ksDA8wN05Xik1hnRv7lLrV19fFLPfguqAM0em5kJsEP4Y57byre/U0dMt8fSqzAI+PtScC\n"
+                                "-----END ELGAMAL PARAM P-----\n"
+                                "-----BEGIN ELGAMAL PARAM G-----\n"
+                                "2K1E/hpeAd4igi3RwZnibVM5ZUyNeAJtkfqLp0L+wG0MlOT04lnC/JAeJUXY97wgw/IQpJNmY+4++tcA\n"
+                                "-----END ELGAMAL PARAM G-----\n"
+                                "-----BEGIN ELGAMAL PARAM B-----\n"
+                                "qAE80AtRrkkiL98tqV40En1FsSb2D8AFi68Ng8jwgBWLnlTrAoxliMK747CVBef4lExUSyv3CpeJ4MEB\n"
+                                "-----END ELGAMAL PARAM B-----\n";
+
+    kryptos_u8_t *no_beta_k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                  "kW+7WMY/t+ksDA8wN05Xik1hnRv7lLrV19fFLPfguqAM0em5kJsEP4Y57byre/U0dMt8fSqzAI+PtScC\n"
+                                  "-----END ELGAMAL PARAM P-----\n"
+                                  "-----BEGIN ELGAMAL PARAM Q-----\n"
+                                  "1/qPyUr0rD4=\n"
+                                  "-----END ELGAMAL PARAM Q-----\n"
+                                  "-----BEGIN ELGAMAL PARAM G-----\n"
+                                  "2K1E/hpeAd4igi3RwZnibVM5ZUyNeAJtkfqLp0L+wG0MlOT04lnC/JAeJUXY97wgw/IQpJNmY+4++tcA\n"
+                                  "-----END ELGAMAL PARAM G-----\n";
+
+    kryptos_u8_t *invalid_q_k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                    "kW+7WMY/t+ksDA8wN05Xik1hnRv7lLrV19fFLPfguqAM0em5kJsEP4Y57byre/U0dMt8fSqzAI+PtScC\n"
+                                    "-----END ELGAMAL PARAM P-----\n"
+                                    "-----BEGIN ELGAMAL PARAM Q-----\n"
+                                    "ticktickbOoM\n"
+                                    "-----END ELGAMAL PARAM Q-----\n"
+                                    "-----BEGIN ELGAMAL PARAM G-----\n"
+                                    "2K1E/hpeAd4igi3RwZnibVM5ZUyNeAJtkfqLp0L+wG0MlOT04lnC/JAeJUXY97wgw/IQpJNmY+4++tcA\n"
+                                    "-----END ELGAMAL PARAM G-----\n"
+                                    "-----BEGIN ELGAMAL PARAM B-----\n"
+                                    "qAE80AtRrkkiL98tqV40En1FsSb2D8AFi68Ng8jwgBWLnlTrAoxliMK747CVBef4lExUSyv3CpeJ4MEB\n"
+                                    "-----END ELGAMAL PARAM B-----\n";
+
+    // INFO(Rafael): NULL key buffer duh!
+    KUTE_ASSERT(kryptos_elgamal_verify_public_key(NULL, 100) == kKryptosInvalidParams);
+
+    // INFO(Rafael): Zeroed key buffer size duh!
+    KUTE_ASSERT(kryptos_elgamal_verify_public_key(valid_k_pub, 0) == kKryptosInvalidParams);
+
+    // INFO(Rafael): Key buffer size with no Q parameter.
+    KUTE_ASSERT(kryptos_elgamal_verify_public_key(weak_k_pub, strlen(weak_k_pub)) == kKryptosInvalidParams);
+
+    // INFO(Rafael): Useless key buffer without the B parameter.
+    KUTE_ASSERT(kryptos_elgamal_verify_public_key(no_beta_k_pub, strlen(no_beta_k_pub)) == kKryptosInvalidParams);
+
+    // INFO(Rafael): Key buffer with an invalid Q.
+    KUTE_ASSERT(kryptos_elgamal_verify_public_key(invalid_q_k_pub, strlen(invalid_q_k_pub)) == kKryptosInvalidParams);
+
+    // INFO(Rafael): Guess what?
+    KUTE_ASSERT(kryptos_elgamal_verify_public_key(valid_k_pub, strlen(valid_k_pub)) == kKryptosSuccess);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
+    kryptos_u8_t *k_pub_alice = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                "kW+7WMY/t+ksDA8wN05Xik1hnRv7lLrV19fFLPfguqAM0em5kJsEP4Y57byre/U0dMt8fSqzAI+PtScC\n"
+                                "-----END ELGAMAL PARAM P-----\n"
+                                "-----BEGIN ELGAMAL PARAM Q-----\n"
+                                "1/qPyUr0rD4=\n"
+                                "-----END ELGAMAL PARAM Q-----\n"
+                                "-----BEGIN ELGAMAL PARAM G-----\n"
+                                "2K1E/hpeAd4igi3RwZnibVM5ZUyNeAJtkfqLp0L+wG0MlOT04lnC/JAeJUXY97wgw/IQpJNmY+4++tcA\n"
+                                "-----END ELGAMAL PARAM G-----\n"
+                                "-----BEGIN ELGAMAL PARAM B-----\n"
+                                "qAE80AtRrkkiL98tqV40En1FsSb2D8AFi68Ng8jwgBWLnlTrAoxliMK747CVBef4lExUSyv3CpeJ4MEB\n"
+                                "-----END ELGAMAL PARAM B-----\n";
+
+    kryptos_u8_t *k_priv_alice = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                 "kW+7WMY/t+ksDA8wN05Xik1hnRv7lLrV19fFLPfguqAM0em5kJsEP4Y57byre/U0dMt8fSqzAI+PtScC\n"
+                                 "-----END ELGAMAL PARAM P-----\n"
+                                 "-----BEGIN ELGAMAL PARAM D-----\n"
+                                 "8KUZ47r90x0=\n"
+                                 "-----END ELGAMAL PARAM D-----\n";
+
+    kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
+    kryptos_u8_t *m = "yo no creo en brujas, pero que las hay, las hay.\x00\x00\x00\x00\x00\x00\x00\x00";
+    size_t m_size = 56;
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    // INFO(Rafael): Bob wants to send a message to Alice.
+
+    bob->key = k_pub_alice;
+    bob->key_size = strlen(k_pub_alice);
+    bob->in = m;
+    bob->in_size = m_size;
+
+    bob->cipher = kKryptosCipherELGAMAL;
+    kryptos_task_set_encrypt_action(bob);
+    kryptos_elgamal_cipher(&bob);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** CIPHERTEXT:\n\n%s\n", bob->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", bob->out);
+#endif
+
+    // INFO(Rafael): Bob sends the cryptogram to Alice.
+
+    alice->in = bob->out;
+    alice->in_size = bob->out_size;
+
+    alice->key = k_priv_alice;
+    alice->key_size = strlen(k_priv_alice);
+    alice->cipher = kKryptosCipherELGAMAL;
+    kryptos_task_set_decrypt_action(alice);
+    kryptos_elgamal_cipher(&alice);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+
+    KUTE_ASSERT(alice->out != NULL);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** PLAINTEXT:\n\n'%s'\n", alice->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** PLAINTEXT:\n\n'%s'\n", alice->out);
+#endif
+
+    KUTE_ASSERT(alice->out_size == m_size);
+    KUTE_ASSERT(memcmp(alice->out, m, m_size) == 0);
+
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_elgamal_cipher_c99_tests)
+#ifdef KRYPTOS_C99
+    kryptos_u8_t *k_pub_bob = "-----BEGIN ELGAMAL PARAM P-----\n"
+                              "cxCr4JOOvFjrdQ/JvbFfwtZJOxOjKTgmYRwU0/x8s+vh1BCj2bnhqAY8iDwjssZOjZSFI3WfMat80ngB\n"
+                              "-----END ELGAMAL PARAM P-----\n"
+                              "-----BEGIN ELGAMAL PARAM Q-----\n"
+                              "oQGiaDjNdCc=\n"
+                              "-----END ELGAMAL PARAM Q-----\n"
+                              "-----BEGIN ELGAMAL PARAM G-----\n"
+                              "WKaDp9g2bYqI6BeSdi1giVohhVGslK7o0Zjocu31Sh9YjeW/k7vvR/pQZmZlbgTqNUKUwEroQI/AKpQA\n"
+                              "-----END ELGAMAL PARAM G-----\n"
+                              "-----BEGIN ELGAMAL PARAM B-----\n"
+                              "64Uee8Q42Vj8cxt9zwyrxd5jnQBXsTMIwgLmmQW7SYUblkiZUFbf2EoMbJPdt1BIUGle+z8nZpEyd2kB\n"
+                              "-----END ELGAMAL PARAM B-----\n";
+
+    kryptos_u8_t *k_priv_bob = "-----BEGIN ELGAMAL PARAM P-----\n"
+                               "cxCr4JOOvFjrdQ/JvbFfwtZJOxOjKTgmYRwU0/x8s+vh1BCj2bnhqAY8iDwjssZOjZSFI3WfMat80ngB\n"
+                               "-----END ELGAMAL PARAM P-----\n"
+                               "-----BEGIN ELGAMAL PARAM D-----\n"
+                               "6cAd5Y8akwE=\n"
+                               "-----END ELGAMAL PARAM D-----\n";
+
+    kryptos_u8_t *m = "This Machine Kills Fascists\x00\x00\x00\x00\x00";
+    size_t m_size = 32;
+    kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    // INFO(Rafael): Alice wants to send a message to Bob.
+
+    kryptos_task_set_in(alice, m, m_size);
+    kryptos_task_set_encrypt_action(alice);
+
+    kryptos_run_cipher(elgamal, alice, k_pub_bob, strlen(k_pub_bob));
+
+    KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** CIPHERTEXT:\n\n%s\n", alice->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", alice->out);
+#endif
+
+    // INFO(Rafael): All done, Alice sends her cryptogram to Bob.
+    //               Bob receives it and configure his input with the data.
+
+    kryptos_task_set_in(bob, alice->out, alice->out_size);
+
+    // INFO(Rafael): Asks the library for a decryption task and call Elgamal passing his private key.
+    kryptos_task_set_decrypt_action(bob);
+
+    kryptos_run_cipher(elgamal, bob, k_priv_bob, strlen(k_priv_bob));
+
+    KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+
+    KUTE_ASSERT(bob->out != NULL);
+
+    KUTE_ASSERT(bob->out_size == m_size);
+    KUTE_ASSERT(memcmp(bob->out, m, bob->out_size) == 0);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** PLAINTEXT:\n\n'%s'\n", bob->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** PLAINTEXT:\n\n'%s'\n", bob->out);
+#endif
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+#else
+# if defined(__FreeBSD__)
+    uprintf("WARN: No c99 support, this test was skipped.\n");
+# elif defined(__linux__)
+    printk(KERN_ERR "WARN: No c99 support, this test was skipped.\n");
+# endif
+#endif
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
+    kryptos_u8_t *k_pub_bob = "-----BEGIN ELGAMAL PARAM P-----\n"
+                              "ub1yArM/5LO8iGWyQoTnXo7eq3kT9JYnO"
+                              "YF1e328owL/2OsFwEzvzEPgvQf3iAjYbh"
+                              "QiTxZsHsUJ0w6NQqAPB2+v+jt7JVqOAt3"
+                              "ovtmRgdHA1LyPf5YIRcHfIajJcIq1uXmu"
+                              "XlNa3w663vwpeB6axF43C3WViqOCnYN8H"
+                              "Jbmaoc=\n"
+                              "-----END ELGAMAL PARAM P-----\n"
+                              "-----BEGIN ELGAMAL PARAM Q-----\n"
+                              "+bUNFB6uJ+3Yif48ULYb0QaNWbI=\n"
+                              "-----END ELGAMAL PARAM Q-----\n"
+                              "-----BEGIN ELGAMAL PARAM G-----\n"
+                              "IDVrez91IjjHsPbVHZjxrgvF0bZ7CzqPy"
+                              "AvelU1scRIrQ3hOexXGShLAT9kJEpHDC7"
+                              "QtWWXXpsKfh6fIxuvexWYgyU50zESlzgz"
+                              "QzU060LrhXvL6BlFt3DIrgWkqiSt9U0J3"
+                              "CnKB9R347kPzQl04K6IWl2qqEGVDknBSM"
+                              "ExqhHg=\n"
+                              "-----END ELGAMAL PARAM G-----\n"
+                              "-----BEGIN ELGAMAL PARAM B-----\n"
+                              "7HXRFK+NOnOrsT6VKqdFNhw8U1qnVU9S8"
+                              "7v6R6XH/BYQxFy30FasKTkMMijXISy5VE"
+                              "zL3YZV+++dN7V7ng31o3nv/R6kX+cQbz/"
+                              "IvrUsCJ5KtPp9+gnORZWHa4uMbZHhDQgY"
+                              "Go6nOv/1AljcG8ZMSNPuMGpGp0fRb77yP"
+                              "IkkY2o=\n"
+                              "-----END ELGAMAL PARAM B-----\n";
+
+    kryptos_u8_t *k_priv_bob = "-----BEGIN ELGAMAL PARAM P-----\n"
+                               "ub1yArM/5LO8iGWyQoTnXo7eq3kT9JYnO"
+                               "YF1e328owL/2OsFwEzvzEPgvQf3iAjYbh"
+                               "QiTxZsHsUJ0w6NQqAPB2+v+jt7JVqOAt3"
+                               "ovtmRgdHA1LyPf5YIRcHfIajJcIq1uXmu"
+                               "XlNa3w663vwpeB6axF43C3WViqOCnYN8H"
+                               "Jbmaoc=\n"
+                               "-----END ELGAMAL PARAM P-----\n"
+                               "-----BEGIN ELGAMAL PARAM D-----\n"
+                               "9Nz8YxvIEqdfeaAoJcNgey2kDWo=\n"
+                               "-----END ELGAMAL PARAM D-----\n";
+
+    kryptos_u8_t *m = "I don't need no make up, I got real scars\x00\x00\x00\x00\x00\x00\x00";
+    size_t m_size = 48;
+    kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
+    kryptos_u8_t *label = "ChocalateJesus";
+    size_t label_size = 14;
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    alice->in = m;
+    alice->in_size = m_size;
+    alice->key = k_pub_bob;
+    alice->key_size = strlen(k_pub_bob);
+    alice->action = kKryptosEncrypt;
+
+    alice->cipher = kKryptosCipherELGAMALOAEP;
+    alice->arg[0] = label;
+    alice->arg[1] = &label_size;
+    alice->arg[2] = kryptos_sha1_hash;
+    alice->arg[3] = kryptos_sha1_hash_size;
+
+    kryptos_elgamal_oaep_cipher(&alice);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+    KUTE_ASSERT(alice->out != NULL);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** CIPHERTEXT:\n\n%s\n", alice->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", alice->out);
+#endif
+
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+    bob->key = k_priv_bob;
+    bob->key_size = strlen(k_priv_bob);
+    bob->action = kKryptosDecrypt;
+
+    bob->cipher = kKryptosCipherELGAMALOAEP;
+    bob->arg[0] = label;
+    bob->arg[1] = &label_size;
+    bob->arg[2] = kryptos_sha1_hash;
+    bob->arg[3] = kryptos_sha1_hash_size;
+
+    kryptos_elgamal_oaep_cipher(&bob);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    KUTE_ASSERT(bob->out != NULL);
+
+    KUTE_ASSERT(bob->out_size == m_size);
+    KUTE_ASSERT(memcmp(bob->out, m, m_size) == 0);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** PLAINTEXT:\n\n'%s'\n\n", bob->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** PLAINTEXT:\n\n'%s'\n\n", bob->out);
+#endif
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Now with a corrupted cryptogram.
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    alice->in = m;
+    alice->in_size = m_size;
+    alice->key = k_pub_bob;
+    alice->key_size = strlen(k_pub_bob);
+    alice->action = kKryptosEncrypt;
+
+    alice->cipher = kKryptosCipherELGAMALOAEP;
+    alice->arg[0] = label;
+    alice->arg[1] = &label_size;
+    alice->arg[2] = kryptos_sha1_hash;
+    alice->arg[3] = kryptos_sha1_hash_size;
+
+    kryptos_elgamal_oaep_cipher(&alice);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+    KUTE_ASSERT(alice->out != NULL);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** CIPHERTEXT:\n\n%s\n", alice->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", alice->out);
+#endif
+
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+    bob->key = k_priv_bob;
+    bob->key_size = strlen(k_priv_bob);
+    bob->action = kKryptosDecrypt;
+
+    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Y, bob->in, bob->in_size) == 1);
+
+#if defined(__FreeBSD__)
+    uprintf(" ( the cryptogram was intentionally corrupted )\n\n");
+#elif defined(__linux__)
+    printk(KERN_ERR " ( the cryptogram was intentionally corrupted )\n\n");
+#endif
+
+    bob->cipher = kKryptosCipherELGAMALOAEP;
+    bob->arg[0] = label;
+    bob->arg[1] = &label_size;
+    bob->arg[2] = kryptos_sha1_hash;
+    bob->arg[3] = kryptos_sha1_hash_size;
+
+    kryptos_elgamal_oaep_cipher(&bob);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(bob) == 0);
+    KUTE_ASSERT(bob->out_size == 0);
+    KUTE_ASSERT(bob->out == NULL);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** PLAINTEXT:\n\n (null)\n\n");
+
+    uprintf(" *** Nice, the unexpected cryptogram was successfully detected => '%s'.\n", bob->result_verbose);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** PLAINTEXT:\n\n (null)\n\n");
+
+    printk(KERN_ERR " *** Nice, the unexpected cryptogram was successfully detected => '%s'.\n", bob->result_verbose);
+#endif
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
+#ifdef KRYPTOS_C99
+    kryptos_u8_t *k_pub_alice = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                "I+oUuRaQpiwFa0Saa5pJFGDro22vya7hh"
+                                "9mkyC5bQADl5BuqXT862/mOX5VWz+UNjR"
+                                "XU2tx380GzWp6UQnbhxM0ptehr+VRJvIL"
+                                "/Lzg5j46tWuv3gbBHHDuC1qREmnAbYmuI"
+                                "1TdPRHsqalbMKOir2+WVg/RSkKlUhxwqO"
+                                "Omhc1Y=\n"
+                                "-----END ELGAMAL PARAM P-----\n"
+                                "-----BEGIN ELGAMAL PARAM Q-----\n"
+                                "CRWNcTQc/I9LD6wEhVMdL6Hfa4Y=\n"
+                                "-----END ELGAMAL PARAM Q-----\n"
+                                "-----BEGIN ELGAMAL PARAM G-----\n"
+                                "RzYrWiANW0FFKw53zqXapqj/YeJDHlcnL"
+                                "ubErvtxulWx9HRRBdQW77U2a9LL/WemDo"
+                                "ssouBpJxHQzbzI4awVHRcBcukKgYM693Y"
+                                "F1OnwQVPfy2xdzPdxKcexYNdp5Q1rq6mL"
+                                "5n5/5zhZwZbuRtqampC/bn/BrmODbpwbF"
+                                "6Ppwiw=\n"
+                                "-----END ELGAMAL PARAM G-----\n"
+                                "-----BEGIN ELGAMAL PARAM B-----\n"
+                                "KlBWeqbION6MuCVYZ+6/lmURkupmJX6LW"
+                                "E37/wOH/HbkLoWJhxU3XzRRoRO9rmCZHB"
+                                "HFlPPEJOnPIdyq5m0BOFNNb26c3SlNImO"
+                                "EsQTaV+3/urZ+lwITX7oqnEv6Tyoi+2mz"
+                                "dNQTLzYZH/SCN/ILQb6Jg0ri/QUddywcH"
+                                "GyLFCI=\n"
+                                "-----END ELGAMAL PARAM B-----\n";
+
+    kryptos_u8_t *k_priv_alice = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                 "I+oUuRaQpiwFa0Saa5pJFGDro22vya7hh"
+                                 "9mkyC5bQADl5BuqXT862/mOX5VWz+UNjR"
+                                 "XU2tx380GzWp6UQnbhxM0ptehr+VRJvIL"
+                                 "/Lzg5j46tWuv3gbBHHDuC1qREmnAbYmuI"
+                                 "1TdPRHsqalbMKOir2+WVg/RSkKlUhxwqO"
+                                 "Omhc1Y=\n"
+                                 "-----END ELGAMAL PARAM P-----\n"
+                                 "-----BEGIN ELGAMAL PARAM D-----\n"
+                                 "0VDQAgkcbyRksu/NskgCkva8rn0=\n"
+                                 "-----END ELGAMAL PARAM D-----\n";
+
+    kryptos_u8_t *m = "a right is not what someone gives you; it's what no one can take from you.\x00\x00";
+    size_t m_size = 76;
+    kryptos_u8_t *label = "Elcabong";
+    size_t label_size = 8;
+    kryptos_task_ctx at, bt, *bob = &bt, *alice = &at;
+
+    kryptos_task_init_as_null(bob);
+    kryptos_task_init_as_null(alice);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    kryptos_task_set_in(bob, m, m_size);
+    kryptos_task_set_encrypt_action(bob);
+    kryptos_run_cipher(elgamal_oaep, bob,
+                       k_pub_alice, strlen(k_pub_alice),
+                       label, &label_size,
+                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    KUTE_ASSERT(bob->out != NULL);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** CIPHERTEXT:\n\n%s\n", bob->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", bob->out);
+#endif
+
+    kryptos_task_set_in(alice, bob->out, bob->out_size);
+    kryptos_task_set_decrypt_action(alice);
+    kryptos_run_cipher(elgamal_oaep, alice,
+                       k_priv_alice, strlen(k_priv_alice),
+                       label, &label_size,
+                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+    KUTE_ASSERT(alice->out != NULL);
+
+    KUTE_ASSERT(alice->out_size == m_size);
+    KUTE_ASSERT(alice->out != NULL);
+
+    KUTE_ASSERT(memcmp(alice->out, m, alice->out_size) == 0);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** PLAINTEXT:\n\n'%s'\n\n", alice->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** PLAINTEXT:\n\n'%s'\n\n", alice->out);
+#endif
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Corrupted cryptogram.
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    kryptos_task_set_in(bob, m, m_size);
+    kryptos_task_set_encrypt_action(bob);
+    kryptos_run_cipher(elgamal_oaep, bob,
+                       k_pub_alice, strlen(k_pub_alice),
+                       label, &label_size,
+                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    KUTE_ASSERT(bob->out != NULL);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** CIPHERTEXT:\n\n%s\n", bob->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", bob->out);
+#endif
+
+    kryptos_task_set_in(alice, bob->out, bob->out_size);
+
+    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Y, alice->in, alice->in_size) == 1);
+
+#if defined(__FreeBSD__)
+    uprintf(" ( the cryptogram was intentionally corrupted )\n\n");
+#elif defined(__linux__)
+    printk(KERN_ERR " ( the cryptogram was intentionally corrupted )\n\n");
+#endif
+
+    kryptos_task_set_decrypt_action(alice);
+    kryptos_run_cipher(elgamal_oaep, alice,
+                       k_priv_alice, strlen(k_priv_alice),
+                       label, &label_size,
+                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
+
+    KUTE_ASSERT(alice->out == NULL);
+    KUTE_ASSERT(alice->out_size == 0);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** PLAINTEXT:\n\n (null)\n\n");
+
+    uprintf(" *** Nice, the unexpected cryptogram was successfully detected => '%s'.\n", alice->result_verbose);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** PLAINTEXT:\n\n (null)\n\n");
+
+    printk(KERN_ERR " *** Nice, the unexpected cryptogram was successfully detected => '%s'.\n", alice->result_verbose);
+#endif
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+#else
+# if defined(__FreeBSD__)
+    uprintf("WARN: No c99 support, this test was skipped.\n");
+# elif defined(__linux__)
+    printk(KERN_ERR "WARN: No c99 support, this test was skipped.\n");
+# endif
+#endif
+KUTE_TEST_CASE_END
