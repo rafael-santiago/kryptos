@@ -147,6 +147,10 @@ the kernel. If it was successfully loaded it means that all is ok, otherwise som
 Beware: A ``LKM`` is inserted into the kernel. Thus, invalid memory accesses, double frees will result in kernel panics. If you
 have made changes and you are not so sure about them, backup your work before continuing and happy kernel hacking! ;)
 
+In ``Linux``, during kernel mode tests you probably will receive some RCU CPU stall warnings, this is "normal" because the
+kernel test executes some insane and uncommon tasks (considering the current context) like running several PK crypto
+primitives and protocols. Things like "kthread starved for N jiffies" are expected, so calm down.
+
 ## Are you searching for some build information not detailed here?
 
 Please let me know more by opening an [issue](https://github.com/rafael-santiago/kryptos/issues). Thank you!
