@@ -772,8 +772,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
 #endif
 KUTE_TEST_CASE_END
 
-/*
-KUTE_TEST_CASE(kryptos_oaep_mgf_tests)
+KUTE_TEST_CASE(kryptos_padding_mgf_tests)
     // WARN(Rafael): Assuming that SHA-1/256 implementation are working well.
     struct oaep_mgf_tests {
         const kryptos_u8_t *seed;
@@ -783,7 +782,7 @@ KUTE_TEST_CASE(kryptos_oaep_mgf_tests)
         const kryptos_u8_t *expected_out;
     };
     struct oaep_mgf_tests test_vector[] = {
-        { "foo", 3,  3,   kryptos_sha1_hash, "\x1A\xC9\x07"  },
+        { "foo", 3,  3,   kryptos_sha1_hash, "\x1A\xC9\x07"          },
         { "foo", 3,  5,   kryptos_sha1_hash, "\x1A\xC9\x07\x5C\xD4"  },
         { "bar", 3,  5,   kryptos_sha1_hash, "\xBC\x0C\x65\x5E\x01"  },
         { "bar", 3, 50,   kryptos_sha1_hash, "\xBC\x0C\x65\x5E\x01"
@@ -805,21 +804,95 @@ KUTE_TEST_CASE(kryptos_oaep_mgf_tests)
                                              "\x4B\x15\x5F\x9F\x60"
                                              "\x69\xF2\x89\xD6\x1D"
                                              "\xAC\xA0\xCB\x81\x45"
-                                             "\x02\xEF\x04\xEA\xE1" },
+                                             "\x02\xEF\x04\xEA\xE1" }
     };
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;
     kryptos_u8_t *out;
     size_t out_size;
 
     for (t = 0; t < test_vector_nr; t++) {
-        out = kryptos_oaep_mgf(test_vector[t].seed, test_vector[t].seed_size,
-                               test_vector[t].len,
-                               test_vector[t].hash_func,
-                               &out_size);
+        out = kryptos_padding_mgf(test_vector[t].seed, test_vector[t].seed_size,
+                                  test_vector[t].len,
+                                  test_vector[t].hash_func,
+                                  &out_size);
         KUTE_ASSERT(out != NULL);
         KUTE_ASSERT(out_size == test_vector[t].len);
         KUTE_ASSERT(memcmp(out, test_vector[t].expected_out, out_size) == 0);
         kryptos_freeseg(out);
     }
 KUTE_TEST_CASE_END
-*/
+
+KUTE_TEST_CASE(kryptos_oaep_padding_tests)
+    struct oaep_padding_tests {
+        kryptos_u8_t *buffer;
+        size_t buffer_size;
+        size_t k;
+        kryptos_u8_t *l;
+        size_t l_size;
+        kryptos_hash_func hash;
+        kryptos_hash_size_func hash_size;
+        int corrupt_it;
+    };
+    struct oaep_padding_tests test_vector[] = {
+        { "(null)", 6, 128, NULL, 0, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
+        { "(null)", 6, 128, NULL, 0, NULL, NULL, 0 },
+        { "foobar", 6, 128, "", 0, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
+        { "alabaster", 9,  96, "L", 1, kryptos_sha224_hash, kryptos_sha224_hash_size, 0 },
+        { "you got a killer scene there, man...", 36, 256, "QoTSA", 5, kryptos_sha256_hash, kryptos_sha256_hash_size, 0 },
+        { "Givin'Up Food For Funk", 22, 512, "TheJ.B.'s", 9, kryptos_sha384_hash, kryptos_sha384_hash_size, 0 },
+        { "stray Cat strut", 15, 1024, "meow!", 5, kryptos_sha512_hash, kryptos_sha512_hash_size, 0 },
+        { "stones in my passway", 20, 128, "RJ", 2, kryptos_md4_hash, kryptos_md4_hash_size, 0 },
+        { "Get Back", 8, 512, "jojo", 4, kryptos_md5_hash, kryptos_md5_hash_size, 0 },
+        { "I Put A Spell On You", 20, 80, "Nina", 4, kryptos_ripemd128_hash, kryptos_ripemd128_hash_size, 0 },
+        { "Space Cadet", 11, 1024, "TheCoyoteWhoSpokeInTongues", 26, kryptos_ripemd160_hash, kryptos_ripemd160_hash_size, 0 },
+        { "Funky President (People It's Bad)", 33, 128, "Mr.Dynamite", 11, kryptos_sha1_hash, kryptos_sha1_hash_size, 1 },
+        { "Boom Boom", 9, 256, "HowHowHowHow", 12, kryptos_sha224_hash, kryptos_sha224_hash_size, 1 },
+        { "First Day Of My Life", 20, 96, "", 0, kryptos_sha256_hash, kryptos_sha256_hash_size, 1 },
+        { "Come On, Let's Go", 17, 1024, "LittleDarling", 13, kryptos_sha384_hash, kryptos_sha384_hash_size, 1 },
+        { "Sexual Healing", 14, 512, "Babe", 4, kryptos_sha512_hash, kryptos_sha512_hash_size, 1 },
+        { "First It Giveth", 15, 128, "...ThanITakeItAway", 18, kryptos_md4_hash, kryptos_md4_hash_size, 1 },
+        { "Easy as It Seems", 16, 2048, "Mavericks", 9, kryptos_md5_hash, kryptos_md5_hash_size, 1 },
+        { "Have You Ever Seen The Rain", 27, 128, "", 0, kryptos_ripemd128_hash, kryptos_ripemd128_hash_size, 1 },
+        { "I Know You Got Soul", 19, 256, "L", 1, kryptos_ripemd160_hash, kryptos_ripemd160_hash_size, 1 },
+        { "(null)", 6, 128, NULL, 0, kryptos_sha1_hash, kryptos_sha1_hash_size, 1 },
+        { "(null)", 6, 128, NULL, 0, NULL, NULL, 1 }
+    };
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;
+    kryptos_u8_t *padded_message = NULL, *message = NULL;
+    size_t padded_message_size = 0, message_size = 0;
+
+    for (t = 0; t < test_vector_nr; t++) {
+        padded_message_size = test_vector[t].buffer_size;
+        padded_message = kryptos_apply_oaep_padding(test_vector[t].buffer,
+                                                    &padded_message_size,
+                                                    test_vector[t].k,
+                                                    test_vector[t].l,
+                                                    test_vector[t].l_size,
+                                                    test_vector[t].hash,
+                                                    test_vector[t].hash_size);
+        KUTE_ASSERT(padded_message != NULL);
+
+        if (test_vector[t].corrupt_it) {
+            padded_message[padded_message_size >> 1] = ~padded_message[padded_message_size >> 1];
+        }
+
+        message = kryptos_drop_oaep_padding(padded_message,
+                                            &padded_message_size,
+                                            test_vector[t].k,
+                                            test_vector[t].l,
+                                            test_vector[t].l_size,
+                                            test_vector[t].hash,
+                                            test_vector[t].hash_size);
+
+        if (test_vector[t].corrupt_it) {
+            KUTE_ASSERT(message == NULL);
+        } else {
+            KUTE_ASSERT(message != NULL);
+            KUTE_ASSERT(padded_message_size == test_vector[t].buffer_size);
+            KUTE_ASSERT(memcmp(message, test_vector[t].buffer, padded_message_size) == 0);
+            kryptos_freeseg(message);
+        }
+
+        kryptos_freeseg(padded_message);
+    }
+KUTE_TEST_CASE_END
