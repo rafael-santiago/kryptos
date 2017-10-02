@@ -109,6 +109,9 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_rsa_cipher_c99_tests);
     KUTE_RUN_TEST(kryptos_padding_mgf_tests);
     KUTE_RUN_TEST(kryptos_oaep_padding_tests);
+
+    KUTE_RUN_TEST(kryptos_rsa_oaep_cipher_tests);
+    KUTE_RUN_TEST(kryptos_rsa_oaep_cipher_c99_tests);
 KUTE_TEST_CASE_END
 
 KUTE_MAIN(ktest_monkey);

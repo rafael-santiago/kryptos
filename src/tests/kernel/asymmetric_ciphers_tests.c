@@ -14,6 +14,72 @@
 // WARN(Rafael): All this stuff is a little bit crazy because is not common run asymmetric ciphers into kernel, however if someone wants to do it, the stuff
 //               must be tested in order to avoid problems for the "crazy person"...
 
+static int corrupt_pem_data(const kryptos_u8_t *hdr, kryptos_u8_t *pem_data, const size_t pem_data_size);
+
+static int corrupt_pem_data(const kryptos_u8_t *hdr, kryptos_u8_t *pem_data, const size_t pem_data_size) {
+    kryptos_u8_t *data = NULL;
+    size_t data_size;
+    kryptos_u8_t *dp, *dp_end, swp = 0, *temp;
+    const kryptos_u8_t *hp, *hp_end;
+    int found = 0;
+
+    dp = pem_data;
+    dp_end = pem_data + pem_data_size;
+
+    hp_end = hdr + strlen(hdr);
+
+    while (dp != dp_end && !found) {
+        found = 1;
+        temp = dp + 1;
+
+        hp = hdr;
+
+        while (found && hp != hp_end && dp != dp_end) {
+            found = (*dp == *hp);
+            dp++;
+            hp++;
+        }
+
+        if (!found) {
+            dp = temp;
+        }
+    }
+
+    if (!found) {
+        return 0;
+    }
+
+    while (*dp != '\n' && dp != dp_end) {
+        dp++;
+    }
+
+    if (dp == dp_end) {
+        return 0;
+    }
+
+    dp++;
+
+    temp = dp;
+    while (*temp != '\n' && temp != dp_end) {
+        temp++;
+    }
+
+    if (temp == dp_end) {
+        return 0;
+    }
+
+    dp_end = dp + ((temp - dp) >> 1);
+
+    while (dp < dp_end) {
+        swp = *dp;
+        *dp = *(dp + 1);
+        *(dp + 1) = swp;
+        dp += 2;
+    }
+
+    return 1;
+}
+
 KUTE_TEST_CASE(kryptos_verify_dl_params_tests)
     kryptos_mp_value_t *p = NULL, *q = NULL, *g = NULL;
 
@@ -895,4 +961,334 @@ KUTE_TEST_CASE(kryptos_oaep_padding_tests)
 
         kryptos_freeseg(padded_message);
     }
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
+    kryptos_u8_t *k_pub_bob = "-----BEGIN RSA PARAM N-----\n"
+                              "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNoVg"
+                              "7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
+                              "-----END RSA PARAM N-----\n"
+                              "-----BEGIN RSA PARAM E-----\n"
+                              "o13jdPAiis0sJZeh0OL9jL8Tib/EgoVNLqNXCM966j1qD4yq5KcXgrDezI48lxWDn66cZnppeXGfK8d0ym8U85JsXVgV2ao4"
+                              "5ESDnBQFoRSoeQ3p3QVqDzfgViMeHIinMzFxx/OYpSgxpuQq4em4CwrBkqn1DxlRCzNCrdAqiwo=\n"
+                              "-----END RSA PARAM E-----\n";
+
+    kryptos_u8_t *k_priv_bob = "-----BEGIN RSA PARAM N-----\n"
+                               "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNoV"
+                               "g7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
+                               "-----END RSA PARAM N-----\n"
+                               "-----BEGIN RSA PARAM D-----\n"
+                               "D3fMDiyVdMeojcOJuo4rB8CdgjNrxS2M9eORsLeiI6t+AiQpsE9LDlk62xHRAKfvX42RDkrlnr1g6PY3shIuPKcSfqLcl+S"
+                               "dvt3NHzRLM8CEgJSWrUu919xo/IUKhFyFdN5ClYwpvaXaK/MVM1AV8gihLHpEsQT9gNfTgwDrVxU=\n"
+                               "-----END RSA PARAM D-----\n";
+
+    kryptos_task_ctx a_kt, *a_ktask = &a_kt;
+    kryptos_task_ctx b_kt, *b_ktask = &b_kt;
+    kryptos_u8_t *m = "Hello Bob!";
+    size_t m_size = 10;
+    kryptos_u8_t *l = "L";
+    size_t l_size = 1;
+
+    // INFO(Rafael): Case without corrupting data.
+
+    kryptos_task_init_as_null(a_ktask);
+    kryptos_task_init_as_null(b_ktask);
+
+    // INFO(Rafael): Alice sends a new message to Bob, so she picks Bob's public key.
+
+    a_ktask->key = k_pub_bob;
+    a_ktask->key_size = strlen(k_pub_bob);
+    a_ktask->arg[0] = l;
+    a_ktask->arg[1] = &l_size;
+    a_ktask->arg[2] = kryptos_sha1_hash;
+    a_ktask->arg[3] = kryptos_sha1_hash_size;
+    a_ktask->in = m;
+    a_ktask->in_size = m_size;
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    a_ktask->cipher = kKryptosCipherRSAOAEP;
+    kryptos_task_set_encrypt_action(a_ktask);
+    kryptos_rsa_oaep_cipher(&a_ktask);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 1);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** CIPHERTEXT:\n\n%s\n", a_ktask->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", a_ktask->out);
+#endif
+
+    // INFO(Rafael): Now Alice sends the encrypted buffer to Bob.
+
+    b_ktask->in = a_ktask->out;
+    b_ktask->in_size = a_ktask->out_size;
+
+    // INFO(Rafael): Bob uses his private key to get the original message.
+
+    b_ktask->key = k_priv_bob;
+    b_ktask->key_size = strlen(k_priv_bob);
+    b_ktask->arg[0] = l;
+    b_ktask->arg[1] = &l_size;
+    b_ktask->arg[2] = kryptos_sha1_hash;
+    b_ktask->arg[3] = kryptos_sha1_hash_size;
+
+    b_ktask->cipher = kKryptosCipherRSAOAEP;
+    kryptos_task_set_decrypt_action(b_ktask);
+    kryptos_rsa_oaep_cipher(&b_ktask);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(b_ktask) == 1);
+
+    KUTE_ASSERT(b_ktask->out != NULL);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** PLAINTEXT:\n\n'%s'\n\n", b_ktask->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** PLAINTEXT:\n\n'%s'\n\n", b_ktask->out);
+#endif
+
+    KUTE_ASSERT(b_ktask->out_size == m_size);
+    KUTE_ASSERT(memcmp(b_ktask->out, m, m_size) == 0);
+
+    kryptos_task_free(a_ktask, KRYPTOS_TASK_OUT);
+    kryptos_task_free(b_ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Case with corrupted data.
+
+    kryptos_task_init_as_null(a_ktask);
+    kryptos_task_init_as_null(b_ktask);
+
+    // INFO(Rafael): Alice sends a new message to Bob, so she picks Bob's public key.
+
+    a_ktask->key = k_pub_bob;
+    a_ktask->key_size = strlen(k_pub_bob);
+    a_ktask->arg[0] = l;
+    a_ktask->arg[1] = &l_size;
+    a_ktask->arg[2] = kryptos_sha1_hash;
+    a_ktask->arg[3] = kryptos_sha1_hash_size;
+    a_ktask->in = m;
+    a_ktask->in_size = m_size;
+
+#if defined(__FreeBSD__)
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    a_ktask->cipher = kKryptosCipherRSAOAEP;
+    kryptos_task_set_encrypt_action(a_ktask);
+    kryptos_rsa_oaep_cipher(&a_ktask);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 1);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** CIPHERTEXT:\n\n%s\n", a_ktask->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", a_ktask->out);
+#endif
+
+    // INFO(Rafael): For some reason during the transfer the cryptogram becomes corrupted.
+
+    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_C, a_ktask->out, a_ktask->out_size) == 1);
+
+#if defined(__FreeBSD__)
+    uprintf(" ( the cryptogram was intentionally corrupted )\n\n");
+#elif defined(__linux__)
+    printk(KERN_ERR " ( the cryptogram was intentionally corrupted )\n\n");
+#endif
+
+    // INFO(Rafael): Now Alice sends the encrypted buffer to Bob.
+
+    b_ktask->in = a_ktask->out;
+    b_ktask->in_size = a_ktask->out_size;
+
+    // INFO(Rafael): Bob uses his private key to get the original message.
+
+    b_ktask->key = k_priv_bob;
+    b_ktask->key_size = strlen(k_priv_bob);
+    b_ktask->arg[0] = l;
+    b_ktask->arg[1] = &l_size;
+    b_ktask->arg[2] = kryptos_sha1_hash;
+    b_ktask->arg[3] = kryptos_sha1_hash_size;
+
+    b_ktask->cipher = kKryptosCipherRSAOAEP;
+    kryptos_task_set_decrypt_action(b_ktask);
+    kryptos_rsa_oaep_cipher(&b_ktask);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(b_ktask) == 0);
+
+    KUTE_ASSERT(b_ktask->out == NULL);
+    KUTE_ASSERT(b_ktask->out_size == 0);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** PLAINTEXT:\n\n (null)\n\n");
+
+    uprintf(" *** Nice, the unexpected cryptogram was successfully detected => '%s'.\n", b_ktask->result_verbose);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** PLAINTEXT:\n\n (null)\n\n");
+
+    printk(KERN_ERR " *** Nice, the unexpected cryptogram was successfully detected => '%s'.\n", b_ktask->result_verbose);
+#endif
+
+    kryptos_task_free(a_ktask, KRYPTOS_TASK_OUT);
+    kryptos_task_free(b_ktask, KRYPTOS_TASK_OUT);
+
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
+#ifdef KRYPTOS_C99
+    kryptos_u8_t *k_pub_alice = "-----BEGIN RSA PARAM N-----\n"
+                                "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNo"
+                                "Vg7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
+                                "-----END RSA PARAM N-----\n"
+                                "-----BEGIN RSA PARAM E-----\n"
+                                "o13jdPAiis0sJZeh0OL9jL8Tib/EgoVNLqNXCM966j1qD4yq5KcXgrDezI48lxWDn66cZnppeXGfK8d0ym8U85JsXVgV2a"
+                                "o45ESDnBQFoRSoeQ3p3QVqDzfgViMeHIinMzFxx/OYpSgxpuQq4em4CwrBkqn1DxlRCzNCrdAqiwo=\n"
+                                "-----END RSA PARAM E-----\n";
+
+    kryptos_u8_t *k_priv_alice = "-----BEGIN RSA PARAM N-----\n"
+                                 "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjN"
+                                 "oVg7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
+                                 "-----END RSA PARAM N-----\n"
+                                 "-----BEGIN RSA PARAM D-----\n"
+                                 "D3fMDiyVdMeojcOJuo4rB8CdgjNrxS2M9eORsLeiI6t+AiQpsE9LDlk62xHRAKfvX42RDkrlnr1g6PY3shIuPKcSfqLcl"
+                                 "+Sdvt3NHzRLM8CEgJSWrUu919xo/IUKhFyFdN5ClYwpvaXaK/MVM1AV8gihLHpEsQT9gNfTgwDrVxU=\n"
+                                 "-----END RSA PARAM D-----\n";
+
+    kryptos_task_ctx a_kt, *a_ktask = &a_kt;
+    kryptos_task_ctx b_kt, *b_ktask = &b_kt;
+    kryptos_u8_t *m = "Hello Alice!";
+    size_t m_size = 12;
+    kryptos_u8_t *l = "L";
+    size_t l_size = 1;
+
+    // INFO(Rafael): Case without corrupting data.
+
+    kryptos_task_init_as_null(a_ktask);
+    kryptos_task_init_as_null(b_ktask);
+
+    // INFO(Rafael): Bob sends a new message to Alice, so he picks Alice's public key.
+
+    kryptos_task_set_in(b_ktask, m, m_size);
+    kryptos_task_set_encrypt_action(b_ktask);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    kryptos_run_cipher(rsa_oaep, b_ktask, k_pub_alice, strlen(k_pub_alice), l, &l_size,
+                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(b_ktask) == 1);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** CIPHERTEXT:\n\n%s\n", b_ktask->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", b_ktask->out);
+#endif
+
+    // INFO(Rafael): Now Bob sends the encrypted buffer to Alice.
+
+    kryptos_task_set_in(a_ktask, b_ktask->out, b_ktask->out_size);
+
+    // INFO(Rafael): Alice uses her private key to get the original message.
+
+    kryptos_task_set_decrypt_action(a_ktask);
+    kryptos_run_cipher(rsa_oaep, a_ktask, k_priv_alice, strlen(k_priv_alice), l, &l_size,
+                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 1);
+
+    KUTE_ASSERT(a_ktask->out != NULL);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** PLAINTEXT:\n\n'%s'\n\n", a_ktask->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** PLAINTEXT:\n\n'%s'\n\n", a_ktask->out);
+#endif
+
+    KUTE_ASSERT(a_ktask->out_size == m_size);
+    KUTE_ASSERT(memcmp(a_ktask->out, m, m_size) == 0);
+
+    kryptos_task_free(a_ktask, KRYPTOS_TASK_OUT);
+    kryptos_task_free(b_ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Case with corrupted data.
+
+    kryptos_task_init_as_null(a_ktask);
+    kryptos_task_init_as_null(b_ktask);
+
+    // INFO(Rafael): Bob sends a new message to Alice, so he picks Alice's public key.
+
+    kryptos_task_set_in(b_ktask, m, m_size);
+    kryptos_task_set_encrypt_action(b_ktask);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    kryptos_run_cipher(rsa_oaep, b_ktask, k_pub_alice, strlen(k_pub_alice), l, &l_size,
+                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(b_ktask) == 1);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** CIPHERTEXT:\n\n%s\n", b_ktask->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", b_ktask->out);
+#endif
+
+    // INFO(Rafael): For some reason during the transfer the cryptogram becomes corrupted.
+
+    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_C, b_ktask->out, b_ktask->out_size) == 1);
+
+#if defined(__FreeBSD__)
+    uprintf(" ( the cryptogram was intentionally corrupted )\n\n");
+#else
+    printk(KERN_ERR " ( the cryptogram was intentionally corrupted )\n\n");
+#endif
+
+    // INFO(Rafael): Now Bob sends the encrypted buffer to Alice.
+
+    kryptos_task_set_in(a_ktask, b_ktask->out, b_ktask->out_size);
+
+    // INFO(Rafael): Alice uses her private key to get the original message.
+
+    kryptos_task_set_decrypt_action(a_ktask);
+    kryptos_run_cipher(rsa_oaep, a_ktask, k_priv_alice, strlen(k_priv_alice), l, &l_size,
+                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 0);
+
+    KUTE_ASSERT(a_ktask->out == NULL);
+    KUTE_ASSERT(a_ktask->out_size == 0);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** PLAINTEXT:\n\n (null)\n\n");
+
+    uprintf(" *** Nice, the unexpected cryptogram was successfully detected => '%s'.\n", a_ktask->result_verbose);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** PLAINTEXT:\n\n (null)\n\n");
+
+    printk(KERN_ERR " *** Nice, the unexpected cryptogram was successfully detected => '%s'.\n", a_ktask->result_verbose);
+#endif
+
+    kryptos_task_free(a_ktask, KRYPTOS_TASK_OUT);
+    kryptos_task_free(b_ktask, KRYPTOS_TASK_OUT);
+
+#else
+# if defined(__FreeBSD__)
+    uprintf("WARN: No c99 support, this test was skipped.\n");
+# elif defined(__linux__)
+    printk(KERN_ERR "WARN: No c99 support, this test was skipped.\n");
+# endif
+#endif
 KUTE_TEST_CASE_END
