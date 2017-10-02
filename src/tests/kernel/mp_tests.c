@@ -9,6 +9,8 @@
 #include <kryptos_mp.h>
 #include <kryptos_memory.h>
 #include <kryptos_random.h>
+#include <kryptos.h>
+#include <kryptos_endianess_utils.h>
 #include <kstring.h>
 
 // WARN(Rafael): Almost all stuff tested here probably will not executed in kernel mode (or at least should not). But if everything
@@ -2084,4 +2086,32 @@ KUTE_TEST_CASE(kryptos_raw_buffer_as_mp_tests)
 
     kryptos_del_mp_value(mp);
     kryptos_del_mp_value(emp);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_mp_as_task_out_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_mp_value_t *mp = NULL;
+    kryptos_u8_t *o = NULL;
+    ssize_t o_size = 0, d = 0;
+    kryptos_u8_t *expected_buffer = "\xDE\xAD\xBE\xEF\xBE\xEF\xDE\xAD";
+    size_t expected_buffer_size = 8;
+
+    mp = kryptos_raw_buffer_as_mp(expected_buffer, expected_buffer_size);
+    KUTE_ASSERT(mp != NULL);
+
+    kryptos_task_init_as_null(ktask);
+
+    kryptos_mp_as_task_out(&ktask, mp, o, o_size, d, kryptos_mp_as_raw_buffer_tests_epilogue);
+
+    KUTE_ASSERT(ktask->out_size == expected_buffer_size);
+    KUTE_ASSERT(ktask->out != NULL);
+
+    KUTE_ASSERT(memcmp(ktask->out, expected_buffer, ktask->out_size) == 0);
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+    kryptos_del_mp_value(mp);
+
+    return 0;
+kryptos_mp_as_raw_buffer_tests_epilogue:
+    return 1;
 KUTE_TEST_CASE_END

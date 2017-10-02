@@ -147,7 +147,7 @@ static void kryptos_oaep_i2osp(kryptos_u8_t *c, const kryptos_u32_t counter) {
     *(c + 2) = ((counter >>  8) & 0xFF);
     *(c + 3) = counter & 0xFF;
 }
-
+/*
 void print_buffer(const kryptos_u8_t *buf, const size_t buf_size) {
     const kryptos_u8_t *bp = buf;
     const kryptos_u8_t *bp_end = bp + buf_size;
@@ -157,7 +157,7 @@ void print_buffer(const kryptos_u8_t *buf, const size_t buf_size) {
     }
     printf("\n");
 }
-
+*/
 kryptos_u8_t *kryptos_apply_oaep_padding(const kryptos_u8_t *buffer, size_t *buffer_size,
                                          const size_t k, const kryptos_u8_t *label, const size_t label_size,
                                          kryptos_hash_func hash_func,

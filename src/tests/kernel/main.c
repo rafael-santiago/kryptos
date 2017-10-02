@@ -62,6 +62,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_mp_lt_tests);
     KUTE_RUN_TEST(kryptos_mp_le_tests);
     KUTE_RUN_TEST(kryptos_mp_is_neg_tests);
+    KUTE_RUN_TEST(kryptos_mp_bitcount_tests);
     KUTE_RUN_TEST(kryptos_mp_add_tests);
     KUTE_RUN_TEST(kryptos_mp_sub_tests);
     KUTE_RUN_TEST(kryptos_mp_mul_tests);
@@ -85,9 +86,16 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_mp_gcd_tests);
     KUTE_RUN_TEST(kryptos_mp_modinv_tests);
     KUTE_RUN_TEST(kryptos_raw_buffer_as_mp_tests);
+    KUTE_RUN_TEST(kryptos_mp_as_task_out_tests);
 
     KUTE_RUN_TEST(kryptos_pem_get_mp_data_tests);
 
+    KUTE_RUN_TEST(kryptos_verify_dl_params_tests);
+    KUTE_RUN_TEST(kryptos_generate_dl_params_tests);
+
+    KUTE_RUN_TEST(kryptos_dh_mk_domain_params_tests);
+    KUTE_RUN_TEST(kryptos_dh_verify_domain_params_tests);
+    KUTE_RUN_TEST(kryptos_dh_get_modp_from_params_buf_tests);
     KUTE_RUN_TEST(kryptos_dh_get_modp_tests);
     KUTE_RUN_TEST(kryptos_dh_get_random_s_tests);
     KUTE_RUN_TEST(kryptos_dh_eval_t_tests);

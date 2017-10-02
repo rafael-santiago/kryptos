@@ -10,6 +10,16 @@
 
 #include <kutest.h>
 
+KUTE_DECLARE_TEST_CASE(kryptos_verify_dl_params_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_generate_dl_params_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_dh_mk_domain_params_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_dh_verify_domain_params_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_dh_get_modp_from_params_buf_tests);
+
 KUTE_DECLARE_TEST_CASE(kryptos_dh_get_modp_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_dh_get_random_s_tests);

@@ -14,6 +14,249 @@
 // WARN(Rafael): All this stuff is a little bit crazy because is not common run asymmetric ciphers into kernel, however if someone wants to do it, the stuff
 //               must be tested in order to avoid problems for the "crazy person"...
 
+KUTE_TEST_CASE(kryptos_verify_dl_params_tests)
+    kryptos_mp_value_t *p = NULL, *q = NULL, *g = NULL;
+
+    // INFO(Rafael): It should pass.
+
+    g = kryptos_hex_value_as_mp("3C", 2);
+    q = kryptos_hex_value_as_mp("2F", 2);
+    p = kryptos_hex_value_as_mp("11B", 3);
+
+    KUTE_ASSERT(p != NULL && q != NULL && g != NULL);
+
+    KUTE_ASSERT(kryptos_verify_dl_params(p, q, g) == kKryptosSuccess);
+
+    // INFO(Rafael): It should fail due to g's nullity.
+
+    KUTE_ASSERT(kryptos_verify_dl_params(p, q, NULL) == kKryptosInvalidParams);
+
+    // INFO(Rafael): It should fail due to q's nullity.
+
+    KUTE_ASSERT(kryptos_verify_dl_params(p, NULL, g) == kKryptosInvalidParams);
+
+    // INFO(Rafael): It should fail due to p's nullity.
+
+    KUTE_ASSERT(kryptos_verify_dl_params(NULL, q, g) == kKryptosInvalidParams);
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(g);
+
+    // INFO(Rafael): It should fail due to g.
+
+    g = kryptos_hex_value_as_mp("0", 1);
+    q = kryptos_hex_value_as_mp("2F", 2);
+    p = kryptos_hex_value_as_mp("11B", 3);
+
+    KUTE_ASSERT(p != NULL && q != NULL && g != NULL);
+
+    KUTE_ASSERT(kryptos_verify_dl_params(p, q, g) == kKryptosInvalidParams);
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(g);
+
+    // INFO(Rafael): It should fail due to g.
+
+    g = kryptos_hex_value_as_mp("11C", 3);
+    q = kryptos_hex_value_as_mp("2F", 2);
+    p = kryptos_hex_value_as_mp("11B", 3);
+
+    KUTE_ASSERT(p != NULL && q != NULL && g != NULL);
+
+    KUTE_ASSERT(kryptos_verify_dl_params(p, q, g) == kKryptosInvalidParams);
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(g);
+
+    // INFO(Rafael): It should fail due to q.
+
+    g = kryptos_hex_value_as_mp("3C", 2);
+    q = kryptos_hex_value_as_mp("2A", 2);
+    p = kryptos_hex_value_as_mp("11B", 3);
+
+    KUTE_ASSERT(p != NULL && q != NULL && g != NULL);
+
+    KUTE_ASSERT(kryptos_verify_dl_params(p, q, g) == kKryptosInvalidParams);
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(g);
+
+    // INFO(Rafael): It should fail due to p.
+
+    g = kryptos_hex_value_as_mp("3C", 2);
+    q = kryptos_hex_value_as_mp("2F", 2);
+    p = kryptos_hex_value_as_mp("11A", 3);
+
+    KUTE_ASSERT(p != NULL && q != NULL && g != NULL);
+
+    KUTE_ASSERT(kryptos_verify_dl_params(p, q, g) == kKryptosInvalidParams);
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(g);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_generate_dl_params_tests)
+    // WARN(Rafael): If the kryptos_verify_dl_params() is broken: "you shall not pass".
+    kryptos_mp_value_t *p = NULL, *q = NULL, *g = NULL;
+
+    KUTE_ASSERT(kryptos_generate_dl_params(80, 40, &p, &q, NULL) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_generate_dl_params(80, 40, &p, NULL, &g) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_generate_dl_params(80, 40, NULL, &q, &g) == kKryptosInvalidParams);
+
+    KUTE_ASSERT(kryptos_generate_dl_params(64, 32, &p, &q, &g) == kKryptosSuccess);
+
+#if defined(__FreeBSD__)
+    uprintf(" P = "); kryptos_print_mp(p);
+    uprintf(" Q = "); kryptos_print_mp(q);
+    uprintf(" G = "); kryptos_print_mp(g);
+#endif
+
+    KUTE_ASSERT(p != NULL);
+    KUTE_ASSERT(q != NULL);
+    KUTE_ASSERT(g != NULL);
+
+    // INFO(Rafael): Internally it was checked but let's make sure here too.
+    KUTE_ASSERT(kryptos_verify_dl_params(p, q, g) == kKryptosSuccess);
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(g);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_dh_mk_domain_params_tests)
+    kryptos_u8_t *params = NULL;
+    size_t params_size = 0;
+    kryptos_u8_t *data = NULL;
+    size_t data_size = 0;
+
+    KUTE_ASSERT(kryptos_dh_mk_domain_params(0, 32, &params, &params_size) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_dh_mk_domain_params(64, 0, &params, &params_size) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_dh_mk_domain_params(64, 32, NULL, &params_size) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_dh_mk_domain_params(64, 32, &params, NULL) == kKryptosInvalidParams);
+
+    KUTE_ASSERT(kryptos_dh_mk_domain_params(64, 32, &params, &params_size) == kKryptosSuccess);
+
+    KUTE_ASSERT(params != NULL);
+    KUTE_ASSERT(params_size > 0);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** DH DOMAIN PARAMETERS:\n\n%s", params);
+#else
+    printk(KERN_ERR " *** DH DOMAIN PARAMETERS:\n\n%s", params);
+#endif
+
+    data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_P, params, params_size, &data_size);
+
+    KUTE_ASSERT(data != NULL);
+
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_Q, params, params_size, &data_size);
+
+    KUTE_ASSERT(data != NULL);
+
+    kryptos_freeseg(data);
+
+    data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_G, params, params_size, &data_size);
+
+    KUTE_ASSERT(data != NULL);
+
+    kryptos_freeseg(data);
+
+    kryptos_freeseg(params);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_dh_verify_domain_params_tests)
+    kryptos_u8_t *valid_params = "-----BEGIN DH PARAM P-----\n"
+                                 "r0JMxbGO+Cg=\n"
+                                 "-----END DH PARAM P-----\n"
+                                 "-----BEGIN DH PARAM Q-----\n"
+                                 "O/IVlg==\n"
+                                 "-----END DH PARAM Q-----\n"
+                                 "-----BEGIN DH PARAM G-----\n"
+                                 "gEAAVxKjmgI=\n"
+                                 "-----END DH PARAM G-----\n";
+
+    kryptos_u8_t *invalid_params = "-----BEGIN DH PARAM P-----\n"
+                                   "Ko87iBqGQEI=\n"
+                                   "-----END DH PARAM P-----\n"
+                                   "-----BEGIN DH PARAM Q-----\n"
+                                   "Y/hBcA==\n"
+                                   "-----END DH PARAM Q-----\n"
+                                   "-----BEGIN DH PARAM G-----\n"
+                                   "tOOCDE3FHCU=\n"
+                                   "-----END DH PARAM G-----\n";
+
+    KUTE_ASSERT(kryptos_dh_verify_domain_params(valid_params, 0) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_dh_verify_domain_params(NULL, 1) == kKryptosInvalidParams);
+
+    KUTE_ASSERT(kryptos_dh_verify_domain_params(valid_params, strlen(valid_params)) == kKryptosSuccess);
+
+    KUTE_ASSERT(kryptos_dh_verify_domain_params(invalid_params, strlen(invalid_params)) == kKryptosInvalidParams);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_dh_get_modp_from_params_buf_tests)
+    kryptos_u8_t *valid_params = "-----BEGIN DH PARAM P-----\n"
+                                 "r0JMxbGO+Cg=\n"
+                                 "-----END DH PARAM P-----\n"
+                                 "-----BEGIN DH PARAM Q-----\n"
+                                 "O/IVlg==\n"
+                                 "-----END DH PARAM Q-----\n"
+                                 "-----BEGIN DH PARAM G-----\n"
+                                 "gEAAVxKjmgI=\n"
+                                 "-----END DH PARAM G-----\n";
+
+    kryptos_u8_t *no_p_param = "-----BEGIN DH PARAM Q-----\n"
+                               "O/IVlg==\n"
+                               "-----END DH PARAM Q-----\n"
+                               "-----BEGIN DH PARAM G-----\n"
+                               "gEAAVxKjmgI=\n"
+                               "-----END DH PARAM G-----\n";
+
+    kryptos_u8_t *no_g_param = "-----BEGIN DH PARAM P-----\n"
+                               "r0JMxbGO+Cg=\n"
+                               "-----END DH PARAM P-----\n"
+                               "-----BEGIN DH PARAM Q-----\n"
+                               "O/IVlg==\n"
+                               "-----END DH PARAM Q-----\n";
+
+    // CLUE(Rafael): It was intentional.
+    kryptos_mp_value_t *p = (kryptos_mp_value_t *)valid_params,
+                       *q = (kryptos_mp_value_t *)valid_params,
+                       *g = (kryptos_mp_value_t *)valid_params;
+
+    KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(NULL, 1, &p, NULL, &g) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, 0, &p, NULL, &g) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, 1, NULL, NULL, &g) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, 1, &p, &q, NULL) == kKryptosInvalidParams);
+
+    KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, strlen(no_p_param), &p, NULL, &g) != kKryptosSuccess);
+    KUTE_ASSERT(p == NULL && g == NULL);
+
+    KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_g_param, strlen(no_g_param), &p, &q, &g) != kKryptosSuccess);
+    KUTE_ASSERT(p == NULL && g == NULL && q == NULL);
+
+    KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(valid_params, strlen(valid_params), &p, &q, &g) == kKryptosSuccess);
+    KUTE_ASSERT(p != NULL && g != NULL && q != NULL);
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(g);
+
+    p = g = NULL;
+
+    KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(valid_params, strlen(valid_params), &p, NULL, &g) == kKryptosSuccess);
+    KUTE_ASSERT(p != NULL && g != NULL);
+
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(g);
+KUTE_TEST_CASE_END
+
 KUTE_TEST_CASE(kryptos_dh_get_modp_tests)
     struct modp_test_ctx {
         kryptos_dh_modp_group_bits_t bits;
