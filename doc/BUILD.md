@@ -148,8 +148,11 @@ Beware: A ``LKM`` is inserted into the kernel. Thus, invalid memory accesses, do
 have made changes and you are not so sure about them, backup your work before continuing and happy kernel hacking! ;)
 
 In ``Linux``, during kernel mode tests you probably will receive some RCU CPU stall warnings, this is "normal" because the
-kernel test executes some insane and uncommon tasks (considering the current context) like running several PK crypto
-primitives and protocols. Things like "kthread starved for N jiffies" are expected, so calm down.
+kernel test executes some insane and uncommon tasks (considering the current context). Things like running several PK crypto
+primitives and protocols. Warnings like "kthread starved for N jiffies" are expected, so calm down.
+
+In ``FreeBSD``, you will experience a big and frightening freeze but the machine not rebooting you are safe. It means
+that all tests were passed.
 
 ## Are you searching for some build information not detailed here?
 

@@ -17,8 +17,6 @@
 static int corrupt_pem_data(const kryptos_u8_t *hdr, kryptos_u8_t *pem_data, const size_t pem_data_size);
 
 static int corrupt_pem_data(const kryptos_u8_t *hdr, kryptos_u8_t *pem_data, const size_t pem_data_size) {
-    kryptos_u8_t *data = NULL;
-    size_t data_size;
     kryptos_u8_t *dp, *dp_end, swp = 0, *temp;
     const kryptos_u8_t *hp, *hp_end;
     int found = 0;
@@ -925,7 +923,7 @@ KUTE_TEST_CASE(kryptos_oaep_padding_tests)
     };
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;
     kryptos_u8_t *padded_message = NULL, *message = NULL;
-    size_t padded_message_size = 0, message_size = 0;
+    size_t padded_message_size = 0;
 
     for (t = 0; t < test_vector_nr; t++) {
         padded_message_size = test_vector[t].buffer_size;

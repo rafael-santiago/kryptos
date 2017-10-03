@@ -166,7 +166,7 @@ Yes, global macros into a code module should be undefined at the end of the modu
 
 ### Unit tests
 
-For unit tests I am using my own [stuff](https://github.com/rafael-santiago/cutest). For kernel mode tests I use a mimic of it versioned under ``src/tests/kernel``.
+For unit tests I am using my own [stuff](https://github.com/rafael-santiago/cutest). For kernel mode tests I use a mimic of that versioned under ``src/tests/kernel``.
 
 The default way of naming a test is by using the name of the function currently tested appended with ("_tests"). Try not be so pedant, describing inputs, behaviors
 and all this kind of shit in the test name. This just creates mess and boredom.
@@ -180,4 +180,4 @@ Otherwise if your code should not be executed in kernel mode, inform it explaini
 
 The correctness of any cipher must be tested with official test vectors. When not possible, the custom test vector should be
 derived from key expansion samples present in the cipher spec written by the algorithm authors. These test vectors should not be
-tested in kernel mode since it was well-tested in user mode.
+tested in kernel mode since them was well-tested in user mode.

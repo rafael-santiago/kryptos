@@ -12,7 +12,6 @@
 #ifdef KRYPTOS_USER_MODE
 #include <string.h>
 #endif
-#include <stdio.h>
 
 static void kryptos_oaep_i2osp(kryptos_u8_t *c, const kryptos_u32_t counter);
 
@@ -185,7 +184,11 @@ kryptos_u8_t *kryptos_apply_oaep_padding(const kryptos_u8_t *buffer, size_t *buf
     }
 
     if (label != NULL && label_size > 0) {
+#if !defined(__FreeBSD__)
         l = (kryptos_u8_t *)label;
+#else
+        l = (kryptos_u8_t *)(uintptr_t)label;
+#endif
         l_size = label_size;
     }
 
@@ -384,7 +387,11 @@ kryptos_u8_t *kryptos_drop_oaep_padding(const kryptos_u8_t *buffer, size_t *buff
     }
 
     if (label != NULL && label_size > 0) {
-        l = (kryptos_u8_t *) label;
+#if !defined(__FreeBSD__)
+        l = (kryptos_u8_t *)label;
+#else
+        l = (kryptos_u8_t *)(uintptr_t)label;
+#endif
         l_size = label_size;
     }
 
@@ -538,7 +545,12 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
 
     // INFO(Rafael): Computing 'mHash'.
 
+#if !defined(__FreeBSD__)
     ktask->in = (kryptos_u8_t *)buffer;
+#else
+    ktask->in = (kryptos_u8_t *)(uintptr_t)buffer;
+#endif
+
     ktask->in_size = *buffer_size;
 
     hash(&ktask, 0);
@@ -778,7 +790,11 @@ const kryptos_u8_t *kryptos_pss_verify(const kryptos_u8_t *m, const size_t m_siz
 
     // INFO(Rafael): 'Let mHash = Hasm(M)'.
 
+#if !defined(__FreeBSD__)
     ktask->in = (kryptos_u8_t *)m;
+#else
+    ktask->in = (kryptos_u8_t *)(uintptr_t)m;
+#endif
     ktask->in_size = m_size;
 
     hash(&ktask, 0);
