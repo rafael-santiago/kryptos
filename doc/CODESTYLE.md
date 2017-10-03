@@ -101,7 +101,7 @@ Always use braces.
 ### Expressions
 
 Do not trust in precedence. Try to make the stuff clearer. If you used to write crypto code you may know that everytime we see and write pretty "insane"
-and long expressions. I think that trust in precedence is evidence of naivety. Nothing should obfuscates the correctness.
+and long expressions. I think that trust in precedence is evidence of naivety. Nothing should obfuscate correctness.
 In this sense Cryptography is beautiful as Math! Let's reverberate this beauty also here...
 
 Then you should use ``(...)`` when you want to communicate and make clearer your intentions.
