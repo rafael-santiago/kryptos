@@ -2417,3 +2417,252 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
 # endif
 #endif
 KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
+    kryptos_u8_t *k_pub_alice = "-----BEGIN RSA PARAM N-----\n"
+                                "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNo"
+                                "Vg7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
+                                "-----END RSA PARAM N-----\n"
+                                "-----BEGIN RSA PARAM E-----\n"
+                                "o13jdPAiis0sJZeh0OL9jL8Tib/EgoVNLqNXCM966j1qD4yq5KcXgrDezI48lxWDn66cZnppeXGfK8d0ym8U85JsXVgV2a"
+                                "o45ESDnBQFoRSoeQ3p3QVqDzfgViMeHIinMzFxx/OYpSgxpuQq4em4CwrBkqn1DxlRCzNCrdAqiwo=\n"
+                                "-----END RSA PARAM E-----\n";
+
+    kryptos_u8_t *k_priv_alice = "-----BEGIN RSA PARAM N-----\n"
+                                 "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjN"
+                                 "oVg7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
+                                 "-----END RSA PARAM N-----\n"
+                                 "-----BEGIN RSA PARAM D-----\n"
+                                 "D3fMDiyVdMeojcOJuo4rB8CdgjNrxS2M9eORsLeiI6t+AiQpsE9LDlk62xHRAKfvX42RDkrlnr1g6PY3shIuPKcSfqLcl"
+                                 "+Sdvt3NHzRLM8CEgJSWrUu919xo/IUKhFyFdN5ClYwpvaXaK/MVM1AV8gihLHpEsQT9gNfTgwDrVxU=\n"
+                                 "-----END RSA PARAM D-----\n";
+
+    kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
+    kryptos_u8_t *m = "Every fortress falls.\x00\x00\x00\x00\x00\x00\x00";
+    size_t m_size = 28;
+    size_t salt_size = 4;
+    kryptos_u8_t *signature = NULL;
+    size_t signature_size = 0;
+
+    // INFO(Rafael): Valid signature case.
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    alice->cipher = kKryptosCipherRSAEMSAPSS;
+
+    alice->in = m;
+    alice->in_size = m_size;
+    alice->key = k_priv_alice;
+    alice->key_size = strlen(k_priv_alice);
+    alice->arg[0] = &salt_size;
+    alice->arg[1] = alice->arg[2] = NULL;
+
+    kryptos_rsa_sign(&alice);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+
+    KUTE_ASSERT(alice->out != NULL);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** SIGNED OUTPUT:\n\n%s\n", alice->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** SIGNED OUTPUT:\n\n%s\n", alice->out);
+#endif
+
+    // INFO(Rafael): Once upon a time, Alice sent a signed message to bob.... blah, blah, blah.
+
+    bob->cipher = kKryptosCipherRSAEMSAPSS;
+
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+    bob->key = k_pub_alice;
+    bob->key_size = strlen(k_pub_alice);
+    bob->arg[0] = &salt_size;
+    bob->arg[1] = bob->arg[2] = NULL;
+
+    kryptos_rsa_verify(&bob);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+
+    KUTE_ASSERT(bob->out != NULL);
+    KUTE_ASSERT(bob->out_size == m_size);
+    KUTE_ASSERT(memcmp(bob->out, m, bob->out_size) == 0);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
+#endif
+
+    signature = alice->out;
+    signature_size = alice->out_size;
+
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Invalid signature cases.
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    alice->cipher = kKryptosCipherRSAEMSAPSS;
+
+    alice->in = m;
+    alice->in_size = m_size;
+    alice->key = k_priv_alice;
+    alice->key_size = strlen(k_priv_alice);
+    alice->arg[0] = &salt_size;
+    alice->arg[1] = alice->arg[2] = NULL;
+
+    alice->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
+    KUTE_ASSERT(alice->out != NULL);
+    memset(alice->out, 0, signature_size + 1);
+    KUTE_ASSERT(memcpy(alice->out, signature, signature_size) == alice->out);
+    alice->out_size = signature_size;
+
+    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** SIGNED OUTPUT WITH X PARAMETER CORRUPTED:\n\n%s\n", alice->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** SIGNED OUTPUT WITH X PARAMETER CORRUPTED:\n\n%s\n", alice->out);
+#endif
+
+    // INFO(Rafael): Once upon a time, Bob received a signed message by Alice with X corrupted.
+
+    bob->cipher = kKryptosCipherRSAEMSAPSS;
+
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+    bob->key = k_pub_alice;
+    bob->key_size = strlen(k_pub_alice);
+    bob->arg[0] = &salt_size;
+    bob->arg[1] = bob->arg[2] = NULL;
+
+    kryptos_rsa_verify(&bob);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(bob) == 0);
+    KUTE_ASSERT(bob->result == kKryptosInvalidSignature);
+    KUTE_ASSERT(bob->out == NULL);
+    KUTE_ASSERT(bob->out_size == 0);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
+#endif
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    alice->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
+    KUTE_ASSERT(alice->out != NULL);
+    memset(alice->out, 0, signature_size + 1);
+    KUTE_ASSERT(memcpy(alice->out, signature, signature_size) == alice->out);
+    alice->out_size = signature_size;
+
+    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** SIGNED OUTPUT WITH S PARAMETER CORRUPTED:\n\n%s\n", alice->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** SIGNED OUTPUT WITH S PARAMETER CORRUPTED:\n\n%s\n", alice->out);
+#endif
+
+    // INFO(Rafael): Once upon a time, Bob received a signed message by Alice with S corrupted.
+
+    bob->cipher = kKryptosCipherRSAEMSAPSS;
+
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+    bob->key = k_pub_alice;
+    bob->key_size = strlen(k_pub_alice);
+    bob->arg[0] = &salt_size;
+    bob->arg[1] = bob->arg[2] = NULL;
+
+    kryptos_rsa_verify(&bob);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(bob) == 0);
+    KUTE_ASSERT(bob->result == kKryptosInvalidSignature);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
+#endif
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    alice->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
+    KUTE_ASSERT(alice->out != NULL);
+    memset(alice->out, 0, signature_size + 1);
+    KUTE_ASSERT(memcpy(alice->out, signature, signature_size) == alice->out);
+    alice->out_size = signature_size;
+
+    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** SIGNED OUTPUT WITH BOTH X AND S PARAMETERS CORRUPTED:\n\n%s\n", alice->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** SIGNED OUTPUT WITH BOTH X AND S PARAMETERS CORRUPTED:\n\n%s\n", alice->out);
+#endif
+
+    // INFO(Rafael): Once upon a time, Bob received a signed message by Alice, totally corrupted.
+
+    bob->cipher = kKryptosCipherRSAEMSAPSS;
+
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+    bob->key = k_pub_alice;
+    bob->key_size = strlen(k_pub_alice);
+    bob->arg[0] = &salt_size;
+    bob->arg[1] = bob->arg[2] = NULL;
+
+    kryptos_rsa_verify(&bob);
+
+    KUTE_ASSERT(kryptos_last_task_succeed(bob) == 0);
+    KUTE_ASSERT(bob->result == kKryptosInvalidSignature);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n", bob->result_verbose);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n",
+                                                                                          bob->result_verbose);
+#endif
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+    kryptos_freeseg(signature);
+KUTE_TEST_CASE_END
