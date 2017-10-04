@@ -2215,3 +2215,205 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
     kryptos_freeseg(signature);
 KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
+#ifdef KRYPTOS_C99
+    kryptos_u8_t *k_pub_bob = "-----BEGIN RSA PARAM N-----\n"
+                              "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNoVg"
+                              "7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
+                              "-----END RSA PARAM N-----\n"
+                              "-----BEGIN RSA PARAM E-----\n"
+                              "o13jdPAiis0sJZeh0OL9jL8Tib/EgoVNLqNXCM966j1qD4yq5KcXgrDezI48lxWDn66cZnppeXGfK8d0ym8U85JsXVgV2ao4"
+                              "5ESDnBQFoRSoeQ3p3QVqDzfgViMeHIinMzFxx/OYpSgxpuQq4em4CwrBkqn1DxlRCzNCrdAqiwo=\n"
+                              "-----END RSA PARAM E-----\n";
+
+    kryptos_u8_t *k_priv_bob = "-----BEGIN RSA PARAM N-----\n"
+                               "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNoV"
+                               "g7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
+                               "-----END RSA PARAM N-----\n"
+                               "-----BEGIN RSA PARAM D-----\n"
+                               "D3fMDiyVdMeojcOJuo4rB8CdgjNrxS2M9eORsLeiI6t+AiQpsE9LDlk62xHRAKfvX42RDkrlnr1g6PY3shIuPKcSfqLcl+S"
+                               "dvt3NHzRLM8CEgJSWrUu919xo/IUKhFyFdN5ClYwpvaXaK/MVM1AV8gihLHpEsQT9gNfTgwDrVxU=\n"
+                               "-----END RSA PARAM D-----\n";
+
+    kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
+    kryptos_u8_t *m = "We're gonna steal your mail, on a Friday night... "
+                      "We're gonna steal your mail, by the pale moonlight\x00\x00\x00\x00";
+    size_t m_size = 104;
+    kryptos_u8_t *signature = NULL;
+    size_t signature_size = 0;
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    // INFO(Rafael): Bob sign the message.
+
+    kryptos_sign(rsa, bob, m, m_size, k_priv_bob, strlen(k_priv_bob));
+
+    KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+    KUTE_ASSERT(bob->out != NULL);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** SIGNED OUTPUT:\n\n%s\n", bob->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** SIGNED OUTPUT:\n\n%s\n", bob->out);
+#endif
+
+    // INFO(Rafael): Now Alice simply verify.
+
+    kryptos_verify(rsa, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob));
+
+    KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+    KUTE_ASSERT(alice->out != NULL);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
+#endif
+
+    signature = bob->out;
+    signature_size = bob->out_size;
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Corrupted signature cases.
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    bob->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
+    KUTE_ASSERT(bob->out != NULL);
+    memset(bob->out, 0, signature_size + 1);
+    bob->out_size = signature_size;
+    KUTE_ASSERT(memcpy(bob->out, signature, signature_size) == bob->out);
+
+    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", bob->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", bob->out);
+#endif
+
+    kryptos_verify(rsa, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob));
+
+    KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
+    KUTE_ASSERT(alice->result == kKryptosInvalidSignature);
+
+    KUTE_ASSERT(alice->out == NULL);
+    KUTE_ASSERT(alice->out_size == 0);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n",
+                                                                                    alice->result_verbose);
+#endif
+
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    bob->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
+    KUTE_ASSERT(bob->out != NULL);
+    memset(bob->out, 0, signature_size + 1);
+    bob->out_size = signature_size;
+    KUTE_ASSERT(memcpy(bob->out, signature, signature_size) == bob->out);
+
+    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->out);
+#endif
+
+    kryptos_verify(rsa, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob));
+
+    KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
+    KUTE_ASSERT(alice->result == kKryptosInvalidSignature);
+
+    KUTE_ASSERT(alice->out == NULL);
+    KUTE_ASSERT(alice->out_size == 0);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n",
+                                                                                     alice->result_verbose);
+#endif
+
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#endif
+
+    bob->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
+    KUTE_ASSERT(bob->out != NULL);
+    memset(bob->out, 0, signature_size + 1);
+    bob->out_size = signature_size;
+    KUTE_ASSERT(memcpy(bob->out, signature, signature_size) == bob->out);
+
+    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** SIGNED OUTPUT WITH BOTH X AND S CORRUPTED:\n\n%s\n", bob->out);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** SIGNED OUTPUT WITH BOTH X AND S CORRUPTED:\n\n%s\n", bob->out);
+#endif
+
+    kryptos_verify(rsa, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob));
+
+    KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
+    KUTE_ASSERT(alice->result == kKryptosInvalidSignature);
+
+    KUTE_ASSERT(alice->out == NULL);
+    KUTE_ASSERT(alice->out_size == 0);
+
+#if defined(__FreeBSD__)
+    uprintf(" *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n", alice->result_verbose);
+#elif defined(__linux__)
+    printk(KERN_ERR " *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n",
+                                                                                        alice->result_verbose);
+#endif
+
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_freeseg(signature);
+#else
+# if defined(__FreeBSD__)
+    uprintf("WARN: No c99 support, this test was skipped.\n");
+# elif defined(__linux__)
+    printk(KERN_ERR "WARN: No c99 support, this test was skipped.\n");
+# endif
+#endif
+KUTE_TEST_CASE_END
