@@ -1961,7 +1961,7 @@ KUTE_TEST_CASE(kryptos_pss_encoding_tests)
     size_t tv_size = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     kryptos_u8_t *em = NULL;
     const kryptos_u8_t *m = NULL;
-    size_t em_size = 0, m_size = 0, x;
+    size_t em_size = 0, m_size = 0;
 
     for (tv = 0; tv < tv_size; tv++) {
         m_size = em_size = strlen(test_vector[tv].m);
@@ -3015,17 +3015,17 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
                            "-----END DSA D-----\n";
 
     kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
-    kryptos_u8_t *m = "Provisoriamente não cantaremos o amor,\n"
-                      "que se refugiou mais abaixo dos subterrâneos.\n"
-                      "Cantaremos o medo, que estereliza os abraços.\n\n"
-                      "não cantaremos o ódio, porque este não existe,\n"
+    kryptos_u8_t *m = "Provisoriamente nao cantaremos o amor,\n"
+                      "que se refugiou mais abaixo dos subterraneos.\n"
+                      "Cantaremos o medo, que estereliza os abracos.\n\n"
+                      "nao cantaremos o odio, porque este nao existe,\n"
                       "existe apenas o medo, nosso pai e nosso companheiro,\n"
-                      "o medo grande dos sertões, dos mares, dos desertos,\n"
-                      "o medo dos soldados, o medo das mães, o medo das igrejas,\n"
+                      "o medo grande dos sertoes, dos mares, dos desertos,\n"
+                      "o medo dos soldados, o medo das maes, o medo das igrejas,\n"
                       "cantaremos o medo dos ditadores, o medo dos democratas,\n"
                       "cantaremos o medo da morte e o medo de depois da morte.\n"
                       "Depois morreremos de medo\n"
-                      "e sobre nossos túmulos nascerão flores amarelas e medrosas.";
+                      "e sobre nossos tumulos nascerao flores amarelas e medrosas.";
     size_t m_size;
 
 #if defined(__FreeBSD__)
@@ -3262,13 +3262,13 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
                            "-----END DSA D-----\n";
 
     kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
-    kryptos_u8_t *m = "Esse é tempo de partido,\n"
+    kryptos_u8_t *m = "Esse e tempo de partido,\n"
                       "tempo de homens partidos.\n\n"
-                      "É tempo de meio silêncio,\n"
-                      "de boca gelada e murmúrio,\n"
+                      "E tempo de meio silencio,\n"
+                      "de boca gelada e murmurio,\n"
                       "palavra indireta, aviso\n"
                       "na esquina. Tempo de cinco sentidos\n"
-                      "num só. O espião janta conosco.";
+                      "num so. O espiao janta conosco.";
     size_t m_size = strlen(m);
     kryptos_u8_t *signature = NULL;
 
