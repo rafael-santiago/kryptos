@@ -126,6 +126,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_rsa_digital_signature_basic_scheme_tests);
     KUTE_RUN_TEST(kryptos_rsa_digital_signature_basic_scheme_c99_tests);
     KUTE_RUN_TEST(kryptos_rsa_emsa_pss_digital_signature_scheme_tests);
+    KUTE_RUN_TEST(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests);
 
 KUTE_TEST_CASE_END
 
