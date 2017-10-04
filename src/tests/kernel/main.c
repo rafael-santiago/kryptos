@@ -99,10 +99,19 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_dh_get_modp_tests);
     KUTE_RUN_TEST(kryptos_dh_get_random_s_tests);
     KUTE_RUN_TEST(kryptos_dh_eval_t_tests);
+
+#ifndef SKIP_DH_XCHG_TESTS
     KUTE_RUN_TEST(kryptos_dh_standard_key_exchange_bare_bone_tests);
     KUTE_RUN_TEST(kryptos_dh_process_stdxchg_tests);
     KUTE_RUN_TEST(kryptos_dh_mk_key_pair_tests);
     KUTE_RUN_TEST(kryptos_dh_process_modxchg_tests);
+#else
+# if defined(__FreeBSD__)
+    uprintf("WARN: The Diffie-Hellman-Merkle exchange tests were skipped.\n");
+# elif defined(__linux__)
+    printk(KERN_ERR "WARN: The Diffie-Hellman-Merkle exchange tests were skipped.\n");
+# endif
+#endif
 
     KUTE_RUN_TEST(kryptos_rsa_mk_key_pair_tests);
     KUTE_RUN_TEST(kryptos_rsa_cipher_tests);
@@ -110,27 +119,60 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_padding_mgf_tests);
     KUTE_RUN_TEST(kryptos_oaep_padding_tests);
 
+#ifndef SKIP_RSA_OAEP_TESTS
     KUTE_RUN_TEST(kryptos_rsa_oaep_cipher_tests);
     KUTE_RUN_TEST(kryptos_rsa_oaep_cipher_c99_tests);
+#else
+# if defined(__FreeBSD__)
+    uprintf("WARN: The RSA-OAEP tests were skipped.\n");
+# elif defined(__linux__)
+    printk(KERN_ERR "WARN: The RSA-OAEP tests were skipped.\n");
+# endif
+#endif
 
     KUTE_RUN_TEST(kryptos_elgamal_mk_key_pair_tests);
     KUTE_RUN_TEST(kryptos_elgamal_verify_public_key_tests);
     KUTE_RUN_TEST(kryptos_elgamal_cipher_tests);
     KUTE_RUN_TEST(kryptos_elgamal_cipher_c99_tests);
 
+#ifndef SKIP_ELGAMAL_OAEP_TESTS
     KUTE_RUN_TEST(kryptos_elgamal_oaep_cipher_tests);
     KUTE_RUN_TEST(kryptos_elgamal_oaep_cipher_c99_tests);
+#else
+# if defined(__FreeBSD__)
+    uprintf("WARN: The Elgamal-OAEP tests were skipped.\n");
+# elif defined(__linux__)
+    printk(KERN_ERR "WARN: The Elgamal-OAEP tests were skipped.\n");
+# endif
+#endif
 
     KUTE_RUN_TEST(kryptos_pss_encoding_tests);
 
+#ifndef SKIP_RSA_SIGNATURE_TESTS
     KUTE_RUN_TEST(kryptos_rsa_digital_signature_basic_scheme_tests);
     KUTE_RUN_TEST(kryptos_rsa_digital_signature_basic_scheme_c99_tests);
     KUTE_RUN_TEST(kryptos_rsa_emsa_pss_digital_signature_scheme_tests);
     KUTE_RUN_TEST(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests);
+#else
+# if defined(__FreeBSD__)
+    uprintf("WARN: The RSA signature tests were skipped.\n");
+# elif defined(__linux__)
+    printk(KERN_ERR "WARN: The RSA signature tests were skipped.\n");
+# endif
+#endif
 
+
+#ifndef SKIP_DSA_SIGNATURE_TESTS
     KUTE_RUN_TEST(kryptos_dsa_mk_key_pair_tests);
     KUTE_RUN_TEST(kryptos_dsa_digital_signature_scheme_tests);
     KUTE_RUN_TEST(kryptos_dsa_digital_signature_scheme_c99_tests);
+#else
+# if defined(__FreeBSD__)
+    uprintf("WARN: The DSA signature tests were skipped.\n");
+# elif defined(__linux__)
+    printk(KERN_ERR "WARN: The DSA signature tests were skipped.\n");
+# endif
+#endif
 KUTE_TEST_CASE_END
 
 KUTE_MAIN(ktest_monkey);

@@ -52,6 +52,31 @@ kryptos-test-mod.prologue() {
         $cflags.add_item("-DKRYPTOS_NO_HMAC_TESTS=1");
     }
 
+    $option = hefesto.sys.get_option("skip-dh-xchg-tests");
+    if ($option.count() > 0) {
+        $cflags.add_item("-DSKIP_DH_XCHG_TESTS=1");
+    }
+
+    $option = hefesto.sys.get_option("skip-rsa-oaep-tests");
+    if ($option.count() > 0) {
+        $cflags.add_item("-DSKIP_RSA_OAEP_TESTS=1");
+    }
+
+    $option = hefesto.sys.get_option("skip-elgamal-oaep-tests");
+    if ($option.count() > 0) {
+        $cflags.add_item("-DSKIP_ELGAMAL_OAEP_TESTS=1");
+    }
+
+    $option = hefesto.sys.get_option("skip-rsa-signature-tests");
+    if ($option.count() > 0) {
+        $cflags.add_item("-DSKIP_RSA_SIGNATURE_TESTS=1");
+    }
+
+    $option = hefesto.sys.get_option("skip-dsa-signature-tests");
+    if ($option.count() > 0) {
+        $cflags.add_item("-DSKIP_DSA_SIGNATURE_TESTS=1");
+    }
+
     # INFO(Rafael): Only define KRYPTOS_KERNEL_MODE will guide the compiler across the build of the kryptos kernel mode version.
     #               Notice that no .ar file is generated. When adding the path "../.." to the includes list the object files from
     #               kryptos are automatically linked together.
