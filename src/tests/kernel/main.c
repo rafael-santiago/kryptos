@@ -130,7 +130,7 @@ KUTE_TEST_CASE(ktest_monkey)
 
     KUTE_RUN_TEST(kryptos_dsa_mk_key_pair_tests);
     KUTE_RUN_TEST(kryptos_dsa_digital_signature_scheme_tests);
-
+    KUTE_RUN_TEST(kryptos_dsa_digital_signature_scheme_c99_tests);
 KUTE_TEST_CASE_END
 
 KUTE_MAIN(ktest_monkey);

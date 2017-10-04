@@ -74,4 +74,6 @@ KUTE_DECLARE_TEST_CASE(kryptos_dsa_mk_key_pair_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests);
+
 #endif
