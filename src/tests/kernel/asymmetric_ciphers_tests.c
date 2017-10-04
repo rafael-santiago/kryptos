@@ -403,7 +403,10 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     // INFO(Rafael): Here only the standard exchange implementation is simulated.
-    kryptos_mp_value_t *g = NULL, *p = NULL, *q = NULL;
+    kryptos_mp_value_t *g = NULL, *p = NULL;
+#ifdef DH_USE_Q_SIZE
+    kryptos_mp_value_t *q = NULL;
+#endif
     kryptos_mp_value_t *s_alice = NULL, *s_bob = NULL;
     kryptos_mp_value_t *t_alice = NULL, *t_bob = NULL;
     kryptos_mp_value_t *kab_alice = NULL, *kab_bob = NULL;
@@ -428,7 +431,9 @@ KUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
                                       "jgP58tlcjSNYP2lJj7TGafmyom44"
                                       "Zxg=\n"
                                       "-----END DH PARAM G-----\n";
+#ifdef DH_USE_Q_SIZE
     kryptos_mp_value_t *_2 = NULL, *q_2 = NULL;
+#endif
 
 
 #if defined(__FreeBSD__)
@@ -468,8 +473,8 @@ KUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     KUTE_ASSERT(kab_bob != NULL);
 
 #if defined(__FreeBSD__)
-    urintf(" *** Alice KAB = "); kryptos_print_mp(kab_alice);
-    urintf(" *** Bob   KAB = "); kryptos_print_mp(kab_bob);
+    uprintf(" *** Alice KAB = "); kryptos_print_mp(kab_alice);
+    uprintf(" *** Bob   KAB = "); kryptos_print_mp(kab_bob);
 #endif
 
     KUTE_ASSERT(kryptos_mp_eq(kab_alice, kab_bob) == 1);
