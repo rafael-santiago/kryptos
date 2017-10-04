@@ -121,6 +121,8 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_elgamal_oaep_cipher_tests);
     KUTE_RUN_TEST(kryptos_elgamal_oaep_cipher_c99_tests);
 
+    KUTE_RUN_TEST(kryptos_pss_encoding_tests);
+
 KUTE_TEST_CASE_END
 
 KUTE_MAIN(ktest_monkey);

@@ -1925,3 +1925,67 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
 # endif
 #endif
 KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_pss_encoding_tests)
+    // WARN(Rafael): Here this case tests kryptos_pss_encode() and also kryptos_pss_verify() functions.
+    struct pss_encoding_tests {
+        kryptos_u8_t *m;
+        size_t k, salt_size;
+        kryptos_hash_func hash;
+        kryptos_hash_size_func hash_size;
+        int corrupt;
+    };
+
+    struct pss_encoding_tests test_vector[] = {
+        { "...tears from the sky, in pools of pain...", 1024, 20, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
+        { "...well baby tonite, I'm gonna go & dance in the rain!!", 1024, 30, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
+        { "...tears from the sky, in pools of pain...", 1024, 0, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
+        { "...well baby tonite, I'm gonna go & dance in the rain!!", 1024, 0, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
+        { "brazil................................................."
+          "......................................................."
+          "....", 1024, 90, kryptos_sha1_hash, kryptos_sha1_hash_size, 1 },
+        { "compliance============================================="
+          "======================================================="
+          "====", 1024, 8, kryptos_sha1_hash, kryptos_sha1_hash_size, 1 },
+        { "true ethics, from home!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+          "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+          "!!!!", 1024, 7, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
+        { "We've built a Great Wall around our power\n"
+          "Economic Great Wall around our power\n"
+          "Worldwide Great Wall around our power\n"
+          "Give us your poor,\n"
+          "Your tired and your weak\n"
+          "We'll send'em right back\n"
+          "To their certain death\n", 1024, 4, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 }
+    };
+    size_t tv_size = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_u8_t *em = NULL;
+    const kryptos_u8_t *m = NULL;
+    size_t em_size = 0, m_size = 0, x;
+
+    for (tv = 0; tv < tv_size; tv++) {
+        m_size = em_size = strlen(test_vector[tv].m);
+
+        em = kryptos_pss_encode(test_vector[tv].m, &em_size,
+                                test_vector[tv].k, test_vector[tv].salt_size,
+                                test_vector[tv].hash, test_vector[tv].hash_size);
+
+        KUTE_ASSERT(em != NULL);
+
+        if (test_vector[tv].corrupt) {
+            em[em_size >> 1] = ~em[em_size >> 1];
+        }
+
+        m = kryptos_pss_verify(test_vector[tv].m, m_size, em, em_size,
+                               test_vector[tv].k, test_vector[tv].salt_size,
+                               test_vector[tv].hash, test_vector[tv].hash_size);
+
+        if (test_vector[tv].corrupt) {
+            KUTE_ASSERT(m == NULL);
+        } else {
+            KUTE_ASSERT(m == test_vector[tv].m);
+        }
+
+        kryptos_freeseg(em);
+    }
+KUTE_TEST_CASE_END

@@ -60,4 +60,6 @@ KUTE_DECLARE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_pss_encoding_tests);
+
 #endif
