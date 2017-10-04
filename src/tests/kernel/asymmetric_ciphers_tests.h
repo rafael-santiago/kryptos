@@ -70,4 +70,6 @@ KUTE_DECLARE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_dsa_mk_key_pair_tests);
+
 #endif
