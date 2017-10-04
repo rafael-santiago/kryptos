@@ -123,6 +123,8 @@ KUTE_TEST_CASE(ktest_monkey)
 
     KUTE_RUN_TEST(kryptos_pss_encoding_tests);
 
+    KUTE_RUN_TEST(kryptos_rsa_digital_signature_basic_scheme_tests);
+
 KUTE_TEST_CASE_END
 
 KUTE_MAIN(ktest_monkey);
