@@ -77,6 +77,11 @@ kryptos-test-mod.prologue() {
         $cflags.add_item("-DSKIP_DSA_SIGNATURE_TESTS=1");
     }
 
+    $option = hefesto.sys.get_option("dh-use-q-size");
+    if ($option.count() > 0) {
+        $cflags.add_item("-DDH_USE_Q_SIZE=1");
+    }
+
     # INFO(Rafael): Only define KRYPTOS_KERNEL_MODE will guide the compiler across the build of the kryptos kernel mode version.
     #               Notice that no .ar file is generated. When adding the path "../.." to the includes list the object files from
     #               kryptos are automatically linked together.
