@@ -129,12 +129,13 @@ Similarly the indication of the operation mode is done by setting the field ``mo
 The following code is an example of how to use the algorithm ``ARC4`` to encrypt and decrypt data:
 
 ```c
-// arc4-sample.c
-//
-// Compilation: gcc arc4-sample.c -oarc4-sample -I<path to kryptos headers> -L<path to libkryptos.a>
-//              -lkryptos
-//
-
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
 #include <kryptos.h>
 #include <string.h>
 #include <stdio.h>
@@ -157,7 +158,7 @@ int main(int argc, char **argv) {
 
     // INFO(Rafael): Running the ARC4 cipher over the input (plaintext).
 
-    kryptos_arc4_cipher(ktask);
+    kryptos_arc4_cipher(&ktask);
 
     if (ktask->result == kKryptosSuccess) {
         printf("Encrypted... now decrypting...\n");
@@ -171,10 +172,12 @@ int main(int argc, char **argv) {
 
         // INFO(Rafael): Running the ARC4 cipher over the input (ciphertext).
 
-        kryptos_arc4_cipher(ktask);
+        kryptos_arc4_cipher(&ktask);
 
         if (ktask->result == kKryptosSuccess) {
-            printf("Out: %s\n", ktask->out);
+            printf("Out: ");
+            fwrite(ktask->out, ktask->out_size, 1, stdout);
+            printf("\n");
         } else {
             printf("Error during decryption.\n");
             exit_code = 1;
@@ -204,17 +207,19 @@ to you. In user mode you can call the default libc ``free()`` function, there is
 It is possible to simplify a little bit more the previous sample by using C macros and c99 capabilities:
 
 ```c
-// arc4-sample-c99.c
-//
-// Compilation: gcc arc4-sample-c99.c -oarc4-sample-c99 -I<path to kryptos headers>
-//              -L<path to libkryptos.a> -lkryptos
-//
-
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
 #include <kryptos.h>
 #include <string.h>
 #include <stdio.h>
 
 int main(int argc, char **argv) {
+#if defined(KRYPTOS_C99)
     unsigned char *data = "hello world!";
     kryptos_task_ctx task, *ktask = &task;
     int exit_code = 0;
@@ -234,8 +239,6 @@ int main(int argc, char **argv) {
     if (kryptos_last_task_succeed(ktask)) {
         printf("Encrypted... now decrypting...\n");
 
-        kryptos_task_init_as_null(ktask);
-
         // INFO(Rafael): Moving the output (ciphertext) to the input.
 
         kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
@@ -245,7 +248,9 @@ int main(int argc, char **argv) {
         kryptos_run_cipher(arc4, ktask, "1234", 4);
 
         if (kryptos_last_task_succeed(ktask)) {
-            printf("Out: %s\n", ktask->out);
+            printf("Out: ");
+            fwrite(ktask->out, ktask->out_size, 1, stdout);
+            printf("\n");
         } else {
             printf("Error during decryption.\n");
             exit_code = 1;
@@ -257,6 +262,10 @@ int main(int argc, char **argv) {
         exit_code = 1;
     }
     return exit_code;
+#else
+    printf("WARNING: libkryptos was compiled without C99 support.\n");
+    return 1;
+#endif
 }
 ```
 
@@ -269,6 +278,13 @@ The general using form of ``kryptos_run_cipher`` macro is:
 Block ciphers should be used in almost the same way:
 
 ```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
 #include <kryptos.h>
 #include <string.h>
 #include <stdio.h>
@@ -294,7 +310,7 @@ int main(int argc, char **argv) {
     ktask->in_size = data_size;
 
     // INFO(Rafael): Encrypting.
-    kryptos_blowfish_cipher(ktask);
+    kryptos_blowfish_cipher(&ktask);
 
     if (ktask->result == kKryptosSuccess) {
         printf("Data encrypted!\n");
@@ -306,10 +322,12 @@ int main(int argc, char **argv) {
         ktask->out = NULL;
 
         // INFO(Rafael): Decrypting.
-        kryptos_blowfish_cipher(ktask);
+        kryptos_blowfish_cipher(&ktask);
 
         if (ktask->result == kKryptosSuccess) {
-            printf("Data decrypted: '%s'\n", ktask->out);
+            printf("Data decrypted: ");
+            fwrite(ktask->out, ktask->out_size, 1, stdout);
+            printf("\n");
         } else {
             printf("ERROR: during decryption.\n");
         }
@@ -327,15 +345,24 @@ int main(int argc, char **argv) {
 The c99 conventions are handy to produce a smaller and straightfoward code:
 
 ```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
 #include <kryptos.h>
 #include <string.h>
 #include <stdio.h>
 
 int main(int argc, char **argv) {
+#if defined(KRYPTOS_C99)
     kryptos_task_ctx task, *ktask = &task;
     kryptos_u8_t *key = "foo";
     kryptos_u8_t *data = "plaintext";
     size_t data_size = 9;
+    int exit_code = 0;
 
     printf("Original data: %s\n", data);
 
@@ -347,15 +374,28 @@ int main(int argc, char **argv) {
     kryptos_run_cipher(blowfish, ktask, key, strlen(key), kKryptosECB);
 
     if (kryptos_last_task_succeed(ktask)) {
+        printf("Encryption success!\n");
         // INFO(Rafael): Decrypting.
         kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
         kryptos_task_set_decrypt_action(ktask);
         kryptos_run_cipher(blowfish, ktask, key, strlen(key), kKryptosECB);
 
+        printf("Plaintext: ");
+        fwrite(ktask->out, ktask->out_size, 1, stdout);
+        printf("\n");
+
         kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT);
+    } else {
+        printf("Error during encryption.\n");
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+        exit_code = 1;
     }
 
-    return 0;
+    return exit_code;
+#else
+    printf("WARNING: libkryptos was compiled without C99 support.\n");
+    return 1;
+#endif
 }
 ```
 
@@ -383,15 +423,24 @@ sadly, this kind of naive "approach" is common. Avoid doing this, it is unrespon
 The following code sample uses the SERPENT cipher in CBC mode with the c99 conveniences:
 
 ```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
 #include <kryptos.h>
 #include <string.h>
 #include <stdio.h>
 
 int main(int argc, char **argv) {
+#if defined(KRYPTOS_C99)
     kryptos_task_ctx task, *ktask = &task;
     kryptos_u8_t *key = "foo";
     kryptos_u8_t *data = "plaintext";
     size_t data_size = 9;
+    int exit_code = 0;
 
     printf("Original data: %s\n", data);
 
@@ -403,15 +452,28 @@ int main(int argc, char **argv) {
     kryptos_run_cipher(serpent, ktask, key, strlen(key), kKryptosCBC);
 
     if (kryptos_last_task_succeed(ktask)) {
+        printf("Encryption success!\n");
         // INFO(Rafael): Decrypting.
         kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
         kryptos_task_set_decrypt_action(ktask);
         kryptos_run_cipher(serpent, ktask, key, strlen(key), kKryptosCBC);
 
+        printf("Plaintext: ");
+        fwrite(ktask->out, ktask->out_size, 1, stdout);
+        printf("\n");
+
         kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT);
+    } else {
+        printf("Encryption error.\n");
+        exit_code = 1;
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
     }
 
-    return 0;
+    return exit_code;
+#else
+    printf("WARNING: libkryptos was compiled without C99 support.\n");
+    return 1;
+#endif
 }
 ```
 
@@ -430,6 +492,13 @@ of 128, 192 and also 256.
 When calling CAMELLIA in kryptos the desired key size should be passed, in the following way (c99):
 
 ```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
 #include <kryptos.h>
 #include <string.h>
 #include <stdio.h>
@@ -440,6 +509,7 @@ int main(int argc, char **argv) {
     kryptos_u8_t *data = "plaintext";
     size_t data_size = 9;
     kryptos_camellia_keysize_t key_size = kKryptosCAMELLIA192; // Let's use Camellia-192.
+    int exit_code = 0;
 
     printf("Original data: %s\n", data);
 
@@ -451,15 +521,22 @@ int main(int argc, char **argv) {
     kryptos_run_cipher(camellia, ktask, key, strlen(key), kKryptosCBC, &key_size);
 
     if (kryptos_last_task_succeed(ktask)) {
+        printf("Encryption success!\n");
         // INFO(Rafael): Decrypting.
         kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
         kryptos_task_set_decrypt_action(ktask);
         kryptos_run_cipher(camellia, ktask, key, strlen(key), kKryptosCBC, &key_size);
-
+        printf("Plaintext: ");
+        fwrite(ktask->out, ktask->out_size, 1, stdout);
+        printf("\n");
         kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT);
+    } else {
+        printf("Encryption error!\n");
+        exit_code = 1;
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
     }
 
-    return 0;
+    return exit_code;
 }
 ```
 
