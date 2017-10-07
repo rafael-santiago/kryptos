@@ -652,8 +652,13 @@ This feature can be accessed using the macro ``kryptos_run_cipher_hmac``. The fo
 a message authenticated taking advantage from the implemented hash algorithms.
 
 ```c
-// hmac-sample.c
-// compilation command line: gcc hmac-sample.c -ohmac-sample -lkryptos
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
 #include <kryptos.h>
 #include <stdio.h>
 
@@ -669,14 +674,19 @@ int main(int argc, char **argv) {
 
     kryptos_task_set_in(&m, "As I was saying...", 18);
 
+    printf("Data: %s\n", m.in);
+
     // INFO(Rafael): Encrypting with CAST5-CBC and generating our MAC based on SHA-512.
 
     kryptos_task_set_encrypt_action(&m);
     kryptos_run_cipher_hmac(cast5, sha512, &m, "silent passenger", 16, kKryptosCBC);
 
     if (kryptos_last_task_succeed(&m)) {
+        printf("Data successfully encrypted... Now we will intentionally corrupt it.\n");
         // INFO(Rafael): Let us corrupt the cryptogram on purpose of seeing the decryption fail.
         //               Do not do it at home! ;)
+
+        kryptos_task_set_in(&m, m.out, m.out_size);
 
         m.in[m.in_size >> 1] = ~m.in[m.in_size >> 1];
 
@@ -702,10 +712,12 @@ int main(int argc, char **argv) {
         } else {
             // INFO(Rafael): It should never happen.
             printf("Rascals! We were fooled!!\n");
+            exit_code = 1;
         }
     } else {
         // INFO(Rafael): It should never happen.
         printf("ERROR: Hmmmm it should be at least encrypted.\n");
+        exit_code = 1;
     }
 
     // INFO(Rafael): Housekeeping.
@@ -732,9 +744,10 @@ As you may have noticed the general form of using the ``kryptos_run_cipher_hmac`
 
 ## Asymmetric stuff
 
-Until now the ``Diffie-Hellman-Merkle`` key exchange scheme and the algorithm ``RSA`` are available.
+Until now the ``Diffie-Hellman-Merkle`` key exchange scheme and the algorithms ``RSA`` and ``Elgamal`` are available.
+For digital signature the library includes ``RSA`` (basic scheme), ``RSA-EMSA-PSS`` and the widely used ``DSA``.
 
-Firstly let's discusse the ``DHKE`` and after ``RSA``.
+Firstly let's discusse the ``DHKE`` and after the other stuff.
 
 ### The Diffie-Hellman-Merkle key exchange
 
