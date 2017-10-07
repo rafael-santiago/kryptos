@@ -752,14 +752,19 @@ Firstly let's discusse the ``DHKE`` and after the other stuff.
 ### The Diffie-Hellman-Merkle key exchange
 
 This key exchange scheme is implemented in two forms. The first one is the standard way, well-known and presented
-in tons of "crypto-books". The second one is a modified implementation of this protocol, this little modification
+in tons of crypto-books. The second one is a modified implementation of this protocol, this little modification
 mitigates the man-in-the-middle attacks.
 
 The standard method is shown as following:
 
 ```c
-// compilation: gcc std-dh-sample.c -ostd-dh-sample -lkryptos -L<libkryptos.a directory>
-//              -I<kryptos includes directory>
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
 #include <kryptos.h>
 #include <stdio.h>
 #include <string.h>
@@ -784,7 +789,7 @@ int main(int argc, char **argv) {
     }
 
     // INFO(Rafael): Alice defines the size in bits of her secret random number.
-    alice->s_bits = 80;
+    alice->s_bits = 160;
 
     // INFO(Rafael): Now Alice processes the setup data.
 
@@ -808,7 +813,7 @@ int main(int argc, char **argv) {
     bob->in_size = alice->out_size;
 
     // INFO(Rafael): Bob also defines the size in bits of his secret random number.
-    bob->s_bits = 80;
+    bob->s_bits = 160;
 
     // INFO(Rafael): Now Bob passes to kryptos_dh_process_stdxchg() "oracle" his input
 
@@ -844,11 +849,13 @@ int main(int argc, char **argv) {
         printf("ERROR: Error during exchange process. (3)\n");
         kryptos_clear_dh_xchg_ctx(alice);
         kryptos_clear_dh_xchg_ctx(bob);
-        goto main_epilogue;
+        return exit_code;
     }
 
     if (alice->k->data_size == bob->k->data_size &&
         memcmp(alice->k->data, bob->k->data, alice->k->data_size) == 0) {
+        alice->in = NULL;
+        bob->in = NULL;
         printf("SUCCESS: Alice and Bob have agreed about a session key.\n");
     } else {
         printf("ERROR: The k values between Alice and Bob are not the same.\n");
@@ -882,8 +889,13 @@ Fortunately, a simple change in this protocol mitigates this kind of attack.
 The modified ``Diffie-Hellman-Merkle`` key exchange protocol involves a preparation phase that should be done once.
 
 ```c
-// compilation: gcc mod-dh-sample.c -omod-dh-sample -lkryptos -L<libkryptos.a directory>
-//              -I<kryptos includes directory>
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
 #include <kryptos.h>
 #include <string.h>
 #include <stdio.h>
@@ -903,7 +915,7 @@ int main(int argc, char **argv) {
 
     if (kryptos_dh_get_modp(kKryptosDHGroup1536, &bob->p, &bob->g) != kKryptosSuccess) {
         exit_code = 1;
-        printf("ERROR: while getting P and G parameters.\n".);
+        printf("ERROR: while getting P and G parameters.\n");
         goto main_epilogue;
     }
 
@@ -992,6 +1004,8 @@ int main(int argc, char **argv) {
 
     if (alice->k->data_size == bob->k->data_size &&
         memcmp(alice->k->data, bob->k->data, alice->k->data_size) == 0) {
+        alice->in = NULL;
+        bob->in = NULL;
         printf("SUCCESS: Alice and Bob have agreed about a session key.\n");
     } else {
         printf("ERROR: The k values between Alice and Bob are not the same.\n");
