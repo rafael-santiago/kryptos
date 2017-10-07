@@ -418,7 +418,7 @@ Once the iv field from ``kryptos_task_ctx`` initialized as NULL, a new iv will b
 encrypting you do not need to worry about transfering the iv as a separated piece of information. The out field from
 ``kryptos_task_ctx`` gathers all information that you will need for a later decryption. As you may known there is no
 necessity of an IV be secret. If you use a static IV, in the end you are using a more complicated scheme for ECB mode,
-sadly, this kind of naive "approach" is common. Avoid doing this, it is unresponsible and stupid.
+sadly, this kind of naive "approach" is common. Avoid doing this, it is irresponsible and stupid.
 
 The following code sample uses the SERPENT cipher in CBC mode with the c99 conveniences:
 
@@ -576,9 +576,13 @@ Until now the available hash algorithms follow listed in **Table 4**.
 | ``RIPEMD-160`` |      ``ripemd160``                 |
 
 ```c
-// bare-bone-hash-sample.c
-// compilation command line: gcc bare-bone-hash-sample.c -obbhs -lkryptos
-
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
 #include <kryptos.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -591,6 +595,8 @@ int main(int argc, char **argv) {
 
     t.in = "abc";
     t.in_size = 3;
+
+    printf("Hashed data: %s\n", t.in);
 
     // INFO(Rafael): Executing the hash algorithm over the input.
     //               The second parameter when 0 requests a raw byte output.
@@ -609,6 +615,7 @@ int main(int argc, char **argv) {
         kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
     } else {
         printf("ERROR: when executing the hash with raw byte output.\n");
+        return 1;
     }
 
     // INFO(Rafael): Executing again the hash algorithm over the previously defined input.
@@ -624,6 +631,7 @@ int main(int argc, char **argv) {
         kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
     } else {
         printf("ERROR: when executing the hash with hexdecimal output.\n");
+        return 1;
     }
 
     return 0;

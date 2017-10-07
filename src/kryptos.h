@@ -45,6 +45,10 @@
 
 #include <kryptos_rsa.h>
 
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
+
 #define kryptos_task_set_ecb_mode(ktask) ( (ktask)->mode = kKryptosECB )
 
 #define kryptos_task_set_cbc_mode(ktask) ( (ktask)->mode = kKryptosCBC )
