@@ -2,7 +2,7 @@
 
 **Abstract**: This library was designed to be used in user mode applications and also in kernel mode. The following
 sections will guide the readers through the main aspects of how to use ``kryptos`` in their own stuff. This documentation
-considers that the readers have at least a minimal formal knowledge in cryptology.
+considers that the readers have at least a minimal formal knowledge of cryptology.
 
 ## Link101
 
@@ -51,13 +51,13 @@ There is no field called "plaintext" or "ciphertext". There are the fields ``in`
 must be stored into ``in``. When decrypting the **ciphertext** also must be stored into ``in``. The resultant data of the two operations
 always will be stored (allocated) into ``out``.
 
-However when you store the input data into the task context is necessary also indicate the size in bytes of that data. The
+However, when you store the input data into the task context is necessary also indicate the size in bytes of that data. The
 field ``in_size`` holds the input size.
 
 After any executed task, the field ``result`` will contain a code which describes the status of that last task. The additional
-field called ``result_verbose`` may also contain some literal description about.
+field called ``result_verbose`` may also contain some literal description about. Sometimes ``result_verbose`` may be null.
 
-The following code defines the input for a task:
+The following code defines the input of a task:
 
 ```c
 #include <kryptos.h>
@@ -89,8 +89,8 @@ int main(int argc, char **argv) {
 Notice that the ``in`` field only points to the original data unlike the ``out`` field, that in this case will point to a
 new allocated pointer representing the result of the processed input. The ``out_size`` will hold the size of the output.
 
-All relevant kryptos_task_ctx fields can be handled by C macros but the remaining information of how manipulate the
-``kryptos_task_ctx`` will be introduced together with the crypto stuff.
+All relevant ``kryptos_task_ctx`` fields can be handled by C macros but the remaining information of how manipulate the
+``kryptos_task_ctx`` will be introduced together with the related crypto stuff.
 
 ## The symmetric stuff
 
@@ -486,8 +486,8 @@ Details about a failure always can be accessed by watching the field ``result_ve
 
 Not all block ciphers only need a key, a size of this key and an operation mode. In kryptos we also have block ciphers
 that need more than the standard parameters. In this case the additional parameters are always passed after the operation
-mode and they must be pointers. As sample, let's pick the cipher CAMELLIA. The CAMELLIA algorithm supports key sizes
-of 128, 192 and also 256.
+mode and they must be pointers to the data. As sample, let's pick the cipher CAMELLIA. The CAMELLIA algorithm supports key
+sizes of 128, 192 and also 256.
 
 When calling CAMELLIA in kryptos the desired key size should be passed, in the following way (c99):
 
@@ -1034,3 +1034,104 @@ The nice part about the modified version of the ``Diffie-Hellman-Merkle`` protoc
 communication that could be hijacked by some attacker. As a result this mitigates a bunch the possibility of mitm attacks.
 Actually, we have only one data exchange during the key agreement and the public part of the generated key can be of
 knowledge of anyone, there is no problem with that.
+
+Until now a show you DHKE sample using standarnized MODP values but kryptos also includes a way of generating your own
+domain parameters. The following sample is a program that can generate those domain parameters.
+
+```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+static int is_valid_number(const char *number, const size_t number_size);
+
+int main(int argc, char **argv) {
+    kryptos_u8_t *params = NULL;
+    size_t params_size = 0, p_bits = 0, q_bits = 0;
+
+    if (argc > 2) {
+        if (!is_valid_number(argv[1], strlen(argv[1])) &&
+            !is_valid_number(argv[2], strlen(argv[2]))) {
+            goto usage;
+        }
+
+        p_bits = atoi(argv[1]);
+        q_bits = atoi(argv[2]);
+
+        if (p_bits < q_bits) {
+            printf("ERROR: the size of p must be greater than the size of q.\n");
+            return 1;
+        }
+
+        if (kryptos_dh_mk_domain_params(p_bits, q_bits, &params, &params_size) != kKryptosSuccess) {
+            printf("ERROR: while generating the domain parameters.\n");
+            return 1;
+        }
+
+        fwrite(params, params_size, 1, stdout);
+
+        kryptos_freeseg(params);
+    } else {
+usage:
+        printf("use: %s <p size in bits> <q size in bits>\n", argv[0]);
+        return 1;
+    }
+
+    return 0;
+}
+
+static int is_valid_number(const char *number, const size_t number_size) {
+    const char *np, *np_end;
+
+    if (number == NULL) {
+        return 0;
+    }
+
+    np = number;
+    np_end = np + number_size;
+
+    if (np == np_end) {
+        return 0;
+    }
+
+    while (np != np_end) {
+        if (!isdigit(*np)) {
+            return 0;
+        }
+        np++;
+    }
+
+    return 1;
+}
+```
+
+In order to generate domain DHKE parameters with the code shown above you should inform the size in bits of P and Q
+respectively:
+
+```
+Watson@221B:~/src/kryptos-test/samples# ./dh-domain-params-sample 160 80 > params.txt
+```
+
+Once generated the parameters can be used insted of the standarnized MODP values. Of course that use p=160 bits and q=80 is
+pretty insecure. The domain parameters calculating process can be slow. Since it depends on finding primes with specific
+relations between them. It is driven by luck... Fortunatelly, you should do it once.
+
+In practice you should use at least p=1024 and q=160 bits.
+
+The domain parameters are exported as a ``PEM`` buffer. When receving a ``PEM`` buffer containing DHKE domain parameters
+a best practice is to verify if these parameters are really "trustable" before accepting and starting using them.
+
+```c
+```
+
+You should avoid using any domain parameters rejected by the verifying function.
+

@@ -66,3 +66,29 @@ mod-dh-sample.epilogue() {
         hefesto.project.abort(1);
     }
 }
+
+project dh-domain-params-sample : toolset "gcc-c-app" : $src, $inc, $cflags, $lib, $ldflags, $appname;
+
+dh-domain-params-sample.prologue() {
+    $src.clear();
+    $inc.clear();
+    $cflags.clear();
+    $lib.clear();
+    $ldflags.clear();
+    $appname = "dh-domain-params-sample";
+    if (hefesto.sys.os_name() == "windows") {
+        $appname = $appname + ".exe";
+    }
+    $src.add_item("dh-domain-params-sample.c");
+    $inc = hefesto.sys.get_option("includes");
+    $cflags = hefesto.sys.get_option("cflags");
+    $lib = hefesto.sys.get_option("libraries");
+    $ldflags = hefesto.sys.get_option("ldflags");
+}
+
+dh-domain-params-sample.epilogue() {
+    if (hefesto.sys.last_forge_result() != 0) {
+        hefesto.sys.echo("~~~ ERROR\n");
+        hefesto.project.abort(1);
+    }
+}
