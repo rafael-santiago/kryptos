@@ -43,7 +43,8 @@ int main(int argc, char **argv) {
 
     // INFO(Rafael): Loading the domain parameters from the previously generated PEM data.
 
-    if (kryptos_dh_get_modp_from_params_buf(params, strlen(params), &bob->p, &bob->q, &bob->g) != kKryptosSuccess) {
+    if (kryptos_dh_get_modp_from_params_buf(params, strlen(params),
+                                            &bob->p, &bob->q, &bob->g) != kKryptosSuccess) {
         exit_code = 1;
         printf("ERROR: while getting P and G parameters.\n");
         goto main_epilogue;

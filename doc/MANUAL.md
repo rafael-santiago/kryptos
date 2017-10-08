@@ -1185,9 +1185,9 @@ int main(int argc, char **argv) {
 
 You really should avoid using any domain parameters rejected by the verifying function.
 
-In order to load valid domain parameters and use it during with DHKE scheme you should use the function
+In order to load valid domain parameters and use them with DHKE stuff you should use the function
 ``kryptos_dh_get_modp_from_params_buf()``. The following code shows how to use domain parameters instead of
-the standard internal MODP values.
+the standard internal MODP values with the ``Diffie-Hellman-Merkle`` key exchange scheme.
 
 ```c
 /*
