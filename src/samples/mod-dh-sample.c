@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     // INFO(Rafael): Bob defines the size in bits of his random secret value and then he makes a key pair
     //               based on p, g and s.
     //
-    //               Actually it will generate a fouth value t what should be published by him.
+    //               Actually it will generate a fourth value t what should be published by him.
 
     bob->s_bits = 160;
 

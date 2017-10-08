@@ -876,7 +876,7 @@ main_epilogue:
 As you may have seen the standard ``DHKE`` implementation using kryptos involves the usage of a specific structure
 called ``kryptos_dh_xchg_ctx`` and a "oracle" function called ``kryptos_dh_process_stdxchg()``. I like to call it
 "oracle" because this function is smart enough to know the stage of the exchange process. This "oracle" behavior
-avoids the necessity of driving the process with different functions or explicit code.
+avoids the necessity of driving the process with different functions or more explicit code.
 
 The calls ``kryptos_init_dh_xchg_ctx()`` and ``kryptos_clear_dh_xchg_ctx()`` are always needed. The first obviously initializes
 the related structures and the second frees any allocated memory inside them.
@@ -922,7 +922,7 @@ int main(int argc, char **argv) {
     // INFO(Rafael): Bob defines the size in bits of his random secret value and then he makes a key pair
     //               based on p, g and s.
     //
-    //               Actually it will generate a fouth value t what should be published by him.
+    //               Actually it will generate a fourth value t what should be published by him.
 
     bob->s_bits = 160;
 
@@ -1035,7 +1035,7 @@ communication that could be hijacked by some attacker. As a result this mitigate
 Actually, we have only one data exchange during the key agreement and the public part of the generated key can be of
 knowledge of anyone, there is no problem with that.
 
-Until now a show you DHKE sample using standarnized MODP values but kryptos also includes a way of generating your own
+Until now I show you DHKE sample using standarnized MODP values but kryptos also includes a way of generating your own
 domain parameters. The following sample is a program that can generate those domain parameters.
 
 ```c
@@ -1121,17 +1121,67 @@ respectively:
 Watson@221B:~/src/kryptos-test/samples# ./dh-domain-params-sample 160 80 > params.txt
 ```
 
-Once generated the parameters can be used insted of the standarnized MODP values. Of course that use p=160 bits and q=80 is
+Once generated the parameters can be used instead of the standarnized MODP values. Of course that use p=160 bits and q=80 is
 pretty insecure. The domain parameters calculating process can be slow. Since it depends on finding primes with specific
-relations between them. It is driven by luck... Fortunatelly, you should do it once.
+relations between them. It is driven by luck, it can take 15 minutes or 2/3 hours... Fortunatelly, you should do it once.
 
 In practice you should use at least p=1024 and q=160 bits.
 
 The domain parameters are exported as a ``PEM`` buffer. When receving a ``PEM`` buffer containing DHKE domain parameters
-a best practice is to verify if these parameters are really "trustable" before accepting and starting using them.
+a best practice is to verify if those parameters are really "trustable" before accepting and starting using them.
+
+The code below shows how to verify the values inside a ``PEM`` buffer.
 
 ```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char **argv) {
+    kryptos_u8_t *domain_params = "-----BEGIN DH PARAM P-----\n"
+                                  "VSsW7ufPMgFn+MceQyQHgBtpq/q/"
+                                  "xLAZ00q/hRh8Of7Wvto1lsS6iBWs"
+                                  "mz4mYiSiOiPZkv6asUoBF8JhxMs4"
+                                  "LHEGaTV0uiRzIPxOABkXDGUnXjwd"
+                                  "EfpwkG3H+EuZK9fINggkkS+cxJ+P"
+                                  "DwkaoMgpwZEZj+ieeeOSnZgKuvaN"
+                                  "pVQ=\n"
+                                  "-----END DH PARAM P-----\n"
+                                  "-----BEGIN DH PARAM Q-----\n"
+                                  "Xdy01wlOrsxucvEv7bz+7VBT9X0=\n"
+                                  "-----END DH PARAM Q-----\n"
+                                  "-----BEGIN DH PARAM G-----\n"
+                                  "PdxLwCCBNeXR4EnVZb30SOHClBpr"
+                                  "bfJkZs3WHyct4mbI71Yo6tqFLXZZ"
+                                  "ozZCnP9ijWpsfz9qsfrcifcixEb0"
+                                  "Ewd+Xf3ne3sHVrFwC/VLCAAi1Ccc"
+                                  "a4GqzyO5juyIdjn2Bx8hWvV4E0G0"
+                                  "jgP58tlcjSNYP2lJj7TGafmyom44"
+                                  "Zxg=\n"
+                                  "-----END DH PARAM G-----\n";
+    int exit_code = 0;
+
+    printf("I'm verifying the following DH domain parameters...\n\n%s\n", domain_params);
+
+    printf("Wait...\n");
+
+    if (kryptos_dh_verify_domain_params(domain_params, strlen(domain_params)) == kKryptosSuccess) {
+        printf("INFO: The domain parameters are valid!\n");
+    } else {
+        printf("ERROR: Invalid domain parameters!\n");
+        exit_code = 1;
+    }
+
+    return exit_code;
+}
 ```
 
-You should avoid using any domain parameters rejected by the verifying function.
+You really should avoid using any domain parameters rejected by the verifying function.
 
