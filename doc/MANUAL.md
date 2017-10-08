@@ -1358,3 +1358,9 @@ parameter buffer does not contain the Q parameter. However be aware that a ``PEM
 implies in an unverified domain parameters buffer. The verifying function cannot ascertain anything without Q.
 Due to it you may be using small groups on your DHKE stuff. Maybe who have generated the used P and G values was naive or
 malicious. Accept domain parameters like these at your own risk.
+
+Well, I think that we are done with DHKE. For awhile let's forget a little about discrete logarithm cryptosystems and dive
+into RSA available stuff...
+
+### RSA
+
