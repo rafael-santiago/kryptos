@@ -1448,5 +1448,41 @@ anymore, because the buffers were allocated by the ``kryptos_rsa_mk_key_pair()``
 Notice that the process of finding primes can be slow, so the key pair making operation will become slow for greater
 key sizes. Fortunatelly, you should do it once.
 
+For example in a 32-bit smp the following code runned using the following command line:
+
+```
+Lestrade@221B:~/src/kryptos-test/src/samples# ../../samples/rsa-mk-key-pair-sample 2048
+```
+
+Tooks ~42/43 minutes to generate this key pair:
+
+```
+*** Public key:
+
+-----BEGIN RSA PARAM N-----
+s9aTg1yS/b0cioPBdaFxwlbXFT0qDjx0aaM6QmImGMfSqg1ycAloDg2d/kP8M8qndrzdX3cOepuoKkGB6iSsMMS8otBSRve8Px5q3woN79T41r1Al9PvW0lIPi+o
+BtNcVOqKCeUlObfzxZecKm2jS+0mcWG+9hSuxl9A9EBxX4APcLUyVRDpX5VLe/IWJL0UzsWZB25FnED1FcqOHRQslDYimFVfnBv6UCU3E+/XfZInpxZ9yvntspV8
+ebuxHOgxKaUgDEfb985yUaRx9ZQfhtDM600nH0PaW4pdOV/BXoVmioO2bM/Rmwkth3/SMgcmjHRIDrsDl+415Rbc+upTDw==
+-----END RSA PARAM N-----
+-----BEGIN RSA PARAM E-----
+b5ZwnpaLpdIdqDv3OLKfKSmGYm1YNwoU+4wsNZaSATDs7HcsH9gUEKykuxMe7aypsuNuzyxNaM+jOGRfMcC5W+7YQJolurDZw9UV1WFdH0RtstcQpZDp/x0/ZcXC
+DBOK0qjoalL43C2+Hpcw6iaRjrtPGWksWAk6feWe/fAjdZaxA6+jUjHdcMP064dpDhv188WfjkvXkvZkM5A/aUm+sQsc0QDzPeKI37TNrVL2RfoJadeTxyoOERy8
+DX973UevG8oFptfJbTE5QSWn+gln6LA/cCaW07TGQpeZ917BibntPDDrenOw+Ox8wN1yTCVx3+tYL4amoEjaxvevM+SgBQ==
+-----END RSA PARAM E-----
+
+*** Private key:
+
+-----BEGIN RSA PARAM N-----
+s9aTg1yS/b0cioPBdaFxwlbXFT0qDjx0aaM6QmImGMfSqg1ycAloDg2d/kP8M8qndrzdX3cOepuoKkGB6iSsMMS8otBSRve8Px5q3woN79T41r1Al9PvW0lIPi+o
+BtNcVOqKCeUlObfzxZecKm2jS+0mcWG+9hSuxl9A9EBxX4APcLUyVRDpX5VLe/IWJL0UzsWZB25FnED1FcqOHRQslDYimFVfnBv6UCU3E+/XfZInpxZ9yvntspV8
+ebuxHOgxKaUgDEfb985yUaRx9ZQfhtDM600nH0PaW4pdOV/BXoVmioO2bM/Rmwkth3/SMgcmjHRIDrsDl+415Rbc+upTDw==
+-----END RSA PARAM N-----
+-----BEGIN RSA PARAM D-----
+DxId/jUln36fB1XhFEtLf8d30+A6Sznf9rU923pkUqK7h34TuyuwmKHumOlLXCGwGpzldMu2J+t6gP3WmTjuKNIHfq/BBd6G6Qh2aDeh4hdg+Iz0Y377NV6mXqDh
+XELrs0oGBfsn0rARQV5rbugY2MqAttYhYf3hBDbTjkv20K4kqb1uKS++/M3UlE/n3pbs5O50SLV0uCgwzkmVZ3ii4k316hXc1wua9NnvVgALl1vXdVkpJo7mqQaB
+rSDKhgvovKWnpt4NjIJRXkX1IgF0n1lUp1ph1A5Mm8NJMiCwNn/LiIuw3nhUDOxD4U3U5Raj6lsWHu5edzYetSfSrSwHDw==
+-----END RSA PARAM D-----
+```
+
 With the key pair well-generated is time to know how to use it in order to encrypt and decrypt some data.
 
