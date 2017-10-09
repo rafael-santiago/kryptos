@@ -142,7 +142,7 @@ This isn't:
 
 ### "Strings" terminator
 
-``0`` <- This is a "string" terminator. But try not to be dependent of them, if you can pass the amount of bytes, pass it!
+``0`` <- This is a "string" terminator. But try not to be dependent of it, if you can pass the amount of bytes, pass it!
 
 ### Gotos
 
