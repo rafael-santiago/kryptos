@@ -2,7 +2,7 @@
 
 **Abstract**: This library was designed to be used in user mode applications and also in kernel mode. The following
 sections will guide the readers through the main aspects of how to use ``kryptos`` in their own stuff. This documentation
-considers that the readers have at least a minimal formal knowledge of cryptology.
+considers that the readers have at least a minimal formal knowledge of modern cryptography.
 
 ## Link101
 
@@ -1035,7 +1035,7 @@ communication that could be hijacked by some attacker. As a result this mitigate
 Actually, we have only one data exchange during the key agreement and the public part of the generated key can be of
 knowledge of anyone, there is no problem with that.
 
-Until now I show you DHKE sample using standarnized MODP values but kryptos also includes a way of generating your own
+Until now I show you DHKE samples using standarnized MODP values but kryptos also includes a way of generating your own
 domain parameters. The following sample is a program that can generate those domain parameters.
 
 ```c
@@ -1114,7 +1114,7 @@ static int is_valid_number(const char *number, const size_t number_size) {
 }
 ```
 
-In order to generate domain DHKE parameters with the code shown above you should inform the size in bits of P and Q
+In order to generate DHKE domain parameters with the code shown above you should inform the size in bits of P and Q
 respectively:
 
 ```
@@ -1363,4 +1363,90 @@ Well, I think that we have done with DHKE. For awhile let's forget a little abou
 into RSA available stuff...
 
 ### RSA
+
+The best way of introducing the usage of ``RSA`` in kryptos is by showing you how to generate the key pair.
+
+Well, the following code shows the way:
+
+```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <ctype.h>
+#include <stdio.h>
+
+static int is_valid_number(const char *number, const size_t number_size);
+
+int main(int argc, char **argv) {
+    kryptos_u8_t *k_priv = NULL, *k_pub = NULL;
+    size_t k_priv_size = 0, k_pub_size = 0;
+    int exit_code = 0;
+
+    if (argc > 1 && is_valid_number(argv[1], strlen(argv[1]))) {
+        if (kryptos_rsa_mk_key_pair(atoi(argv[1]),
+                                    &k_pub, &k_pub_size,
+                                    &k_priv, &k_priv_size) == kKryptosSuccess) {
+            // INFO(Rafael): This is just for demo issues, the best here would be
+            //               save the k_pub and k_priv buffers to separated files
+            //               for a later usage. Duh! :)
+            printf("*** Public key:\n\n");
+            printf("%s\n", k_pub);
+            printf("*** Private key:\n\n");
+            printf("%s\n", k_priv);
+        } else {
+            printf("ERROR: while generating the key pair.\n");
+            exit_code = 1;
+        }
+    } else {
+        printf("use: %s <key size in bits>\n", argv[0]);
+        exit_code = 1;
+    }
+
+    if (k_priv != NULL) {
+        kryptos_freeseg(k_priv);
+    }
+
+    if (k_pub != NULL) {
+        kryptos_freeseg(k_pub);
+    }
+
+    return exit_code;
+}
+
+static int is_valid_number(const char *number, const size_t number_size) {
+    const char *np, *np_end;
+
+    if (number == NULL) {
+        return 0;
+    }
+
+    np = number;
+    np_end = np + number_size;
+
+    while (np != np_end) {
+        if (!isdigit(*np)) {
+            return 0;
+        }
+        np++;
+    }
+
+    return 1;
+}
+```
+
+The function ``kryptos_rsa_mk_key_pair()`` does the job, it receives the key size (in bits), a (kryptos_u8_t **) for
+the public key buffer, a pointer to store the public key size, a (kryptos_u8_t **) for the private key buffer, a
+pointer to store the private key size. If the function succeeds it returns ``kKryptosSuccess``. Once generated
+all that you should do is store the output data in somewhere for later usage. Free the key pair data when not necessary
+anymore, because the buffers were allocated by the ``kryptos_rsa_mk_key_pair()`` function.
+
+Notice that the process of finding primes can be slow, so the key pair making operation will become slow for greater
+key sizes. Fortunatelly, you should do it once.
+
+With the key pair well-generated is time to know how to use it in order to encrypt and decrypt some data.
 
