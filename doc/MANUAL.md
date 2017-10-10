@@ -1443,46 +1443,287 @@ The function ``kryptos_rsa_mk_key_pair()`` does the job, it receives the key siz
 the public key buffer, a pointer to store the public key size, a (kryptos_u8_t **) for the private key buffer, a
 pointer to store the private key size. If the function succeeds it returns ``kKryptosSuccess``. Once generated
 all that you should do is store the output data in somewhere for later usage. Free the key pair data when not necessary
-anymore, because the buffers were allocated by the ``kryptos_rsa_mk_key_pair()`` function.
+anymore, because the buffers were allocated by the ``kryptos_rsa_mk_key_pair()`` function, do not be sloppy! :)
 
-Notice that the process of finding primes can be slow, so the key pair making operation will become slow for greater
+Notice that the process of finding primes can be slow, so the key pair producing will become slow for greater
 key sizes. Fortunatelly, you should do it once.
 
-For example in a 32-bit smp the following code runned using the following command line:
+For example in a 32-bit SMP, the following code runned using the following command line:
 
 ```
 Lestrade@221B:~/src/kryptos-test/src/samples# ../../samples/rsa-mk-key-pair-sample 2048
 ```
 
-Tooks ~42/43 minutes to generate this key pair:
+It tooks about 42, 43 minutes to generate this key pair:
 
 ```
 *** Public key:
 
 -----BEGIN RSA PARAM N-----
-s9aTg1yS/b0cioPBdaFxwlbXFT0qDjx0aaM6QmImGMfSqg1ycAloDg2d/kP8M8qndrzdX3cOepuoKkGB6iSsMMS8otBSRve8Px5q3woN79T41r1Al9PvW0lIPi+o
-BtNcVOqKCeUlObfzxZecKm2jS+0mcWG+9hSuxl9A9EBxX4APcLUyVRDpX5VLe/IWJL0UzsWZB25FnED1FcqOHRQslDYimFVfnBv6UCU3E+/XfZInpxZ9yvntspV8
-ebuxHOgxKaUgDEfb985yUaRx9ZQfhtDM600nH0PaW4pdOV/BXoVmioO2bM/Rmwkth3/SMgcmjHRIDrsDl+415Rbc+upTDw==
+s9aTg1yS/b0cioPBdaFxwlbXFT0qDjx0aaM6QmImGMfSqg1ycAloDg2d/kP8M8qndrzdX3cOepuoKkGB6iSsMMS8otBSRve8Px5q3woN79T4
+1r1Al9PvW0lIPi+oBtNcVOqKCeUlObfzxZecKm2jS+0mcWG+9hSuxl9A9EBxX4APcLUyVRDpX5VLe/IWJL0UzsWZB25FnED1FcqOHRQslDYi
+mFVfnBv6UCU3E+/XfZInpxZ9yvntspV8ebuxHOgxKaUgDEfb985yUaRx9ZQfhtDM600nH0PaW4pdOV/BXoVmioO2bM/Rmwkth3/SMgcmjHRI
+DrsDl+415Rbc+upTDw==
 -----END RSA PARAM N-----
 -----BEGIN RSA PARAM E-----
-b5ZwnpaLpdIdqDv3OLKfKSmGYm1YNwoU+4wsNZaSATDs7HcsH9gUEKykuxMe7aypsuNuzyxNaM+jOGRfMcC5W+7YQJolurDZw9UV1WFdH0RtstcQpZDp/x0/ZcXC
-DBOK0qjoalL43C2+Hpcw6iaRjrtPGWksWAk6feWe/fAjdZaxA6+jUjHdcMP064dpDhv188WfjkvXkvZkM5A/aUm+sQsc0QDzPeKI37TNrVL2RfoJadeTxyoOERy8
-DX973UevG8oFptfJbTE5QSWn+gln6LA/cCaW07TGQpeZ917BibntPDDrenOw+Ox8wN1yTCVx3+tYL4amoEjaxvevM+SgBQ==
+b5ZwnpaLpdIdqDv3OLKfKSmGYm1YNwoU+4wsNZaSATDs7HcsH9gUEKykuxMe7aypsuNuzyxNaM+jOGRfMcC5W+7YQJolurDZw9UV1WFdH0Rt
+stcQpZDp/x0/ZcXCDBOK0qjoalL43C2+Hpcw6iaRjrtPGWksWAk6feWe/fAjdZaxA6+jUjHdcMP064dpDhv188WfjkvXkvZkM5A/aUm+sQsc
+0QDzPeKI37TNrVL2RfoJadeTxyoOERy8DX973UevG8oFptfJbTE5QSWn+gln6LA/cCaW07TGQpeZ917BibntPDDrenOw+Ox8wN1yTCVx3+tY
+L4amoEjaxvevM+SgBQ==
 -----END RSA PARAM E-----
 
 *** Private key:
 
 -----BEGIN RSA PARAM N-----
-s9aTg1yS/b0cioPBdaFxwlbXFT0qDjx0aaM6QmImGMfSqg1ycAloDg2d/kP8M8qndrzdX3cOepuoKkGB6iSsMMS8otBSRve8Px5q3woN79T41r1Al9PvW0lIPi+o
-BtNcVOqKCeUlObfzxZecKm2jS+0mcWG+9hSuxl9A9EBxX4APcLUyVRDpX5VLe/IWJL0UzsWZB25FnED1FcqOHRQslDYimFVfnBv6UCU3E+/XfZInpxZ9yvntspV8
-ebuxHOgxKaUgDEfb985yUaRx9ZQfhtDM600nH0PaW4pdOV/BXoVmioO2bM/Rmwkth3/SMgcmjHRIDrsDl+415Rbc+upTDw==
+s9aTg1yS/b0cioPBdaFxwlbXFT0qDjx0aaM6QmImGMfSqg1ycAloDg2d/kP8M8qndrzdX3cOepuoKkGB6iSsMMS8otBSRve8Px5q3woN79T4
+1r1Al9PvW0lIPi+oBtNcVOqKCeUlObfzxZecKm2jS+0mcWG+9hSuxl9A9EBxX4APcLUyVRDpX5VLe/IWJL0UzsWZB25FnED1FcqOHRQslDYi
+mFVfnBv6UCU3E+/XfZInpxZ9yvntspV8ebuxHOgxKaUgDEfb985yUaRx9ZQfhtDM600nH0PaW4pdOV/BXoVmioO2bM/Rmwkth3/SMgcmjHRI
+DrsDl+415Rbc+upTDw==
 -----END RSA PARAM N-----
 -----BEGIN RSA PARAM D-----
-DxId/jUln36fB1XhFEtLf8d30+A6Sznf9rU923pkUqK7h34TuyuwmKHumOlLXCGwGpzldMu2J+t6gP3WmTjuKNIHfq/BBd6G6Qh2aDeh4hdg+Iz0Y377NV6mXqDh
-XELrs0oGBfsn0rARQV5rbugY2MqAttYhYf3hBDbTjkv20K4kqb1uKS++/M3UlE/n3pbs5O50SLV0uCgwzkmVZ3ii4k316hXc1wua9NnvVgALl1vXdVkpJo7mqQaB
-rSDKhgvovKWnpt4NjIJRXkX1IgF0n1lUp1ph1A5Mm8NJMiCwNn/LiIuw3nhUDOxD4U3U5Raj6lsWHu5edzYetSfSrSwHDw==
+DxId/jUln36fB1XhFEtLf8d30+A6Sznf9rU923pkUqK7h34TuyuwmKHumOlLXCGwGpzldMu2J+t6gP3WmTjuKNIHfq/BBd6G6Qh2aDeh4hdg
++Iz0Y377NV6mXqDhXELrs0oGBfsn0rARQV5rbugY2MqAttYhYf3hBDbTjkv20K4kqb1uKS++/M3UlE/n3pbs5O50SLV0uCgwzkmVZ3ii4k31
+6hXc1wua9NnvVgALl1vXdVkpJo7mqQaBrSDKhgvovKWnpt4NjIJRXkX1IgF0n1lUp1ph1A5Mm8NJMiCwNn/LiIuw3nhUDOxD4U3U5Raj6lsW
+Hu5edzYetSfSrSwHDw==
 -----END RSA PARAM D-----
 ```
 
 With the key pair well-generated is time to know how to use it in order to encrypt and decrypt some data.
 
+The following code shows the very basic usage of RSA cipher:
+
+```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+    kryptos_u8_t *k_pub_bob = "-----BEGIN RSA PARAM N-----\n"
+                              "s9aTg1yS/b0cioPBdaFxwlbXFT0qD"
+                              "jx0aaM6QmImGMfSqg1ycAloDg2d/k"
+                              "P8M8qndrzdX3cOepuoKkGB6iSsMMS"
+                              "8otBSRve8Px5q3woN79T41r1Al9Pv"
+                              "W0lIPi+oBtNcVOqKCeUlObfzxZecK"
+                              "m2jS+0mcWG+9hSuxl9A9EBxX4APcL"
+                              "UyVRDpX5VLe/IWJL0UzsWZB25FnED"
+                              "1FcqOHRQslDYimFVfnBv6UCU3E+/X"
+                              "fZInpxZ9yvntspV8ebuxHOgxKaUgD"
+                              "Efb985yUaRx9ZQfhtDM600nH0PaW4"
+                              "pdOV/BXoVmioO2bM/Rmwkth3/SMgc"
+                              "mjHRIDrsDl+415Rbc+upTDw==\n"
+                              "-----END RSA PARAM N-----\n"
+                              "-----BEGIN RSA PARAM E-----\n"
+                              "b5ZwnpaLpdIdqDv3OLKfKSmGYm1YN"
+                              "woU+4wsNZaSATDs7HcsH9gUEKykux"
+                              "Me7aypsuNuzyxNaM+jOGRfMcC5W+7"
+                              "YQJolurDZw9UV1WFdH0RtstcQpZDp"
+                              "/x0/ZcXCDBOK0qjoalL43C2+Hpcw6"
+                              "iaRjrtPGWksWAk6feWe/fAjdZaxA6"
+                              "+jUjHdcMP064dpDhv188WfjkvXkvZ"
+                              "kM5A/aUm+sQsc0QDzPeKI37TNrVL2"
+                              "RfoJadeTxyoOERy8DX973UevG8oFp"
+                              "tfJbTE5QSWn+gln6LA/cCaW07TGQp"
+                              "eZ917BibntPDDrenOw+Ox8wN1yTCV"
+                              "x3+tYL4amoEjaxvevM+SgBQ==\n"
+                              "-----END RSA PARAM E-----\n";
+
+    kryptos_u8_t *k_priv_bob = "-----BEGIN RSA PARAM N-----\n"
+                               "s9aTg1yS/b0cioPBdaFxwlbXFT0qD"
+                               "jx0aaM6QmImGMfSqg1ycAloDg2d/k"
+                               "P8M8qndrzdX3cOepuoKkGB6iSsMMS"
+                               "8otBSRve8Px5q3woN79T41r1Al9Pv"
+                               "W0lIPi+oBtNcVOqKCeUlObfzxZecK"
+                               "m2jS+0mcWG+9hSuxl9A9EBxX4APcL"
+                               "UyVRDpX5VLe/IWJL0UzsWZB25FnED"
+                               "1FcqOHRQslDYimFVfnBv6UCU3E+/X"
+                               "fZInpxZ9yvntspV8ebuxHOgxKaUgD"
+                               "Efb985yUaRx9ZQfhtDM600nH0PaW4"
+                               "pdOV/BXoVmioO2bM/Rmwkth3/SMgc"
+                               "mjHRIDrsDl+415Rbc+upTDw==\n"
+                               "-----END RSA PARAM N-----\n"
+                               "-----BEGIN RSA PARAM D-----\n"
+                               "DxId/jUln36fB1XhFEtLf8d30+A6S"
+                               "znf9rU923pkUqK7h34TuyuwmKHumO"
+                               "lLXCGwGpzldMu2J+t6gP3WmTjuKNI"
+                               "Hfq/BBd6G6Qh2aDeh4hdg+Iz0Y377"
+                               "NV6mXqDhXELrs0oGBfsn0rARQV5rb"
+                               "ugY2MqAttYhYf3hBDbTjkv20K4kqb"
+                               "1uKS++/M3UlE/n3pbs5O50SLV0uCg"
+                               "wzkmVZ3ii4k316hXc1wua9NnvVgAL"
+                               "l1vXdVkpJo7mqQaBrSDKhgvovKWnp"
+                               "t4NjIJRXkX1IgF0n1lUp1ph1A5Mm8"
+                               "NJMiCwNn/LiIuw3nhUDOxD4U3U5Ra"
+                               "j6lsWHu5edzYetSfSrSwHDw==\n"
+                               "-----END RSA PARAM D-----\n";
+
+    kryptos_u8_t *message = "This is weak!\x00\x00\x00";
+    size_t message_size = 16;
+    kryptos_task_ctx a, b, *alice = &a, *bob = &b;
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    printf("Message: %s\n\n", message);
+
+    alice->in = message;
+    alice->in_size = message_size;
+
+    kryptos_rsa_setup(alice, k_pub_bob, strlen(k_pub_bob));
+    kryptos_task_set_encrypt_action(alice);
+
+    kryptos_rsa_cipher(&alice);
+
+    if (!kryptos_last_task_succeed(alice)) {
+        printf("ERROR: while encrypting!\n");
+        exit(1);
+    }
+
+    printf("Ciphertext:\n\n%s\n", alice->out);
+
+    bob->in = alice->out;
+    bob->in_size = alice->out_size;
+
+    kryptos_rsa_setup(bob, k_priv_bob, strlen(k_priv_bob));
+    kryptos_task_set_decrypt_action(bob);
+
+    kryptos_rsa_cipher(&bob);
+
+    if (!kryptos_last_task_succeed(bob)) {
+        printf("ERROR: while decrypting!\n");
+        exit(1);
+    }
+
+    printf("Plaintext: %s\n", bob->out);
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+    return 0;
+}
+```
+
+The same code can be simplified using ``c99`` capabilities, take a look:
+
+```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+#if defined(KRYPTOS_C99)
+    kryptos_u8_t *k_pub_bob = "-----BEGIN RSA PARAM N-----\n"
+                              "s9aTg1yS/b0cioPBdaFxwlbXFT0qD"
+                              "jx0aaM6QmImGMfSqg1ycAloDg2d/k"
+                              "P8M8qndrzdX3cOepuoKkGB6iSsMMS"
+                              "8otBSRve8Px5q3woN79T41r1Al9Pv"
+                              "W0lIPi+oBtNcVOqKCeUlObfzxZecK"
+                              "m2jS+0mcWG+9hSuxl9A9EBxX4APcL"
+                              "UyVRDpX5VLe/IWJL0UzsWZB25FnED"
+                              "1FcqOHRQslDYimFVfnBv6UCU3E+/X"
+                              "fZInpxZ9yvntspV8ebuxHOgxKaUgD"
+                              "Efb985yUaRx9ZQfhtDM600nH0PaW4"
+                              "pdOV/BXoVmioO2bM/Rmwkth3/SMgc"
+                              "mjHRIDrsDl+415Rbc+upTDw==\n"
+                              "-----END RSA PARAM N-----\n"
+                              "-----BEGIN RSA PARAM E-----\n"
+                              "b5ZwnpaLpdIdqDv3OLKfKSmGYm1YN"
+                              "woU+4wsNZaSATDs7HcsH9gUEKykux"
+                              "Me7aypsuNuzyxNaM+jOGRfMcC5W+7"
+                              "YQJolurDZw9UV1WFdH0RtstcQpZDp"
+                              "/x0/ZcXCDBOK0qjoalL43C2+Hpcw6"
+                              "iaRjrtPGWksWAk6feWe/fAjdZaxA6"
+                              "+jUjHdcMP064dpDhv188WfjkvXkvZ"
+                              "kM5A/aUm+sQsc0QDzPeKI37TNrVL2"
+                              "RfoJadeTxyoOERy8DX973UevG8oFp"
+                              "tfJbTE5QSWn+gln6LA/cCaW07TGQp"
+                              "eZ917BibntPDDrenOw+Ox8wN1yTCV"
+                              "x3+tYL4amoEjaxvevM+SgBQ==\n"
+                              "-----END RSA PARAM E-----\n";
+
+    kryptos_u8_t *k_priv_bob = "-----BEGIN RSA PARAM N-----\n"
+                               "s9aTg1yS/b0cioPBdaFxwlbXFT0qD"
+                               "jx0aaM6QmImGMfSqg1ycAloDg2d/k"
+                               "P8M8qndrzdX3cOepuoKkGB6iSsMMS"
+                               "8otBSRve8Px5q3woN79T41r1Al9Pv"
+                               "W0lIPi+oBtNcVOqKCeUlObfzxZecK"
+                               "m2jS+0mcWG+9hSuxl9A9EBxX4APcL"
+                               "UyVRDpX5VLe/IWJL0UzsWZB25FnED"
+                               "1FcqOHRQslDYimFVfnBv6UCU3E+/X"
+                               "fZInpxZ9yvntspV8ebuxHOgxKaUgD"
+                               "Efb985yUaRx9ZQfhtDM600nH0PaW4"
+                               "pdOV/BXoVmioO2bM/Rmwkth3/SMgc"
+                               "mjHRIDrsDl+415Rbc+upTDw==\n"
+                               "-----END RSA PARAM N-----\n"
+                               "-----BEGIN RSA PARAM D-----\n"
+                               "DxId/jUln36fB1XhFEtLf8d30+A6S"
+                               "znf9rU923pkUqK7h34TuyuwmKHumO"
+                               "lLXCGwGpzldMu2J+t6gP3WmTjuKNI"
+                               "Hfq/BBd6G6Qh2aDeh4hdg+Iz0Y377"
+                               "NV6mXqDhXELrs0oGBfsn0rARQV5rb"
+                               "ugY2MqAttYhYf3hBDbTjkv20K4kqb"
+                               "1uKS++/M3UlE/n3pbs5O50SLV0uCg"
+                               "wzkmVZ3ii4k316hXc1wua9NnvVgAL"
+                               "l1vXdVkpJo7mqQaBrSDKhgvovKWnp"
+                               "t4NjIJRXkX1IgF0n1lUp1ph1A5Mm8"
+                               "NJMiCwNn/LiIuw3nhUDOxD4U3U5Ra"
+                               "j6lsWHu5edzYetSfSrSwHDw==\n"
+                               "-----END RSA PARAM D-----\n";
+
+    kryptos_u8_t *message = "This is shorter but still weak!\x00";
+    size_t message_size = 32;
+    kryptos_task_ctx a, b, *alice = &a, *bob = &b;
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    printf("Message: %s\n\n", message);
+
+    kryptos_task_set_in(alice, message, message_size);
+    kryptos_task_set_encrypt_action(alice);
+    kryptos_run_cipher(rsa, alice, k_pub_bob, strlen(k_pub_bob));
+
+    if (!kryptos_last_task_succeed(alice)) {
+        printf("ERROR: while encrypting!\n");
+        exit(1);
+    }
+
+    printf("Ciphertext:\n\n%s\n", alice->out);
+
+    kryptos_task_set_in(bob, alice->out, alice->out_size);
+    kryptos_task_set_decrypt_action(bob);
+    kryptos_run_cipher(rsa, bob, k_priv_bob, strlen(k_priv_bob));
+
+    if (!kryptos_last_task_succeed(bob)) {
+        printf("ERROR: while decrypting!\n");
+        exit(1);
+    }
+
+    printf("Plaintext: %s\n", bob->out);
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+    return 0;
+#else
+    printf("WARNING: libkryptos was compiled without C99 support.\n");
+    return 1;
+#endif
+}
+```
+
+These two samples should be actually used only for introductory issues, since the ``RSA`` as it is usually explained in many
+crypto books is a very weak system. One of the several weaknesses present is the fact of being a deterministic cryptosystem.
+It works as a block cipher in ``ECB`` mode. It always produces the same result for the same input. In practice the
+"schoolbook RSA" is a naive approach and should be avoided.
