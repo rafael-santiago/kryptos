@@ -1443,18 +1443,18 @@ The function ``kryptos_rsa_mk_key_pair()`` does the job, it receives the key siz
 the public key buffer, a pointer to store the public key size, a (kryptos_u8_t **) for the private key buffer, a
 pointer to store the private key size. If the function succeeds it returns ``kKryptosSuccess``. Once generated
 all that you should do is store the output data in somewhere for later usage. Free the key pair data when not necessary
-anymore, because the buffers were allocated by the ``kryptos_rsa_mk_key_pair()`` function, do not be sloppy! :)
+anymore, because the buffers were allocated by the ``kryptos_rsa_mk_key_pair()`` function. Do not be sloppy! :)
 
 Notice that the process of finding primes can be slow, so the key pair producing will become slow for greater
 key sizes. Fortunatelly, you should do it once.
 
-For example in a 32-bit SMP, the following code runned using the following command line:
+For example in a 32-bit SMP, the code above executed using the following command line:
 
 ```
 Lestrade@221B:~/src/kryptos-test/src/samples# ../../samples/rsa-mk-key-pair-sample 2048
 ```
 
-It tooks about 42, 43 minutes to generate this key pair:
+Took about 42, 43 minutes to generate this key pair:
 
 ```
 *** Public key:
