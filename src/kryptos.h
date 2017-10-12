@@ -434,6 +434,8 @@ kryptos_ ## label_name:\
     kryptos_perform_digsig_proto_action(cname, verify, ktask, cipher_args);\
 }
 
+#define kryptos_oaep_hash(hname) kryptos_ ## hname ## _hash, kryptos_ ## hname ## _hash_size
+
 #endif // KRYPTOS_C99
 
 #endif // KRYPTOS_KRYPTOS_H

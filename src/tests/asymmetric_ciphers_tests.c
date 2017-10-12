@@ -1522,7 +1522,7 @@ CUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
 
     kryptos_task_set_decrypt_action(a_ktask);
     kryptos_run_cipher(rsa_oaep, a_ktask, k_priv_alice, strlen(k_priv_alice), l, &l_size,
-                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+                       kryptos_oaep_hash(sha1));
 
     CUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 1);
 
@@ -1549,7 +1549,7 @@ CUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
     printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 
     kryptos_run_cipher(rsa_oaep, b_ktask, k_pub_alice, strlen(k_pub_alice), l, &l_size,
-                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+                       kryptos_oaep_hash(sha1));
 
     CUTE_ASSERT(kryptos_last_task_succeed(b_ktask) == 1);
 
@@ -1569,7 +1569,7 @@ CUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
 
     kryptos_task_set_decrypt_action(a_ktask);
     kryptos_run_cipher(rsa_oaep, a_ktask, k_priv_alice, strlen(k_priv_alice), l, &l_size,
-                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+                       kryptos_oaep_hash(sha1));
 
     CUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 0);
 
@@ -2051,8 +2051,7 @@ CUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
     kryptos_task_set_encrypt_action(bob);
     kryptos_run_cipher(elgamal_oaep, bob,
                        k_pub_alice, strlen(k_pub_alice),
-                       label, &label_size,
-                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+                       label, &label_size, kryptos_oaep_hash(sha1));
 
     CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
     CUTE_ASSERT(bob->out != NULL);
@@ -2063,8 +2062,7 @@ CUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
     kryptos_task_set_decrypt_action(alice);
     kryptos_run_cipher(elgamal_oaep, alice,
                        k_priv_alice, strlen(k_priv_alice),
-                       label, &label_size,
-                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+                       label, &label_size, kryptos_oaep_hash(sha1));
 
     CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     CUTE_ASSERT(alice->out != NULL);
@@ -2087,8 +2085,7 @@ CUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
     kryptos_task_set_encrypt_action(bob);
     kryptos_run_cipher(elgamal_oaep, bob,
                        k_pub_alice, strlen(k_pub_alice),
-                       label, &label_size,
-                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+                       label, &label_size, kryptos_oaep_hash(sha1));
 
     CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
     CUTE_ASSERT(bob->out != NULL);
@@ -2104,8 +2101,7 @@ CUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
     kryptos_task_set_decrypt_action(alice);
     kryptos_run_cipher(elgamal_oaep, alice,
                        k_priv_alice, strlen(k_priv_alice),
-                       label, &label_size,
-                       kryptos_sha1_hash, kryptos_sha1_hash_size);
+                       label, &label_size, kryptos_oaep_hash(sha1));
 
     CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
 
