@@ -1961,7 +1961,7 @@ In order to generate the sample key pair used in Elgamal stuff here I used the f
 MsHudson@221B:~/src/kryptos-test/src/samples# ../../samples/elgamal-mk-key-pair-sample 1024 160
 ```
 
-It tooks me about 90/91 minutes in a SMP 32-bit environment.
+It took me about 90/91 minutes in a SMP 32-bit environment.
 
 According to the code shown above, it uses the function ``kryptos_elgamal_mk_key_pair()`` to generate
 the Elgamal key pair. The arguments are: the P parameter size, the Q parameter size, a pointer to the public buffer,
