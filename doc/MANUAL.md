@@ -2180,3 +2180,13 @@ If you pass the hash function and the hash function size as NULL pointers, inter
                        NULL /*NULL hash function*/,
                        NULL /*NULL hash size function*/);
 ```
+
+Now is time to talk about digital signature.
+
+### Digital signature
+
+Until now there are two digital signature algorithms implemented: ``RSA`` and ``DSA``.
+
+#### RSA
+
+#### DSA
