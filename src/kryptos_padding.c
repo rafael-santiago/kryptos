@@ -208,7 +208,6 @@ kryptos_u8_t *kryptos_apply_oaep_padding(const kryptos_u8_t *buffer, size_t *buf
     } else {
         // WARN(Rafael): Too long buffer it will be larger than the modulus byte size.
         ps_size = 0;
-        printf("booo!\n");
         goto kryptos_apply_oaep_padding_epilogue;
     }
 
