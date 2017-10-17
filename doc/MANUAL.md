@@ -2174,7 +2174,7 @@ label and also a NULL label size internally the OAEP padding function will use a
 If you pass the hash function and the hash function size as NULL pointers, internally the OAEP padding function will use
 ``SHA1`` to do the hashing stuff. Something like:
 
-```
+```c
     kryptos_run_cipher(elgamal_oaep, alice, k_pub, strlen(k_pub),
                        label, NULL,
                        NULL /*NULL hash function*/,
