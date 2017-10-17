@@ -2176,5 +2176,7 @@ If you pass the hash function and the hash function size as NULL pointers, inter
 
 ```
     kryptos_run_cipher(elgamal_oaep, alice, k_pub, strlen(k_pub),
-                       label, NULL, kryptos_oaep_hash(sha384));
+                       label, NULL,
+                       NULL /*NULL hash function*/,
+                       NULL /*NULL hash size function*/);
 ```
