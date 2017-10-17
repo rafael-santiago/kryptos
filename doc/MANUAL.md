@@ -2169,7 +2169,7 @@ epilogue:
 ```
 
 The sample code shown above introduces a interesting thing about ciphers with support to OAEP padding. If you pass a NULL
-label and also a NULL label size internally the OAEP padding function will use a empty string as a label.
+label and also a NULL label size, internally the OAEP padding function will use an empty string as a label.
 
 If you pass the hash function and the hash function size as NULL pointers, internally the OAEP padding function will use
 ``SHA1`` to do the hashing stuff. Something like:
