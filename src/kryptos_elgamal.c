@@ -291,7 +291,7 @@ void kryptos_elgamal_oaep_cipher(kryptos_task_ctx **ktask) {
         old_in_size = (*ktask)->in_size;
 
         temp = kryptos_apply_oaep_padding((*ktask)->in, &(*ktask)->in_size, kryptos_mp_byte2bit(p->data_size) >> 3,
-                                          (*ktask)->arg[0], *(size_t *)(*ktask)->arg[1],
+                                          (*ktask)->arg[0], (*ktask)->arg[1] != NULL ? *(size_t *)(*ktask)->arg[1] : 0,
                                           (kryptos_hash_func)(*ktask)->arg[2], (kryptos_hash_size_func)(*ktask)->arg[3]);
 
         if (temp == NULL) {
@@ -309,7 +309,8 @@ void kryptos_elgamal_oaep_cipher(kryptos_task_ctx **ktask) {
             temp = (*ktask)->out;
 
             (*ktask)->out = kryptos_drop_oaep_padding(temp, &(*ktask)->out_size, kryptos_mp_byte2bit(p->data_size) >> 3,
-                                                      (*ktask)->arg[0], *(size_t *)(*ktask)->arg[1],
+                                                      (*ktask)->arg[0],
+                                                      (*ktask)->arg[1] != NULL ? *(size_t *)(*ktask)->arg[1] : 0,
                                                       (kryptos_hash_func)(*ktask)->arg[2],
                                                       (kryptos_hash_size_func)(*ktask)->arg[3]);
 
