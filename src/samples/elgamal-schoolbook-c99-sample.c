@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 int main(int argc, char **argv) {
+#if defined(KRYPTOS_C99)
     kryptos_u8_t *k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
                           "VRdEtMLDjy6jSMKvM83QDgAR1Y/2ZI9"
                           "rDvT4nmFFBoV9/0q5HA+29b3V54aBOv"
@@ -89,4 +90,9 @@ epilogue:
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
 
     return exit_code;
+#else
+    printf("WARNING: libkryptos was compiled without C99 support.\n");
+    return 1;
+#endif
+
 }
