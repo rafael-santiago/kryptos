@@ -1847,3 +1847,222 @@ int main(int argc, char **argv) {
 #endif
 }
 ```
+
+I am assuming that the reader has previously knowledge about how ``OAEP`` padding works.
+
+Thus, the ``RSA OAEP`` should receive the key and its size and also a label and the size of this label and a pointer to a hash
+function and a pointer to a hash function size.
+
+In kryptos any available hash function is named by using this format: ``kryptos_<HASHID>_hash``.
+
+The hash size function is named by using this format: ``kryptos_<HASHID>_hash_size``.
+
+The ``HASHID`` can be found in **Table 4**.
+
+The macro ``kryptos_oaep_hash()`` is a way of making easier the function parameters passing. All that you should do with
+this macro is to pass the ``HASHID`` of the desired hash algorithm to be used in the OAEP stuff.
+
+Then now with those tips I hope that the following code snippet becomes clearer to you:
+
+```c
+    kryptos_run_cipher(rsa_oaep, bob, k_priv_bob, strlen(k_priv_bob), label, &label_size,
+                       kryptos_oaep_hash(sha1));
+```
+
+### Elgamal
+
+The Elgamal encryption is available in kryptos in two modes: the schoolbook mode and with OAEP padding.
+
+As you may know the Elgamal is a probabilistic cryptosystem so the schoolbook mode is stronger than the RSA schoolbook.
+
+The key pair generating can take several minutes since it is driven by luck... This process can be time consuming due to it
+go read a book, walk the dog, jog, wash the dishes and so come back later... the following code is capable of generating
+the key pair buffers for Elgamal:
+
+```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <stdio.h>
+
+static int is_valid_number(const char *number, const size_t number_size);
+
+int main(int argc, char **argv) {
+    size_t p_bits, q_bits;
+    kryptos_u8_t *k_pub = NULL, *k_priv = NULL;
+    size_t k_pub_size, k_priv_size;
+    int exit_code = 0;
+
+    if (argc > 2) {
+        if (!is_valid_number(argv[1], strlen(argv[1])) ||
+            !is_valid_number(argv[2], strlen(argv[2]))) {
+            goto usage;
+        }
+
+        if (kryptos_elgamal_mk_key_pair(atoi(argv[1]), atoi(argv[2]),
+                                        &k_pub, &k_pub_size,
+                                        &k_priv, &k_priv_size) == kKryptosSuccess) {
+            printf("Public key:\n");
+            printf("\n%s\n", k_pub);
+            printf("Private key:\n");
+            printf("\n%s\n", k_priv);
+        } else {
+            printf("ERROR: while making the key pair.\n");
+            exit_code = 1;
+        }
+    } else {
+usage:
+        printf("use: %s <p size in bits> <q size in bits>\n", argv[0]);
+        exit_code = 1;
+    }
+
+    if (k_pub != NULL) {
+        kryptos_freeseg(k_pub);
+    }
+
+    if (k_priv != NULL) {
+        kryptos_freeseg(k_priv);
+    }
+
+    return exit_code;
+}
+
+static int is_valid_number(const char *number, const size_t number_size) {
+    const char *np, *np_end;
+
+    if (number == NULL || number_size == 0) {
+        return 0;
+    }
+
+    np = number;
+    np_end = np + number_size;
+
+    while (np != np_end) {
+        if (!isdigit(*np)) {
+            return 0;
+        }
+        np++;
+    }
+
+    return 1;
+}
+```
+
+In order to generate the sample key pair used in Elgamal stuff here I used the following command line:
+
+```
+MsHudson@221B:~/src/kryptos-test/src/samples# ../../samples/elgamal-mk-key-pair-sample 1024 160
+```
+
+It tooks me about 90/91 minutes.
+
+According to the code shown above, it uses the function ``kryptos_elgamal_mk_key_pair()`` to generate
+the Elgamal key pair. The arguments are: the P parameter size, the Q parameter size, a pointer to the public buffer,
+a pointer to store the size of the public buffer, a pointer to the private buffer and a pointer to store the size of the
+private buffer. When the function succeeds it returns ``kKryptosSuccess``.
+
+For brevity I will so you only the ``c99`` applications of the Elgamal in kryptos. The ``raw`` usage mode without ``c99``
+conveniences is similar to ``RSA``, I find you can figure it out by yourself. Thus, this is the way of using the
+Elgamal schoolbook with ``c99``:
+
+```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+    kryptos_u8_t *k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
+                          "VRdEtMLDjy6jSMKvM83QDgAR1Y/2ZI9"
+                          "rDvT4nmFFBoV9/0q5HA+29b3V54aBOv"
+                          "G2Z31lqsfTWldx8AEnfs7N6gOlNmHC4"
+                          "xoST0rv/80gjdb+Kc+LWQAjmsSpdWBJ"
+                          "ZiAeBX7nZ4yyDFbFTTFiLvYwRj48YSr"
+                          "KWnA7aJQwwcSLtQQ=\n"
+                          "-----END ELGAMAL PARAM P-----\n"
+                          "-----BEGIN ELGAMAL PARAM Q-----\n"
+                          "SXShpt+AsZ2nSsm6W+sxh3wVqFY=\n"
+                          "-----END ELGAMAL PARAM Q-----\n"
+                          "-----BEGIN ELGAMAL PARAM G-----\n"
+                          "RiMRb7ClUb6s0ibMlVIlpHA6uXTyZ4J"
+                          "xwzKsNKpMNibCWurQMiW728/mh9krRL"
+                          "1a1rxt0G0ZQJWKBbFbZxGoDOZQW1ltO"
+                          "sJaibQBZ1WELtnN8HI581nJ3Np0sGXn"
+                          "1CvsWm9CuCBroLCpFAVKDJFIwcdSZmD"
+                          "KHPd/aworRwZANAQ=\n"
+                          "-----END ELGAMAL PARAM G-----\n"
+                          "-----BEGIN ELGAMAL PARAM B-----\n"
+                          "mdIQuCFoT4nscK6AcpfkY0cCWmrVHGm"
+                          "UTM3SDL3K0+0mFG6JkhhM0BcI3C7leH"
+                          "UdMW6RD8vYq7qjcsGil6rNu1Ur4MQtw"
+                          "0jtZhxYT8CQAJ0oH8XnwSCGWpgQedb4"
+                          "ViGbiqtR0ZN7o3ScmSbd4o8EIzaVleW"
+                          "BSy5Eb4B1aE2fwQE=\n"
+                          "-----END ELGAMAL PARAM B-----\n";
+
+    kryptos_u8_t *k_priv = "-----BEGIN ELGAMAL PARAM P-----\n"
+                           "VRdEtMLDjy6jSMKvM83QDgAR1Y/2ZI9"
+                           "rDvT4nmFFBoV9/0q5HA+29b3V54aBOv"
+                           "G2Z31lqsfTWldx8AEnfs7N6gOlNmHC4"
+                           "xoST0rv/80gjdb+Kc+LWQAjmsSpdWBJ"
+                           "ZiAeBX7nZ4yyDFbFTTFiLvYwRj48YSr"
+                           "KWnA7aJQwwcSLtQQ=\n"
+                           "-----END ELGAMAL PARAM P-----\n"
+                           "-----BEGIN ELGAMAL PARAM D-----\n"
+                           "onkj9oCz4yimIihUZWsEoEVtl0M=\n"
+                           "-----END ELGAMAL PARAM D-----\n";
+
+    kryptos_u8_t *message = "moon over marin\x00";
+    size_t message_size = 16;
+    kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
+    int exit_code = 0;
+
+    printf("*** ORIGINAL MESSAGE: '%s'\n", message);
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    kryptos_task_set_in(alice, message, message_size);
+    kryptos_task_set_encrypt_action(alice);
+    kryptos_run_cipher(elgamal, alice, k_pub, strlen(k_pub));
+
+    if (!kryptos_last_task_succeed(alice)) {
+        printf("ERROR: while encrypting.\n");
+        exit_code = 1;
+        goto epilogue;
+    }
+
+    printf("*** CIPHERTEXT:\n\n%s\n", alice->out);
+
+    kryptos_task_set_in(bob, alice->out, alice->out_size);
+    kryptos_task_set_decrypt_action(bob);
+    kryptos_run_cipher(elgamal, bob, k_priv, strlen(k_priv));
+
+    if (!kryptos_last_task_succeed(bob)) {
+        printf("ERROR: while decrypting.\n");
+        exit_code = 1;
+        goto epilogue;
+    }
+
+    printf("*** PLAINTEXT: '%s'\n", bob->out);
+
+epilogue:
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+    return exit_code;
+}
+```
