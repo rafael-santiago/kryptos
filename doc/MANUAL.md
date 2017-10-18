@@ -2185,9 +2185,9 @@ Now is time to talk about digital signature.
 
 ### Digital signature
 
-Until now two digital signature algorithms are implemented: ``RSA`` and ``DSA``. The two implementations implement
+Until now two digital signature algorithms are implemented: ``RSA`` and ``DSA``. The two implementions are
 a general way of signing data so the details about the sign protocol is up to you. Maybe you want to encrypt
-and then sign or just signing it depends on your requirements. Due to it the sign process only focuses in ascertain
+and then sign or just signing, it depends on your requirements. Due to it, the sign process only focuses in ascertain
 if the input is authenticated or not. When the verification process fails the output buffer from the task will be
 NULL and the task result will be equal to ``kKryptosInvalidSignature``. When the verification succeeds the output
 buffer will contain the authenticated data and so you can process this verified output as you intend. The output
