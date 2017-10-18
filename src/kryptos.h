@@ -436,6 +436,8 @@ kryptos_ ## label_name:\
 
 #define kryptos_oaep_hash(hname) kryptos_ ## hname ## _hash, kryptos_ ## hname ## _hash_size
 
+#define kryptos_pss_hash(hname) kryptos_oaep_hash(hname)
+
 #endif // KRYPTOS_C99
 
 #endif // KRYPTOS_KRYPTOS_H

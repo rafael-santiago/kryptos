@@ -3140,7 +3140,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
 
     // INFO(Rafael): Bob sign the message.
 
-    kryptos_sign(rsa_emsa_pss, bob, m, m_size, k_priv_bob, strlen(k_priv_bob), &salt_size, NULL, NULL);
+    kryptos_sign(rsa_emsa_pss, bob, m, m_size, k_priv_bob, strlen(k_priv_bob), &salt_size, kryptos_pss_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
     KUTE_ASSERT(bob->out != NULL);
@@ -3153,7 +3153,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
 
     // INFO(Rafael): Now Alice simply verify.
 
-    kryptos_verify(rsa_emsa_pss, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob), &salt_size, NULL, NULL);
+    kryptos_verify(rsa_emsa_pss, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob), &salt_size,
+                   kryptos_pss_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     KUTE_ASSERT(alice->out != NULL);
@@ -3195,7 +3196,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", bob->out);
 #endif
 
-    kryptos_verify(rsa_emsa_pss, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob), &salt_size, NULL, NULL);
+    kryptos_verify(rsa_emsa_pss, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob), &salt_size,
+                   kryptos_pss_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     KUTE_ASSERT(alice->result == kKryptosInvalidSignature);
@@ -3236,7 +3238,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->out);
 #endif
 
-    kryptos_verify(rsa_emsa_pss, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob), &salt_size, NULL, NULL);
+    kryptos_verify(rsa_emsa_pss, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob), &salt_size,
+                   kryptos_pss_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     KUTE_ASSERT(alice->result == kKryptosInvalidSignature);
@@ -3278,7 +3281,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH BOTH X AND S CORRUPTED:\n\n%s\n", bob->out);
 #endif
 
-    kryptos_verify(rsa_emsa_pss, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob), &salt_size, NULL, NULL);
+    kryptos_verify(rsa_emsa_pss, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob), &salt_size,
+                   kryptos_pss_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     KUTE_ASSERT(alice->result == kKryptosInvalidSignature);
