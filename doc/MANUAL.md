@@ -2833,7 +2833,8 @@ int main(int argc, char **argv) {
 
     printf("*** MESSAGE:\n\n%s\n", message);
 
-    kryptos_sign(dsa, alice, message, strlen(message), k_priv_alice, strlen(k_priv_alice), kryptos_dsa_hash(sha256));
+    kryptos_sign(dsa, alice, message, strlen(message), k_priv_alice, strlen(k_priv_alice),
+                 kryptos_dsa_hash(sha256));
 
     if (!kryptos_last_task_succeed(alice)) {
         printf("ERROR: while siginging the message.\n");
@@ -2843,7 +2844,8 @@ int main(int argc, char **argv) {
 
     printf("*** SIGNED OUTPUT:\n\n%s\n", alice->out);
 
-    kryptos_verify(dsa, bob, alice->out, alice->out_size, k_pub_alice, strlen(k_pub_alice), kryptos_dsa_hash(sha256));
+    kryptos_verify(dsa, bob, alice->out, alice->out_size, k_pub_alice, strlen(k_pub_alice),
+                   kryptos_dsa_hash(sha256));
 
     if (!kryptos_last_task_succeed(bob)) {
         if (bob->result == kKryptosInvalidSignature) {
