@@ -2603,7 +2603,7 @@ If you pass both function pointers as NULL the ``PSS`` stuff will use ``SHA-1`` 
 
 #### DSA
 
-The ``DSA`` is one of the most popular signature algorithms. As you may know it involves a key pair generating. The following
+The ``DSA`` is one of the most popular signature algorithms. As you may know it involves a key pair calculation. The following
 code is capable of generating the public and private key ``PEM`` buffers. The data that will be used for signing and verifying.
 
 ```c
@@ -2682,7 +2682,7 @@ static int is_valid_number(const char *number, const size_t number_size) {
 ```
 
 I ran the code above in a simple 32-bit SMP Linux box and it tooks me about 00:25:28 minutes to generate a ``DSA`` key pair
-with <P=1024, Q=160>. Again, it is driven by lucky, like ``RSA``, ``DH``, ``Elgamal`` stuff, it is about to find primes
+with <P=1024, Q=160>. Again, it is driven by luck, like ``RSA``, ``DH``, ``Elgamal`` stuff. It is about to find primes
 with some specific relations between them.
 
 The exact command line was:
@@ -2730,12 +2730,12 @@ vLOB3BI4FOgD7HJCRrL7eQsbRxw=
 -----END DSA D-----
 ```
 
-Now we will use those key pair in other ``DSA`` sample stuff.
+Now we will use those key pair in the next ``DSA`` sample stuff.
 
 The way of use ``DSA`` without ``c99`` conveniences is almost the same way shown in ``RSA``, due to it, for brevity, from
 now on I will show only the sign and verify procedures by using ``c99`` conveniences.
 
-The following code shows how to sign and verify with ``DSA`:
+The following code shows how to sign and verify with ``DSA``:
 
 ```c
 /*
@@ -2879,8 +2879,8 @@ epilogue:
 As you can see the macros ``kryptos_sign`` and ``kryptos_verify`` are used but now is requested ``dsa`` instead of ``rsa``.
 The remaining parameters are: the buffer to be processed (signed or verified), the size of this buffer, the key buffer
 (when sigining the private key and when verifying the public key), the size of the key buffer and also a pointer to the hash
-function that ``DSA`` will use internally. For convenience was used the macro ``kryptos_dsa_hash`` this macro only
-expects an ``HASHID`` you can find the available hash ids in **Table 4**. When NULL is passed the ``SHA-1`` is chosen as
-the default hash function. In the sample above ``SHA-256`` is used, in order to pass it without the macro you should use
-``kryptos_sha256_hash`` since it is the function name that performs ``SHA-256`` stuff in kryptos
-(a.k.a the ``SHA-256`` hash processor).
+function that ``DSA`` will use internally. For convenience was used the macro ``kryptos_dsa_hash``, this macro only
+expects a ``HASHID`` and you can find the available hash ids in **Table 4**. When NULL is passed as the hash function
+parameter, the ``SHA-1`` is chosen as the default hash function. In the sample above ``SHA-256`` is used, in order to
+pass it without the macro you should use ``kryptos_sha256_hash`` since it is the function name that performs ``SHA-256``
+stuff in kryptos (a.k.a the ``SHA-256`` hash processor).
