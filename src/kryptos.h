@@ -384,6 +384,12 @@ kryptos_ ## label_name:\
     }\
 }
 
+#define kryptos_oaep_hash(hname) kryptos_ ## hname ## _hash, kryptos_ ## hname ## _hash_size
+
+#define kryptos_pss_hash(hname) kryptos_oaep_hash(hname)
+
+#define kryptos_dsa_hash(hname) kryptos_ ## hname ## _hash
+
 #ifdef KRYPTOS_C99
 
 #define kryptos_run_cipher(cname, ktask, cipher_args...) {\
@@ -433,10 +439,6 @@ kryptos_ ## label_name:\
 #define kryptos_verify(cname, ktask, cipher_args...) {\
     kryptos_perform_digsig_proto_action(cname, verify, ktask, cipher_args);\
 }
-
-#define kryptos_oaep_hash(hname) kryptos_ ## hname ## _hash, kryptos_ ## hname ## _hash_size
-
-#define kryptos_pss_hash(hname) kryptos_oaep_hash(hname)
 
 #endif // KRYPTOS_C99
 

@@ -3208,14 +3208,14 @@ CUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
 
     printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 
-    kryptos_sign(dsa, bob, m, m_size, k_priv, strlen(k_priv), NULL);
+    kryptos_sign(dsa, bob, m, m_size, k_priv, strlen(k_priv), kryptos_dsa_hash(sha1));
 
     CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
     CUTE_ASSERT(bob->out != NULL);
 
     printf(" *** SIGNED OUTPUT:\n\n%s\n", bob->out);
 
-    kryptos_verify(dsa, alice, bob->out, bob->out_size, k_pub, strlen(k_pub), NULL);
+    kryptos_verify(dsa, alice, bob->out, bob->out_size, k_pub, strlen(k_pub), kryptos_dsa_hash(sha1));
 
     CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     CUTE_ASSERT(alice->out != NULL);
@@ -3237,7 +3237,7 @@ CUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
 
     printf(" *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", signature);
 
-    kryptos_verify(dsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), NULL);
+    kryptos_verify(dsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), kryptos_dsa_hash(sha1));
 
     CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     CUTE_ASSERT(alice->result == kKryptosInvalidSignature);
@@ -3259,7 +3259,7 @@ CUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
 
     printf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", signature);
 
-    kryptos_verify(dsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), NULL);
+    kryptos_verify(dsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), kryptos_dsa_hash(sha1));
 
     CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     CUTE_ASSERT(alice->result == kKryptosInvalidSignature);
@@ -3282,7 +3282,7 @@ CUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
 
     printf(" *** SIGNED OUTPUT WITH BOTH R AND S CORRUPTED:\n\n%s\n", signature);
 
-    kryptos_verify(dsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), NULL);
+    kryptos_verify(dsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), kryptos_dsa_hash(sha1));
 
     CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     CUTE_ASSERT(alice->result == kKryptosInvalidSignature);

@@ -51,7 +51,7 @@ usage:
 static int is_valid_number(const char *number, const size_t number_size) {
     const char *np, *np_end;
 
-    if (number == NULL) {
+    if (number == NULL || number_size == 0) {
         return 0;
     }
 

@@ -2602,3 +2602,278 @@ of the function pointers are abstracted with the another macro ``kryptos_pss_has
 If you pass both function pointers as NULL the ``PSS`` stuff will use ``SHA-1`` to hash the data.
 
 #### DSA
+
+The ``DSA`` is one of the most popular signature algorithms. As you may know it involves a key pair generating. The following
+code is capable of generating the public and private key ``PEM`` buffers. The data that will be used for signing and verifying.
+
+```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <ctype.h>
+#include <stdio.h>
+
+static int is_valid_number(const char *number, const size_t number_size);
+
+int main(int argc, char **argv) {
+    int exit_code = 0;
+    kryptos_u8_t *k_pub = NULL, *k_priv = NULL;
+    size_t k_pub_size, k_priv_size;
+
+    if (argc >= 3) {
+        if (!is_valid_number(argv[1], strlen(argv[1])) ||
+            !is_valid_number(argv[2], strlen(argv[2]))) {
+            exit_code = 1;
+            goto usage;
+        }
+
+        if (kryptos_dsa_mk_key_pair(atoi(argv[1]), atoi(argv[2]),
+                                    &k_pub, &k_pub_size,
+                                    &k_priv, &k_priv_size) != kKryptosSuccess) {
+            exit_code = 1;
+            printf("ERROR: while generating key pair.\n");
+        } else {
+            printf("*** PUBLIC KEY:\n\n%s\n", k_pub);
+            printf("*** PRIVATE KEY:\n\n%s\n", k_priv);
+        }
+    } else {
+usage:
+        printf("use: %s <p size in bits> <q size in bits>\n", argv[0]);
+    }
+
+epilogue:
+
+    if (k_pub != NULL) {
+        kryptos_freeseg(k_pub);
+    }
+
+    if (k_priv != NULL) {
+        kryptos_freeseg(k_priv);
+    }
+
+    return exit_code;
+}
+
+static int is_valid_number(const char *number, const size_t number_size) {
+    const char *np, *np_end;
+
+    if (number == NULL || number_size == 0) {
+        return 0;
+    }
+
+    np = number;
+    np_end = np + number_size;
+
+    while (np != np_end) {
+        if (!isdigit(*np)) {
+            return 0;
+        }
+
+        np++;
+    }
+
+    return 1;
+}
+```
+
+I ran the code above in a simple 32-bit SMP Linux box and it tooks me about 00:25:28 minutes to generate a ``DSA`` key pair
+with <P=1024, Q=160>. Again, it is driven by lucky, like ``RSA``, ``DH``, ``Elgamal`` stuff, it is about to find primes
+with some specific relations between them.
+
+The exact command line was:
+
+```
+Mycroft@221B:~/src/kryptos-test/src/samples# ../../samples/dsa-mk-key-pair-sample 1024 160
+```
+
+As a result it produced the following output:
+
+```
+*** PUBLIC KEY:
+
+-----BEGIN DSA P-----
++TyfXiVPtBkAIRwp5ZDMNNOvx36w9DG0kQVWmbaeIm9VJanCQb+pTfbDTnCnnyZ10h4bibG6CKJFk75bYgL6QzveLHdQO2WIPhXLtv0U08c
+0DRNdjZu9aRvvHj2RXiumUz5pVCbhQoeAv9YI1yxYa+I4J+FNyMnwC6LKtRQGKAM=
+-----END DSA P-----
+-----BEGIN DSA Q-----
+t4dXC9PBaAnSUv0fB30fm9PyUS8=
+-----END DSA Q-----
+-----BEGIN DSA G-----
+xP+KKzjMo3H+gLZKa/UXnZIO7n8RNHNSDE7puR0VOsmWJtXf8wYDb/23+TN+eyMQgF2FOrwQYHj+hS4MbE+yWiMa6nyFhoNbaMU5voVDw7
+Jhpm2Jq23m4kfkjwE4ICzg+uLKRe+U+5ESfWLrRvbrKAxVlBYHfP8RppLRIyv64AA=
+-----END DSA G-----
+-----BEGIN DSA E-----
+RH6V4fmnt9dQA+rCqBsdYUDmKtymXfmx15nlYiCK8hhwf4UWJn760igxwafCx15wnSaYnG2+950eN24MK9UAL69E2VvCir3BXbuWXmPPG
+IWsSuJ8QYIG3vQtbr3yWiJI22zguxOnPzATBF4X5Yl/gjP7/BhDZcQJoFOaZaOATQI=
+-----END DSA E-----
+
+*** PRIVATE KEY:
+
+-----BEGIN DSA P-----
++TyfXiVPtBkAIRwp5ZDMNNOvx36w9DG0kQVWmbaeIm9VJanCQb+pTfbDTnCnnyZ10h4bibG6CKJFk75bYgL6QzveLHdQO2WIPhXLtv0U0
+8c0DRNdjZu9aRvvHj2RXiumUz5pVCbhQoeAv9YI1yxYa+I4J+FNyMnwC6LKtRQGKAM=
+-----END DSA P-----
+-----BEGIN DSA Q-----
+t4dXC9PBaAnSUv0fB30fm9PyUS8=
+-----END DSA Q-----
+-----BEGIN DSA G-----
+xP+KKzjMo3H+gLZKa/UXnZIO7n8RNHNSDE7puR0VOsmWJtXf8wYDb/23+TN+eyMQgF2FOrwQYHj+hS4MbE+yWiMa6nyFhoNbaMU5voVDw
+7Jhpm2Jq23m4kfkjwE4ICzg+uLKRe+U+5ESfWLrRvbrKAxVlBYHfP8RppLRIyv64AA=
+-----END DSA G-----
+-----BEGIN DSA D-----
+vLOB3BI4FOgD7HJCRrL7eQsbRxw=
+-----END DSA D-----
+```
+
+Now we will use those key pair in other ``DSA`` sample stuff.
+
+The way of use ``DSA`` without ``c99`` conveniences is almost the same way shown in ``RSA``, due to it, for brevity, from
+now on I will show only the sign and verify procedures by using ``c99`` conveniences.
+
+The following code shows how to sign and verify with ``DSA`:
+
+```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+#if defined(KRYPTOS_C99)
+    kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
+    kryptos_u8_t *message = "Hellnation's what they teach us, profiting from greed\n"
+                            "Hellnation's where they give us coke, heroin, and speed\n"
+                            "Hellnation's when they tell you gotta go clean up your act\n"
+                            "You're the one who dragged me here and now you drag me back\n\n"
+                            "To this hellnation\n"
+                            "Hellnation\n"
+                            "Hellnation\n"
+                            "Hellnation\n\n"
+                            "Problem is few care\n"
+                            "About the people in despair\n"
+                            "If you help no one\n"
+                            "You're guilty in this hellnation\n\n"
+                            "Hellnation's when the president asks for four more fucking years\n"
+                            "Hellnation's when he gets it by conning poor people and peers\n"
+                            "Hellnation, got no choice, what's the point in trying to vote?\n"
+                            "When this country makes war we all die in the same boat\n\n"
+                            "In this hellnation\n"
+                            "Hellnation\n"
+                            "Hellnation\n"
+                            "Hellnation\n\n"
+                            "Problem is few care\n"
+                            "About the people in despair\n"
+                            "If you help no one\n"
+                            "You're guilty in this hellnation\n\n"
+                            "Problem is few care\n"
+                            "About the people in despair\n"
+                            "If you help no one\n"
+                            "You're guilty in this hellnation\n\n"
+                            "It's the only world we've got\n"
+                            "Let's protect it while we can\n"
+                            "That's all there is and there ain't no more\n\n"
+                            "Hellnation, asking please for a nuclear freeze\n"
+                            "So the unborn kids get their chance to live and breathe\n"
+                            "Hellnation, asking aid for the minimum wage\n"
+                            "So the kids of tomorrow don't wind up slaves to their trade\n\n"
+                            "In this hellnation\n"
+                            "Hellnation\n"
+                            "Hellnation\n"
+                            "Hellnation\n"
+                            "Problem is few care\n"
+                            "About the people in despair\n"
+                            "If you help no one\n"
+                            "You're guilty in this hellnation\n";
+
+    kryptos_u8_t *k_pub_alice = "-----BEGIN DSA P-----\n"
+                                "+TyfXiVPtBkAIRwp5ZDMNNOvx36w9DG0kQVWmbaeIm9VJanCQb+pTfbDTnCnnyZ10h4bibG6CKJFk75bYg"
+                                "L6QzveLHdQO2WIPhXLtv0U08c0DRNdjZu9aRvvHj2RXiumUz5pVCbhQoeAv9YI1yxYa+I4J+FNyMnwC6LKtRQGKAM=\n"
+                                "-----END DSA P-----\n"
+                                "-----BEGIN DSA Q-----\n"
+                                "t4dXC9PBaAnSUv0fB30fm9PyUS8=\n"
+                                "-----END DSA Q-----\n"
+                                "-----BEGIN DSA G-----\n"
+                                "xP+KKzjMo3H+gLZKa/UXnZIO7n8RNHNSDE7puR0VOsmWJtXf8wYDb/23+TN+eyMQgF2FOrwQYHj+hS4MbE"
+                                "+yWiMa6nyFhoNbaMU5voVDw7Jhpm2Jq23m4kfkjwE4ICzg+uLKRe+U+5ESfWLrRvbrKAxVlBYHfP8RppLRIyv64AA=\n"
+                                "-----END DSA G-----\n"
+                                "-----BEGIN DSA E-----\n"
+                                "RH6V4fmnt9dQA+rCqBsdYUDmKtymXfmx15nlYiCK8hhwf4UWJn760igxwafCx15wnSaYnG2+950eN24MK9"
+                                "UAL69E2VvCir3BXbuWXmPPGIWsSuJ8QYIG3vQtbr3yWiJI22zguxOnPzATBF4X5Yl/gjP7/BhDZcQJoFOaZaOATQI=\n"
+                                "-----END DSA E-----\n";
+
+    kryptos_u8_t *k_priv_alice = "-----BEGIN DSA P-----\n"
+                                 "+TyfXiVPtBkAIRwp5ZDMNNOvx36w9DG0kQVWmbaeIm9VJanCQb+pTfbDTnCnnyZ10h4bibG6CKJFk75bYg"
+                                 "L6QzveLHdQO2WIPhXLtv0U08c0DRNdjZu9aRvvHj2RXiumUz5pVCbhQoeAv9YI1yxYa+I4J+FNyMnwC6LKtRQGKAM=\n"
+                                 "-----END DSA P-----\n"
+                                 "-----BEGIN DSA Q-----\n"
+                                 "t4dXC9PBaAnSUv0fB30fm9PyUS8=\n"
+                                 "-----END DSA Q-----\n"
+                                 "-----BEGIN DSA G-----\n"
+                                 "xP+KKzjMo3H+gLZKa/UXnZIO7n8RNHNSDE7puR0VOsmWJtXf8wYDb/23+TN+eyMQgF2FOrwQYHj+hS4MbE"
+                                 "+yWiMa6nyFhoNbaMU5voVDw7Jhpm2Jq23m4kfkjwE4ICzg+uLKRe+U+5ESfWLrRvbrKAxVlBYHfP8RppLRIyv64AA=\n"
+                                 "-----END DSA G-----\n"
+                                 "-----BEGIN DSA D-----\n"
+                                 "vLOB3BI4FOgD7HJCRrL7eQsbRxw=\n"
+                                 "-----END DSA D-----\n";
+
+    int exit_code = 0;
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    printf("*** MESSAGE:\n\n%s\n", message);
+
+    kryptos_sign(dsa, alice, message, strlen(message), k_priv_alice, strlen(k_priv_alice), kryptos_dsa_hash(sha256));
+
+    if (!kryptos_last_task_succeed(alice)) {
+        printf("ERROR: while siginging the message.\n");
+        exit_code = 1;
+        goto epilogue;
+    }
+
+    printf("*** SIGNED OUTPUT:\n\n%s\n", alice->out);
+
+    kryptos_verify(dsa, bob, alice->out, alice->out_size, k_pub_alice, strlen(k_pub_alice), kryptos_dsa_hash(sha256));
+
+    if (!kryptos_last_task_succeed(bob)) {
+        if (bob->result == kKryptosInvalidSignature) {
+            printf("ERROR: The signature is invalid.\n");
+        } else {
+            printf("ERROR: while verifying the signature.\n");
+        }
+        exit_code = 1;
+    } else {
+        printf("*** AUTHENTICATED MESSAGE:\n\n%s\n", bob->out);
+    }
+
+epilogue:
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+    return exit_code;
+#else
+    printf("WARNING: libkryptos was compiled without C99 support.\n");
+    return 1;
+#endif
+}
+```
+
+As you can see the macros ``kryptos_sign`` and ``kryptos_verify`` are used but now is requested ``dsa`` instead of ``rsa``.
+The remaining parameters are: the buffer to be processed (signed or verified), the size of this buffer, the key buffer
+(when sigining the private key and when verifying the public key), the size of the key buffer and also a pointer to the hash
+function that ``DSA`` will use internally. For convenience was used the macro ``kryptos_dsa_hash`` this macro only
+expects an ``HASHID`` you can find the available hash ids in **Table 4**. When NULL is passed the ``SHA-1`` is chosen as
+the default hash function. In the sample above ``SHA-256`` is used, in order to pass it without the macro you should use
+``kryptos_sha256_hash`` since it is the function name that performs ``SHA-256`` stuff in kryptos
+(a.k.a the ``SHA-256`` hash processor).

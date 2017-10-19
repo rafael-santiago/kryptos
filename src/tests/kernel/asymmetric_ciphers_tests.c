@@ -3720,7 +3720,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #endif
 
-    kryptos_sign(dsa, bob, m, m_size, k_priv, strlen(k_priv), NULL);
+    kryptos_sign(dsa, bob, m, m_size, k_priv, strlen(k_priv), kryptos_dsa_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
     KUTE_ASSERT(bob->out != NULL);
@@ -3731,7 +3731,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     printk(KERN_ERR " *** SIGNED OUTPUT:\n\n%s\n", bob->out);
 #endif
 
-    kryptos_verify(dsa, alice, bob->out, bob->out_size, k_pub, strlen(k_pub), NULL);
+    kryptos_verify(dsa, alice, bob->out, bob->out_size, k_pub, strlen(k_pub), kryptos_dsa_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     KUTE_ASSERT(alice->out != NULL);
@@ -3765,7 +3765,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", signature);
 #endif
 
-    kryptos_verify(dsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), NULL);
+    kryptos_verify(dsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), kryptos_dsa_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     KUTE_ASSERT(alice->result == kKryptosInvalidSignature);
@@ -3800,7 +3800,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", signature);
 #endif
 
-    kryptos_verify(dsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), NULL);
+    kryptos_verify(dsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), kryptos_dsa_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     KUTE_ASSERT(alice->result == kKryptosInvalidSignature);

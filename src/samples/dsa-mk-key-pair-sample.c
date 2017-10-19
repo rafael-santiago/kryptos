@@ -12,36 +12,39 @@
 static int is_valid_number(const char *number, const size_t number_size);
 
 int main(int argc, char **argv) {
-    kryptos_u8_t *k_priv = NULL, *k_pub = NULL;
-    size_t k_priv_size = 0, k_pub_size = 0;
     int exit_code = 0;
+    kryptos_u8_t *k_pub = NULL, *k_priv = NULL;
+    size_t k_pub_size, k_priv_size;
 
-    if (argc > 1 && is_valid_number(argv[1], strlen(argv[1]))) {
-        if (kryptos_rsa_mk_key_pair(atoi(argv[1]),
-                                    &k_pub, &k_pub_size,
-                                    &k_priv, &k_priv_size) == kKryptosSuccess) {
-            // INFO(Rafael): This is just for demo issues, the best here would be
-            //               save the k_pub and k_priv buffers to separated files
-            //               for a later usage. Duh! :)
-            printf("*** Public key:\n\n");
-            printf("%s\n", k_pub);
-            printf("*** Private key:\n\n");
-            printf("%s\n", k_priv);
-        } else {
-            printf("ERROR: while generating the key pair.\n");
+    if (argc >= 3) {
+        if (!is_valid_number(argv[1], strlen(argv[1])) ||
+            !is_valid_number(argv[2], strlen(argv[2]))) {
             exit_code = 1;
+            goto usage;
+        }
+
+        if (kryptos_dsa_mk_key_pair(atoi(argv[1]), atoi(argv[2]),
+                                    &k_pub, &k_pub_size,
+                                    &k_priv, &k_priv_size) != kKryptosSuccess) {
+            exit_code = 1;
+            printf("ERROR: while generating key pair.\n");
+        } else {
+            printf("*** PUBLIC KEY:\n\n%s\n", k_pub);
+            printf("*** PRIVATE KEY:\n\n%s\n", k_priv);
         }
     } else {
-        printf("use: %s <key size in bits>\n", argv[0]);
-        exit_code = 1;
+usage:
+        printf("use: %s <p size in bits> <q size in bits>\n", argv[0]);
+    }
+
+epilogue:
+
+    if (k_pub != NULL) {
+        kryptos_freeseg(k_pub);
     }
 
     if (k_priv != NULL) {
         kryptos_freeseg(k_priv);
-    }
-
-    if (k_pub != NULL) {
-        kryptos_freeseg(k_pub);
     }
 
     return exit_code;
@@ -61,6 +64,7 @@ static int is_valid_number(const char *number, const size_t number_size) {
         if (!isdigit(*np)) {
             return 0;
         }
+
         np++;
     }
 
