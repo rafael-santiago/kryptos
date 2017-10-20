@@ -180,4 +180,4 @@ Otherwise if your code should not be executed in kernel mode, inform it explaini
 
 The correctness of any cipher must be tested with official test vectors. When not possible, the custom test vector should be
 derived from key expansion samples present in the cipher spec written by the algorithm authors. These test vectors should not be
-tested in kernel mode since them was well-tested in user mode.
+tested in kernel mode since them were well-tested in user mode.
