@@ -49,5 +49,25 @@ kryptos.epilogue() {
         }
 
         hefesto.sys.cd($oldcwd);
+
+        var option type list;
+
+        $option = hefesto.sys.get_option("mk-samples");
+
+        if ($option.count() > 0) {
+            if (hefesto.sys.cd("samples")) {
+                $exit_code = hefesto.sys.run("hefesto"); # INFO(Rafael): Let's take advantage of the '.ivk'. Less one point
+                                                         #               to manage when adding new samples.
+
+                if ($exit_code != 0) {
+                    hefesto.project.abort($exit_code);
+                }
+
+                hefesto.sys.cd($oldcwd);
+            } else {
+                hefesto.sys.echo("BUILD ERROR: unable to find samples directory.\n");
+                hefesto.sys.exit(1);
+            }
+        }
     }
 }
