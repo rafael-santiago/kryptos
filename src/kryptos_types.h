@@ -68,7 +68,7 @@ typedef unsigned int kryptos_u32_t;
 
 // WARN(Rafael): When 'bits/wordsize.h' is lacking...
 
-#if defined(__unix__)
+#if defined(__unix__) && !defined(KRYPTOS_KERNEL_MODE)
 # include <sys/param.h>
 # if defined(BSD)
 #  include <sys/types.h>
@@ -86,13 +86,9 @@ typedef unsigned int kryptos_u32_t;
 #endif
 
 #if __WORDSIZE == 32
-
-typedef unsigned long long kryptos_u64_t;
-
+ typedef unsigned long long kryptos_u64_t;
 #else
-
-typedef unsigned long kryptos_u64_t;
-
+ typedef unsigned long kryptos_u64_t;
 #endif //  __WORDSIZE == 64
 
 typedef enum {
