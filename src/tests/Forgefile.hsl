@@ -42,6 +42,8 @@ kryptos-tests.prologue() {
         $ldflags.add_item("-lexecinfo");
     } else if (hefesto.sys.os_name() == "linux") {
         $ldflags.add_item("-ldl");
+    } else if (hefesto.sys.os_name() == "openbsd") {
+        $ldflags.add_item("-lexecinfo");
     }
 
     if (isdir("/usr/local/include")) {
@@ -150,6 +152,20 @@ local function forge_cutest() : result type none {
 local function forge_kernel_mode_tests() : result type int {
     var oldcwd type string;
     var exit_code type int;
+    var supported_platforms type list;
+
+    # INFO(Rafael): Add here the platforms where kernel mode stuff is
+    #               supported.
+
+    $supported_platforms.add_item("linux");
+    $supported_platforms.add_item("freebsd");
+
+    if ($supported_platforms.index_of(hefesto.sys.os_name()) == -1) {
+        hefesto.sys.echo("ERROR: Kryptos kernel mode stuff not supported " +
+                         "in this current platform.\n");
+        result 1;
+    }
+
 
     $oldcwd = hefesto.sys.pwd();
     $exit_code = 1;

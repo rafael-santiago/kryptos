@@ -66,6 +66,25 @@ typedef unsigned short kryptos_u16_t;
 
 typedef unsigned int kryptos_u32_t;
 
+// WARN(Rafael): When 'bits/wordsize.h' is lacking...
+
+#if defined(__unix__)
+# include <sys/param.h>
+# if defined(BSD)
+#  include <sys/types.h>
+#  include <unistd.h>
+#  include <sys/endian.h>
+# endif
+# if !defined(__WORDSIZE)
+// INFO(Rafael): OpenBSD branches to this if clause.
+#  if defined(__amd64__)
+#   define __WORDSIZE 64
+#  else
+#   define __WORDSIZE 32
+#  endif
+# endif
+#endif
+
 #if __WORDSIZE == 32
 
 typedef unsigned long long kryptos_u64_t;
