@@ -15,9 +15,9 @@
 #endif
 
 struct kryptos_dh_modp_group_entry_ctx {
-    kryptos_u8_t *p;
+    char *p;
     size_t p_size;
-    kryptos_u8_t *g;
+    char *g;
     size_t g_size;
 };
 

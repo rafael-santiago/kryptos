@@ -138,6 +138,7 @@ The default build options are defined into the file ``src/tests/.ivk``. The **Ta
 | ``--skip-rsa-signature-tests``           | Skips the RSA signature tests. The tests execution becomes faster.           |
 | ``--skip-dsa-signature-tests``           | Skips the DSA signature tests. The tests execution becomes faster.           |
 | ``--mk-samples``                         | Requests the code samples build.                                             |
+| ``--toolset=gcc|clang``                  | Defines the C compiler (the default is ``GCC``).                             |
 
 ### How the kernel mode tests are executed
 

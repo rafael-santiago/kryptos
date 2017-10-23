@@ -1,0 +1,57 @@
+#
+#                                Copyright (C) 2017 by Rafael Santiago
+#
+# This is a free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+#
+
+include ~/toolsets/gcc/gcc-lib.hsl
+include ~/toolsets/clang/clang-lib.hsl
+
+include ~/toolsets/gcc/gcc-app.hsl
+include ~/toolsets/clang/clang-app.hsl
+
+function get_app_toolset() : result type string {
+    result (get_toolset_option_data() + "-c-app");
+}
+
+function get_lib_toolset() : result type string {
+    result (get_toolset_option_data() + "-c-lib");
+}
+
+local function get_toolset_option_data() : result type string {
+    var toolset_option type list;
+
+    $toolset_option = hefesto.sys.get_option("toolset");
+
+    if ($toolset_option.count() > 0) {
+        result $toolset_option.item(0);
+    }
+
+    if (has_gcc()) {
+        result "gcc";
+    } else if (has_clang()) {
+        result "clang";
+    }
+
+    hefesto.sys.echo("BUILD ERROR: You need GCC or Clang well-installed in order to build this software.\n");
+    hefesto.project.abort(1);
+}
+
+local function has_gcc() : result type int {
+    result (runbkcmd("gcc --version") == 0);
+}
+
+local function has_clang() : result type int {
+    result (runbkcmd("clang --version") == 0);
+}
+
+local function runbkcmd(cmd type string) : result type int {
+    if (hefesto.sys.os_name() == "windows") {
+        $cmd = $cmd + " > nul 2>&1";
+    } else {
+        $cmd = $cmd + " > /dev/null 2>&1";
+    }
+    result hefesto.sys.run($cmd);
+}

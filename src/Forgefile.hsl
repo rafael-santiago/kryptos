@@ -6,8 +6,10 @@
 #
 #
 
-include ~/toolsets/gcc/gcc-lib.hsl
+include Toolsets.hsl
 include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
+
+local var toolset_name type string;
 
 local var sources type list;
 local var includes type list;
@@ -16,7 +18,12 @@ local var libraries type list;
 local var ldflags type list;
 local var deps type string;
 
-project kryptos : toolset "gcc-c-lib" : dependencies $deps : $sources, $includes, $cflags, $libraries, $ldflags, "libkryptos.a";
+project kryptos : toolset $toolset_name : dependencies $deps :
+                $sources, $includes, $cflags, $libraries, $ldflags, "libkryptos.a";
+
+kryptos.preloading() {
+    $toolset_name = get_lib_toolset();
+}
 
 kryptos.prologue() {
     $includes = hefesto.sys.get_option("includes");

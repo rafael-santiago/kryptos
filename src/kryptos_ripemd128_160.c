@@ -390,7 +390,8 @@ static void kryptos_ripemd128_do_block(struct kryptos_ripemd_ctx *ctx) {
     T = A = A_ = B = B_ = C = C_ = D = D_ = 0;
 
     if (ctx->paddin2times) {
-        kryptos_hash_ld_u8buf_as_u32_blocks("", 0, ctx->input.block, 16, kryptos_ripemd_block_index_decision_table);
+        kryptos_hash_ld_u8buf_as_u32_blocks((kryptos_u8_t *)"", 0, ctx->input.block, 16,
+                                            kryptos_ripemd_block_index_decision_table);
         kryptos_ripemd128_do_block(ctx);
     }
 }
@@ -613,7 +614,8 @@ static void kryptos_ripemd160_do_block(struct kryptos_ripemd_ctx *ctx) {
     T = A = A_ = B = B_ = C = C_ = D = D_ = E = E_ = 0;
 
     if (ctx->paddin2times) {
-        kryptos_hash_ld_u8buf_as_u32_blocks("", 0, ctx->input.block, 16, kryptos_ripemd_block_index_decision_table);
+        kryptos_hash_ld_u8buf_as_u32_blocks((kryptos_u8_t *)"", 0, ctx->input.block, 16,
+                                            kryptos_ripemd_block_index_decision_table);
         kryptos_ripemd160_do_block(ctx);
     }
 }

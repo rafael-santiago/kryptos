@@ -39,7 +39,7 @@ struct kryptos_dh_xchg_ctx {
     size_t s_bits;
     kryptos_u8_t *in, *out;
     size_t in_size, out_size;
-    kryptos_u8_t *result_verbose;
+    char *result_verbose;
     kryptos_task_result_t result;
 };
 

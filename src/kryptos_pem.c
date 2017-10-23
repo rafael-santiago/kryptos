@@ -21,19 +21,19 @@
 
 #define KRYPTOS_PEM_END_SFX "-----\n"
 
-static const kryptos_u8_t *kryptos_pem_header_begin(const kryptos_u8_t *header, const kryptos_u8_t *buf, const size_t buf_size);
+static const kryptos_u8_t *kryptos_pem_header_begin(const char *header, const kryptos_u8_t *buf, const size_t buf_size);
 
-static const kryptos_u8_t *kryptos_pem_header_end(const kryptos_u8_t *header, const kryptos_u8_t *buf, const size_t buf_size);
+static const kryptos_u8_t *kryptos_pem_header_end(const char *header, const kryptos_u8_t *buf, const size_t buf_size);
 
-static kryptos_u8_t *kryptos_pem_header(const kryptos_u8_t *pfx, const kryptos_u8_t *header, const kryptos_u8_t *sfx);
+static char *kryptos_pem_header(const char *pfx, const char *header, const char *sfx);
 
-static const kryptos_u8_t *kryptos_find_header(const kryptos_u8_t *header, const kryptos_u8_t *buf, const size_t buf_size);
+static const kryptos_u8_t *kryptos_find_header(const char *header, const kryptos_u8_t *buf, const size_t buf_size);
 
-static size_t kryptos_pem_strlen(const kryptos_u8_t *data);
+static size_t kryptos_pem_strlen(const char *data);
 
 kryptos_task_result_t kryptos_pem_put_data(kryptos_u8_t **pem_buf, size_t *pem_buf_size,
-                                           const kryptos_u8_t *header, const kryptos_u8_t *data, const size_t data_size) {
-    kryptos_u8_t *header_begin = NULL, *header_end = NULL;
+                                           const char *header, const kryptos_u8_t *data, const size_t data_size) {
+    char *header_begin = NULL, *header_end = NULL;
     kryptos_task_ctx task, *ktask = &task;
     kryptos_u8_t *new_pem_buf = NULL;
     size_t new_pem_buf_size = 0;
@@ -45,7 +45,7 @@ kryptos_task_result_t kryptos_pem_put_data(kryptos_u8_t **pem_buf, size_t *pem_b
     }
 
     if ((*pem_buf) != NULL) {
-        old_pem_buf_size = (pem_buf_size == NULL) ? kryptos_pem_strlen(*pem_buf) : *pem_buf_size;
+        old_pem_buf_size = (pem_buf_size == NULL) ? kryptos_pem_strlen((char *)*pem_buf) : *pem_buf_size;
         if (kryptos_find_header(header, (*pem_buf), old_pem_buf_size) != NULL) {
             return kKryptosInvalidParams;
         }
@@ -125,7 +125,7 @@ kryptos_pem_put_data_epilogue:
     return result;
 }
 
-kryptos_u8_t *kryptos_pem_get_data(const kryptos_u8_t *header, const kryptos_u8_t *buf, const size_t buf_size,
+kryptos_u8_t *kryptos_pem_get_data(const char *header, const kryptos_u8_t *buf, const size_t buf_size,
                                    size_t *data_size) {
     kryptos_task_ctx task, *ktask = &task;
     const kryptos_u8_t *data_begin = NULL, *data_end = NULL;
@@ -176,7 +176,7 @@ kryptos_pem_get_data_epilogue:
     return ktask->out;
 }
 
-kryptos_task_result_t kryptos_pem_get_mp_data(const kryptos_u8_t *hdr,
+kryptos_task_result_t kryptos_pem_get_mp_data(const char *hdr,
                                               const kryptos_u8_t *in, const size_t in_size,
                                               kryptos_mp_value_t **number) {
     kryptos_u8_t *pem_data;
@@ -203,10 +203,10 @@ kryptos_task_result_t kryptos_pem_get_mp_data(const kryptos_u8_t *hdr,
 }
 
 
-static kryptos_u8_t *kryptos_pem_header(const kryptos_u8_t *pfx, const kryptos_u8_t *header, const kryptos_u8_t *sfx) {
+static char *kryptos_pem_header(const char *pfx, const char *header, const char *sfx) {
     size_t header_size = 0;
-    const kryptos_u8_t *p;
-    kryptos_u8_t *hdata = NULL, *hp = NULL;
+    const char *p;
+    char *hdata = NULL, *hp = NULL;
 
     p = pfx;
     while (*p != 0) {
@@ -226,7 +226,7 @@ static kryptos_u8_t *kryptos_pem_header(const kryptos_u8_t *pfx, const kryptos_u
         header_size++;
     }
 
-    hdata = (kryptos_u8_t *) kryptos_newseg(header_size + 1);
+    hdata = (char *) kryptos_newseg(header_size + 1);
 
     if (hdata == NULL) {
         return NULL;
@@ -260,10 +260,10 @@ static kryptos_u8_t *kryptos_pem_header(const kryptos_u8_t *pfx, const kryptos_u
     return hdata;
 }
 
-static const kryptos_u8_t *kryptos_find_header(const kryptos_u8_t *header, const kryptos_u8_t *buf, const size_t buf_size) {
-    const kryptos_u8_t *bp = buf;
+static const kryptos_u8_t *kryptos_find_header(const char *header, const kryptos_u8_t *buf, const size_t buf_size) {
+    const kryptos_u8_t *bp = buf, *data = NULL;
     const kryptos_u8_t *bp_end = bp + buf_size;
-    const kryptos_u8_t *hp, *data = NULL;
+    const char *hp;
     int equals = 1;
 
     hp = header;
@@ -283,9 +283,9 @@ static const kryptos_u8_t *kryptos_find_header(const kryptos_u8_t *header, const
     return data;
 }
 
-static const kryptos_u8_t *kryptos_pem_header_begin(const kryptos_u8_t *header,
+static const kryptos_u8_t *kryptos_pem_header_begin(const char *header,
                                                     const kryptos_u8_t *buf, const size_t buf_size) {
-    kryptos_u8_t *hmark = kryptos_pem_header(KRYPTOS_PEM_BEGIN_PFX, header, KRYPTOS_PEM_BEGIN_SFX);
+    char *hmark = kryptos_pem_header(KRYPTOS_PEM_BEGIN_PFX, header, KRYPTOS_PEM_BEGIN_SFX);
     const kryptos_u8_t *data = NULL;
 
     if (hmark == NULL) {
@@ -299,9 +299,9 @@ static const kryptos_u8_t *kryptos_pem_header_begin(const kryptos_u8_t *header,
     return data;
 }
 
-static const kryptos_u8_t *kryptos_pem_header_end(const kryptos_u8_t *header,
+static const kryptos_u8_t *kryptos_pem_header_end(const char *header,
                                                   const kryptos_u8_t *buf, const size_t buf_size) {
-    kryptos_u8_t *hmark = kryptos_pem_header(KRYPTOS_PEM_END_PFX, header, KRYPTOS_PEM_END_SFX), *hmark_end = NULL;
+    char *hmark = kryptos_pem_header(KRYPTOS_PEM_END_PFX, header, KRYPTOS_PEM_END_SFX), *hmark_end = NULL;
     const kryptos_u8_t *data = NULL;
 
     if (hmark == NULL) {
@@ -322,10 +322,10 @@ static const kryptos_u8_t *kryptos_pem_header_end(const kryptos_u8_t *header,
 
 }
 
-static size_t kryptos_pem_strlen(const kryptos_u8_t *data) {
+static size_t kryptos_pem_strlen(const char *data) {
     // WARN(Rafael): Let's avoid using <string.h> high level stuff because in some cases we will not be able to use the
     //               entire libc conveniences.
-    const kryptos_u8_t *d = data;
+    const char *d = data;
 
     if (d == NULL) {
         return 0;

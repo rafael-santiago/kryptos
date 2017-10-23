@@ -6,9 +6,11 @@
 #
 #
 
-include ~/toolsets/gcc/gcc-app.hsl
+include ../Toolsets.hsl
 include ~/fsutil.hsl
 include ~/conv.hsl
+
+local var toolset_name type string;
 
 local var sources type list;
 local var includes type list;
@@ -16,7 +18,11 @@ local var cflags type list;
 local var libraries type list;
 local var ldflags type list;
 
-project kryptos-tests : toolset "gcc-c-app" : $sources, $includes, $cflags, $libraries, $ldflags, "kryptos-tests";
+project kryptos-tests : toolset $toolset_name : $sources, $includes, $cflags, $libraries, $ldflags, "kryptos-tests";
+
+kryptos-tests.preloading() {
+    $toolset_name = get_app_toolset();
+}
 
 kryptos-tests.prologue() {
     var user_option type list;
@@ -31,6 +37,11 @@ kryptos-tests.prologue() {
     $user_option = hefesto.sys.get_option("no-hmac-tests");
     if ($user_option.count() > 0) {
         $cflags.add_item("-DKRYPTOS_NO_HMAC_TESTS");
+    }
+
+    if ($toolset_name.match("^clang") == 1) {
+        $cflags.add_item("-Wno-pointer-sign");
+        $cflags.add_item("-Wno-invalid-source-encoding");
     }
 
     $libraries = hefesto.sys.get_option("libraries");

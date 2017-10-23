@@ -59,7 +59,7 @@ static kryptos_u8_t nbxlt[] = {
     }\
 }
 
-static kryptos_u8_t *g_kryptos_mp_small_primes[] = {
+static char *g_kryptos_mp_small_primes[] = {
     "0003", "0005", "0007", "000B", "000D", "0011", "0013", "0017", "001D", "001F", "0025", "0029", "002B", "002F", "0035",
     "003B", "003D", "0043", "0047", "0049", "004F", "0053", "0059", "0061", "0065", "0067", "006B", "006D", "0071", "007F",
     "0083", "0089", "008B", "0095", "0097", "009D", "00A3", "00A7", "00AD", "00B3", "00B5", "00BF", "00C1", "00C5", "00C7",
@@ -291,14 +291,14 @@ kryptos_mp_value_t *kryptos_assign_mp_value(kryptos_mp_value_t **dest,
     return *dest;
 }
 
-kryptos_mp_value_t *kryptos_hex_value_as_mp(const kryptos_u8_t *value, const size_t value_size) {
+kryptos_mp_value_t *kryptos_hex_value_as_mp(const char *value, const size_t value_size) {
     kryptos_mp_value_t *mp;
-    const kryptos_u8_t *vp, *vp_end;
+    const char *vp, *vp_end;
     ssize_t d;
     kryptos_u8_t nb;
 #ifdef KRYPTOS_MP_U32_DIGIT
     size_t w, v;
-    kryptos_u8_t *padded_value = NULL;
+    char *padded_value = NULL;
 #endif
 
     if (value == NULL || value_size == 0) {
@@ -355,7 +355,7 @@ kryptos_mp_value_t *kryptos_hex_value_as_mp(const kryptos_u8_t *value, const siz
     w = 0;
 
     if (v != value_size) {
-        padded_value = (kryptos_u8_t *) kryptos_newseg(v + 1);
+        padded_value = (char *) kryptos_newseg(v + 1);
         memset(padded_value, 0, v + 1);
         memset(padded_value, '0', v);
         memcpy(padded_value + (v - value_size), value, value_size);
@@ -887,8 +887,8 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
 }
 
 kryptos_mp_value_t *kryptos_assign_hex_value_to_mp(kryptos_mp_value_t **dest,
-                                                   const kryptos_u8_t *value, const size_t value_size) {
-    const kryptos_u8_t *vp, *vp_end;
+                                                   const char *value, const size_t value_size) {
+    const char *vp, *vp_end;
     ssize_t d;
     kryptos_u8_t nb;
 #ifdef KRYPTOS_MP_U32_DIGIT
@@ -3569,7 +3569,7 @@ kryptos_mp_gen_prime_small_primes_test_epilogue:
 
 kryptos_mp_value_t *kryptos_raw_buffer_as_mp(const kryptos_u8_t *buf, const size_t buf_size) {
     kryptos_mp_value_t *mp = NULL;
-    kryptos_u8_t *hex = NULL, *hp, *hp_end;
+    char *hex = NULL, *hp, *hp_end;
     size_t hex_size;
     const kryptos_u8_t *bp, *bp_end;
 

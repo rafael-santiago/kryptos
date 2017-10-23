@@ -163,7 +163,8 @@ kryptos_u8_t *kryptos_apply_oaep_padding(const kryptos_u8_t *buffer, size_t *buf
                                          kryptos_hash_size_func hash_size_func) {
     kryptos_hash_func hash = kryptos_sha1_hash;
     kryptos_hash_size_func hash_size = kryptos_sha1_hash_size;
-    kryptos_u8_t *em = NULL, *ps = "", *l = "", *db = NULL, *seed = NULL, *dbmask = NULL, *seedmask = NULL;
+    kryptos_u8_t *em = NULL, *ps = (kryptos_u8_t *)"", *l = (kryptos_u8_t *)"", *db = NULL, *seed = NULL,
+                 *dbmask = NULL, *seedmask = NULL;
     size_t em_size, ps_size, h_size, l_size = 0, db_size = 0, dbmask_size = 0, x, seedmask_size = 0;
     kryptos_task_ctx t, *ktask = &t;
     kryptos_u8_t *dest = NULL;
@@ -353,7 +354,7 @@ kryptos_u8_t *kryptos_drop_oaep_padding(const kryptos_u8_t *buffer, size_t *buff
     kryptos_u8_t *m = NULL;
     kryptos_hash_func hash = kryptos_sha1_hash;
     kryptos_hash_size_func hash_size = kryptos_sha1_hash_size;
-    kryptos_u8_t *seedmask = NULL, *dbmask = NULL, *l = "";
+    kryptos_u8_t *seedmask = NULL, *dbmask = NULL, *l = (kryptos_u8_t *)"";
     kryptos_u8_t *dest = NULL, *dest_end = NULL, *dest_p = NULL;
     size_t seedmask_size = 0, h_size = 0, x, dbmask_size = 0, l_size = 0, ps_size = 0, exp_ps_size = 0, m_size = 0;
     kryptos_task_ctx t, *ktask = &t;

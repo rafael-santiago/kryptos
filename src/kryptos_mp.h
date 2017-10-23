@@ -17,7 +17,7 @@ void kryptos_del_mp_value(kryptos_mp_value_t *mp);
 kryptos_mp_value_t *kryptos_assign_mp_value(kryptos_mp_value_t **dest,
                                               const kryptos_mp_value_t *src);
 
-kryptos_mp_value_t *kryptos_hex_value_as_mp(const kryptos_u8_t *value, const size_t value_size);
+kryptos_mp_value_t *kryptos_hex_value_as_mp(const char *value, const size_t value_size);
 
 kryptos_u8_t *kryptos_mp_value_as_hex(const kryptos_mp_value_t *value, size_t *hex_size);
 
@@ -26,7 +26,7 @@ kryptos_mp_value_t *kryptos_mp_add(kryptos_mp_value_t **dest, const kryptos_mp_v
 kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src);
 
 kryptos_mp_value_t *kryptos_assign_hex_value_to_mp(kryptos_mp_value_t **dest,
-                                                   const kryptos_u8_t *value, const size_t value_size);
+                                                   const char *value, const size_t value_size);
 
 kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src);
 

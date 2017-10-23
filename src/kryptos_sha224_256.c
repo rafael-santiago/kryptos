@@ -316,7 +316,7 @@ static void kryptos_sha224_256_do_block(struct kryptos_sha224_256_ctx *ctx) {
     t = 0;
 
     if (ctx->paddin2times) {
-        kryptos_hash_ld_u8buf_as_u32_blocks("", 0,
+        kryptos_hash_ld_u8buf_as_u32_blocks((kryptos_u8_t *)"", 0,
                                             ctx->input.block, 16,
                                             kryptos_sha224_256_block_index_decision_table);
         kryptos_sha224_256_do_block(ctx);

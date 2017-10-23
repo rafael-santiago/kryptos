@@ -14,7 +14,7 @@
 
 int kryptos_little_endian_cpu(void) {
     static int kryptos_little_endian = -1;
-    static kryptos_u8_t *kryptos_test_seg = "\x01\x00\x00\x00";
+    static kryptos_u8_t *kryptos_test_seg = (kryptos_u8_t *)"\x01\x00\x00\x00";
     if (kryptos_little_endian == -1) {
         kryptos_little_endian = *(int *)kryptos_test_seg;
     }

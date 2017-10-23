@@ -243,7 +243,8 @@ static void kryptos_md4_do_block(struct kryptos_md4_ctx *ctx) {
     AA = BB = CC = DD = 0;
 
     if (ctx->paddin2times) {
-        kryptos_hash_ld_u8buf_as_u32_blocks("", 0, ctx->input.block, 16, kryptos_md4_block_index_decision_table);
+        kryptos_hash_ld_u8buf_as_u32_blocks((kryptos_u8_t *)"", 0, ctx->input.block, 16,
+                                            kryptos_md4_block_index_decision_table);
         kryptos_md4_do_block(ctx);
     }
 }

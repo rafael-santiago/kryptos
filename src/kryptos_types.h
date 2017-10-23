@@ -516,7 +516,7 @@ static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct
         }\
         i = l = 0;\
     } else {\
-        kryptos_hash_ld_u8buf_as_u ## bits_per_block ## _blocks("", 0,\
+        kryptos_hash_ld_u8buf_as_u ## bits_per_block ## _blocks((kryptos_u8_t *)"", 0,\
                                             ctx->input.block, input_block_size,\
                                             block_index_decision_table);\
         hash_do_block_stmt;\
@@ -553,7 +553,7 @@ static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct
         }\
         i = l = 0;\
     } else {\
-        kryptos_hash_ld_u8buf_as_u ## bits_per_block ## _blocks("", 0,\
+        kryptos_hash_ld_u8buf_as_u ## bits_per_block ## _blocks((kryptos_u8_t *)"", 0,\
                                             ctx->input.block, input_block_size,\
                                             block_index_decision_table);\
         hash_do_block_stmt;\
