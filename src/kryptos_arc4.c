@@ -35,8 +35,14 @@ static void kryptos_arc4_key_setup(const kryptos_u8_t *userkey, const size_t use
     kryptos_u8_t S2[256];
     kryptos_u8_t temp;
 
+#if !defined(__clang__)
     for (sk->i = 0; sk->i < 256; sk->S[sk->i] = sk->i++)
         ;
+#else
+    for (sk->i = 0; sk->i < 256; sk->i++) {
+        sk->S[sk->i] = sk->i;
+    }
+#endif
 
     for (sk->i = 0; sk->i < 256; S2[sk->i] = userkey[sk->i % userkey_size], sk->i++)
         ;
@@ -106,6 +112,8 @@ void kryptos_arc4_cipher(kryptos_task_ctx **ktask) {
         out_p++;
         in_p++;
     }
+
+    (*ktask)->result = kKryptosSuccess;
 
 kryptos_arc4_stream_epilogue:
     (*ktask)->out_size = ((*ktask)->out != NULL) ? in_end - (*ktask)->in : 0;

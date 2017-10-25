@@ -31,15 +31,17 @@ typedef long intptr_t;
 #  endif
 # endif
 
+
 #if defined(__FreeBSD__) || defined(__OpenBSD__)
 # ifndef KRYPTOS_KERNEL_MODE
 #  include <unistd.h>
 // TODO(Rafael): Find a better way of detecting c99 capabilities in FreeBSD.
-#   if __ISO_C_VISIBLE >= 1999L
+#   if __ISO_C_VISIBLE >= 1999L && !defined(__STDC_VERSION__)
 #    define __STDC_VERSION__ 19901L
 #   endif
 # endif
 #endif
+
 
 #ifndef NO_KRYPTOS_C99_SUPPORT
 # ifdef __STDC_VERSION__

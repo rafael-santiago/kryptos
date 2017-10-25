@@ -492,6 +492,8 @@ void kryptos_seal_cipher(kryptos_task_ctx **ktask) {
         }
     }
 
+    (*ktask)->result = kKryptosSuccess;
+
 #undef kryptos_seal_get_next_block
 
 #undef kryptos_seal_fill_out

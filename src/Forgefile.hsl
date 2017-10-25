@@ -23,6 +23,10 @@ project kryptos : toolset $toolset_name : dependencies $deps :
 
 kryptos.preloading() {
     $toolset_name = get_lib_toolset();
+    if ($toolset_name.match("^clang") == 1) {
+        $cflags.add_item("-Wno-pointer-sign");
+        $cflags.add_item("-Wno-invalid-source-encoding");
+    }
 }
 
 kryptos.prologue() {
