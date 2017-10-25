@@ -148,7 +148,9 @@ local function forge_cutest() : result type none {
 
     if (hefesto.sys.cd("cutest/src")) {
         hefesto.sys.forge("cutest",
-                          "Forgefile.hsl", "--forgefiles=Forgefile.hsl --Forgefile-projects=cutest --obj-output-dir=obj --bin-output-dir=lib");
+                          "Forgefile.hsl", "--forgefiles=Forgefile.hsl --Forgefile-projects=cutest " +
+                                            "--obj-output-dir=obj --bin-output-dir=lib " +
+                                            "--toolset=" + get_lib_toolset());
         if (hefesto.sys.last_forge_result() != 0) {
             hefesto.sys.echo("~~~ UNABLE TO BUILD LIBCUTEST.\n");
             hefesto.project.abort(1);
