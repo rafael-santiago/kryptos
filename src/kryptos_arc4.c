@@ -35,17 +35,23 @@ static void kryptos_arc4_key_setup(const kryptos_u8_t *userkey, const size_t use
     kryptos_u8_t S2[256];
     kryptos_u8_t temp;
 
+    // WARN(Rafael): Until now we are considering only GCC and Clang as "valid" compilers for this project.
+
 #if !defined(__clang__)
-    for (sk->i = 0; sk->i < 256; sk->S[sk->i] = sk->i++)
+    // CLUE(Rafael).1: Clang does not know how to handle correctly this code construction.
+    //                 In this compiler S will be initialized with random values, screwing
+    //                 up all ARC4 stuff.
+    for (sk->i = 0; sk->i < 256; S2[sk->i] = userkey[sk->i % userkey_size], sk->S[sk->i] = sk->i++)
         ;
 #else
+    // CLUE(Rafael): Due to that explained in CLUE.1 we will adopt a more well-behaved
+    //               initialization loop when using Clang.
     for (sk->i = 0; sk->i < 256; sk->i++) {
         sk->S[sk->i] = sk->i;
+        S2[sk->i] = userkey[sk->i % userkey_size];
     }
-#endif
 
-    for (sk->i = 0; sk->i < 256; S2[sk->i] = userkey[sk->i % userkey_size], sk->i++)
-        ;
+#endif
 
     for(sk->i = 0, sk->j = 0; sk->i < 256; sk->i++) {
         sk->j = (sk->j + sk->S[sk->i] + S2[sk->i]) % 256;
