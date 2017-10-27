@@ -31,6 +31,11 @@ typedef long intptr_t;
 #  endif
 # endif
 
+#if defined(_WIN32)
+# include <windows.h>
+# include <sys/types.h>
+# include <wincrypt.h>
+#endif
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__)
 # ifndef KRYPTOS_KERNEL_MODE
@@ -41,7 +46,6 @@ typedef long intptr_t;
 #   endif
 # endif
 #endif
-
 
 #ifndef NO_KRYPTOS_C99_SUPPORT
 # ifdef __STDC_VERSION__
@@ -85,6 +89,14 @@ typedef unsigned int kryptos_u32_t;
 #   define __WORDSIZE 32
 #  endif
 # endif
+#endif
+
+#if defined(_WIN32) && !defined(__WORDSIZE)
+# define __WORDSIZE 32
+#elif defined(_WIN64)&& !defined(__WORDSIZE)
+# define __WORDSIZE 64
+#else
+# error Cannot defined the WORDSIZE of this machine.
 #endif
 
 #if __WORDSIZE == 32

@@ -42,6 +42,8 @@ static void get_random_bytes(kryptos_u8_t *buf, const size_t n) {
 }
 #endif
 
+#if defined(__unix__)
+
 void *kryptos_get_random_block(const size_t size_in_bytes) {
     void *block = NULL;
 #if defined(KRYPTOS_USER_MODE)
@@ -88,6 +90,48 @@ kryptos_get_random_block_epilogue:
     return block;
 }
 
+#elif defined(_WIN32)
+
+void *kryptos_get_random_block(const size_t size_in_bytes) {
+    void *block = NULL;
+    HCRYPTPROV crypto_ctx = 0;
+
+    if (size_in_bytes == 0) {
+        goto kryptos_get_random_block_epilogue;
+    }
+
+    // TODO(Rafael): This seems to be slow as hell. Improve it to use a
+    //               straightforward way of getting those bytes.
+
+    if (!CryptAcquireContext(&crypto_ctx, NULL, NULL, PROV_RSA_FULL, 0)) {
+        return NULL;
+    }
+
+    block = kryptos_newseg((DWORD)size_in_bytes);
+
+    if (block == NULL) {
+        goto kryptos_get_random_block_epilogue;
+    }
+
+    if (!CryptGenRandom(crypto_ctx, (DWORD) size_in_bytes, block)) {
+        kryptos_freeseg(block);
+        block = NULL;
+        goto kryptos_get_random_block_epilogue;
+    }
+
+kryptos_get_random_block_epilogue:
+
+    if (crypto_ctx) {
+        CryptReleaseContext(crypto_ctx, 0);
+    }
+
+    return block;
+}
+
+#endif
+
+#if defined(__unix__)
+
 kryptos_u8_t kryptos_get_random_byte(void) {
     kryptos_u8_t b = 0;
 #if defined(KRYPTOS_USER_MODE)
@@ -114,3 +158,15 @@ kryptos_get_random_byte_epilogue:
 #endif
     return b;
 }
+
+#elif defined(_WIN32)
+kryptos_u8_t kryptos_get_random_byte(void) {
+    kryptos_u8_t b, *block;
+
+    block = kryptos_get_random_block(1);
+    b = *block;
+    kryptos_freeseg(block);
+
+    return b;
+}
+#endif
