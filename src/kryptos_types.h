@@ -91,10 +91,10 @@ typedef unsigned int kryptos_u32_t;
 # endif
 #endif
 
-#if defined(_WIN32) && !defined(__WORDSIZE)
-# define __WORDSIZE 32
-#elif defined(_WIN64)&& !defined(__WORDSIZE)
+#if defined(_WIN64) && !defined(__WORDSIZE)
 # define __WORDSIZE 64
+#elif defined(_WIN32)&& !defined(__WORDSIZE)
+# define __WORDSIZE 32
 #elif !defined(__WORDSIZE)
 # error I cannot guess the word size of this machine.
 #endif
