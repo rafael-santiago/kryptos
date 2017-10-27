@@ -47,13 +47,17 @@ kryptos-tests.prologue() {
     $libraries = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
 
-    $ldflags.add_item("-lpthread");
 
     if (hefesto.sys.os_name() == "freebsd") {
         $ldflags.add_item("-lexecinfo");
+        $ldflags.add_item("-lpthread");
     } else if (hefesto.sys.os_name() == "linux") {
         $ldflags.add_item("-ldl");
+        $ldflags.add_item("-lpthread");
     } else if (hefesto.sys.os_name() == "openbsd") {
+        $ldflags.add_item("-lexecinfo");
+        $ldflags.add_item("-lpthread");
+    } else if (hefesto.sys.os_name() == "minix") {
         $ldflags.add_item("-lexecinfo");
     }
 
