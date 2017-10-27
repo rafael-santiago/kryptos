@@ -97,7 +97,7 @@ void *kryptos_get_random_block(const size_t size_in_bytes) {
     HCRYPTPROV crypto_ctx = 0;
 
     if (size_in_bytes == 0) {
-        goto kryptos_get_random_block_epilogue;
+        return NULL;
     }
 
     // TODO(Rafael): This seems to be slow as hell. Improve it to use a
