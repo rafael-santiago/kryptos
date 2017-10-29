@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 int main(int argc, char **argv) {
-#if defined(KRYPTOSS_C99)
+#if defined(KRYPTOS_C99)
     kryptos_task_ctx m;
     int exit_code = 1;
 
