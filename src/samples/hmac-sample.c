@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 int main(int argc, char **argv) {
+#if defined(KRYPTOSS_C99)
     kryptos_task_ctx m;
     int exit_code = 1;
 
@@ -71,4 +72,8 @@ int main(int argc, char **argv) {
     kryptos_task_init_as_null(&m);
 
     return exit_code;
+#else
+    printf("WARNING: libkryptos was compiled without C99 support.\n");
+    return 1;
+#endif
 }

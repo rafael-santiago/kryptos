@@ -36,6 +36,11 @@ arc4-sample.prologue() {
     $src.add_item("arc4-sample.c");
     $inc = hefesto.sys.get_option("includes");
     $cflags = hefesto.sys.get_option("cflags");
+    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows") &&
+        $cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT") == -1) {
+        # INFO(Rafael): Let's enable c99 capabilities by default.
+        $cflags.add_item("-std=c99");
+    }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
 }
@@ -66,6 +71,11 @@ arc4-c99-sample.prologue() {
     $src.add_item("arc4-c99-sample.c");
     $inc = hefesto.sys.get_option("includes");
     $cflags = hefesto.sys.get_option("cflags");
+    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows") &&
+        $cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT") == -1) {
+        # INFO(Rafael): Let's enable c99 capabilities by default.
+        $cflags.add_item("-std=c99");
+    }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
 }
