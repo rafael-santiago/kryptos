@@ -84,7 +84,15 @@ kryptos.epilogue() {
                 #               read from 'samples/.ivk' since it was explicitly passed
                 #               in the command line read from 'hefesto.project.cmdline()'...
                 $toolset_name.replace("-.*$", "");
-                $exit_code = hefesto.sys.run("hefesto --toolset=" + $toolset_name);
+
+                var additional_cmdline type string;
+                $additional_cmdline = "--toolset=" + $toolset_name;
+
+                if ($cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT") > -1) {
+                    $additional_cmdline = "--cflags=-DNO_KRYPTOS_C99_SUPPORT";
+                }
+
+                $exit_code = hefesto.sys.run("hefesto " + $additional_cmdline);
 
                 if ($exit_code != 0) {
                     hefesto.project.abort($exit_code);
