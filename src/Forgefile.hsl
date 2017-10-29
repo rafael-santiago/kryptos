@@ -74,12 +74,26 @@ kryptos.epilogue() {
 
         if ($option.count() > 0) {
             if (hefesto.sys.cd("samples")) {
-                $exit_code = hefesto.sys.run("hefesto"); # INFO(Rafael): Let's take advantage of the '.ivk'. Less one point
-                                                         #               to manage when adding new samples.
+                # INFO(Rafael): Let's take advantage of the '.ivk'. Less one point
+                #               to manage when adding new samples.
+                #
+                # CLUE(Rafael): We cannot only pass 'hefesto.project.cmdline()' because
+                #               the options from command line always overwrite the options
+                #               from '.ivk'. If we pass 'hefesto.project.cmdline()' in order
+                #               to get the current toolset the '--includes' option will not be
+                #               read from 'samples/.ivk' since it was explicitly passed
+                #               in the command line read from 'hefesto.project.cmdline()'...
+                $toolset_name.replace("-.*$", "");
+                $exit_code = hefesto.sys.run("hefesto --toolset=" + $toolset_name);
 
                 if ($exit_code != 0) {
                     hefesto.project.abort($exit_code);
                 }
+
+                hefesto.sys.echo("BUILD INFO: All samples were built within '../samples' directory.\n" +
+                                 "            Please, read the '../doc/MANUAL.md' file " +
+                                 "to know more about each available code sample.\n" +
+                                 "            I hope you enjoy and exercise your rights! :)\n");
 
                 hefesto.sys.cd($oldcwd);
             } else {

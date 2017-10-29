@@ -6,7 +6,9 @@
 #
 #
 
-include ~/toolsets/gcc/gcc-app.hsl
+include ../Toolsets.hsl
+
+local var toolset_name type string;
 
 local var src type list;
 local var inc type list;
@@ -15,7 +17,11 @@ local var lib type list;
 local var ldflags type list;
 local var appname type string;
 
-project dsa-mk-key-pair-sample : toolset "gcc-c-app" : $src, $inc, $cflags, $lib, $ldflags, $appname;
+project dsa-mk-key-pair-sample : toolset $toolset_name : $src, $inc, $cflags, $lib, $ldflags, $appname;
+
+dsa-mk-key-pair-sample.preloading() {
+    $toolset_name = get_app_toolset();
+}
 
 dsa-mk-key-pair-sample.prologue() {
     $src.clear();
@@ -41,7 +47,11 @@ dsa-mk-key-pair-sample.epilogue() {
     }
 }
 
-project dsa-sign-c99-sample : toolset "gcc-c-app" : $src, $inc, $cflags, $lib, $ldflags, $appname;
+project dsa-sign-c99-sample : toolset $toolset_name : $src, $inc, $cflags, $lib, $ldflags, $appname;
+
+dsa-sign-c99-sample.preloading() {
+    $toolset_name = get_app_toolset();
+}
 
 dsa-sign-c99-sample.prologue() {
     $src.clear();

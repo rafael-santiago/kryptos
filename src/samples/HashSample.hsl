@@ -6,7 +6,9 @@
 #
 #
 
-include ~/toolsets/gcc/gcc-app.hsl
+include ../Toolsets.hsl
+
+local var toolset_name type string;
 
 local var src type list;
 local var inc type list;
@@ -15,7 +17,11 @@ local var lib type list;
 local var ldflags type list;
 local var appname type string;
 
-project bare-bone-hash-sample : toolset "gcc-c-app" : $src, $inc, $cflags, $lib, $ldflags, $appname;
+project bare-bone-hash-sample : toolset $toolset_name : $src, $inc, $cflags, $lib, $ldflags, $appname;
+
+bare-bone-hash-sample.preloading() {
+    $toolset_name = get_app_toolset();
+}
 
 bare-bone-hash-sample.prologue() {
     $src.clear();
@@ -41,7 +47,11 @@ bare-bone-hash-sample.epilogue() {
     }
 }
 
-project hmac-sample : toolset "gcc-c-app" : $src, $inc, $cflags, $lib, $ldflags, $appname;
+project hmac-sample : toolset $toolset_name : $src, $inc, $cflags, $lib, $ldflags, $appname;
+
+hmac-sample.preloading() {
+    $toolset_name = get_app_toolset();
+}
 
 hmac-sample.prologue() {
     $src.clear();
