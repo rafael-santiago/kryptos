@@ -58,6 +58,9 @@ kryptos-tests.prologue() {
         $ldflags.add_item("-lpthread");
     } else if (hefesto.sys.os_name() == "minix") {
         $ldflags.add_item("-lexecinfo");
+    } else if (hefesto.sys.os_name() == "netbsd") {
+        $ldflags.add_item("-lexecinfo");
+        $ldflags.add_item("-lpthread");
     } else if (hefesto.sys.os_name() == "windows" && $cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT")) {
         # INFO(Rafael): Let's enable c99 capabilities by default.
         $cflags.add_item("-std=c99");
