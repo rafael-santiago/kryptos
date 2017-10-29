@@ -89,7 +89,7 @@ kryptos.epilogue() {
                 $additional_cmdline = "--toolset=" + $toolset_name;
 
                 if ($cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT") > -1) {
-                    $additional_cmdline = "--cflags=-DNO_KRYPTOS_C99_SUPPORT";
+                    $additional_cmdline = $additional_cmdline + " --cflags=-DNO_KRYPTOS_C99_SUPPORT";
                 }
 
                 $exit_code = hefesto.sys.run("hefesto " + $additional_cmdline);
