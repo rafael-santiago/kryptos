@@ -68,6 +68,13 @@ kryptos-tests.prologue() {
     } else if (hefesto.sys.os_name() == "windows" && $cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT") == -1) {
         # INFO(Rafael): Let's enable c99 capabilities by default.
         $cflags.add_item("-std=c99");
+    } else if (hefesto.sys.os_name() == "sunos") {
+        $cflags.add_item("-DNO_CUTEST_BACKTRACING");
+        $ldflags.add_item("-lpthread");
+        if ($cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT") == -1) {
+            # INFO(Rafael): Let's enable c99 capabilities by default.
+            $cflags.add_item("-std=c99");
+        }
     }
 
     if (isdir("/usr/local/include")) {

@@ -36,7 +36,7 @@ rsa-mk-key-pair-sample.prologue() {
     $src.add_item("rsa-mk-key-pair-sample.c");
     $inc = hefesto.sys.get_option("includes");
     $cflags = hefesto.sys.get_option("cflags");
-    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows") &&
+    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows" || hefesto.sys.os_name() == "sunos") &&
         $cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT") == -1) {
         # INFO(Rafael): Let's enable c99 capabilities by default.
         $cflags.add_item("-std=c99");
@@ -71,7 +71,7 @@ rsa-schoolbook-sample.prologue() {
     $src.add_item("rsa-schoolbook-sample.c");
     $inc = hefesto.sys.get_option("includes");
     $cflags = hefesto.sys.get_option("cflags");
-    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows") &&
+    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows" || hefesto.sys.os_name() == "sunos") &&
         $cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT") == -1) {
         # INFO(Rafael): Let's enable c99 capabilities by default.
         $cflags.add_item("-std=c99");
@@ -106,7 +106,7 @@ rsa-schoolbook-c99-sample.prologue() {
     $src.add_item("rsa-schoolbook-c99-sample.c");
     $inc = hefesto.sys.get_option("includes");
     $cflags = hefesto.sys.get_option("cflags");
-    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows") &&
+    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows" || hefesto.sys.os_name() == "sunos") &&
         $cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT") == -1) {
         # INFO(Rafael): Let's enable c99 capabilities by default.
         $cflags.add_item("-std=c99");
@@ -141,7 +141,7 @@ rsa-oaep-c99-sample.prologue() {
     $src.add_item("rsa-oaep-c99-sample.c");
     $inc = hefesto.sys.get_option("includes");
     $cflags = hefesto.sys.get_option("cflags");
-    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows") &&
+    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows" || hefesto.sys.os_name() == "sunos") &&
         $cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT") == -1) {
         # INFO(Rafael): Let's enable c99 capabilities by default.
         $cflags.add_item("-std=c99");
@@ -176,7 +176,7 @@ rsa-sign-sample.prologue() {
     $src.add_item("rsa-sign-sample.c");
     $inc = hefesto.sys.get_option("includes");
     $cflags = hefesto.sys.get_option("cflags");
-    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows") &&
+    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows" || hefesto.sys.os_name() == "sunos") &&
         $cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT") == -1) {
         # INFO(Rafael): Let's enable c99 capabilities by default.
         $cflags.add_item("-std=c99");
@@ -211,7 +211,7 @@ rsa-sign-c99-sample.prologue() {
     $src.add_item("rsa-sign-c99-sample.c");
     $inc = hefesto.sys.get_option("includes");
     $cflags = hefesto.sys.get_option("cflags");
-    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows") &&
+    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows" || hefesto.sys.os_name() == "sunos") &&
         $cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT") == -1) {
         # INFO(Rafael): Let's enable c99 capabilities by default.
         $cflags.add_item("-std=c99");
@@ -246,7 +246,7 @@ rsa-emsa-pss-sign-c99-sample.prologue() {
     $src.add_item("rsa-emsa-pss-sign-c99-sample.c");
     $inc = hefesto.sys.get_option("includes");
     $cflags = hefesto.sys.get_option("cflags");
-    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows") &&
+    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows" || hefesto.sys.os_name() == "sunos") &&
         $cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT") == -1) {
         # INFO(Rafael): Let's enable c99 capabilities by default.
         $cflags.add_item("-std=c99");
