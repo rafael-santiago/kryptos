@@ -45,9 +45,9 @@ You do not need to worry about where this struct is specifically defined in kryp
 ### The kryptos_task_ctx struct
 
 The ``kryptos_task_ctx`` is responsible for storing the plaintext, ciphertext, the current used algorithm, the key parameters
-besides the additional parameters when necessary.
+besides the additional parameters when necessary. You always use this structure to express what you want.
 
-There is no field called "plaintext" or "ciphertext". There are the fields ``in`` and ``out``. Then, for encrypting the **plaintext**
+There is no field called "plaintext" or "ciphertext". There are the fields ``in`` and ``out``. Then, to encrypt data the **plaintext**
 must be stored into ``in``. When decrypting the **ciphertext** also must be stored into ``in``. The resultant data of the two operations
 always will be stored (allocated) into ``out``.
 
@@ -98,7 +98,7 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 
 **Table 1**: The available symmetric ciphers.
 
-|    **Cipher**    |      **Type**         |    **Internal ID constant**      |
+|    **Cipher**    |      **Type**         |    **Internal constant ID**      |
 |:----------------:|:---------------------:|:--------------------------------:|
 |   ``ARC4``       |       Stream          |       ``kKryptosCipherARC4``     |
 |   ``SEAL``       |       Stream          |       ``kKryptosCipherSEAL``     |
@@ -117,11 +117,11 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 | ``BLOWFISH``     |       Block           |       ``kKryptosCipherBLOWFISH`` |
 | ``SERPENT``      |       Block           |       ``kKryptosCipherSERPENT``  |
 
-The available modes of operation for the block ciphers are: ``ECB``, ``CBC`` and ``OFB``. So in practice, considering the OFB
-mode, we have 16 stream ciphers instead of only two. More on cipher modes will be treated later.
+The available modes of operation for the block ciphers are: ``ECB``, ``CBC`` and ``OFB``. So in practice, considering the
+``OFB`` mode, we have 16 stream ciphers instead of only two. More on cipher modes will be treated later.
 
 The way of indicating the desired cipher for an encryption task is by setting the field ``cipher`` from the ``kryptos_task_ctx``
-to the ``Internal ID constant`` listed in **Table 1**.
+to the ``Internal constant ID`` listed in **Table 1**.
 
 Similarly the indication of the operation mode is done by setting the field ``mode``. The values could be: ``kKryptosECB``,
 ``kKryptosCBC``, ``kKryptosOFB``. Of course that this field is only relevant when you are using a block cipher.
@@ -196,7 +196,7 @@ int main(int argc, char **argv) {
 Maybe you can find curious the lack of the second ``kryptos_arc4_setup()`` call. But this arc4 setup is just for storing
 the user key reference inside the task context. The real keystream generation is performed on every task execution.
 Once the user key and some internal control sets defined by ``kryptos_arc4_setup()`` you do not need call it anymore. The
-``kryptos_arc4_setup()`` sets the ``cipher`` field from ``kryptos_task_ctx`` to ``kKryptosCipherARC4``.
+``kryptos_arc4_setup()`` also sets the ``cipher`` field from ``kryptos_task_ctx`` to ``kKryptosCipherARC4``.
 
 Another curious thing could be the lack of the explicit indication of encryption or decryption intentions, however, ``ARC4``
 is a stream cipher, the encryption and decryption are the same. It only depends on the input.
@@ -413,14 +413,14 @@ The **Table 2** lists the identifiers related with each available operation mode
 |       ``CBC``      |         kKryptosCBC              |
 |       ``OFB``      |         kKryptosOFB              |
 
-When using CBC and OFB modes you do not have to worry about generating the initialization vector if you do not want to.
+When using ``CBC`` and ``OFB`` modes you do not have to worry about generating the initialization vector if you do not want to.
 Once the iv field from ``kryptos_task_ctx`` initialized as NULL, a new iv will be generated and used. In addition, after
 encrypting you do not need to worry about transfering the iv as a separated piece of information. The out field from
 ``kryptos_task_ctx`` gathers all information that you will need for a later decryption. As you may known there is no
-necessity of an IV be secret. If you use a static IV, in the end you are using a more complicated scheme for ECB mode,
-sadly, this kind of naive "approach" is common. Avoid doing this, it is irresponsible and stupid.
+necessity of an IV be secret. If you use a static IV, in the end you are using a more complicated scheme for ``ECB`` mode,
+sadly, this kind of naive "pro-approach" is common. Avoid doing this, it is irresponsible and stupid.
 
-The following code sample uses the SERPENT cipher in CBC mode with the c99 conveniences:
+The following code sample uses the SERPENT cipher in ``CBC`` mode with the c99 conveniences:
 
 ```c
 /*
@@ -480,9 +480,10 @@ int main(int argc, char **argv) {
 If you want to generate the iv on your own, you need to care about the content of the fields ``iv`` and ``iv_size`` from the
 ``kryptos_task_ctx`` struct. The iv should point to the chunk of bytes required as iv by the current used cipher and
 the iv_size must store the total in bytes of that byte chunk. If you generate an invalid iv the encryption/decryption will
-fail. As a result the kryptos_last_task_succeed(...) will indicate a zero value.
+fail. As a result the ``kryptos_last_task_succeed(...)`` will indicate a zero value.
 
 Details about a failure always can be accessed by watching the field ``result_verbose`` from the ``kryptos_task_ctx`` struct.
+However, again, some errors let it ``NULL`` (always check its nullity before continuing).
 
 Not all block ciphers only need a key, a size of this key and an operation mode. In kryptos we also have block ciphers
 that need more than the standard parameters. In this case the additional parameters are always passed after the operation
@@ -663,6 +664,7 @@ a message authenticated taking advantage from the implemented hash algorithms.
 #include <stdio.h>
 
 int main(int argc, char **argv) {
+#if defined(KRYPTOS_C99)
     kryptos_task_ctx m;
     int exit_code = 1;
 
@@ -725,6 +727,10 @@ int main(int argc, char **argv) {
     kryptos_task_init_as_null(&m);
 
     return exit_code;
+#else
+    printf("WARNING: libkryptos was compiled without C99 support.\n");
+    return 1;
+#endif
 }
 ```
 
@@ -1123,12 +1129,12 @@ Watson@221B:~/src/kryptos-test/samples# ./dh-domain-params-sample 160 80 > param
 
 Once generated the parameters can be used instead of the standarnized MODP values. Of course that use p=160 bits and q=80 is
 pretty insecure. The domain parameters calculating process can be slow. Since it depends on finding primes with specific
-relations between them. It is driven by luck, it can take 15 minutes or 2/3 hours... Fortunatelly, you should do it once.
+relations between them. It is driven by luck, it can take 15 minutes or 2/3 hours... Fortunately, you should do it once.
 
 In practice you should use at least p=1024 and q=160 bits.
 
 The domain parameters are exported as a ``PEM`` buffer. When receving a ``PEM`` buffer containing DHKE domain parameters
-a best practice is to verify if those parameters are really "trustable" before accepting and starting using them.
+the best practice is to verify if those parameters are really "trustable" before accepting and starting using them.
 
 The code below shows how to verify the values inside a ``PEM`` buffer.
 
@@ -1446,7 +1452,7 @@ all that you should do is store the output data in somewhere for later usage. Fr
 anymore, because the buffers were allocated by the ``kryptos_rsa_mk_key_pair()`` function. Do not be sloppy! :)
 
 Notice that the process of finding primes can be slow, so the key pair producing will become slow for greater
-key sizes. Fortunatelly, you should do it once.
+key sizes. Fortunately, you should do it once.
 
 For example in a 32-bit SMP, the code above executed using the following command line:
 
@@ -1490,7 +1496,7 @@ Hu5edzYetSfSrSwHDw==
 
 With the key pair well-generated is time to know how to use it in order to encrypt and decrypt some data.
 
-The following code shows the very basic usage of RSA cipher:
+The following code shows the very basic usage of RSA cipher in ``kryptos``:
 
 ```c
 /*
@@ -1848,7 +1854,7 @@ int main(int argc, char **argv) {
 }
 ```
 
-I am assuming that the reader has previously knowledge about how ``OAEP`` padding works.
+I am assuming that the reader has a previously knowledge about how ``OAEP`` padding works.
 
 Thus, the ``RSA OAEP`` should receive the key and its size and also a label and the size of this label and a pointer to a hash
 function and a pointer to a hash function size.
@@ -1968,9 +1974,9 @@ the Elgamal key pair. The arguments are: the P parameter size, the Q parameter s
 a pointer to store the size of the public buffer, a pointer to the private buffer and a pointer to store the size of the
 private buffer. When the function succeeds it returns ``kKryptosSuccess``.
 
-For brevity I will so you only the ``c99`` applications of the Elgamal in kryptos. The ``raw`` usage mode without ``c99``
-conveniences is similar to ``RSA``, I find you can figure it out by yourself. Thus, this is the way of using the
-Elgamal schoolbook with ``c99``:
+For brevity I will show you only the ``c99`` applications of the Elgamal in kryptos. The ``raw`` usage mode without ``c99``
+conveniences is similar to ``RSA``, I find you can figure it out by yourself. Thus, this is the way of using the Elgamal
+schoolbook with ``c99``:
 
 ```c
 /*
@@ -2195,8 +2201,8 @@ buffer when not NULL should be freed.
 
 #### RSA
 
-Firstly I will show you the way of sign a input buffer with the standard RSA sign algorithm without ``C99`` conveniences.
-Take a look on it:
+Firstly I will show you the way of sign an input buffer with the standard RSA sign algorithm without ``C99`` conveniences.
+Take a look:
 
 ```c
 /*
