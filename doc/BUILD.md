@@ -40,8 +40,8 @@ All done!
 
 ### Building the kernel mode version
 
-``Kryptos`` has some parts designed to be used in kernel mode. Until now it supports ``FreeBSD``. However, there is no "kernel mode" build.
-The library was written taking in consideration that the users will compile ``kryptos`` together with their own stuff (as monolithic project).
+``Kryptos`` has some parts designed to be used in kernel mode. Until now it supports ``FreeBSD`` and ``Linux``. However, there is no "kernel mode" build.
+The library was written taking in consideration that the users will compile ``kryptos`` together with their own stuff (as a monolithic project).
 The only thing that should be done is define the macro ``KRYPTOS_KERNEL_MODE`` and ``kryptos`` will "become" a kernel mode stuff.
 
 You should use some features with care. Personally I find that execute some features in kernel mode is overkill. You should do only the
@@ -49,7 +49,7 @@ most "straightforward" cryptographic stuff in kernel but you are free... But tak
 
 ## Advanced build commands for contributors
 
-If you want to contribute, thank you! Maybe the following informations can be useful to you.
+If you want to contribute, thank you! Maybe the following information can be useful to you.
 
 ### Skipping the HMAC tests
 
@@ -77,10 +77,29 @@ The option that you should use is ``--quick-dh-tests`` and this option is enable
 secret values. As a result it will take longer to conclude the tests. Otherwise when you specify the build option
 ``--quick-dh-tests`` it will use ``8-bit`` secret values. As a result the test will be fast.
 
-The explicity usage of this build option is pretty straightforward:
+The explicit usage of this build option is pretty straightforward:
 
 ```
 Sherlock@221B:~/src/kryptos/src# hefesto --quick-dh-tests
+```
+
+### Skipping the OAEP tests from some PK algorithms
+
+The OAEP tests not only test the data encryption and its correct data decryption. The test also simulates invalid data passing
+due to it the test can be slow. To speed up the build you can skip the OAEP test stuff as follows:
+
+```
+Sherlock@221B:~/src/kryptos/src# hefesto --skip-rsa-oaep-tests \
+> --skip-elgamal-oaep-tests
+```
+
+### Skipping the digital signature tests
+
+The digital signature tests also can be time consuming. The following command line skips them:
+
+```
+Sherlock@221B:~/src/kryptos/src# hefesto --skip-rsa-signature-tests \
+> --skip-dsa-signature-tests
 ```
 
 ### Stressing the tests in order to see if you have introduced some undefined behavior
@@ -99,7 +118,8 @@ I usually like the following stress testing command line:
 
 ```
 Sherlock@221B:~/src/kryptos/src# hefesto --no-hmac-tests --stress-tests \
-> --runnings-nr=1024
+> --runnings-nr=1024 --skip-rsa-oaep-tests --skip-elgamal-oaep-tests \
+> --skip-rsa-signature-tests --skip-dsa-signature-tests
 ```
 
 When you are dealing with random bugs this is a friendly way of trying to reproduce the bug.
@@ -120,9 +140,10 @@ The default build options are defined into the file ``src/.ivk``. The **Table 1*
 
 ### The default build options (unit tests)
 
-The default build options are defined into the file ``src/tests/.ivk``. The **Table 2** gathers these options.
+The default build options are defined into the file ``src/tests/.ivk``. The **Table 2** gathers these options and also
+additional options.
 
-**Table 2**: The default build options for the unit tests.
+**Table 2**: The default and additional build options for the unit tests.
 
 |             **Option**                   |               **Description**                                                |
 |:----------------------------------------:|:----------------------------------------------------------------------------:|
@@ -138,7 +159,7 @@ The default build options are defined into the file ``src/tests/.ivk``. The **Ta
 | ``--skip-rsa-signature-tests``           | Skips the RSA signature tests. The tests execution becomes faster.           |
 | ``--skip-dsa-signature-tests``           | Skips the DSA signature tests. The tests execution becomes faster.           |
 | ``--mk-samples``                         | Requests the code samples build.                                             |
-| ``--toolset=gcc|clang``                  | Defines the C compiler (the default is ``GCC``).                             |
+| ``--toolset=<gcc or clang>``             | Defines the C compiler (the default is ``GCC``).                             |
 
 ### How the kernel mode tests are executed
 
