@@ -158,8 +158,6 @@ CUTE_TEST_CASE(kryptos_uuencode_dsl_tests)
     };
 
     size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
-    kryptos_u8_t *out;
-    size_t out_size;
 
     kryptos_task_init_as_null(ktask);
 
