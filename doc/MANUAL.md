@@ -3023,6 +3023,13 @@ epilogue:
 }
 ```
 
+The "raw usage" of ``UUEncode`` is similar to the way shown with ``Base64``. Due to it, for brevity, the code below
+uses ``UUEncode`` with the kryptos internal dsl primitive ``kryptos_run_encoder()``.
+
+```c
+
+```
+
 ### Data compression
 
 ### Handling PEM buffers

@@ -37,7 +37,9 @@ int main(int argc, char **argv) {
         goto epilogue;
     }
 
-    printf("Decoded text: '%s'\n", ktask->out);
+    printf("Decoded text: '");
+    fwrite(ktask->out, ktask->out_size, 1, stdout);
+    printf("'\n");
 
 epilogue:
 

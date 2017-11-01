@@ -56,7 +56,9 @@ int main(int argc, char **argv) {
         goto epilogue;
     }
 
-    printf("Decoded text: '%s'\n", t.out);
+    printf("Decoded text: '");
+    fwrite(t.out, t.out_size, 1, stdout);
+    printf("'\n");
 
 epilogue:
 

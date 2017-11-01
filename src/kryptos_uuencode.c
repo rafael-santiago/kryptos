@@ -93,15 +93,25 @@ kryptos_u8_t *kryptos_uuencode_encode_buffer(const kryptos_u8_t *buffer, const s
         if (cp == cp_end || bp == bp_end) {
             *out_p = 32 + enc_total;
             memcpy(out_p + 1, curr_line, (cp - &curr_line[0]));
-            out_p += KRYPTOS_UUENCODE_BYTES_PER_LINE + 1;
-            *out_p = '\n';
-            out_p++;
+            if (cp == cp_end) {
+                out_p += KRYPTOS_UUENCODE_BYTES_PER_LINE + 1;
+                *out_p = '\n';
+                out_p++;
+            } else {
+                // CLUE(Rafael): Rather tiny input cases.
+                out_p += cp - &curr_line[0] + 1;
+            }
             cp = &curr_line[0];
             enc_total = 0;
         }
     }
 
-    out_p = (out + *out_size) - 3;
+    // INFO(Rafael): 'out_p = (out + *out_size) - 3'?! The world is not so perfect little Alice...
+
+    while (*out_p != 0) {
+        out_p++;
+    }
+
     *( out_p ) = '\n';
     *(out_p + 1) = '`';
     *(out_p + 2) = '\n';
@@ -134,6 +144,14 @@ static kryptos_u8_t *kryptos_uuencode_decode_buffer(const kryptos_u8_t *buffer, 
 
     *out_size = ((buffer_size * 6) / 8) - 4;
 
+    bp = buffer;
+    bp_end = bp + buffer_size;
+
+    if (*out_size < *bp - 32) {
+        // CLUE(Rafael): Rather tiny buffers case.
+        *out_size = *bp - 32;
+    }
+
     out = (kryptos_u8_t *) kryptos_newseg(*out_size + KRYPTOS_UUENCODE_BYTES_PER_LINE);
     if (out == NULL) {
         *out_size = 0;
@@ -141,9 +159,6 @@ static kryptos_u8_t *kryptos_uuencode_decode_buffer(const kryptos_u8_t *buffer, 
     }
     out_p = out;
     memset(out, 0, *out_size + KRYPTOS_UUENCODE_BYTES_PER_LINE);
-
-    bp = buffer;
-    bp_end = bp + buffer_size;
 
     while (bp < bp_end && *bp != '`') {
         enc_total = *bp - 32;
