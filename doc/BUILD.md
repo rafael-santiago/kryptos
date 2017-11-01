@@ -1,7 +1,7 @@
 # Build instructions
 
 In this document you find basic information about how to build ``kryptos`` (a.k.a. libkryptos) besides advanced
-build commands destinated for contributors.
+build commands destinated to contributors.
 
 ## Cloning the kryptos repository
 
