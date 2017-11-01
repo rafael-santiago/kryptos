@@ -35,6 +35,7 @@
 
 #include <kryptos_base64.h>
 #include <kryptos_uuencode.h>
+#include <kryptos_huffman.h>
 
 #include <kryptos_hmac.h>
 
