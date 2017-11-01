@@ -12,7 +12,11 @@
 
 CUTE_DECLARE_TEST_CASE(kryptos_base64_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_base64_dsl_tests);
+
 CUTE_DECLARE_TEST_CASE(kryptos_uuencode_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_uuencode_dsl_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_huffman_tests);
 

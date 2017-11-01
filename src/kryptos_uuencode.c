@@ -20,6 +20,8 @@ static kryptos_u8_t *kryptos_uuencode_encode_buffer(const kryptos_u8_t *buffer, 
 
 static kryptos_u8_t *kryptos_uuencode_decode_buffer(const kryptos_u8_t *buffer, const size_t buffer_size, size_t *out_size);
 
+KRYPTOS_IMPL_ENCODING_SETUP(uuencode, ktask, kKryptosEncodingUUENCODE);
+
 KRYPTOS_IMPL_ENCODING_PROCESSOR(uuencode, kKryptosEncodingUUENCODE, ktask,
                                 kryptos_uuencode_buffer_processor,
                                 uuencode_buffer_processor,

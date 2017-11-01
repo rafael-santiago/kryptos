@@ -60,6 +60,8 @@ static kryptos_u8_t *kryptos_base64_encode_buffer(const kryptos_u8_t *buffer, co
 
 static kryptos_u8_t *kryptos_base64_decode_buffer(const kryptos_u8_t *buffer, const size_t buffer_size, size_t *out_size);
 
+KRYPTOS_IMPL_ENCODING_SETUP(base64, ktask, kKryptosEncodingBASE64);
+
 KRYPTOS_IMPL_ENCODING_PROCESSOR(base64, kKryptosEncodingBASE64, ktask,
                                 kryptos_base64_buffer_processor,
                                 base64_buffer_processor,

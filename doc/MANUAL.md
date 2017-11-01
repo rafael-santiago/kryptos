@@ -2900,7 +2900,7 @@ functionalities. In the following section we will discuss them a little.
 
 Until now are available two encoding algorithms: ``Base64`` and ``UUEncode``.
 
-Here follows the way of using ``Base64`` without taking advantage of any c99 convenience:
+Here follows the way of using ``Base64`` without taking advantage of any dsl convenience:
 
 ```c
 /*

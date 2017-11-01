@@ -387,6 +387,17 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
 
 #endif
 
+#define KRYPTOS_DECL_ENCODING_SETUP(encoding_name, ktask)\
+void kryptos_ ## encoding_name ## _setup(kryptos_task_ctx *ktask);
+
+#define KRYPTOS_IMPL_ENCODING_SETUP(encoding_name, ktask, kEncoder)\
+void kryptos_ ## encoding_name ## _setup(kryptos_task_ctx *ktask) {\
+    if ((ktask) == NULL) {\
+        return;\
+    }\
+    (ktask)->encoder = kEncoder;\
+}
+
 #define KRYPTOS_DECL_ENCODING_PROCESSOR(encoding_name, ktask)\
 void kryptos_ ## encoding_name ## _processor(kryptos_task_ctx **ktask);
 

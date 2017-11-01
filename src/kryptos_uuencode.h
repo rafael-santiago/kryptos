@@ -10,6 +10,8 @@
 
 #include <kryptos_types.h>
 
+KRYPTOS_DECL_ENCODING_SETUP(uuencode, ktask);
+
 KRYPTOS_DECL_ENCODING_PROCESSOR(uuencode, ktask)
 
 #endif

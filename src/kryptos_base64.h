@@ -10,6 +10,8 @@
 
 #include <kryptos_types.h>
 
+KRYPTOS_DECL_ENCODING_SETUP(base64, ktask);
+
 KRYPTOS_DECL_ENCODING_PROCESSOR(base64, ktask)
 
 #endif

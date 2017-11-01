@@ -442,4 +442,13 @@ kryptos_ ## label_name:\
 
 #endif // KRYPTOS_C99
 
+#define kryptos_run_encoder(ename, ktask, data, data_size) {\
+    kryptos_ ## ename ## _setup(ktask);\
+    (ktask)->in = data;\
+    (ktask)->in_size = data_size;\
+    (ktask)->mirror_p = (ktask);\
+    kryptos_ ## ename ## _processor(&(ktask)->mirror_p);\
+    (ktask)->mirror_p = NULL;\
+}
+
 #endif // KRYPTOS_KRYPTOS_H

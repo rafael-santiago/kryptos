@@ -74,7 +74,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     // INFO(Rafael): Encoding stuff.
     CUTE_RUN_TEST(kryptos_base64_tests);
+    CUTE_RUN_TEST(kryptos_base64_dsl_tests);
     CUTE_RUN_TEST(kryptos_uuencode_tests);
+    CUTE_RUN_TEST(kryptos_uuencode_dsl_tests);
     CUTE_RUN_TEST(kryptos_huffman_tests);
     CUTE_RUN_TEST(kryptos_pem_get_data_tests);
     CUTE_RUN_TEST(kryptos_pem_put_data_tests);
