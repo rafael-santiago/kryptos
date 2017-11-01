@@ -2961,7 +2961,9 @@ int main(int argc, char **argv) {
         goto epilogue;
     }
 
-    printf("Decoded text: '%s'\n", t.out);
+    printf("Decoded text: '");
+    fwrite(t.out, t.out_size, 1, stdout);
+    printf("'\n");
 
 epilogue:
 
@@ -3013,7 +3015,9 @@ int main(int argc, char **argv) {
         goto epilogue;
     }
 
-    printf("Decoded text: '%s'\n", ktask->out);
+    printf("Decoded text: '");
+    fwrite(ktask->out, ktask->out_size, 1, stdout);
+    printf("'\n");
 
 epilogue:
 
@@ -3023,11 +3027,60 @@ epilogue:
 }
 ```
 
-The "raw usage" of ``UUEncode`` is similar to the way shown with ``Base64``. Due to it, for brevity, the code below
-uses ``UUEncode`` with the kryptos internal dsl primitive ``kryptos_run_encoder()``.
+The "raw usage" of ``UUEncode`` is similar to the way shown in ``Base64`` related sample. Due to it, for the sake of our
+patience, the code below uses ``UUEncode`` with the kryptos internal dsl primitive ``kryptos_run_encoder()``.
 
 ```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <stdio.h>
 
+int main(int argc, char **argv) {
+    int exit_code = 0;
+    kryptos_task_ctx t, *ktask = &t;
+    char *data = "Angel of Harlem";
+
+    kryptos_task_init_as_null(ktask);
+
+    printf("Original data: '%s'\n", data);
+
+    kryptos_task_set_encode_action(ktask);
+    kryptos_run_encoder(uuencode, ktask, data, strlen(data));
+
+    if (!kryptos_last_task_succeed(ktask)) {
+        exit_code = 1;
+        printf("Encoding error!\n");
+        ktask->in = NULL;
+        goto epilogue;
+    }
+
+    printf("Encoded data: '%s'\n", ktask->out);
+
+    kryptos_task_set_decode_action(ktask);
+    kryptos_run_encoder(uuencode, ktask, ktask->out, ktask->out_size);
+
+    if (!kryptos_last_task_succeed(ktask)) {
+        exit_code = 1;
+        printf("Decoding error!\n");
+        goto epilogue;
+    }
+
+    printf("Decoded data: '");
+    fwrite(ktask->out, 1, ktask->out_size, stdout);
+    printf("'\n");
+
+epilogue:
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT);
+
+    return exit_code;
+}
 ```
 
 ### Data compression
