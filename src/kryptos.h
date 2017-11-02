@@ -12,6 +12,7 @@
 #include <kryptos_memory.h>
 #include <kryptos_block_parser.h>
 #include <kryptos_iv_utils.h>
+#include <kryptos_pem.h>
 
 #include <kryptos_arc4.h>
 #include <kryptos_seal.h>

@@ -2,7 +2,8 @@
 
 **Abstract**: This library was designed to be used in user mode applications and also in kernel mode. The following
 sections will guide the readers through the main aspects of how to use ``kryptos`` in their own stuff. This documentation
-considers that the readers have at least a minimal formal knowledge of modern cryptography.
+considers that the readers have at least a minimal formal knowledge of modern cryptography. All complete sample code
+presented here can be built with the command ``hefesto --mk-samples``.
 
 ## Link101
 
@@ -3177,3 +3178,194 @@ epilogue:
 
 ### Handling PEM buffers
 
+The export format used in kryptos is ``PEM``. In order to handle this type of data kryptos exposes three functions. A function
+to put some information into a ``PEM`` buffer. A function to get some information from a ``PEM`` buffer and also another function
+to load a multiprecision number from a ``PEM`` buffer.
+
+The code below shows the way of putting data inside a ``PEM`` buffer:
+
+```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <stdio.h>
+
+#define FIRST_NAME "FIRST"
+
+#define SECOND_NAME "SECOND"
+
+int main(int argc, char **argv) {
+    kryptos_u8_t *pem_buffer = NULL;
+    size_t pem_buffer_size;
+    int exit_code = 0;
+
+    if (kryptos_pem_put_data(&pem_buffer, &pem_buffer_size, SECOND_NAME,
+                             "Bond", 4) != kKryptosSuccess) {
+        printf("Error while putting data labeled as %s into buffer.\n", SECOND_NAME);
+        exit_code = 1;
+        goto epilogue;
+    }
+
+    printf("PEM:\n\n%s\n", pem_buffer);
+
+    if (kryptos_pem_put_data(&pem_buffer, &pem_buffer_size, FIRST_NAME,
+                             "James", 5) != kKryptosSuccess) {
+        printf("Error while putting data labeled as %s into buffer.\n", FIRST_NAME);
+    }
+
+    printf("PEM:\n\n%s\n", pem_buffer);
+
+epilogue:
+
+    if (pem_buffer != NULL) {
+        kryptos_freeseg(pem_buffer);
+    }
+
+    return exit_code;
+}
+```
+
+The following code shows how to get plain data from a ``PEM`` buffer:
+
+```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <stdio.h>
+
+#define SECOND_NAME "SECOND"
+
+#define FIRST_NAME "FIRST"
+
+int main(int argc, char **argv) {
+    int exit_code = 0;
+    kryptos_u8_t *pem_buffer = "-----BEGIN SECOND-----\n"
+                               "Qm9uZA==\n"
+                               "-----END SECOND-----\n"
+                               "-----BEGIN FIRST-----\n"
+                               "SmFtZXM=\n"
+                               "-----END FIRST-----\n";
+
+    kryptos_u8_t *first = NULL, *second = NULL;
+    size_t first_size, second_size, pem_buffer_size = strlen(pem_buffer);
+
+    second = kryptos_pem_get_data(SECOND_NAME, pem_buffer, pem_buffer_size, &second_size);
+
+    if (second == NULL) {
+        printf("Error while getting data labeled as %s from buffer.\n", SECOND_NAME);
+        exit_code = 1;
+        goto epilogue;
+    }
+
+    first = kryptos_pem_get_data(FIRST_NAME, pem_buffer, pem_buffer_size, &first_size);
+
+    if (first == NULL) {
+        printf("Error while getting data labeled as %s from buffer.\n", FIRST_NAME);
+        exit_code = 1;
+        goto epilogue;
+    }
+
+    printf("My name is ");
+
+    fwrite(second, second_size, 1, stdout);
+
+    printf(", ");
+
+    fwrite(first, first_size, 1, stdout);
+
+    printf(" ");
+
+    fwrite(second, second_size, 1, stdout);
+
+    printf(".\n");
+
+epilogue:
+
+    if (second != NULL) {
+        kryptos_freeseg(second);
+    }
+
+    if (first != NULL) {
+        kryptos_freeseg(first);
+    }
+
+    return exit_code;
+}
+```
+
+The third ``PEM`` buffer function is destinated to read multiprecision data. The following code does the job:
+
+```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <kryptos_mp.h>
+#include <stdio.h>
+
+#define PRIME "PRIME"
+
+int main(int argc, char **argv) {
+    int exit_code = 0;
+    kryptos_u8_t *pem_buffer = "-----BEGIN PRIME-----\n"
+                               "+TyfXiVPtBkAIRwp5ZDMN"
+                               "NOvx36w9DG0kQVWmbaeIm"
+                               "9VJanCQb+pTfbDTnCnnyZ"
+                               "10h4bibG6CKJFk75bYgL6"
+                               "QzveLHdQO2WIPhXLtv0U0"
+                               "8c0DRNdjZu9aRvvHj2RXi"
+                               "umUz5pVCbhQoeAv9YI1yx"
+                               "Ya+I4J+FNyMnwC6LKtRQG"
+                               "KAM=\n"
+                               "-----END PRIME-----\n";
+
+    kryptos_mp_value_t *prime = NULL;
+    int is_prime;
+
+    if (kryptos_pem_get_mp_data(PRIME, pem_buffer, strlen(pem_buffer), &prime) != kKryptosSuccess) {
+        printf("Error while getting the prime number from buffer.\n");
+        exit_code = 1;
+        goto epilogue;
+    }
+
+    printf("Number successfully loaded from the PEM buffer.\n");
+
+    printf("By the way, this is the exact number loaded (in hexadecimal format) "); kryptos_print_mp(prime);
+
+    printf("Now I am testing the primality of it, please wait...\n");
+
+    is_prime = kryptos_mp_is_prime(prime);
+
+    if (is_prime) {
+        printf("The number is prime.\n");
+    } else {
+        printf("The number is not prime as expected.\n");
+        exit_code = 1;
+    }
+
+epilogue:
+
+    if (prime != NULL) {
+        kryptos_del_mp_value(prime);
+    }
+
+    return exit_code;
+}
+```
+
+More details about the multiprecision handling functions are not given because it is considered an advanced
+topic for a final user manual. For more details try the technical documentation destinated to contributors.
