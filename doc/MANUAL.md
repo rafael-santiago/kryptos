@@ -3369,3 +3369,11 @@ epilogue:
 
 More details about the multiprecision handling functions are not given because it is considered an advanced
 topic for a final user manual. For more details try the technical documentation destinated to contributors.
+
+## So it is enough
+
+If you have understood every single sample code presented in here, I think that you are ready for some action
+with this library. I hope you enjoy! Happy coding! :)
+
+Do you think that something is still unclear? Please let me [know](https://github.com/rafael-santiago/kryptos/issues)
+and thank you!
