@@ -100,7 +100,7 @@ kryptos.epilogue() {
 
                 hefesto.sys.echo("BUILD INFO: All samples were built within '../samples' directory.\n" +
                                  "            Please, read the '../doc/MANUAL.md' file " +
-                                 "to know more about each available code sample.\n" +
+                                 "to know more about each available sample code.\n" +
                                  "            I hope you enjoy and exercise your rights! :)\n");
 
                 hefesto.sys.cd($oldcwd);
