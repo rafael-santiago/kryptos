@@ -392,6 +392,14 @@ kryptos_ ## label_name:\
 
 #define kryptos_dsa_hash(hname) kryptos_ ## hname ## _hash
 
+#define kryptos_hash(hname, ktask, data, data_size, hex) {\
+    (ktask)->in = data;\
+    (ktask)->in_size = data_size;\
+    (ktask)->mirror_p = (ktask);\
+    kryptos_ ## hname ## _hash(&(ktask)->mirror_p, hex);\
+    (ktask)->mirror_p = NULL;\
+}
+
 #ifdef KRYPTOS_C99
 
 #define kryptos_run_cipher(cname, ktask, cipher_args...) {\

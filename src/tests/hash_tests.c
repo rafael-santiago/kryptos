@@ -13,36 +13,72 @@ CUTE_TEST_CASE(kryptos_sha1_tests)
     kryptos_run_hash_tests(sha1, 64, 20);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_sha1_hash_macro_tests)
+    kryptos_run_hash_macro_tests(sha1, 64, 20);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_sha224_tests)
     kryptos_run_hash_tests(sha224, 64, 28);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_sha224_hash_macro_tests)
+    kryptos_run_hash_macro_tests(sha224, 64, 28);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha256_tests)
     kryptos_run_hash_tests(sha256, 64, 32);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_sha256_hash_macro_tests)
+    kryptos_run_hash_macro_tests(sha256, 64, 32);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_sha384_tests)
     kryptos_run_hash_tests(sha384, 128, 48);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_sha384_hash_macro_tests)
+    kryptos_run_hash_macro_tests(sha384, 128, 48);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha512_tests)
     kryptos_run_hash_tests(sha512, 128, 64);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_sha512_hash_macro_tests)
+    kryptos_run_hash_macro_tests(sha512, 128, 64);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_md4_tests)
     kryptos_run_hash_tests(md4, 64, 16);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_md4_hash_macro_tests)
+    kryptos_run_hash_macro_tests(md4, 64, 16);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_md5_tests)
     kryptos_run_hash_tests(md5, 64, 16);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_md5_hash_macro_tests)
+    kryptos_run_hash_macro_tests(md5, 64, 16);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_ripemd128_tests)
     kryptos_run_hash_tests(ripemd128, 64, 16);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_ripemd128_hash_macro_tests)
+    kryptos_run_hash_macro_tests(ripemd128, 64, 16);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_ripemd160_tests)
     kryptos_run_hash_tests(ripemd160, 64, 20);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_ripemd160_hash_macro_tests)
+    kryptos_run_hash_macro_tests(ripemd160, 64, 20);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_hmac_tests)

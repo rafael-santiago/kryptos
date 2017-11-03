@@ -31,6 +31,10 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
+    kryptos_hash(sha1, ktask, message, message_size, 0);
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
     // INFO(Rafael): SHA-224.
 
     KUTE_ASSERT(kryptos_sha224_hash_input_size() == 64);
@@ -40,6 +44,10 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     KUTE_ASSERT(t.out_size == kryptos_sha224_hash_size());
     raw_hash = "\x23\x09\x7D\x22\x34\x05\xD8\x22\x86\x42\xA4\x77\xBD\xA2"
                "\x55\xB3\x2A\xAD\xBC\xE4\xBD\xA0\xB3\xF7\xE3\x6C\x9D\xA7";
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    kryptos_hash(sha224, ktask, message, message_size, 0);
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
@@ -55,6 +63,10 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
+    kryptos_hash(sha256, ktask, message, message_size, 0);
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
     // INFO(Rafael): SHA-384.
 
     KUTE_ASSERT(kryptos_sha384_hash_input_size() == 128);
@@ -65,6 +77,10 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     raw_hash = "\xCB\x00\x75\x3F\x45\xA3\x5E\x8B\xB5\xA0\x3D\x69\x9A\xC6\x50\x07"
                "\x27\x2C\x32\xAB\x0E\xDE\xD1\x63\x1A\x8B\x60\x5A\x43\xFF\x5B\xED"
                "\x80\x86\x07\x2B\xA1\xE7\xCC\x23\x58\xBA\xEC\xA1\x34\xC8\x25\xA7";
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    kryptos_hash(sha384, ktask, message, message_size, 0);
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
@@ -82,6 +98,10 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
+    kryptos_hash(sha512, ktask, message, message_size, 0);
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
     // INFO(Rafael): MD4.
 
     KUTE_ASSERT(kryptos_md4_hash_input_size() == 64);
@@ -90,6 +110,10 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_md4_hash_size());
     raw_hash = "\xA4\x48\x01\x7A\xAF\x21\xD8\x52\x5F\xC1\x0A\xE8\x7A\xA6\x72\x9D";
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    kryptos_hash(md4, ktask, message, message_size, 0);
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
@@ -104,6 +128,10 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
+    kryptos_hash(md5, ktask, message, message_size, 0);
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
     // INFO(Rafael): RIPEMD-128.
 
     KUTE_ASSERT(kryptos_ripemd128_hash_input_size() == 64);
@@ -115,6 +143,10 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
+    kryptos_hash(ripemd128, ktask, message, message_size, 0);
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
     // INFO(Rafael): RIPEMD-160.
 
     KUTE_ASSERT(kryptos_ripemd160_hash_input_size() == 64);
@@ -123,6 +155,10 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_ripemd160_hash_size());
     raw_hash = "\x8E\xB2\x08\xF7\xE0\x5D\x98\x7A\x9B\x04\x4A\x8E\x98\xC6\xB0\x87\xF1\x5A\x0B\xFC";
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    kryptos_hash(ripemd160, ktask, message, message_size, 0);
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 

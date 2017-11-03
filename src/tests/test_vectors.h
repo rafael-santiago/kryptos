@@ -282,6 +282,25 @@ static kryptos_u8_t *hmac_test_data[] = {
     }\
 }
 
+#define kryptos_run_hash_macro_tests(hash, input_size, size) {\
+    kryptos_task_ctx t, *ktask = &t;\
+    size_t tv, tv_nr = sizeof(hash ## _test_vector) / sizeof(hash ## _test_vector[0]);\
+    CUTE_ASSERT(kryptos_ ## hash ## _hash_input_size() == input_size);\
+    CUTE_ASSERT(kryptos_ ## hash ## _hash_size() == size);\
+    for (tv = 0; tv < tv_nr; tv++) {\
+        kryptos_hash(hash, ktask, hash ## _test_vector[tv].message, hash ## _test_vector[tv].message_size, 0);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size == hash ## _test_vector[tv].raw_hash_size);\
+        CUTE_ASSERT(memcmp(t.out, hash ## _test_vector[tv].raw_hash, t.out_size) == 0);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
+        kryptos_hash(hash, ktask, hash ## _test_vector[tv].message, hash ## _test_vector[tv].message_size, 1);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size == hash ## _test_vector[tv].hex_hash_size);\
+        CUTE_ASSERT(memcmp(t.out, hash ## _test_vector[tv].hex_hash, t.out_size) == 0);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
+    }\
+}
+
 #ifdef KRYPTOS_C99
 
 #define kryptos_run_hmac_tests(t, tv, tv_nr, data_size, cname, hname, cipher_args...) {\

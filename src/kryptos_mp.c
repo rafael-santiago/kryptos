@@ -836,7 +836,8 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
         c += bsub >> 8;
         delta->data[s] = bsub & 0xFF;
 #else
-        bsub = ( (d < (*dest)->data_size) ? (kryptos_u64_t)(*dest)->data[d] : 0 ) - ( (d < src->data_size) ? (kryptos_u64_t)src->data[d] : 0 ) + (kryptos_u64_t)c;
+        bsub = ( (d < (*dest)->data_size) ? (kryptos_u64_t)(*dest)->data[d] : 0 ) -
+                ( (d < src->data_size) ? (kryptos_u64_t)src->data[d] : 0 ) + (kryptos_u64_t)c;
         c += bsub >> 32;
         delta->data[s] = bsub & 0xFFFFFFFF;
 #endif
@@ -3000,7 +3001,8 @@ kryptos_mp_gcd_epilogue:
 #ifdef KRYPTOS_MP_BINARY_MODINV
 
 /*kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *ua, const kryptos_mp_value_t *m) {
-    kryptos_mp_value_t *g = NULL, *x = NULL, *y = NULL, *A = NULL, *B = NULL, *C = NULL, *D = NULL, *u = NULL, *v = NULL, *_0 = NULL, *_1 = NULL;
+    kryptos_mp_value_t *g = NULL, *x = NULL, *y = NULL, *A = NULL, *B = NULL, *C = NULL, *D = NULL,
+                       *u = NULL, *v = NULL, *_0 = NULL, *_1 = NULL;
     kryptos_mp_value_t *a = NULL, *b = NULL, *gcd = NULL;
     int has_converged;
 

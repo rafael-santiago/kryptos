@@ -58,14 +58,23 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     // INFO(Rafael): Hash validation (also official data).
     CUTE_RUN_TEST(kryptos_sha1_tests);
+    CUTE_RUN_TEST(kryptos_sha1_hash_macro_tests);
     CUTE_RUN_TEST(kryptos_sha224_tests);
+    CUTE_RUN_TEST(kryptos_sha224_hash_macro_tests);
     CUTE_RUN_TEST(kryptos_sha256_tests);
+    CUTE_RUN_TEST(kryptos_sha256_hash_macro_tests);
     CUTE_RUN_TEST(kryptos_sha384_tests);
+    CUTE_RUN_TEST(kryptos_sha384_hash_macro_tests);
     CUTE_RUN_TEST(kryptos_sha512_tests);
+    CUTE_RUN_TEST(kryptos_sha512_hash_macro_tests);
     CUTE_RUN_TEST(kryptos_md4_tests);
+    CUTE_RUN_TEST(kryptos_md4_hash_macro_tests);
     CUTE_RUN_TEST(kryptos_md5_tests);
+    CUTE_RUN_TEST(kryptos_md5_hash_macro_tests);
     CUTE_RUN_TEST(kryptos_ripemd128_tests);
+    CUTE_RUN_TEST(kryptos_ripemd128_hash_macro_tests);
     CUTE_RUN_TEST(kryptos_ripemd160_tests);
+    CUTE_RUN_TEST(kryptos_ripemd160_hash_macro_tests);
 
     //  -=-=-=-=-=-=- New block ciphers/hash functions should be added to HMAC tests. -=-=-=-=-=-=-=-
 
