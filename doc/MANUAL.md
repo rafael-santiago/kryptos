@@ -558,8 +558,8 @@ The **Table 3** lists the other ciphers which use additional parameters during t
 
 ### Hashes
 
-Firstly I will show you how to generate hashes without using the c99 conveniences, after we will generate hashes through
-the available macros.
+Firstly I will show you how to generate hashes without using C macro conveniences, after we will generate hashes through
+the available macro.
 
 Until now the available hash algorithms follow listed in **Table 4**.
 
@@ -644,6 +644,54 @@ According to the presented sample above, you should define the input and its siz
 To actually execute the desired hash algorithm you should pass a ``kryptos_task_ctx **`` and a flag requesting hexadecimal
 output (1 => hex, 0 => raw byte). The function to be called is ``kryptos_HASHID_hash``, where ``HASHID`` can be found
 in **Table 4**.
+
+The following code uses the macro ``kryptos_hash()`` to generate a SHA-512 hash output in hexadecimal:
+
+```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+    int exit_code = 0;
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *data = "Empty arms";
+    size_t data_size = 10;
+
+    kryptos_task_init_as_null(ktask);
+
+    kryptos_hash(sha512, ktask, data, data_size, 1);
+
+    if (!kryptos_last_task_succeed(ktask)) {
+        exit_code = 1;
+        printf("Error while computing the message hash.\n");
+        goto epilogue;
+    }
+
+    printf("Message hash: %s\n", ktask->out);
+
+epilogue:
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    return exit_code;
+}
+```
+
+The general idea behind ``kryptos_hash()`` is:
+
+```c
+    kryptos_hash(<HASHID>,
+                 <kryptos_task_ctx pointer>,
+                 <input data>, <input data size>,
+                 <to hex boolean flag>)
+```
 
 ### HMACs
 
