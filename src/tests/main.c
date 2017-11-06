@@ -52,6 +52,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_cast5_tests);
     CUTE_RUN_TEST(kryptos_saferk64_tests);
     CUTE_RUN_TEST(kryptos_aes_tests);
+    CUTE_RUN_TEST(kryptos_aes192_tests);
+
     CUTE_RUN_TEST(kryptos_serpent_tests);
     CUTE_RUN_TEST(kryptos_triple_des_tests);
     CUTE_RUN_TEST(kryptos_triple_des_ede_tests);

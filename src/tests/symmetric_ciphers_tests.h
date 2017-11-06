@@ -32,6 +32,8 @@ CUTE_DECLARE_TEST_CASE(kryptos_saferk64_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_aes_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_aes192_tests);
+
 CUTE_DECLARE_TEST_CASE(kryptos_serpent_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_triple_des_tests);

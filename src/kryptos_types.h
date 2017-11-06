@@ -116,6 +116,7 @@ typedef enum {
     kKryptosCipherARC4 = 0,
     kKryptosCipherSEAL,
     kKryptosCipherAES,
+    kKryptosCipherAES192,
     kKryptosCipherDES,
     kKryptosCipher3DES,
     kKryptosCipher3DESEDE,

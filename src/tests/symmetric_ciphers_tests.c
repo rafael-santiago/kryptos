@@ -446,6 +446,10 @@ CUTE_TEST_CASE(kryptos_aes_tests)
     kryptos_run_block_cipher_tests(aes, KRYPTOS_AES_BLOCKSIZE);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_aes192_tests)
+    kryptos_run_block_cipher_tests(aes192, KRYPTOS_AES_BLOCKSIZE);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_serpent_tests)
     kryptos_run_block_cipher_tests(serpent, KRYPTOS_SERPENT_BLOCKSIZE);
 CUTE_TEST_CASE_END

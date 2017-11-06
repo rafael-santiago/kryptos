@@ -43,6 +43,7 @@ struct kryptos_128bit_u8_matrix {
 
 struct kryptos_aes_subkeys {
     struct kryptos_128bit_u8_matrix round[16];
+    int rounds_nr;
 };
 
 // INFO(Rafael): The AES pre-sets.
@@ -172,6 +173,22 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes,
                                     outblock,
                                     aes_block_processor(outblock, &sks))
 
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(aes192, kKryptosCipherAES192, KRYPTOS_AES_BLOCKSIZE)
+
+KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes192,
+                                    ktask,
+                                    kryptos_aes_subkeys,
+                                    sks,
+                                    kryptos_aes_block_processor,
+                                    aes_block_processor,
+                                    kryptos_aes192_eval_skeys((*ktask)->key, (*ktask)->key_size, &sks),
+                                    kryptos_aes_block_encrypt, /* No additional steps before encrypting */,
+                                    kryptos_aes_block_decrypt, /* No additional steps before decrypting */,
+                                    KRYPTOS_AES_BLOCKSIZE,
+                                    aes_cipher_epilogue,
+                                    outblock,
+                                    aes_block_processor(outblock, &sks))
+
 static void kryptos_aes_sto_u32_into_byte_matrix(const kryptos_u32_t *word, struct kryptos_128bit_u8_matrix *u8m) {
     size_t i, j, k, c;
 
@@ -220,6 +237,9 @@ static void kryptos_aes_eval_skeys(const kryptos_u8_t *key, const size_t key_siz
     kryptos_u32_t wkey[4], roundkey[4];
     size_t i, curr, next, j;
 
+    // TODO(Rafael): Use here the same straightforward circuit-oriented way used on kryptos_aes192_eval_skeys(),
+    //               that is not cute, that is pretty ugly but faster. In the end, the CPU is what matters little Alice ;)
+
     kryptos_aes_ld_user_key(wkey, key, key_size);
 
     // INFO(Rafael): Storing the 128-bits of the user key.
@@ -257,6 +277,8 @@ static void kryptos_aes_eval_skeys(const kryptos_u8_t *key, const size_t key_siz
     memset(roundkey, 0, sizeof(roundkey));
     memset(wkey, 0, sizeof(wkey));
     i = curr = next = j = 0;
+
+    sks->rounds_nr = 10;
 }
 
 static void kryptos_aes192_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
@@ -292,6 +314,7 @@ static void kryptos_aes192_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *u
 
 static void kryptos_aes192_eval_skeys(const kryptos_u8_t *key, const size_t key_size, struct kryptos_aes_subkeys *sks) {
     kryptos_u32_t W[52];
+    size_t w;
 
     // INFO(Rafael): Loading the 192-bit user key into 24 32-bit words.
 
@@ -299,12 +322,12 @@ static void kryptos_aes192_eval_skeys(const kryptos_u8_t *key, const size_t key_
 
 #define kryptos_aes192_eval_key_chunk(w, W, i) {\
     (W)[(w) + 6] = (W)[(w)] ^ kryptos_aes_g((W)[(w) + 5], kryptos_aes_rcon[(i)]);\
-    (W)[(w) + 7] = (W)[  (w)  ] ^ (W)[(w) + 1];\
-    (W)[(w) + 8] = (W)[(w) + 1] ^ (W)[(w) + 2];\
-    (W)[(w) + 9] = (W)[(w) + 2] ^ (W)[(w) + 3];\
-    if (((w) + 4) < ( sizeof((W)) / sizeof((W)[0]) )) {\
-        (W)[(w) + 10] = (W)[(w) + 3] ^ (W)[(w) + 4];\
-        (W)[(w) + 11] = (W)[(w) + 4] ^ (W)[(w) + 5];\
+    (W)[(w) + 7] = (W)[  (w) + 6  ] ^ (W)[(w) + 1];\
+    (W)[(w) + 8] = (W)[(w) + 7] ^ (W)[(w) + 2];\
+    (W)[(w) + 9] = (W)[(w) + 8] ^ (W)[(w) + 3];\
+    if (((w) + 10) < ( sizeof((W)) / sizeof((W)[0]) )) {\
+        (W)[(w) + 10] = (W)[(w) + 9] ^ (W)[(w) + 4];\
+        (W)[(w) + 11] = (W)[(w) + 10] ^ (W)[(w) + 5];\
     }\
 }
 
@@ -318,7 +341,6 @@ static void kryptos_aes192_eval_skeys(const kryptos_u8_t *key, const size_t key_
     kryptos_aes192_eval_key_chunk(30, W, 5);
     kryptos_aes192_eval_key_chunk(36, W, 6);
     kryptos_aes192_eval_key_chunk(42, W, 7);
-    kryptos_aes192_eval_key_chunk(48, W, 0);
 
     // INFO(Rafael): Storing the 128-bit keys as 4x4 byte matrix.
 
@@ -337,6 +359,8 @@ static void kryptos_aes192_eval_skeys(const kryptos_u8_t *key, const size_t key_
     kryptos_aes_sto_u32_into_byte_matrix(&W[48], &sks->round[12]);
 
     memset(W, 0, sizeof(W));
+
+    sks->rounds_nr = 12;
 
 #undef kryptos_aes192_eval_key_chunk
 }
@@ -489,7 +513,7 @@ static void kryptos_aes_block_encrypt(kryptos_u8_t *block, const struct kryptos_
         }
     }
 
-    for (r = 1; r < 11; r++) {
+    for (r = 1; r <= sks->rounds_nr; r++) {
         // INFO(Rafael): SubBytes.
         for (i = 0; i < 4; i++) {
             for (j = 0;j < 4; j++) {
@@ -520,7 +544,7 @@ static void kryptos_aes_block_encrypt(kryptos_u8_t *block, const struct kryptos_
             }
         }
 
-        if (r < 10) {
+        if (r < sks->rounds_nr) {
             for (i = 0; i < 4; i++) {
                 for(j = 0; j < 4; j++) {
                     wblock[i] = wblock[i] << 8 | state.data[j][i];
@@ -591,8 +615,8 @@ static void kryptos_aes_block_decrypt(kryptos_u8_t *block, const struct kryptos_
     state.data[2][3] = *(block + 14);
     state.data[3][3] = *(block + 15);
 
-    for (r = 10; r > 0; r--) {
-        if (r < 10) {
+    for (r = sks->rounds_nr; r > 0; r--) {
+        if (r < sks->rounds_nr) {
             // INFO(Rafael): AddRoundKey.
             for(i = 0; i < 4; i++) {
                 for(j = 0; j < 4; j++) {

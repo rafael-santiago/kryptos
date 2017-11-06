@@ -564,6 +564,42 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 
+    // AES-192 ECB
+
+    kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_encrypt_action(&task);
+
+    kryptos_run_cipher(aes192, &task, "aes192", 6, kKryptosECB);
+
+    CUTE_ASSERT(task.out != NULL);
+
+    kryptos_task_set_in(&task, task.out, task.out_size);
+    kryptos_task_set_decrypt_action(&task);
+
+    kryptos_run_cipher(aes192, &task, "aes192", 6, kKryptosECB);
+
+    CUTE_ASSERT(task.out_size == data_size);
+    CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+
+    // AES-192 CBC
+
+    kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_encrypt_action(&task);
+
+    kryptos_run_cipher(aes192, &task, "aes192", 6, kKryptosCBC);
+
+    CUTE_ASSERT(task.out != NULL);
+
+    kryptos_task_set_in(&task, task.out, task.out_size);
+    kryptos_task_set_decrypt_action(&task);
+
+    kryptos_run_cipher(aes192, &task, "aes192", 6, kKryptosCBC);
+
+    CUTE_ASSERT(task.out_size == data_size);
+    CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
     // SERPENT ECB
 
     kryptos_task_set_in(&task, data, data_size);
