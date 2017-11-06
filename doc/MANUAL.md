@@ -3352,7 +3352,7 @@ epilogue:
 }
 ```
 
-The third ``PEM`` buffer function is destinated to read multiprecision data. The following code does the job:
+The third ``PEM`` buffer function is intended for reading multiprecision data. The following code does the job:
 
 ```c
 /*
@@ -3417,7 +3417,7 @@ epilogue:
 ```
 
 More details about the multiprecision handling functions are not given because it is considered an advanced
-topic for a final user manual. For more details try the technical documentation destinated to contributors.
+topic for a final user manual. For more details try the technical documentation intended for contributors.
 
 ## So it is enough
 
