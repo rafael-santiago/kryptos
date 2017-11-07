@@ -339,6 +339,26 @@ CUTE_TEST_CASE(kryptos_hmac_tests)
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes192, ripemd128, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes192, ripemd160, key, key_size, kKryptosCBC);
 
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, sha1, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, sha224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, sha256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, sha384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, sha512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, md4, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, md5, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, ripemd128, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, ripemd160, key, key_size, kKryptosECB);
+
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, sha1, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, sha224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, sha256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, sha384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, sha512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, md4, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, md5, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, ripemd128, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, aes256, ripemd160, key, key_size, kKryptosCBC);
+
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, serpent, sha1, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, serpent, sha224, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, serpent, sha256, key, key_size, kKryptosECB);
