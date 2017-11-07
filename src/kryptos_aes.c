@@ -143,9 +143,13 @@ static void kryptos_aes_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user
 
 static void kryptos_aes192_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size);
 
+static void kryptos_aes256_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size);
+
 static void kryptos_aes_eval_skeys(const kryptos_u8_t *key, const size_t key_size, struct kryptos_aes_subkeys *sks);
 
 static void kryptos_aes192_eval_skeys(const kryptos_u8_t *key, const size_t key_size, struct kryptos_aes_subkeys *sks);
+
+static void kryptos_aes256_eval_skeys(const kryptos_u8_t *key, const size_t key_size, struct kryptos_aes_subkeys *sks);
 
 static kryptos_u8_t kryptos_aes_mul_xy(const kryptos_u8_t x, const kryptos_u8_t y);
 
@@ -185,7 +189,23 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes192,
                                     kryptos_aes_block_encrypt, /* No additional steps before encrypting */,
                                     kryptos_aes_block_decrypt, /* No additional steps before decrypting */,
                                     KRYPTOS_AES_BLOCKSIZE,
-                                    aes_cipher_epilogue,
+                                    aes192_cipher_epilogue,
+                                    outblock,
+                                    aes_block_processor(outblock, &sks))
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(aes256, kKryptosCipherAES256, KRYPTOS_AES_BLOCKSIZE)
+
+KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes256,
+                                    ktask,
+                                    kryptos_aes_subkeys,
+                                    sks,
+                                    kryptos_aes_block_processor,
+                                    aes_block_processor,
+                                    kryptos_aes256_eval_skeys((*ktask)->key, (*ktask)->key_size, &sks),
+                                    kryptos_aes_block_encrypt, /* No additional steps before encrypting */,
+                                    kryptos_aes_block_decrypt, /* No additional steps before decrypting */,
+                                    KRYPTOS_AES_BLOCKSIZE,
+                                    aes256_cipher_epilogue,
                                     outblock,
                                     aes_block_processor(outblock, &sks))
 
@@ -320,27 +340,38 @@ static void kryptos_aes192_eval_skeys(const kryptos_u8_t *key, const size_t key_
 
     kryptos_aes192_ld_user_key(W, key, key_size);
 
-#define kryptos_aes192_eval_key_chunk(w, W, i) {\
+    // CLUE(Rafael): The head and tail macro approach avoids the if clause inclusion in order to check the validity of the
+    //               array boundary. In fact this if clause code would be useless for any subkey chunk computation before
+    //               the last chunk.
+
+#define kryptos_aes192_eval_skey_chunk_head(w, W, i) {\
     (W)[(w) + 6] = (W)[(w)] ^ kryptos_aes_g((W)[(w) + 5], kryptos_aes_rcon[(i)]);\
     (W)[(w) + 7] = (W)[  (w) + 6  ] ^ (W)[(w) + 1];\
     (W)[(w) + 8] = (W)[(w) + 7] ^ (W)[(w) + 2];\
     (W)[(w) + 9] = (W)[(w) + 8] ^ (W)[(w) + 3];\
-    if (((w) + 10) < ( sizeof((W)) / sizeof((W)[0]) )) {\
-        (W)[(w) + 10] = (W)[(w) + 9] ^ (W)[(w) + 4];\
-        (W)[(w) + 11] = (W)[(w) + 10] ^ (W)[(w) + 5];\
-    }\
+}
+
+#define kryptos_aes192_eval_skey_chunk_tail(w, W) {\
+    (W)[(w) + 10] = (W)[(w) + 9] ^ (W)[(w) + 4];\
+    (W)[(w) + 11] = (W)[(w) + 10] ^ (W)[(w) + 5];\
+}
+
+#define kryptos_aes192_eval_skey_chunk(w, W, i) {\
+    kryptos_aes192_eval_skey_chunk_head(w, W, i);\
+    kryptos_aes192_eval_skey_chunk_tail(w, W);\
 }
 
     // INFO(Rafael): Scheduling the round keys.
 
-    kryptos_aes192_eval_key_chunk( 0, W, 0);
-    kryptos_aes192_eval_key_chunk( 6, W, 1);
-    kryptos_aes192_eval_key_chunk(12, W, 2);
-    kryptos_aes192_eval_key_chunk(18, W, 3);
-    kryptos_aes192_eval_key_chunk(24, W, 4);
-    kryptos_aes192_eval_key_chunk(30, W, 5);
-    kryptos_aes192_eval_key_chunk(36, W, 6);
-    kryptos_aes192_eval_key_chunk(42, W, 7);
+    kryptos_aes192_eval_skey_chunk( 0, W, 0);
+    kryptos_aes192_eval_skey_chunk( 6, W, 1);
+    kryptos_aes192_eval_skey_chunk(12, W, 2);
+    kryptos_aes192_eval_skey_chunk(18, W, 3);
+    kryptos_aes192_eval_skey_chunk(24, W, 4);
+    kryptos_aes192_eval_skey_chunk(30, W, 5);
+    kryptos_aes192_eval_skey_chunk(36, W, 6);
+
+    kryptos_aes192_eval_skey_chunk_head(42, W, 7);
 
     // INFO(Rafael): Storing the 128-bit keys as 4x4 byte matrix.
 
@@ -358,11 +389,127 @@ static void kryptos_aes192_eval_skeys(const kryptos_u8_t *key, const size_t key_
     kryptos_aes_sto_u32_into_byte_matrix(&W[44], &sks->round[11]);
     kryptos_aes_sto_u32_into_byte_matrix(&W[48], &sks->round[12]);
 
-    memset(W, 0, sizeof(W));
-
     sks->rounds_nr = 12;
 
-#undef kryptos_aes192_eval_key_chunk
+    memset(W, 0, sizeof(W));
+
+#undef kryptos_aes192_eval_skey_chunk
+
+#undef kryptos_aes192_eval_skey_chunk_tail
+
+#undef kryptos_aes192_eval_skey_chunk_head
+}
+
+static void kryptos_aes256_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
+    const kryptos_u8_t *kp, *kp_end;
+    size_t w, b;
+    kryptos_ld_user_key_prologue(key, 8, user_key, user_key_size, kp, kp_end, w, b, return);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_aes256_ld_user_key_epilogue);
+    kryptos_ld_user_key_epilogue(kryptos_aes256_ld_user_key_epilogue, key, w, b, kp, kp_end);
+}
+
+static void kryptos_aes256_eval_skeys(const kryptos_u8_t *key, const size_t key_size, struct kryptos_aes_subkeys *sks) {
+    kryptos_u32_t W[60];
+
+    // INFO(Rafael): Loading the key whitening subkey.
+
+    kryptos_aes256_ld_user_key(&W[0], key, key_size);
+
+#define kryptos_aes_h(v) ( ( (kryptos_u32_t) kryptos_aes_subbytes((v), 0, kryptos_aes_sbox) << 24 ) |\
+                           ( (kryptos_u32_t) kryptos_aes_subbytes((v), 1, kryptos_aes_sbox) << 16 ) |\
+                           ( (kryptos_u32_t) kryptos_aes_subbytes((v), 2, kryptos_aes_sbox) <<  8 ) |\
+                           ( (kryptos_u32_t) kryptos_aes_subbytes((v), 3, kryptos_aes_sbox) ) )
+
+#define kryptos_aes256_eval_skey_chunk_head(w, W, i) {\
+    (W)[(w) +  8] = (W)[  (w)  ] ^ kryptos_aes_g((W)[(w) + 7], kryptos_aes_rcon[(i)]);\
+    (W)[(w) +  9] = (W)[(w) + 1] ^ (W)[(w) +  8];\
+    (W)[(w) + 10] = (W)[(w) + 2] ^ (W)[(w) +  9];\
+    (W)[(w) + 11] = (W)[(w) + 3] ^ (W)[(w) + 10];\
+}
+
+#define kryptos_aes256_eval_skey_chunk_tail(w, W) {\
+    (W)[(w) + 12] = (W)[(w) + 4] ^ kryptos_aes_h((W)[(w) + 11]);\
+    (W)[(w) + 13] = (W)[(w) + 5] ^ (W)[(w) + 12];\
+    (W)[(w) + 14] = (W)[(w) + 6] ^ (W)[(w) + 13];\
+    (W)[(w) + 15] = (W)[(w) + 7] ^ (W)[(w) + 14];\
+}
+
+#define kryptos_aes256_eval_skey_chunk(w, W, i) {\
+    kryptos_aes256_eval_skey_chunk_head(w, W, i);\
+    kryptos_aes256_eval_skey_chunk_tail(w, W);\
+}
+
+    // INFO(Rafael): Scheduling the remaining subkeys fractions.
+
+    kryptos_aes256_eval_skey_chunk( 0, W, 0);
+    kryptos_aes256_eval_skey_chunk( 8, W, 1);
+    kryptos_aes256_eval_skey_chunk(16, W, 2);
+    kryptos_aes256_eval_skey_chunk(24, W, 3);
+    kryptos_aes256_eval_skey_chunk(32, W, 4);
+    kryptos_aes256_eval_skey_chunk(40, W, 5);
+
+    kryptos_aes256_eval_skey_chunk_head(48, W, 6);
+
+    // INFO(Rafael): Storing as in a 4x4 matrix form the expanded key bytes.
+
+    kryptos_aes_sto_u32_into_byte_matrix(&W[ 0], &sks->round[ 0]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[ 4], &sks->round[ 1]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[ 8], &sks->round[ 2]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[12], &sks->round[ 3]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[16], &sks->round[ 4]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[20], &sks->round[ 5]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[24], &sks->round[ 6]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[28], &sks->round[ 7]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[32], &sks->round[ 8]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[36], &sks->round[ 9]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[40], &sks->round[10]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[44], &sks->round[11]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[48], &sks->round[12]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[52], &sks->round[13]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[56], &sks->round[14]);
+
+    sks->rounds_nr = 14;
+
+    memset(W, 0, sizeof(W));
+
+#undef kryptos_aes256_eval_skeys_chunk
+
+#undef kryptos_aes256_eval_skey_chunk_tail
+
+#undef kryptos_aes256_eval_skey_chunk_head
+
+#undef kryptos_aes_h
 }
 
 static kryptos_u8_t kryptos_aes_mul_xy(const kryptos_u8_t x, const kryptos_u8_t y) {
