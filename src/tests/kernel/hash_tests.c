@@ -542,6 +542,30 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes192, ripemd128, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes192, ripemd160, key, key_size, kKryptosCBC);
 
+    // INFO(Rafael): AES-256/ECB.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, sha1, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, sha224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, sha256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, sha384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, sha512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, md4, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, md5, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, ripemd128, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, ripemd160, key, key_size, kKryptosECB);
+
+    // INFO(Rafael): AES-256/CBC.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, sha1, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, sha224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, sha256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, sha384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, sha512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, md4, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, md5, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, ripemd128, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, ripemd160, key, key_size, kKryptosCBC);
+
     // INFO(Rafael): SERPENT/ECB.
 
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, serpent, sha1, key, key_size, kKryptosECB);
