@@ -334,7 +334,6 @@ static void kryptos_aes192_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *u
 
 static void kryptos_aes192_eval_skeys(const kryptos_u8_t *key, const size_t key_size, struct kryptos_aes_subkeys *sks) {
     kryptos_u32_t W[52];
-    size_t w;
 
     // INFO(Rafael): Loading the 192-bit user key into 24 32-bit words.
 
