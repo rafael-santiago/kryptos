@@ -139,13 +139,13 @@ static void kryptos_aes_sto_u32_into_byte_matrix(const kryptos_u32_t *word, stru
 
 static kryptos_u8_t kryptos_aes_subbytes(const kryptos_u32_t value, const size_t byte, kryptos_u8_t sbox[16][16]);
 
-static void kryptos_aes_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size);
+static void kryptos_aes128_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size);
 
 static void kryptos_aes192_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size);
 
 static void kryptos_aes256_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size);
 
-static void kryptos_aes_eval_skeys(const kryptos_u8_t *key, const size_t key_size, struct kryptos_aes_subkeys *sks);
+static void kryptos_aes128_eval_skeys(const kryptos_u8_t *key, const size_t key_size, struct kryptos_aes_subkeys *sks);
 
 static void kryptos_aes192_eval_skeys(const kryptos_u8_t *key, const size_t key_size, struct kryptos_aes_subkeys *sks);
 
@@ -169,7 +169,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes128,
                                     sks,
                                     kryptos_aes_block_processor,
                                     aes_block_processor,
-                                    kryptos_aes_eval_skeys((*ktask)->key, (*ktask)->key_size, &sks),
+                                    kryptos_aes128_eval_skeys((*ktask)->key, (*ktask)->key_size, &sks),
                                     kryptos_aes_block_encrypt, /* No additional steps before encrypting */,
                                     kryptos_aes_block_decrypt, /* No additional steps before decrypting */,
                                     KRYPTOS_AES_BLOCKSIZE,
@@ -230,7 +230,7 @@ static kryptos_u8_t kryptos_aes_subbytes(const kryptos_u32_t value, const size_t
     return eval;
 }
 
-static void kryptos_aes_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
+static void kryptos_aes128_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
     size_t w, b;
     kryptos_ld_user_key_prologue(key, 4, user_key, user_key_size, kp, kp_end, w, b, return);
@@ -253,14 +253,14 @@ static void kryptos_aes_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user
     kryptos_ld_user_key_epilogue(kryptos_aes_ld_user_key_epilogue, key, w, b, kp, kp_end);
 }
 
-static void kryptos_aes_eval_skeys(const kryptos_u8_t *key, const size_t key_size, struct kryptos_aes_subkeys *sks) {
+#if defined(KRYPTOS_AES128_OLD_AND_SLOW_KEY_SCHED)
+// WARN(Rafael): 'Ja passei por aqui com a vista cansada e a cabeça lotada... Antigamente... Antigamente...' d:-)
+//               Old and slow code from 2006, you should avoid it.
+static void kryptos_aes128_eval_skeys(const kryptos_u8_t *key, const size_t key_size, struct kryptos_aes_subkeys *sks) {
     kryptos_u32_t wkey[4], roundkey[4];
     size_t i, curr, next, j;
 
-    // TODO(Rafael): Use here the same straightforward circuit-oriented way used on kryptos_aes192_eval_skeys(),
-    //               that is not cute, that is pretty ugly but faster. In the end, the CPU is what matters little Alice ;)
-
-    kryptos_aes_ld_user_key(wkey, key, key_size);
+    kryptos_aes128_ld_user_key(wkey, key, key_size);
 
     // INFO(Rafael): Storing the 128-bits of the user key.
     kryptos_aes_sto_u32_into_byte_matrix(wkey, &sks->round[0]);
@@ -301,6 +301,58 @@ static void kryptos_aes_eval_skeys(const kryptos_u8_t *key, const size_t key_siz
     sks->rounds_nr = 10;
 }
 
+#else
+
+static void kryptos_aes128_eval_skeys(const kryptos_u8_t *key, const size_t key_size, struct kryptos_aes_subkeys *sks) {
+    kryptos_u32_t W[44];
+
+    // INFO(Rafael): Loading the first halve of the key whitening subkey.
+
+    kryptos_aes128_ld_user_key(&W[0], key, key_size);
+
+#define kryptos_aes128_eval_skey_chunk(w, W, i) {\
+    (W)[(w) + 4] = (W)[  (w)  ] ^ kryptos_aes_g((W)[(w) + 3], kryptos_aes_rcon[(i)]);\
+    (W)[(w) + 5] = (W)[(w) + 1] ^ (W)[(w) + 4];\
+    (W)[(w) + 6] = (W)[(w) + 2] ^ (W)[(w) + 5];\
+    (W)[(w) + 7] = (W)[(w) + 3] ^ (W)[(w) + 6];\
+}
+
+    // INFO(Rafael): Remaining subkey chunks scheduling.
+
+    kryptos_aes128_eval_skey_chunk( 0, W, 0);
+    kryptos_aes128_eval_skey_chunk( 4, W, 1);
+    kryptos_aes128_eval_skey_chunk( 8, W, 2);
+    kryptos_aes128_eval_skey_chunk(12, W, 3);
+    kryptos_aes128_eval_skey_chunk(16, W, 4);
+    kryptos_aes128_eval_skey_chunk(20, W, 5);
+    kryptos_aes128_eval_skey_chunk(24, W, 6);
+    kryptos_aes128_eval_skey_chunk(28, W, 7);
+    kryptos_aes128_eval_skey_chunk(32, W, 8);
+    kryptos_aes128_eval_skey_chunk(36, W, 9);
+
+    // INFO(Rafael): Storing each of them as a 4x4 byte matrix.
+
+    kryptos_aes_sto_u32_into_byte_matrix(&W[ 0], &sks->round[ 0]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[ 4], &sks->round[ 1]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[ 8], &sks->round[ 2]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[12], &sks->round[ 3]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[16], &sks->round[ 4]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[20], &sks->round[ 5]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[24], &sks->round[ 6]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[28], &sks->round[ 7]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[32], &sks->round[ 8]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[36], &sks->round[ 9]);
+    kryptos_aes_sto_u32_into_byte_matrix(&W[40], &sks->round[10]);
+
+    sks->rounds_nr = 10;
+
+    memset(W, 0, sizeof(W));
+
+#undef kryptos_aes128_eval_skey_chunk
+}
+
+#endif
+
 static void kryptos_aes192_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
     size_t w, b;
@@ -337,7 +389,7 @@ static void kryptos_aes192_eval_skeys(const kryptos_u8_t *key, const size_t key_
 
     // INFO(Rafael): Loading the 192-bit user key into 24 32-bit words.
 
-    kryptos_aes192_ld_user_key(W, key, key_size);
+    kryptos_aes192_ld_user_key(&W[0], key, key_size);
 
     // CLUE(Rafael): The head and tail macro approach avoids the if clause inclusion in order to check the validity of the
     //               array boundary. In fact this if clause code would be useless for any subkey chunk computation before

@@ -27,7 +27,7 @@
 #   include <linux/module.h>
 #   include <linux/slab.h>
 #   include <linux/random.h>
-typedef long intptr_t;
+    typedef long intptr_t;
 #  endif
 # endif
 
