@@ -341,7 +341,7 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
             return ((*ktask)->iv_size == KRYPTOS_SAFERK64_BLOCKSIZE);
             break;
 
-        case kKryptosCipherAES:
+        case kKryptosCipherAES128:
         case kKryptosCipherAES192:
         case kKryptosCipherAES256:
             return ((*ktask)->iv_size == KRYPTOS_AES_BLOCKSIZE);

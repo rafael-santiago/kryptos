@@ -282,7 +282,7 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
     KUTE_ASSERT(memcmp(t.result_verbose, "Invalid key data.", 17) == 0);
 
-    t.cipher = kKryptosCipherAES;
+    t.cipher = kKryptosCipherAES128;
     t.action = kKryptosEncrypt;
     t.key_size = 4;
     t.mode = kKryptosCBC;

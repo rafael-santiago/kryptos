@@ -442,8 +442,8 @@ CUTE_TEST_CASE(kryptos_saferk64_tests)
 
 CUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_aes_tests)
-    kryptos_run_block_cipher_tests(aes, KRYPTOS_AES_BLOCKSIZE);
+CUTE_TEST_CASE(kryptos_aes128_tests)
+    kryptos_run_block_cipher_tests(aes128, KRYPTOS_AES_BLOCKSIZE);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_aes192_tests)

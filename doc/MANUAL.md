@@ -103,8 +103,9 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 |:----------------:|:---------------------:|:--------------------------------:|
 |   ``ARC4``       |       Stream          |       ``kKryptosCipherARC4``     |
 |   ``SEAL``       |       Stream          |       ``kKryptosCipherSEAL``     |
-| ``AES-128``      |       Block           |       ``kKryptosCipherAES``      |
+| ``AES-128``      |       Block           |       ``kKryptosCipherAES128``   |
 | ``AES-192``      |       Block           |       ``kKryptosCipherAES192``   |
+| ``AES-256``      |       Block           |       ``kKryptosCipherAES256``   |
 |   ``DES``        |       Block           |       ``kKryptosCipherDES``      |
 |   ``3DES``       |       Block           |       ``kKryptosCipher3DES``     |
 | ``3DES-EDE``     |       Block           |       ``kKryptosCipher3DESEDE``  |

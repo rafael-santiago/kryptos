@@ -161,9 +161,9 @@ static void kryptos_aes_block_encrypt(kryptos_u8_t *block, const struct kryptos_
 
 static void kryptos_aes_block_decrypt(kryptos_u8_t *block, const struct kryptos_aes_subkeys *sks);
 
-KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(aes, kKryptosCipherAES, KRYPTOS_AES_BLOCKSIZE)
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(aes128, kKryptosCipherAES128, KRYPTOS_AES_BLOCKSIZE)
 
-KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes,
+KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes128,
                                     ktask,
                                     kryptos_aes_subkeys,
                                     sks,
@@ -173,7 +173,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes,
                                     kryptos_aes_block_encrypt, /* No additional steps before encrypting */,
                                     kryptos_aes_block_decrypt, /* No additional steps before decrypting */,
                                     KRYPTOS_AES_BLOCKSIZE,
-                                    aes_cipher_epilogue,
+                                    aes128_cipher_epilogue,
                                     outblock,
                                     aes_block_processor(outblock, &sks))
 

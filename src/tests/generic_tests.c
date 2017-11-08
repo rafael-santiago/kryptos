@@ -309,7 +309,7 @@ CUTE_TEST_CASE(kryptos_task_check_tests)
     CUTE_ASSERT(t.result == kKryptosInvalidParams);
     CUTE_ASSERT(strcmp(t.result_verbose, "Invalid key data.") == 0);
 
-    t.cipher = kKryptosCipherAES;
+    t.cipher = kKryptosCipherAES128;
     t.action = kKryptosEncrypt;
     t.key_size = 4;
     t.mode = kKryptosCBC;
@@ -585,7 +585,7 @@ CUTE_TEST_CASE(kryptos_task_check_sign_tests)
 
     // INFO(Rafael): Sign using RSA.
 
-    ktask->cipher = kKryptosCipherAES;
+    ktask->cipher = kKryptosCipherAES128;
     ktask->in = NULL;
     ktask->in_size = 0;
     ktask->key = NULL;
@@ -628,7 +628,7 @@ CUTE_TEST_CASE(kryptos_task_check_sign_tests)
 
     ktask->arg[0] = ktask->arg[1] = ktask->arg[2] = NULL;
 
-    ktask->cipher = kKryptosCipherAES;
+    ktask->cipher = kKryptosCipherAES128;
     ktask->in = NULL;
     ktask->in_size = 0;
     ktask->key = NULL;
@@ -775,7 +775,7 @@ CUTE_TEST_CASE(kryptos_task_check_verify_tests)
 
     // INFO(Rafael): Verify using RSA.
 
-    ktask->cipher = kKryptosCipherAES;
+    ktask->cipher = kKryptosCipherAES128;
     ktask->in = NULL;
     ktask->in_size = 0;
     ktask->key = NULL;
@@ -819,7 +819,7 @@ CUTE_TEST_CASE(kryptos_task_check_verify_tests)
 
     ktask->arg[0] = ktask->arg[1] = ktask->arg[2] = NULL;
 
-    ktask->cipher = kKryptosCipherAES;
+    ktask->cipher = kKryptosCipherAES128;
     ktask->in = NULL;
     ktask->in_size = 0;
     ktask->key = NULL;
