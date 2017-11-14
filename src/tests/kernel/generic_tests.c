@@ -15,6 +15,7 @@
 #include <kryptos_iv_utils.h>
 #include <kryptos_hex.h>
 #include <kryptos_hash_common.h>
+#include <kryptos_sha1.h>
 #include <kstring.h>
 
 KUTE_TEST_CASE(kryptos_padding_tests)
@@ -241,19 +242,40 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
     kryptos_u8_t *iv = "bluh";
     kryptos_task_ctx t;
     kryptos_task_ctx *ktask = &t;
-    kryptos_u8_t *k_pub = "-----BEGIN RSA PARAM N-----\n"
-                          "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
-                          "-----END RSA PARAM N-----\n"
-                          "-----BEGIN RSA PARAM E-----\n"
-                          "Q9mxxs0+nosV5jzwUs1UmYEhXLrYAszE9q0S3hljhpXD9ANvkzCUC5nM8FZ3+44V1IrPhIYZYDwfSrGlhwG4Aw==\n"
-                          "-----END RSA PARAM E-----\n";
+    kryptos_u8_t *rsa_k_pub = "-----BEGIN RSA PARAM N-----\n"
+                              "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
+                              "-----END RSA PARAM N-----\n"
+                              "-----BEGIN RSA PARAM E-----\n"
+                              "Q9mxxs0+nosV5jzwUs1UmYEhXLrYAszE9q0S3hljhpXD9ANvkzCUC5nM8FZ3+44V1IrPhIYZYDwfSrGlhwG4Aw==\n"
+                              "-----END RSA PARAM E-----\n";
 
-    kryptos_u8_t *k_priv = "-----BEGIN RSA PARAM N-----\n"
-                           "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
-                           "-----END RSA PARAM N-----\n"
-                           "-----BEGIN RSA PARAM D-----\n"
-                           "K04+KEU3GyG2ABjJu+sTqV5yH8mgO8aIPdygWvBq9GzJfTmLt18cck2pc7y6lmYLsl+NxgFo7KTliwXAjU3eGg==\n"
-                           "-----END RSA PARAM D-----\n";
+    kryptos_u8_t *rsa_k_priv = "-----BEGIN RSA PARAM N-----\n"
+                               "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
+                               "-----END RSA PARAM N-----\n"
+                               "-----BEGIN RSA PARAM D-----\n"
+                               "K04+KEU3GyG2ABjJu+sTqV5yH8mgO8aIPdygWvBq9GzJfTmLt18cck2pc7y6lmYLsl+NxgFo7KTliwXAjU3eGg==\n"
+                               "-----END RSA PARAM D-----\n";
+    kryptos_u8_t *label = "L";
+    size_t label_size = 1;
+    kryptos_u8_t *elgamal_k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                  "LWy0fB4Y6Bc=\n"
+                                  "-----END ELGAMAL PARAM P-----\n"
+                                  "-----BEGIN ELGAMAL PARAM Q-----\n"
+                                  "DYBegQ==\n"
+                                  "-----END ELGAMAL PARAM Q-----\n"
+                                  "-----BEGIN ELGAMAL PARAM G-----\n"
+                                  "7LbbqIYLtgg=\n"
+                                  "-----END ELGAMAL PARAM G-----\n"
+                                  "-----BEGIN ELGAMAL PARAM B-----\n"
+                                  "zVTveNNhyhc=\n"
+                                  "-----END ELGAMAL PARAM B-----\n";
+
+    kryptos_u8_t *elgamal_k_priv = "-----BEGIN ELGAMAL PARAM P-----\n"
+                                   "LWy0fB4Y6Bc=\n"
+                                   "-----END ELGAMAL PARAM P-----\n"
+                                   "-----BEGIN ELGAMAL PARAM D-----\n"
+                                   "Wnb/HA==\n"
+                                   "-----END ELGAMAL PARAM D-----\n";
 
 
     t.cipher = -1;
@@ -357,13 +379,13 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
 
     t.action = kKryptosEncrypt;
-    t.key = k_priv;
-    t.key_size = strlen(k_priv);
+    t.key = rsa_k_priv;
+    t.key_size = strlen(rsa_k_priv);
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosKeyError);
 
-    t.key = k_pub;
-    t.key_size = strlen(k_pub);
+    t.key = rsa_k_pub;
+    t.key_size = strlen(rsa_k_pub);
     KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
     KUTE_ASSERT(t.result == kKryptosSuccess);
 
@@ -371,10 +393,526 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosKeyError);
 
-    t.key = k_priv;
-    t.key_size = strlen(k_priv);
+    t.key = rsa_k_priv;
+    t.key_size = strlen(rsa_k_priv);
     KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
     KUTE_ASSERT(t.result == kKryptosSuccess);
+
+    t.cipher = kKryptosCipherRSAOAEP;
+    t.arg[0] = t.arg[1] = t.arg[2] = t.arg[3] = NULL;
+    t.key = NULL;
+    t.key_size = 0;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.action = kKryptosEncrypt;
+    t.key = rsa_k_priv;
+    t.key_size = strlen(rsa_k_priv);
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosKeyError);
+
+    t.key = rsa_k_pub;
+    t.key_size = strlen(rsa_k_pub);
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    KUTE_ASSERT(t.result == kKryptosSuccess);
+
+    t.action = kKryptosDecrypt;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosKeyError);
+
+    t.key = rsa_k_priv;
+    t.key_size = strlen(rsa_k_priv);
+    t.arg[0] = label;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.arg[0] = NULL;
+    t.arg[1] = &label_size;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.arg[1] = NULL;
+    t.arg[2] = (kryptos_hash_func) label;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.arg[2] = NULL;
+    t.arg[3] = (kryptos_hash_size_func) label;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.arg[3] = NULL;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    KUTE_ASSERT(t.result == kKryptosSuccess);
+
+    t.arg[0] = label;
+    t.arg[1] = &label_size;
+    t.arg[2] = (kryptos_hash_func) label;
+    t.arg[3] = (kryptos_hash_size_func) label;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    KUTE_ASSERT(t.result == kKryptosSuccess);
+
+    t.cipher = kKryptosCipherELGAMAL;
+    t.key = NULL;
+    t.key_size = 0;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.action = kKryptosEncrypt;
+    t.key = elgamal_k_priv;
+    t.key_size = strlen(elgamal_k_priv);
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosKeyError);
+
+    t.key = elgamal_k_pub;
+    t.key_size = strlen(elgamal_k_pub);
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    KUTE_ASSERT(t.result == kKryptosSuccess);
+
+    t.action = kKryptosDecrypt;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosKeyError);
+
+    t.key = elgamal_k_priv;
+    t.key_size = strlen(elgamal_k_priv);
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    KUTE_ASSERT(t.result == kKryptosSuccess);
+
+    t.cipher = kKryptosCipherELGAMALOAEP;
+    t.arg[0] = t.arg[1] = t.arg[2] = t.arg[3] = NULL;
+    t.key = NULL;
+    t.key_size = 0;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.action = kKryptosEncrypt;
+    t.key = elgamal_k_priv;
+    t.key_size = strlen(elgamal_k_priv);
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosKeyError);
+
+    t.key = elgamal_k_pub;
+    t.key_size = strlen(elgamal_k_pub);
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    KUTE_ASSERT(t.result == kKryptosSuccess);
+
+    t.action = kKryptosDecrypt;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosKeyError);
+
+    t.key = elgamal_k_priv;
+    t.key_size = strlen(elgamal_k_priv);
+    t.arg[0] = label;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.arg[0] = NULL;
+    t.arg[1] = &label_size;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.arg[1] = NULL;
+    t.arg[2] = (kryptos_hash_func) label;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.arg[2] = NULL;
+    t.arg[3] = (kryptos_hash_size_func) label;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosInvalidParams);
+
+    t.arg[3] = NULL;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    KUTE_ASSERT(t.result == kKryptosSuccess);
+
+    t.arg[0] = label;
+    t.arg[1] = &label_size;
+    t.arg[2] = (kryptos_hash_func) label;
+    t.arg[3] = (kryptos_hash_size_func) label;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    KUTE_ASSERT(t.result == kKryptosSuccess);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_task_check_sign_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *rsa_k_pub = "-----BEGIN RSA PARAM N-----\n"
+                              "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
+                              "-----END RSA PARAM N-----\n"
+                              "-----BEGIN RSA PARAM E-----\n"
+                              "Q9mxxs0+nosV5jzwUs1UmYEhXLrYAszE9q0S3hljhpXD9ANvkzCUC5nM8FZ3+44V1IrPhIYZYDwfSrGlhwG4Aw==\n"
+                              "-----END RSA PARAM E-----\n";
+
+    kryptos_u8_t *rsa_k_priv = "-----BEGIN RSA PARAM N-----\n"
+                               "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
+                               "-----END RSA PARAM N-----\n"
+                               "-----BEGIN RSA PARAM D-----\n"
+                               "K04+KEU3GyG2ABjJu+sTqV5yH8mgO8aIPdygWvBq9GzJfTmLt18cck2pc7y6lmYLsl+NxgFo7KTliwXAjU3eGg==\n"
+                               "-----END RSA PARAM D-----\n";
+    size_t k;
+
+    kryptos_u8_t *dsa_k_pub = "-----BEGIN DSA P-----\n"
+                              "12Ga65Y5bQ4=\n"
+                              "-----END DSA P-----\n"
+                              "-----BEGIN DSA Q-----\n"
+                              "P1wB2Q==\n"
+                              "-----END DSA Q-----\n"
+                              "-----BEGIN DSA G-----\n"
+                              "gp2RBbxgtAQ=\n"
+                              "-----END DSA G-----\n"
+                              "-----BEGIN DSA E-----\n"
+                              "bfVPLj3soAc=\n"
+                              "-----END DSA E-----\n";
+
+    kryptos_u8_t *dsa_k_priv = "-----BEGIN DSA P-----\n"
+                               "12Ga65Y5bQ4=\n"
+                               "-----END DSA P-----\n"
+                               "-----BEGIN DSA Q-----\n"
+                               "P1wB2Q==\n"
+                               "-----END DSA Q-----\n"
+                               "-----BEGIN DSA G-----\n"
+                               "gp2RBbxgtAQ=\n"
+                               "-----END DSA G-----\n"
+                               "-----BEGIN DSA D-----\n"
+                               "XiL6Hg==\n"
+                               "-----END DSA D-----\n";
+
+    KUTE_ASSERT(kryptos_task_check_sign(NULL) == 0);
+
+    // INFO(Rafael): Sign using RSA.
+
+    ktask->cipher = kKryptosCipherAES128;
+    ktask->in = NULL;
+    ktask->in_size = 0;
+    ktask->key = NULL;
+    ktask->key_size = 0;
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->cipher = kKryptosCipherRSA;
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in = "rsa";
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in_size = 3;
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = rsa_k_pub;
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key_size = strlen(ktask->key);
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = rsa_k_priv;
+    ktask->key_size = strlen(ktask->key);
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 1);
+    KUTE_ASSERT(ktask->result == kKryptosSuccess);
+
+    // INFO(Rafael): Sign using RSA-EMSA-PSS.
+
+    ktask->arg[0] = ktask->arg[1] = ktask->arg[2] = NULL;
+
+    ktask->cipher = kKryptosCipherAES128;
+    ktask->in = NULL;
+    ktask->in_size = 0;
+    ktask->key = NULL;
+    ktask->key_size = 0;
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->cipher = kKryptosCipherRSAEMSAPSS;
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in = "rsa";
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in_size = 3;
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = rsa_k_pub;
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key_size = strlen(ktask->key);
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = rsa_k_priv;
+    ktask->key_size = strlen(ktask->key);
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->arg[0] = &k;
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 1);
+    KUTE_ASSERT(ktask->result == kKryptosSuccess);
+
+    ktask->arg[2] = kryptos_sha1_hash_size;
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->arg[1] = kryptos_sha1_hash;
+    ktask->arg[2] = NULL;
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->arg[1] = kryptos_sha1_hash;
+    ktask->arg[2] = kryptos_sha1_hash_size;
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 1);
+    KUTE_ASSERT(ktask->result == kKryptosSuccess);
+
+    // INFO(Rafael): Sign using DSA.
+
+    ktask->cipher = kKryptosCipherDSA;
+    ktask->in = NULL;
+    ktask->in_size = 0;
+    ktask->key = NULL;
+    ktask->key_size = 0;
+    ktask->arg[0] = ktask->arg[1] = NULL;
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in = "dsa";
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in_size = 3;
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = dsa_k_pub;
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key_size = strlen(ktask->key);
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = dsa_k_priv;
+    ktask->key_size = strlen(ktask->key);
+
+    KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 1);
+    KUTE_ASSERT(ktask->result == kKryptosSuccess);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_task_check_verify_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *rsa_k_pub = "-----BEGIN RSA PARAM N-----\n"
+                              "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
+                              "-----END RSA PARAM N-----\n"
+                              "-----BEGIN RSA PARAM E-----\n"
+                              "Q9mxxs0+nosV5jzwUs1UmYEhXLrYAszE9q0S3hljhpXD9ANvkzCUC5nM8FZ3+44V1IrPhIYZYDwfSrGlhwG4Aw==\n"
+                              "-----END RSA PARAM E-----\n";
+
+    kryptos_u8_t *rsa_k_priv = "-----BEGIN RSA PARAM N-----\n"
+                               "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
+                               "-----END RSA PARAM N-----\n"
+                               "-----BEGIN RSA PARAM D-----\n"
+                               "K04+KEU3GyG2ABjJu+sTqV5yH8mgO8aIPdygWvBq9GzJfTmLt18cck2pc7y6lmYLsl+NxgFo7KTliwXAjU3eGg==\n"
+                               "-----END RSA PARAM D-----\n";
+    size_t k;
+
+    kryptos_u8_t *dsa_k_pub = "-----BEGIN DSA P-----\n"
+                              "12Ga65Y5bQ4=\n"
+                              "-----END DSA P-----\n"
+                              "-----BEGIN DSA Q-----\n"
+                              "P1wB2Q==\n"
+                              "-----END DSA Q-----\n"
+                              "-----BEGIN DSA G-----\n"
+                              "gp2RBbxgtAQ=\n"
+                              "-----END DSA G-----\n"
+                              "-----BEGIN DSA E-----\n"
+                              "bfVPLj3soAc=\n"
+                              "-----END DSA E-----\n";
+
+    kryptos_u8_t *dsa_k_priv = "-----BEGIN DSA P-----\n"
+                               "12Ga65Y5bQ4=\n"
+                               "-----END DSA P-----\n"
+                               "-----BEGIN DSA Q-----\n"
+                               "P1wB2Q==\n"
+                               "-----END DSA Q-----\n"
+                               "-----BEGIN DSA G-----\n"
+                               "gp2RBbxgtAQ=\n"
+                               "-----END DSA G-----\n"
+                               "-----BEGIN DSA D-----\n"
+                               "XiL6Hg==\n"
+                               "-----END DSA D-----\n";
+
+    KUTE_ASSERT(kryptos_task_check_sign(NULL) == 0);
+
+    // INFO(Rafael): Verify using RSA.
+
+    ktask->cipher = kKryptosCipherAES128;
+    ktask->in = NULL;
+    ktask->in_size = 0;
+    ktask->key = NULL;
+    ktask->key_size = 0;
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->cipher = kKryptosCipherRSA;
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in = "rsa";
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in_size = 3;
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = rsa_k_priv;
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key_size = strlen(ktask->key);
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = rsa_k_pub;
+    ktask->key_size = strlen(ktask->key);
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 1);
+    KUTE_ASSERT(ktask->result == kKryptosSuccess);
+
+    // INFO(Rafael): Verify using RSA-EMSA-PSS.
+
+    ktask->arg[0] = ktask->arg[1] = ktask->arg[2] = NULL;
+
+    ktask->cipher = kKryptosCipherAES128;
+    ktask->in = NULL;
+    ktask->in_size = 0;
+    ktask->key = NULL;
+    ktask->key_size = 0;
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->cipher = kKryptosCipherRSAEMSAPSS;
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in = "rsa";
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in_size = 3;
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = rsa_k_priv;
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key_size = strlen(ktask->key);
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = rsa_k_pub;
+    ktask->key_size = strlen(ktask->key);
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->arg[0] = &k;
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 1);
+    KUTE_ASSERT(ktask->result == kKryptosSuccess);
+
+    ktask->arg[1] = kryptos_sha1_hash;
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->arg[1] = NULL;
+    ktask->arg[2] = kryptos_sha1_hash_size;
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->arg[1] = kryptos_sha1_hash;
+    ktask->arg[2] = kryptos_sha1_hash_size;
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 1);
+    KUTE_ASSERT(ktask->result == kKryptosSuccess);
+
+    // INFO(Rafael): Verify using DSA.
+
+    ktask->cipher = kKryptosCipherDSA;
+    ktask->in = NULL;
+    ktask->in_size = 0;
+    ktask->key = NULL;
+    ktask->key_size = 0;
+    ktask->arg[0] = ktask->arg[1] = NULL;
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in = "dsa";
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
+
+    ktask->in_size = 3;
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = dsa_k_priv;
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key_size = strlen(ktask->key);
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
+    KUTE_ASSERT(ktask->result == kKryptosKeyError);
+
+    ktask->key = dsa_k_pub;
+    ktask->key_size = strlen(ktask->key);
+
+    KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 1);
+    KUTE_ASSERT(ktask->result == kKryptosSuccess);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_hex_tests)

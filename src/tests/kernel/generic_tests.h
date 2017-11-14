@@ -24,6 +24,10 @@ KUTE_DECLARE_TEST_CASE(kryptos_iv_data_flush_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_task_check_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_task_check_sign_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_task_check_verify_tests);
+
 KUTE_DECLARE_TEST_CASE(kryptos_hex_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_hash_common_tests);
