@@ -12,6 +12,10 @@
 
 [CODESTYLE.md](https://github.com/rafael-santiago/kryptos/blob/master/doc/CODESTYLE.md).
 
+## Are you looking for some clues about the source code in order to contribute?
+
+[INTERNALS.md](https://github.com/rafael-santiago/kryptos/blob/master/doc/INTERNALS.md).
+
 ## So you have found some issue and want to tell me about
 
 [Thank you](https://github.com/rafael-santiago/kryptos/issues)!
