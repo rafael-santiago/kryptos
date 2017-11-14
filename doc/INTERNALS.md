@@ -1,6 +1,6 @@
 # Libkryptos developer's manual
 
-**Abstract**: This document is intended for contributors. Here you will find informations about how to code new stuff besides maintaining the current ones.
+**Abstract**: This document is intended for contributors. Here you will find information about how to code new stuff besides maintaining the current ones.
 Due to it is assumed that the reader has a medium to advanced C knowledge.
 
 ## The libkryptos repo tree layout
@@ -44,3 +44,14 @@ When you also request the kernel mode tests the native kernel's build system wil
 
 ## Some meaningful header files
 
+### src/kryptos_types.h
+
+### src/kryptos.h
+
+### src/kryptos_mp.h
+
+### src/kryptos_padding.h
+
+### src/kryptos_pem.h
+
+### src/kryptos_task_check.h
