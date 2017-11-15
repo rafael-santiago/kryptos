@@ -86,25 +86,25 @@ static void kryptos_idea_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *use
 
     kryptos_ld_user_key_prologue(key, 4, user_key, user_key_size, kp, kp_end, w, b, return);
 
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_idea_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_idea_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_idea_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_idea_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_idea_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_idea_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_idea_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_idea_ld_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_idea_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_idea_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_idea_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_idea_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_idea_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_idea_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_idea_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_idea_ld_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_idea_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_idea_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_idea_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_idea_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_idea_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_idea_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_idea_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_idea_ld_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_idea_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_idea_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_idea_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_idea_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_idea_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_idea_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_idea_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_idea_ld_user_key_epilogue);
 
     kryptos_ld_user_key_epilogue(kryptos_idea_ld_user_key_epilogue, key, w, b, kp, kp_end);
 }

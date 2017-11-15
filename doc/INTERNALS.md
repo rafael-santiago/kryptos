@@ -99,13 +99,13 @@ exports some useful functions that will make your implementation easier (more on
 
 ## Okay, let's add a new block cipher called "foofish" to libkryptos...
 
-Now let's suppose you read about a brand new awesome, super-secure block cipher called foofish and want to add it to
+Now let's suppose you read about a brand new awesome, super-secure block cipher called foofish and you want to add it to
 kryptos.
 
-The foofish cipher encrypts blocks of 128-bits, this needs a user's key of 256-bits in order to expand the final key (generate
+The foofish cipher encrypts blocks of 128-bits, it needs a user's key of 256-bits in order to expand the final key (generate
 the sub-keys).
 
-The first thing that you should do is define a new constant into the typed enum called ``kryptos_cipher_t``. This enum
+The first thing you should do is define a new constant into the typed enum called ``kryptos_cipher_t``. This enum
 is located in ``kryptos_types.h``, take a look:
 
 ```c
@@ -126,7 +126,7 @@ typedef enum {
     kKryptosCipherSAFERK64,
     kKryptosCipherBLOWFISH,
     kKryptosCipherSERPENT,
-    kKryptosCipherFOOFISH, // Nice, you should respect the order: stream cipher, block ciphers, pk stuff.
+    kKryptosCipherFOOFISH, // Nice, you should respect the order: stream ciphers, block ciphers, pk stuff.
     kKryptosCipherRSA,
     kKryptosCipherRSAOAEP,
     kKryptosCipherELGAMAL,
@@ -140,3 +140,178 @@ typedef enum {
 
 After you should create two files: ``src/kryptos_foofish.h`` and ``src/kryptos_foofish.c``. Let's start with the
 ``kryptos_foofish.c``.
+
+All s-boxes, internal constants, sub-keys struct, etc should be defined into the algorithm implementation file. If it
+performs shifts and you want to code it as macros you should create it in this implementation file and after undefine
+this macro. This is a way of keeping the stuff sanitized.
+
+The function ``kryptos_foofish_ld_user_key`` is responsible for reading the user key into the sub-keys initial state.
+The function ``kryptos_foofish_mk_skeys`` is responsible for expanding the user key:
+
+```c
+(...)
+    static void kryptos_foofish_ld_user_key(kryptos_u32_t *key,
+                                            const kryptos_u8_t *user_key,
+                                            const size_t user_key_size);
+
+    static void kryptos_foofish_mk_skeys(const kryptos_u8_t *key,
+                                         const size_t key_size,
+                                         struct kryptos_foofish_subkeys *sks);
+(...)
+```
+
+The struct ``kryptos_foofish_subkeys`` is abstracted but it will contain the final key used for encrypt and decrypt the data.
+
+As said before the foofish expects a 256-bit key from the user. This data is put into a initial state and processed in some
+way to produce the final key. The function ``kryptos_foofish_ld_user_key`` will load this data. There's a way of making
+this reading stuff easier. Take a look:
+
+```c
+
+static void kryptos_foofish_ld_user_key(kryptos_u32_t *key,
+                                        const kryptos_u8_t *user_key,
+                                        const size_t user_key_size) {
+    const kryptos_u8_t *kp, *kp_end;
+    size_t w, b;
+
+    kryptos_ld_user_key_prologue(key, 8, user_key, user_key_size, kp, kp_end, w, b, return);
+
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+
+    kryptos_ld_user_key_epilogue(kryptos_foofish_ld_user_key_epilogue, key, w, b, kp, kp_end);
+}
+```
+
+The ``kryptos_foofish_ld_user_key`` uses three useful macros: ``kryptos_ld_user_key_prologue``, ``kryptos_ld_user_key_byte``,
+``kryptos_ld_user_key_epilogue``.
+
+Using those three macros allow you deal with keys that do not have the exact expected size. Maybe the user supplied a shorter
+key. With the macros is possible to read the passed bytes and assume the remaining as zeroed bytes. Another thing is that
+those macros avoid using loops in order to load the bytes into the state, as a result the code tends to drop out any kind
+of useless instructions.
+
+All that you need to use the ``kryptos_ld_user_key_*`` macros are four variables: two ``kryptos_u8_t *`` and two ``size_t``.
+Do not worry about their initialization, the ``kryptos_ld_user_key_prologue`` does it:
+
+```c
+    kryptos_ld_user_key_prologue(<pointer to the state>,
+                                 <total of n-bit values produced by the expected key size>,
+                                 <pointer to the user key>,
+                                 <size in bytes of the user key>,
+                                 <head key pointer>,
+                                 <tail key pointer>,
+                                 <state's index>,
+                                 <byte counter>,
+                                 <panic statement [if something is wrong this is what to do]>);
+```
+
+Translating:
+
+```c
+    const kryptos_u8_t *kp, *kp_end;
+    size_t w, b;
+
+    kryptos_ld_user_key_prologue(key, 8, user_key, user_key_size, kp, kp_end, w, b, return);
+```
+
+Since 32 * 8 = 256 (in this case n-bit is 32-bit). We are saying that is expected to read 256 bytes from "key", if not possible
+the remaining are assumed as zero. **Remark**: The ``kryptos_ld_user_key_prologue/byte/epilogue`` can work with key state of
+any type not only 32-bit, this is just an example!
+
+Now you need to call ``kryptos_ld_user_key_byte`` 32 times. Because we will read the data byte-by-byte. The main idea
+behind the macro ``kryptos_ld_user_key_byte`` is:
+
+```c
+    kryptos_ld_user_key_byte(<exact position where the current byte must be loaded>,
+                             <state's index>,
+                             <byte counter>,
+                             <key's head pointer>,
+                             <key's tail pointer>,
+                             <escape label defined in the epilogue macro>)
+```
+
+Translating:
+
+```c
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_foofish_ld_user_key_epilogue);
+```
+
+Now the epilogue macro:
+
+```c
+    kryptos_ld_user_key_epilogue(<escape label>,
+                                 <state pointer>,
+                                 <state's index>,
+                                 <byte counter>,
+                                 <key's head pointer>,
+                                 <key's tail pointer>);
+```
+
+Translating:
+
+```c
+    kryptos_ld_user_key_epilogue(kryptos_foofish_ld_user_key_epilogue, key, w, b, kp, kp_end);
+```
+

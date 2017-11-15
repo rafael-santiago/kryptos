@@ -84,11 +84,11 @@
     w = 0;\
 }
 
-#define kryptos_ld_user_key_byte(state, kp, kp_end, epilogue) {\
+#define kryptos_ld_user_key_byte(state, w, b, kp, kp_end, epilogue) {\
     if (kp == kp_end) goto epilogue;\
-    state = (state << 8) | *kp;\
+    state[w] = (state[w] << 8) | *kp;\
     kp++;\
-    b = (b + 1) % sizeof(state);\
+    b = (b + 1) % sizeof(state[0]);\
     if (b == 0) {\
         w++;\
     }\

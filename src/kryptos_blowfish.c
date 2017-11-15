@@ -304,7 +304,7 @@ static void kryptos_blowfish_block_decrypt(kryptos_u8_t *block, const struct kry
     xl = xr = t  = 0;
 }
 
-static void kryptos_blowfish_ld_user_key(kryptos_u32_t key[KRYPTOS_BLOWFISH_MAX_KEY_NR],
+static void kryptos_blowfish_ld_user_key(kryptos_u32_t *key,
                                          const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
     size_t w, b;
@@ -313,62 +313,62 @@ static void kryptos_blowfish_ld_user_key(kryptos_u32_t key[KRYPTOS_BLOWFISH_MAX_
 
     // TIP(Rafael): The Blowfish max key length is 448-bit.
 
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key[w], kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_blowfish_ld_user_key_epilogue);
 
     kryptos_ld_user_key_epilogue(kryptos_blowfish_ld_user_key_epilogue, key, w, b, kp, kp_end);
 }
