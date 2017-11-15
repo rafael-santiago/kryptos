@@ -96,3 +96,47 @@ check entry points. This also could be understood as a task "compiler".
 
 If you will add a new hash algorithm and this algorithm uses Merkle-Damgard construction, the ``kryptos_hash_common.h``
 exports some useful functions that will make your implementation easier (more on later).
+
+## Okay, let's add a new block cipher called "foofish" to libkryptos...
+
+Now let's suppose you read about a brand new awesome, super-secure block cipher called foofish and want to add it to
+kryptos.
+
+The foofish cipher encrypts blocks of 128-bits, this needs a user's key of 256-bits in order to expand the final key (generate
+the sub-keys).
+
+The first thing that you should do is define a new constant into the typed enum called ``kryptos_cipher_t``. This enum
+is located in ``kryptos_types.h``, take a look:
+
+```c
+typedef enum {
+    kKryptosCipherARC4 = 0,
+    kKryptosCipherSEAL,
+    kKryptosCipherAES128,
+    kKryptosCipherAES192,
+    kKryptosCipherAES256,
+    kKryptosCipherDES,
+    kKryptosCipher3DES,
+    kKryptosCipher3DESEDE,
+    kKryptosCipherIDEA,
+    kKryptosCipherRC2,
+    kKryptosCipherFEAL,
+    kKryptosCipherCAST5,
+    kKryptosCipherCAMELLIA,
+    kKryptosCipherSAFERK64,
+    kKryptosCipherBLOWFISH,
+    kKryptosCipherSERPENT,
+    kKryptosCipherFOOFISH, // Nice, you should respect the order: stream cipher, block ciphers, pk stuff.
+    kKryptosCipherRSA,
+    kKryptosCipherRSAOAEP,
+    kKryptosCipherELGAMAL,
+    kKryptosCipherELGAMALOAEP,
+    kKryptosCipherRSAEMSAPSS,
+    kKryptosCipherDSA,
+    kKryptosCipherNr
+}kryptos_cipher_t;
+
+```
+
+After you should create two files: ``src/kryptos_foofish.h`` and ``src/kryptos_foofish.c``. Let's start with the
+``kryptos_foofish.c``.
