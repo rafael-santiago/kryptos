@@ -247,7 +247,7 @@ Translating:
 
 Since 32 * 8 = 256 (in this case n-bit is 32-bit). We are saying that is expected to read 256 bytes from "key", if not possible
 the remaining are assumed as zero. **Remark**: The ``kryptos_ld_user_key_prologue/byte/epilogue`` can work with key state of
-any type not only 32-bit, this is just an example!
+any primitive type not only 32-bit data, this is just an example.
 
 Now you need to call ``kryptos_ld_user_key_byte`` 32 times. Because we will read the data byte-by-byte. The main idea
 behind the macro ``kryptos_ld_user_key_byte`` is:
