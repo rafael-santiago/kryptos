@@ -98,7 +98,7 @@ static kryptos_sha384_512_init_func kryptos_sha384_512_init[kBitsNr] = {
     kryptos_sha384_init, kryptos_sha512_init
 };
 
-static size_t kryptos_sha384_512_block_index_decision_table[128] = {
+static size_t kryptos_sha384_512_block_index_decision_table[KRYPTOS_SHA384_512_BYTES_PER_BLOCK] = {
      0,  0,  0,  0,  0,  0,  0,  0,
      1,  1,  1,  1,  1,  1,  1,  1,
      2,  2,  2,  2,  2,  2,  2,  2,

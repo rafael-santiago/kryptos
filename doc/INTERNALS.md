@@ -689,7 +689,7 @@ KUTE_TEST_CASE_END
 
 Also into the file ``tests/kernel/hash_tests.c`` you should add the following code:
 
-```
+```c
 KUTE_TEST_CASE(kryptos_hmac_tests)
 (...)
 #if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)
@@ -879,8 +879,8 @@ struct kryptos_sha1_input_message {
 So the input bytes [0], [1], [2] and [3] will be loaded into block[0]. The input bytes [60], [61], [62] and [63] will
 be loaded into block[15]. Yep! Now that you understood it seems pretty boring, huh? :)
 
-The Merkle-Damgard construction also needs a padding step during the current block processing and depeding on the size
-of the block this padding must happen in two "acts". Look the SHA-1 block processing code:
+The Merkle-Damgard construction also needs a padding step during the current block processing (if the current is the last block)
+and depeding on the size of the block this padding must happen in two "acts". Look the SHA-1 block processing code:
 
 ```c
 static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx) {

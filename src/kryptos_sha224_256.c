@@ -101,7 +101,7 @@ static kryptos_sha224_256_init_func kryptos_sha224_256_init[kBitsNr] = {
     kryptos_sha224_init, kryptos_sha256_init
 };
 
-static size_t kryptos_sha224_256_block_index_decision_table[64] = {
+static size_t kryptos_sha224_256_block_index_decision_table[KRYPTOS_SHA224_256_BYTES_PER_BLOCK] = {
      0,  0,  0,  0,
      1,  1,  1,  1,
      2,  2,  2,  2,
@@ -117,7 +117,7 @@ static size_t kryptos_sha224_256_block_index_decision_table[64] = {
     12, 12, 12, 12,
     13, 13, 13, 13,
     14, 14, 14, 14,
-    15, 15, 15, 15,
+    15, 15, 15, 15
 };
 
 KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(sha224_256, kryptos_sha224_256_ctx, ctx,
@@ -251,7 +251,7 @@ static void kryptos_sha224_256_do_block(struct kryptos_sha224_256_ctx *ctx) {
     kryptos_u32_t W[64], a, b, c, d, e, f, g, h, T1, T2;
     size_t t;
 
-    if (ctx->curr_len < 64) {
+    if (ctx->curr_len < KRYPTOS_SHA224_256_BYTES_PER_BLOCK) {
         kryptos_hash_apply_pad_on_u32_block(ctx->input.block, 16,
                                             kryptos_sha224_256_block_index_decision_table,
                                             ctx->curr_len, ctx->total_len, &ctx->paddin2times,

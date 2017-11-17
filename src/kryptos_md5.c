@@ -48,7 +48,7 @@ struct kryptos_md5_ctx {
     int paddin2times;
 };
 
-static size_t kryptos_md5_block_index_decision_table[64] = {
+static size_t kryptos_md5_block_index_decision_table[KRYPTOS_MD5_BYTES_PER_BLOCK] = {
      0,  0,  0,  0,
      1,  1,  1,  1,
      2,  2,  2,  2,

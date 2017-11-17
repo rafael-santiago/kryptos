@@ -57,7 +57,7 @@ struct kryptos_sha1_ctx {
     int paddin2times;
 };
 
-static size_t kryptos_sha1_block_index_decision_table[64] = {
+static size_t kryptos_sha1_block_index_decision_table[KRYPTOS_SHA1_BYTES_PER_BLOCK] = {
      0,  0,  0,  0,
      1,  1,  1,  1,
      2,  2,  2,  2,
@@ -73,7 +73,7 @@ static size_t kryptos_sha1_block_index_decision_table[64] = {
     12, 12, 12, 12,
     13, 13, 13, 13,
     14, 14, 14, 14,
-    15, 15, 15, 15,
+    15, 15, 15, 15
 };
 
 static void kryptos_sha1_init(struct kryptos_sha1_ctx *ctx);
@@ -144,7 +144,7 @@ static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx) {
     kryptos_u32_t W[80];
     size_t t;
 
-    if (ctx->curr_len < 64) {
+    if (ctx->curr_len < KRYPTOS_SHA1_BYTES_PER_BLOCK) {
         kryptos_hash_apply_pad_on_u32_block(ctx->input.block, 16,
                                             kryptos_sha1_block_index_decision_table,
                                             ctx->curr_len, ctx->total_len, &ctx->paddin2times,
