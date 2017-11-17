@@ -721,4 +721,302 @@ Almost the same things done in user mode tests but in kernel mode if there is a 
 a kernel panic, reboot your machine, corrupt your repository, etc. So be sure about your work still in user mode before
 enabling the kernel tests.
 
-Now, it is real, congrats! Your stuff is being really tested according the project requirements. Your job is done!
+Now, it is real, congrats! Your stuff is being really tested according to the project requirements. Your job is done!
+
+## Steps to add a new hash algorithm based on Merkle-Damgard construction
+
+Well it is almost the same thing done with block ciphers. Let's analyse the files ``src/kryptos_sha1.[ch]``.
+
+The following content is what you will find within ``kryptos_sha1.h``:
+
+```c
+/*
+ *                          Copyright (C) 2006, 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#ifndef KRYPTOS_KRYPTOS_SHA1_H
+#define KRYPTOS_KRYPTOS_SHA1_H 1
+
+#include <kryptos_types.h>
+
+KRYPTOS_DECL_HASH_PROCESSOR(sha1, ktask)
+
+KRYPTOS_DECL_HASH_SIZE(sha1)
+
+KRYPTOS_DECL_HASH_INPUT_SIZE(sha1)
+
+#endif
+```
+
+As you can see the header file basically uses some internal dsl macros in order to automate the declaration of some meaningful
+entry points.
+
+- KRYPTOS_DECL_HASH_PROCESSOR(<hash algorithm name, <kryptos_task_ctx **>): creates the function ``kryptos_<hname>_hash(kryptos_task_ctx **)`` and this function is the main entry point to the hash algorithm.
+- KRYPTOS_DECL_HASH_SIZE(<hash algorithm name>): creates the function ``kryptos_<hname>_hash_size(void)`` and this function must return the size of the output hash in bytes.
+- KRYPTOS_DECL_HASH_INPUT_SIZE(<hash algorithm name>): create the function ``kryptos_<hname>_hash_input_size(void)`` and this function must return the size of the input block in bytes.
+
+Now let's see some relevant parts of the implementation file ``kryptos_sha1.c``:
+
+```c
+// The hash processor is accessible outside this module but the message processor is not. The message processor
+// is responsible for processing the whole message block-by-block. So here we are declaring this static function.
+KRYPTOS_DECL_HASH_MESSAGE_PROCESSOR(sha1, kryptos_sha1_ctx, ctx)
+
+// The message processor implementation requires:
+//      - The algorithm name.
+//      - The context T that gathers all algorithm stuff (states, input block, etc).
+//      - The name of the typed context T variable.
+//      - How many bytes are processed "per block".
+//      - How many positions the input array has. -> 16 x 32 = 512-bits
+//      - How many bits each input array item has. -----> 32
+//      - The algorithm initialization code stuff (for the current block).
+//      - The block processing stuff.
+//      - The block decision table (more on later).
+KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR(sha1, kryptos_sha1_ctx, ctx,
+                                    KRYPTOS_SHA1_BYTES_PER_BLOCK,
+                                    16, 32,
+                                    kryptos_sha1_init(ctx),
+                                    kryptos_sha1_do_block(ctx),
+                                    kryptos_sha1_block_index_decision_table)
+
+// The implementation is quite straightforward: Inform the algorithm name and
+// how many bytes there are in its output.
+KRYPTOS_IMPL_HASH_SIZE(sha1, KRYPTOS_SHA1_HASH_SIZE)
+
+// The implementation is quite straightforward: Inform the algorithm name and
+// how many bytes there are in its input.
+KRYPTOS_IMPL_HASH_INPUT_SIZE(sha1, KRYPTOS_SHA1_BYTES_PER_BLOCK)
+
+// This is the hash processor implementation and it requires:
+//      - The algorithm name.
+//      - The typed (kryptos_task_ctx **) variable name.
+//      - The context T that gathers all algorithm stuff (states, input block, etc).
+//      - The name of the typed context T variable.
+//      - The name of the escape/epilogue label.
+//      - The algorithm initial setup stuff.
+//      - The message processor statement 'kryptos_sha1_process_message'
+//        was implemented by the KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR macro.
+//      - The statements necessary to produce a raw byte output.
+//      - The statemenets necessary to produce a hexadecimal output.
+KRYPTOS_IMPL_HASH_PROCESSOR(sha1, ktask, kryptos_sha1_ctx, ctx, sha1_hash_epilogue,
+                            {
+                                ctx.message = (*ktask)->in;
+                                ctx.total_len = (*ktask)->in_size << 3; // INFO(Rafael): Should be expressed in bits.
+                            },
+                            kryptos_sha1_process_message(&ctx),
+                            {
+                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg(KRYPTOS_SHA1_HASH_SIZE);
+                                if ((*ktask)->out == NULL) {
+                                    (*ktask)->out_size = 0;
+                                    (*ktask)->result = kKryptosProcessError;
+                                    (*ktask)->result_verbose = "No memory to get a valid output.";
+                                    goto kryptos_sha1_hash_epilogue;
+                                }
+                                (*ktask)->out_size = KRYPTOS_SHA1_HASH_SIZE;
+                                kryptos_cpy_u32_as_big_endian(     (*ktask)->out, 20, ctx.state[0]);
+                                kryptos_cpy_u32_as_big_endian((*ktask)->out +  4, 16, ctx.state[1]);
+                                kryptos_cpy_u32_as_big_endian((*ktask)->out +  8, 12, ctx.state[2]);
+                                kryptos_cpy_u32_as_big_endian((*ktask)->out + 12,  8, ctx.state[3]);
+                                kryptos_cpy_u32_as_big_endian((*ktask)->out + 16,  4, ctx.state[4]);
+                            },
+                            {
+                                (*ktask)->out = (kryptos_u8_t *) kryptos_newseg((KRYPTOS_SHA1_HASH_SIZE << 1) + 1);
+                                if ((*ktask)->out == NULL) {
+                                    (*ktask)->out_size = 0;
+                                    (*ktask)->result = kKryptosProcessError;
+                                    (*ktask)->result_verbose = "No memory to get a valid output.";
+                                    goto kryptos_sha1_hash_epilogue;
+                                }
+                                (*ktask)->out_size = KRYPTOS_SHA1_HASH_SIZE << 1;
+                                kryptos_u32_to_hex(     (*ktask)->out, 41, ctx.state[0]);
+                                kryptos_u32_to_hex((*ktask)->out  + 8, 33, ctx.state[1]);
+                                kryptos_u32_to_hex((*ktask)->out + 16, 25, ctx.state[2]);
+                                kryptos_u32_to_hex((*ktask)->out + 24, 17, ctx.state[3]);
+                                kryptos_u32_to_hex((*ktask)->out + 32,  9, ctx.state[4]);
+                            })
+
+```
+
+Yes, at first glance it seems quite trick but believe in me, those tricks presented above will save you hours of work. The
+buffer parsing functions are all well tested and all you should do is to focus in the hash algorithm implementation itself.
+
+Maybe the most misterious trinket presented above is the 'block decision table'... For SHA-1 this is the block decision
+table:
+
+```c
+static size_t kryptos_sha1_block_index_decision_table[KRYPTOS_SHA1_BYTES_PER_BLOCK] = {
+     0,  0,  0,  0,
+     1,  1,  1,  1,
+     2,  2,  2,  2,
+     3,  3,  3,  3,
+     4,  4,  4,  4,
+     5,  5,  5,  5,
+     6,  6,  6,  6,
+     7,  7,  7,  7,
+     8,  8,  8,  8,
+     9,  9,  9,  9,
+    10, 10, 10, 10,
+    11, 11, 11, 11,
+    12, 12, 12, 12,
+    13, 13, 13, 13,
+    14, 14, 14, 14,
+    15, 15, 15, 15
+};
+```
+
+This table will help the input buffer parsing functions by putting the current byte into the right word and also by padding it
+correctly. For SHA-1 the input is expressed by the following struct:
+
+```c
+struct kryptos_sha1_input_message {
+    kryptos_u32_t block[16]; // each array position can hold 4-bytes.
+};
+```
+
+So the input bytes [0], [1], [2] and [3] will be loaded into block[0]. The input bytes [60], [61], [62] and [63] will
+be loaded into block[15]. Yep! Now that you understood it seems pretty boring, huh? :)
+
+The Merkle-Damgard construction also needs a padding step during the current block processing and depeding on the size
+of the block this padding must happen in two "acts". Look the SHA-1 block processing code:
+
+```c
+static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx) {
+    kryptos_u32_t A, B, C, D, E, TEMP, Fx, Kx;
+    kryptos_u32_t W[80];
+    size_t t;
+
+    if (ctx->curr_len < KRYPTOS_SHA1_BYTES_PER_BLOCK) {
+        kryptos_hash_apply_pad_on_u32_block(ctx->input.block, 16,
+                                            kryptos_sha1_block_index_decision_table,
+                                            ctx->curr_len, ctx->total_len, &ctx->paddin2times,
+                                            KRYPTOS_SHA1_LEN_BLOCK_OFFSET);
+    }
+
+(...)
+
+    if (ctx->paddin2times) {
+        kryptos_hash_ld_u8buf_as_u32_blocks((kryptos_u8_t *)"", 0, ctx->input.block, 16,
+                                            kryptos_sha1_block_index_decision_table);
+        kryptos_sha1_do_block(ctx);
+    }
+}
+```
+
+The function ``kryptos_hash_apply_pad_on_u32_block`` signales if this padding operation will happen in two "acts" or not
+by setting the int pointer ``&ctx->paddin2times``.
+
+To test the algorithm you also should create a test vector header file under ``tests/``. This is the content from
+``tests/sha1_test_vector.h``:
+
+```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#ifndef KRYPTOS_TESTS_SHA1_TEST_VECTOR_H
+#define KRYPTOS_TESTS_SHA1_TEST_VECTOR_H 1
+
+#include "test_types.h"
+
+test_vector(sha1, hash) = {
+    add_test_vector_data("", 0,
+                         "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709", 40,
+                         "\xDA\x39\xA3\xEE\x5E\x6B\x4B\x0D\x32\x55\xBF\xEF\x95\x60\x18\x90\xAF\xD8\x07\x09", 20),
+    add_test_vector_data("a", 1,
+                         "86F7E437FAA5A7FCE15D1DDCB9EAEAEA377667B8", 40,
+                         "\x86\xF7\xE4\x37\xFA\xA5\xA7\xFC\xE1\x5D\x1D\xDC\xB9\xEA\xEA\xEA\x37\x76\x67\xB8", 20),
+    add_test_vector_data("abc", 3,
+                         "A9993E364706816ABA3E25717850C26C9CD0D89D", 40,
+                         "\xA9\x99\x3E\x36\x47\x06\x81\x6A\xBA\x3E\x25\x71\x78\x50\xC2\x6C\x9C\xD0\xD8\x9D", 20),
+    add_test_vector_data("message digest", 14,
+                         "C12252CEDA8BE8994D5FA0290A47231C1D16AAE3", 40,
+                         "\xC1\x22\x52\xCE\xDA\x8B\xE8\x99\x4D\x5F\xA0\x29\x0A\x47\x23\x1C\x1D\x16\xAA\xE3", 20),
+    add_test_vector_data("abcdefghijklmnopqrstuvwxyz", 26,
+                         "32D10C7B8CF96570CA04CE37F2A19D84240D3A89", 40,
+                         "\x32\xD1\x0C\x7B\x8C\xF9\x65\x70\xCA\x04\xCE\x37\xF2\xA1\x9D\x84\x24\x0D\x3A\x89", 20),
+    add_test_vector_data("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", 56,
+                         "84983E441C3BD26EBAAE4AA1F95129E5E54670F1", 40,
+                         "\x84\x98\x3E\x44\x1C\x3B\xD2\x6E\xBA\xAE\x4A\xA1\xF9\x51\x29\xE5\xE5\x46\x70\xF1", 20)
+};
+
+#endif
+
+```
+
+The ``add_test_vector_data`` expects the input data, input data size, the expected hash in hexadecimal, the size of this
+hexadecimal data, the expected hash in raw bytes, the amount of expected bytes.
+
+You also should include the new test vector header file into ``tests/test_vectors.h``.
+
+In ``tests/hash_tests.h`` you need to declare two new test cases related with the hash algorithm:
+
+```c
+(...)
+CUTE_DECLARE_TEST_CASE(kryptos_sha1_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_sha1_hash_macro_tests);
+(...)
+```
+
+Now into ``tests/hash_tests.c`` you implement them as follows:
+
+```c
+CUTE_TEST_CASE(kryptos_sha1_tests)
+    kryptos_run_hash_tests(sha1, 64, 20);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_sha1_hash_macro_tests)
+    kryptos_run_hash_macro_tests(sha1, 64, 20);
+CUTE_TEST_CASE_END
+```
+
+The macros expect the algorithm name, the size of the input in bytes (64 * 8 = 512-bits) and the size in bytes of the hash
+output.
+
+If you have implemented a new hash algorithm is also important extend the HMAC tests. These tests are located into
+``tests/hash_tests.c``. There you should include for each supported cipher a test using the new hash algorithm with
+ECB and CBC modes:
+
+```c
+CUTE_TEST_CASE(kryptos_hmac_tests)
+
+#if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)
+    kryptos_u8_t *key = "nooneknows";
+    size_t key_size = 10;
+    int feal_rounds = 8, rc2_T1 = 64, saferk64_rounds = 6;
+    kryptos_camellia_keysize_t camellia_size;
+    size_t tv, tv_nr, data_size;
+    kryptos_task_ctx t;
+    kryptos_u8_t *triple_des_key2, *triple_des_key3;
+    size_t triple_des_key2_size, triple_des_key3_size;
+
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, des, sha1, key, key_size, kKryptosECB);
+    (...)
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, des, sha1, key, key_size, kKryptosCBC);
+    (...)
+CUTE_TEST_CASE_END
+```
+
+In order to actually execute the hash algorithm tests you should call it from the kryptos' test monkey in ``tests/main.c``:
+
+```c
+CUTE_TEST_CASE(kryptos_test_monkey)
+(...)
+    // INFO(Rafael): Hash validation (also official data).
+    CUTE_RUN_TEST(kryptos_sha1_tests);
+    CUTE_RUN_TEST(kryptos_sha1_hash_macro_tests);
+(...)
+CUTE_TEST_CASE_END
+```
+
+The kernel tests for hash algorithms only verifies the result for the "abc" hashing. So you should edit the file
+``src/tests/kernel/hash_tests.c`` and in test case ``kryptos_hash_tests`` to add your new test code stuff.
+
+In kernel mode, still in the file ``src/tests/kernel/hash_tests.c``, you should edit the test case ``kryptos_hmac_tests``
+and add the verifying macros for your new hash algorithm. The same thing done in user mode tests.
