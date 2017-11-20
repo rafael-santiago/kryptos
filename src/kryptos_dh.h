@@ -53,6 +53,10 @@ struct kryptos_dh_xchg_ctx {
     (xc)->result = kKryptosSuccess;\
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 kryptos_task_result_t kryptos_dh_mk_domain_params(const size_t p_bits, const size_t q_bits,
                                                   kryptos_u8_t **params, size_t *params_size);
 
@@ -78,5 +82,9 @@ void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8
 void kryptos_dh_process_modxchg(struct kryptos_dh_xchg_ctx **data);
 
 void kryptos_clear_dh_xchg_ctx(struct kryptos_dh_xchg_ctx *data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

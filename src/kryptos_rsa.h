@@ -22,6 +22,10 @@
 
 #define KRYPTOS_RSA_PEM_HDR_PARAM_S "RSA PARAM S"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 kryptos_task_result_t kryptos_rsa_mk_key_pair(const size_t bits, kryptos_u8_t **k_pub, size_t *k_pub_size,
                                               kryptos_u8_t **k_priv, size_t *k_priv_size);
 
@@ -50,5 +54,9 @@ void kryptos_rsa_digital_signature_setup(kryptos_task_ctx *ktask, kryptos_u8_t *
 void kryptos_rsa_emsa_pss_digital_signature_setup(kryptos_task_ctx *ktask, kryptos_u8_t *in, size_t in_size,
                                                   kryptos_u8_t *key, size_t key_size, size_t *salt_size,
                                                   kryptos_hash_func hash, kryptos_hash_size_func hash_size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

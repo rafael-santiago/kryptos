@@ -10,6 +10,10 @@
 
 #include <kryptos_types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 kryptos_u8_t *kryptos_pem_get_data(const char *header, const kryptos_u8_t *buf, const size_t buf_size,
                                    size_t *data_size);
 
@@ -19,5 +23,9 @@ kryptos_task_result_t kryptos_pem_put_data(kryptos_u8_t **pem_buf, size_t *pem_b
 kryptos_task_result_t kryptos_pem_get_mp_data(const char *hdr,
                                               const kryptos_u8_t *in, const size_t in_size,
                                               kryptos_mp_value_t **number);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

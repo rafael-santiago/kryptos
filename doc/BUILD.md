@@ -162,6 +162,7 @@ additional options. The **Table 3** gathers the options related with the kernel 
 | ``--skip-dsa-signature-tests``           | Skips the DSA signature tests. The tests execution becomes faster.           |
 | ``--mk-samples``                         | Requests the code samples build.                                             |
 | ``--toolset=<gcc or clang>``             | Defines the C compiler (the default is ``GCC``).                             |
+| ``--language=<c|cc>``                    | Defines the compiler's language (samples build only).                        |
 
 **Table 3**: The build options for the kernel mode unit tests.
 

@@ -26,6 +26,10 @@
 
 #define KRYPTOS_DSA_PEM_HDR_PARAM_X "DSA X"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 kryptos_task_result_t kryptos_dsa_mk_key_pair(const size_t p_bits, const size_t q_bits,
                                               kryptos_u8_t **k_pub, size_t *k_pub_size,
                                               kryptos_u8_t **k_priv, size_t *k_priv_size);
@@ -36,5 +40,9 @@ void kryptos_dsa_verify(kryptos_task_ctx **ktask);
 
 void kryptos_dsa_digital_signature_setup(kryptos_task_ctx *ktask, kryptos_u8_t *in, size_t in_size,
                                          kryptos_u8_t *key, size_t key_size, kryptos_hash_func hash);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

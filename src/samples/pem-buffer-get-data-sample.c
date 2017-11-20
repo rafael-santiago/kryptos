@@ -14,15 +14,15 @@
 
 int main(int argc, char **argv) {
     int exit_code = 0;
-    kryptos_u8_t *pem_buffer = "-----BEGIN SECOND-----\n"
-                               "Qm9uZA==\n"
-                               "-----END SECOND-----\n"
-                               "-----BEGIN FIRST-----\n"
-                               "SmFtZXM=\n"
-                               "-----END FIRST-----\n";
+    kryptos_u8_t *pem_buffer = (kryptos_u8_t *)"-----BEGIN SECOND-----\n"
+                                               "Qm9uZA==\n"
+                                               "-----END SECOND-----\n"
+                                               "-----BEGIN FIRST-----\n"
+                                               "SmFtZXM=\n"
+                                               "-----END FIRST-----\n";
 
     kryptos_u8_t *first = NULL, *second = NULL;
-    size_t first_size, second_size, pem_buffer_size = strlen(pem_buffer);
+    size_t first_size, second_size, pem_buffer_size = strlen((char *)pem_buffer);
 
     second = kryptos_pem_get_data(SECOND_NAME, pem_buffer, pem_buffer_size, &second_size);
 

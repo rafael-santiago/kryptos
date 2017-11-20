@@ -52,6 +52,10 @@
 #  if __STDC_VERSION__ >= 19901L
 #   define KRYPTOS_C99     1
 #  endif // __STDC_VERSION__ >= 19901L
+# else
+#  ifdef __cplusplus
+#   define KRYPTOS_C99     1
+#  endif
 # endif // __STDC_VERSION__
 #endif // NO_KRYPTOS_C99_SUPPORT
 
@@ -218,11 +222,20 @@ typedef struct kryptos_mp_value {
     kryptos_mp_digit_t *data;
 }kryptos_mp_value_t;
 
+#ifndef __cplusplus
 #define KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(cipher_name)\
 void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
                                        kryptos_u8_t *key,\
                                        const size_t key_size,\
                                        const kryptos_cipher_mode_t mode);
+
+#else
+#define KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(cipher_name)\
+extern "C" void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
+                                                  kryptos_u8_t *key,\
+                                                  const size_t key_size,\
+                                                  const kryptos_cipher_mode_t mode);
+#endif
 
 #define KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(cipher_name, kCipher, cipher_block_size) \
 void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
@@ -242,11 +255,20 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
     }\
 }
 
+#ifndef __cplusplus
 #define KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_SETUP(cipher_name, ktask, additional_args...)\
 void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
                                        kryptos_u8_t *key,\
                                        const size_t key_size,\
                                        const kryptos_cipher_mode_t mode, additional_args);
+#else
+#define KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_SETUP(cipher_name, ktask, additional_args...)\
+extern "C" void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
+                                                  kryptos_u8_t *key,\
+                                                  const size_t key_size,\
+                                                  const kryptos_cipher_mode_t mode, additional_args);
+
+#endif
 
 #define KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(cipher_name, ktask, kCipher, cipher_block_size,\
                                                 additional_arg, additional_setup_stmt)\
@@ -269,7 +291,11 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
     additional_setup_stmt;\
 }
 
+#ifndef __cplusplus
 #define KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR(cipher_name) void kryptos_## cipher_name ##_cipher(kryptos_task_ctx **);
+#else
+#define KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR(cipher_name) extern "C" void kryptos_## cipher_name ##_cipher(kryptos_task_ctx **);
+#endif
 
 #ifndef KRYPTOS_KERNEL_MODE
 
@@ -389,8 +415,13 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
 
 #endif
 
+#ifndef __cplusplus
 #define KRYPTOS_DECL_ENCODING_SETUP(encoding_name, ktask)\
 void kryptos_ ## encoding_name ## _setup(kryptos_task_ctx *ktask);
+#else
+#define KRYPTOS_DECL_ENCODING_SETUP(encoding_name, ktask)\
+extern "C" void kryptos_ ## encoding_name ## _setup(kryptos_task_ctx *ktask);
+#endif
 
 #define KRYPTOS_IMPL_ENCODING_SETUP(encoding_name, ktask, kEncoder)\
 void kryptos_ ## encoding_name ## _setup(kryptos_task_ctx *ktask) {\
@@ -400,8 +431,13 @@ void kryptos_ ## encoding_name ## _setup(kryptos_task_ctx *ktask) {\
     (ktask)->encoder = kEncoder;\
 }
 
+#ifndef __cplusplus
 #define KRYPTOS_DECL_ENCODING_PROCESSOR(encoding_name, ktask)\
 void kryptos_ ## encoding_name ## _processor(kryptos_task_ctx **ktask);
+#else
+#define KRYPTOS_DECL_ENCODING_PROCESSOR(encoding_name, ktask)\
+extern "C" void kryptos_ ## encoding_name ## _processor(kryptos_task_ctx **ktask);
+#endif
 
 #define KRYPTOS_IMPL_ENCODING_PROCESSOR(encoding_name,\
                                         kEncoding,\
@@ -443,8 +479,13 @@ kryptos_ ## encoding_name ## _processor_epilogue:\
     buffer_processor = NULL;\
 }
 
+#ifndef __cplusplus
 #define KRYPTOS_DECL_HASH_PROCESSOR(hash_name, ktask)\
 void kryptos_ ## hash_name ## _hash(kryptos_task_ctx **ktask, const int to_hex);
+#else
+#define KRYPTOS_DECL_HASH_PROCESSOR(hash_name, ktask)\
+extern "C" void kryptos_ ## hash_name ## _hash(kryptos_task_ctx **ktask, const int to_hex);
+#endif
 
 #ifndef KRYPTOS_KERNEL_MODE
 
@@ -589,16 +630,26 @@ static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct
 
 #endif
 
+#ifndef __cplusplus
 #define KRYPTOS_DECL_HASH_SIZE(hash_name)\
 size_t kryptos_ ## hash_name ## _hash_size(void);
+#else
+#define KRYPTOS_DECL_HASH_SIZE(hash_name)\
+extern "C" size_t kryptos_ ## hash_name ## _hash_size(void);
+#endif
 
 #define KRYPTOS_IMPL_HASH_SIZE(hash_name, size)\
 size_t kryptos_ ## hash_name ## _hash_size(void) {\
     return size;\
 }
 
+#ifndef __cplusplus
 #define KRYPTOS_DECL_HASH_INPUT_SIZE(hash_name)\
 size_t kryptos_  ## hash_name ## _hash_input_size(void);
+#else
+#define KRYPTOS_DECL_HASH_INPUT_SIZE(hash_name)\
+extern "C" size_t kryptos_  ## hash_name ## _hash_input_size(void);
+#endif
 
 #define KRYPTOS_IMPL_HASH_INPUT_SIZE(hash_name, size)\
 size_t kryptos_ ## hash_name ## _hash_input_size(void) {\

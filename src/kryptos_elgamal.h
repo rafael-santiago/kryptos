@@ -24,6 +24,10 @@
 
 #define KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Y "ELGAMAL PARAM Y"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 kryptos_task_result_t kryptos_elgamal_mk_key_pair(const size_t p_bits, const size_t q_bits,
                                                   kryptos_u8_t **k_pub, size_t *k_pub_size,
                                                   kryptos_u8_t **k_priv, size_t *k_priv_size);
@@ -40,5 +44,9 @@ void kryptos_elgamal_oaep_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, size
                                 kryptos_hash_size_func hash_size);
 
 void kryptos_elgamal_oaep_cipher(kryptos_task_ctx **ktask);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

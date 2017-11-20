@@ -14,10 +14,18 @@
 # include <stdlib.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void *kryptos_newseg(const size_t ssize);
 
 void *kryptos_realloc(void *addr, const size_t ssize);
 
 void kryptos_freeseg(void *seg);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

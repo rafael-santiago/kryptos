@@ -11,12 +11,16 @@
 int main(int argc, char **argv) {
     kryptos_task_ctx t, *ktask = &t;
     int exit_code = 0;
+#ifndef __cplusplus
     char *data = "Hey Beavis, I will become a encoded string Huh!";
+#else
+    char *data = (char *)"Hey Beavis, I will become a encoded string Huh!";
+#endif
 
     printf("Original text: '%s'\n", data);
 
     kryptos_task_set_encode_action(ktask);
-    kryptos_run_encoder(base64, ktask, data, strlen(data));
+    kryptos_run_encoder(base64, ktask, (kryptos_u8_t *)data, strlen(data));
 
     if (!kryptos_last_task_succeed(ktask)) {
         t.in = NULL;

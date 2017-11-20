@@ -10,7 +10,15 @@
 
 #include <kryptos_types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void kryptos_hmac(kryptos_task_ctx **ktask,
                   kryptos_hash_func h, kryptos_hash_size_func h_input_size, kryptos_hash_size_func h_size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

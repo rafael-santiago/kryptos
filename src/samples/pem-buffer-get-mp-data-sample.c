@@ -13,22 +13,22 @@
 
 int main(int argc, char **argv) {
     int exit_code = 0;
-    kryptos_u8_t *pem_buffer = "-----BEGIN PRIME-----\n"
-                               "+TyfXiVPtBkAIRwp5ZDMN"
-                               "NOvx36w9DG0kQVWmbaeIm"
-                               "9VJanCQb+pTfbDTnCnnyZ"
-                               "10h4bibG6CKJFk75bYgL6"
-                               "QzveLHdQO2WIPhXLtv0U0"
-                               "8c0DRNdjZu9aRvvHj2RXi"
-                               "umUz5pVCbhQoeAv9YI1yx"
-                               "Ya+I4J+FNyMnwC6LKtRQG"
-                               "KAM=\n"
-                               "-----END PRIME-----\n";
+    kryptos_u8_t *pem_buffer = (kryptos_u8_t *)"-----BEGIN PRIME-----\n"
+                                               "+TyfXiVPtBkAIRwp5ZDMN"
+                                               "NOvx36w9DG0kQVWmbaeIm"
+                                               "9VJanCQb+pTfbDTnCnnyZ"
+                                               "10h4bibG6CKJFk75bYgL6"
+                                               "QzveLHdQO2WIPhXLtv0U0"
+                                               "8c0DRNdjZu9aRvvHj2RXi"
+                                               "umUz5pVCbhQoeAv9YI1yx"
+                                               "Ya+I4J+FNyMnwC6LKtRQG"
+                                               "KAM=\n"
+                                               "-----END PRIME-----\n";
 
     kryptos_mp_value_t *prime = NULL;
     int is_prime;
 
-    if (kryptos_pem_get_mp_data(PRIME, pem_buffer, strlen(pem_buffer), &prime) != kKryptosSuccess) {
+    if (kryptos_pem_get_mp_data(PRIME, pem_buffer, strlen((char *)pem_buffer), &prime) != kKryptosSuccess) {
         printf("Error while getting the prime number from buffer.\n");
         exit_code = 1;
         goto epilogue;

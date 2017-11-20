@@ -10,6 +10,10 @@
 
 #include <kryptos_types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int kryptos_little_endian_cpu(void);
 
 kryptos_u32_t kryptos_get_u32_as_big_endian(const kryptos_u8_t *data, const size_t data_size);
@@ -25,5 +29,9 @@ kryptos_u16_t kryptos_get_u16_as_big_endian(const kryptos_u8_t *data, const size
 kryptos_u8_t *kryptos_cpy_u16_as_big_endian(kryptos_u8_t *dest, const size_t dest_size, const kryptos_u16_t value);
 
 kryptos_u8_t *kryptos_cpy_u64_as_big_endian(kryptos_u8_t *dest, const size_t dest_size, const kryptos_u64_t value);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

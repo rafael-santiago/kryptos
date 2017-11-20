@@ -26,6 +26,7 @@ kryptos.preloading() {
 }
 
 kryptos.prologue() {
+    check_compiler_language();
     $includes = hefesto.sys.get_option("includes");
     $cflags = hefesto.sys.get_option("cflags");
     $deps = get_c_cpp_deps();

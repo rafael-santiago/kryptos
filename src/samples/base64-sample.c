@@ -16,8 +16,8 @@ int main(int argc, char **argv) {
 
     t.encoder = kKryptosEncodingBASE64;
 
-    t.in = "Hey Beavis, I will become a encoded string Huh!";
-    t.in_size = strlen(t.in);
+    t.in = (kryptos_u8_t *)"Hey Beavis, I will become a encoded string Huh!";
+    t.in_size = strlen((char *)t.in);
 
     printf("Original text: '%s'\n", t.in);
 

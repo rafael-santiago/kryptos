@@ -8,6 +8,14 @@
 #ifndef KRYPTOS_KRYPTOS_PW2_H
 #define KRYPTOS_KRYPTOS_PW2_H 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int kryptos_pw2(const int e);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

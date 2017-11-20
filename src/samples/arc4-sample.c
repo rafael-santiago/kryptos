@@ -10,7 +10,7 @@
 #include <stdio.h>
 
 int main(int argc, char **argv) {
-    unsigned char *data = "hello world!";
+    unsigned char *data = (unsigned char *)"hello world!";
     kryptos_task_ctx task, *ktask = &task;
     int exit_code = 0;
 
@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
 
     // INFO(Rafael): Setting up the user key data information.
 
-    kryptos_arc4_setup(ktask, "1234", 4);
+    kryptos_arc4_setup(ktask, (kryptos_u8_t *)"1234", 4);
 
     // INFO(Rafael): Running the ARC4 cipher over the input (plaintext).
 

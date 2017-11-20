@@ -25,6 +25,8 @@ kryptos-tests.preloading() {
 }
 
 kryptos-tests.prologue() {
+    check_compiler_language();
+
     var user_option type list;
 
     forge_cutest();

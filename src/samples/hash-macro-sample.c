@@ -11,7 +11,7 @@
 int main(int argc, char **argv) {
     int exit_code = 0;
     kryptos_task_ctx t, *ktask = &t;
-    kryptos_u8_t *data = "Empty arms";
+    kryptos_u8_t *data = (kryptos_u8_t *)"Empty arms";
     size_t data_size = 10;
 
     kryptos_task_init_as_null(ktask);

@@ -10,7 +10,15 @@
 
 #include <kryptos_types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 kryptos_u8_t *kryptos_block_parser(kryptos_u8_t *out, const size_t block_size,
                                    kryptos_u8_t *in, kryptos_u8_t *in_end, kryptos_u8_t **next);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

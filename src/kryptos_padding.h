@@ -10,6 +10,10 @@
 
 #include <kryptos_types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 kryptos_u8_t *kryptos_ansi_x923_padding(const kryptos_u8_t *buffer, size_t *buffer_size,
                                         const size_t block_size_in_bytes, const int randomize);
 
@@ -36,5 +40,9 @@ const kryptos_u8_t *kryptos_pss_verify(const kryptos_u8_t *m, const size_t m_siz
                                        const kryptos_u8_t *em, const size_t em_size,
                                        const size_t k, const size_t salt_size,
                                        kryptos_hash_func hash_func, kryptos_hash_size_func hash_size_func);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

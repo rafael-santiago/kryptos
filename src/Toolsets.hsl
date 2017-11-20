@@ -13,11 +13,35 @@ include ~/toolsets/gcc/gcc-app.hsl
 include ~/toolsets/clang/clang-app.hsl
 
 function get_app_toolset() : result type string {
-    result (get_toolset_option_data() + "-c-app");
+    result (get_toolset_option_data() + "-" + get_language_option_data() + "-app");
 }
 
 function get_lib_toolset() : result type string {
-    result (get_toolset_option_data() + "-c-lib");
+    result (get_toolset_option_data() + "-" + get_language_option_data() + "-lib");
+}
+
+function check_compiler_language() : result type none {
+    if (get_language_option_data() == "cc") {
+        hefesto.sys.echo("BUILD ERROR: You cannot compile kryptos with a C++ compiler.\n" +
+                         "             But you can use the C compiled code with your C++ project.\n\n");
+        hefesto.sys.echo("'?! Blah-blah': Run the standard build command and once it well succeeded, " +
+                         "change to the samples directory and run the command:\n\t\t" +
+                         "-> 'hefesto [--toolset=gcc|clang] --language=cc --cflags=-fpermissive'. " +
+                         "Please do not pee on pants!\n");
+        hefesto.sys.exit(1);
+    }
+}
+
+local function get_language_option_data() : result type string {
+    var language_option type list;
+
+    $language_option = hefesto.sys.get_option("language");
+
+    if ($language_option.count() > 0) {
+        result $language_option.item(0);
+    }
+
+    result "c";
 }
 
 local function get_toolset_option_data() : result type string {

@@ -10,6 +10,10 @@
 
 #include <kryptos_types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void kryptos_hash_apply_pad_on_u32_block(kryptos_u32_t *input, const size_t input_nr,
                                          const size_t *block_index_decision_table,
                                          const kryptos_u64_t curr_len, const kryptos_u64_t total_len,
@@ -28,5 +32,9 @@ void kryptos_hash_ld_u8buf_as_u64_blocks(kryptos_u8_t *buffer, const int buffer_
                                          kryptos_u64_t *input, const size_t input_nr,
                                          const size_t *block_index_decision_table);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

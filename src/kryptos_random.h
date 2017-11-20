@@ -10,8 +10,16 @@
 
 #include <kryptos_types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void *kryptos_get_random_block(const size_t size_in_bytes);
 
 kryptos_u8_t kryptos_get_random_byte(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

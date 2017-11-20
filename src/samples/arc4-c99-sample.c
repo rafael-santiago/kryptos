@@ -11,7 +11,7 @@
 
 int main(int argc, char **argv) {
 #if defined(KRYPTOS_C99)
-    unsigned char *data = "hello world!";
+    unsigned char *data = (unsigned char *)"hello world!";
     kryptos_task_ctx task, *ktask = &task;
     int exit_code = 0;
 
@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 
     // INFO(Rafael): Running the ARC4 cipher over the input (plaintext).
 
-    kryptos_run_cipher(arc4, ktask, "1234", 4);
+    kryptos_run_cipher(arc4, ktask, (kryptos_u8_t *)"1234", 4);
 
     if (kryptos_last_task_succeed(ktask)) {
         printf("Encrypted... now decrypting...\n");
@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
 
         // INFO(Rafael): Running the ARC4 cipher over the input (ciphertext).
 
-        kryptos_run_cipher(arc4, ktask, "1234", 4);
+        kryptos_run_cipher(arc4, ktask, (kryptos_u8_t *)"1234", 4);
 
         if (kryptos_last_task_succeed(ktask)) {
             printf("Out: ");

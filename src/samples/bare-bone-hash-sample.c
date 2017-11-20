@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 
     // INFO(Rafael): Defining the input that must be "hashed".
 
-    t.in = "abc";
+    t.in = (kryptos_u8_t *)"abc";
     t.in_size = 3;
 
     printf("Hashed data: %s\n", t.in);

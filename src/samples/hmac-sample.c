@@ -19,14 +19,14 @@ int main(int argc, char **argv) {
 
     // INFO(Rafael): Setting the plaintext.
 
-    kryptos_task_set_in(&m, "As I was saying...", 18);
+    kryptos_task_set_in(&m, (kryptos_u8_t *)"As I was saying...", 18);
 
     printf("Data: %s\n", m.in);
 
     // INFO(Rafael): Encrypting with CAST5-CBC and generating our MAC based on SHA-512.
 
     kryptos_task_set_encrypt_action(&m);
-    kryptos_run_cipher_hmac(cast5, sha512, &m, "silent passenger", 16, kKryptosCBC);
+    kryptos_run_cipher_hmac(cast5, sha512, &m, (kryptos_u8_t *)"silent passenger", 16, kKryptosCBC);
 
     if (kryptos_last_task_succeed(&m)) {
         printf("Data successfully encrypted... Now we will intentionally corrupt it.\n");
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
         // INFO(Rafael): Now trying to decrypt.
 
         kryptos_task_set_decrypt_action(&m);
-        kryptos_run_cipher_hmac(cast5, sha512, &m, "silent passenger", 16, kKryptosCBC);
+        kryptos_run_cipher_hmac(cast5, sha512, &m, (kryptos_u8_t *)"silent passenger", 16, kKryptosCBC);
 
         if (!kryptos_last_task_succeed(&m) && m.result == kKryptosHMACError) {
             printf("Nice! The cryptogram corruption was detected. Do not consider this, "

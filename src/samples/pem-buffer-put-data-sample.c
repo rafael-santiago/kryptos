@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
     int exit_code = 0;
 
     if (kryptos_pem_put_data(&pem_buffer, &pem_buffer_size, SECOND_NAME,
-                             "Bond", 4) != kKryptosSuccess) {
+                             (kryptos_u8_t *)"Bond", 4) != kKryptosSuccess) {
         printf("Error while putting data labeled as %s into buffer.\n", SECOND_NAME);
         exit_code = 1;
         goto epilogue;
@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
     printf("PEM:\n\n%s\n", pem_buffer);
 
     if (kryptos_pem_put_data(&pem_buffer, &pem_buffer_size, FIRST_NAME,
-                             "James", 5) != kKryptosSuccess) {
+                             (kryptos_u8_t *)"James", 5) != kKryptosSuccess) {
         printf("Error while putting data labeled as %s into buffer.\n", FIRST_NAME);
     }
 

@@ -11,8 +11,8 @@
 
 int main(int argc, char **argv) {
     kryptos_task_ctx task, *ktask = &task;
-    kryptos_u8_t *key = "foo";
-    kryptos_u8_t *data = "plaintext";
+    kryptos_u8_t *key = (kryptos_u8_t *)"foo";
+    kryptos_u8_t *data = (kryptos_u8_t *)"plaintext";
     size_t data_size = 9;
 
     printf("Original data: %s\n", data);
@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
     kryptos_task_init_as_null(ktask);
 
     // INFO(Rafael): Loading the basic information about the task involving the chosen cipher.
-    kryptos_blowfish_setup(ktask, key, strlen(key), kKryptosECB);
+    kryptos_blowfish_setup(ktask, key, strlen((char *)key), kKryptosECB);
 
     // INFO(Rafael): Since we need to encrypt, we need to inform it.
     kryptos_task_set_encrypt_action(ktask);

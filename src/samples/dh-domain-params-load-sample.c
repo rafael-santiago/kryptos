@@ -13,27 +13,27 @@ int main(int argc, char **argv) {
     struct kryptos_dh_xchg_ctx alice_data, bob_data, *alice = &alice_data, *bob = &bob_data;
     kryptos_u8_t *k_pub_bob = NULL, *k_priv_bob = NULL;
     size_t k_pub_bob_size = 0, k_priv_bob_size = 0;
-    kryptos_u8_t *params = "-----BEGIN DH PARAM P-----\n"
-                           "VSsW7ufPMgFn+MceQyQHgBtpq/q/"
-                           "xLAZ00q/hRh8Of7Wvto1lsS6iBWs"
-                           "mz4mYiSiOiPZkv6asUoBF8JhxMs4"
-                           "LHEGaTV0uiRzIPxOABkXDGUnXjwd"
-                           "EfpwkG3H+EuZK9fINggkkS+cxJ+P"
-                           "DwkaoMgpwZEZj+ieeeOSnZgKuvaN"
-                           "pVQ=\n"
-                           "-----END DH PARAM P-----\n"
-                           "-----BEGIN DH PARAM Q-----\n"
-                           "Xdy01wlOrsxucvEv7bz+7VBT9X0=\n"
-                           "-----END DH PARAM Q-----\n"
-                           "-----BEGIN DH PARAM G-----\n"
-                           "PdxLwCCBNeXR4EnVZb30SOHClBpr"
-                           "bfJkZs3WHyct4mbI71Yo6tqFLXZZ"
-                           "ozZCnP9ijWpsfz9qsfrcifcixEb0"
-                           "Ewd+Xf3ne3sHVrFwC/VLCAAi1Ccc"
-                           "a4GqzyO5juyIdjn2Bx8hWvV4E0G0"
-                           "jgP58tlcjSNYP2lJj7TGafmyom44"
-                           "Zxg=\n"
-                           "-----END DH PARAM G-----\n";
+    kryptos_u8_t *params = (kryptos_u8_t *)"-----BEGIN DH PARAM P-----\n"
+                                           "VSsW7ufPMgFn+MceQyQHgBtpq/q/"
+                                           "xLAZ00q/hRh8Of7Wvto1lsS6iBWs"
+                                           "mz4mYiSiOiPZkv6asUoBF8JhxMs4"
+                                           "LHEGaTV0uiRzIPxOABkXDGUnXjwd"
+                                           "EfpwkG3H+EuZK9fINggkkS+cxJ+P"
+                                           "DwkaoMgpwZEZj+ieeeOSnZgKuvaN"
+                                           "pVQ=\n"
+                                           "-----END DH PARAM P-----\n"
+                                           "-----BEGIN DH PARAM Q-----\n"
+                                           "Xdy01wlOrsxucvEv7bz+7VBT9X0=\n"
+                                           "-----END DH PARAM Q-----\n"
+                                           "-----BEGIN DH PARAM G-----\n"
+                                           "PdxLwCCBNeXR4EnVZb30SOHClBpr"
+                                           "bfJkZs3WHyct4mbI71Yo6tqFLXZZ"
+                                           "ozZCnP9ijWpsfz9qsfrcifcixEb0"
+                                           "Ewd+Xf3ne3sHVrFwC/VLCAAi1Ccc"
+                                           "a4GqzyO5juyIdjn2Bx8hWvV4E0G0"
+                                           "jgP58tlcjSNYP2lJj7TGafmyom44"
+                                           "Zxg=\n"
+                                           "-----END DH PARAM G-----\n";
     int exit_code = 0;
 
     // INFO(Rafael): Always initializing the dh_xchg_ctx is a best practice.
@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
 
     // INFO(Rafael): Loading the domain parameters from the previously generated PEM data.
 
-    if (kryptos_dh_get_modp_from_params_buf(params, strlen(params),
+    if (kryptos_dh_get_modp_from_params_buf(params, strlen((char *)params),
                                             &bob->p, &bob->q, &bob->g) != kKryptosSuccess) {
         exit_code = 1;
         printf("ERROR: while getting P and G parameters.\n");

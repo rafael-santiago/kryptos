@@ -11,14 +11,18 @@
 int main(int argc, char **argv) {
     int exit_code = 0;
     kryptos_task_ctx t, *ktask = &t;
+#ifndef __cplusplus
     char *data = "Angel of Harlem";
+#else
+    char *data = (char *)"Angel of Harlem";
+#endif
 
     kryptos_task_init_as_null(ktask);
 
     printf("Original data: '%s'\n", data);
 
     kryptos_task_set_encode_action(ktask);
-    kryptos_run_encoder(uuencode, ktask, data, strlen(data));
+    kryptos_run_encoder(uuencode, ktask, (kryptos_u8_t *)data, strlen(data));
 
     if (!kryptos_last_task_succeed(ktask)) {
         exit_code = 1;

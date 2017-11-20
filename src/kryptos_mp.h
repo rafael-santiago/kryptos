@@ -10,6 +10,10 @@
 
 #include <kryptos_types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 kryptos_mp_value_t *kryptos_new_mp_value(const size_t bitsize);
 
 void kryptos_del_mp_value(kryptos_mp_value_t *mp);
@@ -34,30 +38,6 @@ int kryptos_mp_eq(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
 
 const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b);
 
-#ifndef KRYPTOS_MP_U32_DIGIT
-
-#define kryptos_mp_is_neg(a) ( ((a)->data[(a)->data_size - 1] >> 7) )
-
-#else
-
-#define kryptos_mp_is_neg(a) ( ((a)->data[(a)->data_size - 1] >> 31) )
-
-#endif
-
-#define kryptos_mp_ne(a, b) ( kryptos_mp_eq((a), (b)) == 0 )
-
-#define kryptos_mp_gt(a, b) ( kryptos_mp_ne((a), (b)) && kryptos_mp_get_gt((a), (b)) == (a) )
-
-#define kryptos_mp_lt(a, b) ( kryptos_mp_gt((b), (a)) )
-
-#define kryptos_mp_ge(a, b) ( kryptos_mp_eq((a), (b)) || kryptos_mp_get_gt((a), (b)) == (a) )
-
-#define kryptos_mp_le(a, b) ( kryptos_mp_eq((a), (b)) || kryptos_mp_get_gt((a), (b)) == (b) )
-
-#define kryptos_mp_is_odd(a) ( ( (a)->data[0] & 1 ) )
-
-#define kryptos_mp_is_even(a) ( kryptos_mp_is_odd(a) == 0 )
-
 kryptos_mp_value_t *kryptos_mp_div(const kryptos_mp_value_t *x, const kryptos_mp_value_t *y, kryptos_mp_value_t **r);
 
 kryptos_mp_value_t *kryptos_mp_exp(kryptos_mp_value_t *b, const kryptos_mp_value_t *e);
@@ -80,10 +60,6 @@ kryptos_mp_value_t *kryptos_mp_lsh(kryptos_mp_value_t **a, const int level);
 
 kryptos_mp_value_t *kryptos_mp_rsh_op(kryptos_mp_value_t **a, const int level, const int signed_op);
 
-#define kryptos_mp_rsh(a, l) ( kryptos_mp_rsh_op((a), (l), 0) )
-
-#define kryptos_mp_signed_rsh(a, l) ( kryptos_mp_rsh_op((a), (l), 1) )
-
 kryptos_mp_value_t *kryptos_mp_gen_prime(const size_t bitsize);
 
 kryptos_mp_value_t *kryptos_mp_montgomery_reduction(const kryptos_mp_value_t *x, const kryptos_mp_value_t *y);
@@ -105,6 +81,38 @@ ssize_t kryptos_mp_bitcount(const kryptos_mp_value_t *n);
 kryptos_mp_value_t *kryptos_mp_mul_digit(kryptos_mp_value_t **x, const kryptos_mp_digit_t digit);
 
 kryptos_mp_value_t *kryptos_raw_buffer_as_mp(const kryptos_u8_t *buf, const size_t buf_size);
+
+#ifdef __cplusplus
+}
+#endif
+
+#ifndef KRYPTOS_MP_U32_DIGIT
+
+# define kryptos_mp_is_neg(a) ( ((a)->data[(a)->data_size - 1] >> 7) )
+
+#else
+
+# define kryptos_mp_is_neg(a) ( ((a)->data[(a)->data_size - 1] >> 31) )
+
+#endif
+
+#define kryptos_mp_ne(a, b) ( kryptos_mp_eq((a), (b)) == 0 )
+
+#define kryptos_mp_gt(a, b) ( kryptos_mp_ne((a), (b)) && kryptos_mp_get_gt((a), (b)) == (a) )
+
+#define kryptos_mp_lt(a, b) ( kryptos_mp_gt((b), (a)) )
+
+#define kryptos_mp_ge(a, b) ( kryptos_mp_eq((a), (b)) || kryptos_mp_get_gt((a), (b)) == (a) )
+
+#define kryptos_mp_le(a, b) ( kryptos_mp_eq((a), (b)) || kryptos_mp_get_gt((a), (b)) == (b) )
+
+#define kryptos_mp_is_odd(a) ( ( (a)->data[0] & 1 ) )
+
+#define kryptos_mp_is_even(a) ( kryptos_mp_is_odd(a) == 0 )
+
+#define kryptos_mp_rsh(a, l) ( kryptos_mp_rsh_op((a), (l), 0) )
+
+#define kryptos_mp_signed_rsh(a, l) ( kryptos_mp_rsh_op((a), (l), 1) )
 
 #ifndef KRYPTOS_MP_U32_DIGIT
 # define kryptos_mp_bit2byte(b) ( (b) >> 3 )
