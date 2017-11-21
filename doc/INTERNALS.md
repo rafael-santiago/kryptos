@@ -1020,3 +1020,125 @@ The kernel tests for hash algorithms only verifies the result for the "abc" hash
 
 In kernel mode, still in the file ``src/tests/kernel/hash_tests.c``, you should edit the test case ``kryptos_hmac_tests``
 and add the verifying macros for your new hash algorithm. The same thing done in user mode tests.
+
+## Adding a new stream cipher
+
+Stream ciphers do not have an internal dsl macro that abstracts the cipher entry points implementation. So if you want
+to probe what is done under the hood the best way is by reading a stream cipher implementation. The processing of it
+is pretty straightforward: just handle the data byte-by-byte.
+
+The following code was extracted from ``src/kryptos_arc4.h``:
+
+```c
+(...)
+void kryptos_arc4_cipher(kryptos_task_ctx **ktask);
+
+void kryptos_arc4_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size);
+(...)
+```
+
+Any symmetric cipher (I said any) must have those two entry points listed above.
+
+The function ``kryptos_<cipher-name>_cipher(kryptos_task_ctx **ktask)`` is called during encryption and also decryption.
+This function receives the input, the user key and then it processes all data and outputs some new data (I meant it
+allocates some bytes pointed by ``(*ktask)->out`` and of course indicates the size of the output in ``(*ktask)->out_size``).
+This function also sets the task result and the result verbose (when it should be done). Before performing the data
+encryption/decryption this function must ascertain that all task is well expressed, it can be done by the following code
+snippet:
+
+```c
+    // CLUE(Rafael): Always put this code at the beginning of a cipher function.
+    //               Usually, anything else must not be done before.
+    if (kryptos_task_check(ktask) == 0) {
+        return;
+    }
+```
+
+The function ``kryptos_<cipher-name>_setup(kryptos_task_ctx *ktask, '.*')`` is called before calling the
+encryption/decryption entry point. Usually, this function receives the user keys, its length and sometimes more
+additional data according to the related algorithm. All received data must be referenced by the ``(kryptos_task_ctx *)``
+variable. This function also must set the ``cipher`` field from ``(kryptos_task_ctx *)`` to the expected internal
+algorithm constant.
+
+## Encoding algorithms
+
+The addition of new encoding algorithms are automated by some internal dsl macros.
+
+Let's take the header file ``src/kryptos_uuencode.h``:
+
+```c
+/*
+ *                                Copyright (C) 2017 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#ifndef KRYPTOS_KRYPTOS_UUENCODE_H
+#define KRYPTOS_KRYPTOS_UUENCODE_H 1
+
+#include <kryptos_types.h>
+
+KRYPTOS_DECL_ENCODING_SETUP(uuencode, ktask);
+
+KRYPTOS_DECL_ENCODING_PROCESSOR(uuencode, ktask)
+
+#endif
+```
+
+About the macro ``KRYPTOS_DECL_ENCODING_SETUP``:
+
+```c
+    KRYPTOS_DECL_ENCODING_SETUP(<encoding name>,
+                                <the name of the (kryptos_task_ctx *) typed variable>)
+```
+
+About the macro ``KRYPTOS_DECL_ENCODING_PROCESSOR``:
+
+```c
+    KRYPTOS_DECL_ENCODING_PROCESSOR(<encoding name>,
+                                    <the name of the (kryptos_task_ctx **) typed variable>)
+
+```
+
+Now the implementation of those to macros extracted from ``src/kryptos_uuencode.c`` implementation file:
+
+```c
+    KRYPTOS_IMPL_ENCODING_SETUP(uuencode, ktask, kKryptosEncodingUUENCODE);
+
+    KRYPTOS_IMPL_ENCODING_PROCESSOR(uuencode, kKryptosEncodingUUENCODE, ktask,
+                                    kryptos_uuencode_buffer_processor,
+                                    uuencode_buffer_processor,
+                                    kryptos_uuencode_encode_buffer,
+                                    kryptos_uuencode_decode_buffer,
+        (*ktask)->out = uuencode_buffer_processor((*ktask)->in, (*ktask)->in_size, &(*ktask)->out_size))
+```
+
+About the macro ``KRYPTOS_IMPL_ENCODING_SETUP``:
+
+```c
+    KRYPTOS_IMPL_ENCODING_SETUP(<encoding name>,
+                                <the name of the (kryptos_task_ctx **) typed variable>,
+                                <the internal constant representing the encoding algorithm>)
+```
+
+Finally, about the macro ``KRYPTOS_IMPL_ENCODING_PROCESSOR``:
+
+```c
+    KRYPTOS_IMPL_ENCODING_PROCESSOR(<encoding name>,
+                                    <the internal constant representing the encoding algorithm>,
+                                    <the name of the (kryptos_task_ctx **) typed variable>,
+                                    <the buffer processor function type T>,
+                                    <the name of the typed T buffer processor variable>,
+                                    <the buffer processor encoder>,
+                                    <the buffer processor decoder>,
+                                    <the processing statement or statements>)
+
+```
+
+Piece of cake! All encoding algorithms are pretty boring because they just receive some data and spit some data
+based on the input. Due to it all four presented macros will cover all or at least almost all the new encoding stuff
+that you need to add here in this library.
+
+New constants for encoding algorithms  must be added into the ``kryptos_encoding_t`` typed enum defined in
+``src/kryptos_types.h``.

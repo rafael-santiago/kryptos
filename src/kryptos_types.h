@@ -143,7 +143,7 @@ typedef enum {
 }kryptos_cipher_t;
 
 typedef enum {
-    kKryptosEncodingBASE64,
+    kKryptosEncodingBASE64 = 0,
     kKryptosEncodingUUENCODE,
     kKryptosEncodingNr
 }kryptos_encoding_t;
