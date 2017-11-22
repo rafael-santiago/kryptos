@@ -35,8 +35,13 @@ local function install_kryptos() : result type none {
 
     hefesto.sys.echo("-- kryptos installer\n\n");
 
-    $include_directory = hefesto.sys.make_path("/usr/local/include", "kryptos");
-    $library_directory = hefesto.sys.make_path("/usr/local/lib", "kryptos");
+    if (hefesto.sys.os_name() != "windows") {
+        $include_directory = hefesto.sys.make_path("/usr/local/include", "kryptos");
+        $library_directory = hefesto.sys.make_path("/usr/local/lib", "kryptos");
+    } else {
+        $include_directory = hefesto.sys.make_path("C:\\kryptos\\", "include");
+        $library_directory = hefesto.sys.make_path("C:\\kryptos\\", "lib");
+    }
 
     var answers type list;
 
@@ -174,9 +179,25 @@ local function cpfiles(inc_dir type string, lib_dir type string) : result type i
         hefesto.project.abort(1);
     }
 
-    if (hefesto.sys.cp(".*\\.h$", $inc_dir) != 1) {
-        hefesto.sys.echo("INSTALL ERROR: Error while copying the headers...\n");
-        rollback_kryptos_install($inc_dir, $lib_dir);
+    var headers type list;
+    $headers.ls(".*\\.h$");
+
+    var h type int;
+
+    $h = 0;
+    while ($h < $headers.count()) {
+        var src type string;
+        var dst type string;
+
+        $src = $headers.item($h);
+        $dst = hefesto.sys.make_path($inc_dir, filenamefrompath($src));
+
+        if (hefesto.sys.cp($src, $dst) != 1) {
+            hefesto.sys.echo("INSTALL ERROR: Error while copying the headers...\n");
+            rollback_kryptos_install($inc_dir, $lib_dir);
+        }
+
+        $h = $h + 1;
     }
 
     if (mktree($lib_dir) != 1) {
@@ -215,7 +236,6 @@ local function rmfiles(inc_dir type string, lib_dir type string) : result type n
 
 
     if (isdir($lib_dir)) {
-        hefesto.sys.rmdir($lib_dir);
         var path type string;
         $path = hefesto.sys.make_path($lib_dir, "libkryptos.a");
         if (isfile($path)) {
@@ -223,6 +243,7 @@ local function rmfiles(inc_dir type string, lib_dir type string) : result type n
         } else {
             hefesto.sys.echo("UNINSTALL WARN: Unable to find the library file.\n");
         }
+        hefesto.sys.rmdir($lib_dir);
     } else {
         hefesto.sys.echo("UNINSTALL WARN: Unable to find the directory library.\n");
     }
