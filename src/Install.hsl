@@ -98,8 +98,13 @@ local function uninstall_kryptos() : result type none {
     var include_dir type string;
     var library_dir type string;
 
-    $include_dir = hefesto.sys.make_path("/usr/local/include", "kryptos");
-    $library_dir = hefesto.sys.make_path("/usr/local/lib", "kryptos");
+    if (hefesto.sys.os_name() != "windows") {
+        $include_dir = hefesto.sys.make_path("/usr/local/include", "kryptos");
+        $library_dir = hefesto.sys.make_path("/usr/local/lib", "kryptos");
+    } else {
+        $include_dir = hefesto.sys.make_path("C:\\kryptos\\", "include");
+        $library_dir = hefesto.sys.make_path("C:\\kryptos\\", "lib");
+    }
 
     $answers.clear();
     $answers.add_item("y");
@@ -231,7 +236,7 @@ local function rmfiles(inc_dir type string, lib_dir type string) : result type n
         }
 
         hefesto.sys.cd($oldcwd);
-        hefesto.sys.rmdir($inc_dir);
+        rmtree($inc_dir);
     }
 
 
@@ -243,7 +248,7 @@ local function rmfiles(inc_dir type string, lib_dir type string) : result type n
         } else {
             hefesto.sys.echo("UNINSTALL WARN: Unable to find the library file.\n");
         }
-        hefesto.sys.rmdir($lib_dir);
+        rmtree($lib_dir);
     } else {
         hefesto.sys.echo("UNINSTALL WARN: Unable to find the directory library.\n");
     }
