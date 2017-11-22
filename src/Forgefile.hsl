@@ -8,6 +8,7 @@
 
 include Toolsets.hsl
 include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
+include Install.hsl
 
 local var toolset_name type string;
 
@@ -26,6 +27,7 @@ kryptos.preloading() {
 }
 
 kryptos.prologue() {
+    kryptos_installer();
     check_compiler_language();
     $includes = hefesto.sys.get_option("includes");
     $cflags = hefesto.sys.get_option("cflags");

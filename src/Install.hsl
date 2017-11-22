@@ -1,0 +1,229 @@
+#
+#                                Copyright (C) 2017 by Rafael Santiago
+#
+# This is a free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+#
+include ~/fsutil.hsl
+
+function kryptos_installer() : result type none {
+    var option type list;
+
+    $option = hefesto.sys.get_option("install");
+
+    if ($option.count() > 0) {
+        install_kryptos();
+    }
+
+    $option = hefesto.sys.get_option("uninstall");
+
+    if ($option.count() > 0) {
+        uninstall_kryptos();
+    }
+}
+
+local function install_kryptos() : result type none {
+    if (isfile(hefesto.sys.make_path("../lib", "libkryptos.a")) == 0) {
+        if ((hefesto.sys.run("hefesto") != 0) || (isfile(hefesto.sys.make_path("../lib", "libkryptos.a")) == 0)) {
+            hefesto.project.abort(1);
+        }
+    }
+
+    var include_directory type string;
+    var library_directory type string;
+
+    hefesto.sys.echo("-- kryptos installer\n\n");
+
+    $include_directory = hefesto.sys.make_path("/usr/local/include", "kryptos");
+    $library_directory = hefesto.sys.make_path("/usr/local/lib", "kryptos");
+
+    var answers type list;
+
+    $answers.add_item("y");
+    $answers.add_item("n");
+    $answers.add_item("c");
+    $answers.add_item("Y");
+    $answers.add_item("N");
+    $answers.add_item("C");
+
+    $include_directory = read_directory_path("Do you want to install kryptos headers within directory '",
+                                             $include_directory, "'? [y/n/c] ", $answers,
+                                             "So type a new directory path for the headers: ");
+
+    $library_directory = read_directory_path("Do you want to install kryptos library within directory '",
+                                             $library_directory, "'? [y/n/c] ", $answers,
+                                             "So type a new directory path for the kryptos library: ");
+
+
+    hefesto.sys.echo("\n");
+
+    var exit_code type int;
+    $exit_code = 0;
+
+    if (cpfiles($include_directory, $library_directory)) {
+        hefesto.sys.echo("INSTALL INFO: All done!\n");
+    } else {
+        $exit_code = 1;
+    }
+
+    hefesto.sys.echo("\n--\n");
+
+    hefesto.project.abort($exit_code);
+}
+
+local function uninstall_kryptos() : result type none {
+    var answers type list;
+    $answers.add_item("y");
+    $answers.add_item("n");
+    $answers.add_item("Y");
+    $answers.add_item("N");
+
+    hefesto.sys.echo("-- kryptos uninstaller\n\n");
+
+    var answer type string;
+    $answer = question("Do you really want to uninstall kryptos? [y/n] ", $answers);
+
+    if ($answer == "n" || $answer == "N") {
+        abort_kryptos_installer();
+    }
+
+    hefesto.sys.echo("\n");
+
+    var include_dir type string;
+    var library_dir type string;
+
+    $include_dir = hefesto.sys.make_path("/usr/local/include", "kryptos");
+    $library_dir = hefesto.sys.make_path("/usr/local/lib", "kryptos");
+
+    $answers.clear();
+    $answers.add_item("y");
+    $answers.add_item("n");
+    $answers.add_item("c");
+    $answers.add_item("Y");
+    $answers.add_item("N");
+    $answers.add_item("C");
+
+    $include_dir = read_directory_path("Do you have installed kryptos headers within '", $include_dir, "'? [y/n/c] ", $answers,
+                                       "So type where it is currently installed: ");
+
+    $library_dir = read_directory_path("Do you have installed kryptos library within '", $library_dir, "'? [y/n/c] ", $answers,
+                                       "So type where it is currently installed: ");
+
+    hefesto.sys.echo("\n");
+
+    rmfiles($include_dir, $library_dir);
+
+    hefesto.sys.echo("UNINSTALL INFO: All done!\n--\n");
+
+    hefesto.project.abort(0);
+}
+
+local function read_directory_path(qpfx type string, default_path type string, qsffx type string,
+                                   answers type list, otherwise_prompt type string) : result type string {
+    var answer type string;
+    var path type string;
+
+    $path = $default_path;
+    $answer = "";
+    while ($answer != "y" && $answer != "Y") {
+        $answer = question($qpfx + $path + $qsffx, $answers);
+
+        if ($answer == "c" || $answer == "C") {
+            abort_kryptos_installer();
+        }
+
+        if ($answer == "n" || $answer == "N") {
+            $path = "";
+            while ($path.len() == 0) {
+                $path = hefesto.sys.prompt($otherwise_prompt);
+            }
+        }
+    }
+
+    result $path;
+}
+
+local function abort_kryptos_installer() : result type none {
+    hefesto.sys.echo("\n--\n\nGERENAL INFO: Aborted.\n");
+    hefesto.project.abort(1);
+}
+
+local function question(msg type string, opts type list) : result type string {
+    var opt type string;
+
+    $opt = "";
+
+    while ($opts.index_of($opt) == -1) {
+        $opt = hefesto.sys.prompt($msg);
+    }
+
+    result $opt;
+}
+
+local function rollback_kryptos_install(inc_dir type string, lib_dir type string) : result type none {
+    hefesto.sys.echo("\n--\n\nGENERAL INFO: Rolling back...\n");
+    rmfiles($inc_dir, $lib_dir);
+    hefesto.sys.echo("GENERAL INFO: Done!\n");
+    hefesto.project.abort(1);
+}
+
+local function cpfiles(inc_dir type string, lib_dir type string) : result type int {
+    if (mktree($inc_dir) != 1) {
+        hefesto.sys.echo("INSTALL ERROR: Unable to create the directory path: " + $inc_dir + "\n");
+        hefesto.project.abort(1);
+    }
+
+    if (hefesto.sys.cp(".*\\.h$", $inc_dir) != 1) {
+        hefesto.sys.echo("INSTALL ERROR: Error while copying the headers...\n");
+        rollback_kryptos_install($inc_dir, $lib_dir);
+    }
+
+    if (mktree($lib_dir) != 1) {
+        hefesto.sys.echo("INSTALL ERROR: Unable to create the directory path " + $lib_dir + "\n");
+        rollback_kryptos_install($inc_dir, $lib_dir);
+    }
+
+    if (hefesto.sys.cp(hefesto.sys.make_path("../lib/", "libkryptos.a"),
+                       hefesto.sys.make_path($lib_dir, "libkryptos.a")) != 1) {
+        hefesto.sys.echo("INSTALL ERROR: Error while copying the library file...\n");
+        rollback_kryptos_install($inc_dir, $lib_dir);
+    }
+
+    result 1;
+}
+
+local function rmfiles(inc_dir type string, lib_dir type string) : result type none {
+    var oldcwd type string;
+    $oldcwd = hefesto.sys.pwd();
+
+    if (hefesto.sys.cd($inc_dir) == 0) {
+        hefesto.sys.echo("UNINSTALL WARN: Unable to find the directory '" + $inc_dir + "'\n");
+    } else {
+        var headers type list;
+        $headers.ls(".*\\.h$");
+
+        var h type int;
+        while ($h < $headers.count()) {
+            hefesto.sys.rm($headers.item($h));
+            $h = $h + 1;
+        }
+
+        hefesto.sys.cd($oldcwd);
+        hefesto.sys.rmdir($inc_dir);
+    }
+
+
+    if (isdir($lib_dir)) {
+        hefesto.sys.rmdir($lib_dir);
+        var path type string;
+        $path = hefesto.sys.make_path($lib_dir, "libkryptos.a");
+        if (isfile($path)) {
+            hefesto.sys.rm($path);
+        } else {
+            hefesto.sys.echo("UNINSTALL WARN: Unable to find the library file.\n");
+        }
+    } else {
+        hefesto.sys.echo("UNINSTALL WARN: Unable to find the directory library.\n");
+    }
+}
