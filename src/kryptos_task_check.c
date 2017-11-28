@@ -42,8 +42,6 @@ static int kryptos_task_check_verify_dsa(kryptos_task_ctx **ktask);
 
 static int kryptos_task_check_dsa_domain_params(kryptos_task_ctx **ktask);
 
-static int kryptos_task_check_dsa_hash_funcs(kryptos_task_ctx **ktask);
-
 // WARN(Rafael): If you have changed something in RSA-OAEP additional parameters maybe should be better to implement a
 //               separated function to verify the additional parameters of Elgamal-OAEP.
 

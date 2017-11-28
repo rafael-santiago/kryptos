@@ -1297,7 +1297,9 @@ kryptos_mp_value_t *kryptos_mp_pow(const kryptos_mp_value_t *g, const kryptos_mp
 }
 
 void kryptos_print_mp(const kryptos_mp_value_t *v) {
+#if !defined(KRYPTOS_KERNEL_MODE)
     ssize_t d;
+#endif
     if (v == NULL) {
         return;
     }

@@ -513,6 +513,8 @@ static void kryptos_camellia_keyexp_192_256(const kryptos_u8_t *key, const size_
         KR[3] = K256[7];
         K256[0] = K256[1] = K256[2] = K256[3] = K256[4] = K256[5] = 
         K256[6] = K256[7] = 0;
+    } else {
+        return;
     }
 
     T[0] = KL[0] ^ KR[0];

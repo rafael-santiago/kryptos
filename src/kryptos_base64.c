@@ -73,7 +73,7 @@ static kryptos_u8_t *kryptos_base64_encode_buffer(const kryptos_u8_t *buffer, co
     const kryptos_u8_t *bp, *bp_end;
     kryptos_u8_t *out, *out_p;
     kryptos_u32_t block;
-    size_t block_size, pad_size;
+    size_t block_size, pad_size = 0;
 
     if (buffer == NULL || buffer_size == 0) {
         *out_size = 0;

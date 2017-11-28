@@ -157,7 +157,6 @@ kryptos_dsa_mk_key_pair_epilogue:
 static kryptos_mp_value_t *kryptos_dsa_get_random(const kryptos_mp_value_t *n) {
     kryptos_mp_value_t *_1 = NULL, *n_1 = NULL;
     kryptos_mp_value_t *r = NULL;
-    ssize_t d;
 
     if (n == NULL) {
         return NULL;
@@ -204,8 +203,6 @@ kryptos_dsa_get_random_d_epilogue:
     if (n_1 != NULL) {
         kryptos_del_mp_value(n_1);
     }
-
-    d = 0;
 
     return r;
 }
@@ -476,8 +473,7 @@ void kryptos_dsa_verify(kryptos_task_ctx **ktask) {
                        *e = NULL, *h = NULL, *e2u2 = NULL, *v = NULL;
 
     kryptos_mp_value_t *div = NULL, *mod = NULL;
-    ssize_t o_size = 0, xd = 0;
-    kryptos_u8_t *o = NULL, *x = NULL;
+    kryptos_u8_t *x = NULL;
     size_t x_size = 0;
     kryptos_hash_func hash = kryptos_sha1_hash;
     kryptos_task_ctx ht, *htask = &ht;
@@ -876,8 +872,4 @@ kryptos_dsa_verify_epilogue:
         (*ktask)->out = NULL;
         (*ktask)->out_size = 0;
     }
-
-    xd = o_size = 0;
-
-    o = NULL;
 }
