@@ -260,8 +260,8 @@ CUTE_TEST_CASE(kryptos_seal_tests)
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_des_tests)
-    // INFO(Rafael): Running the ECB and CBC tests. Once defined the ECB test vector related with the cipher, the following
-    //               incantation is all that you should implement inside a test case dedicated to block cipher.
+    // INFO(Rafael): Running the ECB, CBC and OFB tests. Once defined the ECB test vector related with the cipher,
+    //               the following incantation is all that you should implement inside a test case dedicated to block cipher.
     kryptos_run_block_cipher_tests(des, KRYPTOS_DES_BLOCKSIZE);
 CUTE_TEST_CASE_END
 
@@ -560,4 +560,8 @@ CUTE_TEST_CASE(kryptos_triple_des_ede_tests)
                                                                           &addkeys[tv % addkeys_nr].key2_size,
                                                                           addkeys[tv % addkeys_nr].key3,
                                                                           &addkeys[tv % addkeys_nr].key3_size));
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_tea_tests)
+    kryptos_run_block_cipher_tests(tea, KRYPTOS_TEA_BLOCKSIZE);
 CUTE_TEST_CASE_END

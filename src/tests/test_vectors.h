@@ -21,6 +21,7 @@
 #include "serpent_test_vector.h"
 #include "triple_des_test_vector.h"
 #include "triple_des_ede_test_vector.h"
+#include "tea_test_vector.h"
 #include "sha1_test_vector.h"
 #include "sha224_test_vector.h"
 #include "sha256_test_vector.h"
@@ -124,8 +125,8 @@ static kryptos_u8_t *hmac_test_data[] = {
     kryptos_task_ctx t, *ktask = &t;\
     size_t cbc_test_data_nr = sizeof(cbc_test_data) / sizeof(cbc_test_data[0]);\
     size_t data_size = 0;\
-    kryptos_u8_t *key = "beetlejuice";\
-    size_t key_size = 11;\
+    kryptos_u8_t *key = "beetlejuice\x00\x00\x00\x00\x00";\
+    size_t key_size = 16;\
     size_t test_vector_nr = sizeof(cipher_name ## _test_vector) / sizeof(cipher_name ## _test_vector[0]), tv;\
     kryptos_task_init_as_null(&t);\
     /*INFO(Rafael): ECB tests.*/\
@@ -155,7 +156,7 @@ static kryptos_u8_t *hmac_test_data[] = {
     for (tv = 0; tv < cbc_test_data_nr; tv++) {\
         t.iv = NULL;\
         data_size = strlen(cbc_test_data[tv]);\
-        kryptos_ ## cipher_name ## _setup(&t, key, 11, kKryptosCBC);\
+        kryptos_ ## cipher_name ## _setup(&t, key, 16, kKryptosCBC);\
         t.in = cbc_test_data[tv];\
         t.in_size = data_size;\
         kryptos_task_set_encrypt_action(&t);\
@@ -174,7 +175,7 @@ static kryptos_u8_t *hmac_test_data[] = {
     for (tv = 0; tv < cbc_test_data_nr; tv++) {\
         t.iv = NULL;\
         data_size = strlen(cbc_test_data[tv]);\
-        kryptos_ ## cipher_name ## _setup(&t, key, 11, kKryptosOFB);\
+        kryptos_ ## cipher_name ## _setup(&t, key, 16, kKryptosOFB);\
         t.in = cbc_test_data[tv];\
         t.in_size = data_size;\
         kryptos_task_set_encrypt_action(&t);\

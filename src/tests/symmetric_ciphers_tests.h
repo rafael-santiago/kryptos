@@ -42,4 +42,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_triple_des_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_triple_des_ede_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_tea_tests);
+
 #endif

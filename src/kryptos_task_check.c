@@ -16,6 +16,7 @@
 #include <kryptos_saferk64.h>
 #include <kryptos_aes.h>
 #include <kryptos_serpent.h>
+#include <kryptos_tea.h>
 #include <kryptos_rsa.h>
 #include <kryptos_elgamal.h>
 #include <kryptos_dsa.h>
@@ -337,6 +338,10 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
 
         case kKryptosCipherSAFERK64:
             return ((*ktask)->iv_size == KRYPTOS_SAFERK64_BLOCKSIZE);
+            break;
+
+        case kKryptosCipherTEA:
+            return ((*ktask)->iv_size == KRYPTOS_TEA_BLOCKSIZE);
             break;
 
         case kKryptosCipherAES128:

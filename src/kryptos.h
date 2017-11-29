@@ -26,6 +26,7 @@
 #include <kryptos_saferk64.h>
 #include <kryptos_aes.h>
 #include <kryptos_serpent.h>
+#include <kryptos_tea.h>
 
 #include <kryptos_sha1.h>
 #include <kryptos_sha224_256.h>

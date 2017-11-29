@@ -119,6 +119,7 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 | ``SAFER-K64``    |       Block           |       ``kKryptosCipherSAFERK64`` |
 | ``BLOWFISH``     |       Block           |       ``kKryptosCipherBLOWFISH`` |
 | ``SERPENT``      |       Block           |       ``kKryptosCipherSERPENT``  |
+|   ``TEA``        |       Block           |       ``kKryptosCipherTEA``      |
 
 The available modes of operation for the block ciphers are: ``ECB``, ``CBC`` and ``OFB``. So in practice, considering the
 ``OFB`` mode, we have 16 stream ciphers instead of only two. More on cipher modes will be treated later.
