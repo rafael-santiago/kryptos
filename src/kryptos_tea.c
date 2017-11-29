@@ -69,6 +69,7 @@ static void kryptos_tea_block_encryption(kryptos_u8_t *block, kryptos_u8_t *key)
 
     kryptos_cpy_u32_as_big_endian(block, 8, y);
     kryptos_cpy_u32_as_big_endian(block + 4, 4, z);
+
     memset(k, 0, sizeof(k));
     y = z = 0;
     sum = r = 0;
@@ -94,6 +95,7 @@ static void kryptos_tea_block_decryption(kryptos_u8_t *block, kryptos_u8_t *key)
 
     kryptos_cpy_u32_as_big_endian(block, 8, y);
     kryptos_cpy_u32_as_big_endian(block + 4, 4, z);
+
     memset(k, 0, sizeof(k));
     y = z = 0;
     sum = r = 0;

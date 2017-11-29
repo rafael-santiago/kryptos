@@ -228,8 +228,8 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
         kryptos_task_free(&t, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
     }\
 }
-    kryptos_u8_t *key = "nooneknows";
-    size_t key_size = 10;
+    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    size_t key_size = 16;
     kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
@@ -725,6 +725,30 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
 
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des_ede, ripemd160, key, key_size, kKryptosCBC,
                            triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    // INFO(Rafael): TEA/ECB.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, sha1, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, sha224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, sha256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, sha384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, sha512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, md4, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, md5, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, ripemd128, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, ripemd160, key, key_size, kKryptosECB);
+
+    // INFO(Rafael): TEA/CBC.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, sha1, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, sha224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, sha256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, sha384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, sha512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, md4, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, md5, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, ripemd128, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, ripemd160, key, key_size, kKryptosCBC);
 
 #undef kryptos_run_hmac_tests
 
