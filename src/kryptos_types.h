@@ -134,6 +134,7 @@ typedef enum {
     kKryptosCipherBLOWFISH,
     kKryptosCipherSERPENT,
     kKryptosCipherTEA,
+    kKryptosCipherXTEA,
     kKryptosCipherRSA,
     kKryptosCipherRSAOAEP,
     kKryptosCipherELGAMAL,

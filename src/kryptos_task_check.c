@@ -17,6 +17,7 @@
 #include <kryptos_aes.h>
 #include <kryptos_serpent.h>
 #include <kryptos_tea.h>
+#include <kryptos_xtea.h>
 #include <kryptos_rsa.h>
 #include <kryptos_elgamal.h>
 #include <kryptos_dsa.h>
@@ -342,6 +343,10 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
 
         case kKryptosCipherTEA:
             return ((*ktask)->iv_size == KRYPTOS_TEA_BLOCKSIZE);
+            break;
+
+        case kKryptosCipherXTEA:
+            return ((*ktask)->iv_size == KRYPTOS_XTEA_BLOCKSIZE);
             break;
 
         case kKryptosCipherAES128:

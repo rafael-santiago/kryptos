@@ -31,6 +31,7 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     int saferk64_rounds;
     kryptos_u8_t *triple_des_key2, *triple_des_key3;
     size_t triple_des_key2_size, triple_des_key3_size;
+    int xtea_rounds;
 
     kryptos_task_set_ecb_mode(&task);
     CUTE_ASSERT(task.mode == kKryptosECB);
@@ -799,6 +800,44 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     kryptos_task_set_decrypt_action(&task);
 
     kryptos_run_cipher(tea, &task, "tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCBC);
+
+    CUTE_ASSERT(task.out_size == data_size);
+    CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
+    // XTEA ECB
+
+    xtea_rounds = 48;
+
+    kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_encrypt_action(&task);
+
+    kryptos_run_cipher(xtea, &task, "xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosECB, &xtea_rounds);
+
+    CUTE_ASSERT(task.out != NULL);
+
+    kryptos_task_set_in(&task, task.out, task.out_size);
+    kryptos_task_set_decrypt_action(&task);
+
+    kryptos_run_cipher(xtea, &task, "xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosECB, &xtea_rounds);
+
+    CUTE_ASSERT(task.out_size == data_size);
+    CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+
+    // XTEA CBC
+
+    kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_encrypt_action(&task);
+
+    kryptos_run_cipher(xtea, &task, "xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCBC, &xtea_rounds);
+
+    CUTE_ASSERT(task.out != NULL);
+
+    kryptos_task_set_in(&task, task.out, task.out_size);
+    kryptos_task_set_decrypt_action(&task);
+
+    kryptos_run_cipher(xtea, &task, "xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCBC, &xtea_rounds);
 
     CUTE_ASSERT(task.out_size == data_size);
     CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);

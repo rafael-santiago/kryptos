@@ -565,3 +565,39 @@ CUTE_TEST_CASE_END
 CUTE_TEST_CASE(kryptos_tea_tests)
     kryptos_run_block_cipher_tests(tea, KRYPTOS_TEA_BLOCKSIZE);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_xtea_tests)
+    struct xtea_rounds_ctx {
+        int rounds;
+    };
+    struct xtea_rounds_ctx xtea_rounds[] = {
+        { 32 }, { 32 }, { 32 }, { 32 }, { 32 }, { 32 },
+        { 32 }, { 32 }, { 32 }, { 32 }, { 32 }, { 32 },
+        { 32 }, { 32 }, { 32 }, { 32 }, { 32 }, { 32 },
+        { 32 }, { 32 }
+    };
+    size_t xtea_rounds_nr = sizeof(xtea_rounds) / sizeof(xtea_rounds[0]);
+    kryptos_task_ctx t;
+    size_t tv;
+
+    kryptos_run_block_cipher_tests_with_custom_setup(xtea,
+                                                     KRYPTOS_XTEA_BLOCKSIZE,
+                                                     t,
+                                                     tv,
+                                                     xtea_rounds, xtea_rounds_nr,
+                                                     kryptos_xtea_setup(&t,
+                                                                        xtea_test_vector[tv % xtea_rounds_nr].key,
+                                                                        xtea_test_vector[tv % xtea_rounds_nr].key_size,
+                                                                        kKryptosECB,
+                                                                        &xtea_rounds[tv % xtea_rounds_nr].rounds),
+                                                     kryptos_xtea_setup(&t,
+                                                                        xtea_test_vector[tv % xtea_rounds_nr].key,
+                                                                        xtea_test_vector[tv % xtea_rounds_nr].key_size,
+                                                                        kKryptosCBC,
+                                                                        &xtea_rounds[tv % xtea_rounds_nr].rounds),
+                                                     kryptos_xtea_setup(&t,
+                                                                        xtea_test_vector[tv % xtea_rounds_nr].key,
+                                                                        xtea_test_vector[tv % xtea_rounds_nr].key_size,
+                                                                        kKryptosOFB,
+                                                                        &xtea_rounds[tv % xtea_rounds_nr].rounds));
+CUTE_TEST_CASE_END

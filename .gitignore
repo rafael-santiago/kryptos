@@ -7,3 +7,5 @@ src/tests/o
 *.cmd
 *\.tmp_versions
 *.mod.c
+src/tests/kernel/*.ko
+samples/*
