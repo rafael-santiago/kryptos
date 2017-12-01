@@ -96,7 +96,7 @@ test_vector(rc2, block_cipher) = {
                          "\x00\x00\x00\x00\x00\x00\x00\x00",
                          "\x61\x0D\x02\xC6\xD6\xD8\xFD\x2E",
                          "\x00\x00\x00\x00\x00\x00\x00\x00",
-                         8),
+                         8), // INFO(Rafael): Assuming T1=128.
     add_test_vector_data("\x00\x00\x00\x00\x00\x00\x00\x20\x00\x00\x00\x00\x00\x00\x00\x00",
                          16,
                          "\x00\x00\x00\x00\x00\x00\x00\x00",
