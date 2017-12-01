@@ -163,72 +163,30 @@ test_vector(rc2, block_cipher) = {
                          "\x1D\xC0\x95\x5C\x2C\xCA\x54\x1D",
                          "\xEA\x02\x47\x14\xAD\x5C\x4D\x84",
                          8), // INFO(Rafael): Assuming T1=128.
+    add_test_vector_data("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+                         16,
+                         "\x00\x00\x00\x00\x00\x00\x00\x00",
+                         "\x1C\x19\x8A\x83\x8D\xF0\x28\xB7",
+                         "\x00\x00\x00\x00\x00\x00\x00\x00",
+                         8), // INFO(Rafael): Assuming T1=1024.
+    add_test_vector_data("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01",
+                         16,
+                         "\x00\x00\x00\x00\x00\x00\x00\x00",
+                         "\x21\x82\x9C\x78\xA9\xF9\xC0\x74",
+                         "\x00\x00\x00\x00\x00\x00\x00\x00",
+                         8), // INFO(Rafael): Assuming T1=1024.
+    add_test_vector_data("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+                         16,
+                         "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF",
+                         "\x13\xDB\x35\x17\xD3\x21\x86\x9E",
+                         "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF",
+                         8), // INFO(Rafael): Assuming T1=1024.
     add_test_vector_data("\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F",
                          16,
                          "\x00\x00\x00\x00\x00\x00\x00\x00",
                          "\x50\xDC\x01\x62\xBD\x75\x7F\x31",
                          "\x00\x00\x00\x00\x00\x00\x00\x00",
-                         8), // INFO(Rafael): Assuming T1=1024.
-    /*add_test_vector_data("",
-                         16,
-                         "",
-                         "",
-                         "",
-                         8), // INFO(Rafael): Assuming T1=128.
-    add_test_vector_data("",
-                         16,
-                         "",
-                         "",
-                         "",
-                         8), // INFO(Rafael): Assuming T1=128.
-    add_test_vector_data("",
-                         16,
-                         "",
-                         "",
-                         "",
-                         8), // INFO(Rafael): Assuming T1=128.
-    add_test_vector_data("",
-                         16,
-                         "",
-                         "",
-                         "",
-                         8), // INFO(Rafael): Assuming T1=128.
-    add_test_vector_data("",
-                         16,
-                         "",
-                         "",
-                         "",
-                         8), // INFO(Rafael): Assuming T1=128.
-    add_test_vector_data("",
-                         16,
-                         "",
-                         "",
-                         "",
-                         8), // INFO(Rafael): Assuming T1=128.
-    add_test_vector_data("",
-                         16,
-                         "",
-                         "",
-                         "",
-                         8), // INFO(Rafael): Assuming T1=128.
-    add_test_vector_data("",
-                         16,
-                         "",
-                         "",
-                         "",
-                         8), // INFO(Rafael): Assuming T1=128.
-    add_test_vector_data("",
-                         16,
-                         "",
-                         "",
-                         "",
-                         8), // INFO(Rafael): Assuming T1=128.
-    add_test_vector_data("",
-                         16,
-                         "",
-                         "",
-                         "",
-                         8)*/
+                         8) // INFO(Rafael): Assuming T1=1024.
 };
 
 #endif
