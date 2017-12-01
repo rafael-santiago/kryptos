@@ -6,7 +6,7 @@
  *
  */
 #include <kryptos_rc2.h>
-#include <kryptos_endianess_utils.h>
+#include <kryptos_endianness_utils.h>
 #include <kryptos_random.h>
 #include <kryptos_padding.h>
 #include <kryptos_task_check.h>
@@ -334,7 +334,7 @@ static void kryptos_rc2_block_encrypt(kryptos_u8_t *block, const struct kryptos_
     r[2] = kryptos_get_u16_as_big_endian(block + 4, 2);
     r[3] = kryptos_get_u16_as_big_endian(block + 6, 2);
 
-    // WARN(Rafael): Well, the endian convention on RC2 Spec is a little "bit" confuse. Little-Confuse.
+    // WARN(Rafael): Well, the endianness convention on RC2 Spec is a little "bit" confuse. Little-Confuse.
 
     r[0] = kryptos_rc2_rev(r[0]);
     r[1] = kryptos_rc2_rev(r[1]);
@@ -366,7 +366,7 @@ static void kryptos_rc2_block_encrypt(kryptos_u8_t *block, const struct kryptos_
     kryptos_rc2_mixinground(r, sks->K, ri);
     kryptos_rc2_mixinground(r, sks->K, ri);
 
-    // WARN(Rafael): Well, the endian convention on RC2 Spec is a little "bit" confuse. Little-Confuse.
+    // WARN(Rafael): Well, the endianness convention on RC2 Spec is a little "bit" confuse. Little-Confuse.
 
     kryptos_cpy_u16_as_big_endian(block, 8, kryptos_rc2_rev(r[0]));
     kryptos_cpy_u16_as_big_endian(block + 2, 6, kryptos_rc2_rev(r[1]));
@@ -386,7 +386,7 @@ static void kryptos_rc2_block_decrypt(kryptos_u8_t *block, const struct kryptos_
     r[2] = kryptos_get_u16_as_big_endian(block + 4, 2);
     r[3] = kryptos_get_u16_as_big_endian(block + 6, 2);
 
-    // WARN(Rafael): Well, the endian convention on RC2 Spec is a little "bit" confuse. Little-Confuse.
+    // WARN(Rafael): Well, the endianness convention on RC2 Spec is a little "bit" confuse. Little-Confuse.
 
     r[0] = kryptos_rc2_rev(r[0]);
     r[1] = kryptos_rc2_rev(r[1]);
@@ -418,7 +418,7 @@ static void kryptos_rc2_block_decrypt(kryptos_u8_t *block, const struct kryptos_
     kryptos_rc2_rmixinground(r, sks->K, ri);
     kryptos_rc2_rmixinground(r, sks->K, ri);
 
-    // WARN(Rafael): Well, the endian convention on RC2 Spec is a little "bit" confuse. Little-Confuse.
+    // WARN(Rafael): Well, the endianness convention on RC2 Spec is a little "bit" confuse. Little-Confuse.
 
     kryptos_cpy_u16_as_big_endian(block, 8, kryptos_rc2_rev(r[0]));
     kryptos_cpy_u16_as_big_endian(block + 2, 6, kryptos_rc2_rev(r[1]));

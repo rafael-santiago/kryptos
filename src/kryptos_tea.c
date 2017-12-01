@@ -6,7 +6,7 @@
  *
  */
 #include <kryptos_tea.h>
-#include <kryptos_endianess_utils.h>
+#include <kryptos_endianness_utils.h>
 #include <kryptos_task_check.h>
 #include <kryptos_random.h>
 #include <kryptos_padding.h>

@@ -10,7 +10,7 @@
 #include <kryptos_memory.h>
 #include <kryptos_random.h>
 #include <kryptos.h>
-#include <kryptos_endianess_utils.h>
+#include <kryptos_endianness_utils.h>
 #include <kstring.h>
 
 // WARN(Rafael): Almost all stuff tested here probably will not executed in kernel mode (or at least should not). But if everything

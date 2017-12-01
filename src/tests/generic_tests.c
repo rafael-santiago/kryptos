@@ -11,7 +11,7 @@
 #include <kryptos_random.h>
 #include <kryptos_task_check.h>
 #include <kryptos_block_parser.h>
-#include <kryptos_endianess_utils.h>
+#include <kryptos_endianness_utils.h>
 #include <kryptos_iv_utils.h>
 #include <kryptos_hex.h>
 #include <kryptos_hash_common.h>

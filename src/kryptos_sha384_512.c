@@ -7,7 +7,7 @@
  */
 #include <kryptos_sha384_512.h>
 #include <kryptos_hash_common.h>
-#include <kryptos_endianess_utils.h>
+#include <kryptos_endianness_utils.h>
 #include <kryptos_hex.h>
 #include <kryptos_memory.h>
 #ifndef KRYPTOS_KERNEL_MODE

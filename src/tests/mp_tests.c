@@ -9,7 +9,7 @@
 #include <kryptos_mp.h>
 #include <kryptos_memory.h>
 #include <kryptos_random.h>
-#include <kryptos_endianess_utils.h>
+#include <kryptos_endianness_utils.h>
 #include <kryptos.h>
 #include <string.h>
 

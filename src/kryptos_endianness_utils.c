@@ -5,7 +5,7 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#include <kryptos_endianess_utils.h>
+#include <kryptos_endianness_utils.h>
 #ifndef KRYPTOS_KERNEL_MODE
 # include <string.h>
 #endif

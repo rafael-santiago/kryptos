@@ -12,7 +12,7 @@
 #include <kryptos_random.h>
 #include <kryptos_mp.h>
 #include <kryptos_pem.h>
-#include <kryptos_endianess_utils.h>
+#include <kryptos_endianness_utils.h>
 #include <kryptos_task_check.h>
 #ifndef KRYPTOS_KERNEL_MODE
 #include <string.h>

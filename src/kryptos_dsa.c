@@ -12,7 +12,7 @@
 #include <kryptos_sha1.h>
 #include <kryptos_task_check.h>
 #include <kryptos_pem.h>
-#include <kryptos_endianess_utils.h>
+#include <kryptos_endianness_utils.h>
 #include <kryptos.h>
 #ifndef KRYPTOS_KERNEL_MODE
 # include <string.h>
