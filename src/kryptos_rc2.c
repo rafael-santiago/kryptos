@@ -58,6 +58,8 @@
                                           kryptos_rc2_rmashr(r, 1, k),\
                                           kryptos_rc2_rmashr(r, 0, k) )
 
+#define kryptos_rc2_rev(v) ( (((v) & 0xFF) << 8) | ((v) >> 8) )
+
 // INFO(Rafael): random bytes based on PI-digits.
 static kryptos_u8_t kryptos_rc2_PITABLE[256] = {
     0xd9, 0x78, 0xf9, 0xc4, 0x19, 0xdd, 0xb5, 0xed, 0x28, 0xe9, 0xfd, 0x79, 0x4a, 0xa0, 0xd8, 0x9d,
@@ -332,6 +334,13 @@ static void kryptos_rc2_block_encrypt(kryptos_u8_t *block, const struct kryptos_
     r[2] = kryptos_get_u16_as_big_endian(block + 4, 2);
     r[3] = kryptos_get_u16_as_big_endian(block + 6, 2);
 
+    // WARN(Rafael): Well, the endian convention on RC2 Spec is a little "bit" confuse. Little-Confuse.
+
+    r[0] = kryptos_rc2_rev(r[0]);
+    r[1] = kryptos_rc2_rev(r[1]);
+    r[2] = kryptos_rc2_rev(r[2]);
+    r[3] = kryptos_rc2_rev(r[3]);
+
     ri = 0;
 
     kryptos_rc2_mixinground(r, sks->K, ri);
@@ -357,10 +366,12 @@ static void kryptos_rc2_block_encrypt(kryptos_u8_t *block, const struct kryptos_
     kryptos_rc2_mixinground(r, sks->K, ri);
     kryptos_rc2_mixinground(r, sks->K, ri);
 
-    kryptos_cpy_u16_as_big_endian(block, 8, r[0]);
-    kryptos_cpy_u16_as_big_endian(block + 2, 6, r[1]);
-    kryptos_cpy_u16_as_big_endian(block + 4, 4, r[2]);
-    kryptos_cpy_u16_as_big_endian(block + 6, 2, r[3]);
+    // WARN(Rafael): Well, the endian convention on RC2 Spec is a little "bit" confuse. Little-Confuse.
+
+    kryptos_cpy_u16_as_big_endian(block, 8, kryptos_rc2_rev(r[0]));
+    kryptos_cpy_u16_as_big_endian(block + 2, 6, kryptos_rc2_rev(r[1]));
+    kryptos_cpy_u16_as_big_endian(block + 4, 4, kryptos_rc2_rev(r[2]));
+    kryptos_cpy_u16_as_big_endian(block + 6, 2, kryptos_rc2_rev(r[3]));
 
     memset(r, 0, sizeof(r));
     ri = 0;
@@ -374,6 +385,13 @@ static void kryptos_rc2_block_decrypt(kryptos_u8_t *block, const struct kryptos_
     r[1] = kryptos_get_u16_as_big_endian(block + 2, 2);
     r[2] = kryptos_get_u16_as_big_endian(block + 4, 2);
     r[3] = kryptos_get_u16_as_big_endian(block + 6, 2);
+
+    // WARN(Rafael): Well, the endian convention on RC2 Spec is a little "bit" confuse. Little-Confuse.
+
+    r[0] = kryptos_rc2_rev(r[0]);
+    r[1] = kryptos_rc2_rev(r[1]);
+    r[2] = kryptos_rc2_rev(r[2]);
+    r[3] = kryptos_rc2_rev(r[3]);
 
     ri = 63;
 
@@ -400,10 +418,12 @@ static void kryptos_rc2_block_decrypt(kryptos_u8_t *block, const struct kryptos_
     kryptos_rc2_rmixinground(r, sks->K, ri);
     kryptos_rc2_rmixinground(r, sks->K, ri);
 
-    kryptos_cpy_u16_as_big_endian(block, 8, r[0]);
-    kryptos_cpy_u16_as_big_endian(block + 2, 6, r[1]);
-    kryptos_cpy_u16_as_big_endian(block + 4, 4, r[2]);
-    kryptos_cpy_u16_as_big_endian(block + 6, 2, r[3]);
+    // WARN(Rafael): Well, the endian convention on RC2 Spec is a little "bit" confuse. Little-Confuse.
+
+    kryptos_cpy_u16_as_big_endian(block, 8, kryptos_rc2_rev(r[0]));
+    kryptos_cpy_u16_as_big_endian(block + 2, 6, kryptos_rc2_rev(r[1]));
+    kryptos_cpy_u16_as_big_endian(block + 4, 4, kryptos_rc2_rev(r[2]));
+    kryptos_cpy_u16_as_big_endian(block + 6, 2, kryptos_rc2_rev(r[3]));
 
     memset(r, 0L, sizeof(r));
     ri = 0;
@@ -432,3 +452,5 @@ static void kryptos_rc2_block_decrypt(kryptos_u8_t *block, const struct kryptos_
 #undef kryptos_rc2_rmixinground
 
 #undef kryptos_rc2_rmashinground
+
+#undef kryptos_rc2_rev
