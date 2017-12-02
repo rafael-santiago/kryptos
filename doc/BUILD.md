@@ -38,6 +38,20 @@ libkryptos.a
 
 All done!
 
+## How to install the library and its headers
+
+Pretty easy, being within the ``src`` sub-directory execute the following command:
+
+```
+MrsHudson@221B:~/src/kryptos/src# hefesto --install
+```
+
+To uninstall:
+
+```
+MrsHudson@221B:~/src/kryptos/src# hefesto --uninstall
+```
+
 ### Building the kernel mode version
 
 ``Kryptos`` has some parts designed to be used in kernel mode. Until now it supports ``FreeBSD`` and ``Linux``. However, there is no "kernel mode" build.
