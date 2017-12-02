@@ -20,7 +20,7 @@ All instructions about how to install this build system can be found in its repo
 
 ## How final users should build kryptos
 
-Once ``Hefesto`` well-installed and running in your system. For building ``kryptos`` you should execute the following
+Once ``Hefesto`` well installed and running in your system. For building ``kryptos`` you should execute the following
 commands (supposing you have cloned your kryptos copy within ``~/src/kryptos``):
 
 ```
@@ -42,7 +42,7 @@ All done!
 
 ``Kryptos`` has some parts designed to be used in kernel mode. Until now it supports ``FreeBSD`` and ``Linux``. However, there is no "kernel mode" build.
 The library was written taking in consideration that the users will compile ``kryptos`` together with their own stuff (as a monolithic project).
-The only thing that should be done is define the macro ``KRYPTOS_KERNEL_MODE`` and ``kryptos`` will "become" a kernel mode stuff.
+The only thing you should do is define the macro ``KRYPTOS_KERNEL_MODE`` and ``kryptos`` will "become" a kernel mode stuff.
 
 You should use some features with care. Personally I find that execute some features in kernel mode is overkill. You should do only the
 most "straightforward" cryptographic stuff in kernel but you are free... But take my point in consideration. ;)
@@ -72,12 +72,12 @@ Sherlock@221B:~/src/kryptos/src# hefesto --skip-dh-xchg-tests
 
 ### Speeding up the Diffie-Hellman-Merkle exchange tests
 
-The option that you should use is ``--quick-dh-tests`` and this option is enabled by default (take a look in the
-``src/.ivk`` file). When you do not specify this build option the unit tests for Diffie-Hellman-Merkle will use ``256-bit``
+The option you should use is ``--quick-dh-tests`` and this option is enabled by default (take a look in the
+``src/.ivk`` file). When you do not specify this build option, the unit tests for Diffie-Hellman-Merkle will use ``256-bit``
 secret values. As a result it will take longer to conclude the tests. Otherwise when you specify the build option
 ``--quick-dh-tests`` it will use ``8-bit`` secret values. As a result the test will be fast.
 
-The explicit usage of this build option is pretty straightforward:
+The usage of this build option through command line is pretty straightforward:
 
 ```
 Sherlock@221B:~/src/kryptos/src# hefesto --quick-dh-tests
@@ -85,8 +85,8 @@ Sherlock@221B:~/src/kryptos/src# hefesto --quick-dh-tests
 
 ### Skipping the OAEP tests from some PK algorithms
 
-The OAEP tests not only test the data encryption and its correct data decryption. The test also simulates invalid data passing
-due to it the test can be slow. To speed up the build you can skip the OAEP test stuff as follows:
+The OAEP tests not only test the data encryption and its correct data decryption. The test also simulates invalid data passing.
+Due to it the test can be slow. To speed up the build you can skip the OAEP test stuff as follows:
 
 ```
 Sherlock@221B:~/src/kryptos/src# hefesto --skip-rsa-oaep-tests \
@@ -106,7 +106,7 @@ Sherlock@221B:~/src/kryptos/src# hefesto --skip-rsa-signature-tests \
 
 Sometimes little bad bugs can corrupt some data but instead of directly break something it can indirectly
 introduce a bug into a place where you did not change anything. A good way of detecting this kind of
-behavior is executing the build as follows:
+unexpected behavior is by executing the build as follows:
 
 ```
 Sherlock@221B:~/src/kryptos/src# hefesto --stress-tests --runnings-nr=100
@@ -143,7 +143,7 @@ The default build options are defined into the file ``src/.ivk``. The **Table 1*
 The default build options are defined into the file ``src/tests/.ivk``. The **Table 2** gathers these options and also
 additional options. The **Table 3** gathers the options related with the kernel mode tests.
 
-**Table 2**: The default and additional build options for the unit tests.
+**Table 2**: The default and additional build options of the unit tests.
 
 |             **Option**                   |               **Description**                                                |
 |:----------------------------------------:|:----------------------------------------------------------------------------:|
@@ -180,11 +180,11 @@ additional options. The **Table 3** gathers the options related with the kernel 
 ### How the kernel mode tests are executed
 
 The kernel mode tests are almost the same of the user mode tests. However, the correctness of the ciphers are not verified since
-it was already done in user mode. The execution is pretty straightforward a loadable kernel module is generated and inserted into
+it was already done in user mode. The execution is pretty straightforward: a loadable kernel module is generated and inserted into
 the kernel. If it was successfully loaded it means that all is ok, otherwise some issues were found.
 
 Beware: A ``LKM`` is inserted into the kernel. Thus, invalid memory accesses, double frees will result in kernel panics. If you
-have made changes and you are not so sure about them, backup your work before continuing and happy kernel hacking! ;)
+have made some changes and you are not so sure about them, backup your work before continuing and happy kernel hacking! ;)
 
 In ``Linux``, during kernel mode tests you probably will receive some RCU CPU stall warnings, this is "normal" because the
 kernel test executes some insane and uncommon tasks (considering the current context). Things like running several PK crypto

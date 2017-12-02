@@ -46,7 +46,7 @@ You do not need to worry about where this struct is specifically defined in kryp
 ### The kryptos_task_ctx struct
 
 The ``kryptos_task_ctx`` is responsible for storing the plaintext, ciphertext, the current used algorithm, the key parameters
-besides the additional parameters when necessary. You always use this structure to express what you want.
+besides the additional parameters when necessary. You always use this structure to express what you want to do.
 
 There is no field called "plaintext" or "ciphertext". There are the fields ``in`` and ``out``. Then, to encrypt data the **plaintext**
 must be stored into ``in``. When decrypting the **ciphertext** also must be stored into ``in``. The resultant data of the two operations
@@ -56,7 +56,7 @@ However, when you store the input data into the task context is necessary also i
 field ``in_size`` holds the input size.
 
 After any executed task, the field ``result`` will contain a code which describes the status of that last task. The additional
-field called ``result_verbose`` may also contain some literal description about. Sometimes ``result_verbose`` may be null.
+field called ``result_verbose`` may also contain some literal description about. **Sometimes ``result_verbose`` may be null**.
 
 The following code defines the input of a task:
 
@@ -129,7 +129,7 @@ The way of indicating the desired cipher for an encryption task is by setting th
 to the ``Internal constant ID`` listed in **Table 1**.
 
 Similarly the indication of the operation mode is done by setting the field ``mode``. The values could be: ``kKryptosECB``,
-``kKryptosCBC``, ``kKryptosOFB``. Of course that this field is only relevant when you are using a block cipher.
+``kKryptosCBC``, ``kKryptosOFB``. Of course, this field is only relevant when you are dealing with block ciphers.
 
 The following code is an example of how to use the algorithm ``ARC4`` to encrypt and decrypt data:
 
@@ -206,8 +206,8 @@ Once the user key and some internal control sets defined by ``kryptos_arc4_setup
 Another curious thing could be the lack of the explicit indication of encryption or decryption intentions, however, ``ARC4``
 is a stream cipher, the encryption and decryption are the same. It only depends on the input.
 
-The use of ``kryptos_freeseg()`` in order to free memory is indicated because in kernel mode it can abstract some complications
-to you. In user mode you can call the default libc ``free()`` function, there is no problem with that.
+The use of ``kryptos_freeseg()`` in order to free memory is encouraged because in kernel mode it can abstract some complications
+for you. In user mode you can call the default libc ``free()`` function, there is no problem with that.
 
 It is possible to simplify a little bit more the previous sample by using C macros and c99 capabilities:
 
@@ -276,7 +276,7 @@ int main(int argc, char **argv) {
 
 As you can see the kryptos task manipulation C macros implement a direct and simple internal ``DSL``.
 
-The general using form of ``kryptos_run_cipher`` macro is:
+The general usage of ``kryptos_run_cipher`` macro is:
 
 ``kryptos_run_cipher(<cipher>, <ktask pointer>, key, key_size[, args]...)``
 
@@ -488,7 +488,7 @@ the iv_size must store the total in bytes of that byte chunk. If you generate an
 fail. As a result the ``kryptos_last_task_succeed(...)`` will indicate a zero value.
 
 Details about a failure always can be accessed by watching the field ``result_verbose`` from the ``kryptos_task_ctx`` struct.
-However, again, some errors let it ``NULL`` (always check its nullity before continuing).
+However, again, some errors let it ``NULL`` (**always check its nullity before continuing access it**).
 
 Not all block ciphers only need a key, a size of this key and an operation mode. In kryptos we also have block ciphers
 that need more than the standard parameters. In this case the additional parameters are always passed after the operation
@@ -565,7 +565,7 @@ The **Table 3** lists the other ciphers which use additional parameters during t
 Firstly I will show you how to generate hashes without using C macro conveniences, after we will generate hashes through
 the available macro.
 
-Until now the available hash algorithms follow listed in **Table 4**.
+The **Table 4** lists the available hash algorithms.
 
 **Table 4**: Currently available hash algorithms.
 
@@ -644,7 +644,7 @@ int main(int argc, char **argv) {
 }
 ```
 
-According to the presented sample above, you should define the input and its size in bytes in a ``kryptos_task_ctx`` struct.
+According to the presented sample, you should define the input and its size in bytes in a ``kryptos_task_ctx`` struct.
 To actually execute the desired hash algorithm you should pass a ``kryptos_task_ctx **`` and a flag requesting hexadecimal
 output (1 => hex, 0 => raw byte). The function to be called is ``kryptos_HASHID_hash``, where ``HASHID`` can be found
 in **Table 4**.
@@ -806,7 +806,7 @@ As you may have noticed the general form of using the ``kryptos_run_cipher_hmac`
 Until now the ``Diffie-Hellman-Merkle`` key exchange scheme and the algorithms ``RSA`` and ``Elgamal`` are available.
 For digital signature the library includes ``RSA`` (basic scheme), ``RSA-EMSA-PSS`` and the widely used ``DSA``.
 
-Firstly let's discusse the ``DHKE`` and after the other stuff.
+Firstly let's discuss the ``DHKE`` and after the other stuff.
 
 ### The Diffie-Hellman-Merkle key exchange
 
@@ -935,7 +935,7 @@ main_epilogue:
 As you may have seen the standard ``DHKE`` implementation using kryptos involves the usage of a specific structure
 called ``kryptos_dh_xchg_ctx`` and a "oracle" function called ``kryptos_dh_process_stdxchg()``. I like to call it
 "oracle" because this function is smart enough to know the stage of the exchange process. This "oracle" behavior
-avoids the necessity of driving the process with different functions or more explicit code.
+avoids the necessity of driving the process with different functions or a more specific code.
 
 The calls ``kryptos_init_dh_xchg_ctx()`` and ``kryptos_clear_dh_xchg_ctx()`` are always needed. The first obviously initializes
 the related structures and the second frees any allocated memory inside them.
@@ -1180,7 +1180,7 @@ respectively:
 Watson@221B:~/src/kryptos-test/samples# ./dh-domain-params-sample 160 80 > params.txt
 ```
 
-Once generated the parameters can be used instead of the standarnized MODP values. Of course that use p=160 bits and q=80 is
+Once generated the parameters can be used instead of the standarnized MODP values. Of course, use p=160 bits and q=80 is
 pretty insecure. The domain parameters calculating process can be slow. Since it depends on finding primes with specific
 relations between them. It is driven by luck, it can take 15 minutes or 2/3 hours... Fortunately, you should do it once.
 
@@ -1413,9 +1413,9 @@ main_epilogue:
 ```
 
 The function ``kryptos_dh_get_modp_from_params_buf()`` accepts a NULL Q parameter. You must pass it as NULL when your domain
-parameter buffer does not contain the Q parameter. However be aware that a ``PEM`` buffer containing only P and G parameters
+parameter buffer does not contain the Q parameter. However, be aware that a ``PEM`` buffer containing only P and G parameters
 implies in an unverified domain parameters buffer. The verifying function cannot ascertain anything without Q.
-Due to it you may be using small groups on your DHKE stuff. Maybe who have generated the used P and G values was naive or
+Due to it, you may be using small groups on your DHKE stuff. Maybe who have generated the used P and G values was naive or
 malicious. Accept domain parameters like these at your own risk.
 
 Well, I think that we have done with DHKE. For awhile let's forget a little about discrete logarithm cryptosystems and dive
@@ -1425,7 +1425,7 @@ into RSA available stuff...
 
 The best way of introducing the usage of ``RSA`` in kryptos is by showing you how to generate the key pair.
 
-Well, the following code shows the way:
+Well, the following code shows you the way:
 
 ```c
 /*
@@ -1498,10 +1498,10 @@ static int is_valid_number(const char *number, const size_t number_size) {
 }
 ```
 
-The function ``kryptos_rsa_mk_key_pair()`` does the job, it receives the key size (in bits), a (kryptos_u8_t **) for
+The function ``kryptos_rsa_mk_key_pair()`` does the job. It receives the key size (in bits), a (kryptos_u8_t **) for
 the public key buffer, a pointer to store the public key size, a (kryptos_u8_t **) for the private key buffer, a
 pointer to store the private key size. If the function succeeds it returns ``kKryptosSuccess``. Once generated
-all that you should do is store the output data in somewhere for later usage. Free the key pair data when not necessary
+all you should do is store the output data in somewhere for later usage. Free the key pair data when not necessary
 anymore, because the buffers were allocated by the ``kryptos_rsa_mk_key_pair()`` function. Do not be sloppy! :)
 
 Notice that the process of finding primes can be slow, so the key pair producing will become slow for greater
@@ -1907,8 +1907,6 @@ int main(int argc, char **argv) {
 }
 ```
 
-I am assuming that the reader has a previously knowledge about how ``OAEP`` padding works.
-
 Thus, the ``RSA OAEP`` should receive the key and its size and also a label and the size of this label and a pointer to a hash
 function and a pointer to a hash function size.
 
@@ -1918,8 +1916,8 @@ The hash size function is named by using this format: ``kryptos_<HASHID>_hash_si
 
 The ``HASHID`` can be found in **Table 4**.
 
-The macro ``kryptos_oaep_hash()`` is a way of making easier the function parameters passing. All that you should do with
-this macro is to pass the ``HASHID`` of the desired hash algorithm to be used in the OAEP stuff.
+The macro ``kryptos_oaep_hash()`` is a way of making easier the function parameters passing. All you should do with
+this macro is to pass the ``HASHID`` of the desired hash algorithm for the OAEP stuff.
 
 Then now with those tips I hope that the following code snippet becomes clearer to you:
 
@@ -2014,7 +2012,7 @@ static int is_valid_number(const char *number, const size_t number_size) {
 }
 ```
 
-In order to generate the sample key pair used in Elgamal stuff here I used the following command line:
+In order to generate the sample key pair used in Elgamal stuff here. I used the following command line:
 
 ```
 MsHudson@221B:~/src/kryptos-test/src/samples# ../../samples/elgamal-mk-key-pair-sample 1024 160
@@ -2027,8 +2025,8 @@ the Elgamal key pair. The arguments are: the P parameter size, the Q parameter s
 a pointer to store the size of the public buffer, a pointer to the private buffer and a pointer to store the size of the
 private buffer. When the function succeeds it returns ``kKryptosSuccess``.
 
-For brevity I will show you only the ``c99`` applications of the Elgamal in kryptos. The ``raw`` usage mode without ``c99``
-conveniences is similar to ``RSA``, I find you can figure it out by yourself. Thus, this is the way of using the Elgamal
+For brevity, I will show you only the ``c99`` applications of the Elgamal in kryptos. The ``raw`` usage mode without ``c99``
+conveniences is similar to ``RSA``, I find you can figure it out by yourself easily. Thus, this is the way of using the Elgamal
 schoolbook with ``c99``:
 
 ```c
@@ -2254,7 +2252,7 @@ buffer when not NULL should be freed.
 
 #### RSA
 
-Firstly I will show you the way of sign an input buffer with the standard RSA sign algorithm without ``C99`` conveniences.
+Firstly I will show you the way of signing an input buffer with the standard RSA sign algorithm without ``C99`` conveniences.
 Take a look:
 
 ```c
@@ -2388,7 +2386,7 @@ epilogue:
 ```
 
 The code above is a little bit longer since it does not use the internal dsl implemented by some ``c99`` macros. The following
-code sample does the same thing but it uses ``c99``:
+code sample does the same job but it uses ``c99``:
 
 ```c
 /*
@@ -2518,12 +2516,12 @@ The code above is shorter and simpler than the previous one. You just use the ds
 The ``kryptos_sign()`` primitive expects the signature algorithm name, a pointer to the task context, the message and its
 size, the private key buffer and its size.
 
-The ``kryptos_verify()`` similarly expects the signature algorithm name, a pointer to the task context, the signed buffer and
+Similarly, the ``kryptos_verify()`` expects the signature algorithm name, a pointer to the task context, the signed buffer and
 its size, the public key buffer and its size.
 
 The ``RSA`` signature tends to be time consuming depending on the size of the input and of course the modulus. There is also
 a trick that can speed up the verification process and it can be achieved by choosing a small public key factor,
-however, it is out of scope of the manual. You can also hash the input before signing.
+however, it is out of scope of the manual. You can also hash the input before signing. Moreover it is about generic tricks.
 
 The standard RSA digital signature is weak. The best practice to avoid some flaws present in the standard way is to pad the
 input. Thus, kryptos implements the ``RSA-EMSA-PSS`` signature scheme. The following code sample shows how to use this
@@ -2791,7 +2789,7 @@ vLOB3BI4FOgD7HJCRrL7eQsbRxw=
 
 Now we will use those key pair in the next ``DSA`` sample stuff.
 
-The way of use ``DSA`` without ``c99`` conveniences is almost the same way shown in ``RSA``, due to it, for brevity, from
+The way of using ``DSA`` without ``c99`` conveniences is almost the same way shown in ``RSA``, due to it, for brevity, from
 now on I will show only the sign and verify procedures by using ``c99`` conveniences.
 
 The following code shows how to sign and verify with ``DSA``:
@@ -2946,7 +2944,7 @@ stuff in kryptos (a.k.a the ``SHA-256`` hash processor).
 
 ## Secondary stuff
 
-Besides the cryptographic tasks, ``kryptos`` also has some secondary stuff such as encoding, compression and data export
+Besides the cryptographic tasks, ``kryptos`` also has some secondary stuff such as encoding, compression and data exporting
 functionalities. In the following section we will discuss them a little.
 
 ### Encoding algorithms
@@ -3230,7 +3228,7 @@ epilogue:
 
 ### Handling PEM buffers
 
-The export format used in kryptos is ``PEM``. In order to handle this type of data kryptos exposes three functions. A function
+The export format used in kryptos is ``PEM``. In order to handle this type of data, kryptos exposes three functions. A function
 to put some information into a ``PEM`` buffer. A function to get some information from a ``PEM`` buffer and also another function
 to load a multiprecision number from a ``PEM`` buffer.
 
@@ -3420,7 +3418,8 @@ epilogue:
 ```
 
 More details about the multiprecision handling functions are not given because it is considered an advanced
-topic for a final user manual. For more details try the technical documentation intended for contributors.
+topic for a final user manual. For more details try the technical documentation intended for contributors besides
+reading the library's code.
 
 ## So it is enough
 

@@ -3,7 +3,7 @@
 This is a not exhaustive description of the code style that I have been using for this project. Anyway, if you are intending to contribute, please,
 read this document first. I personally like some points present in [pike's style](https://doc.cat-v.org/bell_labs/pikestyle).
 
-This is not an absolute truth (a.k.a. unicorn) but this is the truth that I have been adopting.
+This is not an absolute truth (a.k.a. unicorn) but this is the truth that I have been taking in consideration.
 
 ## Comments
 
@@ -22,11 +22,11 @@ Take a look at the **Table 1** to know more about those labels and their proper 
 |   ``WARN``             |  warns someone about something                                                                                                              |
 |   ``CLUE``, ``TIP``    |  gives the tips of an intricate passage of your work (in other words do not mess with the code just because you cannot instantly understand)|
 |  ``TODO``              |  marks a section of the code as a part to be improved or even developed                                                                     |
-|  ``FIXME``, ``HELPME`` |  you are in trouble and do not know how to dealing with to get the issue solved                                                             |
+|  ``FIXME``, ``HELPME`` |  you are in trouble and do not know how to deal with that "beast" to get the issue solved                                                   |
 |   ``BUG``              |  you have commented some code in order to avoid an evil bug                                                                                 |
 | ``CAUTION``            |  you want to warn people about the implications of messing with the related code                                                            |
 
-I prefer using ``// ...`` instead of ``/* ... */``. However I find it is up to you, pick your prefered one.
+I prefer using ``// ...`` instead of ``/* ... */``. However, I find it is up to you, pick your prefered one.
 
 ## Code constructions
 
@@ -102,9 +102,8 @@ Always use braces.
 
 Do not trust in precedence. Try to make the stuff clearer. If you used to write crypto code you may know that everytime we see and write pretty "insane"
 and long expressions. I think that trust in precedence is evidence of naivety. Nothing should obfuscate correctness.
-In this sense Cryptography is beautiful as Math! Let's reverberate this beauty also here...
 
-Then you should use ``(...)`` when you want to communicate and make clearer your intentions.
+You should use ``(...)`` when you want to communicate and make clearer your intentions about precedence.
 
 ### Functions
 
@@ -129,7 +128,7 @@ This isn't:
 
 - Static stuff even used only by one function should be prototyped at the beginning of the module.
 - Not use ``<type> function()`` when defining or prototyping, this is about C. Thus ``<type> function(void)`` is a better choice for us.
-- Try not use char arrays as function parameters, since this is a theoretical fiction in C. Use pointers! I am sure that you are very skilled in it.
+- Try not use char arrays as function parameters, since this does not exist in C. Use pointers! I am sure that you are very well skilled in it.
 - If you are passing a char pointer, try also pass its size. Specially for non-static functions, since users can mess with them.
 - In kernel mode, try to avoid stack and heap consumption.
 - Never ever perform busy waits in kernel.
@@ -153,7 +152,7 @@ If you have got reasons for a spaghetti code let's discuss the idea before.
 
 ### Macros
 
-C macros are sharp and great, if you know how to proper use it.
+C macros are sharp and great, if you know how to proper use them.
 
 Macros should be designed for doing a single thing.
 
@@ -162,7 +161,7 @@ problem with that, we are all literate in C and you will be understood.
 
 Try always wrapping your macro parameters with (...) during the computations.
 
-Yes, global macros into a code module should be undefined at the end of the module.
+Yes, global macros into a code module (``*.c``) should be undefined at the end of the module.
 
 ### Unit tests
 
@@ -176,8 +175,8 @@ You should test the function, period. Go ahead and test it. Comment if you need 
 Even code that is not probable of being executed into kernel should be tested in kernel mode (if possible). This is a good way of making sure that nothing is
 exploding after your changes. You should not fear good code, should you?
 
-Otherwise if your code should not be executed in kernel mode, inform it explaining why. Do not let people spend their time on it. Comment.
+Otherwise, if your code should not be executed in kernel mode, inform it explaining why. Do not let people spend their time on it. Comment.
 
-The correctness of any cipher must be tested with official test vectors. When not possible, the custom test vector should be
+The correctness of any cipher (symmetric) must be tested with official test vectors. When not possible, the custom test vector should be
 derived from key expansion samples present in the cipher spec written by the algorithm authors. These test vectors should not be
-tested in kernel mode since them were well-tested in user mode.
+tested in kernel mode since they were well-tested in user mode.

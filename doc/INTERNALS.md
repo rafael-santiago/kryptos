@@ -1,7 +1,7 @@
 # Libkryptos developer's manual
 
 **Abstract**: This document is intended for contributors. Here you will find information about how to code new stuff besides maintaining the current ones.
-Due to it is assumed that the reader has a medium to advanced C knowledge.
+Due to it the reader is assumed as a medium to advanced C programmer and also a "cryptoholic" ;)
 
 ## The libkryptos repo tree layout
 
@@ -21,7 +21,7 @@ libkryptos/         <-------------- Root directory (duh).
 ```
 
 After a well suceeded build task the ar file was created within ``libkryptos/lib``. When the samples are also requested in a build task, they will be
-created within ``libkryptos/samples``. Supposing that you ran the build using this command: ``hefesto --mk-samples``. As a result you will get the
+created within ``libkryptos/samples``. Supposing you ran the build using this command: ``hefesto --mk-samples``. As a result you will get the
 following repo tree:
 
 ```
@@ -47,8 +47,10 @@ When you also request the kernel mode tests the native kernel's build system wil
 
 ## Some meaningful header files
 
-Some of the detailed headers includes their own implementation files. A header implementation file usually has the same name of
+Some of the detailed headers include their own implementation files. A header implementation file usually has the same name of
 the header file but the file extension is ``.c`` instead of ``.h``.
+
+For the library code never include using "..."  always use ``<...>``.
 
 ### src/kryptos_types.h
 
@@ -79,18 +81,18 @@ functions for PK crypto.
 
 ### src/kryptos_padding.h
 
-This header file contains all function prototypes related with padding tasks. Actually it is important for block ciphers.
+This header file contains all function prototypes related with padding tasks. Actually it is quite important for block ciphers.
 
 ### src/kryptos_pem.h
 
 This header file exposes some functions for PEM buffer reading and writing. This is very important for PK crypto, because all
-of PK crypto algorithms implemented in kryptos expects and returns their data using the PEM format.
+PK crypto algorithms implemented in kryptos expects and returns their data using the PEM format.
 
 ### src/kryptos_task_check.h
 
 Any interaction by the users with the library is represented as a task, due to it before doing the requested task
 the library must verify if the current task makes sense or not. The ``kryptos_task_check.h`` exports some important task
-check entry points. This also could be understood as a task "compiler".
+check entry points. This also could be understood as a "task compiler".
 
 ### src/kryptos_hash_common.h
 
@@ -103,7 +105,7 @@ Now let's suppose you read about a brand new awesome, super-secure block cipher 
 kryptos.
 
 The foofish cipher encrypts blocks of 128-bits, it needs a user's key of 256-bits in order to expand the final key (generate
-the sub-keys).
+the round sub-keys).
 
 The first thing you should do is define a new constant into the typed enum called ``kryptos_cipher_t``. This enum
 is located in ``kryptos_types.h``, take a look:
@@ -143,7 +145,7 @@ After you should create two files: ``src/kryptos_foofish.h`` and ``src/kryptos_f
 
 All s-boxes, internal constants, sub-keys struct, etc should be defined into the algorithm implementation file. If it
 performs shifts and you want to code it as macros you should create it in this implementation file and after undefine
-this macro. This is a way of keeping the stuff sanitized.
+this macro. This is a way of keeping the stuff sanitized and self contained.
 
 The function ``kryptos_foofish_ld_user_key`` is responsible for reading the user key into the sub-keys initial state.
 The function ``kryptos_foofish_mk_skeys`` is responsible for expanding the user key:
@@ -160,7 +162,7 @@ The function ``kryptos_foofish_mk_skeys`` is responsible for expanding the user 
 (...)
 ```
 
-The struct ``kryptos_foofish_subkeys`` is abstracted but it will contain the final key used for encrypt and decrypt the data.
+The struct ``kryptos_foofish_subkeys`` is abstracted but it will contain the final key used in data encryption/decryption.
 
 As said before the foofish expects a 256-bit key from the user. This data is put into a initial state and processed in some
 way to produce the final key. The function ``kryptos_foofish_ld_user_key`` will load this data. There's a way of making
@@ -218,11 +220,11 @@ The ``kryptos_foofish_ld_user_key`` uses three useful macros: ``kryptos_ld_user_
 
 Using those three macros allow you deal with keys that do not have the exact expected size. Maybe the user supplied a shorter
 key. With the macros is possible to read the passed bytes and assume the remaining as zeroed bytes. Another thing is that
-those macros avoid using loops in order to load the bytes into the state, as a result the code tends to drop out any kind
+those macros avoid using loops in order to load the bytes into the state and as a result the code tends to drop out any kind
 of useless instructions.
 
-All that you need to use the ``kryptos_ld_user_key_*`` macros are four variables: two ``kryptos_u8_t *`` and two ``size_t``.
-Do not worry about their initialization, the ``kryptos_ld_user_key_prologue`` does it:
+All you need to use the ``kryptos_ld_user_key_*`` macros are some local variables. Do not worry about their initialization,
+the ``kryptos_ld_user_key_prologue`` does it:
 
 ```c
     kryptos_ld_user_key_prologue(<pointer to the state>,
@@ -347,7 +349,7 @@ parse a buffer by getting the amount of bytes necessary by the block cipher and 
 (still following the chosen operation mode). The nice part is that almost always you should not worry about
 this parser/processor. Kryptos has a nice abstraction for doing it through its internal developer's dsl.
 
-The first thing to do in order to take advantage of it is to define a function pointer type that expresses the
+The first thing to do in order to take advantage of it is to define a function pointer type expressing the
 block encrypt/decrypt prototype followed by you:
 
 ```c
@@ -396,6 +398,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(<internal cipher name>,
 The encrypt and decrypt block functions in foofish return the data into the own input block. Due to it the block
 processing statement is simply ``foofish_block_processor(outblock, &sks)``.
 
+Do not worry about giving support for the supported cipher modes. The "incantation" above does this job for you.
+
 There is also a "magic" to implement the cipher setup function:
 
 ```c
@@ -433,9 +437,9 @@ The macro ``KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR`` will make visible the function
 
 The macro ``KRYPTOS_FOOFISH_BLOCKSIZE`` is also important it states in bytes the size of processed blocks.
 
-By doing it foofish can be called by the user macro ``kryptos_run_cipher``.
+By doing it foofish also can be called by the user macro ``kryptos_run_cipher``.
 
-The cipher module is done, but you still need to teach the task check module how to handle this new cipher otherwise
+The cipher module is done, but you still need to teach the task check module how to handle this new cipher, otherwise
 the final users never will be able to use your new cipher. The task check module stands for the file
 ``src/kryptos_task_check.c``. For almost new block ciphers all you should do is edit the function
 ``kryptos_task_check_iv_data`` adding the following case statement:
@@ -468,8 +472,8 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
 
 ```
 
-All done! Now the new cipher is actually added into kryptos. However, you should not add a new stuff without also adding
-tests for it.
+All done! Now the new cipher is actually added into kryptos. However, you should not add a new stuff without adding
+tests for it too.
 
 ## Okay, let's write some tests for "foofish"...
 
@@ -564,7 +568,7 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
 CUTE_TEST_CASE_END
 ```
 
-Within this directive you should add tests for foofish using the ``kryptos_run_cipher`` macro, look:
+Inside this directive block you should add tests for foofish using the ``kryptos_run_cipher`` macro, look:
 
 ```c
 #ifdef KRYPTOS_C99
@@ -722,6 +726,7 @@ a kernel panic, reboot your machine, corrupt your repository, etc. So be sure ab
 enabling the kernel tests.
 
 Now, it is real, congrats! Your stuff is being really tested according to the project requirements. Your job is done!
+Let's celebrate coding a little more...
 
 ## Steps to add a new hash algorithm based on Merkle-Damgard construction
 
@@ -797,8 +802,8 @@ KRYPTOS_IMPL_HASH_INPUT_SIZE(sha1, KRYPTOS_SHA1_BYTES_PER_BLOCK)
 //      - The name of the typed context T variable.
 //      - The name of the escape/epilogue label.
 //      - The algorithm initial setup stuff.
-//      - The message processor statement 'kryptos_sha1_process_message'
-//        was implemented by the KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR macro.
+//      - The message processor statement 'kryptos_sha1_process_message'.
+//        It was implemented by the KRYPTOS_IMPL_HASH_MESSAGE_PROCESSOR macro.
 //      - The statements necessary to produce a raw byte output.
 //      - The statemenets necessary to produce a hexadecimal output.
 KRYPTOS_IMPL_HASH_PROCESSOR(sha1, ktask, kryptos_sha1_ctx, ctx, sha1_hash_epilogue,
@@ -844,7 +849,7 @@ Yes, at first glance it seems quite trick but believe in me, those tricks presen
 buffer parsing functions are all well tested and all you should do is to focus in the hash algorithm implementation itself.
 
 Maybe the most misterious trinket presented above is the 'block decision table'... For SHA-1 this is the block decision
-table:
+table "layout":
 
 ```c
 static size_t kryptos_sha1_block_index_decision_table[KRYPTOS_SHA1_BYTES_PER_BLOCK] = {
@@ -877,10 +882,10 @@ struct kryptos_sha1_input_message {
 ```
 
 So the input bytes [0], [1], [2] and [3] will be loaded into block[0]. The input bytes [60], [61], [62] and [63] will
-be loaded into block[15]. Yep! Now that you understood it seems pretty boring, huh? :)
+be loaded into block[15]. Yep! Now you understood and now it seems pretty boring, huh? :)
 
 The Merkle-Damgard construction also needs a padding step during the current block processing (if the current is the last block)
-and depeding on the size of the block this padding must happen in two "acts". Look the SHA-1 block processing code:
+and depeding on the size of the block this padding must happen in "two acts". Look the SHA-1 block processing code:
 
 ```c
 static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx) {
@@ -905,7 +910,7 @@ static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx) {
 }
 ```
 
-The function ``kryptos_hash_apply_pad_on_u32_block`` signales if this padding operation will happen in two "acts" or not
+The function ``kryptos_hash_apply_pad_on_u32_block`` signales if this padding operation will happen in "two acts" or not
 by setting the int pointer ``&ctx->paddin2times``.
 
 To test the algorithm you also should create a test vector header file under ``tests/``. This is the content from
@@ -1015,7 +1020,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 CUTE_TEST_CASE_END
 ```
 
-The kernel tests for hash algorithms only verifies the result for the "abc" hashing. So you should edit the file
+The kernel tests for hash algorithms only verify the result for the "abc" hashing. So you should edit the file
 ``src/tests/kernel/hash_tests.c`` and in test case ``kryptos_hash_tests`` to add your new test code stuff.
 
 In kernel mode, still in the file ``src/tests/kernel/hash_tests.c``, you should edit the test case ``kryptos_hmac_tests``
@@ -1055,7 +1060,7 @@ snippet:
 ```
 
 The function ``kryptos_<cipher-name>_setup(kryptos_task_ctx *ktask, '.*')`` is called before calling the
-encryption/decryption entry point. Usually, this function receives the user keys, its length and sometimes more
+encryption/decryption entry point. Usually, this function receives the user key, its length and sometimes more
 additional data according to the related algorithm. All received data must be referenced by the ``(kryptos_task_ctx *)``
 variable. This function also must set the ``cipher`` field from ``(kryptos_task_ctx *)`` to the expected internal
 algorithm constant.
@@ -1138,7 +1143,7 @@ Finally, about the macro ``KRYPTOS_IMPL_ENCODING_PROCESSOR``:
 
 Piece of cake! All encoding algorithms are pretty boring because they just receive some data and spit some data
 based on the input. Due to it all four presented macros will cover all or at least almost all the new encoding stuff
-that you need to add here in this library.
+you need to add here in this library.
 
-New constants for encoding algorithms  must be added into the ``kryptos_encoding_t`` typed enum defined in
+New constants for encoding algorithms must be added into the ``kryptos_encoding_t`` typed enum defined in
 ``src/kryptos_types.h``.
