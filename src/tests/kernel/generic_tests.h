@@ -8,7 +8,7 @@
 #ifndef KRYPTOS_KRYPTOS_TESTS_KERNEL_GENERIC_TESTS_H
 #define KRYPTOS_KRYPTOS_TESTS_KERNEL_GENERIC_TESTS_H 1
 
-#include <kutest.h>
+#include <tests/cutest/src/kutest.h>
 
 KUTE_DECLARE_TEST_CASE(kryptos_padding_tests);
 

@@ -5,7 +5,7 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#include <kutest.h>
+#include <tests/cutest/src/kutest.h>
 #if defined(__FreeBSD__)
 # include <sys/cdefs.h>
 # include <sys/malloc.h>

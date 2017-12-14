@@ -8,7 +8,7 @@
 #ifndef KRYPTOS_TESTS_ASYMMETRIC_CIPHERS_TESTS_H
 #define KRYPTOS_TESTS_ASYMMETRIC_CIPHERS_TESTS_H 1
 
-#include <kutest.h>
+#include <tests/cutest/src/kutest.h>
 
 KUTE_DECLARE_TEST_CASE(kryptos_verify_dl_params_tests);
 
