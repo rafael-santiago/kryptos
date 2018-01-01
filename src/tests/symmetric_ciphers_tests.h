@@ -46,4 +46,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_tea_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_xtea_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_misty1_tests);
+
 #endif

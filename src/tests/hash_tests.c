@@ -502,6 +502,26 @@ CUTE_TEST_CASE(kryptos_hmac_tests)
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, xtea, md5, key, key_size, kKryptosCBC, &xtea_rounds);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, xtea, ripemd128, key, key_size, kKryptosCBC, &xtea_rounds);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, xtea, ripemd160, key, key_size, kKryptosCBC, &xtea_rounds);
+
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, sha1, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, sha224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, sha256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, sha384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, sha512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, md4, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, md5, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, ripemd128, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, ripemd160, key, key_size, kKryptosECB);
+
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, sha1, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, sha224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, sha256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, sha384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, sha512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, md4, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, md5, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, ripemd128, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, misty1, ripemd160, key, key_size, kKryptosCBC);
 #else
 # if !defined(KRYPTOS_NO_HMAC_TESTS)
     // TODO(Rafael): When there is no C99 support add a simple bare bone test with at least one block cipher and all

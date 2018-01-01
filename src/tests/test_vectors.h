@@ -23,6 +23,7 @@
 #include "triple_des_ede_test_vector.h"
 #include "tea_test_vector.h"
 #include "xtea_test_vector.h"
+#include "misty1_test_vector.h"
 #include "sha1_test_vector.h"
 #include "sha224_test_vector.h"
 #include "sha256_test_vector.h"

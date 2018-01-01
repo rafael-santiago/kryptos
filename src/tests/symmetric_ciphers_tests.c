@@ -607,3 +607,7 @@ CUTE_TEST_CASE(kryptos_xtea_tests)
                                                                         kKryptosOFB,
                                                                         &xtea_rounds[tv % xtea_rounds_nr].rounds));
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_misty1_tests)
+    kryptos_run_block_cipher_tests(misty1, KRYPTOS_MISTY1_BLOCKSIZE);
+CUTE_TEST_CASE_END
