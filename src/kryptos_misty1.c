@@ -59,7 +59,7 @@
                               : (d1) ^ ((d0) & (sks)->EK[(((((k) - 1) >> 1) + 2) % 8) + 8]),\
     ( (((kryptos_u32_t)(d0)) << 16) | (d1) ) )
 
-// INFO(Rafael): The 7 and 9-bit sboxes, respectivelly.
+// INFO(Rafael): The 7 and 9-bit sboxes, respectively.
 
 static kryptos_u8_t kryptos_misty1_S7[128] = {
     0x1B, 0x32, 0x33, 0x5A, 0x3B, 0x10, 0x17, 0x54, 0x5B, 0x1A, 0x72, 0x73, 0x6B, 0x2C, 0x66, 0x49,

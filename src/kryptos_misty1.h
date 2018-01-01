@@ -12,9 +12,9 @@
 
 #define KRYPTOS_MISTY1_BLOCKSIZE 8
 
-// INFO(Rafael): According to the MISTY1 spec the 8-rounds is recommended even
-//               being possible to set up a variable rounds total. Due to it,
-//               here we will assume 'n' as eight fixed rounds.
+// INFO(Rafael): According to the MISTY1 spec the total of eight rounds is recommended even
+//               being possible to set up a variable rounds total. Due to it, here we will
+//               assume 'n' as eight fixed rounds.
 
 KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(misty1)
 
