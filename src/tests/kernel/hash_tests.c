@@ -775,6 +775,30 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, xtea, ripemd128, key, key_size, kKryptosCBC, &xtea_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, xtea, ripemd160, key, key_size, kKryptosCBC, &xtea_rounds);
 
+    // INFO(Rafael): MISTY1/ECB.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, sha1, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, sha224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, sha256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, sha384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, sha512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, md4, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, md5, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, ripemd128, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, ripemd160, key, key_size, kKryptosECB);
+
+    // INFO(Rafael): MISTY1/CBC.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, sha1, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, sha224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, sha256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, sha384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, sha512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, md4, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, md5, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, ripemd128, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, ripemd160, key, key_size, kKryptosCBC);
+
 #undef kryptos_run_hmac_tests
 
 #else
