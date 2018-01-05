@@ -1040,8 +1040,8 @@ static void kryptos_keccak_sponge_1600(struct kryptos_keccak_ctx *ctx) {
             //               loop stuff for 'non-standard' bit-sizes makes easier sponge's extensions. Anyway, if
             //               a new standard output size show up it may be processed outside this default case.
             //
-            //               In practice this is a dead code since any hash function implemented within this module
-            //               supports a custom bit-size output passing.
+            //               In practice this is a dead code since none hash function implemented within this module
+            //               support a custom bit-size output passing.
 
             zp_end = zp + ctx->z_size; // INFO(Rafael): I prefer ascertaing it.
 
