@@ -36,6 +36,7 @@
 #include <kryptos_md4.h>
 #include <kryptos_md5.h>
 #include <kryptos_ripemd128_160.h>
+#include <kryptos_keccak.h>
 
 #include <kryptos_base64.h>
 #include <kryptos_uuencode.h>

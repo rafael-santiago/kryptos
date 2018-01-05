@@ -5,8 +5,8 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#ifndef KRYPTOS_ENDIANESS_UTILS_H
-#define KRYPTOS_ENDIANESS_UTILS_H 1
+#ifndef KRYPTOS_ENDIANNESS_UTILS_H
+#define KRYPTOS_ENDIANNESS_UTILS_H 1
 
 #include <kryptos_types.h>
 

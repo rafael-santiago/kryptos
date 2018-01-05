@@ -10,7 +10,7 @@
 # include <string.h>
 #endif
 
-#define kryptos_u32_rev(w) ( ((w) << 24) | (((w) & 0x0000ff00) << 8) | (((w) & 0x00ff0000) >> 8) | ((w) >> 24) )
+#define kryptos_u32_rev(w) ( ((w) << 24) | (((w) & 0x0000FF00) << 8) | (((w) & 0x00FF0000) >> 8) | ((w) >> 24) )
 
 int kryptos_little_endian_cpu(void) {
     static int kryptos_little_endian = -1;

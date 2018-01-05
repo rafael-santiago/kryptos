@@ -81,6 +81,38 @@ CUTE_TEST_CASE(kryptos_ripemd160_hash_macro_tests)
     kryptos_run_hash_macro_tests(ripemd160, 64, 20);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_sha3_224_tests)
+    kryptos_run_hash_tests(sha3_224, 200, 28);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_sha3_224_hash_macro_tests)
+    kryptos_run_hash_macro_tests(sha3_224, 200, 28);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_sha3_256_tests)
+    kryptos_run_hash_macro_tests(sha3_256, 200, 32);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_sha3_256_hash_macro_tests)
+    kryptos_run_hash_macro_tests(sha3_256, 200, 32);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_sha3_384_tests)
+    kryptos_run_hash_macro_tests(sha3_384, 200, 48);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_sha3_384_hash_macro_tests)
+    kryptos_run_hash_macro_tests(sha3_384, 200, 48);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_sha3_512_tests)
+    kryptos_run_hash_macro_tests(sha3_512, 200, 64);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_sha3_512_hash_macro_tests)
+    kryptos_run_hash_macro_tests(sha3_512, 200, 64);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_hmac_tests)
 
 #if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)

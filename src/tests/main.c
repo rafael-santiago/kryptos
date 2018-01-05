@@ -80,6 +80,14 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_ripemd128_hash_macro_tests);
     CUTE_RUN_TEST(kryptos_ripemd160_tests);
     CUTE_RUN_TEST(kryptos_ripemd160_hash_macro_tests);
+    CUTE_RUN_TEST(kryptos_sha3_224_tests);
+    CUTE_RUN_TEST(kryptos_sha3_224_hash_macro_tests);
+    CUTE_RUN_TEST(kryptos_sha3_256_tests);
+    CUTE_RUN_TEST(kryptos_sha3_256_hash_macro_tests);
+    CUTE_RUN_TEST(kryptos_sha3_384_tests);
+    CUTE_RUN_TEST(kryptos_sha3_384_hash_macro_tests);
+    CUTE_RUN_TEST(kryptos_sha3_512_tests);
+    CUTE_RUN_TEST(kryptos_sha3_512_hash_macro_tests);
 
     //  -=-=-=-=-=-=- New block ciphers/hash functions should be added to HMAC tests. -=-=-=-=-=-=-=-
 

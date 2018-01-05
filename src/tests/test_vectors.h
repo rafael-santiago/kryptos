@@ -33,6 +33,10 @@
 #include "md5_test_vector.h"
 #include "ripemd128_test_vector.h"
 #include "ripemd160_test_vector.h"
+#include "sha3_224_test_vector.h"
+#include "sha3_256_test_vector.h"
+#include "sha3_384_test_vector.h"
+#include "sha3_512_test_vector.h"
 #include <string.h>
 
 static kryptos_u8_t *cbc_test_data[] = {
@@ -275,6 +279,9 @@ static kryptos_u8_t *hmac_test_data[] = {
         kryptos_ ## hash ## _hash(&ktask, 0);\
         CUTE_ASSERT(t.out != NULL);\
         CUTE_ASSERT(t.out_size == hash ## _test_vector[tv].raw_hash_size);\
+        /*if (t.out_size == 28) {\
+            printf("%.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X\n", t.out[0], t.out[1], t.out[2], t.out[3], t.out[4], t.out[5], t.out[6], t.out[7], t.out[8], t.out[9], t.out[10], t.out[11], t.out[12], t.out[13], t.out[14], t.out[15], t.out[16], t.out[17], t.out[18], t.out[19], t.out[20], t.out[21], t.out[22], t.out[23], t.out[24], t.out[25], t.out[26], t.out[27]);\
+        }*/\
         CUTE_ASSERT(memcmp(t.out, hash ## _test_vector[tv].raw_hash, t.out_size) == 0);\
         kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
         kryptos_ ## hash ## _hash(&ktask, 1);\
