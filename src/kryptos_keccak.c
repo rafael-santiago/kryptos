@@ -846,8 +846,6 @@ static void kryptos_keccak_sponge_1600(struct kryptos_keccak_ctx *ctx) {
     }
 
     memset(ctx->z, 0, ctx->z_size);
-    zp = ctx->z;
-    zp_end = zp + ctx->z_size; // INFO(Rafael): I prefer ascertaing it.
 
     switch (ctx->z_size) {
         case KRYPTOS_KECCAK_224_HASH_SIZE:
@@ -1042,6 +1040,9 @@ static void kryptos_keccak_sponge_1600(struct kryptos_keccak_ctx *ctx) {
             //
             //               In practice this is a dead code since any hash function implemented within this module
             //               supports a custom bit-size output passing.
+
+            zp = ctx->z;
+            zp_end = zp + ctx->z_size; // INFO(Rafael): I prefer ascertaing it.
 
             mp = m;
             mp_end = mp + m_size;
