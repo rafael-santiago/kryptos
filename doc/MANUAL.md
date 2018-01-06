@@ -577,6 +577,14 @@ The **Table 4** lists the available hash algorithms.
 |   ``SHA-256``  |       ``sha256``                   |
 |   ``SHA-384``  |       ``sha384``                   |
 |   ``SHA-512``  |       ``sha512``                   |
+|   ``SHA3-224`` |       ``sha3_224``                 |
+|   ``SHA3-256`` |       ``sha3_256``                 |
+|   ``SHA3-384`` |       ``sha3_384``                 |
+|   ``SHA3-512`` |       ``sha3_512``                 |
+|  ``KECCAK-224``|       ``keccak224``                |
+|  ``KECCAK-256``|       ``keccak256``                |
+|  ``KECCAK-384``|       ``keccak384``                |
+|  ``KECCAK-512``|       ``keccak512``                |
 |    ``MD4``     |       ``md4``                      |
 |    ``MD5``     |       ``md5``                      |
 | ``RIPEMD-128`` |      ``ripemd128``                 |
