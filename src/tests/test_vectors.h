@@ -37,6 +37,10 @@
 #include "sha3_256_test_vector.h"
 #include "sha3_384_test_vector.h"
 #include "sha3_512_test_vector.h"
+#include "keccak224_test_vector.h"
+#include "keccak256_test_vector.h"
+#include "keccak384_test_vector.h"
+#include "keccak512_test_vector.h"
 #include <string.h>
 
 static kryptos_u8_t *cbc_test_data[] = {

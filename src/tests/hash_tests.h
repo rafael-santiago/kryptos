@@ -62,6 +62,22 @@ CUTE_DECLARE_TEST_CASE(kryptos_sha3_512_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_sha3_512_hash_macro_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_keccak224_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_keccak224_hash_macro_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_keccak256_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_keccak256_hash_macro_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_keccak384_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_keccak384_hash_macro_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_keccak512_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_keccak512_hash_macro_tests);
+
 CUTE_DECLARE_TEST_CASE(kryptos_hmac_tests);
 
 #endif

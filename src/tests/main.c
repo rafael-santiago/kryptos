@@ -88,6 +88,14 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_sha3_384_hash_macro_tests);
     CUTE_RUN_TEST(kryptos_sha3_512_tests);
     CUTE_RUN_TEST(kryptos_sha3_512_hash_macro_tests);
+    CUTE_RUN_TEST(kryptos_keccak224_tests);
+    CUTE_RUN_TEST(kryptos_keccak224_hash_macro_tests);
+    CUTE_RUN_TEST(kryptos_keccak256_tests);
+    CUTE_RUN_TEST(kryptos_keccak256_hash_macro_tests);
+    CUTE_RUN_TEST(kryptos_keccak384_tests);
+    CUTE_RUN_TEST(kryptos_keccak384_hash_macro_tests);
+    CUTE_RUN_TEST(kryptos_keccak512_tests);
+    CUTE_RUN_TEST(kryptos_keccak512_hash_macro_tests);
 
     //  -=-=-=-=-=-=- New block ciphers/hash functions should be added to HMAC tests. -=-=-=-=-=-=-=-
 

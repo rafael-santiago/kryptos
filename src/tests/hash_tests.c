@@ -82,35 +82,67 @@ CUTE_TEST_CASE(kryptos_ripemd160_hash_macro_tests)
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha3_224_tests)
-    kryptos_run_hash_tests(sha3_224, 200, 28);
+    kryptos_run_hash_tests(sha3_224, 144, 28);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha3_224_hash_macro_tests)
-    kryptos_run_hash_macro_tests(sha3_224, 200, 28);
+    kryptos_run_hash_macro_tests(sha3_224, 144, 28);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha3_256_tests)
-    kryptos_run_hash_macro_tests(sha3_256, 200, 32);
+    kryptos_run_hash_tests(sha3_256, 136, 32);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha3_256_hash_macro_tests)
-    kryptos_run_hash_macro_tests(sha3_256, 200, 32);
+    kryptos_run_hash_macro_tests(sha3_256, 136, 32);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha3_384_tests)
-    kryptos_run_hash_macro_tests(sha3_384, 200, 48);
+    kryptos_run_hash_tests(sha3_384, 104, 48);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha3_384_hash_macro_tests)
-    kryptos_run_hash_macro_tests(sha3_384, 200, 48);
+    kryptos_run_hash_macro_tests(sha3_384, 104, 48);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha3_512_tests)
-    kryptos_run_hash_macro_tests(sha3_512, 200, 64);
+    kryptos_run_hash_tests(sha3_512, 72, 64);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha3_512_hash_macro_tests)
-    kryptos_run_hash_macro_tests(sha3_512, 200, 64);
+    kryptos_run_hash_macro_tests(sha3_512, 72, 64);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_keccak224_tests)
+    kryptos_run_hash_tests(keccak224, 144, 28);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_keccak224_hash_macro_tests)
+    kryptos_run_hash_macro_tests(keccak224, 144, 28);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_keccak256_tests)
+    kryptos_run_hash_tests(keccak256, 136, 32);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_keccak256_hash_macro_tests)
+    kryptos_run_hash_macro_tests(keccak256, 136, 32);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_keccak384_tests)
+    kryptos_run_hash_tests(keccak384, 104, 48);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_keccak384_hash_macro_tests)
+    kryptos_run_hash_macro_tests(keccak384, 104, 48);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_keccak512_tests)
+    kryptos_run_hash_tests(keccak512, 72, 64);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_keccak512_hash_macro_tests)
+    kryptos_run_hash_macro_tests(keccak512, 72, 64);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_hmac_tests)

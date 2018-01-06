@@ -44,23 +44,37 @@
 
 #define KRYPTOS_KECCAK_1600_ROUNDS_NR 24
 
-#define KRYPTOS_KECCAK_1600_BYTES_PER_BLOCK 200
-
 #define KRYPTOS_KECCAK_224_HASH_SIZE 28
+
+#define KRYPTOS_KECCAK_224_BYTES_PER_BLOCK 144
 
 #define KRYPTOS_KECCAK_256_HASH_SIZE 32
 
+#define KRYPTOS_KECCAK_256_BYTES_PER_BLOCK 136
+
 #define KRYPTOS_KECCAK_384_HASH_SIZE 48
+
+#define KRYPTOS_KECCAK_384_BYTES_PER_BLOCK 104
 
 #define KRYPTOS_KECCAK_512_HASH_SIZE 64
 
+#define KRYPTOS_KECCAK_512_BYTES_PER_BLOCK 72
+
 #define KRYPTOS_SHA3_224_HASH_SIZE KRYPTOS_KECCAK_224_HASH_SIZE
+
+#define KRYPTOS_SHA3_224_BYTES_PER_BLOCK KRYPTOS_KECCAK_224_BYTES_PER_BLOCK
 
 #define KRYPTOS_SHA3_256_HASH_SIZE KRYPTOS_KECCAK_256_HASH_SIZE
 
+#define KRYPTOS_SHA3_256_BYTES_PER_BLOCK KRYPTOS_KECCAK_256_BYTES_PER_BLOCK
+
 #define KRYPTOS_SHA3_384_HASH_SIZE KRYPTOS_KECCAK_384_HASH_SIZE
 
+#define KRYPTOS_SHA3_384_BYTES_PER_BLOCK KRYPTOS_KECCAK_384_BYTES_PER_BLOCK
+
 #define KRYPTOS_SHA3_512_HASH_SIZE KRYPTOS_KECCAK_512_HASH_SIZE
+
+#define KRYPTOS_SHA3_512_BYTES_PER_BLOCK KRYPTOS_KECCAK_512_BYTES_PER_BLOCK
 
 // CLUE(Rafael): If for some reason you want to use KECCAK with a non-standard bit-size.
 //               You also must make possible the wanted bit-size passing (hashes entry points).
@@ -104,11 +118,11 @@ static void kryptos_keccak_sponge_1600(struct kryptos_keccak_ctx *ctx);
 
 static void kryptos_keccak_r1600(kryptos_u64_t state[5][5]);
 
-KRYPTOS_IMPL_HASH_SIZE(keccak_224, KRYPTOS_KECCAK_224_HASH_SIZE)
+KRYPTOS_IMPL_HASH_SIZE(keccak224, KRYPTOS_KECCAK_224_HASH_SIZE)
 
-KRYPTOS_IMPL_HASH_INPUT_SIZE(keccak_224, KRYPTOS_KECCAK_1600_BYTES_PER_BLOCK)
+KRYPTOS_IMPL_HASH_INPUT_SIZE(keccak224, KRYPTOS_KECCAK_224_BYTES_PER_BLOCK)
 
-KRYPTOS_IMPL_HASH_PROCESSOR(keccak_224, ktask, kryptos_keccak_ctx, ctx, keccak_224_epilogue,
+KRYPTOS_IMPL_HASH_PROCESSOR(keccak224, ktask, kryptos_keccak_ctx, ctx, keccak_224_epilogue,
                             {
                                 ctx.message = (*ktask)->in;
                                 ctx.message_size = (*ktask)->in_size;
@@ -173,11 +187,11 @@ KRYPTOS_IMPL_HASH_PROCESSOR(keccak_224, ktask, kryptos_keccak_ctx, ctx, keccak_2
                                 ctx.z_size = 0;
                             })
 
-KRYPTOS_IMPL_HASH_SIZE(keccak_256, KRYPTOS_KECCAK_256_HASH_SIZE)
+KRYPTOS_IMPL_HASH_SIZE(keccak256, KRYPTOS_KECCAK_256_HASH_SIZE)
 
-KRYPTOS_IMPL_HASH_INPUT_SIZE(keccak_256, KRYPTOS_KECCAK_1600_BYTES_PER_BLOCK)
+KRYPTOS_IMPL_HASH_INPUT_SIZE(keccak256, KRYPTOS_KECCAK_256_BYTES_PER_BLOCK)
 
-KRYPTOS_IMPL_HASH_PROCESSOR(keccak_256, ktask, kryptos_keccak_ctx, ctx, keccak_256_epilogue,
+KRYPTOS_IMPL_HASH_PROCESSOR(keccak256, ktask, kryptos_keccak_ctx, ctx, keccak_256_epilogue,
                             {
                                 ctx.message = (*ktask)->in;
                                 ctx.message_size = (*ktask)->in_size;
@@ -246,11 +260,11 @@ KRYPTOS_IMPL_HASH_PROCESSOR(keccak_256, ktask, kryptos_keccak_ctx, ctx, keccak_2
                                 ctx.z_size = 0;
                             })
 
-KRYPTOS_IMPL_HASH_SIZE(keccak_384, KRYPTOS_KECCAK_384_HASH_SIZE)
+KRYPTOS_IMPL_HASH_SIZE(keccak384, KRYPTOS_KECCAK_384_HASH_SIZE)
 
-KRYPTOS_IMPL_HASH_INPUT_SIZE(keccak_384, KRYPTOS_KECCAK_1600_BYTES_PER_BLOCK)
+KRYPTOS_IMPL_HASH_INPUT_SIZE(keccak384, KRYPTOS_KECCAK_384_BYTES_PER_BLOCK)
 
-KRYPTOS_IMPL_HASH_PROCESSOR(keccak_384, ktask, kryptos_keccak_ctx, ctx, keccak_384_epilogue,
+KRYPTOS_IMPL_HASH_PROCESSOR(keccak384, ktask, kryptos_keccak_ctx, ctx, keccak_384_epilogue,
                             {
                                 ctx.message = (*ktask)->in;
                                 ctx.message_size = (*ktask)->in_size;
@@ -335,11 +349,11 @@ KRYPTOS_IMPL_HASH_PROCESSOR(keccak_384, ktask, kryptos_keccak_ctx, ctx, keccak_3
                                 ctx.z_size = 0;
                             })
 
-KRYPTOS_IMPL_HASH_SIZE(keccak_512, KRYPTOS_KECCAK_512_HASH_SIZE)
+KRYPTOS_IMPL_HASH_SIZE(keccak512, KRYPTOS_KECCAK_512_HASH_SIZE)
 
-KRYPTOS_IMPL_HASH_INPUT_SIZE(keccak_512, KRYPTOS_KECCAK_1600_BYTES_PER_BLOCK)
+KRYPTOS_IMPL_HASH_INPUT_SIZE(keccak512, KRYPTOS_KECCAK_512_BYTES_PER_BLOCK)
 
-KRYPTOS_IMPL_HASH_PROCESSOR(keccak_512, ktask, kryptos_keccak_ctx, ctx, keccak_512_epilogue,
+KRYPTOS_IMPL_HASH_PROCESSOR(keccak512, ktask, kryptos_keccak_ctx, ctx, keccak_512_epilogue,
                             {
                                 ctx.message = (*ktask)->in;
                                 ctx.message_size = (*ktask)->in_size;
@@ -452,7 +466,7 @@ KRYPTOS_IMPL_HASH_PROCESSOR(keccak_512, ktask, kryptos_keccak_ctx, ctx, keccak_5
 
 KRYPTOS_IMPL_HASH_SIZE(sha3_224, KRYPTOS_SHA3_224_HASH_SIZE)
 
-KRYPTOS_IMPL_HASH_INPUT_SIZE(sha3_224, KRYPTOS_KECCAK_1600_BYTES_PER_BLOCK)
+KRYPTOS_IMPL_HASH_INPUT_SIZE(sha3_224, KRYPTOS_SHA3_224_BYTES_PER_BLOCK)
 
 KRYPTOS_IMPL_HASH_PROCESSOR(sha3_224, ktask, kryptos_keccak_ctx, ctx, sha3_224_epilogue,
                             {
@@ -521,7 +535,7 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha3_224, ktask, kryptos_keccak_ctx, ctx, sha3_224_e
 
 KRYPTOS_IMPL_HASH_SIZE(sha3_256, KRYPTOS_SHA3_256_HASH_SIZE)
 
-KRYPTOS_IMPL_HASH_INPUT_SIZE(sha3_256, KRYPTOS_KECCAK_1600_BYTES_PER_BLOCK)
+KRYPTOS_IMPL_HASH_INPUT_SIZE(sha3_256, KRYPTOS_SHA3_256_BYTES_PER_BLOCK)
 
 KRYPTOS_IMPL_HASH_PROCESSOR(sha3_256, ktask, kryptos_keccak_ctx, ctx, sha3_256_epilogue,
                             {
@@ -594,7 +608,7 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha3_256, ktask, kryptos_keccak_ctx, ctx, sha3_256_e
 
 KRYPTOS_IMPL_HASH_SIZE(sha3_384, KRYPTOS_SHA3_384_HASH_SIZE)
 
-KRYPTOS_IMPL_HASH_INPUT_SIZE(sha3_384, KRYPTOS_KECCAK_1600_BYTES_PER_BLOCK)
+KRYPTOS_IMPL_HASH_INPUT_SIZE(sha3_384, KRYPTOS_SHA3_384_BYTES_PER_BLOCK)
 
 KRYPTOS_IMPL_HASH_PROCESSOR(sha3_384, ktask, kryptos_keccak_ctx, ctx, sha3_384_epilogue,
                             {
@@ -683,7 +697,7 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha3_384, ktask, kryptos_keccak_ctx, ctx, sha3_384_e
 
 KRYPTOS_IMPL_HASH_SIZE(sha3_512, KRYPTOS_SHA3_512_HASH_SIZE)
 
-KRYPTOS_IMPL_HASH_INPUT_SIZE(sha3_512, KRYPTOS_KECCAK_1600_BYTES_PER_BLOCK)
+KRYPTOS_IMPL_HASH_INPUT_SIZE(sha3_512, KRYPTOS_SHA3_512_BYTES_PER_BLOCK)
 
 KRYPTOS_IMPL_HASH_PROCESSOR(sha3_512, ktask, kryptos_keccak_ctx, ctx, sha3_512_epilogue,
                             {
@@ -820,7 +834,7 @@ static void kryptos_keccak_sponge_1600(struct kryptos_keccak_ctx *ctx) {
 
     while (mp < mp_end) {
         for (m_off = 0; m_off < rw; m_off++) {
-            m_chunk = ( (kryptos_u64_t)(*(mp + (m_off << 3) + 7 )) << 56 ) |
+            m_chunk = ( (kryptos_u64_t)(*(mp + (m_off << 3) + 7)) << 56 ) |
                       ( (kryptos_u64_t)(*(mp + (m_off << 3) + 6)) << 48 ) |
                       ( (kryptos_u64_t)(*(mp + (m_off << 3) + 5)) << 40 ) |
                       ( (kryptos_u64_t)(*(mp + (m_off << 3) + 4)) << 32 ) |
@@ -1036,7 +1050,7 @@ static void kryptos_keccak_sponge_1600(struct kryptos_keccak_ctx *ctx) {
 
         default:
 #ifdef KRYPTOS_KECCAK_ARBITRARY_OUTPUT
-            // WARN(Rafael): This is a inefficient way of implementing the absorving phase. However, this default
+            // WARN(Rafael): This is a inefficient way of implementing the squeezing phase. However, this default
             //               loop stuff for 'non-standard' bit-sizes makes easier sponge's extensions. Anyway, if
             //               a new standard output size show up it may be processed outside this default case.
             //
@@ -1142,23 +1156,37 @@ static void kryptos_keccak_r1600(kryptos_u64_t state[5][5]) {
 
 #undef KRYPTOS_KECCAK_1600_ROUNDS_NR
 
-#undef KRYPTOS_KECCAK_1600_BYTES_PER_BLOCK
-
 #undef KRYPTOS_KECCAK_224_HASH_SIZE
+
+#undef KRYPTOS_KECCAK_224_BYTES_PER_BLOCK
 
 #undef KRYPTOS_KECCAK_256_HASH_SIZE
 
+#undef KRYPTOS_KECCAK_256_BYTES_PER_BLOCK
+
 #undef KRYPTOS_KECCAK_384_HASH_SIZE
+
+#undef KRYPTOS_KECCAK_384_BYTES_PER_BLOCK
 
 #undef KRYPTOS_KECCAK_512_HASH_SIZE
 
+#undef KRYPTOS_KECCAK_512_BYTES_PER_BLOCK
+
 #undef KRYPTOS_SHA3_224_HASH_SIZE
+
+#undef KRYPTOS_SHA3_224_BYTES_PER_BLOCK
 
 #undef KRYPTOS_SHA3_256_HASH_SIZE
 
+#undef KRYPTOS_SHA3_256_BYTES_PER_BLOCK
+
 #undef KRYPTOS_SHA3_384_HASH_SIZE
 
+#undef KRYPTOS_SHA3_384_BYTES_PER_BLOCK
+
 #undef KRYPTOS_SHA3_512_HASH_SIZE
+
+#undef KRYPTOS_SHA3_512_BYTES_PER_BLOCK
 
 #ifdef KRYPTOS_KECCAK_ARBITRARY_OUTPUT
 # undef KRYPTOS_KECCAK_ARBITRARY_OUPUT
