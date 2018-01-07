@@ -803,7 +803,10 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha3_512, ktask, kryptos_keccak_ctx, ctx, sha3_512_e
 static void kryptos_keccak_sponge_1600(struct kryptos_keccak_ctx *ctx) {
     size_t x, y;
     size_t d;
-    kryptos_u8_t *m, *mp, *mp_end, *zp, *zp_end;
+    kryptos_u8_t *m, *mp, *mp_end, *zp;
+#ifdef KRYPTOS_KECCAK_ARBITRARY_OUTPUT
+    kryptos_u8_t *zp_end;
+#endif
     size_t m_size, b_size, rw, m_off;
     kryptos_u64_t m_chunk;
 
