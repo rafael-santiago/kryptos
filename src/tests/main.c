@@ -23,7 +23,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_padding_tests);
     CUTE_RUN_TEST(kryptos_get_random_block_tests);
     CUTE_RUN_TEST(kryptos_block_parser_tests);
-    CUTE_RUN_TEST(kryptos_endianess_utils_tests);
+    CUTE_RUN_TEST(kryptos_endianness_utils_tests);
     CUTE_RUN_TEST(kryptos_apply_iv_tests);
     CUTE_RUN_TEST(kryptos_iv_data_flush_tests);
     CUTE_RUN_TEST(kryptos_task_check_tests);

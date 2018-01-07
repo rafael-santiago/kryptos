@@ -168,7 +168,7 @@ KUTE_TEST_CASE(kryptos_block_parser_tests)
     kryptos_freeseg(out);
 KUTE_TEST_CASE_END
 
-KUTE_TEST_CASE(kryptos_endianess_utils_tests)
+KUTE_TEST_CASE(kryptos_endianness_utils_tests)
     kryptos_u8_t *data = NULL;
     kryptos_u32_t deadbeef = 0;
     kryptos_u16_t beef = 0;

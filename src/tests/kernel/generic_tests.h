@@ -16,7 +16,7 @@ KUTE_DECLARE_TEST_CASE(kryptos_get_random_block_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_block_parser_tests);
 
-KUTE_DECLARE_TEST_CASE(kryptos_endianess_utils_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_endianness_utils_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_apply_iv_tests);
 
