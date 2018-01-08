@@ -1053,7 +1053,7 @@ static void kryptos_keccak_sponge_1600(struct kryptos_keccak_ctx *ctx) {
 
         default:
 #ifdef KRYPTOS_KECCAK_ARBITRARY_OUTPUT
-            // WARN(Rafael): This is a inefficient way of implementing the squeezing phase. However, this default
+            // WARN(Rafael): This is an inefficient way of implementing the squeezing phase. However, this default
             //               loop stuff for 'non-standard' bit-sizes makes easier sponge's extensions. Anyway, if
             //               a new standard output size show up it may be processed outside this default case.
             //
