@@ -15,11 +15,11 @@
 void kryptos_hash_apply_pad_on_u32_block(kryptos_u32_t *input, size_t const input_nr,
                                          const size_t *block_index_decision_table,
                                          const kryptos_u64_t curr_len, const kryptos_u64_t total_len,
-                                         int *paddin2times, kryptos_u32_t len_block_offset) {
+                                         int *paddin2times, const kryptos_u8_t padtok, kryptos_u32_t len_block_offset) {
     size_t b = block_index_decision_table[curr_len], shlv;
     if (*paddin2times == 0) {
         shlv = 24 - ((curr_len % 4) << 3);
-        input[b] = (input[b] << 8 | 0x80) << shlv;
+        input[b] = (input[b] << 8 | padtok) << shlv;
     }
 
     if (curr_len < len_block_offset || *paddin2times) {
@@ -53,11 +53,11 @@ void kryptos_hash_ld_u8buf_as_u32_blocks(kryptos_u8_t *buffer, const int buffer_
 void kryptos_hash_apply_pad_on_u64_block(kryptos_u64_t *input, size_t const input_nr,
                                          const size_t *block_index_decision_table,
                                          const kryptos_u64_t curr_len, const kryptos_u64_t total_len,
-                                         int *paddin2times, kryptos_u64_t len_block_offset) {
+                                         int *paddin2times, const kryptos_u8_t padtok, kryptos_u64_t len_block_offset) {
     size_t b = block_index_decision_table[curr_len], shlv;
     if (*paddin2times == 0) {
         shlv = 56 - ((curr_len % 8) << 3);
-        input[b] = (input[b] << 8 | 0x80) << shlv;
+        input[b] = (input[b] << 8 | padtok) << shlv;
     }
 
     if (curr_len < len_block_offset || *paddin2times) {

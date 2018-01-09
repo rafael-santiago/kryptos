@@ -14,7 +14,9 @@
 # include <string.h>
 #endif
 
-// TODO(Rafael): Implement the tests.
+// WARN(Rafael): Tiger assumes little-endian convention, so do not be afraid if the world seems upside down while reading
+//               this code. My intention here was create a more endianness free stuff, then some 'dirty' tricks were
+//               applied.
 
 // INFO(Rafael): T1 .. T4 S-Boxes.
 
@@ -86,70 +88,70 @@ static kryptos_u64_t kryptos_tiger_t1[256] = {
 };
 
 static kryptos_u64_t kryptos_tiger_t2[256] = {
-    0x02AAB17CF7E90C5E, 0xAC424B03E243A8EC, 0x72CD5BE30DD5FCD3, 0x6D019B93F6F97F3A,
-    0xCD9978FFD21F9193, 0x7573A1C9708029E2, 0xB164326B922A83C3, 0x46883EEE04915870,
-    0xEAACE3057103ECE6, 0xC54169B808A3535C, 0x4CE754918DDEC47C, 0x0AA2F4DFDC0DF40C,
-    0x10B76F18A74DBEFA, 0xC6CCB6235AD1AB6A, 0x13726121572FE2FF, 0x1A488C6F199D921E,
-    0x4BC9F9F4DA0007CA, 0x26F5E6F6E85241C7, 0x859079DBEA5947B6, 0x4F1885C5C99E8C92,
-    0xD78E761EA96F864B, 0x8E36428C52B5C17D, 0x69CF6827373063C1, 0xB607C93D9BB4C56E,
-    0x7D820E760E76B5EA, 0x645C9CC6F07FDC42, 0xBF38A078243342E0, 0x5F6B343C9D2E7D04,
-    0xF2C28AEB600B0EC6, 0x6C0ED85F7254BCAC, 0x71592281A4DB4FE5, 0x1967FA69CE0FED9F,
-    0xFD5293F8B96545DB, 0xC879E9D7F2A7600B, 0x860248920193194E, 0xA4F9533B2D9CC0B3,
-    0x9053836C15957613, 0xDB6DCF8AFC357BF1, 0x18BEEA7A7A370F57, 0x037117CA50B99066,
-    0x6AB30A9774424A35, 0xF4E92F02E325249B, 0x7739DB07061CCAE1, 0xD8F3B49CECA42A05,
-    0xBD56BE3F51382F73, 0x45FAED5843B0BB28, 0x1C813D5C11BF1F83, 0x8AF0E4B6D75FA169,
-    0x33EE18A487AD9999, 0x3C26E8EAB1C94410, 0xB510102BC0A822F9, 0x141EEF310CE6123B,
-    0xFC65B90059DDB154, 0xE0158640C5E0E607, 0x884E079826C3A3CF, 0x930D0D9523C535FD,
-    0x35638D754E9A2B00, 0x4085FCCF40469DD5, 0xC4B17AD28BE23A4C, 0xCAB2F0FC6A3E6A2E,
-    0x2860971A6B943FCD, 0x3DDE6EE212E30446, 0x6222F32AE01765AE, 0x5D550BB5478308FE,
-    0xA9EFA98DA0EDA22A, 0xC351A71686C40DA7, 0x1105586D9C867C84, 0xDCFFEE85FDA22853,
-    0xCCFBD0262C5EEF76, 0xBAF294CB8990D201, 0xE69464F52AFAD975, 0x94B013AFDF133E14,
-    0x06A7D1A32823C958, 0x6F95FE5130F61119, 0xD92AB34E462C06C0, 0xED7BDE33887C71D2,
-    0x79746D6E6518393E, 0x5BA419385D713329, 0x7C1BA6B948A97564, 0x31987C197BFDAC67,
-    0xDE6C23C44B053D02, 0x581C49FED002D64D, 0xDD474D6338261571, 0xAA4546C3E473D062,
-    0x928FCE349455F860, 0x48161BBACAAB94D9, 0x63912430770E6F68, 0x6EC8A5E602C6641C,
-    0x87282515337DDD2B, 0x2CDA6B42034B701B, 0xB03D37C181CB096D, 0xE108438266C71C6F,
-    0x2B3180C7EB51B255, 0xDF92B82F96C08BBC, 0x5C68C8C0A632F3BA, 0x5504CC861C3D0556,
-    0xABBFA4E55FB26B8F, 0x41848B0AB3BACEB4, 0xB334A273AA445D32, 0xBCA696F0A85AD881,
-    0x24F6EC65B528D56C, 0x0CE1512E90F4524A, 0x4E9DD79D5506D35A, 0x258905FAC6CE9779,
-    0x2019295B3E109B33, 0xF8A9478B73A054CC, 0x2924F2F934417EB0, 0x3993357D536D1BC4,
-    0x38A81AC21DB6FF8B, 0x47C4FBF17D6016BF, 0x1E0FAADD7667E3F5, 0x7ABCFF62938BEB96,
-    0xA78DAD948FC179C9, 0x8F1F98B72911E50D, 0x61E48EAE27121A91, 0x4D62F7AD31859808,
-    0xECEBA345EF5CEAEB, 0xF5CEB25EBC9684CE, 0xF633E20CB7F76221, 0xA32CDF06AB8293E4,
-    0x985A202CA5EE2CA4, 0xCF0B8447CC8A8FB1, 0x9F765244979859A3, 0xA8D516B1A1240017,
-    0x0BD7BA3EBB5DC726, 0xE54BCA55B86ADB39, 0x1D7A3AFD6C478063, 0x519EC608E7669EDD,
-    0x0E5715A2D149AA23, 0x177D4571848FF194, 0xEEB55F3241014C22, 0x0F5E5CA13A6E2EC2,
-    0x8029927B75F5C361, 0xAD139FABC3D6E436, 0x0D5DF1A94CCF402F, 0x3E8BD948BEA5DFC8,
-    0xA5A0D357BD3FF77E, 0xA2D12E251F74F645, 0x66FD9E525E81A082, 0x2E0C90CE7F687A49,
-    0xC2E8BCBEBA973BC5, 0x000001BCE509745F, 0x423777BBE6DAB3D6, 0xD1661C7EAEF06EB5,
-    0xA1781F354DAACFD8, 0x2D11284A2B16AFFC, 0xF1FC4F67FA891D1F, 0x73ECC25DCB920ADA,
-    0xAE610C22C2A12651, 0x96E0A810D356B78A, 0x5A9A381F2FE7870F, 0xD5AD62EDE94E5530,
-    0xD225E5E8368D1427, 0x65977B70C7AF4631, 0x99F889B2DE39D74F, 0x233F30BF54E1D143,
-    0x9A9675D3D9A63C97, 0x5470554FF334F9A8, 0x166ACB744A4F5688, 0x70C74CAAB2E4AEAD,
-    0xF0D091646F294D12, 0x57B82A89684031D1, 0xEFD95A5A61BE0B6B, 0x2FBD12E969F2F29A,
-    0x9BD37013FEFF9FE8, 0x3F9B0404D6085A06, 0x4940C1F3166CFE15, 0x09542C4DCDF3DEFB,
-    0xB4C5218385CD5CE3, 0xC935B7DC4462A641, 0x3417F8A68ED3B63F, 0xB80959295B215B40,
-    0xF99CDAEF3B8C8572, 0x018C0614F8FCB95D, 0x1B14ACCD1A3ACDF3, 0x84D471F200BB732D,
-    0xC1A3110E95E8DA16, 0x430A7220BF1A82B8, 0xB77E090D39DF210E, 0x5EF4BD9F3CD05E9D,
-    0x9D4FF6DA7E57A444, 0xDA1D60E183D4A5F8, 0xB287C38417998E47, 0xFE3EDC121BB31886,
-    0xC7FE3CCC980CCBEF, 0xE46FB590189BFD03, 0x3732FD469A4C57DC, 0x7EF700A07CF1AD65,
-    0x59C64468A31D8859, 0x762FB0B4D45B61F6, 0x155BAED099047718, 0x68755E4C3D50BAA6,
-    0xE9214E7F22D8B4DF, 0x2ADDBF532EAC95F4, 0x32AE3909B4BD0109, 0x834DF537B08E3450,
-    0xFA209DA84220728D, 0x9E691D9B9EFE23F7, 0x0446D288C4AE8D7F, 0x7B4CC524E169785B,
-    0x21D87F0135CA1385, 0xCEBB400F137B8AA5, 0x272E2B66580796BE, 0x3612264125C2B0DE,
-    0x057702BDAD1EFBB2, 0xD4BABB8EACF84BE9, 0x91583139641BC67B, 0x8BDC2DE08036E024,
-    0x603C8156F49F68ED, 0xF7D236F7DBEF5111, 0x9727C4598AD21E80, 0xA08A0896670A5FD7,
-    0xCB4A8F4309EBA9CB, 0x81AF564B0F7036A1, 0xC0B99AA778199ABD, 0x959F1EC83FC8E952,
-    0x8C505077794A81B9, 0x3ACAAF8F056338F0, 0x07B43F50627A6778, 0x4A44AB49F5ECCC77,
-    0x3BC3D6E4B679EE98, 0x9CC0D4D1CF14108C, 0x4406C00B206BC8A0, 0x82A18854C8D72D89,
-    0x67E366B35C3C432C, 0xB923DD61102B37F2, 0x56AB2779D884271D, 0xBE83E1B0FF1525AF,
-    0xFB7C65D4217E49A9, 0x6BDBE0E76D48E7D4, 0x08DF828745D9179E, 0x22EA6A9ADD53BD34,
-    0xE36E141C5622200A, 0x7F805D1B8CB750EE, 0xAFE5C7A59F58E837, 0xE27F996A4FB1C23C,
-    0xD3867DFB0775F0D0, 0xD0E673DE6E88891A, 0x123AEB9EAFB86C25, 0x30F1D5D5C145B895,
-    0xBB434A2DEE7269E7, 0x78CB67ECF931FA38, 0xF33B0372323BBF9C, 0x52D66336FB279C74,
-    0x505F33AC0AFB4EAA, 0xE8A5CD99A2CCE187, 0x534974801E2D30BB, 0x8D2D5711D5876D90,
-    0x1F1A412891BC038E, 0xD6E2E71D82E56648, 0x74036C3A497732B7, 0x89B67ED96361F5AB,
-    0xFFED95D8F1EA02A2, 0xE72B3BD61464D43D, 0xA6300F170BDC4820, 0xEBC18760ED78A77A
+    0xE6A6BE5A05A12138, 0xB5A122A5B4F87C98, 0x563C6089140B6990, 0x4C46CB2E391F5DD5,
+    0xD932ADDBC9B79434, 0x08EA70E42015AFF5, 0xD765A6673E478CF1, 0xC4FB757EAB278D99,
+    0xDF11C6862D6E0692, 0xDDEB84F10D7F3B16, 0x6F2EF604A665EA04, 0x4A8E0F0FF0E0DFB3,
+    0xA5EDEEF83DBCBA51, 0xFC4F0A2A0EA4371E, 0xE83E1DA85CB38429, 0xDC8FF882BA1B1CE2,
+    0xCD45505E8353E80D, 0x18D19A00D4DB0717, 0x34A0CFEDA5F38101, 0x0BE77E518887CAF2,
+    0x1E341438B3C45136, 0xE05797F49089CCF9, 0xFFD23F9DF2591D14, 0x543DDA228595C5CD,
+    0x661F81FD99052A33, 0x8736E641DB0F7B76, 0x15227725418E5307, 0xE25F7F46162EB2FA,
+    0x48A8B2126C13D9FE, 0xAFDC541792E76EEA, 0x03D912BFC6D1898F, 0x31B1AAFA1B83F51B,
+    0xF1AC2796E42AB7D9, 0x40A3A7D7FCD2EBAC, 0x1056136D0AFBBCC5, 0x7889E1DD9A6D0C85,
+    0xD33525782A7974AA, 0xA7E25D09078AC09B, 0xBD4138B3EAC6EDD0, 0x920ABFBE71EB9E70,
+    0xA2A5D0F54FC2625C, 0xC054E36B0B1290A3, 0xF6DD59FF62FE932B, 0x3537354511A8AC7D,
+    0xCA845E9172FADCD4, 0x84F82B60329D20DC, 0x79C62CE1CD672F18, 0x8B09A2ADD124642C,
+    0xD0C1E96A19D9E726, 0x5A786A9B4BA9500C, 0x0E020336634C43F3, 0xC17B474AEB66D822,
+    0x6A731AE3EC9BAAC2, 0x8226667AE0840258, 0x67D4567691CAECA5, 0x1D94155C4875ADB5,
+    0x6D00FD985B813FDF, 0x51286EFCB774CD06, 0x5E8834471FA744AF, 0xF72CA0AEE761AE2E,
+    0xBE40E4CDAEE8E09A, 0xE9970BBB5118F665, 0x726E4BEB33DF1964, 0x703B000729199762,
+    0x4631D816F5EF30A7, 0xB880B5B51504A6BE, 0x641793C37ED84B6C, 0x7B21ED77F6E97D96,
+    0x776306312EF96B73, 0xAE528948E86FF3F4, 0x53DBD7F286A3F8F8, 0x16CADCE74CFC1063,
+    0x005C19BDFA52C6DD, 0x68868F5D64D46AD3, 0x3A9D512CCF1E186A, 0x367E62C2385660AE,
+    0xE359E7EA77DCB1D7, 0x526C0773749ABE6E, 0x735AE5F9D09F734B, 0x493FC7CC8A558BA8,
+    0xB0B9C1533041AB45, 0x321958BA470A59BD, 0x852DB00B5F46C393, 0x91209B2BD336B0E5,
+    0x6E604F7D659EF19F, 0xB99A8AE2782CCB24, 0xCCF52AB6C814C4C7, 0x4727D9AFBE11727B,
+    0x7E950D0C0121B34D, 0x756F435670AD471F, 0xF5ADD442615A6849, 0x4E87E09980B9957A,
+    0x2ACFA1DF50AEE355, 0xD898263AFD2FD556, 0xC8F4924DD80C8FD6, 0xCF99CA3D754A173A,
+    0xFE477BACAF91BF3C, 0xED5371F6D690C12D, 0x831A5C285E687094, 0xC5D3C90A3708A0A4,
+    0x0F7F903717D06580, 0x19F9BB13B8FDF27F, 0xB1BD6F1B4D502843, 0x1C761BA38FFF4012,
+    0x0D1530C4E2E21F3B, 0x8943CE69A7372C8A, 0xE5184E11FEB5CE66, 0x618BDB80BD736621,
+    0x7D29BAD68B574D0B, 0x81BB613E25E6FE5B, 0x071C9C10BC07913F, 0xC7BEEB7909AC2D97,
+    0xC3E58D353BC5D757, 0xEB017892F38F61E8, 0xD4EFFB9C9B1CC21A, 0x99727D26F494F7AB,
+    0xA3E063A2956B3E03, 0x9D4A8B9A4AA09C30, 0x3F6AB7D500090FB4, 0x9CC0F2A057268AC0,
+    0x3DEE9D2DEDBF42D1, 0x330F49C87960A972, 0xC6B2720287421B41, 0x0AC59EC07C00369C,
+    0xEF4EAC49CB353425, 0xF450244EEF0129D8, 0x8ACC46E5CAF4DEB6, 0x2FFEAB63989263F7,
+    0x8F7CB9FE5D7A4578, 0x5BD8F7644E634635, 0x427A7315BF2DC900, 0x17D0C4AA2125261C,
+    0x3992486C93518E50, 0xB4CBFEE0A2D7D4C3, 0x7C75D6202C5DDD8D, 0xDBC295D8E35B6C61,
+    0x60B369D302032B19, 0xCE42685FDCE44132, 0x06F3DDB9DDF65610, 0x8EA4D21DB5E148F0,
+    0x20B0FCE62FCD496F, 0x2C1B912358B0EE31, 0xB28317B818F5A308, 0xA89C1E189CA6D2CF,
+    0x0C6B18576AAADBC8, 0xB65DEAA91299FAE3, 0xFB2B794B7F1027E7, 0x04E4317F443B5BEB,
+    0x4B852D325939D0A6, 0xD5AE6BEEFB207FFC, 0x309682B281C7D374, 0xBAE309A194C3B475,
+    0x8CC3F97B13B49F05, 0x98A9422FF8293967, 0x244B16B01076FF7C, 0xF8BF571C663D67EE,
+    0x1F0D6758EEE30DA1, 0xC9B611D97ADEB9B7, 0xB7AFD5887B6C57A2, 0x6290AE846B984FE1,
+    0x94DF4CDEACC1A5FD, 0x058A5BD1C5483AFF, 0x63166CC142BA3C37, 0x8DB8526EB2F76F40,
+    0xE10880036F0D6D4E, 0x9E0523C9971D311D, 0x45EC2824CC7CD691, 0x575B8359E62382C9,
+    0xFA9E400DC4889995, 0xD1823ECB45721568, 0xDAFD983B8206082F, 0xAA7D29082386A8CB,
+    0x269FCD4403B87588, 0x1B91F5F728BDD1E0, 0xE4669F39040201F6, 0x7A1D7C218CF04ADE,
+    0x65623C29D79CE5CE, 0x2368449096C00BB1, 0xAB9BF1879DA503BA, 0xBC23ECB1A458058E,
+    0x9A58DF01BB401ECC, 0xA070E868A85F143D, 0x4FF188307DF2239E, 0x14D565B41A641183,
+    0xEE13337452701602, 0x950E3DCF3F285E09, 0x59930254B9C80953, 0x3BF299408930DA6D,
+    0xA955943F53691387, 0xA15EDECAA9CB8784, 0x29142127352BE9A0, 0x76F0371FFF4E7AFB,
+    0x0239F450274F2228, 0xBB073AF01D5E868B, 0xBFC80571C10E96C1, 0xD267088568222E23,
+    0x9671A3D48E80B5B0, 0x55B5D38AE193BB81, 0x693AE2D0A18B04B8, 0x5C48B4ECADD5335F,
+    0xFD743B194916A1CA, 0x2577018134BE98C4, 0xE77987E83C54A4AD, 0x28E11014DA33E1B9,
+    0x270CC59E226AA213, 0x71495F756D1A5F60, 0x9BE853FB60AFEF77, 0xADC786A7F7443DBF,
+    0x0904456173B29A82, 0x58BC7A66C232BD5E, 0xF306558C673AC8B2, 0x41F639C6B6C9772A,
+    0x216DEFE99FDA35DA, 0x11640CC71C7BE615, 0x93C43694565C5527, 0xEA038E6246777839,
+    0xF9ABF3CE5A3E2469, 0x741E768D0FD312D2, 0x0144B883CED652C6, 0xC20B5A5BA33F8552,
+    0x1AE69633C3435A9D, 0x97A28CA4088CFDEC, 0x8824A43C1E96F420, 0x37612FA66EEEA746,
+    0x6B4CB165F9CF0E5A, 0x43AA1C06A0ABFB4A, 0x7F4DC26FF162796B, 0x6CBACC8E54ED9B0F,
+    0xA6B7FFEFD2BB253E, 0x2E25BC95B0A29D4F, 0x86D6A58BDEF1388C, 0xDED74AC576B6F054,
+    0x8030BDBC2B45805D, 0x3C81AF70E94D9289, 0x3EFF6DDA9E3100DB, 0xB38DC39FDFCC8847,
+    0x123885528D17B87E, 0xF2DA0ED240B1B642, 0x44CEFADCD54BF9A9, 0x1312200E433C7EE6,
+    0x9FFCC84F3A78C748, 0xF0CD1F72248576BB, 0xEC6974053638CFE4, 0x2BA7B67C0CEC4E4C,
+    0xAC2F4DF3E5CE32ED, 0xCB33D14326EA4C11, 0xA4E9044CC77E58BC, 0x5F513293D934FCEF,
+    0x5DC9645506E55444, 0x50DE418F317DE40A, 0x388CB31A69DDE259, 0x2DB4A83455820A86,
+    0x9010A91E84711AE9, 0x4DF7F0B7B1498371, 0xD62A2EABC0977179, 0x22FAC097AA8D5C0E
 };
 
 static kryptos_u64_t kryptos_tiger_t3[256] = {
@@ -336,7 +338,7 @@ static size_t kryptos_tiger_block_index_decision_table[KRYPTOS_TIGER_BYTES_PER_B
     c ^= x;\
     a -= kryptos_tiger_t1[kryptos_tiger_c_0(c)] ^ kryptos_tiger_t2[kryptos_tiger_c_2(c)] ^\
          kryptos_tiger_t3[kryptos_tiger_c_4(c)] ^ kryptos_tiger_t4[kryptos_tiger_c_6(c)];\
-    b -= kryptos_tiger_t4[kryptos_tiger_c_1(c)] ^ kryptos_tiger_t3[kryptos_tiger_c_3(c)] ^\
+    b += kryptos_tiger_t4[kryptos_tiger_c_1(c)] ^ kryptos_tiger_t3[kryptos_tiger_c_3(c)] ^\
          kryptos_tiger_t2[kryptos_tiger_c_5(c)] ^ kryptos_tiger_t1[kryptos_tiger_c_7(c)];\
     b *= m;\
 }
@@ -374,6 +376,15 @@ static size_t kryptos_tiger_block_index_decision_table[KRYPTOS_TIGER_BYTES_PER_B
     b -= bb;\
     c += cc;\
 }
+
+#define kryptos_tiger_rev64(x) ( kryptos_tiger_c_0(x) << 56 |\
+                                 kryptos_tiger_c_1(x) << 48 |\
+                                 kryptos_tiger_c_2(x) << 40 |\
+                                 kryptos_tiger_c_3(x) << 32 |\
+                                 kryptos_tiger_c_4(x) << 24 |\
+                                 kryptos_tiger_c_5(x) << 16 |\
+                                 kryptos_tiger_c_6(x) <<  8 |\
+                                 kryptos_tiger_c_7(x) )
 
 struct kryptos_tiger_input_message {
     kryptos_u64_t block[8];
@@ -454,47 +465,66 @@ KRYPTOS_IMPL_HASH_PROCESSOR(tiger, ktask, kryptos_tiger_ctx, ctx, tiger_hash_epi
                                     goto kryptos_tiger_hash_epilogue;
                                 }
                                 (*ktask)->out_size = KRYPTOS_TIGER_HASH_SIZE << 1;
-                                kryptos_u64_to_hex((*ktask)->out, 48, (kryptos_tiger_c_7(ctx.a) << 56)  |
-                                                                      (kryptos_tiger_c_6(ctx.a) << 48)  |
-                                                                      (kryptos_tiger_c_5(ctx.a) << 40)  |
-                                                                      (kryptos_tiger_c_4(ctx.a) << 32)  |
-                                                                      (kryptos_tiger_c_3(ctx.a) << 24)  |
-                                                                      (kryptos_tiger_c_2(ctx.a) << 16)  |
-                                                                      (kryptos_tiger_c_1(ctx.a) <<  8)  |
-                                                                       kryptos_tiger_c_0(ctx.a));
-                                kryptos_u64_to_hex((*ktask)->out, 33, (kryptos_tiger_c_7(ctx.b) << 56)  |
-                                                                      (kryptos_tiger_c_6(ctx.b) << 48)  |
-                                                                      (kryptos_tiger_c_5(ctx.b) << 40)  |
-                                                                      (kryptos_tiger_c_4(ctx.b) << 32)  |
-                                                                      (kryptos_tiger_c_3(ctx.b) << 24)  |
-                                                                      (kryptos_tiger_c_2(ctx.b) << 16)  |
-                                                                      (kryptos_tiger_c_1(ctx.b) <<  8)  |
-                                                                       kryptos_tiger_c_0(ctx.b));
-                                kryptos_u64_to_hex((*ktask)->out, 17, (kryptos_tiger_c_7(ctx.c) << 56)  |
-                                                                      (kryptos_tiger_c_6(ctx.c) << 48)  |
-                                                                      (kryptos_tiger_c_5(ctx.c) << 40)  |
-                                                                      (kryptos_tiger_c_4(ctx.c) << 32)  |
-                                                                      (kryptos_tiger_c_3(ctx.c) << 24)  |
-                                                                      (kryptos_tiger_c_2(ctx.c) << 16)  |
-                                                                      (kryptos_tiger_c_1(ctx.c) <<  8)  |
-                                                                       kryptos_tiger_c_0(ctx.c));
+                                kryptos_u64_to_hex((*ktask)->out,      48, (kryptos_tiger_c_0(ctx.a) << 56)  |
+                                                                           (kryptos_tiger_c_1(ctx.a) << 48)  |
+                                                                           (kryptos_tiger_c_2(ctx.a) << 40)  |
+                                                                           (kryptos_tiger_c_3(ctx.a) << 32)  |
+                                                                           (kryptos_tiger_c_4(ctx.a) << 24)  |
+                                                                           (kryptos_tiger_c_5(ctx.a) << 16)  |
+                                                                           (kryptos_tiger_c_6(ctx.a) <<  8)  |
+                                                                            kryptos_tiger_c_7(ctx.a));
+                                kryptos_u64_to_hex((*ktask)->out + 16, 33, (kryptos_tiger_c_0(ctx.b) << 56)  |
+                                                                           (kryptos_tiger_c_1(ctx.b) << 48)  |
+                                                                           (kryptos_tiger_c_2(ctx.b) << 40)  |
+                                                                           (kryptos_tiger_c_3(ctx.b) << 32)  |
+                                                                           (kryptos_tiger_c_4(ctx.b) << 24)  |
+                                                                           (kryptos_tiger_c_5(ctx.b) << 16)  |
+                                                                           (kryptos_tiger_c_6(ctx.b) <<  8)  |
+                                                                            kryptos_tiger_c_7(ctx.b));
+                                kryptos_u64_to_hex((*ktask)->out + 32, 17, (kryptos_tiger_c_0(ctx.c) << 56)  |
+                                                                           (kryptos_tiger_c_1(ctx.c) << 48)  |
+                                                                           (kryptos_tiger_c_2(ctx.c) << 40)  |
+                                                                           (kryptos_tiger_c_3(ctx.c) << 32)  |
+                                                                           (kryptos_tiger_c_4(ctx.c) << 24)  |
+                                                                           (kryptos_tiger_c_5(ctx.c) << 16)  |
+                                                                           (kryptos_tiger_c_6(ctx.c) <<  8)  |
+                                                                            kryptos_tiger_c_7(ctx.c));
                             })
 
 static void kryptos_tiger_init(struct kryptos_tiger_ctx *ctx) {
     ctx->a = 0x0123456789ABCDEF;
     ctx->b = 0xFEDCBA9876543210;
     ctx->c = 0xF096A5B4C3B2E187;
+    ctx->paddin2times = 0;
 }
 
 static void kryptos_tiger_do_block(struct kryptos_tiger_ctx *ctx) {
     kryptos_u64_t aa, bb, cc;
 
     if (ctx->curr_len < KRYPTOS_TIGER_BYTES_PER_BLOCK) {
+        // INFO(Rafael): Unlike SHA-n and *MDn hashing algorithm families,
+        //               TIGER uses 0x01 (instead of 0x80) as his 'token pad'.
         kryptos_hash_apply_pad_on_u64_block(ctx->input.block, 8,
                                             kryptos_tiger_block_index_decision_table,
-                                            ctx->curr_len, ctx->total_len, &ctx->paddin2times,
+                                            ctx->curr_len, ctx->total_len, &ctx->paddin2times, 0x01,
                                             KRYPTOS_TIGER_LEN_BLOCK_OFFSET);
+        if (!ctx->paddin2times) {
+            // WARN(Rafael): For a more endianness free implementation we need to pay the price.
+            ctx->input.block[6] = kryptos_tiger_rev64(ctx->input.block[6]);
+            ctx->input.block[7] = kryptos_tiger_rev64(ctx->input.block[7]);
+        }
     }
+
+    // WARN(Rafael): For a more endianness free implementation we need to pay the price.
+
+    ctx->input.block[0] = kryptos_tiger_rev64(ctx->input.block[0]);
+    ctx->input.block[1] = kryptos_tiger_rev64(ctx->input.block[1]);
+    ctx->input.block[2] = kryptos_tiger_rev64(ctx->input.block[2]);
+    ctx->input.block[3] = kryptos_tiger_rev64(ctx->input.block[3]);
+    ctx->input.block[4] = kryptos_tiger_rev64(ctx->input.block[4]);
+    ctx->input.block[5] = kryptos_tiger_rev64(ctx->input.block[5]);
+    ctx->input.block[6] = kryptos_tiger_rev64(ctx->input.block[6]);
+    ctx->input.block[7] = kryptos_tiger_rev64(ctx->input.block[7]);
 
     kryptos_tiger_computation(ctx->a, ctx->b, ctx->c, aa, bb, cc, ctx->input.block);
 
@@ -533,3 +563,5 @@ static void kryptos_tiger_do_block(struct kryptos_tiger_ctx *ctx) {
 #undef kryptos_tiger_key_sched
 
 #undef kryptos_tiger_feedforward
+
+#undef kryptos_tiger_rev64

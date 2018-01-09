@@ -1142,7 +1142,7 @@ KUTE_TEST_CASE(kryptos_hash_common_tests)
     kryptos_hash_apply_pad_on_u32_block(u32_input, 16,
                                         index_decision_table32,
                                         curr_len, total_len,
-                                        &paddin2times, 56);
+                                        &paddin2times, 0x80, 56);
 
     KUTE_ASSERT(u32_input[ 0] == 0x61626380);
     KUTE_ASSERT(u32_input[ 1] == 0x0);
@@ -1169,7 +1169,7 @@ KUTE_TEST_CASE(kryptos_hash_common_tests)
     kryptos_hash_apply_pad_on_u32_block(u32_input, 16,
                                         index_decision_table32,
                                         curr_len, total_len,
-                                        &paddin2times, 56);
+                                        &paddin2times, 0x80, 56);
     KUTE_ASSERT(paddin2times == 1);
 
     paddin2times = 0;
@@ -1201,7 +1201,7 @@ KUTE_TEST_CASE(kryptos_hash_common_tests)
     kryptos_hash_apply_pad_on_u64_block(u64_input, 16,
                                         index_decision_table64,
                                         curr_len, total_len,
-                                        &paddin2times, 120);
+                                        &paddin2times, 0x80, 120);
 
     KUTE_ASSERT(u64_input[ 0] == 0x6162638000000000);
     KUTE_ASSERT(u64_input[ 1] == 0x0);
@@ -1228,6 +1228,6 @@ KUTE_TEST_CASE(kryptos_hash_common_tests)
     kryptos_hash_apply_pad_on_u64_block(u64_input, 16,
                                         index_decision_table64,
                                         curr_len, total_len,
-                                        &paddin2times, 120);
+                                        &paddin2times, 0x80, 120);
     KUTE_ASSERT(paddin2times == 1);
 KUTE_TEST_CASE_END

@@ -254,7 +254,7 @@ static void kryptos_sha224_256_do_block(struct kryptos_sha224_256_ctx *ctx) {
     if (ctx->curr_len < KRYPTOS_SHA224_256_BYTES_PER_BLOCK) {
         kryptos_hash_apply_pad_on_u32_block(ctx->input.block, 16,
                                             kryptos_sha224_256_block_index_decision_table,
-                                            ctx->curr_len, ctx->total_len, &ctx->paddin2times,
+                                            ctx->curr_len, ctx->total_len, &ctx->paddin2times, 0x80,
                                             KRYPTOS_SHA224_256_LEN_BLOCK_OFFSET);
     }
 

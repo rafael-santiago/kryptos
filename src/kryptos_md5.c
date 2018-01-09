@@ -129,7 +129,7 @@ static void kryptos_md5_do_block(struct kryptos_md5_ctx *ctx) {
     if (ctx->curr_len < KRYPTOS_MD5_BYTES_PER_BLOCK) {
         kryptos_hash_apply_pad_on_u32_block(ctx->input.block, 16,
                                             kryptos_md5_block_index_decision_table,
-                                            ctx->curr_len, ctx->total_len, &ctx->paddin2times,
+                                            ctx->curr_len, ctx->total_len, &ctx->paddin2times, 0x80,
                                             KRYPTOS_MD5_LEN_BLOCK_OFFSET);
         if (!ctx->paddin2times) {
             AA = ctx->input.block[14];

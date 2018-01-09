@@ -147,7 +147,7 @@ static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx) {
     if (ctx->curr_len < KRYPTOS_SHA1_BYTES_PER_BLOCK) {
         kryptos_hash_apply_pad_on_u32_block(ctx->input.block, 16,
                                             kryptos_sha1_block_index_decision_table,
-                                            ctx->curr_len, ctx->total_len, &ctx->paddin2times,
+                                            ctx->curr_len, ctx->total_len, &ctx->paddin2times, 0x80,
                                             KRYPTOS_SHA1_LEN_BLOCK_OFFSET);
     }
 

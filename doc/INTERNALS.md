@@ -624,20 +624,24 @@ should add the following "incantation" :)...
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, sha256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, sha384, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, sha512, key, key_size, kKryptosECB);
+    (...)
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, md4, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, md5, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, ripemd128, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, ripemd160, key, key_size, kKryptosECB);
+    (...)
 
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, sha1, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, sha224, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, sha256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, sha384, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, sha512, key, key_size, kKryptosCBC);
+    (...)
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, md4, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, md5, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, ripemd128, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, ripemd160, key, key_size, kKryptosCBC);
+    (...)
 ```
 
 ... congrats! You just added a new well tested stuff...
@@ -703,16 +707,19 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, sha256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, sha384, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, sha512, key, key_size, kKryptosECB);
+    (...)
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, md4, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, md5, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, ripemd128, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, ripemd160, key, key_size, kKryptosECB);
+    (...)
 
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, sha1, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, sha224, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, sha256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, sha384, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, sha512, key, key_size, kKryptosCBC);
+    (...)
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, md4, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, md5, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, foofish, ripemd128, key, key_size, kKryptosCBC);
@@ -896,7 +903,7 @@ static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx) {
     if (ctx->curr_len < KRYPTOS_SHA1_BYTES_PER_BLOCK) {
         kryptos_hash_apply_pad_on_u32_block(ctx->input.block, 16,
                                             kryptos_sha1_block_index_decision_table,
-                                            ctx->curr_len, ctx->total_len, &ctx->paddin2times,
+                                            ctx->curr_len, ctx->total_len, &ctx->paddin2times, 0x80,
                                             KRYPTOS_SHA1_LEN_BLOCK_OFFSET);
     }
 

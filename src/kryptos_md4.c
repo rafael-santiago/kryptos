@@ -144,7 +144,7 @@ static void kryptos_md4_do_block(struct kryptos_md4_ctx *ctx) {
         kryptos_hash_apply_pad_on_u32_block(ctx->input.block, 16,
                                             kryptos_md4_block_index_decision_table,
                                             ctx->curr_len, ctx->total_len,
-                                            &ctx->paddin2times,
+                                            &ctx->paddin2times, 0x80,
                                             KRYPTOS_MD4_LEN_BLOCK_OFFSET);
         if (!ctx->paddin2times) {
             AA = ctx->input.block[14];

@@ -250,7 +250,7 @@ static void kryptos_sha384_512_do_block(struct kryptos_sha384_512_ctx *ctx) {
     if (ctx->curr_len < KRYPTOS_SHA384_512_BYTES_PER_BLOCK) {
         kryptos_hash_apply_pad_on_u64_block(ctx->input.block, 16,
                                             kryptos_sha384_512_block_index_decision_table,
-                                            ctx->curr_len, ctx->total_len, &ctx->paddin2times,
+                                            ctx->curr_len, ctx->total_len, &ctx->paddin2times, 0x80,
                                             KRYPTOS_SHA384_512_LEN_BLOCK_OFFSET);
     }
 
