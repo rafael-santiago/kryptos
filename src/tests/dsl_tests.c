@@ -457,6 +457,7 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 
     // RC2 ECB
+
     rc2_t1 = 128;
 
     kryptos_task_set_in(&task, data, data_size);
