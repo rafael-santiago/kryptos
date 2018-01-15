@@ -127,6 +127,7 @@ typedef enum {
     kKryptosCipher3DESEDE,
     kKryptosCipherIDEA,
     kKryptosCipherRC2,
+    kKryptosCipherRC5,
     kKryptosCipherFEAL,
     kKryptosCipherCAST5,
     kKryptosCipherCAMELLIA,

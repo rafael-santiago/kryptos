@@ -14,6 +14,7 @@
 #include "blowfish_test_vector.h"
 #include "feal_test_vector.h"
 #include "rc2_test_vector.h"
+#include "rc5_test_vector.h"
 #include "camellia_test_vector.h"
 #include "cast5_test_vector.h"
 #include "saferk64_test_vector.h"

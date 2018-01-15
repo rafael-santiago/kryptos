@@ -111,6 +111,7 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 | ``3DES-EDE``     |       Block           |       ``kKryptosCipher3DESEDE``  |
 |   ``IDEA``       |       Block           |       ``kKryptosCipherIDEA``     |
 |    ``RC2``       |       Block           |       ``kKryptosCipherRC2``      |
+|    ``RC5``       |       Block           |       ``kKryptosCipherRC5``      |
 |   ``FEAL``       |       Block           |       ``kKryptosCipherFEAL``     |
 |  ``CAST5``       |       Block           |       ``kKryptosCipherCAST5``    |
 | ``CAMELLIA-128`` |       Block           |       ``kKryptosCipherCAMELLIA`` |
@@ -124,7 +125,7 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 |  ``MISTY1``      |       Block           |       ``kKryptosCipherMISTY1``   |
 
 The available modes of operation for the block ciphers are: ``ECB``, ``CBC`` and ``OFB``. So in practice, considering the
-``OFB`` mode, we have 21 stream ciphers instead of only two. More on cipher modes will be treated later.
+``OFB`` mode, we have 22 stream ciphers instead of only two. More on cipher modes will be treated later.
 
 The way of indicating the desired cipher for an encryption task is by setting the field ``cipher`` from the ``kryptos_task_ctx``
 to the ``Internal constant ID`` listed in **Table 1**.

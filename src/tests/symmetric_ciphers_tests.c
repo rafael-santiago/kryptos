@@ -611,3 +611,40 @@ CUTE_TEST_CASE_END
 CUTE_TEST_CASE(kryptos_misty1_tests)
     kryptos_run_block_cipher_tests(misty1, KRYPTOS_MISTY1_BLOCKSIZE);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc5_tests)
+    struct rc5_rounds_ctx {
+        int rounds;
+    };
+    struct rc5_rounds_ctx rc5_rounds[] = {
+        { 12 }, { 12 }, { 12 }, { 12 }, { 12 }, { 12 }, { 12 }, { 12 },
+        { 12 }, { 12 }, { 12 }, { 12 }, { 12 }, { 12 }, { 12 }, { 12 },
+        { 12 }, { 12 }, { 12 }, { 12 }, { 12 }, { 12 }, { 12 }, { 12 },
+        { 12 }, { 12 }, { 12 }, { 12 }, { 12 }, { 12 }, { 12 }, { 12 },
+        { 12 }, { 12 }
+    };
+    size_t rc5_rounds_nr = sizeof(rc5_rounds) / sizeof(rc5_rounds[0]);
+    kryptos_task_ctx t;
+    size_t tv;
+
+    kryptos_run_block_cipher_tests_with_custom_setup(rc5,
+                                                     KRYPTOS_RC5_BLOCKSIZE,
+                                                     t,
+                                                     tv,
+                                                     rc5_rounds, rc5_rounds_nr,
+                                                     kryptos_rc5_setup(&t,
+                                                                        rc5_test_vector[tv % rc5_rounds_nr].key,
+                                                                        rc5_test_vector[tv % rc5_rounds_nr].key_size,
+                                                                        kKryptosECB,
+                                                                        &rc5_rounds[tv % rc5_rounds_nr].rounds),
+                                                     kryptos_rc5_setup(&t,
+                                                                        rc5_test_vector[tv % rc5_rounds_nr].key,
+                                                                        rc5_test_vector[tv % rc5_rounds_nr].key_size,
+                                                                        kKryptosCBC,
+                                                                        &rc5_rounds[tv % rc5_rounds_nr].rounds),
+                                                     kryptos_rc5_setup(&t,
+                                                                        rc5_test_vector[tv % rc5_rounds_nr].key,
+                                                                        rc5_test_vector[tv % rc5_rounds_nr].key_size,
+                                                                        kKryptosOFB,
+                                                                        &rc5_rounds[tv % rc5_rounds_nr].rounds));
+CUTE_TEST_CASE_END
