@@ -14,6 +14,7 @@
 #include <kryptos_cast5.h>
 #include <kryptos_rc2.h>
 #include <kryptos_rc5.h>
+#include <kryptos_rc6.h>
 #include <kryptos_saferk64.h>
 #include <kryptos_aes.h>
 #include <kryptos_serpent.h>
@@ -341,6 +342,10 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
 
         case kKryptosCipherRC5:
             return ((*ktask)->iv_size == KRYPTOS_RC5_BLOCKSIZE);
+            break;
+
+        case kKryptosCipherRC6:
+            return ((*ktask)->iv_size == KRYPTOS_RC6_BLOCKSIZE);
             break;
 
         case kKryptosCipherSAFERK64:

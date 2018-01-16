@@ -24,6 +24,7 @@
 #include <kryptos_cast5.h>
 #include <kryptos_rc2.h>
 #include <kryptos_rc5.h>
+#include <kryptos_rc6.h>
 #include <kryptos_saferk64.h>
 #include <kryptos_aes.h>
 #include <kryptos_serpent.h>
