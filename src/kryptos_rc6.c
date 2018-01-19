@@ -51,13 +51,151 @@ struct kryptos_rc6_subkeys {
 
 typedef void (*kryptos_rc6_block_processor)(kryptos_u8_t *block, const struct kryptos_rc6_subkeys *sks);
 
-void kryptos_rc6_ksched(const kryptos_u8_t *user_key, const size_t user_key_size, struct kryptos_rc6_subkeys *sks);
+static void kryptos_rc6_ksched(const kryptos_u8_t *user_key, const size_t user_key_size, struct kryptos_rc6_subkeys *sks);
 
-void kryptos_rc6_ld_user_key(kryptos_u32_t *l, const kryptos_u8_t *key, const size_t key_size);
+static void kryptos_rc6_ld_user_key(kryptos_u32_t *l, const kryptos_u8_t *key, const size_t key_size);
 
-void kryptos_rc6_block_encrypt(kryptos_u8_t *block, const struct kryptos_rc6_subkeys *sks);
+static void kryptos_rc6_block_encrypt(kryptos_u8_t *block, const struct kryptos_rc6_subkeys *sks);
 
-void kryptos_rc6_block_decrypt(kryptos_u8_t *block, const struct kryptos_rc6_subkeys *sks);
+static void kryptos_rc6_block_decrypt(kryptos_u8_t *block, const struct kryptos_rc6_subkeys *sks);
+
+KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(rc6_128, ktask, kKryptosCipherRC6, KRYPTOS_RC6_BLOCKSIZE, int *rounds,
+                                       {
+                                            if (rounds != NULL) {
+                                                ktask->arg[0] = rounds;
+                                            } else {
+                                                ktask->arg[0] = NULL;
+                                            }
+                                        })
+
+KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(rc6_128,
+                                    ktask,
+                                    kryptos_rc6_subkeys,
+                                    sks,
+                                    kryptos_rc6_block_processor,
+                                    rc6_block_processor,
+                                    {
+                                        if ((*ktask)->key_size > 16) {
+                                            (*ktask)->result = kKryptosKeyError;
+                                            (*ktask)->result_verbose = "RC6 key size greater than 16 bytes.";
+                                            goto kryptos_rc6_128_cipher_epilogue;
+                                        }
+                                        if ((*ktask)->arg[0] == NULL) {
+                                            (*ktask)->result = kKryptosInvalidParams;
+                                            (*ktask)->result_verbose = "RC6 round parameter is missing.";
+                                            goto kryptos_rc6_128_cipher_epilogue;
+                                        }
+                                        sks.rounds = *(int *)(*ktask)->arg[0];
+                                        if (sks.rounds < 1) {
+                                            (*ktask)->result = kKryptosInvalidParams;
+                                            (*ktask)->result_verbose = "RC6 rounds underflow.";
+                                            goto kryptos_rc6_128_cipher_epilogue;
+                                        } else if (((sks.rounds + 2) << 1) > kryptos_rc6_K_NR) {
+                                            (*ktask)->result = kKryptosInvalidParams;
+                                            (*ktask)->result_verbose = "RC6 rounds overflow.";
+                                            goto kryptos_rc6_128_cipher_epilogue;
+                                        }
+                                        sks.ksize = kKryptosRC6128;
+                                        kryptos_rc6_ksched((*ktask)->key, (*ktask)->key_size, &sks);
+                                    },
+                                    kryptos_rc6_block_encrypt, /* No additional steps for encrypting */,
+                                    kryptos_rc6_block_decrypt, /* No additional steps for decrypting */,
+                                    KRYPTOS_RC6_BLOCKSIZE,
+                                    rc6_128_cipher_epilogue,
+                                    outblock,
+                                    rc6_block_processor(outblock, &sks))
+
+KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(rc6_192, ktask, kKryptosCipherRC6, KRYPTOS_RC6_BLOCKSIZE, int *rounds,
+                                       {
+                                            if (rounds != NULL) {
+                                                ktask->arg[0] = rounds;
+                                            } else {
+                                                ktask->arg[0] = NULL;
+                                            }
+                                        })
+
+KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(rc6_192,
+                                    ktask,
+                                    kryptos_rc6_subkeys,
+                                    sks,
+                                    kryptos_rc6_block_processor,
+                                    rc6_block_processor,
+                                    {
+                                        if ((*ktask)->key_size > 24) {
+                                            (*ktask)->result = kKryptosKeyError;
+                                            (*ktask)->result_verbose = "RC6 key size greater than 24 bytes.";
+                                            goto kryptos_rc6_192_cipher_epilogue;
+                                        }
+                                        if ((*ktask)->arg[0] == NULL) {
+                                            (*ktask)->result = kKryptosInvalidParams;
+                                            (*ktask)->result_verbose = "RC6 round parameter is missing.";
+                                            goto kryptos_rc6_192_cipher_epilogue;
+                                        }
+                                        sks.rounds = *(int *)(*ktask)->arg[0];
+                                        if (sks.rounds < 1) {
+                                            (*ktask)->result = kKryptosInvalidParams;
+                                            (*ktask)->result_verbose = "RC6 rounds underflow.";
+                                            goto kryptos_rc6_192_cipher_epilogue;
+                                        } else if (((sks.rounds + 2) << 1) > kryptos_rc6_K_NR) {
+                                            (*ktask)->result = kKryptosInvalidParams;
+                                            (*ktask)->result_verbose = "RC6 rounds overflow.";
+                                            goto kryptos_rc6_192_cipher_epilogue;
+                                        }
+                                        sks.ksize = kKryptosRC6192;
+                                        kryptos_rc6_ksched((*ktask)->key, (*ktask)->key_size, &sks);
+                                    },
+                                    kryptos_rc6_block_encrypt, /* No additional steps for encrypting */,
+                                    kryptos_rc6_block_decrypt, /* No additional steps for decrypting */,
+                                    KRYPTOS_RC6_BLOCKSIZE,
+                                    rc6_192_cipher_epilogue,
+                                    outblock,
+                                    rc6_block_processor(outblock, &sks))
+
+KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(rc6_256, ktask, kKryptosCipherRC6, KRYPTOS_RC6_BLOCKSIZE, int *rounds,
+                                       {
+                                            if (rounds != NULL) {
+                                                ktask->arg[0] = rounds;
+                                            } else {
+                                                ktask->arg[0] = NULL;
+                                            }
+                                        })
+
+KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(rc6_256,
+                                    ktask,
+                                    kryptos_rc6_subkeys,
+                                    sks,
+                                    kryptos_rc6_block_processor,
+                                    rc6_block_processor,
+                                    {
+                                        if ((*ktask)->key_size > 32) {
+                                            (*ktask)->result = kKryptosKeyError;
+                                            (*ktask)->result_verbose = "RC6 key size greater than 32 bytes.";
+                                            goto kryptos_rc6_256_cipher_epilogue;
+                                        }
+                                        if ((*ktask)->arg[0] == NULL) {
+                                            (*ktask)->result = kKryptosInvalidParams;
+                                            (*ktask)->result_verbose = "RC6 round parameter is missing.";
+                                            goto kryptos_rc6_256_cipher_epilogue;
+                                        }
+                                        sks.rounds = *(int *)(*ktask)->arg[0];
+                                        if (sks.rounds < 1) {
+                                            (*ktask)->result = kKryptosInvalidParams;
+                                            (*ktask)->result_verbose = "RC6 rounds underflow.";
+                                            goto kryptos_rc6_256_cipher_epilogue;
+                                        } else if (((sks.rounds + 2) << 1) > kryptos_rc6_K_NR) {
+                                            (*ktask)->result = kKryptosInvalidParams;
+                                            (*ktask)->result_verbose = "RC6 rounds overflow.";
+                                            goto kryptos_rc6_256_cipher_epilogue;
+                                        }
+                                        sks.ksize = kKryptosRC6256;
+                                        kryptos_rc6_ksched((*ktask)->key, (*ktask)->key_size, &sks);
+                                    },
+                                    kryptos_rc6_block_encrypt, /* No additional steps for encrypting */,
+                                    kryptos_rc6_block_decrypt, /* No additional steps for decrypting */,
+                                    KRYPTOS_RC6_BLOCKSIZE,
+                                    rc6_256_cipher_epilogue,
+                                    outblock,
+                                    rc6_block_processor(outblock, &sks))
 
 void kryptos_rc6_ld_user_key(kryptos_u32_t *l, const kryptos_u8_t *key, const size_t key_size) {
     const kryptos_u8_t *kp, *kp_end;
@@ -109,13 +247,19 @@ void kryptos_rc6_ksched(const kryptos_u8_t *user_key, const size_t user_key_size
     size_t c, i, s, t, v, j;
 
     memset(cp_uk, 0, sizeof(cp_uk));
-    memcpy(cp_uk, user_key, user_key_size % sks->ksize);
+    memcpy(cp_uk, user_key, user_key_size);
 
     kryptos_rc6_ld_user_key(L, cp_uk, sks->ksize);
 
     c = sks->ksize >> 2;
 
+    for (i = 0; i < c; i++) {
+        L[i] = kryptos_rc6_rev32(L[i]);
+    }
+
     t = (sks->rounds << 1) + 3;
+
+    sks->K[0] = kryptos_rc6_PW;
 
     for (i = 1; i <= t; i++) {
         sks->K[i] = sks->K[i - 1] + kryptos_rc6_QW;
@@ -164,7 +308,7 @@ void kryptos_rc6_block_encrypt(kryptos_u8_t *block, const struct kryptos_rc6_sub
         block[12];
 
     B += sks->K[0];
-    D += sks->K[0];
+    D += sks->K[1];
 
     for (r = 1; r <= sks->rounds; r++) {
         t = kryptos_rc6_rotl(B * ((B<<1) + 1), kryptos_rc6_LG_W);
@@ -221,7 +365,7 @@ void kryptos_rc6_block_decrypt(kryptos_u8_t *block, const struct kryptos_rc6_sub
     C -= sks->K[(sks->rounds << 1) + 3];
     A -= sks->K[(sks->rounds << 1) + 2];
 
-    for (r = sks->rounds; r > 0; r--) {
+    for (r = sks->rounds; r >= 1; r--) {
         t = A;
         A = D;
         u = B;
@@ -236,7 +380,7 @@ void kryptos_rc6_block_decrypt(kryptos_u8_t *block, const struct kryptos_rc6_sub
     }
 
     D -= sks->K[1];
-    A -= sks->K[0];
+    B -= sks->K[0];
 
     kryptos_cpy_u32_as_big_endian(block, 16, kryptos_rc6_rev32(A));
     kryptos_cpy_u32_as_big_endian(block + 4, 12, kryptos_rc6_rev32(B));

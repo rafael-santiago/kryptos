@@ -33,6 +33,7 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     size_t triple_des_key2_size, triple_des_key3_size;
     int xtea_rounds;
     int rc5_rounds;
+    int rc6_rounds;
 
     kryptos_task_set_ecb_mode(&task);
     CUTE_ASSERT(task.mode == kKryptosECB);
@@ -530,7 +531,45 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
 
     CUTE_ASSERT(task.out_size == data_size);
     CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
+    // RC6-128 ECB
+
+    rc6_rounds = 40;
+
+    kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_encrypt_action(&task);
+
+    kryptos_run_cipher(rc6_128, &task, "rc6", 3, kKryptosECB, &rc6_rounds);
+
+    CUTE_ASSERT(task.out != NULL);
+
+    kryptos_task_set_in(&task, task.out, task.out_size);
+    kryptos_task_set_decrypt_action(&task);
+
+    kryptos_run_cipher(rc6_128, &task, "rc6", 3, kKryptosECB, &rc6_rounds);
+
+    CUTE_ASSERT(task.out_size == data_size);
+    CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+
+    // RC6-128 CBC
+
+    kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_encrypt_action(&task);
+
+    kryptos_run_cipher(rc6_128, &task, "rc6", 3, kKryptosCBC, &rc6_rounds);
+
+    CUTE_ASSERT(task.out != NULL);
+
+    kryptos_task_set_in(&task, task.out, task.out_size);
+    kryptos_task_set_decrypt_action(&task);
+
+    kryptos_run_cipher(rc6_128, &task, "rc6", 3, kKryptosCBC, &rc6_rounds);
+
+    CUTE_ASSERT(task.out_size == data_size);
+    CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 
     // SAFER K-64 ECB
 

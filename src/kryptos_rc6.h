@@ -10,7 +10,7 @@
 
 #include <kryptos_types.h>
 
-#define KRYPTOS_RC6_BLOCKSIZE 8
+#define KRYPTOS_RC6_BLOCKSIZE 16
 
 KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_SETUP(rc6_128, ktask, int *rounds)
 
