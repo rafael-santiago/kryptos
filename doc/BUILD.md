@@ -213,6 +213,30 @@ kernel mode tests, your tests have been breaking where it should not... try to c
 it you must be within the ``tests/kernel`` sub-directory, once there run the command ``hefesto --clean`` and re-run the
 build.
 
+### The GCC is being killed during the build process
+
+I only observed it when compiling kernel stuff (so, in Linux). I was experiencing the following run-time error message:
+
+```
+gcc: internal compiler error: Killed (program cc1)
+```
+
+This have been occurred more precisely when compiling the source file ``tests/kernel/hash_tests.c``. This module has tons of
+macro stuff so the C pre-processor seems to be defeated by them... The solution is skip the HMAC tests, btw where the C
+pre-processor is abused. Try to re-run the kernel-mode tests as follows:
+
+```
+Sherlock@221B:~/src/kryptos/src/tests/kernel# hefesto --no-hmac-tests
+```
+
+or...
+
+```
+Sherlock@221B:~/src/kryptos/src# hefesto --kernel-mode-tests --no-hmac-tests
+```
+
+It depends on your location in the project's source tree.
+
 ## Are you searching for some build information not detailed here?
 
 Please let me know more by opening an [issue](https://github.com/rafael-santiago/kryptos/issues). Thank you!
