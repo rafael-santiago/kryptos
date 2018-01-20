@@ -50,6 +50,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_rc2_tests);
     CUTE_RUN_TEST(kryptos_rc5_tests);
     CUTE_RUN_TEST(kryptos_rc6_128_tests);
+    CUTE_RUN_TEST(kryptos_rc6_192_tests);
+    CUTE_RUN_TEST(kryptos_rc6_256_tests);
     CUTE_RUN_TEST(kryptos_camellia_tests);
     CUTE_RUN_TEST(kryptos_cast5_tests);
     CUTE_RUN_TEST(kryptos_saferk64_tests);

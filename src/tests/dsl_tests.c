@@ -571,6 +571,82 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 
+    // RC6-192 ECB
+
+    rc6_rounds = 40;
+
+    kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_encrypt_action(&task);
+
+    kryptos_run_cipher(rc6_192, &task, "rc6", 3, kKryptosECB, &rc6_rounds);
+
+    CUTE_ASSERT(task.out != NULL);
+
+    kryptos_task_set_in(&task, task.out, task.out_size);
+    kryptos_task_set_decrypt_action(&task);
+
+    kryptos_run_cipher(rc6_192, &task, "rc6", 3, kKryptosECB, &rc6_rounds);
+
+    CUTE_ASSERT(task.out_size == data_size);
+    CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+
+    // RC6-192 CBC
+
+    kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_encrypt_action(&task);
+
+    kryptos_run_cipher(rc6_192, &task, "rc6", 3, kKryptosCBC, &rc6_rounds);
+
+    CUTE_ASSERT(task.out != NULL);
+
+    kryptos_task_set_in(&task, task.out, task.out_size);
+    kryptos_task_set_decrypt_action(&task);
+
+    kryptos_run_cipher(rc6_192, &task, "rc6", 3, kKryptosCBC, &rc6_rounds);
+
+    CUTE_ASSERT(task.out_size == data_size);
+    CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
+    // RC6-256 ECB
+
+    rc6_rounds = 40;
+
+    kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_encrypt_action(&task);
+
+    kryptos_run_cipher(rc6_256, &task, "rc6", 3, kKryptosECB, &rc6_rounds);
+
+    CUTE_ASSERT(task.out != NULL);
+
+    kryptos_task_set_in(&task, task.out, task.out_size);
+    kryptos_task_set_decrypt_action(&task);
+
+    kryptos_run_cipher(rc6_256, &task, "rc6", 3, kKryptosECB, &rc6_rounds);
+
+    CUTE_ASSERT(task.out_size == data_size);
+    CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+
+    // RC6-256 CBC
+
+    kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_encrypt_action(&task);
+
+    kryptos_run_cipher(rc6_256, &task, "rc6", 3, kKryptosCBC, &rc6_rounds);
+
+    CUTE_ASSERT(task.out != NULL);
+
+    kryptos_task_set_in(&task, task.out, task.out_size);
+    kryptos_task_set_decrypt_action(&task);
+
+    kryptos_run_cipher(rc6_256, &task, "rc6", 3, kKryptosCBC, &rc6_rounds);
+
+    CUTE_ASSERT(task.out_size == data_size);
+    CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
     // SAFER K-64 ECB
 
     saferk64_rounds = 32;

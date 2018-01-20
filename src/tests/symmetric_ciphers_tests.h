@@ -52,4 +52,8 @@ CUTE_DECLARE_TEST_CASE(kryptos_rc5_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_rc6_128_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_rc6_192_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_rc6_256_tests);
+
 #endif

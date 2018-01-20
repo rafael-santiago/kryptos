@@ -683,3 +683,77 @@ CUTE_TEST_CASE(kryptos_rc6_128_tests)
                                                                            kKryptosOFB,
                                                                            &rc6_rounds[tv % rc6_rounds_nr].rounds));
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc6_192_tests)
+    struct rc6_rounds_ctx {
+        int rounds;
+    };
+    struct rc6_rounds_ctx rc6_rounds[] = {
+        { 20 }, { 20 }, { 20 }, { 20 },
+        { 20 }, { 20 }, { 20 }, { 20 },
+        { 20 }, { 20 }, { 20 }, { 20 },
+        { 20 }, { 20 }, { 20 }, { 20 }
+    };
+    size_t rc6_rounds_nr = sizeof(rc6_rounds) / sizeof(rc6_rounds[0]);
+    kryptos_task_ctx t;
+    size_t tv;
+
+    kryptos_run_block_cipher_tests_with_custom_setup(rc6_192,
+                                                     KRYPTOS_RC6_BLOCKSIZE,
+                                                     t,
+                                                     tv,
+                                                     rc6_rounds, rc6_rounds_nr,
+                                                     kryptos_rc6_192_setup(&t,
+                                                                           rc6_192_test_vector[tv % rc6_rounds_nr].key,
+                                                                           rc6_192_test_vector[tv % rc6_rounds_nr].key_size,
+                                                                           kKryptosECB,
+                                                                           &rc6_rounds[tv % rc6_rounds_nr].rounds),
+                                                     kryptos_rc6_192_setup(&t,
+                                                                           rc6_192_test_vector[tv % rc6_rounds_nr].key,
+                                                                           rc6_192_test_vector[tv % rc6_rounds_nr].key_size,
+                                                                           kKryptosCBC,
+                                                                           &rc6_rounds[tv % rc6_rounds_nr].rounds),
+                                                     kryptos_rc6_192_setup(&t,
+                                                                           rc6_192_test_vector[tv % rc6_rounds_nr].key,
+                                                                           rc6_192_test_vector[tv % rc6_rounds_nr].key_size,
+                                                                           kKryptosOFB,
+                                                                           &rc6_rounds[tv % rc6_rounds_nr].rounds));
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc6_256_tests)
+    struct rc6_rounds_ctx {
+        int rounds;
+    };
+    struct rc6_rounds_ctx rc6_rounds[] = {
+        { 20 }, { 20 }, { 20 }, { 20 },
+        { 20 }, { 20 }, { 20 }, { 20 },
+        { 20 }, { 20 }, { 20 }, { 20 },
+        { 20 }, { 20 }, { 20 }, { 20 },
+        { 20 }, { 20 }, { 20 }, { 20 },
+        { 20 }, { 20 }, { 20 }, { 20 }
+    };
+    size_t rc6_rounds_nr = sizeof(rc6_rounds) / sizeof(rc6_rounds[0]);
+    kryptos_task_ctx t;
+    size_t tv;
+
+    kryptos_run_block_cipher_tests_with_custom_setup(rc6_256,
+                                                     KRYPTOS_RC6_BLOCKSIZE,
+                                                     t,
+                                                     tv,
+                                                     rc6_rounds, rc6_rounds_nr,
+                                                     kryptos_rc6_256_setup(&t,
+                                                                           rc6_256_test_vector[tv % rc6_rounds_nr].key,
+                                                                           rc6_256_test_vector[tv % rc6_rounds_nr].key_size,
+                                                                           kKryptosECB,
+                                                                           &rc6_rounds[tv % rc6_rounds_nr].rounds),
+                                                     kryptos_rc6_256_setup(&t,
+                                                                           rc6_256_test_vector[tv % rc6_rounds_nr].key,
+                                                                           rc6_256_test_vector[tv % rc6_rounds_nr].key_size,
+                                                                           kKryptosCBC,
+                                                                           &rc6_rounds[tv % rc6_rounds_nr].rounds),
+                                                     kryptos_rc6_256_setup(&t,
+                                                                           rc6_256_test_vector[tv % rc6_rounds_nr].key,
+                                                                           rc6_256_test_vector[tv % rc6_rounds_nr].key_size,
+                                                                           kKryptosOFB,
+                                                                           &rc6_rounds[tv % rc6_rounds_nr].rounds));
+CUTE_TEST_CASE_END
