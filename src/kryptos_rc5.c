@@ -15,6 +15,10 @@
 # include <string.h>
 #endif
 
+// WARN(Rafael): This implementation only considers little-endian machines, if you want to
+//               make it also big-endian, watch out some obvious points during key scheduling,
+//               encryption and decryption.
+
 #define kryptos_rc5_W 32
 
 #define kryptos_rc5_U 4 // INFO(Rafael): This is about rc5-32, your real cpu size does not matter here.
@@ -238,8 +242,14 @@ static void kryptos_rc5_block_encrypt(kryptos_u8_t *block, const struct kryptos_
         B = kryptos_rc5_rotl(B ^ A, A % kryptos_rc5_W) + sks->K[(r << 1) + 1];
     }
 
-    kryptos_cpy_u32_as_big_endian(block, 8, kryptos_rc5_rev32(A));
-    kryptos_cpy_u32_as_big_endian(block + 4, 4, kryptos_rc5_rev32(B));
+    block[0] = A & 0xFF;
+    block[1] = (A >> 8) & 0xFF;
+    block[2] = (A >> 16) & 0xFF;
+    block[3] = A >> 24;
+    block[4] = B & 0xFF;
+    block[5] = (B >> 8) & 0xFF;
+    block[6] = (B >> 16) & 0xFF;
+    block[7] = B >> 24;
 
     r = 0;
 
@@ -266,8 +276,17 @@ static void kryptos_rc5_block_decrypt(kryptos_u8_t *block, const struct kryptos_
         A = kryptos_rc5_rotr(A - sks->K[r << 1], B % kryptos_rc5_W) ^ B;
     }
 
-    kryptos_cpy_u32_as_big_endian(block, 8, kryptos_rc5_rev32(A - sks->K[0]));
-    kryptos_cpy_u32_as_big_endian(block + 4, 4, kryptos_rc5_rev32(B - sks->K[1]));
+    A -= sks->K[0];
+    B -= sks->K[1];
+
+    block[0] = A & 0xFF;
+    block[1] = (A >> 8) & 0xFF;
+    block[2] = (A >> 16) & 0xFF;
+    block[3] = A >> 24;
+    block[4] = B & 0xFF;
+    block[5] = (B >> 8) & 0xFF;
+    block[6] = (B >> 16) & 0xFF;
+    block[7] = B >> 24;
 
     A = B = 0;
 }

@@ -15,6 +15,10 @@
 # include <string.h>
 #endif
 
+// WARN(Rafael): This implementation only considers little-endian machines, if you want to
+//               make it also big-endian, watch out some obvious points during key scheduling,
+//               encryption and decryption.
+
 #define kryptos_rc6_W 32
 
 #define kryptos_rc6_U 4
@@ -325,10 +329,22 @@ void kryptos_rc6_block_encrypt(kryptos_u8_t *block, const struct kryptos_rc6_sub
     A += sks->K[(sks->rounds << 1) + 2];
     C += sks->K[(sks->rounds << 1) + 3];
 
-    kryptos_cpy_u32_as_big_endian(block, 16, kryptos_rc6_rev32(A));
-    kryptos_cpy_u32_as_big_endian(block + 4, 12, kryptos_rc6_rev32(B));
-    kryptos_cpy_u32_as_big_endian(block + 8, 8, kryptos_rc6_rev32(C));
-    kryptos_cpy_u32_as_big_endian(block + 12, 4, kryptos_rc6_rev32(D));
+    block[0] = A & 0xFF;
+    block[1] = (A >> 8) & 0xFF;
+    block[2] = (A >> 16) & 0xFF;
+    block[3] = A >> 24;
+    block[4] = B & 0xFF;
+    block[5] = (B >> 8) & 0xFF;
+    block[6] = (B >> 16) & 0xFF;
+    block[7] = B >> 24;
+    block[8] = C & 0xFF;
+    block[9] = (C >> 8) & 0xFF;
+    block[10] = (C >> 16) & 0xFF;
+    block[11] = C >> 24;
+    block[12] = D & 0xFF;
+    block[13] = (D >> 8) & 0xFF;
+    block[14] = (D >> 16) & 0xFF;
+    block[15] = D >> 24;
 
     A =
     B =
@@ -382,10 +398,22 @@ void kryptos_rc6_block_decrypt(kryptos_u8_t *block, const struct kryptos_rc6_sub
     D -= sks->K[1];
     B -= sks->K[0];
 
-    kryptos_cpy_u32_as_big_endian(block, 16, kryptos_rc6_rev32(A));
-    kryptos_cpy_u32_as_big_endian(block + 4, 12, kryptos_rc6_rev32(B));
-    kryptos_cpy_u32_as_big_endian(block + 8, 8, kryptos_rc6_rev32(C));
-    kryptos_cpy_u32_as_big_endian(block + 12, 4, kryptos_rc6_rev32(D));
+    block[0] = A & 0xFF;
+    block[1] = (A >> 8) & 0xFF;
+    block[2] = (A >> 16) & 0xFF;
+    block[3] = A >> 24;
+    block[4] = B & 0xFF;
+    block[5] = (B >> 8) & 0xFF;
+    block[6] = (B >> 16) & 0xFF;
+    block[7] = B >> 24;
+    block[8] = C & 0xFF;
+    block[9] = (C >> 8) & 0xFF;
+    block[10] = (C >> 16) & 0xFF;
+    block[11] = C >> 24;
+    block[12] = D & 0xFF;
+    block[13] = (D >> 8) & 0xFF;
+    block[14] = (D >> 16) & 0xFF;
+    block[15] = D >> 24;
 
     A =
     B =
@@ -410,3 +438,5 @@ void kryptos_rc6_block_decrypt(kryptos_u8_t *block, const struct kryptos_rc6_sub
 #undef kryptos_rc6_rotl
 
 #undef kryptos_rc6_rotr
+
+#undef kryptos_rc6_rev32
