@@ -388,6 +388,7 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
     size_t triple_des_key2_size, triple_des_key3_size;
     int xtea_rounds = 64;
     int rc5_rounds = 20;
+    int rc6_rounds = 40;
 
     // INFO(Rafael): DES/ECB.
 
@@ -640,6 +641,132 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc5, ripemd128, key, key_size, kKryptosCBC, &rc5_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc5, ripemd160, key, key_size, kKryptosCBC, &rc5_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc5, tiger, key, key_size, kKryptosCBC, &rc5_rounds);
+
+    // INFO(Rafael): RC6-128/ECB.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha1, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha224, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha256, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha384, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha512, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha3_224, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha3_256, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha3_384, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha3_512, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, keccak224, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, keccak256, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, keccak384, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, keccak512, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, md4, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, md5, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, ripemd128, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, ripemd160, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, tiger, key, key_size, kKryptosECB, &rc6_rounds);
+
+    // INFO(Rafael): RC6-128/CBC.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha1, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha224, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha256, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha384, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha512, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha3_224, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha3_256, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha3_384, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, sha3_512, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, keccak224, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, keccak256, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, keccak384, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, keccak512, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, md4, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, md5, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, ripemd128, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, ripemd160, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, tiger, key, key_size, kKryptosCBC, &rc6_rounds);
+
+    // INFO(Rafael): RC6-192/ECB.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha1, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha224, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha256, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha384, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha512, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha3_224, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha3_256, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha3_384, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha3_512, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, keccak224, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, keccak256, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, keccak384, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, keccak512, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, md4, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, md5, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, ripemd128, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, ripemd160, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, tiger, key, key_size, kKryptosECB, &rc6_rounds);
+
+    // INFO(Rafael): RC6-192/CBC.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha1, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha224, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha256, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha384, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha512, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha3_224, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha3_256, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha3_384, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, sha3_512, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, keccak224, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, keccak256, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, keccak384, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, keccak512, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, md4, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, md5, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, ripemd128, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, ripemd160, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, tiger, key, key_size, kKryptosCBC, &rc6_rounds);
+
+    // INFO(Rafael): RC6-256/ECB.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha1, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha224, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha256, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha384, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha512, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha3_224, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha3_256, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha3_384, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha3_512, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, keccak224, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, keccak256, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, keccak384, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, keccak512, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, md4, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, md5, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, ripemd128, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, ripemd160, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, tiger, key, key_size, kKryptosECB, &rc6_rounds);
+
+    // INFO(Rafael): RC6-256/CBC.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha1, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha224, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha256, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha384, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha512, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha3_224, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha3_256, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha3_384, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, sha3_512, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, keccak224, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, keccak256, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, keccak384, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, keccak512, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, md4, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, md5, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, ripemd128, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, ripemd160, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, tiger, key, key_size, kKryptosCBC, &rc6_rounds);
 
     // INFO(Rafael): CAMELLIA-128/ECB.
 

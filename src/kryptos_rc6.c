@@ -59,7 +59,7 @@ static void kryptos_rc6_block_encrypt(kryptos_u8_t *block, const struct kryptos_
 
 static void kryptos_rc6_block_decrypt(kryptos_u8_t *block, const struct kryptos_rc6_subkeys *sks);
 
-KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(rc6_128, ktask, kKryptosCipherRC6, KRYPTOS_RC6_BLOCKSIZE, int *rounds,
+KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(rc6_128, ktask, kKryptosCipherRC6128, KRYPTOS_RC6_BLOCKSIZE, int *rounds,
                                        {
                                             if (rounds != NULL) {
                                                 ktask->arg[0] = rounds;
@@ -105,7 +105,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(rc6_128,
                                     outblock,
                                     rc6_block_processor(outblock, &sks))
 
-KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(rc6_192, ktask, kKryptosCipherRC6, KRYPTOS_RC6_BLOCKSIZE, int *rounds,
+KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(rc6_192, ktask, kKryptosCipherRC6192, KRYPTOS_RC6_BLOCKSIZE, int *rounds,
                                        {
                                             if (rounds != NULL) {
                                                 ktask->arg[0] = rounds;
@@ -151,7 +151,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(rc6_192,
                                     outblock,
                                     rc6_block_processor(outblock, &sks))
 
-KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(rc6_256, ktask, kKryptosCipherRC6, KRYPTOS_RC6_BLOCKSIZE, int *rounds,
+KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(rc6_256, ktask, kKryptosCipherRC6256, KRYPTOS_RC6_BLOCKSIZE, int *rounds,
                                        {
                                             if (rounds != NULL) {
                                                 ktask->arg[0] = rounds;

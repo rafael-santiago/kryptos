@@ -344,7 +344,9 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
             return ((*ktask)->iv_size == KRYPTOS_RC5_BLOCKSIZE);
             break;
 
-        case kKryptosCipherRC6:
+        case kKryptosCipherRC6128:
+        case kKryptosCipherRC6192:
+        case kKryptosCipherRC6256:
             return ((*ktask)->iv_size == KRYPTOS_RC6_BLOCKSIZE);
             break;
 

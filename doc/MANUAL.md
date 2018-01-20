@@ -112,9 +112,9 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 |   ``IDEA``       |       Block           |       ``kKryptosCipherIDEA``     |
 |    ``RC2``       |       Block           |       ``kKryptosCipherRC2``      |
 |    ``RC5``       |       Block           |       ``kKryptosCipherRC5``      |
-|   ``RC6-128``    |       Block           |       ``kKryptosCipherRC6``      |
-|   ``RC6-192``    |       Block           |       ``kKryptosCipherRC6``      |
-|   ``RC6-256``    |       Block           |       ``kKryptosCipherRC6``      |
+|   ``RC6-128``    |       Block           |       ``kKryptosCipherRC6128``   |
+|   ``RC6-192``    |       Block           |       ``kKryptosCipherRC6192``   |
+|   ``RC6-256``    |       Block           |       ``kKryptosCipherRC6256``   |
 |   ``FEAL``       |       Block           |       ``kKryptosCipherFEAL``     |
 |  ``CAST5``       |       Block           |       ``kKryptosCipherCAST5``    |
 | ``CAMELLIA-128`` |       Block           |       ``kKryptosCipherCAMELLIA`` |
