@@ -26,7 +26,6 @@ KUTE_TEST_CASE(kryptos_dsl_tests)
     kryptos_seal_version_t seal_version;
     size_t seal_n, seal_l;
     int feal_rounds;
-    kryptos_camellia_keysize_t camellia_keysize;
     int rc2_t1;
     int saferk64_rounds;
     kryptos_u8_t *triple_des_key2, *triple_des_key3;
@@ -288,19 +287,17 @@ KUTE_TEST_CASE(kryptos_dsl_tests)
 
     // CAMELLIA-128 ECB
 
-    camellia_keysize = kKryptosCAMELLIA128;
-
     kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
 
-    kryptos_run_cipher(camellia, &task, "camellia", 8, kKryptosECB, &camellia_keysize);
+    kryptos_run_cipher(camellia128, &task, "camellia", 8, kKryptosECB);
 
     KUTE_ASSERT(task.out != NULL);
 
     kryptos_task_set_in(&task, task.out, task.out_size);
     kryptos_task_set_decrypt_action(&task);
 
-    kryptos_run_cipher(camellia, &task, "camellia", 8, kKryptosECB, &camellia_keysize);
+    kryptos_run_cipher(camellia128, &task, "camellia", 8, kKryptosECB);
 
     KUTE_ASSERT(task.out_size == data_size);
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
@@ -311,33 +308,32 @@ KUTE_TEST_CASE(kryptos_dsl_tests)
     kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
 
-    kryptos_run_cipher(camellia, &task, "camellia", 8, kKryptosCBC, &camellia_keysize);
+    kryptos_run_cipher(camellia128, &task, "camellia", 8, kKryptosCBC);
 
     KUTE_ASSERT(task.out != NULL);
 
     kryptos_task_set_in(&task, task.out, task.out_size);
     kryptos_task_set_decrypt_action(&task);
 
-    kryptos_run_cipher(camellia, &task, "camellia", 8, kKryptosCBC, &camellia_keysize);
+    kryptos_run_cipher(camellia128, &task, "camellia", 8, kKryptosCBC);
 
     KUTE_ASSERT(task.out_size == data_size);
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 
     // CAMELLIA-192 ECB
-    camellia_keysize = kKryptosCAMELLIA192;
 
     kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
 
-    kryptos_run_cipher(camellia, &task, "camellia", 8, kKryptosECB, &camellia_keysize);
+    kryptos_run_cipher(camellia192, &task, "camellia", 8, kKryptosECB);
 
     KUTE_ASSERT(task.out != NULL);
 
     kryptos_task_set_in(&task, task.out, task.out_size);
     kryptos_task_set_decrypt_action(&task);
 
-    kryptos_run_cipher(camellia, &task, "camellia", 8, kKryptosECB, &camellia_keysize);
+    kryptos_run_cipher(camellia192, &task, "camellia", 8, kKryptosECB);
 
     KUTE_ASSERT(task.out_size == data_size);
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
@@ -348,14 +344,14 @@ KUTE_TEST_CASE(kryptos_dsl_tests)
     kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
 
-    kryptos_run_cipher(camellia, &task, "camellia", 8, kKryptosCBC, &camellia_keysize);
+    kryptos_run_cipher(camellia192, &task, "camellia", 8, kKryptosCBC);
 
     KUTE_ASSERT(task.out != NULL);
 
     kryptos_task_set_in(&task, task.out, task.out_size);
     kryptos_task_set_decrypt_action(&task);
 
-    kryptos_run_cipher(camellia, &task, "camellia", 8, kKryptosCBC, &camellia_keysize);
+    kryptos_run_cipher(camellia192, &task, "camellia", 8, kKryptosCBC);
 
     KUTE_ASSERT(task.out_size == data_size);
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
@@ -363,19 +359,17 @@ KUTE_TEST_CASE(kryptos_dsl_tests)
 
     // CAMELLIA-256 ECB
 
-    camellia_keysize = kKryptosCAMELLIA256;
-
     kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
 
-    kryptos_run_cipher(camellia, &task, "camellia", 8, kKryptosECB, &camellia_keysize);
+    kryptos_run_cipher(camellia256, &task, "camellia", 8, kKryptosECB);
 
     KUTE_ASSERT(task.out != NULL);
 
     kryptos_task_set_in(&task, task.out, task.out_size);
     kryptos_task_set_decrypt_action(&task);
 
-    kryptos_run_cipher(camellia, &task, "camellia", 8, kKryptosECB, &camellia_keysize);
+    kryptos_run_cipher(camellia256, &task, "camellia", 8, kKryptosECB);
 
     KUTE_ASSERT(task.out_size == data_size);
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
@@ -386,14 +380,14 @@ KUTE_TEST_CASE(kryptos_dsl_tests)
     kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
 
-    kryptos_run_cipher(camellia, &task, "camellia", 8, kKryptosCBC, &camellia_keysize);
+    kryptos_run_cipher(camellia256, &task, "camellia", 8, kKryptosCBC);
 
     KUTE_ASSERT(task.out != NULL);
 
     kryptos_task_set_in(&task, task.out, task.out_size);
     kryptos_task_set_decrypt_action(&task);
 
-    kryptos_run_cipher(camellia, &task, "camellia", 8, kKryptosCBC, &camellia_keysize);
+    kryptos_run_cipher(camellia256, &task, "camellia", 8, kKryptosCBC);
 
     KUTE_ASSERT(task.out_size == data_size);
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);

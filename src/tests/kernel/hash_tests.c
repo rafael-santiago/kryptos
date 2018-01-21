@@ -382,7 +382,6 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
                               " -- Write in C(\"Let it Be\")\n";
     size_t plaintext_size = kstrlen(plaintext);
     int feal_rounds = 8, rc2_T1 = 64, saferk64_rounds = 6;
-    kryptos_camellia_keysize_t camellia_size;
     kryptos_task_ctx t;
     kryptos_u8_t *triple_des_key2, *triple_des_key3;
     size_t triple_des_key2_size, triple_des_key3_size;
@@ -770,141 +769,129 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
 
     // INFO(Rafael): CAMELLIA-128/ECB.
 
-    camellia_size = kKryptosCAMELLIA128;
-
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha1, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha224, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha256, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha384, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha512, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_224, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_256, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_384, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_512, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak224, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak256, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak384, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak512, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, md4, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, md5, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, ripemd128, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, ripemd160, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, tiger, key, key_size, kKryptosECB, &camellia_size);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha1, key, key_size, kKryptosECB;
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha3_224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha3_256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha3_384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha3_512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, keccak224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, keccak256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, keccak384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, keccak512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, md4, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, md5, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, ripemd128, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, ripemd160, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, tiger, key, key_size, kKryptosECB);
 
     // INFO(Rafael): CAMELLIA-128/CBC.
 
-    camellia_size = kKryptosCAMELLIA128;
-
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha1, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha224, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha256, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha384, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha512, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_224, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_256, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_384, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_512, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak224, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak256, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak384, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak512, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, md4, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, md5, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, ripemd128, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, ripemd160, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, tiger, key, key_size, kKryptosCBC, &camellia_size);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha1, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha3_224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha3_256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha3_384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha3_512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, keccak224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, keccak256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, keccak384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, keccak512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, md4, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, md5, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, ripemd128, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, ripemd160, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, tiger, key, key_size, kKryptosCBC);
 
     // INFO(Rafael): CAMELLIA-192/ECB.
 
-    camellia_size = kKryptosCAMELLIA192;
-
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha1, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha224, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha256, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha384, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha512, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_224, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_256, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_384, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_512, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak224, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak256, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak384, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak512, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, md4, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, md5, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, ripemd128, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, ripemd160, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, tiger, key, key_size, kKryptosECB, &camellia_size);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha1, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha3_224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha3_256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha3_384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha3_512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, keccak224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, keccak256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, keccak384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, keccak512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, md4, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, md5, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, ripemd128, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, ripemd160, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, tiger, key, key_size, kKryptosECB);
 
     // INFO(Rafael): CAMELLIA-192/CBC.
 
-    camellia_size = kKryptosCAMELLIA192;
-
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha1, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha224, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha256, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha384, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha512, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_224, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_256, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_384, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_512, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak224, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak256, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak384, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak512, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, md4, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, md5, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, ripemd128, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, ripemd160, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, tiger, key, key_size, kKryptosCBC, &camellia_size);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha1, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha3_224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha3_256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha3_384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, sha3_512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, keccak224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, keccak256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, keccak384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, keccak512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, md4, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, md5, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, ripemd128, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, ripemd160, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, tiger, key, key_size, kKryptosCBC);
 
     // INFO(Rafael): CAMELLIA-256/ECB.
 
-    camellia_size = kKryptosCAMELLIA256;
-
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha1, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha224, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha256, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha384, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha512, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_224, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_256, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_384, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_512, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak224, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak256, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak384, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak512, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, md4, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, md5, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, ripemd128, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, ripemd160, key, key_size, kKryptosECB, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, tiger, key, key_size, kKryptosECB, &camellia_size);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha1, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha3_224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha3_256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha3_384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha3_512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, keccak224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, keccak256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, keccak384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, keccak512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, md4, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, md5, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, ripemd128, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, ripemd160, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, tiger, key, key_size, kKryptosECB);
 
     // INFO(Rafael): CAMELLIA-256/CBC.
 
-    camellia_size = kKryptosCAMELLIA256;
-
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha1, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha224, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha256, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha384, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha512, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_224, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_256, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_384, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, sha3_512, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak224, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak256, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak384, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, keccak512, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, md4, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, md5, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, ripemd128, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, ripemd160, key, key_size, kKryptosCBC, &camellia_size);
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia, tiger, key, key_size, kKryptosCBC, &camellia_size);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha1, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha3_224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha3_256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha3_384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, sha3_512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, keccak224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, keccak256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, keccak384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, keccak512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, md4, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, md5, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, ripemd128, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, ripemd160, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, tiger, key, key_size, kKryptosCBC);
 
     // INFO(Rafael): CAST5/ECB.
 

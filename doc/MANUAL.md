@@ -497,10 +497,10 @@ However, again, some errors let it ``NULL`` (**always check its nullity before c
 
 Not all block ciphers only need a key, a size of this key and an operation mode. In kryptos we also have block ciphers
 that need more than the standard parameters. In this case the additional parameters are always passed after the operation
-mode and they must be pointers to the data. As sample, let's pick the cipher CAMELLIA. The CAMELLIA algorithm supports key
-sizes of 128, 192 and also 256.
+mode and they must be pointers to the data. As sample, let's pick the cipher FEAL. The FEAL algorithm supports variable
+rounds total.
 
-When calling CAMELLIA in kryptos the desired key size should be passed, in the following way (c99):
+When calling FEAL in kryptos the desired rounds total should be passed, in the following way (c99):
 
 ```c
 /*
@@ -519,7 +519,7 @@ int main(int argc, char **argv) {
     kryptos_u8_t *key = "foo";
     kryptos_u8_t *data = "plaintext";
     size_t data_size = 9;
-    kryptos_camellia_keysize_t key_size = kKryptosCAMELLIA192; // Let's use Camellia-192.
+    int rounds = 80; /* Let's use FEAL with 80 rounds */
     int exit_code = 0;
 
     printf("Original data: %s\n", data);
@@ -529,14 +529,14 @@ int main(int argc, char **argv) {
     // INFO(Rafael): Encrypting.
     kryptos_task_set_in(ktask, data, data_size);
     kryptos_task_set_encrypt_action(ktask);
-    kryptos_run_cipher(camellia, ktask, key, strlen(key), kKryptosCBC, &key_size);
+    kryptos_run_cipher(feal, ktask, key, strlen(key), kKryptosCBC, &rounds);
 
     if (kryptos_last_task_succeed(ktask)) {
         printf("Encryption success!\n");
         // INFO(Rafael): Decrypting.
         kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
         kryptos_task_set_decrypt_action(ktask);
-        kryptos_run_cipher(camellia, ktask, key, strlen(key), kKryptosCBC, &key_size);
+        kryptos_run_cipher(feal, ktask, key, strlen(key), kKryptosCBC, &rounds);
         printf("Plaintext: ");
         fwrite(ktask->out, ktask->out_size, 1, stdout);
         printf("\n");
@@ -551,16 +551,17 @@ int main(int argc, char **argv) {
 }
 ```
 
-The available CAMELLIA key size constants are: ``kKryptosCAMELLIA128``, ``kKryptosCAMELLIA192``, ``kKryptosCAMELLIA256``.
-
 The **Table 3** lists the other ciphers which use additional parameters during their call.
 
 **Table 3**: The additional parameters required by some implemented block ciphers.
 
 | **Cipher** |              **Parameters**       |            **Parameters data type**                 |                                     **Call example**                                                 |
 |:----------:|:---------------------------------:|----------------------------------------------------:|-----------------------------------------------------------------------------------------------------:|
-|    FEAL    |  Rounds total                     |          ``int``                                    | ``kryptos_run_cipher(feal, &task, "feal", 4, kKryptosCBC, &feal_rounds)``                            |
 |    RC2     |  T1 parameter                     |          ``int``                                    | ``kryptos_run_cipher(rc2, &task, "rc2", 3, kKryptosOFB, &rc2_t1)``                                   |
+|    RC5     |  Rounds total                     |          ``int``                                    | ``kryptos_run_cipher(rc5, &task, "rc5", 3, kKryptosOFB, &rounds)``                                   |
+|  RC6-128   |  Rounds total                     |          ``int``                                    | ``kryptos_run_cipher(rc6_128, &task, "rc6", 3, kKryptosOFB, &rounds)``                               |
+|  RC6-192   |  Rounds total                     |          ``int``                                    | ``kryptos_run_cipher(rc6_192, &task, "rc6", 3, kKryptosOFB, &rounds)``                               |
+|  RC6-256   |  Rounds total                     |          ``int``                                    | ``kryptos_run_cipher(rc6_256, &task, "rc6", 3, kKryptosOFB, &rounds)``                               |
 | SAFER K-64 |  Rounds total                     |          ``int``                                    | ``kryptos_run_cipher(saferk64, &task, "saferk64", 8, kKryptosECB, &saferk64_rounds)``                |
 |    3DES    |  Key2, Key2 size, Key3, Key3 size | ``unsigned char`` for keys and ``size_t`` for sizes | ``kryptos_run_cipher(triple_des, &task, k1, &k1_size, kKryptosECB, k2, &k2_size, k3, &k3_size)``     |
 |  3DES-EDE  |  Key2, Key2 size, Key3, Key3 size | ``unsigned char`` for keys and ``size_t`` for sizes | ``kryptos_run_cipher(triple_des_ede, &task, k1, &k1_size, kKryptosECB, k2, &k2_size, k3, &k3_size)`` |

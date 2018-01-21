@@ -24,7 +24,11 @@ CUTE_DECLARE_TEST_CASE(kryptos_feal_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_rc2_tests);
 
-CUTE_DECLARE_TEST_CASE(kryptos_camellia_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_camellia128_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_camellia192_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_camellia256_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_cast5_tests);
 

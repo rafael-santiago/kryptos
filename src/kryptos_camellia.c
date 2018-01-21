@@ -103,6 +103,13 @@ static kryptos_u8_t kryptos_camellia_s4[] = { 112,  44, 179, 192, 228,  87, 234,
                                                92,   2,  74,  51, 103, 243, 127, 226, 155,  38,  55,  59, 150,  75, 190,  46,
                                               121, 140, 110, 142, 245, 182, 253,  89, 152, 106,  70, 186,  37,  66, 162, 250,
                                                 7,  85, 238,  10,  73, 104,  56, 164,  40, 123, 201, 193, 227, 244, 199, 158 };
+typedef enum {
+    kKryptosCAMELLIA128,
+    kKryptosCAMELLIA192,
+    kKryptosCAMELLIA256,
+    kKryptosCamelliaKeySizeNr
+}kryptos_camellia_keysize_t;
+
 struct kryptos_camellia_subkeys {
     kryptos_u32_t kw[ 14][12]; // INFO(Rafael): kw1..kw4
     kryptos_u32_t  k[124][12]; // INFO(Rafael): k1..k18
@@ -133,66 +140,57 @@ static void kryptos_camellia_FL(kryptos_u32_t *data, const kryptos_u32_t kl, con
 
 static void kryptos_camellia_FL_1(kryptos_u32_t *data, const kryptos_u32_t kl, const kryptos_u32_t kr);
 
-KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(camellia, ktask, kKryptosCipherCAMELLIA, KRYPTOS_CAMELLIA_BLOCKSIZE,
-                                       kryptos_camellia_keysize_t *keysize,
-                                       {
-                                            if (keysize != NULL) {
-                                                ktask->arg[0] = keysize;
-                                            } else {
-                                                ktask->arg[0] = NULL;
-                                            }
-                                       })
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(camellia128, kKryptosCipherCAMELLIA, KRYPTOS_CAMELLIA_BLOCKSIZE)
 
-KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(camellia,
+KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(camellia128,
                                     ktask,
                                     kryptos_camellia_subkeys,
                                     sks,
                                     kryptos_camellia_block_processor,
                                     camellia_block_processor,
                                     {
-                                        if ((*ktask)->arg[0] == NULL) {
-                                            (*ktask)->result = kKryptosInvalidParams;
-                                            (*ktask)->result_verbose = "CAMELLIA key size is missing.";
-                                            goto kryptos_camellia_cipher_epilogue;
-                                        }
-                                        sks.keysize = *(kryptos_camellia_keysize_t *)(*ktask)->arg[0];
-                                        // INFO(Rafael): Until now these are the supported key sizes.
-                                        if (sks.keysize != kKryptosCAMELLIA128 &&
-                                            sks.keysize != kKryptosCAMELLIA192 &&
-                                            sks.keysize != kKryptosCAMELLIA256) {
-                                            (*ktask)->result = kKryptosInvalidParams;
-                                            (*ktask)->result_verbose = "CAMELLIA unknown key size.";
-                                            goto kryptos_camellia_cipher_epilogue;
-                                        }
-                                        // INFO(Rafael): Depending on the key size, we must redirect the
-                                        //               processing flow to the desired key expansion algorithm.
-                                        if (sks.keysize == kKryptosCAMELLIA128) {
-                                            kryptos_camellia_keyexp_128((*ktask)->key, (*ktask)->key_size, &sks);
-                                        } else if (sks.keysize == kKryptosCAMELLIA192 ||
-                                                   sks.keysize == kKryptosCAMELLIA256) {
-                                            kryptos_camellia_keyexp_192_256((*ktask)->key, (*ktask)->key_size, &sks);
-                                        }
+                                        kryptos_camellia_keyexp_128((*ktask)->key, (*ktask)->key_size, &sks);
                                     },
-                                    kryptos_camellia_block_encrypt_128,
+                                    kryptos_camellia_block_encrypt_128, /* No additional steps before encrypting */,
+                                    kryptos_camellia_block_decrypt_128, /* No additional steps before decrypting */,
+                                    KRYPTOS_CAMELLIA_BLOCKSIZE,
+                                    camellia_cipher_epilogue,
+                                    outblock,
+                                    camellia_block_processor(outblock, &sks))
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(camellia192, kKryptosCipherCAMELLIA, KRYPTOS_CAMELLIA_BLOCKSIZE)
+
+KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(camellia192,
+                                    ktask,
+                                    kryptos_camellia_subkeys,
+                                    sks,
+                                    kryptos_camellia_block_processor,
+                                    camellia_block_processor,
                                     {
-                                        // INFO(Rafael): Dirty trick for using the correct encryption based on
-                                        //               the chosen key size. Tip: "sks.keysize != kKryptosCAMELLIA128"
-                                        //               would be naive because could inject a bug when added new key sizes.
-                                        if (sks.keysize == kKryptosCAMELLIA192 ||
-                                            sks.keysize == kKryptosCAMELLIA256) {
-                                            camellia_block_processor = kryptos_camellia_block_encrypt_192_256;
-                                        }
+                                        sks.keysize = kKryptosCAMELLIA192;
+                                        kryptos_camellia_keyexp_192_256((*ktask)->key, (*ktask)->key_size, &sks);
                                     },
-                                    kryptos_camellia_block_decrypt_128,
+                                    kryptos_camellia_block_encrypt_192_256, /* No additional steps before encrypting */,
+                                    kryptos_camellia_block_decrypt_192_256, /* No additional steps before decrypting */,
+                                    KRYPTOS_CAMELLIA_BLOCKSIZE,
+                                    camellia_cipher_epilogue,
+                                    outblock,
+                                    camellia_block_processor(outblock, &sks))
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(camellia256, kKryptosCipherCAMELLIA, KRYPTOS_CAMELLIA_BLOCKSIZE)
+
+KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(camellia256,
+                                    ktask,
+                                    kryptos_camellia_subkeys,
+                                    sks,
+                                    kryptos_camellia_block_processor,
+                                    camellia_block_processor,
                                     {
-                                        // INFO(Rafael): Dirty trick for using the correct decryption based on
-                                        //               the chosen key size. Tip: "sks.keysize != kKryptosCAMELLIA128"
-                                        //               would be naive because could inject a bug when added new key sizes.
-                                        if (sks.keysize == kKryptosCAMELLIA192 ||
-                                            sks.keysize == kKryptosCAMELLIA256) {
-                                            camellia_block_processor = kryptos_camellia_block_decrypt_192_256;
-                                        }
+                                        sks.keysize = kKryptosCAMELLIA256;
+                                        kryptos_camellia_keyexp_192_256((*ktask)->key, (*ktask)->key_size, &sks);
                                     },
+                                    kryptos_camellia_block_encrypt_192_256, /* No additional steps before encrypting */,
+                                    kryptos_camellia_block_decrypt_192_256, /* No additional steps before decrypting */,
                                     KRYPTOS_CAMELLIA_BLOCKSIZE,
                                     camellia_cipher_epilogue,
                                     outblock,

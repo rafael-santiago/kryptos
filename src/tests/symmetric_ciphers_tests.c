@@ -369,43 +369,16 @@ CUTE_TEST_CASE(kryptos_rc2_tests)
 
 CUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_camellia_tests)
-    struct camellia_key_size {
-        kryptos_camellia_keysize_t size;
-    };
-    struct camellia_key_size key_size[] = {
-        { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 },
-        { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 }, { kKryptosCAMELLIA128 },
-        { kKryptosCAMELLIA192 }, { kKryptosCAMELLIA192 }, { kKryptosCAMELLIA192 }, { kKryptosCAMELLIA192 },
-        { kKryptosCAMELLIA192 }, { kKryptosCAMELLIA192 }, { kKryptosCAMELLIA192 }, { kKryptosCAMELLIA192 },
-        { kKryptosCAMELLIA192 }, { kKryptosCAMELLIA256 }, { kKryptosCAMELLIA256 }, { kKryptosCAMELLIA256 },
-        { kKryptosCAMELLIA256 }, { kKryptosCAMELLIA256 }, { kKryptosCAMELLIA256 }, { kKryptosCAMELLIA256 },
-        { kKryptosCAMELLIA256 }, { kKryptosCAMELLIA256 }
-    };
-    size_t key_size_nr = sizeof(key_size) / sizeof(key_size[0]);
-    kryptos_task_ctx t;
-    size_t tv;
-    kryptos_run_block_cipher_tests_with_custom_setup(camellia,
-                                                     KRYPTOS_CAMELLIA_BLOCKSIZE,
-                                                     t,
-                                                     tv,
-                                                     key_size, key_size_nr,
-                                                     kryptos_camellia_setup(&t,
-                                                                            camellia_test_vector[tv % key_size_nr].key,
-                                                                            camellia_test_vector[tv % key_size_nr].key_size,
-                                                                            kKryptosECB,
-                                                                            &key_size[tv % key_size_nr].size),
-                                                     kryptos_camellia_setup(&t,
-                                                                            camellia_test_vector[tv % key_size_nr].key,
-                                                                            camellia_test_vector[tv % key_size_nr].key_size,
-                                                                            kKryptosCBC,
-                                                                            &key_size[tv % key_size_nr].size),
-                                                     kryptos_camellia_setup(&t,
-                                                                            camellia_test_vector[tv % key_size_nr].key,
-                                                                            camellia_test_vector[tv % key_size_nr].key_size,
-                                                                            kKryptosOFB,
-                                                                            &key_size[tv % key_size_nr].size));
+CUTE_TEST_CASE(kryptos_camellia128_tests)
+    kryptos_run_block_cipher_tests(camellia128, KRYPTOS_CAMELLIA_BLOCKSIZE);
+CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_camellia192_tests)
+    kryptos_run_block_cipher_tests(camellia192, KRYPTOS_CAMELLIA_BLOCKSIZE);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_camellia256_tests)
+    kryptos_run_block_cipher_tests(camellia256, KRYPTOS_CAMELLIA_BLOCKSIZE);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_cast5_tests)
