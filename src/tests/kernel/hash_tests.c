@@ -769,7 +769,7 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
 
     // INFO(Rafael): CAMELLIA-128/ECB.
 
-    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha1, key, key_size, kKryptosECB;
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha1, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha224, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, sha384, key, key_size, kKryptosECB);
