@@ -54,7 +54,7 @@ MrsHudson@221B:~/src/kryptos/src# hefesto --uninstall
 
 ### Building the kernel mode version
 
-``Kryptos`` has some parts designed to be used in kernel mode. Until now it supports ``FreeBSD`` and ``Linux``. However, there is no "kernel mode" build.
+``Kryptos`` has some parts designed to be used in kernel mode. Until now it supports ``FreeBSD``, ``NetBSD`` and ``Linux``. However, there is no "kernel mode" build.
 The library was written taking in consideration that the users will compile ``kryptos`` together with their own stuff (as a monolithic project).
 The only thing you should do is define the macro ``KRYPTOS_KERNEL_MODE`` and ``kryptos`` will "become" a kernel mode stuff.
 
@@ -213,9 +213,56 @@ kernel mode tests, your tests have been breaking where it should not... try to c
 it you must be within the ``tests/kernel`` sub-directory, once there run the command ``hefesto --clean`` and re-run the
 build.
 
+In order to run the kernel mode tests your Hefesto copy must know how to build the LKM for your platform. Due to it
+additional toolsets must be installed. This additional toolsets are shared in another repository of mine called
+[Helios](https://github.com/rafael-santiago/helios). The first thing to do is clone a copy of Helios:
+
+```
+Sherlock@221B:~/src# git clone https://github.com/rafael-santiago/helios
+```
+
+Now move to your helios' copy root directory:
+
+```
+Sherlock@221B:~/src# cd helios
+Sherlock@221B:~/src/helios# _
+```
+
+If you are in Linux:
+
+```
+Sherlock@221B:~/src/helios# hefesto --install=lnx-module-toolset
+```
+
+If you are in FreeBSD:
+
+```
+Sherlock@221B:~/src/helios# hefesto --install=freebsd-module-toolset
+```
+
+If you are in NetBSD:
+
+```
+Sherlock@221B:~/src/helios# hefesto --install=netbsd-module-toolset
+```
+
+Done! Once the toolset well installed your Hefesto's copy is able to build the LKM and test the kernel mode version of Kryptos.
+
+Btw, you can remove your Helios' copy:
+
+```
+Sherlock@221B:~/src/helios# cd ..
+Sherlock@221B:~/src# rm -rf helios
+```
+
+As you already should know just by running ``hefesto --kernel-mode-tests`` within the Kryptos' src directory will execute
+the kernel mode tests after a successful execution of the user mode tests. If you just want the kernel mode tests, move to
+the ``src/tests/kernel`` and invoke Hefesto from there.
+
 ### The GCC is being killed during the build process
 
-I only observed it when compiling kernel stuff (so, in Linux). I was experiencing the following run-time error message:
+I only observed it when compiling kernel stuff (so, in Linux and NetBSD). I was experiencing the following run-time error
+message:
 
 ```
 gcc: internal compiler error: Killed (program cc1)

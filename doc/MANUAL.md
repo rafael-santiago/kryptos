@@ -26,9 +26,9 @@ Of course, you should indicate where the ``kryptos`` headers are. In ``GCC``, ``
 
 ### Linking kernel mode stuff
 
-For kernel mode, until now, kryptos can be used in ``FreeBSD`` and ``Linux``. The main idea was create a tiny library
-easy to embed in any project. Thus all you need to do is define the C macro ``KRYPTOS_KERNEL_MODE`` during the compilation
-of your code.
+For kernel mode, until now, kryptos can be used in ``FreeBSD``, ``NetBSD`` and ``Linux``. The main idea was create a tiny
+library easy to embed in any project. Thus all you need to do is define the C macro ``KRYPTOS_KERNEL_MODE`` during the
+compilation of your code.
 
 In ``Linux`` if you want to use the c99 capabilities of ``kryptos`` you also need to pass the compiler flag ``-std=gnu99``.
 
