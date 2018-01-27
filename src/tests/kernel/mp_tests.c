@@ -1945,7 +1945,7 @@ KUTE_TEST_CASE(kryptos_mp_gen_prime_tests)
         expected_bitsize = 1;
     }
     KUTE_ASSERT(p->data_size == expected_bitsize);
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Your luck number is: "); kryptos_print_mp(p);
     uprintf(" *** Search for it in everywhere...\n");
 #elif defined(__linux__)

@@ -1309,7 +1309,7 @@ void kryptos_print_mp(const kryptos_mp_value_t *v) {
 # endif
     printf("\n");
 #else
-# if defined(__FreeBSD__)
+# if defined(__FreeBSD__) || defined(__NetBSD__)
     ssize_t d;
 #  ifndef KRYPTOS_MP_U32_DIGIT
     for (d = v->data_size - 1; d >= 0; d--) uprintf("%.2X", v->data[d]);

@@ -13,14 +13,19 @@
 #  include <stdint.h>
 #  include <stddef.h>
 # else
-#  if defined(__FreeBSD__)
+#  if defined(__FreeBSD__) || defined(__NetBSD__)
 #   include <sys/cdefs.h>
 #   include <sys/param.h>
 #   include <sys/module.h>
 #   include <sys/kernel.h>
 #   include <sys/systm.h>
 #   include <sys/malloc.h>
-#   include <sys/libkern.h>
+#    if defined(__FreeBSD__)
+#     include <sys/libkern.h>
+#    else
+#     include <lib/libkern/libkern.h>
+#     include <sys/cprng.h>
+#    endif
 #  elif defined(__linux__)
 #   include <bits/wordsize.h>
 #   include <linux/init.h>

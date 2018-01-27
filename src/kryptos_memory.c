@@ -10,7 +10,7 @@
 #if defined(KRYPTOS_USER_MODE)
 # include <stdio.h>
 # include <unistd.h>
-#elif defined(KRYPTOS_KERNEL_MODE) && defined(__FreeBSD__)
+#elif defined(KRYPTOS_KERNEL_MODE) && (defined(__FreeBSD__) || defined(__NetBSD__))
   MALLOC_DECLARE(M_KRYPTOS);
   MALLOC_DEFINE(M_KRYPTOS, "kryptos_general_memory_buffer", "buffer allocated by libkryptos");
 #endif // KRYPTOS_USER_MODE
@@ -23,7 +23,7 @@ void *kryptos_newseg(const size_t ssize) {
         printf("kryptos panic: no memory!\n");
         exit(1);
     }
-#elif defined(__FreeBSD__)
+#elif defined(__FreeBSD__) || defined(__NetBSD__)
     segment = malloc(ssize, M_KRYPTOS, M_NOWAIT);
 #elif defined(__linux__)
     segment = kmalloc(ssize, GFP_ATOMIC);
@@ -37,7 +37,7 @@ void kryptos_freeseg(void *seg) {
     if (seg != NULL) {
 #if defined(KRYPTOS_USER_MODE)
         free(seg);
-#elif defined(KRYPTOS_KERNEL_MODE) && defined(__FreeBSD__)
+#elif defined(KRYPTOS_KERNEL_MODE) && (defined(__FreeBSD__) || defined(__NetBSD__))
         free(seg, M_KRYPTOS);
 #elif defined(KRYPTOS_KERNEL_MODE) && defined(__linux__)
         kfree(seg);
@@ -48,7 +48,7 @@ void kryptos_freeseg(void *seg) {
 void *kryptos_realloc(void *addr, const size_t ssize) {
 #if defined(KRYPTOS_USER_MODE)
     return realloc(addr, ssize);
-#elif defined(KRYPTOS_KERNEL_MODE) && defined(__FreeBSD__)
+#elif defined(KRYPTOS_KERNEL_MODE) && (defined(__FreeBSD__) || defined(__NetBSD__))
     return realloc(addr, ssize, M_KRYPTOS, M_NOWAIT);
 #elif defined(KRYPTOS_KERNEL_MODE) && defined(__linux__)
     return krealloc(addr, ssize, GFP_ATOMIC);

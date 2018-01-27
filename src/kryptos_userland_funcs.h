@@ -8,7 +8,7 @@
 #ifndef KRYPTOS_KRYPTOS_USERLAND_FUNCS_H
 #define KRYPTOS_KRYPTOS_USERLAND_FUNCS_H 1
 
-#ifdef KRYPTOS_KERNEL_MODE
+#if defined(KRYPTOS_KERNEL_MODE) && !defined(__NetBSD__)
 
 #include <kryptos_types.h>
 

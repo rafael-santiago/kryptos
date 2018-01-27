@@ -198,6 +198,7 @@ local function forge_kernel_mode_tests() : result type int {
 
     $supported_platforms.add_item("linux");
     $supported_platforms.add_item("freebsd");
+    $supported_platforms.add_item("netbsd");
 
     if ($supported_platforms.index_of(hefesto.sys.os_name()) == -1) {
         hefesto.sys.echo("ERROR: Kryptos kernel mode stuff not supported " +

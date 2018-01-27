@@ -6,7 +6,7 @@
  *
  */
 #include <tests/cutest/src/kutest.h>
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
 # include <sys/cdefs.h>
 # include <sys/malloc.h>
 # include <sys/module.h>
@@ -108,7 +108,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_dh_mk_key_pair_tests);
     KUTE_RUN_TEST(kryptos_dh_process_modxchg_tests);
 #else
-# if defined(__FreeBSD__)
+# if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("WARN: The Diffie-Hellman-Merkle exchange tests were skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: The Diffie-Hellman-Merkle exchange tests were skipped.\n");
@@ -125,7 +125,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_rsa_oaep_cipher_tests);
     KUTE_RUN_TEST(kryptos_rsa_oaep_cipher_c99_tests);
 #else
-# if defined(__FreeBSD__)
+# if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("WARN: The RSA-OAEP tests were skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: The RSA-OAEP tests were skipped.\n");
@@ -141,7 +141,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_elgamal_oaep_cipher_tests);
     KUTE_RUN_TEST(kryptos_elgamal_oaep_cipher_c99_tests);
 #else
-# if defined(__FreeBSD__)
+# if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("WARN: The Elgamal-OAEP tests were skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: The Elgamal-OAEP tests were skipped.\n");
@@ -156,7 +156,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_rsa_emsa_pss_digital_signature_scheme_tests);
     KUTE_RUN_TEST(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests);
 #else
-# if defined(__FreeBSD__)
+# if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("WARN: The RSA signature tests were skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: The RSA signature tests were skipped.\n");
@@ -169,7 +169,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_dsa_digital_signature_scheme_tests);
     KUTE_RUN_TEST(kryptos_dsa_digital_signature_scheme_c99_tests);
 #else
-# if defined(__FreeBSD__)
+# if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("WARN: The DSA signature tests were skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: The DSA signature tests were skipped.\n");

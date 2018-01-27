@@ -174,7 +174,7 @@ KUTE_TEST_CASE(kryptos_generate_dl_params_tests)
 
     KUTE_ASSERT(kryptos_generate_dl_params(64, 32, &p, &q, &g) == kKryptosSuccess);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" P = "); kryptos_print_mp(p);
     uprintf(" Q = "); kryptos_print_mp(q);
     uprintf(" G = "); kryptos_print_mp(g);
@@ -208,7 +208,7 @@ KUTE_TEST_CASE(kryptos_dh_mk_domain_params_tests)
     KUTE_ASSERT(params != NULL);
     KUTE_ASSERT(params_size > 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** DH DOMAIN PARAMETERS:\n\n%s", params);
 #else
     printk(KERN_ERR " *** DH DOMAIN PARAMETERS:\n\n%s", params);
@@ -436,7 +436,7 @@ KUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
 #endif
 
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("*** Using MODP from RFC-3526.\n\n");
 #elif defined(__linux__)
     printk(KERN_ERR "*** Using MODP from RFC-3526.\n\n");
@@ -472,7 +472,7 @@ KUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     KUTE_ASSERT(kryptos_dh_eval_t(&kab_bob, t_alice, s_bob, p) == kKryptosSuccess);
     KUTE_ASSERT(kab_bob != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Alice KAB = "); kryptos_print_mp(kab_alice);
     uprintf(" *** Bob   KAB = "); kryptos_print_mp(kab_bob);
 #endif
@@ -491,7 +491,7 @@ KUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     // INFO(Rafael): Now using the "homemade" domain parameters. They were well generated (strong primes) so let's
     //               assume that Alice and Bob verified those parameters.
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n*** Using pre-computed domain parameters.\n\n");
 #elif defined(__linux__)
     printk(KERN_ERR "\n*** Using pre-computed domain parameters.\n\n");
@@ -580,7 +580,7 @@ KUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     KUTE_ASSERT(kryptos_dh_eval_t(&kab_bob, t_alice, s_bob, p) == kKryptosSuccess);
     KUTE_ASSERT(kab_bob != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Alice KAB = "); kryptos_print_mp(kab_alice);
     uprintf(" *** Bob   KAB = "); kryptos_print_mp(kab_bob);
 #endif
@@ -628,7 +628,7 @@ KUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
     kryptos_dh_init_xchg_ctx(alice);
     kryptos_dh_init_xchg_ctx(bob);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("*** Using MODP from RFC-3526.\n\n");
 #elif defined(__linux__)
     printk(KERN_ERR "*** Using MODP from RFC-3526.\n\n");
@@ -671,7 +671,7 @@ KUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     KUTE_ASSERT(alice->k != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Alice KAB = "); kryptos_print_mp(alice->k);
     uprintf(" *** Bob   KAB = "); kryptos_print_mp(bob->k);
 #endif
@@ -684,7 +684,7 @@ KUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
     kryptos_clear_dh_xchg_ctx(alice);
     kryptos_clear_dh_xchg_ctx(bob);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n*** Using the pre-computed domain parameters.\n\n");
 #elif defined(__linux__)
     printk(KERN_ERR "\n*** Using the pre-computed domain parameters.\n\n");
@@ -749,7 +749,7 @@ KUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     KUTE_ASSERT(alice->k != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Alice KAB = "); kryptos_print_mp(alice->k);
     uprintf(" *** Bob   KAB = "); kryptos_print_mp(bob->k);
 #endif
@@ -947,7 +947,7 @@ KUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
 
     // INFO(Rafael): Using MODP defined in RFC-3526.
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("*** Using MODP from RFC-3526.\n\n");
 #elif defined(__linux__)
     printk(KERN_ERR "*** Using MODP from RFC-3526.\n\n");
@@ -999,7 +999,7 @@ KUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
     KUTE_ASSERT(bob->out == NULL && bob->out_size == 0); // INFO(Rafael): Bob does not need to send any data to Alice.
     KUTE_ASSERT(bob->k != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Alice KAB = "); kryptos_print_mp(alice->k);
     uprintf(" *** Bob   KAB = "); kryptos_print_mp(bob->k);
 #endif
@@ -1017,7 +1017,7 @@ KUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
 
     // INFO(Rafael): Using the pre-computed parameters and q (when --dh-use-q-size is present).
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n*** Using the pre-computed domain parameters.\n\n");
 #elif defined(__linux__)
     printk(KERN_ERR "\n*** Using the pre-computed domain parameters.\n\n");
@@ -1081,7 +1081,7 @@ KUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
     KUTE_ASSERT(bob->out == NULL && bob->out_size == 0); // INFO(Rafael): Bob does not need to send any data to Alice.
     KUTE_ASSERT(bob->k != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Alice KAB = "); kryptos_print_mp(alice->k);
     uprintf(" *** Bob   KAB = "); kryptos_print_mp(bob->k);
 #endif
@@ -1103,7 +1103,7 @@ KUTE_TEST_CASE(kryptos_rsa_mk_key_pair_tests)
     size_t k_pub_size, k_priv_size;
     kryptos_rsa_mk_key_pair(80, &k_pub, &k_pub_size, &k_priv, &k_priv_size);
     KUTE_ASSERT(k_pub != NULL && k_priv != NULL);
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** RSA PUBLIC KEY:\n\n");
     uprintf("%s", k_pub);
     uprintf("\n *** RSA PRIVATE KEY:\n\n");
@@ -1148,7 +1148,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_tests)
     a_ktask->in = m;
     a_ktask->in_size = m_size;
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -1160,7 +1160,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_tests)
 
     KUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** CIPHERTEXT:\n\n%s\n\n", a_ktask->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n\n", a_ktask->out);
@@ -1184,7 +1184,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_tests)
 
     KUTE_ASSERT(b_ktask->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** PLAINTEXT:\n\n'%s'\n\n", b_ktask->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** PLAINTEXT:\n\n'%s'\n\n", b_ktask->out);
@@ -1226,7 +1226,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
     kryptos_task_set_in(b_ktask, m, m_size);
     kryptos_task_set_encrypt_action(b_ktask);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -1236,7 +1236,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
 
     KUTE_ASSERT(kryptos_last_task_succeed(b_ktask) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** CIPHERTEXT:\n\n%s\n\n", b_ktask->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n\n", b_ktask->out);
@@ -1255,7 +1255,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
 
     KUTE_ASSERT(a_ktask->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** PLAINTEXT:\n\n'%s'\n\n", a_ktask->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** PLAINTEXT:\n\n'%s'\n\n", a_ktask->out);
@@ -1267,7 +1267,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
     kryptos_task_free(a_ktask, KRYPTOS_TASK_OUT);
     kryptos_task_free(b_ktask, KRYPTOS_TASK_OUT);
 #else
-# if defined(__FreeBSD__)
+# if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("WARN: No c99 support, this test was skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: No c99 support, this test was skipped.\n");
@@ -1442,7 +1442,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
     a_ktask->in = m;
     a_ktask->in_size = m_size;
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -1454,7 +1454,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
 
     KUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** CIPHERTEXT:\n\n%s\n", a_ktask->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", a_ktask->out);
@@ -1482,7 +1482,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
 
     KUTE_ASSERT(b_ktask->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** PLAINTEXT:\n\n'%s'\n\n", b_ktask->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** PLAINTEXT:\n\n'%s'\n\n", b_ktask->out);
@@ -1510,7 +1510,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
     a_ktask->in = m;
     a_ktask->in_size = m_size;
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -1522,7 +1522,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
 
     KUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** CIPHERTEXT:\n\n%s\n", a_ktask->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", a_ktask->out);
@@ -1532,7 +1532,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
 
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_C, a_ktask->out, a_ktask->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" ( the cryptogram was intentionally corrupted )\n\n");
 #elif defined(__linux__)
     printk(KERN_ERR " ( the cryptogram was intentionally corrupted )\n\n");
@@ -1561,7 +1561,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
     KUTE_ASSERT(b_ktask->out == NULL);
     KUTE_ASSERT(b_ktask->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** PLAINTEXT:\n\n (null)\n\n");
 
     uprintf(" *** Nice, the unexpected cryptogram was successfully detected => '%s'.\n", b_ktask->result_verbose);
@@ -1613,7 +1613,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
     kryptos_task_set_in(b_ktask, m, m_size);
     kryptos_task_set_encrypt_action(b_ktask);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -1624,7 +1624,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
 
     KUTE_ASSERT(kryptos_last_task_succeed(b_ktask) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** CIPHERTEXT:\n\n%s\n", b_ktask->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", b_ktask->out);
@@ -1644,7 +1644,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
 
     KUTE_ASSERT(a_ktask->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** PLAINTEXT:\n\n'%s'\n\n", a_ktask->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** PLAINTEXT:\n\n'%s'\n\n", a_ktask->out);
@@ -1666,7 +1666,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
     kryptos_task_set_in(b_ktask, m, m_size);
     kryptos_task_set_encrypt_action(b_ktask);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -1677,7 +1677,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
 
     KUTE_ASSERT(kryptos_last_task_succeed(b_ktask) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** CIPHERTEXT:\n\n%s\n", b_ktask->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", b_ktask->out);
@@ -1687,7 +1687,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
 
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_C, b_ktask->out, b_ktask->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" ( the cryptogram was intentionally corrupted )\n\n");
 #else
     printk(KERN_ERR " ( the cryptogram was intentionally corrupted )\n\n");
@@ -1708,7 +1708,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
     KUTE_ASSERT(a_ktask->out == NULL);
     KUTE_ASSERT(a_ktask->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** PLAINTEXT:\n\n (null)\n\n");
 
     uprintf(" *** Nice, the unexpected cryptogram was successfully detected => '%s'.\n", a_ktask->result_verbose);
@@ -1722,7 +1722,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
     kryptos_task_free(b_ktask, KRYPTOS_TASK_OUT);
 
 #else
-# if defined(__FreeBSD__)
+# if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("WARN: No c99 support, this test was skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: No c99 support, this test was skipped.\n");
@@ -1742,7 +1742,7 @@ KUTE_TEST_CASE(kryptos_elgamal_mk_key_pair_tests)
     KUTE_ASSERT(kryptos_elgamal_mk_key_pair(80, 40, &k_pub, &k_pub_size, &k_priv, &k_priv_size) == kKryptosSuccess);
     KUTE_ASSERT(k_pub != NULL && k_pub_size != 0 && k_priv != NULL && k_priv_size != 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ELGAMAL PUBLIC KEY:\n\n");
     uprintf("%s", k_pub);
 
@@ -1883,7 +1883,7 @@ KUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
     kryptos_u8_t *m = "yo no creo en brujas, pero que las hay, las hay.\x00\x00\x00\x00\x00\x00\x00\x00";
     size_t m_size = 56;
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -1905,7 +1905,7 @@ KUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
 
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** CIPHERTEXT:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", bob->out);
@@ -1926,7 +1926,7 @@ KUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
 
     KUTE_ASSERT(alice->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** PLAINTEXT:\n\n'%s'\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** PLAINTEXT:\n\n'%s'\n", alice->out);
@@ -1965,7 +1965,7 @@ KUTE_TEST_CASE(kryptos_elgamal_cipher_c99_tests)
     size_t m_size = 32;
     kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -1983,7 +1983,7 @@ KUTE_TEST_CASE(kryptos_elgamal_cipher_c99_tests)
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** CIPHERTEXT:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", alice->out);
@@ -2006,7 +2006,7 @@ KUTE_TEST_CASE(kryptos_elgamal_cipher_c99_tests)
     KUTE_ASSERT(bob->out_size == m_size);
     KUTE_ASSERT(memcmp(bob->out, m, bob->out_size) == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** PLAINTEXT:\n\n'%s'\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** PLAINTEXT:\n\n'%s'\n", bob->out);
@@ -2015,7 +2015,7 @@ KUTE_TEST_CASE(kryptos_elgamal_cipher_c99_tests)
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
 #else
-# if defined(__FreeBSD__)
+# if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("WARN: No c99 support, this test was skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: No c99 support, this test was skipped.\n");
@@ -2073,7 +2073,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -2096,7 +2096,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     KUTE_ASSERT(alice->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** CIPHERTEXT:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", alice->out);
@@ -2122,7 +2122,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
     KUTE_ASSERT(bob->out_size == m_size);
     KUTE_ASSERT(memcmp(bob->out, m, m_size) == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** PLAINTEXT:\n\n'%s'\n\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** PLAINTEXT:\n\n'%s'\n\n", bob->out);
@@ -2133,7 +2133,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
 
     // INFO(Rafael): Now with a corrupted cryptogram.
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -2156,7 +2156,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     KUTE_ASSERT(alice->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** CIPHERTEXT:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", alice->out);
@@ -2170,7 +2170,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
 
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Y, bob->in, bob->in_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" ( the cryptogram was intentionally corrupted )\n\n");
 #elif defined(__linux__)
     printk(KERN_ERR " ( the cryptogram was intentionally corrupted )\n\n");
@@ -2188,7 +2188,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
     KUTE_ASSERT(bob->out_size == 0);
     KUTE_ASSERT(bob->out == NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** PLAINTEXT:\n\n (null)\n\n");
 
     uprintf(" *** Nice, the unexpected cryptogram was successfully detected => '%s'.\n", bob->result_verbose);
@@ -2253,7 +2253,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
     kryptos_task_init_as_null(bob);
     kryptos_task_init_as_null(alice);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -2268,7 +2268,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
     KUTE_ASSERT(bob->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** CIPHERTEXT:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", bob->out);
@@ -2288,7 +2288,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
 
     KUTE_ASSERT(memcmp(alice->out, m, alice->out_size) == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** PLAINTEXT:\n\n'%s'\n\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** PLAINTEXT:\n\n'%s'\n\n", alice->out);
@@ -2299,7 +2299,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
 
     // INFO(Rafael): Corrupted cryptogram.
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -2314,7 +2314,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
     KUTE_ASSERT(bob->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** CIPHERTEXT:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** CIPHERTEXT:\n\n%s\n", bob->out);
@@ -2324,7 +2324,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
 
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Y, alice->in, alice->in_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" ( the cryptogram was intentionally corrupted )\n\n");
 #elif defined(__linux__)
     printk(KERN_ERR " ( the cryptogram was intentionally corrupted )\n\n");
@@ -2340,7 +2340,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
     KUTE_ASSERT(alice->out == NULL);
     KUTE_ASSERT(alice->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** PLAINTEXT:\n\n (null)\n\n");
 
     uprintf(" *** Nice, the unexpected cryptogram was successfully detected => '%s'.\n", alice->result_verbose);
@@ -2353,7 +2353,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
 #else
-# if defined(__FreeBSD__)
+# if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("WARN: No c99 support, this test was skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: No c99 support, this test was skipped.\n");
@@ -2452,7 +2452,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
 
     // INFO(Rafael): Valid signature case.
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -2474,7 +2474,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
 
     KUTE_ASSERT(alice->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT:\n\n%s\n", alice->out);
@@ -2497,7 +2497,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     KUTE_ASSERT(bob->out_size == m_size);
     KUTE_ASSERT(memcmp(bob->out, m, bob->out_size) == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
@@ -2510,7 +2510,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
 
     // INFO(Rafael): Invalid signature cases.
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -2527,7 +2527,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
 
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH X PARAMETER CORRUPTED:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH X PARAMETER CORRUPTED:\n\n%s\n", alice->out);
@@ -2549,7 +2549,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     KUTE_ASSERT(bob->out == NULL);
     KUTE_ASSERT(bob->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
@@ -2558,7 +2558,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -2572,7 +2572,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
 
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH S PARAMETER CORRUPTED:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH S PARAMETER CORRUPTED:\n\n%s\n", alice->out);
@@ -2592,7 +2592,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 0);
     KUTE_ASSERT(bob->result == kKryptosInvalidSignature);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
@@ -2601,7 +2601,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -2619,7 +2619,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH BOTH X AND S PARAMETERS CORRUPTED:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH BOTH X AND S PARAMETERS CORRUPTED:\n\n%s\n", alice->out);
@@ -2639,7 +2639,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 0);
     KUTE_ASSERT(bob->result == kKryptosInvalidSignature);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n", bob->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n",
@@ -2681,7 +2681,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -2694,7 +2694,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
     KUTE_ASSERT(bob->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT:\n\n%s\n", bob->out);
@@ -2707,7 +2707,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     KUTE_ASSERT(alice->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
@@ -2723,7 +2723,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -2737,7 +2737,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
 
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", bob->out);
@@ -2751,7 +2751,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     KUTE_ASSERT(alice->out == NULL);
     KUTE_ASSERT(alice->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n",
@@ -2764,7 +2764,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -2778,7 +2778,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
 
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->out);
@@ -2792,7 +2792,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     KUTE_ASSERT(alice->out == NULL);
     KUTE_ASSERT(alice->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n",
@@ -2805,7 +2805,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -2820,7 +2820,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH BOTH X AND S CORRUPTED:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH BOTH X AND S CORRUPTED:\n\n%s\n", bob->out);
@@ -2834,7 +2834,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     KUTE_ASSERT(alice->out == NULL);
     KUTE_ASSERT(alice->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n", alice->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n",
@@ -2845,7 +2845,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
     kryptos_freeseg(signature);
 #else
-# if defined(__FreeBSD__)
+# if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("WARN: No c99 support, this test was skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: No c99 support, this test was skipped.\n");
@@ -2881,7 +2881,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
 
     // INFO(Rafael): Valid signature case.
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -2905,7 +2905,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
 
     KUTE_ASSERT(alice->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT:\n\n%s\n", alice->out);
@@ -2930,7 +2930,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     KUTE_ASSERT(bob->out_size == m_size);
     KUTE_ASSERT(memcmp(bob->out, m, bob->out_size) == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
@@ -2943,7 +2943,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
 
     // INFO(Rafael): Invalid signature cases.
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -2969,7 +2969,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
 
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH X PARAMETER CORRUPTED:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH X PARAMETER CORRUPTED:\n\n%s\n", alice->out);
@@ -2993,7 +2993,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     KUTE_ASSERT(bob->out == NULL);
     KUTE_ASSERT(bob->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
@@ -3002,7 +3002,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -3019,7 +3019,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
 
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH S PARAMETER CORRUPTED:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH S PARAMETER CORRUPTED:\n\n%s\n", alice->out);
@@ -3041,7 +3041,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 0);
     KUTE_ASSERT(bob->result == kKryptosInvalidSignature);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
@@ -3050,7 +3050,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -3068,7 +3068,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH BOTH X AND S PARAMETERS CORRUPTED:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH BOTH X AND S PARAMETERS CORRUPTED:\n\n%s\n", alice->out);
@@ -3090,7 +3090,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 0);
     KUTE_ASSERT(bob->result == kKryptosInvalidSignature);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n", bob->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n",
@@ -3132,7 +3132,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -3145,7 +3145,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
     KUTE_ASSERT(bob->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT:\n\n%s\n", bob->out);
@@ -3159,7 +3159,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     KUTE_ASSERT(alice->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
@@ -3176,7 +3176,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -3190,7 +3190,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
 
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", bob->out);
@@ -3205,7 +3205,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     KUTE_ASSERT(alice->out == NULL);
     KUTE_ASSERT(alice->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n",
@@ -3218,7 +3218,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -3232,7 +3232,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
 
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     printf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->out);
@@ -3247,7 +3247,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     KUTE_ASSERT(alice->out == NULL);
     KUTE_ASSERT(alice->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n",
@@ -3260,7 +3260,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -3275,7 +3275,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH BOTH X AND S CORRUPTED:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH BOTH X AND S CORRUPTED:\n\n%s\n", bob->out);
@@ -3290,7 +3290,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     KUTE_ASSERT(alice->out == NULL);
     KUTE_ASSERT(alice->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n", alice->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n",
@@ -3301,7 +3301,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
     kryptos_freeseg(signature);
 #else
-# if defined(__FreeBSD__)
+# if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("WARN: No c99 support, this test was skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: No c99 support, this test was skipped.\n");
@@ -3324,7 +3324,7 @@ KUTE_TEST_CASE(kryptos_dsa_mk_key_pair_tests)
 
     KUTE_ASSERT(k_pub != NULL && k_priv != NULL && k_pub_size > 0 && k_priv_size > 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** DSA PUBLIC KEY:\n\n");
     uprintf("%s", k_pub);
 
@@ -3467,7 +3467,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
                       "e sobre nossos tumulos nascerao flores amarelas e medrosas.";
     size_t m_size;
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -3488,7 +3488,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     KUTE_ASSERT(alice->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT:\n\n%s\n", alice->out);
@@ -3507,7 +3507,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     KUTE_ASSERT(bob->out_size == m_size);
     KUTE_ASSERT(memcmp(bob->out, m, m_size) == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
@@ -3515,7 +3515,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -3532,7 +3532,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
 
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_R, bob->in, bob->in_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", bob->in);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", bob->in);
@@ -3545,7 +3545,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     KUTE_ASSERT(bob->out == NULL);
     KUTE_ASSERT(bob->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with r corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with r corrupted was successfully detected => '%s'\n\n",
@@ -3554,7 +3554,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
 
     kryptos_task_free(bob, KRYPTOS_TASK_IN);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -3571,7 +3571,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
 
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_S, bob->in, bob->in_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->in);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->in);
@@ -3584,7 +3584,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     KUTE_ASSERT(bob->out == NULL);
     KUTE_ASSERT(bob->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
@@ -3592,7 +3592,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
 
     kryptos_task_free(bob, KRYPTOS_TASK_IN);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -3610,7 +3610,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_R, bob->in, bob->in_size) == 1);
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_S, bob->in, bob->in_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH BOTH R AND S CORRUPTED:\n\n%s\n", bob->in);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH BOTH R AND S CORRUPTED:\n\n%s\n", bob->in);
@@ -3623,7 +3623,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     KUTE_ASSERT(bob->out == NULL);
     KUTE_ASSERT(bob->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with r and s corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with r and s corrupted was successfully detected => '%s'\n\n",
@@ -3714,7 +3714,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -3725,7 +3725,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
     KUTE_ASSERT(bob->out != NULL);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT:\n\n%s\n", bob->out);
@@ -3738,7 +3738,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     KUTE_ASSERT(alice->out_size == m_size);
     KUTE_ASSERT(memcmp(alice->out, m, alice->out_size) == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
@@ -3746,7 +3746,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
 
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -3759,7 +3759,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
 
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_R, signature, bob->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", signature);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", signature);
@@ -3772,7 +3772,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     KUTE_ASSERT(alice->out == NULL);
     KUTE_ASSERT(alice->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with r corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with r corrupted was successfully detected => '%s'\n\n",
@@ -3781,7 +3781,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
 
     kryptos_freeseg(signature);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -3794,7 +3794,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
 
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_S, signature, bob->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", signature);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", signature);
@@ -3807,7 +3807,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     KUTE_ASSERT(alice->out == NULL);
     KUTE_ASSERT(alice->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n",
@@ -3816,7 +3816,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
 
     kryptos_freeseg(signature);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -3830,7 +3830,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_R, signature, bob->out_size) == 1);
     KUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_S, signature, bob->out_size) == 1);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH BOTH R AND S CORRUPTED:\n\n%s\n", signature);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH BOTH R AND S CORRUPTED:\n\n%s\n", signature);
@@ -3843,7 +3843,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     KUTE_ASSERT(alice->out == NULL);
     KUTE_ASSERT(alice->out_size == 0);
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     printf(" *** Nice, the signed output with r and s corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with r and s corrupted was successfully detected => '%s'\n\n",
@@ -3854,7 +3854,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
 #else
-# if defined(__FreeBSD__)
+# if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("WARN: No c99 support, this test was skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: No c99 support, this test was skipped.\n");

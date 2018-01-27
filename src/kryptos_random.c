@@ -12,7 +12,7 @@
 # include <unistd.h>
 #endif
 
-#if defined(KRYPTOS_KERNEL_MODE) && defined(__FreeBSD__)
+#if defined(KRYPTOS_KERNEL_MODE) && (defined(__FreeBSD__) || defined(__NetBSD__))
 static void get_random_bytes(kryptos_u8_t *buf, const size_t n);
 
 static void get_random_bytes(kryptos_u8_t *buf, const size_t n) {
@@ -28,7 +28,11 @@ static void get_random_bytes(kryptos_u8_t *buf, const size_t n) {
     b_end = b + n;
 
     while (b != b_end) {
+#if defined(__FreeBSD__)
         r = arc4random();
+#elif defined(__NetBSD__)
+        r = cprng_strong32();
+#endif
         for (byte = 0; byte < sizeof(r) && b != b_end; byte++, b++) {
             *b = r & 0xFF;
             r = r >> 8;

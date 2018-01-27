@@ -1517,13 +1517,13 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
 # if !defined(KRYPTOS_NO_HMAC_TESTS)
     // TODO(Rafael): When there is no C99 support add a simple bare bone test with at least one block cipher and all
     //               available hash functions.
-#  if defined(__FreeBSD__)
+#  if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("WARN: This test runs only when libkryptos is compiled with C99 support. It will be skipped.\n");
 #  elif defined(__linux__)
     printk(KERN_ERR "WARN: This test runs only when libkryptos is compiled with C99 support. It will be skipped.\n");
 #  endif
 # else
-#   if defined(__FreeBSD__)
+#   if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("WARN: You have requested build this binary without the HMAC tests.\n");
 #   else
     printk(KERN_ERR "WARN: You have requested build this binary without the HMAC tests.\n");
