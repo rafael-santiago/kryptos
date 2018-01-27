@@ -92,11 +92,18 @@ typedef unsigned int kryptos_u32_t;
 # endif
 # if !defined(__WORDSIZE)
 // INFO(Rafael): OpenBSD branches to this if clause.
-#  if defined(__amd64__)
+#  if defined(__amd64__) || defined(__x86_64__)
 #   define __WORDSIZE 64
 #  else
 #   define __WORDSIZE 32
 #  endif
+# endif
+#elif !defined(__WORDSIZE) && defined(KRYPTOS_KERNEL_MODE)
+// INFO(Rafael): Until now it is only for NetBSD.
+# if defined(__x86_64__) || defined(__amd64__)
+#  define __WORDSIZE 64
+# else
+#  define __WORDSIZE 32
 # endif
 #endif
 
