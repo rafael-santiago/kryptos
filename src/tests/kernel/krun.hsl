@@ -25,6 +25,8 @@ function krun(modpath type string) : result type int {
 local function install_kernel_module(modpath type string) : result type int {
     if (hefesto.sys.os_name() == "freebsd") {
         result hefesto.sys.run("kldload ./" + $modpath);
+    } else if (hefesto.sys.os_name() == "netbsd") {
+        result hefesto.sys.run("modload ./" + $modpath);
     } else if (hefesto.sys.os_name() == "linux") {
         hefesto.sys.run("dmesg -n4");
         result hefesto.sys.run("insmod ./" + $modpath);
@@ -35,6 +37,8 @@ local function install_kernel_module(modpath type string) : result type int {
 local function remove_kernel_module(modpath type string) : result type int {
     if (hefesto.sys.os_name() == "freebsd") {
         result hefesto.sys.run("kldunload " + $modpath);
+    } else if (hefesto.sys.os_name() == "netbsd") {
+        result hefesto.sys.run("modunload ktest_monkey");
     } else if (hefesto.sys.os_name() == "linux") {
         result hefesto.sys.run("rmmod " + $modpath);
     }

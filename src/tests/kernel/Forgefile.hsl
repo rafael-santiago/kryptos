@@ -16,10 +16,12 @@ local var includes type list;
 local var cflags type list;
 local var libraries type list;
 local var ldflags type list;
+local var modname type string;
 
 local var LKMTOOL type string;
 
-project kryptos-test-mod : toolset $LKMTOOL : "main.c", $includes, $cflags, $libraries, $ldflags, "kryptos_test";
+
+project kryptos-test-mod : toolset $LKMTOOL : "main.c", $includes, $cflags, $libraries, $ldflags, $modname;
 
 kryptos-test-mod.preloading() {
     if (hefesto.sys.os_name() == "freebsd") {
@@ -89,13 +91,25 @@ kryptos-test-mod.prologue() {
     #               Notice that no .ar file is generated. When adding the path "../.." to the includes list the object files from
     #               kryptos are automatically linked together.
     $cflags.add_item("-DKRYPTOS_KERNEL_MODE=1");
+
+    $modname = "kryptos_test";
 }
 
 kryptos-test-mod.epilogue() {
     if (hefesto.sys.last_forge_result() == 0) {
         hefesto.sys.echo("*** Test module successfully compiled.\n");
+
+        if (hefesto.sys.os_name() != "netbsd") {
+            $modname = $modname + ".ko";
+        } else {
+            $modname = $modname + ".kmod";
+        }
+
+        # WARN(Rafael): Buckle up!
+
         var exit_code type int;
-        $exit_code = krun("kryptos_test.ko");
+        $exit_code = krun($modname);
+
         if ($exit_code != 0) {
             hefesto.project.abort($exit_code);
         }
