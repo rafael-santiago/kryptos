@@ -165,7 +165,7 @@ Yes, global macros into a code module (``*.c``) should be undefined at the end o
 
 ### Unit tests
 
-For unit tests I am using my own [stuff](https://github.com/rafael-santiago/cutest). For kernel mode tests I use a mimic of that versioned inside the own submodule directory (``tests/cutest/src``).
+For unit tests (user and kernel modes) I am using my own [stuff](https://github.com/rafael-santiago/cutest).
 
 The default way of naming a test is by using the name of the function currently tested appended with ("_tests"). Try not be so pedant, describing inputs, behaviors
 and all this kind of shit in the test name. This just creates mess and boredom.

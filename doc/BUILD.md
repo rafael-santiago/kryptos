@@ -268,7 +268,7 @@ message:
 gcc: internal compiler error: Killed (program cc1)
 ```
 
-This have been occurred more precisely when compiling the source file ``tests/kernel/hash_tests.c``. This module has tons of
+It have been occurred more precisely when compiling the source file ``tests/kernel/hash_tests.c``. This module has tons of
 macro stuff so the C pre-processor seems to be defeated by them... The solution is skip the HMAC tests, btw where the C
 pre-processor is abused. Try to re-run the kernel-mode tests as follows:
 
