@@ -730,3 +730,15 @@ CUTE_TEST_CASE(kryptos_rc6_256_tests)
                                                                            kKryptosOFB,
                                                                            &rc6_rounds[tv % rc6_rounds_nr].rounds));
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mars128_tests)
+    kryptos_run_block_cipher_tests(mars128, KRYPTOS_MARS_BLOCKSIZE);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mars192_tests)
+    kryptos_run_block_cipher_tests(mars192, KRYPTOS_MARS_BLOCKSIZE);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mars256_tests)
+    kryptos_run_block_cipher_tests(mars256, KRYPTOS_MARS_BLOCKSIZE);
+CUTE_TEST_CASE_END

@@ -12,7 +12,7 @@
 #include <kryptos_padding.h>
 #include <kryptos.h>
 #ifndef KRYPTOS_KERNEL_MODE
-#  include <string.h>
+# include <string.h>
 #endif
 
 #define kryptos_aes_rotl(x, s) ( (x) << (s) | (x) >> ((sizeof(x) << 3) - (s)) )

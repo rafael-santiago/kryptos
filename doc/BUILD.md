@@ -207,7 +207,7 @@ primitives and protocols. Warnings like "kthread starved for N jiffies" are expe
 In ``FreeBSD``, you will experience a big and frightening freeze but the machine not rebooting you are safe. It means
 that all tests were passed.
 
-Sometimes ``make`` (the build system used by the two supported platforms) does not detect correctly changes and as a result
+Sometimes ``make`` (the build system used by supported platforms) does not detect correctly changes and as a result
 some piece of code that should be recompiled remains untouched. If you have been experiencing some weird errors during the
 kernel mode tests, your tests have been breaking where it should not... try to clean up the kernel objects. In order to do
 it you must be within the ``tests/kernel`` sub-directory, once there run the command ``hefesto --clean`` and re-run the

@@ -66,6 +66,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_tea_tests);
     CUTE_RUN_TEST(kryptos_xtea_tests);
     CUTE_RUN_TEST(kryptos_misty1_tests);
+    CUTE_RUN_TEST(kryptos_mars128_tests);
+    CUTE_RUN_TEST(kryptos_mars192_tests);
+    CUTE_RUN_TEST(kryptos_mars256_tests);
 
     // INFO(Rafael): Hash validation (also official data).
     CUTE_RUN_TEST(kryptos_sha1_tests);

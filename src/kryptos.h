@@ -31,6 +31,7 @@
 #include <kryptos_tea.h>
 #include <kryptos_xtea.h>
 #include <kryptos_misty1.h>
+#include <kryptos_mars.h>
 
 #include <kryptos_sha1.h>
 #include <kryptos_sha224_256.h>
