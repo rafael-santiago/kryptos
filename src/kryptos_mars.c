@@ -15,7 +15,7 @@
 # include <string.h>
 #endif
 
-// INFO(Rafael): The SBOXES 'from MARS'... ;-p
+// INFO(Rafael): The SBOXES 'from MARS'...
 
 static kryptos_u32_t kryptos_mars_S[512] = {
     0x09D0C479, 0x28C8FFE0, 0x84AA6C39, 0x9DAD7287, 0x7DFF9BE3, 0xD4268361, 0xC96DA1D4, 0x7974CC93,
