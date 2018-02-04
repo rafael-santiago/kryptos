@@ -311,7 +311,7 @@ static void kryptos_mars_key_sched(const kryptos_u8_t *key, const size_t key_siz
     (m) |= (m) << 2;\
     (m) |= (m) << 4;\
     (m) &= 0x7FFFFFFC;\
-    (w) ^= kryptos_mars_rotl(kryptos_mars_B[(K)[(i)] & 0x3], (K)[(i) - 1] & 0x1FF) & (m);\
+    (w) ^= kryptos_mars_rotl(kryptos_mars_B[(K)[(i)] & 0x3], (K)[(i) - 1] & 0x1F) & (m);\
     (K)[(i)] = (w);\
 }
 
