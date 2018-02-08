@@ -48,6 +48,12 @@ kryptos.prologue() {
 kryptos.epilogue() {
     if (hefesto.sys.last_forge_result() == 0) {
         var oldcwd type string;
+        var option type list;
+
+        $option = hefesto.sys.get_option("no-tests");
+        if ($option.count() > 0) {
+            hefesto.project.abort(0);
+        }
 
         $oldcwd = hefesto.sys.pwd();
 
@@ -70,8 +76,6 @@ kryptos.epilogue() {
         }
 
         hefesto.sys.cd($oldcwd);
-
-        var option type list;
 
         $option = hefesto.sys.get_option("mk-samples");
 

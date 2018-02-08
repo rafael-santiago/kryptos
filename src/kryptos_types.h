@@ -155,6 +155,7 @@ typedef enum {
     kKryptosCipherMARS128,
     kKryptosCipherMARS192,
     kKryptosCipherMARS256,
+    kKryptosCipherPRESENT,
     kKryptosCipherRSA,
     kKryptosCipherRSAOAEP,
     kKryptosCipherELGAMAL,

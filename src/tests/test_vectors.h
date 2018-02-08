@@ -27,6 +27,7 @@
 #include "xtea_test_vector.h"
 #include "misty1_test_vector.h"
 #include "mars_test_vector.h"
+#include "present_test_vector.h"
 #include "sha1_test_vector.h"
 #include "sha224_test_vector.h"
 #include "sha256_test_vector.h"
@@ -154,11 +155,9 @@ static kryptos_u8_t *hmac_test_data[] = {
         kryptos_ ## cipher_name  ## _cipher(&ktask);\
         CUTE_ASSERT(t.out != NULL);\
         CUTE_ASSERT(t.out_size == (t.in_size << 1));\
-        /*if (t.out_size == 32) {\
-            printf("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x "\
-                   "%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n",\
-                     *(t.out), *(t.out+1), *(t.out+2), *(t.out+3), *(t.out+4), *(t.out+5), *(t.out+6), *(t.out+7),\
-                     *(t.out+8), *(t.out+9), *(t.out+10), *(t.out+11), *(t.out+12), *(t.out+13), *(t.out+14), *(t.out+15));\
+        /*if (t.out_size == 16) {\
+            printf("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n",\
+                     *(t.out), *(t.out+1), *(t.out+2), *(t.out+3), *(t.out+4), *(t.out+5), *(t.out+6), *(t.out+7));\
         }*/\
         CUTE_ASSERT(memcmp(t.out, cipher_name ## _test_vector[tv].cipher, cipher_name ## _test_vector[tv].block_size) == 0);\
         t.in = t.out;\
@@ -228,10 +227,9 @@ static kryptos_u8_t *hmac_test_data[] = {
         kryptos_ ## cipher_name  ## _cipher(&ktask);\
         CUTE_ASSERT(t.out != NULL);\
         CUTE_ASSERT(t.out_size == (t.in_size << 1));\
-        /*if (t.out_size == 32) {\
-            printf("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n",\
-                 *(t.out), *(t.out+1), *(t.out+2), *(t.out+3), *(t.out+4), *(t.out+5), *(t.out+6), *(t.out+7),\
-                 *(t.out+8), *(t.out+9), *(t.out+10), *(t.out+11), *(t.out+12), *(t.out+13), *(t.out+14), *(t.out+15));\
+        /*if (t.out_size == 8) {\
+            printf("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n",\
+                 *(t.out), *(t.out+1), *(t.out+2), *(t.out+3), *(t.out+4), *(t.out+5), *(t.out+6), *(t.out+7));\
         }*/\
         CUTE_ASSERT(memcmp(t.out, cipher_name ## _test_vector[tv].cipher, cipher_name ## _test_vector[tv].block_size) == 0);\
         t.in = t.out;\

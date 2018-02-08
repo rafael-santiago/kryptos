@@ -742,3 +742,7 @@ CUTE_TEST_CASE_END
 CUTE_TEST_CASE(kryptos_mars256_tests)
     kryptos_run_block_cipher_tests(mars256, KRYPTOS_MARS_BLOCKSIZE);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_present80_tests)
+    kryptos_run_block_cipher_tests(present80, KRYPTOS_PRESENT_BLOCKSIZE);
+CUTE_TEST_CASE_END

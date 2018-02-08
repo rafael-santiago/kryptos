@@ -22,6 +22,7 @@
 #include <kryptos_xtea.h>
 #include <kryptos_misty1.h>
 #include <kryptos_mars.h>
+#include <kryptos_present.h>
 #include <kryptos_rsa.h>
 #include <kryptos_elgamal.h>
 #include <kryptos_dsa.h>
@@ -381,6 +382,10 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
         case kKryptosCipherMARS192:
         case kKryptosCipherMARS256:
             return ((*ktask)->iv_size == KRYPTOS_MARS_BLOCKSIZE);
+            break;
+
+        case kKryptosCipherPRESENT:
+            return ((*ktask)->iv_size == KRYPTOS_PRESENT_BLOCKSIZE);
             break;
 
         default: // WARN(Rafael): Only to shut up the cumbersome compiler warning.

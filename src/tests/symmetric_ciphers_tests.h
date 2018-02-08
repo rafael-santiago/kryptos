@@ -66,4 +66,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_mars192_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_mars256_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_present80_tests);
+
 #endif
