@@ -1,6 +1,6 @@
 # Kryptos
 
-This project is a try of building a tiny and straightforward crypto library that can be used in user mode and also
+This project is an attempt of building a tiny and straightforward crypto library that can be used in user mode and also
 kernel mode stuff.
 
 Until now these are the supported platforms:

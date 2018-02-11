@@ -285,6 +285,11 @@ static void kryptos_present_key_sched(const kryptos_u8_t *key, const size_t key_
                       ((kryptos_u64_t)key_buf[14] <<  8) | key_buf[15];
             kryptos_present_rotl = kryptos_present_rotl_u128;
             break;
+
+        default:
+            kryptos_present_rotl = NULL; // WARN(Rafael): It is just for shut up pedantic compiler warnings and also
+                                         //               to make sure to fuck any bad future extension.
+            break;
     }
 
     memset(key_buf, 0, sizeof(key_buf));
@@ -324,8 +329,8 @@ static void kryptos_present_key_sched(const kryptos_u8_t *key, const size_t key_
  *   So according to PRESENT spec, we need XOR the bits = { h {..., 19, 18, 17, 16}, l {15, ....} } with r and to put the
  *   result back without flipping the remaining bits. The last if else block is about creating the right remaining bitmask
  *   halve for appending the XOR op result. The 128bit version is similar but the bit positions change a little, I think that
- *   if you are reading and or even reviewing it, you know crypto besides just 'plain programming' so any doubt, please,
- *   find the official PRESENT specification, more precisely the Appendix II.
+ *   if you are reading or even reviewing it, you know crypto besides just 'plain programming' so any doubt, please, find the
+ *   official PRESENT specification, more precisely the Appendix II.
  */
 
 #define kryptos_present_ksched_iii(K, r, u64reg) {\
