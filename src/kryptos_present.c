@@ -10,13 +10,9 @@
 #include <kryptos_random.h>
 #include <kryptos_padding.h>
 #include <kryptos.h>
-//#include <inttypes.h>
-//#include <stdio.h>
 #ifndef KRYPTOS_KERNEL_MODE
 # include <string.h>
 #endif
-
-// TODO(Rafael): Implement the 128bit version.
 
 struct kryptos_present_kbuf {
     size_t bits;
@@ -207,6 +203,22 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(present80,
                                     outblock,
                                     present_block_processor(outblock, &sks))
 
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(present128, kKryptosCipherPRESENT, KRYPTOS_PRESENT_BLOCKSIZE)
+
+KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(present128,
+                                    ktask,
+                                    kryptos_present_subkeys,
+                                    sks,
+                                    kryptos_present_block_processor,
+                                    present_block_processor,
+                                    kryptos_present_key_sched((*ktask)->key, (*ktask)->key_size, 128, &sks),
+                                    kryptos_present_block_encrypt, /* No additional steps before encrypting */,
+                                    kryptos_present_block_decrypt, /* No additional steps before decrypting */,
+                                    KRYPTOS_PRESENT_BLOCKSIZE,
+                                    present128_cipher_epilogue,
+                                    outblock,
+                                    present_block_processor(outblock, &sks))
+
 static void kryptos_present_rotl_u80(struct kryptos_present_kbuf *key, const size_t n) {
     size_t l;
     kryptos_u8_t h_h, l_h;
@@ -283,6 +295,9 @@ static void kryptos_present_key_sched(const kryptos_u8_t *key, const size_t key_
 
 #define kryptos_present_ksched_ii(K) {\
     (K).h = ((kryptos_u64_t)kryptos_present_S[(K).h >> 60] << 60) | ((K).h & 0x0FFFFFFFFFFFFFFF);\
+    if ((K).bits == 128) {\
+        (K).h = ((kryptos_u64_t)kryptos_present_S[((K).h >> 56) & 0xF] << 56) | ((K).h & 0xF0FFFFFFFFFFFFFF);\
+    }\
 }
 
 /*
@@ -290,8 +305,8 @@ static void kryptos_present_key_sched(const kryptos_u8_t *key, const size_t key_
  *               our 'big-endian minds' in the following way:
  *
  * b [0][1][2][3][4][5][6][7] W
- *   79 78 77 76 75 74 73 72 [0] __
- *   71 70 69 68 67 66 65 64 [1]   |
+ *   79 78 77 76 75 74 73 72 [0] __  __
+ *   71 70 69 68 67 66 65 64 [1]   | __=> a 'W'
  *   63 62 61 60 59 58 57 56 [2]   |
  *   55 54 53 52 51 50 49 48 [3]   |
  *   47 46 45 44 43 42 41 40 [4]    -> h < kryptos_u64_t >
@@ -308,19 +323,28 @@ static void kryptos_present_key_sched(const kryptos_u8_t *key, const size_t key_
  *
  *   So according to PRESENT spec, we need XOR the bits = { h {..., 19, 18, 17, 16}, l {15, ....} } with r and to put the
  *   result back without flipping the remaining bits. The last if else block is about creating the right remaining bitmask
- *   halve for appending the XOR op result.
+ *   halve for appending the XOR op result. The 128bit version is similar but the bit positions change a little, I think that
+ *   if you are reading and or even reviewing it, you know crypto besides just 'plain programming' so any doubt, please,
+ *   find the official PRESENT specification, more precisely the Appendix II.
  */
 
 #define kryptos_present_ksched_iii(K, r, u64reg) {\
     if ((K).bits == 80) {\
         (u64reg) = (((K).h & 0xF) << 1) | ((K).l.u16 >> 15);\
+    } else {\
+        (u64reg) = (((K).h & 0x7) << 2) | ((K).l.u64 >> 62);\
     }\
     (u64reg) ^= (r);\
-    (K).h &= 0xFFFFFFFFFFFFFFF0;\
-    (K).h |= ((u64reg) >> 1);\
     if ((K).bits == 80) {\
+        (K).h &= 0xFFFFFFFFFFFFFFF0;\
+        (K).h |= ((u64reg) >> 1);\
         (K).l.u16 &= 0x7FFF;\
         (K).l.u16 |= ((u64reg & 0x1) << 15);\
+    } else {\
+        (K).h &= 0xFFFFFFFFFFFFFFF8;\
+        (K).h |= ((u64reg) >> 2);\
+        (K).l.u64 &= 0x3FFFFFFFFFFFFFFF;\
+        (K).l.u64 |= ((u64reg & 0x3) << 62);\
     }\
 }
 
