@@ -118,4 +118,27 @@ kryptos_u8_t *kryptos_cpy_u64_as_big_endian(kryptos_u8_t *dest, const size_t des
     return dest;
 }
 
+kryptos_u64_t kryptos_get_u64_as_big_endian(const kryptos_u8_t *data, const size_t data_size) {
+    kryptos_u64_t value = 0;
+
+    if ((data + sizeof(kryptos_u64_t)) > data + data_size) {
+        return 0;
+    }
+
+    if (kryptos_little_endian_cpu()) {
+        value = (kryptos_u64_t)(*(data)) << 56 |
+                (kryptos_u64_t)(*(data + 1)) << 48 |
+                (kryptos_u64_t)(*(data + 2)) << 40 |
+                (kryptos_u64_t)(*(data + 3)) << 32 |
+                (kryptos_u64_t)(*(data + 4)) << 24 |
+                (kryptos_u64_t)(*(data + 5)) << 16 |
+                (kryptos_u64_t)(*(data + 6)) <<  8 |
+                (kryptos_u64_t)(*(data + 7));
+    } else {
+        value = *(const kryptos_u64_t *)data;
+    }
+
+    return value;
+}
+
 #undef kryptos_u32_rev

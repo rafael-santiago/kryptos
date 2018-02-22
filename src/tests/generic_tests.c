@@ -206,7 +206,10 @@ CUTE_TEST_CASE(kryptos_endianness_utils_tests)
 
     data = (kryptos_u8_t *)kryptos_newseg(8);
     CUTE_ASSERT(data != NULL);
-    deadbeefdeadbeef = 0xdeadbeefdeadbeef;
+    memcpy(data, "\xde\xad\xbe\xef\xde\xad\xbe\xef", 8);
+    memcpy(&deadbeefdeadbeef, data, 8);
+    deadbeefdeadbeef = kryptos_get_u64_as_big_endian(data, 8);
+    CUTE_ASSERT(deadbeefdeadbeef == 0xdeadbeefdeadbeef);
     memset(data, 0, 8);
     data = kryptos_cpy_u64_as_big_endian(data, 8, deadbeefdeadbeef);
     CUTE_ASSERT(data != NULL);

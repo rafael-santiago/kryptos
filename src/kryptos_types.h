@@ -129,8 +129,11 @@ typedef enum {
 }kryptos_cipher_mode_t;
 
 typedef enum {
+    // INFO(Rafael): Stream ciphers.
     kKryptosCipherARC4 = 0,
     kKryptosCipherSEAL,
+    kKryptosCipherRABBIT,
+    // INFO(Rafael): Block ciphers.
     kKryptosCipherAES128,
     kKryptosCipherAES192,
     kKryptosCipherAES256,
@@ -156,6 +159,7 @@ typedef enum {
     kKryptosCipherMARS192,
     kKryptosCipherMARS256,
     kKryptosCipherPRESENT,
+    // INFO(Rafael): PK algorithms.
     kKryptosCipherRSA,
     kKryptosCipherRSAOAEP,
     kKryptosCipherELGAMAL,

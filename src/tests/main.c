@@ -43,6 +43,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     // INFO(Rafael): Cipher validation using official test vectors.
     CUTE_RUN_TEST(kryptos_arc4_tests);
     CUTE_RUN_TEST(kryptos_seal_tests);
+    CUTE_RUN_TEST(kryptos_rabbit_tests);
     CUTE_RUN_TEST(kryptos_des_tests);
     CUTE_RUN_TEST(kryptos_idea_tests);
     CUTE_RUN_TEST(kryptos_blowfish_tests);

@@ -107,9 +107,9 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     // INFO(Rafael): Stream ciphers.
     kryptos_task_init_as_null(&task);
 
+    // ARC4
     kryptos_task_set_in(&task, data, data_size);
 
-    // ARC4
     kryptos_run_cipher(arc4, &task, "arc4", 4);
     CUTE_ASSERT(kryptos_last_task_succeed(&task) == 1);
 
@@ -154,6 +154,22 @@ CUTE_TEST_CASE(kryptos_dsl_tests)
     kryptos_task_set_in(&task, kryptos_task_get_out(&task), kryptos_task_get_out_size(&task));
 
     kryptos_run_cipher(seal, &task, "seal", 4, &seal_version, &seal_l, &seal_n);
+    CUTE_ASSERT(kryptos_last_task_succeed(&task) == 1);
+
+    CUTE_ASSERT(task.out_size == data_size);
+    CUTE_ASSERT(task.out != NULL);
+    CUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+
+    // RABBIT
+    kryptos_task_set_in(&task, data, data_size);
+
+    kryptos_run_cipher(rabbit, &task, "rabbit", 6, NULL);
+    CUTE_ASSERT(kryptos_last_task_succeed(&task) == 1);
+
+    kryptos_task_set_in(&task, kryptos_task_get_out(&task), kryptos_task_get_out_size(&task));
+
+    kryptos_run_cipher(rabbit, &task, "rabbit", 6, NULL);
     CUTE_ASSERT(kryptos_last_task_succeed(&task) == 1);
 
     CUTE_ASSERT(task.out_size == data_size);

@@ -9,6 +9,7 @@
 #define KRYPTOS_TESTS_TEST_VECTORS_H 1
 
 #include <kryptos_types.h>
+#include "rabbit_test_vector.h"
 #include "des_test_vector.h"
 #include "idea_test_vector.h"
 #include "blowfish_test_vector.h"

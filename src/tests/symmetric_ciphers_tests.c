@@ -750,3 +750,29 @@ CUTE_TEST_CASE_END
 CUTE_TEST_CASE(kryptos_present128_tests)
     kryptos_run_block_cipher_tests(present128, KRYPTOS_PRESENT_BLOCKSIZE);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rabbit_tests)
+    size_t test_vector_nr = sizeof(kryptos_rabbit_test_vector) / sizeof(kryptos_rabbit_test_vector[0]), t;
+    kryptos_task_ctx ktsk, *ktask = &ktsk;
+    int s;
+    for (t = 0; t < test_vector_nr; t++) {
+        kryptos_rabbit_setup(ktask,
+                             kryptos_rabbit_test_vector[t].key, kryptos_rabbit_test_vector[t].key_size,
+                             kryptos_rabbit_test_vector[t].iv);
+        ktask->in = kryptos_rabbit_test_vector[t].in;
+        ktask->in_size = kryptos_rabbit_test_vector[t].in_size;
+        kryptos_rabbit_cipher(&ktask);
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        CUTE_ASSERT(ktask->out_size == kryptos_rabbit_test_vector[t].out_size);
+        CUTE_ASSERT(ktask->out != NULL);
+        CUTE_ASSERT(memcmp(ktask->out, kryptos_rabbit_test_vector[t].out, ktask->out_size) == 0);
+        ktask->in = ktask->out;
+        ktask->in_size = ktask->out_size; // WARN(Rafael): It must be the same but let's do it for correctness issues.
+        kryptos_rabbit_cipher(&ktask);
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        CUTE_ASSERT(ktask->out != NULL);
+        CUTE_ASSERT(ktask->out_size == kryptos_rabbit_test_vector[t].exp_size);
+        CUTE_ASSERT(memcmp(ktask->out, kryptos_rabbit_test_vector[t].exp, ktask->out_size) == 0);
+        kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT);
+    }
+CUTE_TEST_CASE_END
