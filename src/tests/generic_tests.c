@@ -380,6 +380,31 @@ CUTE_TEST_CASE(kryptos_task_check_tests)
     CUTE_ASSERT(t.result == kKryptosSuccess);
     CUTE_ASSERT(t.result_verbose == NULL);
 
+    t.cipher = kKryptosCipherRABBIT;
+    t.iv = NULL;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    CUTE_ASSERT(t.result == kKryptosSuccess);
+    CUTE_ASSERT(t.result_verbose == NULL);
+
+    t.cipher = kKryptosCipherRABBIT;
+    t.iv = "\x00\x00\x00\x00\x00\x00\x00\x00";
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+    CUTE_ASSERT(t.result_verbose != NULL);
+    CUTE_ASSERT(strcmp(t.result_verbose, "Invalid iv data.") == 0);
+
+    t.cipher = kKryptosCipherRABBIT;
+    t.iv_size = 8;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    CUTE_ASSERT(t.result_verbose == NULL);
+    CUTE_ASSERT(t.result == kKryptosSuccess);
+
+    t.key = key;
+    t.key_size = 0;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+    CUTE_ASSERT(strcmp(t.result_verbose, "Invalid key data.") == 0);
+
     t.cipher = kKryptosCipherRSA;
     t.key = NULL;
     t.key_size = 0;

@@ -14,11 +14,6 @@
 
 // INFO(Rafael): Rabbit's internal constants.
 
-// INFO(Rafael): It seems quite weird since we are dealing with a stream cipher but each 'stream operation' will generate
-//               128-bits at once.
-
-#define KRYPTOS_RABBIT_BLOCKSIZE 16
-
 #define KRYPTOS_RABBIT_A0 0x4D34D34D
 #define KRYPTOS_RABBIT_A1 0xD34D34D3
 #define KRYPTOS_RABBIT_A2 0x34D34D34

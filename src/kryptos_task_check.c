@@ -23,6 +23,7 @@
 #include <kryptos_misty1.h>
 #include <kryptos_mars.h>
 #include <kryptos_present.h>
+#include <kryptos_rabbit.h>
 #include <kryptos_rsa.h>
 #include <kryptos_elgamal.h>
 #include <kryptos_dsa.h>
@@ -86,6 +87,7 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
 
     if (( (*ktask)->cipher != kKryptosCipherARC4        &&
           (*ktask)->cipher != kKryptosCipherSEAL        &&
+          (*ktask)->cipher != kKryptosCipherRABBIT      &&
           (*ktask)->cipher != kKryptosCipherRSA         &&
           (*ktask)->cipher != kKryptosCipherRSAOAEP     &&
           (*ktask)->cipher != kKryptosCipherELGAMAL     &&
@@ -97,12 +99,15 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
         goto kryptos_task_check_error;
     }
 
+    // INFO(Rafael): When the used stream cipher is RABBIT we can check the iv (if supplied).
+
     if (( (*ktask)->cipher != kKryptosCipherARC4    &&
           (*ktask)->cipher != kKryptosCipherSEAL    &&
           (*ktask)->cipher != kKryptosCipherRSA     &&
           (*ktask)->cipher != kKryptosCipherRSAOAEP &&
           (*ktask)->cipher != kKryptosCipherELGAMAL ) && ( (*ktask)->mode == kKryptosCBC ||
-                                                           (*ktask)->mode == kKryptosOFB ) &&
+                                                           (*ktask)->mode == kKryptosOFB ||
+                                                           (*ktask)->cipher == kKryptosCipherRABBIT) &&
                                                               kryptos_task_check_iv_data(ktask) == 0) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Invalid iv data.";
@@ -110,7 +115,8 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
     }
 
     if (( (*ktask)->cipher != kKryptosCipherARC4   &&
-          (*ktask)->cipher != kKryptosCipherSEAL ) &&
+          (*ktask)->cipher != kKryptosCipherSEAL   &&
+          (*ktask)->cipher != kKryptosCipherRABBIT   ) &&
         (*ktask)->action != kKryptosEncrypt && (*ktask)->action != kKryptosDecrypt) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Invalid task action.";
@@ -307,7 +313,7 @@ kryptos_task_check_verify_rsa_error:
 }
 
 static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
-    if ((*ktask)->iv == NULL || (*ktask)->iv_size == 0) {
+    if (((*ktask)->iv == NULL || (*ktask)->iv_size == 0) && (*ktask)->cipher != kKryptosCipherRABBIT) {
         return 0;
     }
 
@@ -386,6 +392,11 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
 
         case kKryptosCipherPRESENT:
             return ((*ktask)->iv_size == KRYPTOS_PRESENT_BLOCKSIZE);
+            break;
+
+        case kKryptosCipherRABBIT:
+            return (((*ktask)->iv == NULL && (*ktask)->iv_size == 0) ||
+                    (*ktask)->iv_size == (KRYPTOS_RABBIT_BLOCKSIZE >> 1));
             break;
 
         default: // WARN(Rafael): Only to shut up the cumbersome compiler warning.

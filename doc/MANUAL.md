@@ -134,7 +134,7 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 | ``PRESENT-128``  |       Block           |       ``kKryptosCipherPRESENT``  |
 
 The available modes of operation for the block ciphers are: ``ECB``, ``CBC`` and ``OFB``. So in practice, considering the
-``OFB`` mode, we have 30 stream ciphers instead of only three. More on cipher modes will be treated later.
+``OFB`` mode, we have 31 stream ciphers instead of only three. More on cipher modes will be treated later.
 
 The way of indicating the desired cipher for an encryption task is by setting the field ``cipher`` from the ``kryptos_task_ctx``
 to the ``Internal constant ID`` listed in **Table 1**.
