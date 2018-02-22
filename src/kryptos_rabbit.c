@@ -398,8 +398,6 @@ static void kryptos_rabbit_xor(kryptos_u8_t *block, struct kryptos_rabbit_keystr
 #undef KRYPTOS_RABBIT_A6
 #undef KRYPTOS_RABBIT_A7
 
-#undef KRYPTOS_RABBIT_WORDSIZE
-
 #undef kryptos_rabbit_rol
 
 #undef kryptos_rabbit_lsw
