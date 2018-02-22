@@ -176,7 +176,11 @@ static void kryptos_rabbit_ld_user_key(kryptos_u16_t *K, const kryptos_u8_t *key
     ktemp = (kryptos_u8_t *)kryptos_newseg(key_size);
 
     if (ktemp == NULL) {
+#if defined(__FreeBSD__) && defined(KRYPTOS_KERNEL_MODE)
+        ktemp = (kryptos_u8_t *)(intptr_t)key;
+#else
         ktemp = (kryptos_u8_t *)key;
+#endif
     } else {
         for (k = key_size - 1; k >= 0; k--) {
             ktemp[key_size - k - 1] = key[k];
