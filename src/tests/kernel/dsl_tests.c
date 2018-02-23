@@ -137,6 +137,22 @@ KUTE_TEST_CASE(kryptos_dsl_tests)
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
 
+    // RABBIT
+    kryptos_task_set_in(&task, data, data_size);
+
+    kryptos_run_cipher(rabbit, &task, "rabbit", 6, NULL);
+    KUTE_ASSERT(kryptos_last_task_succeed(&task) == 1);
+
+    kryptos_task_set_in(&task, kryptos_task_get_out(&task), kryptos_task_get_out_size(&task));
+
+    kryptos_run_cipher(rabbit, &task, "rabbit", 6, NULL);
+    KUTE_ASSERT(kryptos_last_task_succeed(&task) == 1);
+
+    KUTE_ASSERT(task.out_size == data_size);
+    KUTE_ASSERT(task.out != NULL);
+    KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+
     // INFO(Rafael): Block ciphers.
     kryptos_task_init_as_null(&task);
 

@@ -11,7 +11,7 @@
 // WARN(Rafael): For all test vectors entries I have been considering only the first 64 bytes from the official test vectors.
 //               Here we are only testing the 'streaming' by three consecutive times; in 'Rabbit's slang', we are calling the
 //               extraction function three times. The encryption/decryption is pretty straightforward, thus, if it works with
-//               with the three initial 128-bit blocks, for sure it would work with the remaining blocks, too.
+//               the three initial 128-bit blocks, for sure it would work with the remaining blocks, too.
 
 #include <kryptos_types.h>
 

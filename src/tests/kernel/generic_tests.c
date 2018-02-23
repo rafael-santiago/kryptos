@@ -372,6 +372,31 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
     KUTE_ASSERT(t.result == kKryptosSuccess);
     KUTE_ASSERT(t.result_verbose == NULL);
 
+    t.cipher = kKryptosCipherRABBIT;
+    t.iv = NULL;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    KUTE_ASSERT(t.result == kKryptosSuccess);
+    KUTE_ASSERT(t.result_verbose == NULL);
+
+    t.cipher = kKryptosCipherRABBIT;
+    t.iv = "\x00\x00\x00\x00\x00\x00\x00\x00";
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosInvalidParams);
+    KUTE_ASSERT(t.result_verbose != NULL);
+    KUTE_ASSERT(strcmp(t.result_verbose, "Invalid iv data.") == 0);
+
+    t.cipher = kKryptosCipherRABBIT;
+    t.iv_size = 8;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+    KUTE_ASSERT(t.result_verbose == NULL);
+    KUTE_ASSERT(t.result == kKryptosSuccess);
+
+    t.key = key;
+    t.key_size = 0;
+    KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    KUTE_ASSERT(t.result == kKryptosInvalidParams);
+    KUTE_ASSERT(strcmp(t.result_verbose, "Invalid key data.") == 0);
+
     t.cipher = kKryptosCipherRSA;
     t.key = NULL;
     t.key_size = 0;
