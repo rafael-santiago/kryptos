@@ -18,6 +18,8 @@ kryptos_u8_t *kryptos_apply_iv(kryptos_u8_t *block, const kryptos_u8_t *iv, cons
 
 void kryptos_iv_data_flush(kryptos_u8_t *iv, const kryptos_u8_t *y, const size_t size);
 
+void kryptos_iv_inc_u32(kryptos_u8_t *iv, const size_t iv_size);
+
 #ifdef __cplusplus
 }
 #endif

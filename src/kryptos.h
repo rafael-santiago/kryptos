@@ -228,6 +228,14 @@ epilogue:\
                                           out, out_p, out_size,\
                                           in_block, out_block,\
                                           epilogue, block_processor_call_scheme);\
+    } else if (mode == kKryptosCTR) {\
+        kryptos_meta_block_processing_ctr(block_size_in_bytes,\
+                                          action,\
+                                          iv,\
+                                          in, in_p, in_end, in_size,\
+                                          out, out_p, out_size,\
+                                          in_block, out_block,\
+                                          epilogue, block_processor_call_scheme);\
     }\
 }
 
@@ -248,6 +256,59 @@ kryptos_ ## label_name:\
     in_size = 0;\
     in_p = in_end = out_p = NULL;\
     memset(&sks, 0, sizeof(sks));\
+}
+
+#define kryptos_meta_block_processing_ctr(block_size_in_bytes,\
+                                          action,\
+                                          iv,\
+                                          in, in_p, in_end, in_size,\
+                                          out, out_p, out_size,\
+                                          in_block, out_block,\
+                                          epilogue, block_processor_call_scheme) {\
+    if (action == kKryptosEncrypt) {\
+        in_p = kryptos_ansi_x923_padding(in, in_size, block_size_in_bytes, 1);\
+        out = (kryptos_u8_t *) kryptos_newseg(*in_size + block_size_in_bytes);\
+        if (out == NULL) {\
+            goto kryptos_ ## epilogue;\
+        }\
+        *out_size = *in_size + block_size_in_bytes;\
+        out_p = out + block_size_in_bytes;\
+        kryptos_iv_data_flush(out, iv, block_size_in_bytes);\
+        in_end = in_p + *in_size;\
+        in_block = in_p;\
+    } else {\
+        in_p = in;\
+        out = (kryptos_u8_t *) kryptos_newseg(*in_size - block_size_in_bytes);\
+        if (out == NULL) {\
+            goto kryptos_ ## epilogue;\
+        }\
+        *out_size = *in_size - block_size_in_bytes;\
+        out_p = out;\
+        kryptos_iv_data_flush(iv, in_p, block_size_in_bytes);\
+        in_p += block_size_in_bytes;\
+        in_end = in_p + *in_size - block_size_in_bytes;\
+        in_block = in_p;\
+    }\
+    memcpy(out_block, iv, block_size_in_bytes);\
+    while (out_block != NULL) {\
+        block_processor_call_scheme;\
+        kryptos_iv_data_flush(iv, out_block, block_size_in_bytes);\
+        out_block = kryptos_block_parser(out_block, block_size_in_bytes, in_block, in_end, &in_block);\
+        if (out_block == NULL) {\
+            break;\
+        }\
+        kryptos_apply_iv(out_block, iv, block_size_in_bytes);\
+        memcpy(out_p, out_block, block_size_in_bytes);\
+        out_p += block_size_in_bytes;\
+        kryptos_iv_data_flush(out_block, iv, block_size_in_bytes);\
+    }\
+    if (action == kKryptosDecrypt) {\
+        (*out_size) = (*in_size) - block_size_in_bytes - *(out + (*in_size) - block_size_in_bytes - 1);\
+        *(out + (*in_size) - block_size_in_bytes - 1) = 0;\
+    } else {\
+        kryptos_freeseg(in_p);\
+    }\
+    memset(iv, 0, block_size_in_bytes);\
 }
 
 #define kryptos_meta_block_processing_ofb(block_size_in_bytes,\

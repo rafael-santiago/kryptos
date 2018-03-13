@@ -125,6 +125,7 @@ typedef enum {
     kKryptosECB = 0,
     kKryptosCBC,
     kKryptosOFB,
+    kKryptosCTR,
     kKryptosCipherModeNr
 }kryptos_cipher_mode_t;
 
@@ -276,9 +277,15 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
     ktask->mode = mode;\
     ktask->key = key;\
     ktask->key_size = key_size;\
-    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB) && ktask->iv == NULL) {\
+    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB || ktask->mode == kKryptosCTR) && ktask->iv == NULL) {\
         ktask->iv = kryptos_get_random_block(cipher_block_size);\
         ktask->iv_size = cipher_block_size;\
+    }\
+    if (ktask->mode == kKryptosCTR && ktask->arg[0] != NULL) {\
+        ktask->iv[cipher_block_size - 4] = (*((kryptos_u32_t *)ktask->arg[0])) >> 24;\
+        ktask->iv[cipher_block_size - 3] = ((*((kryptos_u32_t *)ktask->arg[0])) & 0xFF0000) >> 16;\
+        ktask->iv[cipher_block_size - 2] = ((*((kryptos_u32_t *)ktask->arg[0])) & 0xFF00) >> 8;\
+        ktask->iv[cipher_block_size - 1] = *((kryptos_u32_t *)ktask->arg[0]) & 0xFF;\
     }\
 }
 
@@ -311,9 +318,15 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
     ktask->mode = mode;\
     ktask->key = key;\
     ktask->key_size = key_size;\
-    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB) && ktask->iv == NULL) {\
+    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB || ktask->mode == kKryptosCTR) && ktask->iv == NULL) {\
         ktask->iv = kryptos_get_random_block(cipher_block_size);\
         ktask->iv_size = cipher_block_size;\
+    }\
+    if (ktask->mode == kKryptosCTR && ktask->arg[0] != NULL) {\
+        ktask->iv[cipher_block_size - 4] = (*((kryptos_u32_t *)ktask->arg[0])) >> 24;\
+        ktask->iv[cipher_block_size - 3] = ((*((kryptos_u32_t *)ktask->arg[0])) & 0xFF0000) >> 16;\
+        ktask->iv[cipher_block_size - 2] = ((*((kryptos_u32_t *)ktask->arg[0])) & 0xFF00) >> 8;\
+        ktask->iv[cipher_block_size - 1] = *((kryptos_u32_t *)ktask->arg[0]) & 0xFF;\
     }\
     additional_setup_stmt;\
 }
@@ -351,7 +364,7 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
         return;\
     }\
     cipher_key_expansion_stmt;\
-    if ((*ktask)->action == kKryptosEncrypt || (*ktask)->mode == kKryptosOFB) {\
+    if ((*ktask)->action == kKryptosEncrypt || (*ktask)->mode == kKryptosOFB || (*ktask)->mode == kKryptosCTR) {\
         cipher_block_processor = cipher_block_encrypt;\
         cipher_additional_stmts_before_encrypting;\
     } else {\
@@ -409,7 +422,7 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
         return;\
     }\
     cipher_key_expansion_stmt;\
-    if ((*ktask)->action == kKryptosEncrypt || (*ktask)->mode == kKryptosOFB) {\
+    if ((*ktask)->action == kKryptosEncrypt || (*ktask)->mode == kKryptosOFB || (*ktask)->mode == kKryptosCTR) {\
         cipher_block_processor = cipher_block_encrypt;\
         cipher_additional_stmts_before_encrypting;\
     } else {\

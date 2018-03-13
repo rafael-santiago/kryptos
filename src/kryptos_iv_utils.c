@@ -40,3 +40,17 @@ void kryptos_iv_data_flush(kryptos_u8_t *iv, const kryptos_u8_t *y, const size_t
         y_p++;
     }
 }
+
+void kryptos_iv_inc_u32(kryptos_u8_t *iv, const size_t iv_size) {
+    kryptos_u32_t u32_ctr = (kryptos_u32_t) iv[iv_size - 4] << 24 |
+                            (kryptos_u32_t) iv[iv_size - 3] << 16 |
+                            (kryptos_u32_t) iv[iv_size - 2] <<  8 |
+                            (kryptos_u32_t) iv[iv_size - 1];
+
+    u32_ctr += 1;
+
+    iv[iv_size - 4] = u32_ctr >> 24;
+    iv[iv_size - 3] = (u32_ctr & 0xFF0000) >> 16;
+    iv[iv_size - 2] = (u32_ctr & 0xFF00) >> 8;
+    iv[iv_size - 1] = u32_ctr & 0xFF;
+}

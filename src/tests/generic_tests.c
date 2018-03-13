@@ -1246,3 +1246,24 @@ CUTE_TEST_CASE(kryptos_hash_common_tests)
                                         &paddin2times, 0x80, 120);
     CUTE_ASSERT(paddin2times == 1);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_iv_inc_u32_tests)
+    kryptos_u8_t iv[8] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x00, 0x00, 0x00 };
+    kryptos_u8_t expected_iv[8] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x00, 0x00, 0x00 };
+    kryptos_u32_t r;
+
+    r = 0;
+
+    while (r < 0xFFFF) {
+        kryptos_iv_inc_u32(iv, 8);
+
+        r += 1;
+
+        expected_iv[4] = r >> 24;
+        expected_iv[5] = (r & 0xFF0000) >> 16;
+        expected_iv[6] = (r & 0xFF00) >> 8;
+        expected_iv[7] = r & 0xFF;
+
+        CUTE_ASSERT(memcmp(iv, expected_iv, 8) == 0);
+    }
+CUTE_TEST_CASE_END

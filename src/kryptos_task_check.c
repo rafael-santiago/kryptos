@@ -93,7 +93,8 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
           (*ktask)->cipher != kKryptosCipherELGAMAL     &&
           (*ktask)->cipher != kKryptosCipherELGAMALOAEP   ) && (*ktask)->mode != kKryptosECB  &&
                                                                (*ktask)->mode != kKryptosCBC  &&
-                                                               (*ktask)->mode != kKryptosOFB) {
+                                                               (*ktask)->mode != kKryptosOFB  &&
+                                                               (*ktask)->mode != kKryptosCTR) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Invalid operation mode.";
         goto kryptos_task_check_error;
@@ -107,6 +108,7 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
           (*ktask)->cipher != kKryptosCipherRSAOAEP &&
           (*ktask)->cipher != kKryptosCipherELGAMAL ) && ( (*ktask)->mode == kKryptosCBC ||
                                                            (*ktask)->mode == kKryptosOFB ||
+                                                           (*ktask)->mode == kKryptosCTR ||
                                                            (*ktask)->cipher == kKryptosCipherRABBIT) &&
                                                               kryptos_task_check_iv_data(ktask) == 0) {
         (*ktask)->result = kKryptosInvalidParams;
