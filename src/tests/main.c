@@ -74,6 +74,10 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_present80_tests);
     CUTE_RUN_TEST(kryptos_present128_tests);
 
+    // INFO(Rafael): Operation modes (complementary tests).
+
+    CUTE_RUN_TEST(kryptos_ctr_mode_sequencing_tests);
+
     // INFO(Rafael): Hash validation (also official data).
     CUTE_RUN_TEST(kryptos_sha1_tests);
     CUTE_RUN_TEST(kryptos_sha1_hash_macro_tests);

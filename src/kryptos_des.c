@@ -253,9 +253,16 @@ void kryptos_triple_des_setup(kryptos_task_ctx *ktask,
     ktask->key = key1;
     ktask->key_size = key1_size;
 
-    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB) && ktask->iv == NULL) {
+    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB || ktask->mode == kKryptosCTR) && ktask->iv == NULL) {
         ktask->iv = kryptos_get_random_block(KRYPTOS_DES_BLOCKSIZE);
         ktask->iv_size = KRYPTOS_DES_BLOCKSIZE;
+    }
+
+    if (ktask->mode == kKryptosCTR && ktask->ctr != NULL) {
+        ktask->iv[KRYPTOS_DES_BLOCKSIZE - 4] = (*ktask->ctr) >> 24;
+        ktask->iv[KRYPTOS_DES_BLOCKSIZE - 3] = ((*ktask->ctr) & 0xFF0000) >> 16;
+        ktask->iv[KRYPTOS_DES_BLOCKSIZE - 2] = ((*ktask->ctr) & 0xFF00) >> 8;
+        ktask->iv[KRYPTOS_DES_BLOCKSIZE - 1] = (*ktask->ctr) & 0xFF;
     }
 
     if (key2 != NULL && key2_size != NULL) {
@@ -333,7 +340,7 @@ void kryptos_triple_des_cipher(kryptos_task_ctx **ktask) {
 
     kryptos_des_expand_user_key(&sks3, (kryptos_u8_t *)(*ktask)->arg[2], *(size_t *)(*ktask)->arg[3]);
 
-    if ((*ktask)->action == kKryptosEncrypt || (*ktask)->mode == kKryptosOFB) {
+    if ((*ktask)->action == kKryptosEncrypt || (*ktask)->mode == kKryptosOFB || (*ktask)->mode == kKryptosCTR) {
         block_processor = encrypt_processor;
     } else {
         block_processor = decrypt_processor;
@@ -354,7 +361,7 @@ void kryptos_triple_des_cipher(kryptos_task_ctx **ktask) {
                                   (*ktask)->out, out_p,
                                   &(*ktask)->out_size,
                                   inblock_p,
-                                  outblock_p,
+                                  outblock_p, &(*ktask)->aux_buffers, (*ktask)->ctr,
                                   triple_des_cipher_epilogue, block_processor(outblock, &sks1, &sks2, &sks3));
 
     kryptos_meta_block_processing_epilogue(triple_des_cipher_epilogue,

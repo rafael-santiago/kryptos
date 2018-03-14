@@ -65,6 +65,8 @@
 
 #define kryptos_task_set_cbc_mode(ktask) ( (ktask)->mode = kKryptosCBC )
 
+#define kryptos_task_set_ctr_mode(ktask, uctr) ( (ktask)->mode = kKryptosCTR, (ktask)->ctr = (uctr) )
+
 #define kryptos_task_set_encrypt_action(ktask) ( (ktask)->action = kKryptosEncrypt )
 
 #define kryptos_task_set_decrypt_action(ktask) ( (ktask)->action = kKryptosDecrypt )
@@ -130,6 +132,7 @@ epilogue:\
     (ktask)->key_size = 0;\
     (ktask)->iv = NULL;\
     (ktask)->iv_size = 0;\
+    (ktask)->ctr = NULL;\
     (ktask)->cipher = kKryptosCipherNr;\
     (ktask)->encoder = kKryptosEncodingNr;\
     (ktask)->action = kKryptosActionNr;\
@@ -178,6 +181,9 @@ epilogue:\
         (ktask)->aux_buffers.buf1 = NULL;\
         (ktask)->aux_buffers.buf1_size = 0;\
     }\
+    if ((ktask)->ctr != NULL) {\
+        (ktask)->ctr = NULL;\
+    }\
     (ktask)->cipher = kKryptosCipherNr;\
     (ktask)->action = kKryptosActionNr;\
     (ktask)->mode = kKryptosCipherModeNr;\
@@ -203,7 +209,7 @@ epilogue:\
                                       iv,\
                                       in, in_p, in_end, in_size,\
                                       out, out_p, out_size,\
-                                      in_block, out_block,\
+                                      in_block, out_block, bufs, ctr,\
                                       epilogue, block_processor_call_scheme) {\
     if (mode == kKryptosCBC) {\
         kryptos_meta_block_processing_cbc(block_size_in_bytes,\
@@ -234,7 +240,7 @@ epilogue:\
                                           iv,\
                                           in, in_p, in_end, in_size,\
                                           out, out_p, out_size,\
-                                          in_block, out_block,\
+                                          in_block, out_block, bufs, ctr,\
                                           epilogue, block_processor_call_scheme);\
     }\
 }
@@ -263,8 +269,11 @@ kryptos_ ## label_name:\
                                           iv,\
                                           in, in_p, in_end, in_size,\
                                           out, out_p, out_size,\
-                                          in_block, out_block,\
+                                          in_block, out_block, bufs, ctr,\
                                           epilogue, block_processor_call_scheme) {\
+    if ((void *)(bufs) == NULL) {\
+        goto kryptos_ ## epilogue;\
+    }\
     if (action == kKryptosEncrypt) {\
         in_p = kryptos_ansi_x923_padding(in, in_size, block_size_in_bytes, 1);\
         out = (kryptos_u8_t *) kryptos_newseg(*in_size + block_size_in_bytes);\
@@ -289,6 +298,11 @@ kryptos_ ## label_name:\
         in_end = in_p + *in_size - block_size_in_bytes;\
         in_block = in_p;\
     }\
+    (bufs)->buf0 = (kryptos_u8_t *) kryptos_newseg(block_size_in_bytes);\
+    if ((bufs)->buf0 == NULL) {\
+        goto kryptos_ ## epilogue;\
+    }\
+    memcpy((bufs)->buf0, iv, block_size_in_bytes);\
     memcpy(out_block, iv, block_size_in_bytes);\
     while (out_block != NULL) {\
         block_processor_call_scheme;\
@@ -300,7 +314,21 @@ kryptos_ ## label_name:\
         kryptos_apply_iv(out_block, iv, block_size_in_bytes);\
         memcpy(out_p, out_block, block_size_in_bytes);\
         out_p += block_size_in_bytes;\
+        memcpy(iv, (bufs)->buf0, block_size_in_bytes);\
+        kryptos_iv_inc_u32(iv, block_size_in_bytes);\
+        memcpy((bufs)->buf0, iv, block_size_in_bytes);\
         kryptos_iv_data_flush(out_block, iv, block_size_in_bytes);\
+    }\
+    if ((bufs) != NULL && ctr != NULL && (bufs)->buf0 != NULL) {\
+        *ctr = ((kryptos_u32_t)((kryptos_u8_t *)(bufs)->buf0)[block_size_in_bytes - 4]) << 24 |\
+               ((kryptos_u32_t)((kryptos_u8_t *)(bufs)->buf0)[block_size_in_bytes - 3]) << 16 |\
+               ((kryptos_u32_t)((kryptos_u8_t *)(bufs)->buf0)[block_size_in_bytes - 2]) <<  8 |\
+               ((kryptos_u32_t)((kryptos_u8_t *)(bufs)->buf0)[block_size_in_bytes - 1]);\
+    }\
+    if ((bufs) != NULL && (bufs)->buf0 != NULL) {\
+        memset((bufs)->buf0, 0, block_size_in_bytes);\
+        kryptos_freeseg((bufs)->buf0);\
+        (bufs)->buf0 = NULL;\
     }\
     if (action == kKryptosDecrypt) {\
         (*out_size) = (*in_size) - block_size_in_bytes - *(out + (*in_size) - block_size_in_bytes - 1);\

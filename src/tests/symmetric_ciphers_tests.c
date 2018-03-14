@@ -322,6 +322,11 @@ CUTE_TEST_CASE(kryptos_feal_tests)
                                                                         feal_test_vector[tv % feal_rounds_nr].key,
                                                                         feal_test_vector[tv % feal_rounds_nr].key_size,
                                                                         kKryptosOFB,
+                                                                        &feal_rounds[tv % feal_rounds_nr].rounds),
+                                                     kryptos_feal_setup(&t,
+                                                                        feal_test_vector[tv % feal_rounds_nr].key,
+                                                                        feal_test_vector[tv % feal_rounds_nr].key_size,
+                                                                        kKryptosCTR,
                                                                         &feal_rounds[tv % feal_rounds_nr].rounds));
     // INFO(Rafael): The last three parameters of kryptos_run_block_cipher_test_with_custom_setup()
     //               are related with the exact cipher setup call that must be executed on the test step.
@@ -365,6 +370,11 @@ CUTE_TEST_CASE(kryptos_rc2_tests)
                                                                        rc2_test_vector[tv % rc2_key_bits_nr].key,
                                                                        rc2_test_vector[tv % rc2_key_bits_nr].key_size,
                                                                        kKryptosOFB,
+                                                                       &rc2_key_bits[tv % rc2_key_bits_nr].T1),
+                                                     kryptos_rc2_setup(&t,
+                                                                       rc2_test_vector[tv % rc2_key_bits_nr].key,
+                                                                       rc2_test_vector[tv % rc2_key_bits_nr].key_size,
+                                                                       kKryptosCTR,
                                                                        &rc2_key_bits[tv % rc2_key_bits_nr].T1));
 
 CUTE_TEST_CASE_END
@@ -414,6 +424,11 @@ CUTE_TEST_CASE(kryptos_saferk64_tests)
                                                                             saferk64_test_vector[tv % rounds_nr].key,
                                                                             saferk64_test_vector[tv % rounds_nr].key_size,
                                                                             kKryptosOFB,
+                                                                            &rounds[tv % rounds_nr].n),
+                                                     kryptos_saferk64_setup(&t,
+                                                                            saferk64_test_vector[tv % rounds_nr].key,
+                                                                            saferk64_test_vector[tv % rounds_nr].key_size,
+                                                                            kKryptosCTR,
                                                                             &rounds[tv % rounds_nr].n));
 
 CUTE_TEST_CASE_END
@@ -478,6 +493,14 @@ CUTE_TEST_CASE(kryptos_triple_des_tests)
                                                                               addkeys[tv % addkeys_nr].key2,
                                                                               &addkeys[tv % addkeys_nr].key2_size,
                                                                               addkeys[tv % addkeys_nr].key3,
+                                                                              &addkeys[tv % addkeys_nr].key3_size),
+                                                     kryptos_triple_des_setup(&t,
+                                                                              triple_des_test_vector[tv % addkeys_nr].key,
+                                                                              triple_des_test_vector[tv % addkeys_nr].key_size,
+                                                                              kKryptosCTR,
+                                                                              addkeys[tv % addkeys_nr].key2,
+                                                                              &addkeys[tv % addkeys_nr].key2_size,
+                                                                              addkeys[tv % addkeys_nr].key3,
                                                                               &addkeys[tv % addkeys_nr].key3_size));
 CUTE_TEST_CASE_END
 
@@ -535,6 +558,14 @@ CUTE_TEST_CASE(kryptos_triple_des_ede_tests)
                                                                           addkeys[tv % addkeys_nr].key2,
                                                                           &addkeys[tv % addkeys_nr].key2_size,
                                                                           addkeys[tv % addkeys_nr].key3,
+                                                                          &addkeys[tv % addkeys_nr].key3_size),
+                                                     kryptos_triple_des_ede_setup(&t,
+                                                                          triple_des_ede_test_vector[tv % addkeys_nr].key,
+                                                                          triple_des_ede_test_vector[tv % addkeys_nr].key_size,
+                                                                          kKryptosCTR,
+                                                                          addkeys[tv % addkeys_nr].key2,
+                                                                          &addkeys[tv % addkeys_nr].key2_size,
+                                                                          addkeys[tv % addkeys_nr].key3,
                                                                           &addkeys[tv % addkeys_nr].key3_size));
 CUTE_TEST_CASE_END
 
@@ -578,6 +609,11 @@ CUTE_TEST_CASE(kryptos_xtea_tests)
                                                                         xtea_test_vector[tv % xtea_rounds_nr].key,
                                                                         xtea_test_vector[tv % xtea_rounds_nr].key_size,
                                                                         kKryptosOFB,
+                                                                        &xtea_rounds[tv % xtea_rounds_nr].rounds),
+                                                     kryptos_xtea_setup(&t,
+                                                                        xtea_test_vector[tv % xtea_rounds_nr].key,
+                                                                        xtea_test_vector[tv % xtea_rounds_nr].key_size,
+                                                                        kKryptosCTR,
                                                                         &xtea_rounds[tv % xtea_rounds_nr].rounds));
 CUTE_TEST_CASE_END
 
@@ -619,6 +655,11 @@ CUTE_TEST_CASE(kryptos_rc5_tests)
                                                                         rc5_test_vector[tv % rc5_rounds_nr].key,
                                                                         rc5_test_vector[tv % rc5_rounds_nr].key_size,
                                                                         kKryptosOFB,
+                                                                        &rc5_rounds[tv % rc5_rounds_nr].rounds),
+                                                     kryptos_rc5_setup(&t,
+                                                                        rc5_test_vector[tv % rc5_rounds_nr].key,
+                                                                        rc5_test_vector[tv % rc5_rounds_nr].key_size,
+                                                                        kKryptosCTR,
                                                                         &rc5_rounds[tv % rc5_rounds_nr].rounds));
 CUTE_TEST_CASE_END
 
@@ -654,6 +695,11 @@ CUTE_TEST_CASE(kryptos_rc6_128_tests)
                                                                            rc6_128_test_vector[tv % rc6_rounds_nr].key,
                                                                            rc6_128_test_vector[tv % rc6_rounds_nr].key_size,
                                                                            kKryptosOFB,
+                                                                           &rc6_rounds[tv % rc6_rounds_nr].rounds),
+                                                     kryptos_rc6_128_setup(&t,
+                                                                           rc6_128_test_vector[tv % rc6_rounds_nr].key,
+                                                                           rc6_128_test_vector[tv % rc6_rounds_nr].key_size,
+                                                                           kKryptosCTR,
                                                                            &rc6_rounds[tv % rc6_rounds_nr].rounds));
 CUTE_TEST_CASE_END
 
@@ -690,6 +736,11 @@ CUTE_TEST_CASE(kryptos_rc6_192_tests)
                                                                            rc6_192_test_vector[tv % rc6_rounds_nr].key,
                                                                            rc6_192_test_vector[tv % rc6_rounds_nr].key_size,
                                                                            kKryptosOFB,
+                                                                           &rc6_rounds[tv % rc6_rounds_nr].rounds),
+                                                     kryptos_rc6_192_setup(&t,
+                                                                           rc6_192_test_vector[tv % rc6_rounds_nr].key,
+                                                                           rc6_192_test_vector[tv % rc6_rounds_nr].key_size,
+                                                                           kKryptosCTR,
                                                                            &rc6_rounds[tv % rc6_rounds_nr].rounds));
 CUTE_TEST_CASE_END
 
@@ -728,6 +779,11 @@ CUTE_TEST_CASE(kryptos_rc6_256_tests)
                                                                            rc6_256_test_vector[tv % rc6_rounds_nr].key,
                                                                            rc6_256_test_vector[tv % rc6_rounds_nr].key_size,
                                                                            kKryptosOFB,
+                                                                           &rc6_rounds[tv % rc6_rounds_nr].rounds),
+                                                     kryptos_rc6_256_setup(&t,
+                                                                           rc6_256_test_vector[tv % rc6_rounds_nr].key,
+                                                                           rc6_256_test_vector[tv % rc6_rounds_nr].key_size,
+                                                                           kKryptosCTR,
                                                                            &rc6_rounds[tv % rc6_rounds_nr].rounds));
 CUTE_TEST_CASE_END
 
@@ -775,4 +831,41 @@ CUTE_TEST_CASE(kryptos_rabbit_tests)
         CUTE_ASSERT(memcmp(ktask->out, kryptos_rabbit_test_vector[t].exp, ktask->out_size) == 0);
         kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT);
     }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_ctr_mode_sequencing_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u32_t ctr = 10;
+    kryptos_u8_t *data = "ISLEEPTHROUGHTHEWAR";
+    size_t data_size = 19;
+
+    kryptos_task_init_as_null(ktask);
+
+    kryptos_task_set_in(ktask, data, data_size);
+
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_task_set_ctr_mode(ktask, &ctr);
+    kryptos_misty1_setup(ktask, "bulls", 5, kKryptosCTR);
+    kryptos_misty1_cipher(&ktask);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    CUTE_ASSERT(ktask->out != NULL);
+
+    CUTE_ASSERT(ctr == 13);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_misty1_setup(ktask, "bulls", 5, kKryptosCTR);
+    kryptos_misty1_cipher(&ktask);
+
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    CUTE_ASSERT(ktask->out != NULL);
+    CUTE_ASSERT(ktask->out_size == data_size);
+
+    CUTE_ASSERT(memcmp(ktask->out, data, data_size) == 0);
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT | KRYPTOS_TASK_IV);
 CUTE_TEST_CASE_END

@@ -23,6 +23,7 @@
 #include <encoding_tests.h>
 #include <hash_tests.h>
 #include <mp_tests.h>
+#include <symmetric_ciphers_tests.h>
 #include <asymmetric_ciphers_tests.h>
 
 KUTE_DECLARE_TEST_CASE(ktest_monkey);
@@ -47,6 +48,10 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_huffman_tests);
     KUTE_RUN_TEST(kryptos_pem_get_data_tests);
     KUTE_RUN_TEST(kryptos_pem_put_data_tests);
+
+    // INFO(Rafael): Operation modes (complementary tests).
+
+    KUTE_RUN_TEST(kryptos_ctr_mode_sequencing_tests);
 
     KUTE_RUN_TEST(kryptos_hash_tests);
     KUTE_RUN_TEST(kryptos_hmac_tests);

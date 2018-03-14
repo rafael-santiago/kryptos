@@ -213,6 +213,7 @@ typedef struct kryptos_task {
     size_t key_size;
     kryptos_u8_t *iv;
     size_t iv_size;
+    kryptos_u32_t *ctr;
 
     kryptos_u8_t *in;
     size_t in_size;
@@ -281,11 +282,11 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
         ktask->iv = kryptos_get_random_block(cipher_block_size);\
         ktask->iv_size = cipher_block_size;\
     }\
-    if (ktask->mode == kKryptosCTR && ktask->arg[0] != NULL) {\
-        ktask->iv[cipher_block_size - 4] = (*((kryptos_u32_t *)ktask->arg[0])) >> 24;\
-        ktask->iv[cipher_block_size - 3] = ((*((kryptos_u32_t *)ktask->arg[0])) & 0xFF0000) >> 16;\
-        ktask->iv[cipher_block_size - 2] = ((*((kryptos_u32_t *)ktask->arg[0])) & 0xFF00) >> 8;\
-        ktask->iv[cipher_block_size - 1] = *((kryptos_u32_t *)ktask->arg[0]) & 0xFF;\
+    if (ktask->mode == kKryptosCTR && ktask->ctr != NULL) {\
+        ktask->iv[cipher_block_size - 4] = (*ktask->ctr) >> 24;\
+        ktask->iv[cipher_block_size - 3] = ((*ktask->ctr) & 0xFF0000) >> 16;\
+        ktask->iv[cipher_block_size - 2] = ((*ktask->ctr) & 0xFF00) >> 8;\
+        ktask->iv[cipher_block_size - 1] = (*ktask->ctr) & 0xFF;\
     }\
 }
 
@@ -322,11 +323,11 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
         ktask->iv = kryptos_get_random_block(cipher_block_size);\
         ktask->iv_size = cipher_block_size;\
     }\
-    if (ktask->mode == kKryptosCTR && ktask->arg[0] != NULL) {\
-        ktask->iv[cipher_block_size - 4] = (*((kryptos_u32_t *)ktask->arg[0])) >> 24;\
-        ktask->iv[cipher_block_size - 3] = ((*((kryptos_u32_t *)ktask->arg[0])) & 0xFF0000) >> 16;\
-        ktask->iv[cipher_block_size - 2] = ((*((kryptos_u32_t *)ktask->arg[0])) & 0xFF00) >> 8;\
-        ktask->iv[cipher_block_size - 1] = *((kryptos_u32_t *)ktask->arg[0]) & 0xFF;\
+    if (ktask->mode == kKryptosCTR && ktask->ctr != NULL) {\
+        ktask->iv[cipher_block_size - 4] = (*ktask->ctr) >> 24;\
+        ktask->iv[cipher_block_size - 3] = ((*ktask->ctr) & 0xFF0000) >> 16;\
+        ktask->iv[cipher_block_size - 2] = ((*ktask->ctr) & 0xFF00) >> 8;\
+        ktask->iv[cipher_block_size - 1] = (*ktask->ctr) & 0xFF;\
     }\
     additional_setup_stmt;\
 }
@@ -386,6 +387,7 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
                                   &(*ktask)->out_size,\
                                   inblock_p,\
                                   outblock_p,\
+                                  &(*ktask)->aux_buffers, (*ktask)->ctr,\
                                   cipher_epilogue, cipher_block_processor_stmt);\
     kryptos_meta_block_processing_epilogue(cipher_epilogue,\
                                            inblock, inblock_p, in_p, in_end,\
@@ -444,6 +446,7 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
                                   &(*ktask)->out_size,\
                                   inblock_p,\
                                   outblock_p,\
+                                  &(*ktask)->aux_buffers, (*ktask)->ctr,\
                                   cipher_epilogue, cipher_block_processor_stmt);\
     kryptos_meta_block_processing_epilogue(cipher_epilogue,\
                                            inblock, inblock_p, in_p, in_end,\

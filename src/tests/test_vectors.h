@@ -208,12 +208,32 @@ static kryptos_u8_t *hmac_test_data[] = {
         CUTE_ASSERT(memcmp(t.out, cbc_test_data[tv], t.out_size) == 0);\
         kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
     }\
+    /*INFO(Rafael): CTR tests.*/\
+    for (tv = 0; tv < cbc_test_data_nr; tv++) {\
+        t.iv = NULL;\
+        data_size = strlen(cbc_test_data[tv]);\
+        kryptos_ ## cipher_name ## _setup(&t, key, 16, kKryptosCTR);\
+        t.in = cbc_test_data[tv];\
+        t.in_size = data_size;\
+        kryptos_task_set_encrypt_action(&t);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(t.out != NULL);\
+        t.in = t.out;\
+        t.in_size = t.out_size;\
+        kryptos_task_set_decrypt_action(&t);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size == data_size);\
+        CUTE_ASSERT(memcmp(t.out, cbc_test_data[tv], t.out_size) == 0);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+    }\
 }
 
 #define kryptos_run_block_cipher_tests_with_custom_setup(cipher_name, blocksize, t, tv, args, args_nr,\
                                                          cipher_setup_ecb_stmt,\
                                                          cipher_setup_cbc_stmt,\
-                                                         cipher_setup_ofb_stmt) {\
+                                                         cipher_setup_ofb_stmt,\
+                                                         cipher_setup_ctr_stmt) {\
     kryptos_task_ctx *ktask = &t;\
     size_t cbc_test_data_nr = sizeof(cbc_test_data) / sizeof(cbc_test_data[0]);\
     size_t data_size = 0;\
@@ -266,6 +286,26 @@ static kryptos_u8_t *hmac_test_data[] = {
         t.iv = NULL;\
         data_size = strlen(cbc_test_data[tv]);\
         cipher_setup_ofb_stmt;\
+        t.in = cbc_test_data[tv];\
+        t.in_size = data_size;\
+        kryptos_task_set_encrypt_action(&t);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(t.out != NULL);\
+        t.in = t.out;\
+        t.in_size = t.out_size;\
+        kryptos_task_set_decrypt_action(&t);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size == data_size);\
+        CUTE_ASSERT(memcmp(t.out, cbc_test_data[tv], t.out_size) == 0);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+    }\
+    /*INFO(Rafael): CTR tests.*/\
+    for (tv = 0; tv < cbc_test_data_nr; tv++) {\
+        t.iv = NULL;\
+        t.ctr = NULL;\
+        data_size = strlen(cbc_test_data[tv]);\
+        cipher_setup_ctr_stmt;\
         t.in = cbc_test_data[tv];\
         t.in_size = data_size;\
         kryptos_task_set_encrypt_action(&t);\
