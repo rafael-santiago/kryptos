@@ -34,4 +34,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_hash_common_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_iv_inc_u32_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_fortuna_general_tests);
+
 #endif

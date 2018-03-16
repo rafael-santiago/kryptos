@@ -195,6 +195,11 @@ typedef enum {
     kKryptosTaskResultNr
 }kryptos_task_result_t;
 
+typedef enum {
+    kKryptosCSPRNGSys,
+    kKryptosCSPRNGFortuna
+}kryptos_csprng_t;
+
 #define KRYPTOS_KRYPTO_TASK_ARG_NR 10
 
 struct kryptos_task_aux_buffers_ctx {

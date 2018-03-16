@@ -18,6 +18,8 @@ void *kryptos_get_random_block(const size_t size_in_bytes);
 
 kryptos_u8_t kryptos_get_random_byte(void);
 
+int kryptos_set_csprng(kryptos_csprng_t csprng);
+
 #ifdef __cplusplus
 }
 #endif

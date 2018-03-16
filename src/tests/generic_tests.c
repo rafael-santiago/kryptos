@@ -9,6 +9,7 @@
 #include <kryptos_padding.h>
 #include <kryptos_memory.h>
 #include <kryptos_random.h>
+#include <kryptos_fortuna.h>
 #include <kryptos_task_check.h>
 #include <kryptos_block_parser.h>
 #include <kryptos_endianness_utils.h>
@@ -1265,5 +1266,71 @@ CUTE_TEST_CASE(kryptos_iv_inc_u32_tests)
         expected_iv[7] = r & 0xFF;
 
         CUTE_ASSERT(memcmp(iv, expected_iv, 8) == 0);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_fortuna_general_tests)
+    struct kryptos_fortuna_ctx *fortuna;
+    kryptos_u8_t *block;
+//    kryptos_u8_t *bp, *bp_end;
+    int t, i;
+
+    for (i = 0; i < 2; i++) {
+        fortuna = kryptos_fortuna_init(i);
+        CUTE_ASSERT(fortuna != NULL);
+
+        for (t = 0; t < 10; t++) {
+            block = kryptos_fortuna_get_random_block(fortuna, t + 1);
+            CUTE_ASSERT(block != NULL);
+            /*bp = block;
+            bp_end = bp + t + 1;
+            printf("RND BLOCK = ");
+            while (bp != bp_end) {
+                printf("%.2X", *bp);
+                bp++;
+            }
+            printf("\n");*/
+            memset(block, 0, t + 1); // INFO(Rafael): If it did not allocate the right size, SIGSEGV and/or undefined behavior
+                                     //               (hopefully) may occur...
+            kryptos_freeseg(block);
+        }
+
+        if (i) {
+            kryptos_fortuna_fini(fortuna);
+        }
+
+        fortuna = kryptos_fortuna_init(i);
+        CUTE_ASSERT(fortuna != NULL);
+
+        //printf("\n");
+        CUTE_ASSERT(kryptos_fortuna_reseed(fortuna, "fortes fortuna adiuvat", 22) == 1);
+
+        for (t = 0; t < 10; t++) {
+            block = kryptos_fortuna_get_random_block(fortuna, t + 1);
+            CUTE_ASSERT(block != NULL);
+            /*bp = block;
+            bp_end = bp + t + 1;
+            printf("RND BLOCK' = ");
+            while (bp != bp_end) {
+                printf("%.2X", *bp);
+                bp++;
+            }
+            printf("\n");*/
+            memset(block, 0, t + 1); // INFO(Rafael): If it did not allocate the right size, SIGSEGV and/or undefined behavior
+                                     //               (hopefully) may occur...
+            kryptos_freeseg(block);
+        }
+
+        /*printf("\nRND BYTES = ");
+        for (t = 0; t < 10; t++) {
+            printf("%.2X", kryptos_fortuna_get_random_byte(fortuna));
+        }
+        printf("\n\n");*/
+
+        CUTE_ASSERT(fortuna->seed_size == 32);
+        CUTE_ASSERT(memcmp(fortuna->seed, "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+                                          "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 32) != 0);
+
+        kryptos_fortuna_fini(fortuna);
     }
 CUTE_TEST_CASE_END
