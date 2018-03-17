@@ -181,6 +181,7 @@ typedef enum {
     kKryptosDecrypt,
     kKryptosEncode,
     kKryptosDecode,
+    kKryptosEncryptWithoutRandomPad,
     kKryptosActionNr
 }kryptos_action_t;
 
@@ -196,7 +197,7 @@ typedef enum {
 }kryptos_task_result_t;
 
 typedef enum {
-    kKryptosCSPRNGSys,
+    kKryptosCSPRNGSystem,
     kKryptosCSPRNGFortuna
 }kryptos_csprng_t;
 

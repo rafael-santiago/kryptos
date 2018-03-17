@@ -275,8 +275,8 @@ kryptos_ ## label_name:\
     if ((void *)(bufs) == NULL) {\
         goto kryptos_ ## epilogue;\
     }\
-    if (action == kKryptosEncrypt) {\
-        in_p = kryptos_ansi_x923_padding(in, in_size, block_size_in_bytes, 1);\
+    if (action == kKryptosEncrypt || action == kKryptosEncryptWithoutRandomPad) {\
+        in_p = kryptos_ansi_x923_padding(in, in_size, block_size_in_bytes, action == kKryptosEncrypt);\
         out = (kryptos_u8_t *) kryptos_newseg(*in_size + block_size_in_bytes);\
         if (out == NULL) {\
             goto kryptos_ ## epilogue;\
@@ -347,8 +347,8 @@ kryptos_ ## label_name:\
                                           out, out_p, out_size,\
                                           in_block, out_block,\
                                           epilogue, block_processor_call_scheme) {\
-    if (action == kKryptosEncrypt) {\
-        in_p = kryptos_ansi_x923_padding(in, in_size, block_size_in_bytes, 1);\
+    if (action == kKryptosEncrypt || action == kKryptosEncryptWithoutRandomPad) {\
+        in_p = kryptos_ansi_x923_padding(in, in_size, block_size_in_bytes, action == kKryptosEncrypt);\
         out = (kryptos_u8_t *) kryptos_newseg(*in_size + block_size_in_bytes);\
         if (out == NULL) {\
             goto kryptos_ ## epilogue;\
@@ -400,8 +400,8 @@ kryptos_ ## label_name:\
                                           out, out_p, out_size,\
                                           in_block, out_block,\
                                           epilogue, block_processor_call_scheme) {\
-    if (action == kKryptosEncrypt) {\
-        in_p = kryptos_ansi_x923_padding(in, in_size, block_size_in_bytes, 1);\
+    if (action == kKryptosEncrypt || action == kKryptosEncryptWithoutRandomPad) {\
+        in_p = kryptos_ansi_x923_padding(in, in_size, block_size_in_bytes, action == kKryptosEncrypt);\
         out = (kryptos_u8_t *) kryptos_newseg(*in_size + block_size_in_bytes);\
         if (out == NULL) {\
             goto kryptos_ ## epilogue;\
@@ -458,8 +458,8 @@ kryptos_ ## label_name:\
                                           out, out_p, out_size,\
                                           in_block, out_block,\
                                           epilogue, block_processor_call_scheme) {\
-    if (action == kKryptosEncrypt) {\
-        in_p = kryptos_ansi_x923_padding(in, in_size, block_size_in_bytes, 1);\
+    if (action == kKryptosEncrypt || action == kKryptosEncryptWithoutRandomPad) {\
+        in_p = kryptos_ansi_x923_padding(in, in_size, block_size_in_bytes, action == kKryptosEncrypt);\
     } else {\
         in_p = in;\
     }\

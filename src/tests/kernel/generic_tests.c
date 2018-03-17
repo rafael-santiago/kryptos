@@ -9,6 +9,7 @@
 #include <kryptos_padding.h>
 #include <kryptos_memory.h>
 #include <kryptos_random.h>
+#include <kryptos_fortuna.h>
 #include <kryptos_task_check.h>
 #include <kryptos_block_parser.h>
 #include <kryptos_endianness_utils.h>
@@ -63,6 +64,19 @@ KUTE_TEST_CASE(kryptos_padding_tests)
         kryptos_freeseg(pad);
 
         t++;
+    }
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_sys_get_random_block_tests)
+    void *block = NULL;
+    size_t b = 0;
+
+    KUTE_ASSERT(kryptos_sys_get_random_block(0) == NULL);
+
+    for (b = 1; b < 101; b++) {
+        block = kryptos_sys_get_random_block(b);
+        KUTE_ASSERT(block != NULL);
+        kryptos_freeseg(block);
     }
 KUTE_TEST_CASE_END
 
@@ -1255,4 +1269,79 @@ KUTE_TEST_CASE(kryptos_hash_common_tests)
                                         curr_len, total_len,
                                         &paddin2times, 0x80, 120);
     KUTE_ASSERT(paddin2times == 1);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_fortuna_general_tests)
+    struct kryptos_fortuna_ctx *fortuna;
+    kryptos_u8_t *block;
+    int t, i;
+
+    for (i = 0; i < 2; i++) {
+        fortuna = kryptos_fortuna_init(i);
+        KUTE_ASSERT(fortuna != NULL);
+
+        for (t = 0; t < 10; t++) {
+            block = kryptos_fortuna_get_random_block(fortuna, t + 1);
+            KUTE_ASSERT(block != NULL);
+            memset(block, 0, t + 1); // INFO(Rafael): If it did not allocate the right size, SIGSEGV and/or undefined behavior
+                                     //               (hopefully) may occur...
+            kryptos_freeseg(block);
+        }
+
+        if (i) {
+            kryptos_fortuna_fini(fortuna);
+        }
+
+        fortuna = kryptos_fortuna_init(i);
+        KUTE_ASSERT(fortuna != NULL);
+
+        KUTE_ASSERT(kryptos_fortuna_reseed(fortuna, "fortes fortuna adiuvat", 22) == 1);
+
+        for (t = 0; t < 10; t++) {
+            block = kryptos_fortuna_get_random_block(fortuna, t + 1);
+            KUTE_ASSERT(block != NULL);
+            memset(block, 0, t + 1); // INFO(Rafael): If it did not allocate the right size, SIGSEGV and/or undefined behavior
+                                     //               (hopefully) may occur...
+            kryptos_freeseg(block);
+        }
+
+        for (t = 0; t < 10; t++) {
+            kryptos_fortuna_get_random_byte(fortuna);
+        }
+
+        KUTE_ASSERT(fortuna->seed_size == 32);
+        KUTE_ASSERT(memcmp(fortuna->seed, "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+                                          "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 32) != 0);
+
+        kryptos_fortuna_fini(fortuna);
+    }
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_csprng_context_change_tests)
+    kryptos_u8_t *block;
+    size_t c, b;
+
+    for (c = 0; c < 3; c++) {
+        // INFO(Rafael): Fortuna stuff.
+        KUTE_ASSERT(kryptos_set_csprng(kKryptosCSPRNGFortuna) == 1);
+
+        block = kryptos_get_random_block(101);
+        KUTE_ASSERT(block != NULL);
+        kryptos_freeseg(block);
+
+        for (b = 0; b < 101; b++) {
+            kryptos_get_random_byte();
+        }
+
+        // INFO(Rafael): Native system csprng stuff.
+        KUTE_ASSERT(kryptos_set_csprng(kKryptosCSPRNGSystem) == 1);
+
+        block = kryptos_get_random_block(101);
+        KUTE_ASSERT(block != NULL);
+        kryptos_freeseg(block);
+
+        for (b = 0; b < 101; b++) {
+            kryptos_get_random_byte();
+        }
+    }
 KUTE_TEST_CASE_END

@@ -60,7 +60,8 @@ int kryptos_fortuna_reseed(struct kryptos_fortuna_ctx *fortuna, const kryptos_u8
     kryptos_task_init_as_null(ktask);
 
     if (fortuna != NULL) {
-        ktask->in = (kryptos_u8_t *) kryptos_newseg(seed_size + fortuna->K_size);
+        ktask->in_size = seed_size + fortuna->K_size;
+        ktask->in = (kryptos_u8_t *) kryptos_newseg(ktask->in_size);
 
         if (ktask->in == NULL) {
             goto kryptos_fortuna_reseed_epilogue;
@@ -189,9 +190,9 @@ static void *kryptos_fortuna_generate_blocks(struct kryptos_fortuna_ctx *fortuna
     if (fp->C == 0) {
         // INFO(Rafael): The generator was not seeded yet. It can happen when initializing it. Because the block cipher
         //               will try to pad with some random data by default. However, in this case, it is OK; we are not
-        //               considering the padding part here. In this special case we will use the current active CSPRNG
-        //               in order to avoid returning a zeroed by reseeding Fortuna.
-        seed = kryptos_get_random_block(32);
+        //               considering the padding part here. In this special case we will use the system CSPRNG in order
+        //               to avoid returning a zeroed block just by reseeding Fortuna.
+        seed = kryptos_sys_get_random_block(32);
 
         if (seed == NULL) {
             goto kryptos_fortuna_generate_blocks_epilogue;
@@ -218,7 +219,8 @@ static void *kryptos_fortuna_generate_blocks(struct kryptos_fortuna_ctx *fortuna
 
     for (i = 0; i < k; i++) {
         kryptos_aes128_setup(ktask, fp->K, fp->K_size, kKryptosECB);
-        kryptos_task_set_encrypt_action(ktask);
+        // CAUTION(Rafael): Always use this action unless you want a race condition and its related headaches.
+        ktask->action = kKryptosEncryptWithoutRandomPad;
 
         ktask->in[0] = fp->C & 0xFF;
         ktask->in[1] = (fp->C & 0xFF00) >> 8;

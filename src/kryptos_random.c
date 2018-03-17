@@ -14,35 +14,40 @@
 # include <string.h>
 #endif
 
-static kryptos_csprng_t g_kryptos_csprng = kKryptosCSPRNGSys;
+static kryptos_csprng_t g_kryptos_csprng = kKryptosCSPRNGSystem;
 
 struct kryptos_fortuna_ctx *g_kryptos_fortuna_state = NULL;
+
+void *kryptos_sys_get_random_block(const size_t size_in_bytes);
 
 static void kryptos_release_curr_csprng(void);
 
 int kryptos_set_csprng(kryptos_csprng_t csprng) {
     int set_glvar = 0;
-    kryptos_u8_t *seed;
-    kryptos_u32_t seed_size;
+    kryptos_u8_t *seed = NULL;
+    kryptos_u32_t seed_size = 0;
 
     switch (csprng) {
-        case kKryptosCSPRNGSys:
+        case kKryptosCSPRNGSystem:
             kryptos_release_curr_csprng();
             set_glvar = 1;
             break;
 
         case kKryptosCSPRNGFortuna:
-            seed = kryptos_get_random_block(4);
+
+            // CAUTION(Rafael): It is indispensable to use 'kryptos_sys_get_random_block' for avoiding a race
+            //                  condition and as a result a stack overflow failure.
+            seed = kryptos_sys_get_random_block(4);
 
             if (seed == NULL) {
                 goto kryptos_use_csprng_epilogue;
             }
 
             seed_size = *(kryptos_u32_t *)seed;
-            seed_size = (seed_size + 1) % 32;
+            seed_size = (seed_size % 31) + 1;
             kryptos_freeseg(seed);
 
-            seed = kryptos_get_random_block((size_t)seed_size);
+            seed = kryptos_sys_get_random_block((size_t)seed_size);
 
             if (seed == NULL) {
                 goto kryptos_use_csprng_epilogue;
@@ -58,8 +63,6 @@ int kryptos_set_csprng(kryptos_csprng_t csprng) {
 
             g_kryptos_fortuna_state = kryptos_fortuna_init(0);
             set_glvar = kryptos_fortuna_reseed(g_kryptos_fortuna_state, seed, (size_t)seed_size);
-
-            set_glvar = 1;
             break;
 
         default:
@@ -128,16 +131,20 @@ static void get_random_bytes(kryptos_u8_t *buf, const size_t n) {
 }
 #endif
 
-#if defined(__unix__)
-
 void *kryptos_get_random_block(const size_t size_in_bytes) {
-    void *block = NULL;
-#if defined(KRYPTOS_USER_MODE)
-    int fd = -1;
-
     if (g_kryptos_csprng == kKryptosCSPRNGFortuna) {
         return kryptos_fortuna_get_random_block(g_kryptos_fortuna_state, size_in_bytes);
     }
+
+    return kryptos_sys_get_random_block(size_in_bytes);
+}
+
+#if defined(__unix__)
+
+void *kryptos_sys_get_random_block(const size_t size_in_bytes) {
+    void *block = NULL;
+#if defined(KRYPTOS_USER_MODE)
+    int fd = -1;
 
     if (size_in_bytes == 0) {
         goto kryptos_get_random_block_epilogue;
@@ -169,9 +176,6 @@ kryptos_get_random_block_epilogue:
         close(fd);
     }
 #elif  defined(KRYPTOS_KERNEL_MODE)
-    if (g_kryptos_csprgn == kKryptosCSPRNGFortuna) {
-        return kryptos_fortuna_get_random_block(g_kryptos_fortuna_state, size_in_bytes);
-    }
     if (size_in_bytes > 0) {
         block = kryptos_newseg(size_in_bytes);
 
@@ -185,20 +189,16 @@ kryptos_get_random_block_epilogue:
 
 #elif defined(_WIN32)
 
-void *kryptos_get_random_block(const size_t size_in_bytes) {
+void *kryptos_sys_get_random_block(const size_t size_in_bytes) {
     void *block = NULL;
     HCRYPTPROV crypto_ctx = 0;
-
-    if (g_kryptos_csprgn == kKryptosCSPRNGFortuna) {
-        return kryptos_fortuna_get_random_block(g_kryptos_fortuna_state, size_in_bytes);
-    }
 
     if (size_in_bytes == 0) {
         return NULL;
     }
 
-    // TODO(Rafael): This seems to be slow as hell. Improve it to use a
-    //               straightforward way of getting those bytes.
+    // INFO(Rafael): This seems to be slow as hell. If it is slow enough to you
+    //               try to use Fortuna instead of the native Windows CSPRNG.
 
     if (!CryptAcquireContext(&crypto_ctx, NULL, NULL, PROV_RSA_FULL, 0)) {
         return NULL;
@@ -256,7 +256,7 @@ kryptos_get_random_byte_epilogue:
     }
 #elif  defined(KRYPTOS_KERNEL_MODE)
     if (g_kryptos_csprng == kKryptosCSPRNGFortuna) {
-        return kryptos_fortuna_get_random_byte(g_fortuna_state));
+        return kryptos_fortuna_get_random_byte(g_kryptos_fortuna_state);
     }
 
     get_random_bytes(&b, 1);

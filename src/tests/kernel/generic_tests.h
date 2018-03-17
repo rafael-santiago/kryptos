@@ -12,6 +12,8 @@
 
 KUTE_DECLARE_TEST_CASE(kryptos_padding_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_sys_get_random_block_tests);
+
 KUTE_DECLARE_TEST_CASE(kryptos_get_random_block_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_block_parser_tests);
@@ -31,5 +33,9 @@ KUTE_DECLARE_TEST_CASE(kryptos_task_check_verify_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_hex_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_hash_common_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_fortuna_general_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_csprng_context_change_tests);
 
 #endif

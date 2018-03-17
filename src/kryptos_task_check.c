@@ -119,7 +119,8 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
     if (( (*ktask)->cipher != kKryptosCipherARC4   &&
           (*ktask)->cipher != kKryptosCipherSEAL   &&
           (*ktask)->cipher != kKryptosCipherRABBIT   ) &&
-        (*ktask)->action != kKryptosEncrypt && (*ktask)->action != kKryptosDecrypt) {
+        (*ktask)->action != kKryptosEncrypt && (*ktask)->action != kKryptosDecrypt &&
+        (*ktask)->action != kKryptosEncryptWithoutRandomPad) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Invalid task action.";
         goto kryptos_task_check_error;

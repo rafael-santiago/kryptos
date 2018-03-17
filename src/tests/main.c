@@ -6,6 +6,7 @@
  *
  */
 #include <cutest.h>
+#include <kryptos_random.h>
 #include "generic_tests.h"
 #include "dsl_tests.h"
 #include "symmetric_ciphers_tests.h"
@@ -21,8 +22,10 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     // INFO(Rafael): Generic/shared stuff.
 
     CUTE_RUN_TEST(kryptos_padding_tests);
+    CUTE_RUN_TEST(kryptos_sys_get_random_block_tests);
     CUTE_RUN_TEST(kryptos_get_random_block_tests);
     CUTE_RUN_TEST(kryptos_fortuna_general_tests);
+    CUTE_RUN_TEST(kryptos_csprng_context_change_tests);
     CUTE_RUN_TEST(kryptos_block_parser_tests);
     CUTE_RUN_TEST(kryptos_endianness_utils_tests);
     CUTE_RUN_TEST(kryptos_apply_iv_tests);
@@ -33,6 +36,10 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_task_check_verify_tests);
     CUTE_RUN_TEST(kryptos_hex_tests);
     CUTE_RUN_TEST(kryptos_hash_common_tests);
+
+#ifdef _WIN32
+    kryptos_set_csprng(kKryptosCSPRNGFortuna);
+#endif
 
     //  -=-=-=-=- If you have just added a new cipher take a look in "kryptos_dsl_tests" case, there is some work to
     //                                               be done there too! -=-=-=-=-=-=-

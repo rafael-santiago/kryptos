@@ -12,6 +12,8 @@
 
 CUTE_DECLARE_TEST_CASE(kryptos_padding_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_sys_get_random_block_tests);
+
 CUTE_DECLARE_TEST_CASE(kryptos_get_random_block_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_block_parser_tests);
@@ -35,5 +37,7 @@ CUTE_DECLARE_TEST_CASE(kryptos_hash_common_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_iv_inc_u32_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_fortuna_general_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_csprng_context_change_tests);
 
 #endif

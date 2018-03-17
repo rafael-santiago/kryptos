@@ -30,6 +30,7 @@ KUTE_DECLARE_TEST_CASE(ktest_monkey);
 
 KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_padding_tests);
+    KUTE_RUN_TEST(kryptos_sys_get_random_block_tests);
     KUTE_RUN_TEST(kryptos_get_random_block_tests);
     KUTE_RUN_TEST(kryptos_block_parser_tests);
     KUTE_RUN_TEST(kryptos_endianness_utils_tests);
