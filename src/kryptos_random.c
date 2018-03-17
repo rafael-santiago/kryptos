@@ -269,7 +269,7 @@ kryptos_u8_t kryptos_get_random_byte(void) {
     kryptos_u8_t b, *block;
 
     if (g_kryptos_csprng == kKryptosCSPRNGFortuna) {
-        return kryptos_fortuna_get_random_byte(g_fortuna_state));
+        return kryptos_fortuna_get_random_byte(g_kryptos_fortuna_state);
     }
 
     block = kryptos_get_random_block(1);
