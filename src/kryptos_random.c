@@ -191,16 +191,16 @@ kryptos_get_random_block_epilogue:
 
 void *kryptos_sys_get_random_block(const size_t size_in_bytes) {
     void *block = NULL;
-    HCRYPTPROV crypto_ctx = 0;
+#if 1 // TODO(Rafael): Use 'bcrypt.h' in vista or newer.
+    static HCRYPTPROV crypto_ctx = 0;
 
     if (size_in_bytes == 0) {
         return NULL;
     }
 
-    // INFO(Rafael): This seems to be slow as hell. If it is slow enough to you
-    //               try to use Fortuna instead of the native Windows CSPRNG.
+    // WARN(Rafael): crypto_ctx will 'leak' otherwise it will be slow as hell. 
 
-    if (!CryptAcquireContext(&crypto_ctx, NULL, NULL, PROV_RSA_FULL, 0)) {
+    if (crypto_ctx == 0 && !CryptAcquireContext(&crypto_ctx, NULL, NULL, PROV_RSA_FULL, 0)) {
         return NULL;
     }
 
@@ -215,12 +215,27 @@ void *kryptos_sys_get_random_block(const size_t size_in_bytes) {
         block = NULL;
         goto kryptos_get_random_block_epilogue;
     }
+#else
+    block = kryptos_newseg(size_in_bytes);
+
+    if (block == NULL) {
+        goto kryptos_get_random_block_epilogue;
+    }
+
+    if (BCryptGenRandom(NULL, block, size_in_bytes,
+                        BCRYPT_USE_SYSTEM_PREFERRED_RNG) != STATUS_SUCCESS) {
+        kryptos_freeseg(block);
+        block = NULL;
+    }
+#endif
 
 kryptos_get_random_block_epilogue:
 
-    if (crypto_ctx) {
-        CryptReleaseContext(crypto_ctx, 0);
-    }
+    // WARN(Rafael): See? It is leaking. Go away! Boo!
+
+    //if (crypto_ctx) {
+    //    CryptReleaseContext(crypto_ctx, 0);
+    //}
 
     return block;
 }

@@ -38,8 +38,13 @@
 
 #if defined(_WIN32)
 # include <windows.h>
+# include <sdkddkver.h>
 # include <sys/types.h>
-# include <wincrypt.h>
+# if (_WIN32_WINNT >= 0x0600)
+#  include <bcrypt.h>
+# else
+#  include <wincrypt.h>
+# endif
 #endif
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
