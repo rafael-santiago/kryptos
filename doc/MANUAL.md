@@ -438,7 +438,7 @@ necessity of an IV be secret. If you use a static IV, in the end you are using a
 sadly, this kind of naive "pro-approach" is common. Avoid doing this. It is stupid.
 
 In order to strengthen the ``CTR`` mode, kryptos uses a common strategy of concatenating a random chosen IV with the current
-counter value. It reserses 4 bytes for the counter data. So we have 2^32 different values for the counter. The library does
+counter value. It reserves 4 bytes for the counter data. So we have 2^32 different values for the counter. The library does
 not control if the counter is recycled, it is up to you, but usually in ordinary cryptography implementations you should not
 mind so much about that. Assuming you are using AES-128 in CTR mode, you will be able of processing 2^35 bytes (2^3 + 2^32)
 before chosing a new random IV. This is something near to 32 Gigabytes, if you application does disk encryption or even
