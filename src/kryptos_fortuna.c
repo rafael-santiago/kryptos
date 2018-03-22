@@ -219,7 +219,7 @@ static void *kryptos_fortuna_generate_blocks(struct kryptos_fortuna_ctx *fortuna
 
     for (i = 0; i < k; i++) {
         kryptos_aes128_setup(ktask, fp->K, fp->K_size, kKryptosECB);
-        // CAUTION(Rafael): Always use this action unless you want a race condition and its related headaches.
+        // CAUTION(Rafael): Always use this action unless you want a deadlock and its related headaches.
         ktask->action = kKryptosEncryptWithoutRandomPad;
 
         ktask->in[0] = fp->C & 0xFF;

@@ -7,7 +7,6 @@
  */
 #include <kryptos_random.h>
 #include <kryptos_memory.h>
-#include <kryptos_fortuna.h>
 #ifndef KRYPTOS_KERNEL_MODE
 # include <fcntl.h>
 # include <unistd.h>
@@ -35,8 +34,8 @@ int kryptos_set_csprng(kryptos_csprng_t csprng) {
 
         case kKryptosCSPRNGFortuna:
 
-            // CAUTION(Rafael): It is indispensable to use 'kryptos_sys_get_random_block' for avoiding a race
-            //                  condition and as a result a stack overflow failure.
+            // CAUTION(Rafael): It is indispensable to use 'kryptos_sys_get_random_block' for avoiding a deadlock
+            //                  and as a result a stack overflow failure.
             seed = kryptos_sys_get_random_block(4);
 
             if (seed == NULL) {

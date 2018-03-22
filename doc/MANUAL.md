@@ -428,13 +428,33 @@ The **Table 2** lists the identifiers related with each available operation mode
 |       ``ECB``      |         kKryptosECB              |
 |       ``CBC``      |         kKryptosCBC              |
 |       ``OFB``      |         kKryptosOFB              |
+|       ``CTR``      |         kKryptosCTR              |
 
-When using ``CBC`` and ``OFB`` modes you do not have to worry about generating the initialization vector if you do not want to.
-Once the iv field from ``kryptos_task_ctx`` initialized as NULL, a new iv will be generated and used. In addition, after
+When using ``CBC``, ``OFB`` and ``CTR`` modes you do not have to worry about generating the initialization vector if you do not
+want to. Once the iv field from ``kryptos_task_ctx`` initialized as NULL, a new iv will be generated and used. In addition, after
 encrypting you do not need to worry about transfering the iv as a separated piece of information. The out field from
 ``kryptos_task_ctx`` gathers all information that you will need for a later decryption. As you may known there is no
 necessity of an IV be secret. If you use a static IV, in the end you are using a more complicated scheme for ``ECB`` mode,
-sadly, this kind of naive "pro-approach" is common. Avoid doing this, it is irresponsible and stupid.
+sadly, this kind of naive "pro-approach" is common. Avoid doing this. It is stupid.
+
+In order to streghten the ``CTR`` mode, kryptos uses a common strategy of concatenating a random chosen IV with the current
+counter value. It reserses 4 bytes for the counter data. So we have 2^32 different values for the counter. The library does
+not control if the counter is recycled, it is up to you, but usually in ordinary cryptography implementations you should not
+mind so much about that. Assuming you are using AES-128 in CTR mode, you will be able of processing 2^35 bytes (2^3 + 2^32)
+before chosing a new random IV. This is something near to 32 Gigabytes, if you application does disk encryption or even
+network encryption you should mind about it.
+
+If you want to get the current state of the counter in order to save it you should use the following macro:
+
+```c
+    kryptos_u32_t counter;
+    kryptos_task_ctx t, *ktask = &t;
+
+    kryptos_task_set_ctr_mode(ktask, &counter)
+
+    /* Perform the encryption steps and then 'counter' will be
+            storing the curret value of the counter of the CTR mode. */
+```
 
 The following code sample uses the SERPENT cipher in ``CBC`` mode with the c99 conveniences:
 
@@ -3435,6 +3455,136 @@ epilogue:
     }
 
     return exit_code;
+}
+```
+
+### CSPRNG
+
+By default kryptos uses the native CSPRNG but the library also features a Fortuna implementation.
+
+The usage of fortuna is pretty straightforward. It is possible to use it just by changing the kryptos CSPRNG,
+with the following statement:
+
+```c
+if (!kryptos_set_csprng(kKryptosCSPRNGFortuna)) {
+    printf("ERROR: the CSPRNG was not switched!\n");
+}
+```
+
+If you want to switch back to the native CSPRNG:
+
+```c
+if (!kryptos_set_csprng(kKryptosCSPRNGSystem)) {
+    printf("ERROR: the CSPRNG was not switched!\n");
+}
+```
+
+Maybe your requirements demands the usage of several random pools besides managing the reseed of it. Kryptos does not
+create seed files, it is up to you if you want to. The library only gives you access to the current seed, you do what
+you want with it:
+
+```c
+/*
+ *                                Copyright (C) 2018 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <ctype.h>
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+    struct kryptos_fortuna_ctx *fortuna;
+    kryptos_u8_t *block, *bp, *bp_end;
+    size_t block_size;
+    int error = 0;
+
+    // INFO(Rafael): When passing 1 it signales kryptos to alloc a new context,
+    //               instead of using a static one.
+    fortuna = kryptos_fortuna_init(1);
+
+    if (fortuna != NULL) {
+
+        if (kryptos_fortuna_reseed(fortuna, "fortes fortuna adiuvat", 22)) {
+            block_size = 16;
+            block = kryptos_fortuna_get_random_block(fortuna, block_size);
+            if (block != NULL) {
+                bp = block;
+                bp_end = bp + block_size;
+
+                printf("Random 128-bit block from external generator: ");
+
+                while (bp != bp_end) {
+                    printf("%c", isprint(*bp) ? *bp : '.');
+                    bp++;
+                }
+
+                printf("\n");
+
+                kryptos_freeseg(block);
+
+                // INFO(Rafael): You should save it somewhere, if you want to restore
+                //               the CSPRNG state later.
+
+                printf("Current seed from external generator: 0x");
+                bp = fortuna->seed;
+                bp_end = bp + fortuna->seed_size;
+
+                while (bp != bp_end) {
+                    printf("%.2X", *bp);
+                    bp++;
+                }
+
+                printf("\n");
+
+                // INFO(Rafael): Now let's switch the internal kryptos CSPRNG to Fortuna.
+
+                if (kryptos_set_csprng(kKryptosCSPRNGFortuna)) {
+
+                    // INFO(Rafael): Notice that we call 'kryptos_get_random_block' instead of
+                    //               'kryptos_fortuna_get_random_block'.
+                    block = kryptos_get_random_block(block_size);
+                    if (block != NULL) {
+                        bp = block;
+                        bp_end = bp + block_size;
+
+                        printf("Random 128-bit block from internal generator: ");
+
+                        while (bp != bp_end) {
+                            printf("%c", isprint(*bp) ? *bp : '.');
+                            bp++;
+                        }
+
+                        printf("\n");
+
+                        kryptos_freeseg(block);
+                    } else {
+                        error = 1;
+                        printf("ERROR: Unable to get a random block.\n");
+                    }
+                } else {
+                    error = 1;
+                    printf("ERROR: Unable to set the internal kryptos CSPRNG to Fortuna.\n");
+                }
+
+            } else {
+                error = 1;
+                printf("ERROR: Unable to get a random block.\n");
+            }
+        } else {
+            error = 1;
+            printf("ERROR: Unable to reseed Fortuna.\n");
+        }
+
+        kryptos_fortuna_fini(fortuna);
+    } else {
+        error = 1;
+        printf("ERROR: Unable to initialize Fortuna.\n");
+    }
+
+    return error;
 }
 ```
 

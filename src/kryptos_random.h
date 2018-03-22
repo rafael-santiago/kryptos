@@ -9,6 +9,7 @@
 #define KRYPTOS_KRYPTOS_RANDOM_H 1
 
 #include <kryptos_types.h>
+#include <kryptos_fortuna.h>
 
 #ifdef __cplusplus
 extern "C" {
