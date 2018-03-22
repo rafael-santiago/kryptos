@@ -450,7 +450,7 @@ If you want to get the current state of the counter in order to save it you shou
     kryptos_u32_t counter;
     kryptos_task_ctx t, *ktask = &t;
 
-    kryptos_init_task_as_null(ktask);
+    kryptos_task_init_as_null(ktask);
 
     kryptos_task_set_ctr_mode(ktask, &counter);
 
@@ -463,7 +463,7 @@ If you just want to use CTR mode without saving the counter status:
 ```c
     kryptos_task_ctx t, *ktask = &t;
 
-    kryptos_init_task_as_null(ktask);
+    kryptos_task_init_as_null(ktask);
 
     kryptos_task_set_ctr_mode(ktask, NULL);
 ```
