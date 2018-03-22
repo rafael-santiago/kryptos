@@ -463,9 +463,17 @@ If you just want to use CTR mode without saving the counter status:
 ```c
     kryptos_task_ctx t, *ktask = &t;
 
-    kryptos_task_init_as_null(ktask);
+    (...)
 
     kryptos_task_set_ctr_mode(ktask, NULL);
+```
+
+You also should initialize the task context as null and do not mess with its internal counter:
+
+```c
+    kryptos_task_ctx t, *ktask = &t;
+
+    kryptos_task_init_as_null(ktask);
 ```
 
 The following code sample uses the SERPENT cipher in ``CBC`` mode with the c99 conveniences:
