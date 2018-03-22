@@ -441,7 +441,7 @@ In order to strengthen the ``CTR`` mode, kryptos uses a common strategy of conca
 counter value. It reserves 4 bytes for the counter data. So we have 2^32 different values for the counter. The library does
 not control if the counter is recycled, it is up to you, but usually in ordinary cryptography implementations you should not
 mind so much about that. Assuming you are using AES-128 in CTR mode, you will be able of processing 2^35 bytes (2^3 + 2^32)
-before chosing a new random IV. This is something near to 32 Gigabytes, if you application does disk encryption or even
+before chosing a new random IV. This is something near to 32 gigabytes, if your application does disk encryption or even
 network encryption you should mind about it.
 
 If you want to get the current state of the counter in order to save it you should use the following macro:
