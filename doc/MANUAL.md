@@ -450,10 +450,22 @@ If you want to get the current state of the counter in order to save it you shou
     kryptos_u32_t counter;
     kryptos_task_ctx t, *ktask = &t;
 
-    kryptos_task_set_ctr_mode(ktask, &counter)
+    kryptos_init_task_as_null(ktask);
+
+    kryptos_task_set_ctr_mode(ktask, &counter);
 
     /* Perform the encryption steps and then 'counter' will be
             storing the curret value of the counter of the CTR mode. */
+```
+
+If you just want to use CTR mode without saving the counter status:
+
+```c
+    kryptos_task_ctx t, *ktask = &t;
+
+    kryptos_init_task_as_null(ktask);
+
+    kryptos_task_set_ctr_mode(ktask, NULL);
 ```
 
 The following code sample uses the SERPENT cipher in ``CBC`` mode with the c99 conveniences:
