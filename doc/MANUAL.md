@@ -533,6 +533,88 @@ fail. As a result the ``kryptos_last_task_succeed(...)`` will indicate a zero va
 Details about a failure always can be accessed by watching the field ``result_verbose`` from the ``kryptos_task_ctx`` struct.
 However, again, some errors let it ``NULL`` (**always check its nullity before continuing access it**).
 
+Okay, now coming back to CTR mode let's use AES-256 in this mode:
+
+```c
+/*
+ *                                Copyright (C) 2018 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char **argv) {
+#if defined(KRYPTOS_C99)
+    int error = 0;
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u32_t ctr = 9;
+    kryptos_u8_t *plain = "But why don't you take him with you into the light? "
+                          "He does not deserve the light, he deserves peace.";
+    kryptos_u8_t *p, *p_end;
+    size_t plain_size = strlen(plain);
+    kryptos_u8_t *key = "Fly Me To The Moon";
+    size_t key_size = strlen(key);
+
+    kryptos_task_init_as_null(ktask);
+
+    kryptos_task_set_in(ktask, plain, plain_size);
+    kryptos_task_set_ctr_mode(ktask, &ctr);
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_run_cipher(aes256, ktask, key, key_size, kKryptosCTR);
+
+    if (!kryptos_last_task_succeed(ktask)) {
+        printf("ERROR: %s\n", ktask->result_verbose);
+        error = 1;
+        goto epilogue;
+    }
+
+    p = ktask->out;
+    p_end = p + ktask->out_size;
+
+    printf("CRYPTOGRAM: ");
+
+    while (p != p_end) {
+        printf("%c", isprint(*p) ? *p : '.');
+        p++;
+    }
+
+    printf("\n");
+
+    printf("NEXT COUNTER VALUE: %d\n", ctr);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_run_cipher(aes256, ktask, key, key_size, kKryptosCTR);
+
+    if (!kryptos_last_task_succeed(ktask)) {
+        printf("ERROR: %s\n", ktask->result_verbose);
+        error = 1;
+        goto epilogue;
+    }
+
+    printf("PLAINTEXT: ");
+    fwrite(ktask->out, ktask->out_size, 1, stdout);
+    printf("\n");
+
+epilogue:
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_IV | KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT);
+
+    return error;
+#else
+    printf("WARNING: libkryptos was compiled without C99 support.\n");
+    return 1;
+#endif
+}
+```
+
 Not all block ciphers only need a key, a size of this key and an operation mode. In kryptos we also have block ciphers
 that need more than the standard parameters. In this case the additional parameters are always passed after the operation
 mode and they must be pointers to the data. As sample, let's pick the cipher FEAL. The FEAL algorithm supports variable
@@ -3470,6 +3552,10 @@ epilogue:
 }
 ```
 
+More details about the multiprecision handling functions are not given because it is considered an advanced
+topic for a final user manual. For more details try the technical documentation intended for contributors besides
+reading the library's code.
+
 ### CSPRNG
 
 By default kryptos uses the native CSPRNG but the library also features a Fortuna implementation.
@@ -3599,10 +3685,6 @@ int main(int argc, char **argv) {
     return error;
 }
 ```
-
-More details about the multiprecision handling functions are not given because it is considered an advanced
-topic for a final user manual. For more details try the technical documentation intended for contributors besides
-reading the library's code.
 
 ## So it is enough
 
