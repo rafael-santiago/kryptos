@@ -29,6 +29,7 @@
 #include "misty1_test_vector.h"
 #include "mars_test_vector.h"
 #include "present_test_vector.h"
+#include "shacal1_test_vector.h"
 #include "sha1_test_vector.h"
 #include "sha224_test_vector.h"
 #include "sha256_test_vector.h"
@@ -156,9 +157,9 @@ static kryptos_u8_t *hmac_test_data[] = {
         kryptos_ ## cipher_name  ## _cipher(&ktask);\
         CUTE_ASSERT(t.out != NULL);\
         CUTE_ASSERT(t.out_size == (t.in_size << 1));\
-        /*if (t.out_size == 16) {\
+        /*if (t.out_size == 40) {\
             printf("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n",\
-                     *(t.out), *(t.out+1), *(t.out+2), *(t.out+3), *(t.out+4), *(t.out+5), *(t.out+6), *(t.out+7));\
+                     t.out[0], t.out[1], t.out[2], t.out[3], t.out[4], t.out[5], t.out[6], t.out[7]);\
         }*/\
         CUTE_ASSERT(memcmp(t.out, cipher_name ## _test_vector[tv].cipher, cipher_name ## _test_vector[tv].block_size) == 0);\
         t.in = t.out;\
@@ -248,7 +249,7 @@ static kryptos_u8_t *hmac_test_data[] = {
         kryptos_ ## cipher_name  ## _cipher(&ktask);\
         CUTE_ASSERT(t.out != NULL);\
         CUTE_ASSERT(t.out_size == (t.in_size << 1));\
-        /*if (t.out_size == 8) {\
+        /*if (t.out_size == 20) {\
             printf("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n",\
                  *(t.out), *(t.out+1), *(t.out+2), *(t.out+3), *(t.out+4), *(t.out+5), *(t.out+6), *(t.out+7));\
         }*/\

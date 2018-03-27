@@ -869,3 +869,7 @@ CUTE_TEST_CASE(kryptos_ctr_mode_sequencing_tests)
 
     kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT | KRYPTOS_TASK_IV);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_shacal1_tests)
+    kryptos_run_block_cipher_tests(shacal1, KRYPTOS_SHACAL1_BLOCKSIZE);
+CUTE_TEST_CASE_END

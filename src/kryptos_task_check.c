@@ -23,6 +23,7 @@
 #include <kryptos_misty1.h>
 #include <kryptos_mars.h>
 #include <kryptos_present.h>
+#include <kryptos_shacal1.h>
 #include <kryptos_rabbit.h>
 #include <kryptos_rsa.h>
 #include <kryptos_elgamal.h>
@@ -395,6 +396,10 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
 
         case kKryptosCipherPRESENT:
             return ((*ktask)->iv_size == KRYPTOS_PRESENT_BLOCKSIZE);
+            break;
+
+        case kKryptosCipherSHACAL1:
+            return ((*ktask)->iv_size == KRYPTOS_SHACAL1_BLOCKSIZE);
             break;
 
         case kKryptosCipherRABBIT:
