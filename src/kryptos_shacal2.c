@@ -20,8 +20,6 @@
 
 #define kryptos_shacal2_ROTR(x, lv) ( ( (x) >> (lv) ) | ( (x) << ( (sizeof(x) << 3) - (lv) ) ) )
 
-#define kryptos_shacal2_ROTL(x, lv) ( ( (x) << (lv) ) | ( (x) >> ( (sizeof(x) << 3) - (lv) ) ) )
-
 #define kryptos_shacal2_BSIG0(x) ( kryptos_shacal2_ROTR(x,  2) ^\
                                    kryptos_shacal2_ROTR(x, 13) ^\
                                    kryptos_shacal2_ROTR(x, 22) )

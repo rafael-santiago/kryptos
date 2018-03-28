@@ -166,7 +166,7 @@ additional options. The **Table 3** gathers the options related with the kernel 
 | ``--libraries=../../lib,cutest/src/lib`` | Defines paths of additional libraries.                                       |
 | ``--ldflags=-lkryptos,-lcutest``         | Defines the default linker flags.                                            |
 | ``--includes=../,cutest/src``            | Defines paths of additional include directories.                             |
-| ``--kernel-mode-tests|=clean|``          | Requests the kernel mode tests execution. The option 'clean' requests a clean build. |
+| ``--kernel-mode-tests[=clean]``          | Requests the kernel mode tests execution. The option 'clean' requests a clean build. |
 | ``--no-hmac-tests``                      | Does not include the HMAC tests in the test binary. Speeds up the build.     |
 | ``--skip-dh-xchg-tests``                 | Skips the Diffie-Hellman-Merkle exchange tests.                              |
 | ``--skip-rsa-oaep-tests``                | Skips the RSA-OAEP tests. The tests execution becomes faster.                |
