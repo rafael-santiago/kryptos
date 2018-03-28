@@ -105,7 +105,9 @@ kryptos-tests.epilogue() {
             var kernel_mode_tests type list;
             $kernel_mode_tests = hefesto.sys.get_option("kernel-mode-tests");
             if ($kernel_mode_tests.count() > 0) {
-                $exit_code = forge_kernel_mode_tests();
+                var build_mode type string;
+                $build_mode = $kernel_mode_tests.item(0);
+                $exit_code = forge_kernel_mode_tests($build_mode);
             }
 
             if ($exit_code != 0) {
@@ -188,7 +190,7 @@ local function forge_cutest() : result type none {
     }
 }
 
-local function forge_kernel_mode_tests() : result type int {
+local function forge_kernel_mode_tests(build_mode type string) : result type int {
     var oldcwd type string;
     var exit_code type int;
     var supported_platforms type list;
@@ -211,6 +213,12 @@ local function forge_kernel_mode_tests() : result type int {
     $exit_code = 1;
 
     if (hefesto.sys.cd("kernel")) {
+        if ($build_mode == "clean") {
+            if (hefesto.sys.run("hefesto --clean") != 0) {
+                hefesto.sys.echo("ERROR: Unable to clean the object files.\n");
+                result 1;
+            }
+        }
         $exit_code = hefesto.sys.forge("kryptos-test-mod",
                                        "Forgefile.hsl", "--forgefiles=Forgefile.hsl --Forgefile-projects=kryptos-test-mod " +
                                        hefesto.project.cmdline());

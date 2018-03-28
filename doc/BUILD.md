@@ -166,7 +166,7 @@ additional options. The **Table 3** gathers the options related with the kernel 
 | ``--libraries=../../lib,cutest/src/lib`` | Defines paths of additional libraries.                                       |
 | ``--ldflags=-lkryptos,-lcutest``         | Defines the default linker flags.                                            |
 | ``--includes=../,cutest/src``            | Defines paths of additional include directories.                             |
-| ``--kernel-mode-tests``                  | Requests the kernel mode tests execution.                                    |
+| ``--kernel-mode-tests|=clean|``          | Requests the kernel mode tests execution. The option 'clean' requests a clean build. |
 | ``--no-hmac-tests``                      | Does not include the HMAC tests in the test binary. Speeds up the build.     |
 | ``--skip-dh-xchg-tests``                 | Skips the Diffie-Hellman-Merkle exchange tests.                              |
 | ``--skip-rsa-oaep-tests``                | Skips the RSA-OAEP tests. The tests execution becomes faster.                |
@@ -212,7 +212,7 @@ Sometimes ``make`` (the build system used by supported platforms) does not detec
 some piece of code that should be recompiled remains untouched. If you have been experiencing some weird errors during the
 kernel mode tests, your tests have been breaking where it should not... try to clean up the kernel objects. In order to do
 it you must be within the ``tests/kernel`` sub-directory, once there run the command ``hefesto --clean`` and re-run the
-build.
+build. You can also call the build from the main ``src`` sub-directory passing the option ``--kernel-mode-tests=clean``.
 
 In order to run the kernel mode tests your Hefesto copy must know how to build the LKM for your platform. Due to it
 additional toolsets must be installed. This additional toolsets are shared in another repository of mine called
