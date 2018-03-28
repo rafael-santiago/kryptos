@@ -166,6 +166,7 @@ typedef enum {
     kKryptosCipherMARS256,
     kKryptosCipherPRESENT,
     kKryptosCipherSHACAL1,
+    kKryptosCipherSHACAL2,
     // INFO(Rafael): PK algorithms.
     kKryptosCipherRSA,
     kKryptosCipherRSAOAEP,

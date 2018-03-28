@@ -208,7 +208,7 @@ static void kryptos_shacal1_block_decrypt(kryptos_u8_t *block, const struct kryp
         //               Some authors give a different transformation for the subkeys during decryption in order to re-use
         //               the encryption circuit, however, this is software so I do not mind of implementing a new one. This
         //               is a little bit different from what you may find in literature; specially the compression function
-        //               inverse, this directly uses the 2^32 sum inversion instead of gets the same result from different
+        //               inverse, this directly uses the 2^32 sum inversion instead of getting the same result from different
         //               subkeys values (inverse round keys).
         TEMP = A;
         A = B;

@@ -36,6 +36,7 @@
 #include <kryptos_mars.h>
 #include <kryptos_present.h>
 #include <kryptos_shacal1.h>
+#include <kryptos_shacal2.h>
 
 #include <kryptos_sha1.h>
 #include <kryptos_sha224_256.h>

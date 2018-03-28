@@ -873,3 +873,7 @@ CUTE_TEST_CASE_END
 CUTE_TEST_CASE(kryptos_shacal1_tests)
     kryptos_run_block_cipher_tests(shacal1, KRYPTOS_SHACAL1_BLOCKSIZE);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_shacal2_tests)
+    kryptos_run_block_cipher_tests(shacal2, KRYPTOS_SHACAL2_BLOCKSIZE);
+CUTE_TEST_CASE_END

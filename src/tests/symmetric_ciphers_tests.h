@@ -76,4 +76,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_ctr_mode_sequencing_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_shacal1_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_shacal2_tests);
+
 #endif
