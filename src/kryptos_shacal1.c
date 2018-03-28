@@ -198,12 +198,12 @@ static void kryptos_shacal1_block_decrypt(kryptos_u8_t *block, const struct kryp
     E = kryptos_get_u32_as_big_endian(block + 16, 4);
 
     for (t = 79; t >= 0; t--) {
-        // CLUE(Rafael): (32 - 30) = 2... This is also true when talking about rounded shifts :)
+        // CLUE(Rafael): (32 - 30) = 2... This is also true when talking about circular shifts :)
         //
         //               The constant 32 is because we are rotating 32-bit registers...
         //
         //               By exploring this basic shift property give us the chance of avoiding the
-        //               implementation of a rounded right shift macro (what in this case would be a useless inverse macro).
+        //               implementation of a circular right shift macro (what in this case would be a useless inverse macro).
         //
         //               Some authors give a different transformation for the subkeys during decryption in order to re-use
         //               the encryption circuit, however, this is software so I do not mind of implementing a new one. This

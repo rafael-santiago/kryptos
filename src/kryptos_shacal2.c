@@ -12,7 +12,7 @@
 #include <kryptos_padding.h>
 #include <kryptos.h>
 
-// INFO(Rafael): The SHACAL-2 implementation follows the same approach and ideas introduced in 'kryptos_shacal-1.c'.
+// INFO(Rafael): The SHACAL-2 implementation follows the same approach and ideas introduced in 'kryptos_shacal1.c'.
 
 #define kryptos_shacal2_CH(x, y, z) ( ( (x) & (y) ) ^ ( (~(x)) & (z) ) )
 
@@ -222,7 +222,7 @@ static void kryptos_shacal2_block_decrypt(kryptos_u8_t *block, const struct kryp
     h = kryptos_get_u32_as_big_endian(block + 28, 4);
 
     for (t = 63; t >= 0; t--) {
-        // INFO(Rafael): Decrypt it is even easier than SHACAL-1 since we do not need any inverse for any rounded shifts.
+        // INFO(Rafael): Decrypt it is even easier than SHACAL-1 since we do not need any inverse for any circular shift.
         T1 = a;
         a = b;
         b = c;

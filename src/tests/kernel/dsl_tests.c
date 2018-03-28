@@ -1238,5 +1238,41 @@ KUTE_TEST_CASE(kryptos_dsl_tests)
     KUTE_ASSERT(task.out_size == data_size);
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
+    // SHACAL-2 ECB
+
+    kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_encrypt_action(&task);
+
+    kryptos_run_cipher(shacal2, &task, "shacal2", 7, kKryptosECB);
+
+    KUTE_ASSERT(task.out != NULL);
+
+    kryptos_task_set_in(&task, task.out, task.out_size);
+    kryptos_task_set_decrypt_action(&task);
+
+    kryptos_run_cipher(shacal2, &task, "shacal2", 7, kKryptosECB);
+
+    KUTE_ASSERT(task.out_size == data_size);
+    KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+
+    // SHACAL-2 CBC
+
+    kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_encrypt_action(&task);
+
+    kryptos_run_cipher(shacal2, &task, "shacal2", 7, kKryptosCBC);
+
+    KUTE_ASSERT(task.out != NULL);
+
+    kryptos_task_set_in(&task, task.out, task.out_size);
+    kryptos_task_set_decrypt_action(&task);
+
+    kryptos_run_cipher(shacal2, &task, "shacal2", 7, kKryptosCBC);
+
+    KUTE_ASSERT(task.out_size == data_size);
+    KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 #endif
 KUTE_TEST_CASE_END
