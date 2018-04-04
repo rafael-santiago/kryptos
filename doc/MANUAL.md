@@ -725,6 +725,7 @@ The **Table 4** lists the available hash algorithms.
 | ``RIPEMD-128`` |      ``ripemd128``                 |
 | ``RIPEMD-160`` |      ``ripemd160``                 |
 | ``TIGER``      |      ``tiger``                     |
+| ``WHIRLPOOL``  |      ``whirlpool``                 |
 
 ```c
 /*
