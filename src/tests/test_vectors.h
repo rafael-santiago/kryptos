@@ -49,6 +49,7 @@
 #include "keccak384_test_vector.h"
 #include "keccak512_test_vector.h"
 #include "tiger_test_vector.h"
+#include "whirlpool_test_vector.h"
 #include <string.h>
 
 static kryptos_u8_t *cbc_test_data[] = {

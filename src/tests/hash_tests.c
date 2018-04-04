@@ -153,6 +153,14 @@ CUTE_TEST_CASE(kryptos_tiger_hash_macro_tests)
     kryptos_run_hash_macro_tests(tiger, 64, 24);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_whirlpool_tests)
+    kryptos_run_hash_tests(whirlpool, 64, 64);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_whirlpool_hash_macro_tests)
+    kryptos_run_hash_macro_tests(whirlpool, 64, 64);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_hmac_tests)
 
 #if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)

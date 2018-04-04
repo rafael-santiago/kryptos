@@ -82,6 +82,10 @@ CUTE_DECLARE_TEST_CASE(kryptos_tiger_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_tiger_hash_macro_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_whirlpool_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_whirlpool_hash_macro_tests);
+
 CUTE_DECLARE_TEST_CASE(kryptos_hmac_tests);
 
 #endif

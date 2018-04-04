@@ -46,6 +46,7 @@
 #include <kryptos_ripemd128_160.h>
 #include <kryptos_keccak.h>
 #include <kryptos_tiger.h>
+#include <kryptos_whirlpool.h>
 
 #include <kryptos_base64.h>
 #include <kryptos_uuencode.h>
