@@ -28,7 +28,10 @@ test_vector(sha1, hash) = {
                          "\x32\xD1\x0C\x7B\x8C\xF9\x65\x70\xCA\x04\xCE\x37\xF2\xA1\x9D\x84\x24\x0D\x3A\x89", 20),
     add_test_vector_data("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", 56,
                          "84983E441C3BD26EBAAE4AA1F95129E5E54670F1", 40,
-                         "\x84\x98\x3E\x44\x1C\x3B\xD2\x6E\xBA\xAE\x4A\xA1\xF9\x51\x29\xE5\xE5\x46\x70\xF1", 20)
+                         "\x84\x98\x3E\x44\x1C\x3B\xD2\x6E\xBA\xAE\x4A\xA1\xF9\x51\x29\xE5\xE5\x46\x70\xF1", 20),
+    add_test_vector_data("abcdbcdecdefdefgefghfghighijhijk", 32,
+                         "37BC5221ADE3BC09CAD15E4784F3C7051454B1B3", 40,
+                         "\x37\xBC\x52\x21\xAD\xE3\xBC\x09\xCA\xD1\x5E\x47\x84\xF3\xC7\x05\x14\x54\xB1\xB3", 20)
 };
 
 #endif

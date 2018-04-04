@@ -28,7 +28,10 @@ test_vector(md5, hash) = {
                          "\xC3\xFC\xD3\xD7\x61\x92\xE4\x00\x7D\xFB\x49\x6C\xCA\x67\xE1\x3B", 16),
     add_test_vector_data("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", 56,
                          "8215EF0796A20BCAAAE116D3876C664A", 32,
-                         "\x82\x15\xEF\x07\x96\xA2\x0B\xCA\xAA\xE1\x16\xD3\x87\x6C\x66\x4A", 16)
+                         "\x82\x15\xEF\x07\x96\xA2\x0B\xCA\xAA\xE1\x16\xD3\x87\x6C\x66\x4A", 16),
+    add_test_vector_data("abcdbcdecdefdefgefghfghighijhijk", 32,
+                         "8F52322928B91BF06561EA38DDF1752E", 32,
+                         "\x8F\x52\x32\x29\x28\xB9\x1B\xF0\x65\x61\xEA\x38\xDD\xF1\x75\x2E", 16)
 };
 
 #endif

@@ -40,7 +40,11 @@ test_vector(sha256, hash) = {
                          "248D6A61D20638B8E5C026930C3E6039"
                          "A33CE45964FF2167F6ECEDD419DB06C1", 64,
                          "\x24\x8D\x6A\x61\xD2\x06\x38\xB8\xE5\xC0\x26\x93\x0C\x3E\x60\x39"
-                         "\xA3\x3C\xE4\x59\x64\xFF\x21\x67\xF6\xEC\xED\xD4\x19\xDB\x06\xC1", 32)
+                         "\xA3\x3C\xE4\x59\x64\xFF\x21\x67\xF6\xEC\xED\xD4\x19\xDB\x06\xC1", 32),
+    add_test_vector_data("abcdbcdecdefdefgefghfghighijhijk", 32,
+                         "B09CBD263B043F000C5BEFCAA40BC2F55A4785E024E5DEB749B56061EAFB65E9", 64,
+                         "\xB0\x9C\xBD\x26\x3B\x04\x3F\x00\x0C\x5B\xEF\xCA\xA4\x0B\xC2\xF5"
+                         "\x5A\x47\x85\xE0\x24\xE5\xDE\xB7\x49\xB5\x60\x61\xEA\xFB\x65\xE9", 32)
 };
 
 #endif

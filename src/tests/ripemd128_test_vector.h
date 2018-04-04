@@ -32,7 +32,10 @@ test_vector(ripemd128, hash) = {
                          "\xFD\x2A\xA6\x07\xF7\x1D\xC8\xF5\x10\x71\x49\x22\xB3\x71\x83\x4E", 16),
     add_test_vector_data("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", 56,
                          "A1AA0689D0FAFA2DDC22E88B49133A06", 32,
-                         "\xA1\xAA\x06\x89\xD0\xFA\xFA\x2D\xDC\x22\xE8\x8B\x49\x13\x3A\x06", 16)
+                         "\xA1\xAA\x06\x89\xD0\xFA\xFA\x2D\xDC\x22\xE8\x8B\x49\x13\x3A\x06", 16),
+    add_test_vector_data("abcdbcdecdefdefgefghfghighijhijk", 32,
+                         "13FC13E8EFFF347DE193FF46DBACCFD4", 32,
+                         "\x13\xFC\x13\xE8\xEF\xFF\x34\x7D\xE1\x93\xFF\x46\xDB\xAC\xCF\xD4", 16) // Not IETF Tools.
 };
 
 #endif

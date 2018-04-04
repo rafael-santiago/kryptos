@@ -35,7 +35,11 @@ test_vector(tiger, hash) = {
                          "mnopnopq", 56,
                          "0F7BF9A19B9C58F2B7610DF7E84F0AC3A71C631E7B53F78E", 48,
                          "\x0F\x7B\xF9\xA1\x9B\x9C\x58\xF2\xB7\x61\x0D\xF7"
-                         "\xE8\x4F\x0A\xC3\xA7\x1C\x63\x1E\x7B\x53\xF7\x8E", 24)
+                         "\xE8\x4F\x0A\xC3\xA7\x1C\x63\x1E\x7B\x53\xF7\x8E", 24),
+    add_test_vector_data("abcdbcdecdefdefgefghfghighijhijk", 32,
+                         "24DA7C949CCDDEFA0A2AAB697D6AE0CCE491B12BBF2EFD25", 48,
+                         "\x24\xDA\x7C\x94\x9C\xCD\xDE\xFA\x0A\x2A\xAB\x69"
+                         "\x7D\x6A\xE0\xCC\xE4\x91\xB1\x2B\xBF\x2E\xFD\x25", 24)
 };
 
 #endif

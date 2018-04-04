@@ -27,7 +27,11 @@ test_vector(sha224, hash) = {
                          "hijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu", 112,
                          "C97CA9A559850CE97A04A96DEF6D99A9E0E0E2AB14E6B8DF265FC0B3", 56,
                          "\xC9\x7C\xA9\xA5\x59\x85\x0C\xE9\x7A\x04\xA9\x6D\xEF\x6D"
-                         "\x99\xA9\xE0\xE0\xE2\xAB\x14\xE6\xB8\xDF\x26\x5F\xC0\xB3", 28)
+                         "\x99\xA9\xE0\xE0\xE2\xAB\x14\xE6\xB8\xDF\x26\x5F\xC0\xB3", 28),
+    add_test_vector_data("abcdbcdecdefdefgefghfghighijhijk", 32,
+                         "D7D147B9B2BC45479A494087EF8D212EF37910AA52462CCE9C4DC8B7", 56,
+                         "\xD7\xD1\x47\xB9\xB2\xBC\x45\x47\x9A\x49\x40\x87\xEF\x8D"
+                         "\x21\x2E\xF3\x79\x10\xAA\x52\x46\x2C\xCE\x9C\x4D\xC8\xB7", 28)
 };
 
 #endif

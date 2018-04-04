@@ -581,7 +581,7 @@ static size_t kryptos_whirlpool_block_index_decision_table[KRYPTOS_WHIRLPOOL_BYT
      5,  5,  5,  5,  5,  5,  5,  5,
      6,  6,  6,  6,  6,  6,  6,  6,
      7,  7,  7,  7,  7,  7,  7,  7
-}; // CLUE(Rafael): Mr. Mercury and his crew would sing 'It's a kind of ' + black + ' magic'. Do not even try touch on it.
+}; // CLUE(Rafael): Mr. Mercury and his crew would sing 'It's a kind of ' + black + ' magic'. Do not even try to touch on it.
 
 struct kryptos_whirlpool_input_message {
     kryptos_u64_t block[8];
