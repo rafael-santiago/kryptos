@@ -78,4 +78,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_shacal1_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_shacal2_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_noekeon_tests);
+
 #endif

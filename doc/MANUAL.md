@@ -99,44 +99,45 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 
 **Table 1**: The available symmetric ciphers.
 
-|    **Cipher**    |      **Type**         |    **Internal constant ID**      |
-|:----------------:|:---------------------:|:--------------------------------:|
-|   ``ARC4``       |       Stream          |       ``kKryptosCipherARC4``     |
-|   ``SEAL``       |       Stream          |       ``kKryptosCipherSEAL``     |
-|  ``RABBIT``      |       Stream          |       ``kKryptosCipherRABBIT``   |
-| ``AES-128``      |       Block           |       ``kKryptosCipherAES128``   |
-| ``AES-192``      |       Block           |       ``kKryptosCipherAES192``   |
-| ``AES-256``      |       Block           |       ``kKryptosCipherAES256``   |
-|   ``DES``        |       Block           |       ``kKryptosCipherDES``      |
-|   ``3DES``       |       Block           |       ``kKryptosCipher3DES``     |
-| ``3DES-EDE``     |       Block           |       ``kKryptosCipher3DESEDE``  |
-|   ``IDEA``       |       Block           |       ``kKryptosCipherIDEA``     |
-|    ``RC2``       |       Block           |       ``kKryptosCipherRC2``      |
-|    ``RC5``       |       Block           |       ``kKryptosCipherRC5``      |
-|   ``RC6-128``    |       Block           |       ``kKryptosCipherRC6128``   |
-|   ``RC6-192``    |       Block           |       ``kKryptosCipherRC6192``   |
-|   ``RC6-256``    |       Block           |       ``kKryptosCipherRC6256``   |
-|   ``FEAL``       |       Block           |       ``kKryptosCipherFEAL``     |
-|  ``CAST5``       |       Block           |       ``kKryptosCipherCAST5``    |
-| ``CAMELLIA-128`` |       Block           |       ``kKryptosCipherCAMELLIA`` |
-| ``CAMELLIA-192`` |       Block           |       ``kKryptosCipherCAMELLIA`` |
-| ``CAMELLIA-256`` |       Block           |       ``kKryptosCipherCAMELLIA`` |
-| ``SAFER-K64``    |       Block           |       ``kKryptosCipherSAFERK64`` |
-| ``BLOWFISH``     |       Block           |       ``kKryptosCipherBLOWFISH`` |
-| ``SERPENT``      |       Block           |       ``kKryptosCipherSERPENT``  |
-|   ``TEA``        |       Block           |       ``kKryptosCipherTEA``      |
-|   ``XTEA``       |       Block           |       ``kKryptosCipherXTEA``     |
-|  ``MISTY1``      |       Block           |       ``kKryptosCipherMISTY1``   |
-| ``MARS-128``     |       Block           |       ``kKryptosCipherMARS128``  |
-| ``MARS-192``     |       Block           |       ``kKryptosCipherMARS192``  |
-| ``MARS-256``     |       Block           |       ``kKryptosCipherMARS256``  |
-| ``PRESENT-80``   |       Block           |       ``kKryptosCipherPRESENT``  |
-| ``PRESENT-128``  |       Block           |       ``kKryptosCipherPRESENT``  |
-| ``SHACAL-1``     |       Block           |       ``kKryptosCipherSHACAL1``  |
-| ``SHACAL-2``     |       Block           |       ``kKryptosCipherSHACAL2``  |
+|    **Cipher**                   |**Type**|    **Internal constant ID**      |
+|:-------------------------------:|:------:|:--------------------------------:|
+|   ``ARC4``                      | Stream |       ``kKryptosCipherARC4``     |
+|   ``SEAL``                      | Stream |       ``kKryptosCipherSEAL``     |
+|  ``RABBIT``                     | Stream |       ``kKryptosCipherRABBIT``   |
+| ``AES-128``                     | Block  |       ``kKryptosCipherAES128``   |
+| ``AES-192``                     | Block  |       ``kKryptosCipherAES192``   |
+| ``AES-256``                     | Block  |       ``kKryptosCipherAES256``   |
+|   ``DES``                       | Block  |       ``kKryptosCipherDES``      |
+|   ``3DES``                      | Block  |       ``kKryptosCipher3DES``     |
+| ``3DES-EDE``                    | Block  |       ``kKryptosCipher3DESEDE``  |
+|   ``IDEA``                      | Block  |       ``kKryptosCipherIDEA``     |
+|    ``RC2``                      | Block  |       ``kKryptosCipherRC2``      |
+|    ``RC5``                      | Block  |       ``kKryptosCipherRC5``      |
+|   ``RC6-128``                   | Block  |       ``kKryptosCipherRC6128``   |
+|   ``RC6-192``                   | Block  |       ``kKryptosCipherRC6192``   |
+|   ``RC6-256``                   | Block  |       ``kKryptosCipherRC6256``   |
+|   ``FEAL``                      | Block  |       ``kKryptosCipherFEAL``     |
+|  ``CAST5``                      | Block  |       ``kKryptosCipherCAST5``    |
+| ``CAMELLIA-128``                | Block  |       ``kKryptosCipherCAMELLIA`` |
+| ``CAMELLIA-192``                | Block  |       ``kKryptosCipherCAMELLIA`` |
+| ``CAMELLIA-256``                | Block  |       ``kKryptosCipherCAMELLIA`` |
+| ``SAFER-K64``                   | Block  |       ``kKryptosCipherSAFERK64`` |
+| ``BLOWFISH``                    | Block  |       ``kKryptosCipherBLOWFISH`` |
+| ``SERPENT``                     | Block  |       ``kKryptosCipherSERPENT``  |
+|   ``TEA``                       | Block  |       ``kKryptosCipherTEA``      |
+|   ``XTEA``                      | Block  |       ``kKryptosCipherXTEA``     |
+|  ``MISTY1``                     | Block  |       ``kKryptosCipherMISTY1``   |
+| ``MARS-128``                    | Block  |       ``kKryptosCipherMARS128``  |
+| ``MARS-192``                    | Block  |       ``kKryptosCipherMARS192``  |
+| ``MARS-256``                    | Block  |       ``kKryptosCipherMARS256``  |
+| ``PRESENT-80``                  | Block  |       ``kKryptosCipherPRESENT``  |
+| ``PRESENT-128``                 | Block  |       ``kKryptosCipherPRESENT``  |
+| ``SHACAL-1``                    | Block  |       ``kKryptosCipherSHACAL1``  |
+| ``SHACAL-2``                    | Block  |       ``kKryptosCipherSHACAL2``  |
+| ``NOEKEON`` (indirect key mode) | Block  |       ``kKryptosCipherNOEKEON``  |
 
 The available modes of operation for the block ciphers are: ``ECB``, ``CBC`` and ``OFB``. So in practice, considering the
-``OFB`` mode, we have 33 stream ciphers instead of only three. More on cipher modes will be treated later.
+``OFB`` mode, we have 34 stream ciphers instead of only three. More on cipher modes will be treated later.
 
 The way of indicating the desired cipher for an encryption task is by setting the field ``cipher`` from the ``kryptos_task_ctx``
 to the ``Internal constant ID`` listed in **Table 1**.

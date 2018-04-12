@@ -877,3 +877,7 @@ CUTE_TEST_CASE_END
 CUTE_TEST_CASE(kryptos_shacal2_tests)
     kryptos_run_block_cipher_tests(shacal2, KRYPTOS_SHACAL2_BLOCKSIZE);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_noekeon_tests)
+    kryptos_run_block_cipher_tests(noekeon, KRYPTOS_NOEKEON_BLOCKSIZE);
+CUTE_TEST_CASE_END
