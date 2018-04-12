@@ -2047,7 +2047,7 @@ kryptos_mp_div_2p_epilogue:
 
 // WARN(Rafael): This is a good example of what is and what should be. People always tell us to use Montgomery,
 //               however, it has been showing slower than MP division. So I have decided deactivate it.
-//               Maybe this reduction worth in hardware or other more statical contexts.
+//               Maybe this reduction worth in hardware or other more static contexts.
 
 #undef KRYPTOS_MP_ME_MOD_N_USE_MONTGOMERY_REDUCTION
 

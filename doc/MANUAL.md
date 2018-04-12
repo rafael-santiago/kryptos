@@ -99,46 +99,46 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 
 **Table 1**: The available symmetric ciphers.
 
-|    **Cipher**                   |**Type**|    **Internal constant ID**      |
-|:-------------------------------:|:------:|:--------------------------------:|
-|   ``ARC4``                      | Stream |       ``kKryptosCipherARC4``     |
-|   ``SEAL``                      | Stream |       ``kKryptosCipherSEAL``     |
-|  ``RABBIT``                     | Stream |       ``kKryptosCipherRABBIT``   |
-| ``AES-128``                     | Block  |       ``kKryptosCipherAES128``   |
-| ``AES-192``                     | Block  |       ``kKryptosCipherAES192``   |
-| ``AES-256``                     | Block  |       ``kKryptosCipherAES256``   |
-|   ``DES``                       | Block  |       ``kKryptosCipherDES``      |
-|   ``3DES``                      | Block  |       ``kKryptosCipher3DES``     |
-| ``3DES-EDE``                    | Block  |       ``kKryptosCipher3DESEDE``  |
-|   ``IDEA``                      | Block  |       ``kKryptosCipherIDEA``     |
-|    ``RC2``                      | Block  |       ``kKryptosCipherRC2``      |
-|    ``RC5``                      | Block  |       ``kKryptosCipherRC5``      |
-|   ``RC6-128``                   | Block  |       ``kKryptosCipherRC6128``   |
-|   ``RC6-192``                   | Block  |       ``kKryptosCipherRC6192``   |
-|   ``RC6-256``                   | Block  |       ``kKryptosCipherRC6256``   |
-|   ``FEAL``                      | Block  |       ``kKryptosCipherFEAL``     |
-|  ``CAST5``                      | Block  |       ``kKryptosCipherCAST5``    |
-| ``CAMELLIA-128``                | Block  |       ``kKryptosCipherCAMELLIA`` |
-| ``CAMELLIA-192``                | Block  |       ``kKryptosCipherCAMELLIA`` |
-| ``CAMELLIA-256``                | Block  |       ``kKryptosCipherCAMELLIA`` |
-| ``SAFER-K64``                   | Block  |       ``kKryptosCipherSAFERK64`` |
-| ``BLOWFISH``                    | Block  |       ``kKryptosCipherBLOWFISH`` |
-| ``SERPENT``                     | Block  |       ``kKryptosCipherSERPENT``  |
-|   ``TEA``                       | Block  |       ``kKryptosCipherTEA``      |
-|   ``XTEA``                      | Block  |       ``kKryptosCipherXTEA``     |
-|  ``MISTY1``                     | Block  |       ``kKryptosCipherMISTY1``   |
-| ``MARS-128``                    | Block  |       ``kKryptosCipherMARS128``  |
-| ``MARS-192``                    | Block  |       ``kKryptosCipherMARS192``  |
-| ``MARS-256``                    | Block  |       ``kKryptosCipherMARS256``  |
-| ``PRESENT-80``                  | Block  |       ``kKryptosCipherPRESENT``  |
-| ``PRESENT-128``                 | Block  |       ``kKryptosCipherPRESENT``  |
-| ``SHACAL-1``                    | Block  |       ``kKryptosCipherSHACAL1``  |
-| ``SHACAL-2``                    | Block  |       ``kKryptosCipherSHACAL2``  |
-| ``NOEKEON`` (indirect key mode) | Block  |       ``kKryptosCipherNOEKEON``  |
-| ``NOEKEON`` (direct key mode)   | Block  |       ``kKryptosCipherNOEKEOND`` |
+|    **Cipher**                   |**Type**|    **Internal constant ID**      |  **Internal Name** |
+|:-------------------------------:|:------:|:--------------------------------:|:------------------:|
+|   ``ARC4``                      | Stream |       ``kKryptosCipherARC4``     |      ``arc4``      |
+|   ``SEAL``                      | Stream |       ``kKryptosCipherSEAL``     |      ``seal``      |
+|  ``RABBIT``                     | Stream |       ``kKryptosCipherRABBIT``   |      ``rabbit``    |
+| ``AES-128``                     | Block  |       ``kKryptosCipherAES128``   |      ``aes128``    |
+| ``AES-192``                     | Block  |       ``kKryptosCipherAES192``   |      ``aes192``    |
+| ``AES-256``                     | Block  |       ``kKryptosCipherAES256``   |      ``aes256``    |
+|   ``DES``                       | Block  |       ``kKryptosCipherDES``      |       ``des``      |
+|   ``3DES``                      | Block  |       ``kKryptosCipher3DES``     |    ``triple_des``  |
+| ``3DES-EDE``                    | Block  |       ``kKryptosCipher3DESEDE``  |  ``triple_des_ede``|
+|   ``IDEA``                      | Block  |       ``kKryptosCipherIDEA``     |       ``idea``     |
+|    ``RC2``                      | Block  |       ``kKryptosCipherRC2``      |        ``rc2``     |
+|    ``RC5``                      | Block  |       ``kKryptosCipherRC5``      |        ``rc5``     |
+|   ``RC6-128``                   | Block  |       ``kKryptosCipherRC6128``   |      ``rc6_128``   |
+|   ``RC6-192``                   | Block  |       ``kKryptosCipherRC6192``   |      ``rc6_192``   |
+|   ``RC6-256``                   | Block  |       ``kKryptosCipherRC6256``   |      ``rc6_256``   |
+|   ``FEAL``                      | Block  |       ``kKryptosCipherFEAL``     |       ``feal``     |
+|  ``CAST5``                      | Block  |       ``kKryptosCipherCAST5``    |       ``cast5``    |
+| ``CAMELLIA-128``                | Block  |       ``kKryptosCipherCAMELLIA`` |    ``camellia128`` |
+| ``CAMELLIA-192``                | Block  |       ``kKryptosCipherCAMELLIA`` |    ``camellia192`` |
+| ``CAMELLIA-256``                | Block  |       ``kKryptosCipherCAMELLIA`` |    ``camellia256`` |
+| ``SAFER-K64``                   | Block  |       ``kKryptosCipherSAFERK64`` |     ``saferk64``   |
+| ``BLOWFISH``                    | Block  |       ``kKryptosCipherBLOWFISH`` |     ``blowfish``   |
+| ``SERPENT``                     | Block  |       ``kKryptosCipherSERPENT``  |      ``serpent``   |
+|   ``TEA``                       | Block  |       ``kKryptosCipherTEA``      |        ``tea``     |
+|   ``XTEA``                      | Block  |       ``kKryptosCipherXTEA``     |        ``xtea``    |
+|  ``MISTY1``                     | Block  |       ``kKryptosCipherMISTY1``   |        ``misty1``  |
+| ``MARS-128``                    | Block  |       ``kKryptosCipherMARS128``  |       ``mars128``  |
+| ``MARS-192``                    | Block  |       ``kKryptosCipherMARS192``  |       ``mars192``  |
+| ``MARS-256``                    | Block  |       ``kKryptosCipherMARS256``  |       ``mars256``  |
+| ``PRESENT-80``                  | Block  |       ``kKryptosCipherPRESENT``  |      ``present80`` |
+| ``PRESENT-128``                 | Block  |       ``kKryptosCipherPRESENT``  |      ``present128``|
+| ``SHACAL-1``                    | Block  |       ``kKryptosCipherSHACAL1``  |       ``shacal1``  |
+| ``SHACAL-2``                    | Block  |       ``kKryptosCipherSHACAL2``  |       ``shacal2``  |
+| ``NOEKEON`` (indirect key mode) | Block  |       ``kKryptosCipherNOEKEON``  |       ``noekeon``  |
+| ``NOEKEON`` (direct key mode)   | Block  |       ``kKryptosCipherNOEKEOND`` |       ``noekeon_d``|
 
-The available modes of operation for the block ciphers are: ``ECB``, ``CBC`` and ``OFB``. So in practice, considering the
-``OFB`` mode, we have 35 stream ciphers instead of only three. More on cipher modes will be treated later.
+The available modes of operation for the block ciphers are: ``ECB``, ``CBC``, ``CTR`` and ``OFB``. So in practice, considering
+the ``OFB`` mode, we have 35 stream ciphers instead of only three. More on cipher modes will be treated later.
 
 The way of indicating the desired cipher for an encryption task is by setting the field ``cipher`` from the ``kryptos_task_ctx``
 to the ``Internal constant ID`` listed in **Table 1**.
@@ -293,7 +293,7 @@ As you can see the kryptos task manipulation C macros implement a direct and sim
 
 The general usage of ``kryptos_run_cipher`` macro is:
 
-``kryptos_run_cipher(<cipher>, <ktask pointer>, key, key_size[, args]...)``
+``kryptos_run_cipher(<cipher internal name>, <ktask pointer>, key, key_size[, args]...)``
 
 Block ciphers should be used in almost the same way:
 
@@ -421,7 +421,7 @@ int main(int argc, char **argv) {
 
 The ECB mode is the weakest mode to be used with block ciphers.
 
-Until now is possible to use block ciphers in three modes: ``ECB``, ``CBC`` and ``OFB``.
+Until now is possible to use block ciphers in four modes: ``ECB``, ``CBC``, ``CTR`` and ``OFB``.
 
 The **Table 2** lists the identifiers related with each available operation mode.
 
@@ -436,16 +436,16 @@ The **Table 2** lists the identifiers related with each available operation mode
 
 When using ``CBC``, ``OFB`` and ``CTR`` modes you do not have to worry about generating the initialization vector if you do not
 want to. Once the iv field from ``kryptos_task_ctx`` initialized as NULL, a new iv will be generated and used. In addition, after
-encrypting you do not need to worry about transfering the iv as a separated piece of information. The out field from
-``kryptos_task_ctx`` gathers all information that you will need for a later decryption. As you may known there is no
+encrypting you do not need to worry about transferring the iv as a separated piece of information. The out field from
+``kryptos_task_ctx`` gathers all information that you will need for a later decryption. As you may known, there is no
 necessity of an IV be secret. If you use a static IV, in the end you are using a more complicated scheme for ``ECB`` mode,
 sadly, this kind of naive "pro-approach" is common. Avoid doing this. It is stupid.
 
 In order to strengthen the ``CTR`` mode, kryptos uses a common strategy of concatenating a random chosen IV with the current
 counter value. It reserves 4 bytes for the counter data. So we have 2^32 different values for the counter. The library does
-not control if the counter is recycled, it is up to you, but usually in ordinary cryptography implementations you should not
+not control if the counter is recycled, it is up to you, but usually in ordinary cryptographic tasks you should not
 mind so much about that. Assuming you are using AES-128 in CTR mode, you will be able of processing 2^35 bytes (2^3 + 2^32)
-before chosing a new random IV. This is something near to 32 gigabytes, if your application does disk encryption or even
+before choosing a new random IV. This is something near to 32 gigabytes, if your application does disk encryption or even
 network encryption you should mind about it.
 
 If you want to get the current state of the counter in order to save it you should use the following macro:
@@ -459,7 +459,7 @@ If you want to get the current state of the counter in order to save it you shou
     kryptos_task_set_ctr_mode(ktask, &counter);
 
     /* Perform the encryption steps and then 'counter' will be
-            storing the curret value of the counter of the CTR mode. */
+            storing the current value of the counter of the CTR mode. */
 ```
 
 If you just want to use CTR mode without saving the counter status:
