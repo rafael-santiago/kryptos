@@ -40,8 +40,6 @@
     (a)[0] ^= (a)[2] & (a)[1];\
 }
 
-// INFO(Rafael): '#define kryptos_noekeon_rsh(v, l) kryptos_noekeon_lsh(v, 32 - l)'???!! Go to sleep (in hell) buddy!..
-
 #define kryptos_noekeon_Theta(k, a, t) {\
     (t) = (a)[0] ^ (a)[2];\
     (t) ^= kryptos_noekeon_lsh(t, 24) ^ kryptos_noekeon_lsh(t, 8);\
@@ -58,6 +56,8 @@
 }
 
 #define kryptos_noekeon_lsh(v, l) ( ( (v) << (l) ) | ( (v) >> (32 - (l)) ) )
+
+// CLUE(Rafael): '#define kryptos_noekeon_rsh(v, l) kryptos_noekeon_lsh(v, 32 - l)'???!! Go to sleep (in hell) buddy!.. :)
 
 #define kryptos_noekeon_Pi1(a) {\
     (a)[1] = kryptos_noekeon_lsh(a[1], 1);\
@@ -223,7 +223,7 @@ static void kryptos_noekeon_block_encrypt(kryptos_u8_t *block, const struct kryp
 static void kryptos_noekeon_block_decrypt(kryptos_u8_t *block, const struct kryptos_noekeon_subkeys *sks) {
     kryptos_u32_t temp, state[4];
 
-    // WARN(Rafael): At this point the computation of the 'inverse' working key has already occured,
+    // WARN(Rafael): At this point the computation of the 'inverse' working key has already occurred,
     //               in the cipher's processor.
 
     state[0] = kryptos_get_u32_as_big_endian(     block, 4);
