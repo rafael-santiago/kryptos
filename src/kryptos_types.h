@@ -619,7 +619,7 @@ static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct
                                             buffer_size, input_block_size, bits_per_block,\
                                             hash_init_stmt, hash_do_block_stmt, block_index_decision_table)\
 static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct_var) {\
-    kryptos_u64_t i, l = ctx->total_len >> 3;\
+    kryptos_u64_t i, l = struct_var->total_len >> 3;\
     kryptos_u8_t buffer[buffer_size];\
     hash_init_stmt;\
     ctx->curr_len = 0;\
@@ -656,7 +656,7 @@ static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct
                                             buffer_size, input_block_size, bits_per_block,\
                                             hash_init_stmt, hash_do_block_stmt, block_index_decision_table)\
 static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct_var) {\
-    kryptos_u64_t i, l = ctx->total_len >> 3;\
+    kryptos_u64_t i, l = struct_var->total_len >> 3;\
     static kryptos_u8_t buffer[buffer_size];\
     hash_init_stmt;\
     ctx->curr_len = 0;\
