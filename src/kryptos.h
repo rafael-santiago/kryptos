@@ -526,6 +526,7 @@ kryptos_ ## label_name:\
         }\
     } else if ((ktask)->action == kKryptosDecrypt) {\
             (ktask)->mirror_p = (ktask);\
+            kryptos_ ## cname ## _setup((ktask), cipher_args);\
             kryptos_hmac(&(ktask)->mirror_p,\
                          kryptos_ ## hname ## _hash,\
                          kryptos_ ## hname ## _hash_input_size,\

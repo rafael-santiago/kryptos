@@ -173,6 +173,7 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
     kryptos_u8_t *temp_data = NULL;
     size_t temp_size = 0;
     kryptos_u8_t *out = NULL;
+    ssize_t delta;
 
     // INFO(Rafael): Boring necessary check code.
 
@@ -200,7 +201,12 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
     hash_input_size = h_input_size();
     hash_size = h_size();
 
-    input_key_delta = hash_input_size - key_size;
+    delta = hash_input_size - key_size;
+
+    if (delta > 0) {
+        input_key_delta = delta;
+    }
+
     k_xor_size = hash_input_size;
 
     k_xor_ipad = (kryptos_u8_t *) kryptos_newseg(k_xor_size);
@@ -219,11 +225,17 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
 
     // INFO(Rafael): Key padding (inner, outter).
 
-    memset(k_xor_ipad, 0, input_key_delta);
-    memcpy(k_xor_ipad + input_key_delta, key, key_size);
+    if (delta > 0) {
+        delta = key_size;
+    } else {
+        delta = k_xor_size;
+    }
 
-    memset(k_xor_opad, 0, input_key_delta);
-    memcpy(k_xor_opad + input_key_delta, key, key_size);
+    memset(k_xor_ipad, 0, k_xor_size);
+    memcpy(k_xor_ipad + input_key_delta, key, delta);
+
+    memset(k_xor_opad, 0, k_xor_size);
+    memcpy(k_xor_opad + input_key_delta, key, delta);
 
     // INFO(Rafael): Key xoring (inner, outter).
 
@@ -318,13 +330,13 @@ kryptos_hmac_gen_epilogue:
     kp = kp_end = NULL;
 
     if (k_xor_ipad != NULL) {
-        memset(k_xor_ipad, 0, input_key_delta + key_size);
+        memset(k_xor_ipad, 0, k_xor_size);
         kryptos_freeseg(k_xor_ipad);
         k_xor_ipad = NULL;
     }
 
     if (k_xor_opad != NULL) {
-        memset(k_xor_opad, 0, input_key_delta + key_size);
+        memset(k_xor_opad, 0, k_xor_size);
         kryptos_freeseg(k_xor_opad);
         k_xor_opad = NULL;
     }
@@ -340,6 +352,8 @@ kryptos_hmac_gen_epilogue:
     }
 
     input_key_delta = hash_input_size = hash_size = k_xor_size = 0;
+
+    delta = 0;
 
     return out;
 }
