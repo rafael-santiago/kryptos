@@ -2722,6 +2722,12 @@ kryptos_mp_value_t *kryptos_mp_gen_prime(const size_t bitsize) {
         pn->data[0] |= 0x1;
 
 #ifdef KRYPTOS_MP_U32_DIGIT
+        pn->data[pn->data_size - 1] |= 0x80000000;
+#else
+        pn->data[pn->data_size - 1] |= 0x80;
+#endif
+
+#ifdef KRYPTOS_MP_U32_DIGIT
 
         d = 0;
 
