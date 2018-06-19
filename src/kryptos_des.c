@@ -300,7 +300,7 @@ void kryptos_triple_des_cipher(kryptos_task_ctx **ktask) {
     kryptos_triple_des_block_processor encrypt_processor = kryptos_triple_des_block_encrypt;
     kryptos_triple_des_block_processor decrypt_processor = kryptos_triple_des_block_decrypt;
     kryptos_u8_t *in_p, *in_end, *out_p;
-    kryptos_u8_t *outblock, *outblock_p, *inblock, *inblock_p;
+    kryptos_u8_t *outblock = NULL, *outblock_p, *inblock = NULL, *inblock_p;
     size_t in_size;
 
     if (kryptos_task_check(ktask) == 0) {

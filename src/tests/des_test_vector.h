@@ -1811,7 +1811,6 @@ test_vector(des, block_cipher) = {
                           "\x8C\xA6\x4D\xE9\xC1\xB1\x23\xA7",
                           "\x00\x00\x00\x00\x00\x00\x00\x00",
                           "\x8C\xA6\x4D\xE9\xC1\xB1\x23\xA7", 8),
-     // TODO(Rafael): Fill it up with the remaining test data from NESSIE.
     add_test_vector_data("\x00\x00\x00\x00\x00\x00\x00\x00", 8,
                           "\x80\x00\x00\x00\x00\x00\x00\x00",
                           "\x95\xF8\xA5\xE5\xDD\x31\xD9\x00",
