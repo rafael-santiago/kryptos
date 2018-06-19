@@ -407,7 +407,7 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
     kryptos_meta_block_processing_epilogue(cipher_epilogue,\
                                            inblock, inblock_p, in_p, in_end,\
                                            outblock, outblock_p, out_p,\
-                                           in_size,\
+                                           in_size, cipher_block_size,\
                                            cipher_subkeys_struct_var, ktask);\
     cipher_block_processor = NULL;\
 }
@@ -466,7 +466,7 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
     kryptos_meta_block_processing_epilogue(cipher_epilogue,\
                                            inblock, inblock_p, in_p, in_end,\
                                            outblock, outblock_p, out_p,\
-                                           in_size,\
+                                           in_size, cipher_block_size,\
                                            cipher_subkeys_struct_var, ktask);\
     cipher_block_processor = NULL;\
 }

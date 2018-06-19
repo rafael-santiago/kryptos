@@ -53,6 +53,7 @@ KUTE_TEST_CASE(ktest_monkey)
     // INFO(Rafael): Operation modes (complementary tests).
 
     KUTE_RUN_TEST(kryptos_ctr_mode_sequencing_tests);
+    //KUTE_RUN_TEST(kryptos_des_weak_keys_detection_tests);
 
     KUTE_RUN_TEST(kryptos_hash_tests);
     KUTE_RUN_TEST(kryptos_hmac_tests);

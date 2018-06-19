@@ -176,7 +176,7 @@ static kryptos_u32_t kryptos_des_bitseq_to_u32(kryptos_u8_t *bitseq);
 
 static kryptos_u32_t kryptos_des_f(kryptos_u32_t R, kryptos_u32_t KL, kryptos_u32_t KR);
 
-static void kryptos_des_expand_user_key(struct kryptos_des_subkeys *sks, const kryptos_u8_t *key, const size_t key_size);
+static int kryptos_des_expand_user_key(struct kryptos_des_subkeys *sks, const kryptos_u8_t *key, const size_t key_size);
 
 static void kryptos_des_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size);
 
@@ -204,6 +204,8 @@ static void kryptos_triple_des_ede_block_decrypt(kryptos_u8_t *block,
                                                  const struct kryptos_des_subkeys *sks2,
                                                  const struct kryptos_des_subkeys *sks3);
 
+static int is_somekind_des_weak_key(const kryptos_u32_t k[2]);
+
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(des, kKryptosCipherDES, KRYPTOS_DES_BLOCKSIZE)
 
 KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(des,
@@ -212,7 +214,13 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(des,
                                     sks,
                                     kryptos_des_block_processor,
                                     des_block_processor,
-                                    kryptos_des_expand_user_key(&sks, (*ktask)->key, (*ktask)->key_size),
+                                    {
+                                        if (kryptos_des_expand_user_key(&sks, (*ktask)->key, (*ktask)->key_size) == 0) {
+                                            (*ktask)->result = kKryptosKeyError;
+                                            (*ktask)->result_verbose = "DES weak key informed.";
+                                            goto kryptos_des_cipher_epilogue;
+                                        }
+                                    },
                                     kryptos_des_block_encrypt, /*No additional steps before encrypting*/,
                                     kryptos_des_block_decrypt, /*No additional steps before decrypting*/,
                                     KRYPTOS_DES_BLOCKSIZE,
@@ -334,11 +342,23 @@ void kryptos_triple_des_cipher(kryptos_task_ctx **ktask) {
         decrypt_processor = kryptos_triple_des_ede_block_decrypt;
     }
 
-    kryptos_des_expand_user_key(&sks1, (*ktask)->key, (*ktask)->key_size);
+    if (kryptos_des_expand_user_key(&sks1, (*ktask)->key, (*ktask)->key_size) == 0) {
+        (*ktask)->result = kKryptosKeyError;
+        (*ktask)->result_verbose = "3DES weak key informed.";
+        goto kryptos_triple_des_cipher_epilogue;
+    }
 
-    kryptos_des_expand_user_key(&sks2, (kryptos_u8_t *)(*ktask)->arg[0], *(size_t *)(*ktask)->arg[1]);
+    if (kryptos_des_expand_user_key(&sks2, (kryptos_u8_t *)(*ktask)->arg[0], *(size_t *)(*ktask)->arg[1]) == 0) {
+        (*ktask)->result = kKryptosKeyError;
+        (*ktask)->result_verbose = "3DES weak key informed.";
+        goto kryptos_triple_des_cipher_epilogue;
+    }
 
-    kryptos_des_expand_user_key(&sks3, (kryptos_u8_t *)(*ktask)->arg[2], *(size_t *)(*ktask)->arg[3]);
+    if (kryptos_des_expand_user_key(&sks3, (kryptos_u8_t *)(*ktask)->arg[2], *(size_t *)(*ktask)->arg[3]) == 0) {
+        (*ktask)->result = kKryptosKeyError;
+        (*ktask)->result_verbose = "3DES weak key informed.";
+        goto kryptos_triple_des_cipher_epilogue;
+    }
 
     if ((*ktask)->action == kKryptosEncrypt || (*ktask)->mode == kKryptosOFB || (*ktask)->mode == kKryptosCTR) {
         block_processor = encrypt_processor;
@@ -367,7 +387,7 @@ void kryptos_triple_des_cipher(kryptos_task_ctx **ktask) {
     kryptos_meta_block_processing_epilogue(triple_des_cipher_epilogue,
                                            inblock, inblock_p, in_p, in_end,
                                            outblock, outblock_p, out_p,
-                                           in_size,
+                                           in_size, KRYPTOS_DES_BLOCKSIZE,
                                            sks1, ktask);
     memset(&sks2, 0, sizeof(sks2));
     memset(&sks3, 0, sizeof(sks3));
@@ -700,7 +720,8 @@ static void kryptos_des_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user
     kryptos_ld_user_key_epilogue(kryptos_des_ld_user_key_epilogue, key, w, b, kp, kp_end);
 }
 
-static void kryptos_des_expand_user_key(struct kryptos_des_subkeys *sks, const kryptos_u8_t *key, const size_t key_size) {
+static int kryptos_des_expand_user_key(struct kryptos_des_subkeys *sks, const kryptos_u8_t *key, const size_t key_size) {
+    // INFO(Rafael): This function only returns zero (failure) when a weak key is passed.
     kryptos_u8_t bits[KRYPTOS_DES_MASTER_SIZE], key_perm[KRYPTOS_DES_MASTER_SIZE];
     kryptos_u32_t C[18];
     kryptos_u32_t D[18];
@@ -708,6 +729,11 @@ static void kryptos_des_expand_user_key(struct kryptos_des_subkeys *sks, const k
     size_t i, j;
 
     kryptos_des_ld_user_key(user_key, key, key_size);
+
+    if (is_somekind_des_weak_key(user_key)) {
+        user_key[0] = user_key[1] = 0;
+        return 0;
+    }
 
     memset(bits, 0, sizeof(bits));
 
@@ -784,8 +810,63 @@ static void kryptos_des_expand_user_key(struct kryptos_des_subkeys *sks, const k
     memset(D, 0L, sizeof(D));
     memset(key_perm, 0, sizeof(key_perm));
     memset(bits, 0, sizeof(bits));
-    memset(user_key, 0, sizeof(user_key));
+    user_key[0] = user_key[1] = 0;
     i = j = 0;
+
+    return 1;
+}
+
+static int is_somekind_des_weak_key(const kryptos_u32_t k[2]) {
+    struct des_weak_keys {
+        kryptos_u32_t L;
+        kryptos_u32_t R;
+    };
+#define REGISTER_DES_WEAK_KEY(fh, sh) { 0x ## fh, 0x ## sh }
+    static struct des_weak_keys wkey[] = {
+        // WARN(Rafael): DES' weak keys.
+        REGISTER_DES_WEAK_KEY(01010101, 01010101), REGISTER_DES_WEAK_KEY(1F1F1F1F, 0E0E0E0E),
+        REGISTER_DES_WEAK_KEY(E0E0E0E0, F1F1F1F1), REGISTER_DES_WEAK_KEY(FEFEFEFE, FEFEFEFE),
+        // WARN(Rafael): DES' semiweak keys.
+        REGISTER_DES_WEAK_KEY(01FE01FE, 01FE01FE), REGISTER_DES_WEAK_KEY(FE01FE01, FE01FE01),
+        REGISTER_DES_WEAK_KEY(1FE01FE0, 0EF10EF1), REGISTER_DES_WEAK_KEY(E0F1E0F1, F10EF10E),
+        REGISTER_DES_WEAK_KEY(01E001E0, 01F101F1), REGISTER_DES_WEAK_KEY(E001E001, F101F101),
+        REGISTER_DES_WEAK_KEY(1FFE1FFE, 0EFE0EFE), REGISTER_DES_WEAK_KEY(FE1FFE1F, FE0EFE0E),
+        REGISTER_DES_WEAK_KEY(01F101F1, 010E010E), REGISTER_DES_WEAK_KEY(1F011F01, 0E010E01),
+        REGISTER_DES_WEAK_KEY(0EFE0EFE, F1FEF1FE), REGISTER_DES_WEAK_KEY(FE0EFE0E, FEF1FEF1),
+        // WARN(Rafael): DES' possibly weak keys.
+        REGISTER_DES_WEAK_KEY(1F1F0101, 0E0E0101), REGISTER_DES_WEAK_KEY(0E010EF1, F10101F1),
+        REGISTER_DES_WEAK_KEY(011F1F01, 010E0E01), REGISTER_DES_WEAK_KEY(FEF101E0, FE0E01F1),
+        REGISTER_DES_WEAK_KEY(1F01011F, 0E01010E), REGISTER_DES_WEAK_KEY(FE011FE0, FE010EF1),
+        REGISTER_DES_WEAK_KEY(01011F1F, 01010E0E), REGISTER_DES_WEAK_KEY(E01F1FE0, F10E0EF1),
+        REGISTER_DES_WEAK_KEY(E0E00101, F1F10101), REGISTER_DES_WEAK_KEY(FE0101FE, FE0101FE),
+        REGISTER_DES_WEAK_KEY(FEFE0101, FEFE0101), REGISTER_DES_WEAK_KEY(E01F01FE, F10E01FE),
+        REGISTER_DES_WEAK_KEY(FEE01F01, FEF10E01), REGISTER_DES_WEAK_KEY(E0011FFE, F1010EFE),
+        REGISTER_DES_WEAK_KEY(E0FE1F01, F1FE0E01), REGISTER_DES_WEAK_KEY(FE1F1FFE, FE0E0EFE),
+        REGISTER_DES_WEAK_KEY(FEE0011F, FEF1010E), REGISTER_DES_WEAK_KEY(1FFE01E0, 0EFE01F1),
+        REGISTER_DES_WEAK_KEY(E0FE011F, F1FE010E), REGISTER_DES_WEAK_KEY(01FE1FE0, 01FE0EF1),
+        REGISTER_DES_WEAK_KEY(E0E01F1F, F1F10E0E), REGISTER_DES_WEAK_KEY(1FE001FE, 0EF101FE),
+        REGISTER_DES_WEAK_KEY(FEFE1F1F, FEFE0E0E), REGISTER_DES_WEAK_KEY(01E01FFE, 01F10EFE),
+        REGISTER_DES_WEAK_KEY(FE1FE001, FE0EF101), REGISTER_DES_WEAK_KEY(0101E0E0, 0101F1F1),
+        REGISTER_DES_WEAK_KEY(E01FFE01, F10EFE01), REGISTER_DES_WEAK_KEY(1F1FE0E0, 0E0EF1F1),
+        REGISTER_DES_WEAK_KEY(FE01E01F, FE01F10E), REGISTER_DES_WEAK_KEY(1F01FEE0, 0E01FEF1),
+        REGISTER_DES_WEAK_KEY(E001FE1F, F101FE0E), REGISTER_DES_WEAK_KEY(011FFEE0, 010EFEF1),
+        REGISTER_DES_WEAK_KEY(01E0E001, 01F1F101), REGISTER_DES_WEAK_KEY(1F01E0FE, 0E01F1FE),
+        REGISTER_DES_WEAK_KEY(1FFEE001, 0EFEF001), REGISTER_DES_WEAK_KEY(011FE0FE, 010EF1FE),
+        REGISTER_DES_WEAK_KEY(1FE0FE01, 0EF1FE01), REGISTER_DES_WEAK_KEY(0101FEFE, 0101FEFE),
+        REGISTER_DES_WEAK_KEY(01FEFE01, 01FEFE01), REGISTER_DES_WEAK_KEY(1F1FFEFE, 0E0EFEFE),
+        REGISTER_DES_WEAK_KEY(1FE0E01F, 0EF1F10E), REGISTER_DES_WEAK_KEY(FEFEE0E0, FEFEF1F1),
+        REGISTER_DES_WEAK_KEY(01FEE01F, 01FEF10E), REGISTER_DES_WEAK_KEY(E0FEFEE0, F1FEFEF1),
+        REGISTER_DES_WEAK_KEY(01E0FE1F, 01F1FE0E), REGISTER_DES_WEAK_KEY(FEE0E0FE, FEF1F1FE),
+        REGISTER_DES_WEAK_KEY(1FFEFE1F, 0EFEFE0E), REGISTER_DES_WEAK_KEY(E0E0FEFE, F1F1FEFE)
+    };
+#undef REGISTER_DES_WEAK_KEY
+    size_t wkey_nr = sizeof(wkey) / sizeof(wkey[0]), w;
+    int weak = 0;
+    for (w = 0; w < wkey_nr && !weak; w++) {
+        weak = (k[0] == wkey[w].L) && (k[1] == wkey[w].R);
+    }
+    w = 0;
+    return weak;
 }
 
 #undef kryptos_des_SHL

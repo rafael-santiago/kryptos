@@ -253,16 +253,20 @@ epilogue:\
 #define kryptos_meta_block_processing_epilogue(label_name,\
                                                inblock, inblock_p, in_p, in_end,\
                                                outblock, outblock_p, out_p,\
-                                               in_size, sks, ktask) {\
+                                               in_size, block_size_in_bytes, sks, ktask) {\
 kryptos_ ## label_name:\
-    if ((*ktask)->out == NULL) {\
+    if ((*ktask)->out == NULL && (*ktask)->result != kKryptosKeyError) {\
         (*ktask)->result = kKryptosProcessError;\
         (*ktask)->result_verbose = "No memory to get a valid output.";\
     }\
-    memset(inblock, 0, 8);\
-    memset(outblock, 0, 8);\
-    kryptos_freeseg(inblock);\
-    kryptos_freeseg(outblock);\
+    if (inblock != NULL) {\
+        memset(inblock, 0, block_size_in_bytes);\
+        kryptos_freeseg(inblock);\
+    }\
+    if (outblock != NULL) {\
+        memset(outblock, 0, block_size_in_bytes);\
+        kryptos_freeseg(outblock);\
+    }\
     inblock_p = outblock_p = NULL;\
     in_size = 0;\
     in_p = in_end = out_p = NULL;\
