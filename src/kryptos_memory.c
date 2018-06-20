@@ -10,6 +10,7 @@
 #if defined(KRYPTOS_USER_MODE)
 # include <stdio.h>
 # include <unistd.h>
+# include <string.h>
 #elif defined(KRYPTOS_KERNEL_MODE) && (defined(__FreeBSD__) || defined(__NetBSD__))
   MALLOC_DECLARE(M_KRYPTOS);
   MALLOC_DEFINE(M_KRYPTOS, "kryptos_general_memory_buffer", "buffer allocated by libkryptos");
@@ -33,8 +34,12 @@ void *kryptos_newseg(const size_t ssize) {
     return segment;
 }
 
-void kryptos_freeseg(void *seg) {
+void kryptos_freeseg(void *seg, const size_t ssize) {
     if (seg != NULL) {
+        if (ssize > 0) {
+            // PARANOID-TODO(Rafael): To be paranoid enough and go ahead with some data wiping over RAM data or not to be?
+            memset(seg, 0, ssize);
+        }
 #if defined(KRYPTOS_USER_MODE)
         free(seg);
 #elif defined(KRYPTOS_KERNEL_MODE) && (defined(__FreeBSD__) || defined(__NetBSD__))

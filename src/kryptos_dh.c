@@ -235,7 +235,7 @@ kryptos_task_result_t kryptos_dh_mk_domain_params(const size_t p_bits, const siz
 kryptos_dh_mk_domain_params_epilogue:
 
     if (result != kKryptosSuccess && (*params) != NULL) {
-        kryptos_freeseg(*params);
+        kryptos_freeseg(*params, *params_size);
         *params_size = 0;
     }
 
@@ -390,7 +390,7 @@ void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8
     }
 
     if ((*k_pub) != NULL) {
-        kryptos_freeseg(*k_pub);
+        kryptos_freeseg(*k_pub, *k_pub_size);
     }
 
     (*data)->result = kryptos_pem_put_data(k_pub,
@@ -439,7 +439,7 @@ void kryptos_dh_mk_key_pair(kryptos_u8_t **k_pub, size_t *k_pub_size, kryptos_u8
     (*data)->t = NULL;
 
     if ((*k_priv) != NULL) {
-        kryptos_freeseg(*k_priv);
+        kryptos_freeseg(*k_priv, *k_priv_size);
     }
 
     (*data)->result = kryptos_pem_put_data(k_priv,
@@ -660,7 +660,7 @@ void kryptos_dh_process_stdxchg(struct kryptos_dh_xchg_ctx **data) {
 
         if ((*data)->out != NULL) {
             // INFO(Rafael): Since it is about a protocol, it can fail, if the user try again let's avoid any memory leak.
-            kryptos_freeseg((*data)->out);
+            kryptos_freeseg((*data)->out, (*data)->out_size);
             (*data)->out = NULL;
         }
 
@@ -755,11 +755,11 @@ void kryptos_clear_dh_xchg_ctx(struct kryptos_dh_xchg_ctx *data) {
     }
 
     if (data->in != NULL) {
-        kryptos_freeseg(data->in);
+        kryptos_freeseg(data->in, data->in_size);
     }
 
     if (data->out != NULL) {
-        kryptos_freeseg(data->out);
+        kryptos_freeseg(data->out, data->out_size);
     }
 
     kryptos_dh_init_xchg_ctx(data);

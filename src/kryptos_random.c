@@ -44,7 +44,7 @@ int kryptos_set_csprng(kryptos_csprng_t csprng) {
 
             seed_size = *(kryptos_u32_t *)seed;
             seed_size = (seed_size % 31) + 1;
-            kryptos_freeseg(seed);
+            kryptos_freeseg(seed, 4);
 
             seed = kryptos_sys_get_random_block((size_t)seed_size);
 
@@ -71,9 +71,8 @@ int kryptos_set_csprng(kryptos_csprng_t csprng) {
 kryptos_use_csprng_epilogue:
 
     if (seed != NULL) {
-        memset(seed, 0, (size_t)seed_size);
+        kryptos_freeseg(seed, (size_t)seed_size);
         seed_size = 0;
-        kryptos_freeseg(seed);
     }
 
     if (set_glvar) {
@@ -166,7 +165,7 @@ void *kryptos_sys_get_random_block(const size_t size_in_bytes) {
     }
 
     if (read(fd, block, size_in_bytes) == -1) {
-        kryptos_freeseg(block);
+        kryptos_freeseg(block, size_in_bytes);
         block = NULL;
     }
 
@@ -210,7 +209,7 @@ void *kryptos_sys_get_random_block(const size_t size_in_bytes) {
     }
 
     if (!CryptGenRandom(crypto_ctx, (DWORD) size_in_bytes, block)) {
-        kryptos_freeseg(block);
+        kryptos_freeseg(block, size_in_bytes);
         block = NULL;
         goto kryptos_get_random_block_epilogue;
     }
@@ -223,7 +222,7 @@ void *kryptos_sys_get_random_block(const size_t size_in_bytes) {
 
     if (BCryptGenRandom(NULL, block, size_in_bytes,
                         BCRYPT_USE_SYSTEM_PREFERRED_RNG) != STATUS_SUCCESS) {
-        kryptos_freeseg(block);
+        kryptos_freeseg(block, size_in_bytes);
         block = NULL;
     }
 #endif
@@ -288,7 +287,7 @@ kryptos_u8_t kryptos_get_random_byte(void) {
 
     block = kryptos_get_random_block(1);
     b = *block;
-    kryptos_freeseg(block);
+    kryptos_freeseg(block, 1);
 
     return b;
 }

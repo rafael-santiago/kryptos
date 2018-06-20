@@ -57,11 +57,11 @@ int main(int argc, char **argv) {
 epilogue:
 
     if (second != NULL) {
-        kryptos_freeseg(second);
+        kryptos_freeseg(second, second_size);
     }
 
     if (first != NULL) {
-        kryptos_freeseg(first);
+        kryptos_freeseg(first, first_size);
     }
 
     return exit_code;

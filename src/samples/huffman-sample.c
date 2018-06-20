@@ -72,11 +72,11 @@ int main(int argc, char **argv) {
 epilogue:
 
     if (deflated_data != NULL) {
-        kryptos_freeseg(deflated_data);
+        kryptos_freeseg(deflated_data, deflated_data_size);
     }
 
     if (inflated_data != NULL) {
-        kryptos_freeseg(inflated_data);
+        kryptos_freeseg(inflated_data, inflated_data_size);
     }
 
     return exit_code;

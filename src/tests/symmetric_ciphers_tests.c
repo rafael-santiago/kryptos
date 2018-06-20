@@ -187,8 +187,8 @@ CUTE_TEST_CASE(kryptos_arc4_tests)
         CUTE_ASSERT(t.out != NULL);
         CUTE_ASSERT(t.out_size == test_vector[ct].in_size);
         CUTE_ASSERT(memcmp(t.out, temp, t.out_size) == 0);
-        kryptos_freeseg(t.in);
-        kryptos_freeseg(t.out);
+        kryptos_freeseg(t.in, t.in_size);
+        kryptos_freeseg(t.out, t.out_size);
     }
 
 CUTE_TEST_CASE_END
@@ -234,8 +234,8 @@ CUTE_TEST_CASE(kryptos_seal_tests)
     CUTE_ASSERT(t.out_size == t.in_size);
     CUTE_ASSERT(memcmp(t.out, in, t.out_size) == 0);
 
-    kryptos_freeseg(t.out);
-    kryptos_freeseg(t.in);
+    kryptos_freeseg(t.out, t.out_size);
+    kryptos_freeseg(t.in, t.in_size);
 
     //  INFO(Rafael): Testing SEAL 3.0 processing.
 
@@ -255,8 +255,8 @@ CUTE_TEST_CASE(kryptos_seal_tests)
     CUTE_ASSERT(t.out_size == t.in_size);
     CUTE_ASSERT(memcmp(t.out, in, t.out_size) == 0);
 
-    kryptos_freeseg(t.out);
-    kryptos_freeseg(t.in);
+    kryptos_freeseg(t.out, t.out_size);
+    kryptos_freeseg(t.in, t.in_size);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_des_tests)

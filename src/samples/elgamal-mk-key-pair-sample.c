@@ -42,11 +42,11 @@ usage:
     }
 
     if (k_pub != NULL) {
-        kryptos_freeseg(k_pub);
+        kryptos_freeseg(k_pub, k_pub_size);
     }
 
     if (k_priv != NULL) {
-        kryptos_freeseg(k_priv);
+        kryptos_freeseg(k_priv, k_priv_size);
     }
 
     return exit_code;

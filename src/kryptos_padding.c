@@ -102,7 +102,7 @@ kryptos_u8_t *kryptos_padding_mgf(const kryptos_u8_t *seed, const size_t seed_si
         hash_func(&ktask, 0);
 
         if (ktask->result != kKryptosSuccess) {
-            kryptos_freeseg(out);
+            kryptos_freeseg(out, *out_size);
             out = NULL;
             *out_size = 0;
             goto kryptos_padding_mgf_epilogue;
@@ -122,7 +122,7 @@ kryptos_u8_t *kryptos_padding_mgf(const kryptos_u8_t *seed, const size_t seed_si
 kryptos_padding_mgf_epilogue:
 
     if (in != NULL) {
-        kryptos_freeseg(in);
+        kryptos_freeseg(in, in_size);
     }
 
     op = NULL;
@@ -296,7 +296,7 @@ kryptos_u8_t *kryptos_apply_oaep_padding(const kryptos_u8_t *buffer, size_t *buf
     dest = em + 1;
 
     if (memcpy(dest, seed, h_size) != dest) {
-        kryptos_freeseg(em);
+        kryptos_freeseg(em, em_size);
         em = NULL;
         goto kryptos_apply_oaep_padding_epilogue;
     }
@@ -304,7 +304,7 @@ kryptos_u8_t *kryptos_apply_oaep_padding(const kryptos_u8_t *buffer, size_t *buf
     dest = em + h_size + 1;
 
     if (memcpy(dest, db, db_size) != dest) {
-        kryptos_freeseg(em);
+        kryptos_freeseg(em, em_size);
         em = NULL;
         goto kryptos_apply_oaep_padding_epilogue;
     }
@@ -314,23 +314,23 @@ kryptos_u8_t *kryptos_apply_oaep_padding(const kryptos_u8_t *buffer, size_t *buf
 kryptos_apply_oaep_padding_epilogue:
 
     if (ps_size > 0 && ps != NULL) {
-        kryptos_freeseg(ps);
+        kryptos_freeseg(ps, ps_size);
     }
 
     if (db != NULL) {
-        kryptos_freeseg(db);
+        kryptos_freeseg(db, db_size);
     }
 
     if (seed != NULL) {
-        kryptos_freeseg(seed);
+        kryptos_freeseg(seed, h_size);
     }
 
     if (dbmask != NULL) {
-        kryptos_freeseg(dbmask);
+        kryptos_freeseg(dbmask, dbmask_size);
     }
 
     if (seedmask != NULL) {
-        kryptos_freeseg(seedmask);
+        kryptos_freeseg(seedmask, seedmask_size);
     }
 
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
@@ -478,7 +478,7 @@ kryptos_u8_t *kryptos_drop_oaep_padding(const kryptos_u8_t *buffer, size_t *buff
     }
 
     if (memcpy(m, dest_p + 1, m_size) != m) {
-        kryptos_freeseg(m);
+        kryptos_freeseg(m, m_size);
         m = NULL;
         goto kryptos_drop_oaep_padding_epilogue;
     }
@@ -488,15 +488,15 @@ kryptos_u8_t *kryptos_drop_oaep_padding(const kryptos_u8_t *buffer, size_t *buff
 kryptos_drop_oaep_padding_epilogue:
 
     if (buffer_copy != NULL) {
-        kryptos_freeseg(buffer_copy);
+        kryptos_freeseg(buffer_copy, buffer_copy_size);
     }
 
     if (seedmask != NULL) {
-        kryptos_freeseg(seedmask);
+        kryptos_freeseg(seedmask, seedmask_size);
     }
 
     if (dbmask != NULL) {
-        kryptos_freeseg(dbmask);
+        kryptos_freeseg(dbmask, dbmask_size);
     }
 
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
@@ -646,7 +646,7 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
             goto kryptos_pss_encode_epilogue;
         }
 
-        kryptos_freeseg(salt);
+        kryptos_freeseg(salt, salt_size);
         salt = NULL;
     }
 
@@ -687,7 +687,7 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
     dest = em;
 
     if (memcpy(dest, dbmask, dbmask_size) != dest) {
-        kryptos_freeseg(em);
+        kryptos_freeseg(em, *buffer_size);
         em = NULL;
         goto kryptos_pss_encode_epilogue;
     }
@@ -695,7 +695,7 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
     dest += dbmask_size;
 
     if (memcpy(dest, ktask->out, h_size) != dest) {
-        kryptos_freeseg(em);
+        kryptos_freeseg(em, *buffer_size);
         em = NULL;
         goto kryptos_pss_encode_epilogue;
     }
@@ -709,23 +709,23 @@ kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size
 kryptos_pss_encode_epilogue:
 
     if (dbmask != NULL) {
-        kryptos_freeseg(dbmask);
+        kryptos_freeseg(dbmask, dbmask_size);
     }
 
     if (db != NULL) {
-        kryptos_freeseg(db);
+        kryptos_freeseg(db, db_size);
     }
 
     if (ps != NULL) {
-        kryptos_freeseg(ps);
+        kryptos_freeseg(ps, ps_size);
     }
 
     if (mp != NULL) {
-        kryptos_freeseg(mp);
+        kryptos_freeseg(mp, mp_size);
     }
 
     if (salt != NULL) {
-        kryptos_freeseg(salt);
+        kryptos_freeseg(salt, salt_size);
     }
 
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
@@ -955,23 +955,23 @@ const kryptos_u8_t *kryptos_pss_verify(const kryptos_u8_t *m, const size_t m_siz
 kryptos_pss_verify_epilogue:
 
     if (mp != NULL) {
-        kryptos_freeseg(mp);
+        kryptos_freeseg(mp, mp_size);
     }
 
     if (salt != NULL) {
-        kryptos_freeseg(salt);
+        kryptos_freeseg(salt, salt_size);
     }
 
     if (dbmask != NULL) {
-        kryptos_freeseg(dbmask);
+        kryptos_freeseg(dbmask, dbmask_size);
     }
 
     if (h != NULL) {
-        kryptos_freeseg(h);
+        kryptos_freeseg(h, h_size);
     }
 
     if (db != NULL) {
-        kryptos_freeseg(db);
+        kryptos_freeseg(db, db_size);
     }
 
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);

@@ -52,8 +52,8 @@ int main(int argc, char **argv) {
             exit_code = 1;
         }
 
-        kryptos_freeseg(ktask->in);
-        kryptos_freeseg(ktask->out);
+        kryptos_freeseg(ktask->in, ktask->in_size);
+        kryptos_freeseg(ktask->out, ktask->out_size);
     } else {
         printf("Error during encryption.\n");
         exit_code = 1;

@@ -29,7 +29,7 @@
 
 #define kryptos_huffman_del_tree(t) {\
     kryptos_huffman_deltree_recurr((t));\
-    kryptos_freeseg((t));\
+    kryptos_freeseg((t), sizeof(struct kryptos_huffman_tree_ctx));\
     (t) = NULL;\
 }
 
@@ -361,7 +361,7 @@ static struct kryptos_huffman_tree_ctx *kryptos_huffman_mk_tree(struct kryptos_h
                 freq_table[n + 1].byte = 0;
                 freq_table[n + 1].freq = 0;
                 if (freq_table[n + 1].subtree->r == NULL) {
-                    kryptos_freeseg(freq_table[n + 1].subtree);
+                    kryptos_freeseg(freq_table[n + 1].subtree, sizeof(struct kryptos_huffman_tree_ctx));
                 }
                 freq_table[n + 1].subtree = NULL;
                 htree = freq_table[n].subtree;
@@ -375,7 +375,7 @@ static struct kryptos_huffman_tree_ctx *kryptos_huffman_mk_tree(struct kryptos_h
                 freq_table[n].byte = 0;
                 freq_table[n].freq = 0;
                 if (freq_table[n].subtree->r == NULL) {
-                    kryptos_freeseg(freq_table[n].subtree);
+                    kryptos_freeseg(freq_table[n].subtree, sizeof(struct kryptos_huffman_tree_ctx));
                 }
                 freq_table[n].subtree = NULL;
                 htree = freq_table[n + 1].subtree;
@@ -409,12 +409,12 @@ static void kryptos_huffman_deltree_recurr(struct kryptos_huffman_tree_ctx *htre
     htree->byte = 0;
 
     if (htree->l != NULL) {
-        kryptos_freeseg(htree->l);
+        kryptos_freeseg(htree->l, sizeof(struct kryptos_huffman_tree_ctx));
         htree->l = NULL;
     }
 
     if (htree->r != NULL) {
-        kryptos_freeseg(htree->r);
+        kryptos_freeseg(htree->r, sizeof(struct kryptos_huffman_tree_ctx));
         htree->r = NULL;
     }
 }

@@ -22,7 +22,7 @@ void *kryptos_newseg(const size_t ssize);
 
 void *kryptos_realloc(void *addr, const size_t ssize);
 
-void kryptos_freeseg(void *seg);
+void kryptos_freeseg(void *seg, const size_t ssize);
 
 #ifdef __cplusplus
 }

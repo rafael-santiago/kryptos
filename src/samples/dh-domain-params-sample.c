@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
 
         fwrite(params, params_size, 1, stdout);
 
-        kryptos_freeseg(params);
+        kryptos_freeseg(params, params_size);
     } else {
 usage:
         printf("use: %s <p size in bits> <q size in bits>\n", argv[0]);

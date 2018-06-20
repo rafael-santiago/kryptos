@@ -37,11 +37,11 @@ int main(int argc, char **argv) {
     }
 
     if (k_priv != NULL) {
-        kryptos_freeseg(k_priv);
+        kryptos_freeseg(k_priv, k_priv_size);
     }
 
     if (k_pub != NULL) {
-        kryptos_freeseg(k_pub);
+        kryptos_freeseg(k_pub, k_pub_size);
     }
 
     return exit_code;

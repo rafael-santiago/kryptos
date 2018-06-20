@@ -253,12 +253,11 @@ void kryptos_del_mp_value(kryptos_mp_value_t *mp) {
     }
 
     if (mp->data != NULL) {
-        memset(mp->data, 0, mp->data_size);
-        kryptos_freeseg(mp->data);
+        kryptos_freeseg(mp->data, mp->data_size);
         mp->data_size = 0;
     }
 
-    kryptos_freeseg(mp);
+    kryptos_freeseg(mp, sizeof(kryptos_mp_value_t));
 }
 
 kryptos_mp_value_t *kryptos_assign_mp_value(kryptos_mp_value_t **dest,
@@ -274,7 +273,7 @@ kryptos_mp_value_t *kryptos_assign_mp_value(kryptos_mp_value_t **dest,
     }
 
     if (src->data_size > (*dest)->data_size) {
-        kryptos_freeseg((*dest)->data);
+        kryptos_freeseg((*dest)->data, (*dest)->data_size);
         (*dest)->data_size = src->data_size;
         (*dest)->data = (kryptos_mp_digit_t *) kryptos_newseg(kryptos_mp_byte2bit(src->data_size));
     }
@@ -385,7 +384,7 @@ kryptos_mp_value_t *kryptos_hex_value_as_mp(const char *value, const size_t valu
     }
 
     if (padded_value != NULL) {
-        kryptos_freeseg(padded_value);
+        kryptos_freeseg(padded_value, v + 1);
     }
 #endif
 
@@ -590,8 +589,8 @@ kryptos_mp_add_epilogue:
     for (sn = sum->data_size - 1; sn >= 0 && sum->data[sn] == 0; sn--)
         ;
 
+    kryptos_freeseg((*dest)->data, (*dest)->data_size);
     (*dest)->data_size = (sn < sum->data_size) ? sn + 1 : sum->data_size;
-    kryptos_freeseg((*dest)->data);
 
     (*dest)->data = (kryptos_mp_digit_t *) kryptos_newseg((*dest)->data_size * sizeof(kryptos_mp_digit_t));
 
@@ -868,8 +867,8 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
     for (sn = delta->data_size - 1; sn >= 0 && delta->data[sn] == 0; sn--)
         ;
 
+    kryptos_freeseg((*dest)->data, (*dest)->data_size);
     (*dest)->data_size = (sn < delta->data_size) ? sn + 1 : delta->data_size;
-    kryptos_freeseg((*dest)->data);
 
     (*dest)->data = (kryptos_mp_digit_t *) kryptos_newseg((*dest)->data_size * sizeof(kryptos_mp_digit_t));
     memset((*dest)->data, 0, (*dest)->data_size * sizeof(kryptos_mp_digit_t));
@@ -3609,8 +3608,7 @@ kryptos_mp_value_t *kryptos_raw_buffer_as_mp(const kryptos_u8_t *buf, const size
 
     mp = kryptos_hex_value_as_mp(hex, hex_size);
 
-    memset(hex, 0, hex_size);
-    kryptos_freeseg(hex);
+    kryptos_freeseg(hex, hex_size);
 
     return mp;
 }

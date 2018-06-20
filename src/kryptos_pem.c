@@ -101,7 +101,7 @@ kryptos_pem_put_data_epilogue:
             memcpy(new_pem_buf + old_pem_buf_size + header_begin_size + ktask->out_size + 1, header_end, header_end_size);
 
             if ((*pem_buf) != NULL) {
-                kryptos_freeseg(*pem_buf);
+                kryptos_freeseg(*pem_buf, (pem_buf_size == NULL) ? 0 : *pem_buf_size);
             }
 
             (*pem_buf) = new_pem_buf;
@@ -113,11 +113,11 @@ kryptos_pem_put_data_epilogue:
     }
 
     if (header_begin != NULL) {
-        kryptos_freeseg(header_begin);
+        kryptos_freeseg(header_begin, header_begin_size);
     }
 
     if (header_end != NULL) {
-        kryptos_freeseg(header_end);
+        kryptos_freeseg(header_end, header_end_size);
     }
 
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
@@ -195,8 +195,7 @@ kryptos_task_result_t kryptos_pem_get_mp_data(const char *hdr,
 
     memcpy((*number)->data, pem_data, pem_data_size);
     (*number)->data_size = pem_data_size / sizeof(kryptos_mp_digit_t);
-    memset(pem_data, 0, pem_data_size);
-    kryptos_freeseg(pem_data);
+    kryptos_freeseg(pem_data, pem_data_size);
     pem_data_size = 0;
 
     return kKryptosSuccess;
@@ -294,7 +293,7 @@ static const kryptos_u8_t *kryptos_pem_header_begin(const char *header,
 
     data = kryptos_find_header(hmark, buf, buf_size);
 
-    kryptos_freeseg(hmark);
+    kryptos_freeseg(hmark, strlen(hmark));
 
     return data;
 }
@@ -316,7 +315,7 @@ static const kryptos_u8_t *kryptos_pem_header_end(const char *header,
         data -= (hmark_end - hmark + 1); // INFO(Rafael): +1 due to the "\n" stated by the format.
     }
 
-    kryptos_freeseg(hmark);
+    kryptos_freeseg(hmark, strlen(hmark));
 
     return data;
 

@@ -44,11 +44,11 @@ struct kryptos_fortuna_ctx *kryptos_fortuna_init(const int allocate) {
 
 void kryptos_fortuna_fini(struct kryptos_fortuna_ctx *fortuna) {
     if (fortuna != NULL) {
-        fortuna->call_nr = 0;
-        memset(fortuna->seed, 0, fortuna->seed_size);
-        fortuna->seed_size = 0;
+        //fortuna->call_nr = 0;
+        //memset(fortuna->seed, 0, fortuna->seed_size);
+        //fortuna->seed_size = 0;
         if (fortuna != &g_fortuna) {
-            kryptos_freeseg(fortuna);
+            kryptos_freeseg(fortuna, sizeof(struct kryptos_fortuna_ctx));
         }
     }
 }
@@ -128,8 +128,7 @@ void *kryptos_fortuna_get_random_block(struct kryptos_fortuna_ctx *fortuna, cons
 
     memcpy(r, t, size_in_bytes);
 
-    memset(t, 0, t_size);
-    kryptos_freeseg(t);
+    kryptos_freeseg(t, t_size);
 
     // INFO(Rafael): We are using AES-128 and we must fill up a key buffer of 32 bytes.
 
@@ -145,8 +144,7 @@ void *kryptos_fortuna_get_random_block(struct kryptos_fortuna_ctx *fortuna, cons
 kryptos_fortuna_get_random_block_epilogue:
 
     if (t != NULL) {
-        memset(t, 0, t_size);
-        kryptos_freeseg(t);
+        kryptos_freeseg(t, t_size);
     }
 
     t_size = 0;
@@ -160,7 +158,7 @@ kryptos_u8_t kryptos_fortuna_get_random_byte(struct kryptos_fortuna_ctx *fortuna
 
     if (block != NULL) {
         byte = *block;
-        kryptos_freeseg(block);
+        kryptos_freeseg(block, 16);
     }
 
     return byte;
@@ -230,7 +228,7 @@ static void *kryptos_fortuna_generate_blocks(struct kryptos_fortuna_ctx *fortuna
         kryptos_aes128_cipher(&ktask);
 
         if (!kryptos_last_task_succeed(ktask)) {
-            kryptos_freeseg(r);
+            kryptos_freeseg(r, r_size);
             r = NULL;
             break;
         }
@@ -248,8 +246,7 @@ static void *kryptos_fortuna_generate_blocks(struct kryptos_fortuna_ctx *fortuna
 kryptos_fortuna_generate_blocks_epilogue:
 
     if (seed != NULL) {
-        memset(seed, 0, seed_size);
-        kryptos_freeseg(seed);
+        kryptos_freeseg(seed, seed_size);
         seed_size = 0;
     }
 

@@ -139,13 +139,13 @@ kryptos_dsa_mk_key_pair_epilogue:
 
     if (result != kKryptosSuccess) {
         if (*k_pub != NULL) {
-            kryptos_freeseg(*k_pub);
+            kryptos_freeseg(*k_pub, *k_pub_size);
             (*k_pub) = NULL;
             *k_pub_size = 0;
         }
 
         if (*k_priv != NULL) {
-            kryptos_freeseg(*k_priv);
+            kryptos_freeseg(*k_priv, *k_priv_size);
             (*k_priv) = NULL;
             *k_priv_size = 0;
         }
@@ -463,7 +463,7 @@ kryptos_dsa_sign_epilogue:
     kryptos_task_init_as_null(htask);
 
     if ((*ktask)->result != kKryptosSuccess && (*ktask)->out != NULL) {
-        kryptos_freeseg((*ktask)->out);
+        kryptos_freeseg((*ktask)->out, (*ktask)->out_size);
         (*ktask)->out_size = 0;
     }
 }
@@ -841,7 +841,7 @@ kryptos_dsa_verify_epilogue:
     }
 
     if (x != NULL) {
-        kryptos_freeseg(x);
+        kryptos_freeseg(x, x_size);
         x_size = 0;
     }
 
@@ -862,13 +862,13 @@ kryptos_dsa_verify_epilogue:
     }
 
     if (htask->out != NULL) {
-        kryptos_freeseg(htask->out);
+        kryptos_freeseg(htask->out, htask->out_size);
     }
 
     kryptos_task_init_as_null(htask);
 
     if ((*ktask)->result != kKryptosSuccess && (*ktask)->out != NULL) {
-        kryptos_freeseg((*ktask)->out);
+        kryptos_freeseg((*ktask)->out, (*ktask)->out_size);
         (*ktask)->out = NULL;
         (*ktask)->out_size = 0;
     }

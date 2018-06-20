@@ -218,21 +218,21 @@ KUTE_TEST_CASE(kryptos_dh_mk_domain_params_tests)
 
     KUTE_ASSERT(data != NULL);
 
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, data_size);
 
     data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_Q, params, params_size, &data_size);
 
     KUTE_ASSERT(data != NULL);
 
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, data_size);
 
     data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_G, params, params_size, &data_size);
 
     KUTE_ASSERT(data != NULL);
 
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, data_size);
 
-    kryptos_freeseg(params);
+    kryptos_freeseg(params, params_size);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_dh_verify_domain_params_tests)
@@ -825,15 +825,15 @@ KUTE_TEST_CASE(kryptos_dh_mk_key_pair_tests)
 
     pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_P, k_pub, k_pub_size, &pem_data_size);
     KUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
-    kryptos_freeseg(pem_data);
+    kryptos_freeseg(pem_data, pem_data_size);
 
     pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_G, k_pub, k_pub_size, &pem_data_size);
     KUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
-    kryptos_freeseg(pem_data);
+    kryptos_freeseg(pem_data, pem_data_size);
 
     pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_T, k_pub, k_pub_size, &pem_data_size);
     KUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
-    kryptos_freeseg(pem_data);
+    kryptos_freeseg(pem_data, pem_data_size);
 
     pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_S, k_pub, k_pub_size, &pem_data_size);
     KUTE_ASSERT(pem_data == NULL);
@@ -842,15 +842,15 @@ KUTE_TEST_CASE(kryptos_dh_mk_key_pair_tests)
 
     pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_S, k_priv, k_priv_size, &pem_data_size);
     KUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
-    kryptos_freeseg(pem_data);
+    kryptos_freeseg(pem_data, pem_data_size);
 
     pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_P, k_priv, k_priv_size, &pem_data_size);
     KUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
-    kryptos_freeseg(pem_data);
+    kryptos_freeseg(pem_data, pem_data_size);
 
     kryptos_clear_dh_xchg_ctx(kp);
-    kryptos_freeseg(k_pub);
-    kryptos_freeseg(k_priv);
+    kryptos_freeseg(k_pub, k_pub_size);
+    kryptos_freeseg(k_priv, k_priv_size);
 
     // INFO(Rafael): Now we will use domain parameters pre-computed including a q parameter (when --dh-use-q-size is present).
 
@@ -882,12 +882,12 @@ KUTE_TEST_CASE(kryptos_dh_mk_key_pair_tests)
 
     pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_P, k_pub, k_pub_size, &pem_data_size);
     KUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
-    kryptos_freeseg(pem_data);
+    kryptos_freeseg(pem_data, pem_data_size);
 
 #ifdef DH_USE_Q_SIZE
     pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_Q, k_pub, k_pub_size, &pem_data_size);
     KUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
-    kryptos_freeseg(pem_data);
+    kryptos_freeseg(pem_data, pem_data_size);
 #else
     pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_Q, k_pub, k_pub_size, &pem_data_size);
     KUTE_ASSERT(pem_data == NULL);
@@ -895,11 +895,11 @@ KUTE_TEST_CASE(kryptos_dh_mk_key_pair_tests)
 
     pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_G, k_pub, k_pub_size, &pem_data_size);
     KUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
-    kryptos_freeseg(pem_data);
+    kryptos_freeseg(pem_data, pem_data_size);
 
     pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_T, k_pub, k_pub_size, &pem_data_size);
     KUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
-    kryptos_freeseg(pem_data);
+    kryptos_freeseg(pem_data, pem_data_size);
 
     pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_S, k_pub, k_pub_size, &pem_data_size);
     KUTE_ASSERT(pem_data == NULL);
@@ -908,15 +908,15 @@ KUTE_TEST_CASE(kryptos_dh_mk_key_pair_tests)
 
     pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_S, k_priv, k_priv_size, &pem_data_size);
     KUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
-    kryptos_freeseg(pem_data);
+    kryptos_freeseg(pem_data, pem_data_size);
 
     pem_data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_P, k_priv, k_priv_size, &pem_data_size);
     KUTE_ASSERT(pem_data != NULL && pem_data_size != 0);
-    kryptos_freeseg(pem_data);
+    kryptos_freeseg(pem_data, pem_data_size);
 
     kryptos_clear_dh_xchg_ctx(kp);
-    kryptos_freeseg(k_pub);
-    kryptos_freeseg(k_priv);
+    kryptos_freeseg(k_pub, k_pub_size);
+    kryptos_freeseg(k_priv, k_priv_size);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
@@ -1012,8 +1012,8 @@ KUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
 
     kryptos_clear_dh_xchg_ctx(alice);
     kryptos_clear_dh_xchg_ctx(bob);
-    kryptos_freeseg(k_pub_bob);
-    kryptos_freeseg(k_priv_bob);
+    kryptos_freeseg(k_pub_bob, k_pub_bob_size);
+    kryptos_freeseg(k_priv_bob, k_priv_bob_size);
 
     // INFO(Rafael): Using the pre-computed parameters and q (when --dh-use-q-size is present).
 
@@ -1094,8 +1094,8 @@ KUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
 
     kryptos_clear_dh_xchg_ctx(alice);
     kryptos_clear_dh_xchg_ctx(bob);
-    kryptos_freeseg(k_pub_bob);
-    kryptos_freeseg(k_priv_bob);
+    kryptos_freeseg(k_pub_bob, k_pub_bob_size);
+    kryptos_freeseg(k_priv_bob, k_priv_bob_size);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rsa_mk_key_pair_tests)
@@ -1114,8 +1114,8 @@ KUTE_TEST_CASE(kryptos_rsa_mk_key_pair_tests)
     printk(KERN_ERR "\n *** RSA PRIVATE KEY:\n\n");
     printk(KERN_ERR "%s", k_priv);
 #endif
-    kryptos_freeseg(k_pub);
-    kryptos_freeseg(k_priv);
+    kryptos_freeseg(k_pub, k_pub_size);
+    kryptos_freeseg(k_priv, k_priv_size);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rsa_cipher_tests)
@@ -1321,7 +1321,7 @@ KUTE_TEST_CASE(kryptos_padding_mgf_tests)
         KUTE_ASSERT(out != NULL);
         KUTE_ASSERT(out_size == test_vector[t].len);
         KUTE_ASSERT(memcmp(out, test_vector[t].expected_out, out_size) == 0);
-        kryptos_freeseg(out);
+        kryptos_freeseg(out, out_size);
     }
 KUTE_TEST_CASE_END
 
@@ -1393,10 +1393,10 @@ KUTE_TEST_CASE(kryptos_oaep_padding_tests)
             KUTE_ASSERT(message != NULL);
             KUTE_ASSERT(padded_message_size == test_vector[t].buffer_size);
             KUTE_ASSERT(memcmp(message, test_vector[t].buffer, padded_message_size) == 0);
-            kryptos_freeseg(message);
+            kryptos_freeseg(message, padded_message_size);
         }
 
-        kryptos_freeseg(padded_message);
+        kryptos_freeseg(padded_message, padded_message_size);
     }
 KUTE_TEST_CASE_END
 
@@ -1760,19 +1760,19 @@ KUTE_TEST_CASE(kryptos_elgamal_mk_key_pair_tests)
 
     data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_P, k_pub, k_pub_size, &data_size);
     KUTE_ASSERT(data != NULL && data_size > 0);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, data_size);
 
     data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Q, k_pub, k_pub_size, &data_size);
     KUTE_ASSERT(data != NULL && data_size > 0);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, data_size);
 
     data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_G, k_pub, k_pub_size, &data_size);
     KUTE_ASSERT(data != NULL && data_size > 0);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, data_size);
 
     data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_B, k_pub, k_pub_size, &data_size);
     KUTE_ASSERT(data != NULL && data_size > 0);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, data_size);
 
     // WARN(Rafael): D parameter cannot be in public key.
     data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_D, k_pub, k_pub_size, &data_size);
@@ -1782,14 +1782,14 @@ KUTE_TEST_CASE(kryptos_elgamal_mk_key_pair_tests)
 
     data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_P, k_priv, k_priv_size, &data_size);
     KUTE_ASSERT(data != NULL && data_size > 0);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, data_size);
 
     data = kryptos_pem_get_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_D, k_priv, k_priv_size, &data_size);
     KUTE_ASSERT(data != NULL && data_size > 0);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, data_size);
 
-    kryptos_freeseg(k_pub);
-    kryptos_freeseg(k_priv);
+    kryptos_freeseg(k_pub, k_pub_size);
+    kryptos_freeseg(k_priv, k_priv_size);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_elgamal_verify_public_key_tests)
@@ -2421,7 +2421,7 @@ KUTE_TEST_CASE(kryptos_pss_encoding_tests)
             KUTE_ASSERT(m == test_vector[tv].m);
         }
 
-        kryptos_freeseg(em);
+        kryptos_freeseg(em, em_size);
     }
 KUTE_TEST_CASE_END
 
@@ -2648,7 +2648,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
 
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
-    kryptos_freeseg(signature);
+    kryptos_freeseg(signature, signature_size);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
@@ -2843,7 +2843,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
-    kryptos_freeseg(signature);
+    kryptos_freeseg(signature, signature_size);
 #else
 # if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("WARN: No c99 support, this test was skipped.\n");
@@ -3099,7 +3099,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
 
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
-    kryptos_freeseg(signature);
+    kryptos_freeseg(signature, signature_size);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
@@ -3299,7 +3299,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
-    kryptos_freeseg(signature);
+    kryptos_freeseg(signature, signature_size);
 #else
 # if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("WARN: No c99 support, this test was skipped.\n");
@@ -3342,19 +3342,19 @@ KUTE_TEST_CASE(kryptos_dsa_mk_key_pair_tests)
 
     data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_P, k_pub, k_pub_size, &dsize);
     KUTE_ASSERT(data != NULL);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, dsize);
 
     data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_Q, k_pub, k_pub_size, &dsize);
     KUTE_ASSERT(data != NULL);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, dsize);
 
     data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_G, k_pub, k_pub_size, &dsize);
     KUTE_ASSERT(data != NULL);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, dsize);
 
     data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_E, k_pub, k_pub_size, &dsize);
     KUTE_ASSERT(data != NULL);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, dsize);
 
     // WARN(Rafael): D parameter must not be in public key.
 
@@ -3365,27 +3365,27 @@ KUTE_TEST_CASE(kryptos_dsa_mk_key_pair_tests)
 
     data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_P, k_priv, k_priv_size, &dsize);
     KUTE_ASSERT(data != NULL);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, dsize);
 
     data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_Q, k_priv, k_priv_size, &dsize);
     KUTE_ASSERT(data != NULL);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, dsize);
 
     data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_G, k_priv, k_priv_size, &dsize);
     KUTE_ASSERT(data != NULL);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, dsize);
 
     data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_D, k_priv, k_priv_size, &dsize);
     KUTE_ASSERT(data != NULL);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, dsize);
 
     // WARN(Rafael): E parameter should not be in private key. It is useless.
 
     data = kryptos_pem_get_data(KRYPTOS_DSA_PEM_HDR_PARAM_E, k_priv, k_priv_size, &dsize);
     KUTE_ASSERT(data == NULL);
 
-    kryptos_freeseg(k_pub);
-    kryptos_freeseg(k_priv);
+    kryptos_freeseg(k_pub, k_pub_size);
+    kryptos_freeseg(k_priv, k_priv_size);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
@@ -3779,7 +3779,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
                                                                                      alice->result_verbose);
 #endif
 
-    kryptos_freeseg(signature);
+    kryptos_freeseg(signature, bob->out_size + 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -3814,7 +3814,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
                                                                                      alice->result_verbose);
 #endif
 
-    kryptos_freeseg(signature);
+    kryptos_freeseg(signature, bob->out_size + 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
@@ -3850,7 +3850,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
                                                                                            alice->result_verbose);
 #endif
 
-    kryptos_freeseg(signature);
+    kryptos_freeseg(signature, bob->out_size + 1);
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
 #else

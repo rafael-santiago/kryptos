@@ -183,7 +183,7 @@ KRYPTOS_IMPL_HASH_PROCESSOR(keccak224, ktask, kryptos_keccak_ctx, ctx, keccak_22
                                                                            ((kryptos_u32_t)ctx.z[25]) << 16 |
                                                                            ((kryptos_u32_t)ctx.z[26]) <<  8 |
                                                                             (kryptos_u32_t)ctx.z[27]);
-                                kryptos_freeseg(ctx.z);
+                                kryptos_freeseg(ctx.z, ctx.z_size);
                                 ctx.z_size = 0;
                             })
 
@@ -256,7 +256,7 @@ KRYPTOS_IMPL_HASH_PROCESSOR(keccak256, ktask, kryptos_keccak_ctx, ctx, keccak_25
                                                                            ((kryptos_u64_t)ctx.z[29]) << 16 |
                                                                            ((kryptos_u64_t)ctx.z[30]) <<  8 |
                                                                             (kryptos_u64_t)ctx.z[31]);
-                                kryptos_freeseg(ctx.z);
+                                kryptos_freeseg(ctx.z, ctx.z_size);
                                 ctx.z_size = 0;
                             })
 
@@ -345,7 +345,7 @@ KRYPTOS_IMPL_HASH_PROCESSOR(keccak384, ktask, kryptos_keccak_ctx, ctx, keccak_38
                                                                            ((kryptos_u64_t)ctx.z[45]) << 16 |
                                                                            ((kryptos_u64_t)ctx.z[46]) <<  8 |
                                                                             (kryptos_u64_t)ctx.z[47]);
-                                kryptos_freeseg(ctx.z);
+                                kryptos_freeseg(ctx.z, ctx.z_size);
                                 ctx.z_size = 0;
                             })
 
@@ -450,7 +450,7 @@ KRYPTOS_IMPL_HASH_PROCESSOR(keccak512, ktask, kryptos_keccak_ctx, ctx, keccak_51
                                                                              ((kryptos_u64_t)ctx.z[61]) << 16 |
                                                                              ((kryptos_u64_t)ctx.z[62]) <<  8 |
                                                                               (kryptos_u64_t)ctx.z[63]);
-                                kryptos_freeseg(ctx.z);
+                                kryptos_freeseg(ctx.z, ctx.z_size);
                                 ctx.z_size = 0;
                             })
 
@@ -529,7 +529,7 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha3_224, ktask, kryptos_keccak_ctx, ctx, sha3_224_e
                                                                            ((kryptos_u32_t)ctx.z[25]) << 16 |
                                                                            ((kryptos_u32_t)ctx.z[26]) <<  8 |
                                                                             (kryptos_u32_t)ctx.z[27]);
-                                kryptos_freeseg(ctx.z);
+                                kryptos_freeseg(ctx.z, ctx.z_size);
                                 ctx.z_size = 0;
                             })
 
@@ -602,7 +602,7 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha3_256, ktask, kryptos_keccak_ctx, ctx, sha3_256_e
                                                                            ((kryptos_u64_t)ctx.z[29]) << 16 |
                                                                            ((kryptos_u64_t)ctx.z[30]) <<  8 |
                                                                             (kryptos_u64_t)ctx.z[31]);
-                                kryptos_freeseg(ctx.z);
+                                kryptos_freeseg(ctx.z, ctx.z_size);
                                 ctx.z_size = 0;
                             })
 
@@ -691,7 +691,7 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha3_384, ktask, kryptos_keccak_ctx, ctx, sha3_384_e
                                                                            ((kryptos_u64_t)ctx.z[45]) << 16 |
                                                                            ((kryptos_u64_t)ctx.z[46]) <<  8 |
                                                                             (kryptos_u64_t)ctx.z[47]);
-                                kryptos_freeseg(ctx.z);
+                                kryptos_freeseg(ctx.z, ctx.z_size);
                                 ctx.z_size = 0;
                             })
 
@@ -796,7 +796,7 @@ KRYPTOS_IMPL_HASH_PROCESSOR(sha3_512, ktask, kryptos_keccak_ctx, ctx, sha3_512_e
                                                                              ((kryptos_u64_t)ctx.z[61]) << 16 |
                                                                              ((kryptos_u64_t)ctx.z[62]) <<  8 |
                                                                               (kryptos_u64_t)ctx.z[63]);
-                                kryptos_freeseg(ctx.z);
+                                kryptos_freeseg(ctx.z, ctx.z_size);
                                 ctx.z_size = 0;
                             })
 
@@ -1088,7 +1088,7 @@ kryptos_keccak_sponge_1600_epilogue:
     m_chunk = 0;
     x = y = d = 0;
     if (m != NULL) {
-        kryptos_freeseg(m);
+        kryptos_freeseg(m, m_size);
     }
     m_size = 0;
     kryptos_keccak_clear_ctx(ctx);

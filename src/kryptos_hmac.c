@@ -128,8 +128,7 @@ static void kryptos_hmac_check(kryptos_task_ctx **ktask,
             x = (kryptos_u8_t *) kryptos_newseg(x_size);
             if (x != NULL) {
                 memcpy(x, (*ktask)->in + hmac_size, x_size);
-                memset((*ktask)->in, 0, (*ktask)->in_size);
-                kryptos_freeseg((*ktask)->in);
+                kryptos_freeseg((*ktask)->in, (*ktask)->in_size);
                 (*ktask)->in_size = x_size;
                 (*ktask)->in = x;
                 x = NULL;
@@ -140,13 +139,11 @@ static void kryptos_hmac_check(kryptos_task_ctx **ktask,
         }
     } else if (x != NULL) {
         // INFO(Rafael): If the task is not completed x has a strong probability of leaking.
-        memset(x, 0, x_size);
-        kryptos_freeseg(x);
+        kryptos_freeseg(x, x_size);
     }
 
     if (hmac != NULL) {
-        memset(hmac, 0, hmac_size);
-        kryptos_freeseg(hmac);
+        kryptos_freeseg(hmac, hmac_size);
     }
 
     hmac_size = 0;
@@ -330,14 +327,12 @@ kryptos_hmac_gen_epilogue:
     kp = kp_end = NULL;
 
     if (k_xor_ipad != NULL) {
-        memset(k_xor_ipad, 0, k_xor_size);
-        kryptos_freeseg(k_xor_ipad);
+        kryptos_freeseg(k_xor_ipad, k_xor_size);
         k_xor_ipad = NULL;
     }
 
     if (k_xor_opad != NULL) {
-        memset(k_xor_opad, 0, k_xor_size);
-        kryptos_freeseg(k_xor_opad);
+        kryptos_freeseg(k_xor_opad, k_xor_size);
         k_xor_opad = NULL;
     }
 
@@ -347,7 +342,7 @@ kryptos_hmac_gen_epilogue:
     kryptos_task_init_as_null(&oktask);
 
     if (temp_data != NULL) {
-        kryptos_freeseg(temp_data);
+        kryptos_freeseg(temp_data, temp_size);
         temp_size = 0;
     }
 

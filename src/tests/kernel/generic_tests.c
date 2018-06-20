@@ -47,7 +47,7 @@ KUTE_TEST_CASE(kryptos_padding_tests)
 
         KUTE_ASSERT(memcmp(pad, tests[t].pad, buffer_size) == 0);
 
-        kryptos_freeseg(pad);
+        kryptos_freeseg(pad, buffer_size);
         pad = NULL;
 
         buffer_size = tests[t].buffer_size;
@@ -61,7 +61,7 @@ KUTE_TEST_CASE(kryptos_padding_tests)
 
         KUTE_ASSERT(pad[buffer_size - 1] == tests[t].pad[tests[t].expected_buffer_size - 1]);
 
-        kryptos_freeseg(pad);
+        kryptos_freeseg(pad, buffer_size);
 
         t++;
     }
@@ -76,7 +76,7 @@ KUTE_TEST_CASE(kryptos_sys_get_random_block_tests)
     for (b = 1; b < 101; b++) {
         block = kryptos_sys_get_random_block(b);
         KUTE_ASSERT(block != NULL);
-        kryptos_freeseg(block);
+        kryptos_freeseg(block, b);
     }
 KUTE_TEST_CASE_END
 
@@ -89,7 +89,7 @@ KUTE_TEST_CASE(kryptos_get_random_block_tests)
     for (b = 1; b < 101; b++) {
         block = kryptos_get_random_block(b);
         KUTE_ASSERT(block != NULL);
-        kryptos_freeseg(block);
+        kryptos_freeseg(block, b);
     }
 KUTE_TEST_CASE_END
 
@@ -179,7 +179,7 @@ KUTE_TEST_CASE(kryptos_block_parser_tests)
 
     KUTE_ASSERT(kryptos_block_parser(out, 8, in_p, in_end, &in_p) == NULL);
 
-    kryptos_freeseg(out);
+    kryptos_freeseg(out, 8);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_endianness_utils_tests)
@@ -198,7 +198,7 @@ KUTE_TEST_CASE(kryptos_endianness_utils_tests)
     data = kryptos_cpy_u16_as_big_endian(data, 2, beef);
     KUTE_ASSERT(data != NULL);
     KUTE_ASSERT(*data == 0xbe && *(data + 1) == 0xef);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, sizeof(kryptos_u16_t));
 
     data = (kryptos_u8_t *)kryptos_newseg(4);
     KUTE_ASSERT(data != NULL);
@@ -210,7 +210,7 @@ KUTE_TEST_CASE(kryptos_endianness_utils_tests)
     data = kryptos_cpy_u32_as_big_endian(data, 4, deadbeef);
     KUTE_ASSERT(data != NULL);
     KUTE_ASSERT(*data == 0xde && *(data + 1) == 0xad && *(data + 2) == 0xbe && *(data + 3) == 0xef);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, sizeof(kryptos_u32_t));
 
     data = (kryptos_u8_t *)kryptos_newseg(8);
     KUTE_ASSERT(data != NULL);
@@ -220,7 +220,7 @@ KUTE_TEST_CASE(kryptos_endianness_utils_tests)
     KUTE_ASSERT(data != NULL);
     KUTE_ASSERT(      *data == 0xde && *(data + 1) == 0xad && *(data + 2) == 0xbe && *(data + 3) == 0xef &&
                 *(data + 4) == 0xde && *(data + 5) == 0xad && *(data + 6) == 0xbe && *(data + 7) == 0xef);
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, sizeof(kryptos_u64_t));
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_apply_iv_tests)
@@ -236,8 +236,8 @@ KUTE_TEST_CASE(kryptos_apply_iv_tests)
     KUTE_ASSERT(kryptos_apply_iv(block, iv, s) == block);
     KUTE_ASSERT(kryptos_apply_iv(block, iv, s) == block);
     KUTE_ASSERT(memcmp(block, "thedroidsthatuarelookingfor", 27) == 0);
-    kryptos_freeseg(iv);
-    kryptos_freeseg(block);
+    kryptos_freeseg(iv, s + 1);
+    kryptos_freeseg(block, s);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_iv_data_flush_tests)
@@ -247,7 +247,7 @@ KUTE_TEST_CASE(kryptos_iv_data_flush_tests)
     KUTE_ASSERT(iv != NULL);
     kryptos_iv_data_flush(iv, y, s);
     KUTE_ASSERT(memcmp(iv, "hellyeah!", s) == 0);
-    kryptos_freeseg(iv);
+    kryptos_freeseg(iv, s);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_task_check_tests)
@@ -1285,7 +1285,7 @@ KUTE_TEST_CASE(kryptos_fortuna_general_tests)
             KUTE_ASSERT(block != NULL);
             memset(block, 0, t + 1); // INFO(Rafael): If it did not allocate the right size, SIGSEGV and/or undefined behavior
                                      //               (hopefully) may occur...
-            kryptos_freeseg(block);
+            kryptos_freeseg(block, t + 1);
         }
 
         if (i) {
@@ -1302,7 +1302,7 @@ KUTE_TEST_CASE(kryptos_fortuna_general_tests)
             KUTE_ASSERT(block != NULL);
             memset(block, 0, t + 1); // INFO(Rafael): If it did not allocate the right size, SIGSEGV and/or undefined behavior
                                      //               (hopefully) may occur...
-            kryptos_freeseg(block);
+            kryptos_freeseg(block, t + 1);
         }
 
         for (t = 0; t < 10; t++) {
@@ -1327,7 +1327,7 @@ KUTE_TEST_CASE(kryptos_csprng_context_change_tests)
 
         block = kryptos_get_random_block(101);
         KUTE_ASSERT(block != NULL);
-        kryptos_freeseg(block);
+        kryptos_freeseg(block, 101);
 
         for (b = 0; b < 101; b++) {
             kryptos_get_random_byte();
@@ -1338,7 +1338,7 @@ KUTE_TEST_CASE(kryptos_csprng_context_change_tests)
 
         block = kryptos_get_random_block(101);
         KUTE_ASSERT(block != NULL);
-        kryptos_freeseg(block);
+        kryptos_freeseg(block, 101);
 
         for (b = 0; b < 101; b++) {
             kryptos_get_random_byte();

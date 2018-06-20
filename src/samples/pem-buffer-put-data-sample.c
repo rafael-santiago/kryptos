@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
 epilogue:
 
     if (pem_buffer != NULL) {
-        kryptos_freeseg(pem_buffer);
+        kryptos_freeseg(pem_buffer, pem_buffer_size);
     }
 
     return exit_code;

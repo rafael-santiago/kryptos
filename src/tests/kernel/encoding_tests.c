@@ -201,8 +201,8 @@ KUTE_TEST_CASE(kryptos_huffman_tests)
         KUTE_ASSERT(inflated_buffer != NULL);
         KUTE_ASSERT(inflated_buffer_size == in_size);
         KUTE_ASSERT(memcmp(inflated_buffer, test_vector[tv], inflated_buffer_size) == 0);
-        kryptos_freeseg(deflated_buffer);
-        kryptos_freeseg(inflated_buffer);
+        kryptos_freeseg(deflated_buffer, deflated_buffer_size);
+        kryptos_freeseg(inflated_buffer, inflated_buffer_size);
     }
 KUTE_TEST_CASE_END
 
@@ -226,7 +226,7 @@ KUTE_TEST_CASE(kryptos_pem_get_data_tests)
     KUTE_ASSERT(data_size == 7);
     KUTE_ASSERT(kstrcmp(data, "Foobar0") == 0);
 
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, data_size);
 
     data_size = 0;
     data = kryptos_pem_get_data("FOOBAR (1)", buf, kstrlen(buf), &data_size);
@@ -235,7 +235,7 @@ KUTE_TEST_CASE(kryptos_pem_get_data_tests)
     KUTE_ASSERT(data_size == 7);
     KUTE_ASSERT(kstrcmp(data, "Foobar1") == 0);
 
-    kryptos_freeseg(data);
+    kryptos_freeseg(data, data_size);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_pem_put_data_tests)
@@ -257,7 +257,7 @@ KUTE_TEST_CASE(kryptos_pem_put_data_tests)
     KUTE_ASSERT(pem_buf != NULL);
     KUTE_ASSERT(pem_buf_size == kstrlen(expected_buffer));
     KUTE_ASSERT(kstrcmp(pem_buf, expected_buffer) == 0);
-    kryptos_freeseg(pem_buf);
+    kryptos_freeseg(pem_buf, pem_buf_size);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_pem_get_mp_data_tests)
@@ -278,7 +278,7 @@ KUTE_TEST_CASE(kryptos_pem_get_mp_data_tests)
 
     KUTE_ASSERT(kryptos_mp_eq(mp, emp) == 1);
 
-    kryptos_freeseg(pem_buf);
+    kryptos_freeseg(pem_buf, pem_buf_size);
     kryptos_del_mp_value(emp);
     kryptos_del_mp_value(mp);
 KUTE_TEST_CASE_END

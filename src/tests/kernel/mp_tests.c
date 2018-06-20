@@ -71,7 +71,7 @@ KUTE_TEST_CASE(kryptos_mp_value_as_hex_tests)
     KUTE_ASSERT(x_size == 32);
     KUTE_ASSERT(memcmp(x, "FFEEDDCCBBAA00112233445566778899", x_size) == 0);
     kryptos_del_mp_value(mp);
-    kryptos_freeseg(x);
+    kryptos_freeseg(x, x_size);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_assign_mp_value_tests)

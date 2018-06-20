@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
 
                 printf("\n");
 
-                kryptos_freeseg(block);
+                kryptos_freeseg(block, block_size);
 
                 // INFO(Rafael): You should save it somewhere, if you want to restore
                 //               the CSPRNG state later.
@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
 
                         printf("\n");
 
-                        kryptos_freeseg(block);
+                        kryptos_freeseg(block, block_size);
                     } else {
                         error = 1;
                         printf("ERROR: Unable to get a random block.\n");

@@ -151,38 +151,32 @@ epilogue:\
 
 #define kryptos_task_free(ktask, freemask) {\
     if ((ktask)->out != NULL && ((freemask) & KRYPTOS_TASK_OUT) ) {\
-        memset((ktask)->out, 0, (ktask)->out_size);\
-        kryptos_freeseg((ktask)->out);\
+        kryptos_freeseg((ktask)->out, (ktask)->out_size);\
         (ktask)->out = NULL;\
         (ktask)->out_size = 0;\
     }\
     if ((ktask)->in != NULL && ((freemask) & KRYPTOS_TASK_IN) ) {\
-        memset((ktask)->in, 0, (ktask)->in_size);\
-        kryptos_freeseg((ktask)->in);\
+        kryptos_freeseg((ktask)->in, (ktask)->in_size);\
         (ktask)->in = NULL;\
         (ktask)->in_size = 0;\
     }\
     if ((ktask)->key != NULL && ((freemask) & KRYPTOS_TASK_KEY) ) {\
-        memset((ktask)->key, 0, (ktask)->key_size);\
-        kryptos_freeseg((ktask)->key);\
+        kryptos_freeseg((ktask)->key, (ktask)->key_size);\
         (ktask)->key = NULL;\
         (ktask)->key_size = 0;\
     }\
     if ((ktask)->iv != NULL && ((freemask) & KRYPTOS_TASK_IV) ) {\
-        memset((ktask)->iv, 0, (ktask)->iv_size);\
-        kryptos_freeseg((ktask)->iv);\
+        kryptos_freeseg((ktask)->iv, (ktask)->iv_size);\
         (ktask)->iv = NULL;\
         (ktask)->iv_size = 0;\
     }\
     if ((ktask)->aux_buffers.buf0 != NULL && ((freemask) & KRYPTOS_TASK_AUX_BUF0) ) {\
-        memset((ktask)->aux_buffers.buf0, 0, (ktask)->aux_buffers.buf0_size);\
-        kryptos_freeseg((ktask)->aux_buffers.buf0);\
+        kryptos_freeseg((ktask)->aux_buffers.buf0, (ktask)->aux_buffers.buf0_size);\
         (ktask)->aux_buffers.buf0 = NULL;\
         (ktask)->aux_buffers.buf0_size = 0;\
     }\
     if ((ktask)->aux_buffers.buf1 != NULL && ((freemask) & KRYPTOS_TASK_AUX_BUF1) ) {\
-        memset((ktask)->aux_buffers.buf1, 0, (ktask)->aux_buffers.buf1_size);\
-        kryptos_freeseg((ktask)->aux_buffers.buf1);\
+        kryptos_freeseg((ktask)->aux_buffers.buf1, (ktask)->aux_buffers.buf1_size);\
         (ktask)->aux_buffers.buf1 = NULL;\
         (ktask)->aux_buffers.buf1_size = 0;\
     }\
@@ -260,12 +254,10 @@ kryptos_ ## label_name:\
         (*ktask)->result_verbose = "No memory to get a valid output.";\
     }\
     if (inblock != NULL) {\
-        memset(inblock, 0, block_size_in_bytes);\
-        kryptos_freeseg(inblock);\
+        kryptos_freeseg(inblock, block_size_in_bytes);\
     }\
     if (outblock != NULL) {\
-        memset(outblock, 0, block_size_in_bytes);\
-        kryptos_freeseg(outblock);\
+        kryptos_freeseg(outblock, block_size_in_bytes);\
     }\
     inblock_p = outblock_p = NULL;\
     in_size = 0;\
@@ -335,15 +327,14 @@ kryptos_ ## label_name:\
                ((kryptos_u32_t)((kryptos_u8_t *)(bufs)->buf0)[block_size_in_bytes - 1]);\
     }\
     if ((bufs) != NULL && (bufs)->buf0 != NULL) {\
-        memset((bufs)->buf0, 0, block_size_in_bytes);\
-        kryptos_freeseg((bufs)->buf0);\
+        kryptos_freeseg((bufs)->buf0, block_size_in_bytes);\
         (bufs)->buf0 = NULL;\
     }\
     if (action == kKryptosDecrypt) {\
         (*out_size) = (*in_size) - block_size_in_bytes - *(out + (*in_size) - block_size_in_bytes - 1);\
         *(out + (*in_size) - block_size_in_bytes - 1) = 0;\
     } else {\
-        kryptos_freeseg(in_p);\
+        kryptos_freeseg(in_p, *in_size);\
     }\
     memset(iv, 0, block_size_in_bytes);\
 }
@@ -396,7 +387,7 @@ kryptos_ ## label_name:\
         (*out_size) = (*in_size) - block_size_in_bytes - *(out + (*in_size) - block_size_in_bytes - 1);\
         *(out + (*in_size) - block_size_in_bytes - 1) = 0;\
     } else {\
-        kryptos_freeseg(in_p);\
+        kryptos_freeseg(in_p, *in_size);\
     }\
     memset(iv, 0, block_size_in_bytes);\
 }
@@ -455,7 +446,7 @@ kryptos_ ## label_name:\
         (*out_size) = (*in_size) - block_size_in_bytes - *(out + (*in_size) - block_size_in_bytes - 1);\
         *(out + (*in_size) - block_size_in_bytes - 1) = 0;\
     } else {\
-        kryptos_freeseg(in_p);\
+        kryptos_freeseg(in_p, *in_size);\
     }\
     memset(iv, 0, block_size_in_bytes);\
 }
@@ -490,7 +481,7 @@ kryptos_ ## label_name:\
         *out_size = (*in_size) - *(out + (*in_size) - 1);\
         *(out + (*in_size) - 1) = 0;\
     } else {\
-        kryptos_freeseg(in_p);\
+        kryptos_freeseg(in_p, *in_size);\
     }\
 }
 

@@ -99,12 +99,12 @@ kryptos_elgamal_mk_key_pair_epilogue:
 
     if (result != kKryptosSuccess) {
         if ((*k_pub) != NULL) {
-            kryptos_freeseg(*k_pub);
+            kryptos_freeseg(*k_pub, *k_pub_size);
             *k_pub_size = 0;
         }
 
         if ((*k_priv) != NULL) {
-            kryptos_freeseg(*k_priv);
+            kryptos_freeseg(*k_priv, *k_priv_size);
             *k_priv_size = 0;
         }
     }
@@ -323,7 +323,7 @@ void kryptos_elgamal_oaep_cipher(kryptos_task_ctx **ktask) {
     }
 
     if (temp != NULL) {
-        kryptos_freeseg(temp);
+        kryptos_freeseg(temp, (temp == (*ktask)->in) ? (*ktask)->in_size : (*ktask)->out_size);
     }
 
 kryptos_elgamal_oaep_cipher_epilogue:
@@ -582,7 +582,7 @@ kryptos_elgamal_encrypt_epilogue:
     }
 
     if ((*ktask)->result != kKryptosSuccess && (*ktask)->out != NULL) {
-        kryptos_freeseg((*ktask)->out);
+        kryptos_freeseg((*ktask)->out, (*ktask)->out_size);
         (*ktask)->out_size = 0;
     }
 }
@@ -734,7 +734,7 @@ kryptos_elgamal_decrypt_epilogue:
     }
 
     if ((*ktask)->result != kKryptosSuccess && (*ktask)->out != NULL) {
-        kryptos_freeseg((*ktask)->out);
+        kryptos_freeseg((*ktask)->out, (*ktask)->out_size);
         (*ktask)->out_size = 0;
     }
 }

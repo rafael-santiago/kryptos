@@ -126,11 +126,11 @@ main_epilogue:
     kryptos_clear_dh_xchg_ctx(alice);
 
     if (k_pub_bob != NULL) {
-        kryptos_freeseg(k_pub_bob);
+        kryptos_freeseg(k_pub_bob, k_pub_bob_size);
     }
 
     if (k_priv_bob != NULL) {
-        kryptos_freeseg(k_priv_bob);
+        kryptos_freeseg(k_priv_bob, k_priv_bob_size);
     }
 
     k_priv_bob_size = k_pub_bob_size = 0;

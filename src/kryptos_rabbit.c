@@ -209,8 +209,7 @@ static void kryptos_rabbit_ld_user_key(kryptos_u16_t *K, const kryptos_u8_t *key
     kryptos_ld_user_key_epilogue(kryptos_rabbit_ld_user_key_epilogue, KK, w, b, kp, kp_end);
 
     if (ktemp != NULL && ktemp != key) {
-        memset(ktemp, 0, key_size);
-        kryptos_freeseg(ktemp);
+        kryptos_freeseg(ktemp, key_size);
     }
 
     // INFO(Rafael): This algorithm follows the I2OSP convention from PKCS#1.

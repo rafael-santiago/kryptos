@@ -327,7 +327,7 @@ void kryptos_rsa_oaep_cipher(kryptos_task_ctx **ktask) {
     }
 
     if (temp != NULL) {
-        kryptos_freeseg(temp);
+        kryptos_freeseg(temp, (temp == (*ktask)->in) ? (*ktask)->in_size : (*ktask)->out_size);
     }
 
 kryptos_rsa_oaep_cipher_epilogue:
@@ -598,7 +598,7 @@ void kryptos_rsa_sign(kryptos_task_ctx **ktask) {
     // INFO(Rafael): Exporting the relevant multiprecision data.
 
     if ((*ktask)->cipher == kKryptosCipherRSAEMSAPSS) {
-        kryptos_freeseg((*ktask)->in);
+        kryptos_freeseg((*ktask)->in, (*ktask)->in_size);
 
         (*ktask)->in = old_in;
         (*ktask)->in_size = old_in_size;
@@ -655,7 +655,7 @@ kryptos_rsa_sign_epilogue:
 
     if (old_in != NULL) {
         if ((*ktask)->in != NULL) {
-            kryptos_freeseg((*ktask)->in);
+            kryptos_freeseg((*ktask)->in, (*ktask)->in_size);
         }
 
         (*ktask)->in = old_in;
@@ -666,7 +666,7 @@ kryptos_rsa_sign_epilogue:
 
     if ((*ktask)->result != kKryptosSuccess && (*ktask)->out != NULL) {
         if ((*ktask)->out != NULL) {
-            kryptos_freeseg((*ktask)->out);
+            kryptos_freeseg((*ktask)->out, (*ktask)->out_size);
         }
 
         (*ktask)->out = NULL;
@@ -751,7 +751,7 @@ void kryptos_rsa_verify(kryptos_task_ctx **ktask) {
                                (kryptos_hash_func)(*ktask)->arg[1],
                                (kryptos_hash_size_func)(*ktask)->arg[2]) != (*ktask)->out) {
             if ((*ktask)->out != NULL) {
-                kryptos_freeseg((*ktask)->out);
+                kryptos_freeseg((*ktask)->out, (*ktask)->out_size);
                 (*ktask)->out = NULL;
                 (*ktask)->out_size = 0;
             }
@@ -801,7 +801,7 @@ kryptos_rsa_verify_epilogue:
     }
 
     if ((*ktask)->result != kKryptosSuccess && (*ktask)->out != NULL) {
-        kryptos_freeseg((*ktask)->out);
+        kryptos_freeseg((*ktask)->out, (*ktask)->out_size);
         (*ktask)->out = NULL;
         (*ktask)->out_size = 0;
     }
