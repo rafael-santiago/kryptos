@@ -203,8 +203,8 @@ int main(int argc, char **argv) {
             exit_code = 1;
         }
 
-        kryptos_freeseg(ktask->in);
-        kryptos_freeseg(ktask->out);
+        kryptos_freeseg(ktask->in, ktask->in_size);
+        kryptos_freeseg(ktask->out, ktask->out_size);
     } else {
         printf("Error during encryption.\n");
         exit_code = 1;
@@ -222,7 +222,8 @@ Another curious thing could be the lack of the explicit indication of encryption
 is a stream cipher, the encryption and decryption are the same. It only depends on the input.
 
 The use of ``kryptos_freeseg()`` in order to free memory is encouraged because in kernel mode it can abstract some complications
-for you. In user mode you can call the default libc ``free()`` function, there is no problem with that.
+for you. In user mode you can call the default libc ``free()`` function, there is no problem with that if you do not worry about
+letting data behind (``kryptos_freeseg()`` zeroes the segment before actually freeing it).
 
 It is possible to simplify a little bit more the previous sample by using C macros and c99 capabilities:
 
@@ -1224,11 +1225,11 @@ main_epilogue:
     kryptos_clear_dh_xchg_ctx(alice);
 
     if (k_pub_bob != NULL) {
-        kryptos_freeseg(k_pub_bob);
+        kryptos_freeseg(k_pub_bob, k_pub_bob_size);
     }
 
     if (k_priv_bob != NULL) {
-        kryptos_freeseg(k_priv_bob);
+        kryptos_freeseg(k_priv_bob, k_priv_bob_size);
     }
 
     k_priv_bob_size = k_pub_bob_size = 0;
@@ -1286,7 +1287,7 @@ int main(int argc, char **argv) {
 
         fwrite(params, params_size, 1, stdout);
 
-        kryptos_freeseg(params);
+        kryptos_freeseg(params, params_size);
     } else {
 usage:
         printf("use: %s <p size in bits> <q size in bits>\n", argv[0]);
@@ -1547,11 +1548,11 @@ main_epilogue:
     kryptos_clear_dh_xchg_ctx(alice);
 
     if (k_pub_bob != NULL) {
-        kryptos_freeseg(k_pub_bob);
+        kryptos_freeseg(k_pub_bob, k_pub_bob_size);
     }
 
     if (k_priv_bob != NULL) {
-        kryptos_freeseg(k_priv_bob);
+        kryptos_freeseg(k_priv_bob, k_priv_bob_size);
     }
 
     k_priv_bob_size = k_pub_bob_size = 0;
@@ -1615,11 +1616,11 @@ int main(int argc, char **argv) {
     }
 
     if (k_priv != NULL) {
-        kryptos_freeseg(k_priv);
+        kryptos_freeseg(k_priv, k_priv_size);
     }
 
     if (k_pub != NULL) {
-        kryptos_freeseg(k_pub);
+        kryptos_freeseg(k_pub, k_pub_size);
     }
 
     return exit_code;
@@ -2129,11 +2130,11 @@ usage:
     }
 
     if (k_pub != NULL) {
-        kryptos_freeseg(k_pub);
+        kryptos_freeseg(k_pub, k_pub_size);
     }
 
     if (k_priv != NULL) {
-        kryptos_freeseg(k_priv);
+        kryptos_freeseg(k_priv, k_priv_size);
     }
 
     return exit_code;
@@ -2854,11 +2855,11 @@ usage:
 epilogue:
 
     if (k_pub != NULL) {
-        kryptos_freeseg(k_pub);
+        kryptos_freeseg(k_pub, k_pub_size);
     }
 
     if (k_priv != NULL) {
-        kryptos_freeseg(k_priv);
+        kryptos_freeseg(k_priv, k_priv_size);
     }
 
     return exit_code;
@@ -3363,11 +3364,11 @@ int main(int argc, char **argv) {
 epilogue:
 
     if (deflated_data != NULL) {
-        kryptos_freeseg(deflated_data);
+        kryptos_freeseg(deflated_data, deflated_data_size);
     }
 
     if (inflated_data != NULL) {
-        kryptos_freeseg(inflated_data);
+        kryptos_freeseg(inflated_data, inflated_data_size);
     }
 
     return exit_code;
@@ -3421,7 +3422,7 @@ int main(int argc, char **argv) {
 epilogue:
 
     if (pem_buffer != NULL) {
-        kryptos_freeseg(pem_buffer);
+        kryptos_freeseg(pem_buffer, pem_buffer_size);
     }
 
     return exit_code;
@@ -3490,11 +3491,11 @@ int main(int argc, char **argv) {
 epilogue:
 
     if (second != NULL) {
-        kryptos_freeseg(second);
+        kryptos_freeseg(second, second_size);
     }
 
     if (first != NULL) {
-        kryptos_freeseg(first);
+        kryptos_freeseg(first, first_size);
     }
 
     return exit_code;
@@ -3634,7 +3635,7 @@ int main(int argc, char **argv) {
 
                 printf("\n");
 
-                kryptos_freeseg(block);
+                kryptos_freeseg(block, block_size);
 
                 // INFO(Rafael): You should save it somewhere, if you want to restore
                 //               the CSPRNG state later.
@@ -3670,7 +3671,7 @@ int main(int argc, char **argv) {
 
                         printf("\n");
 
-                        kryptos_freeseg(block);
+                        kryptos_freeseg(block, block_size);
                     } else {
                         error = 1;
                         printf("ERROR: Unable to get a random block.\n");
