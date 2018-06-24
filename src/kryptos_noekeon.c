@@ -26,7 +26,7 @@
     kryptos_noekeon_Pi2(s);\
 }
 
-// CLUE(Rafael): I am taking in consideration that any architecture will perform ~(a[3] | a[2]) quicker than (~a[3] & ~a[2]).
+// CLUE(Rafael): I am considering that any architecture will perform ~(a[3] | a[2]) quicker than (~a[3] & ~a[2]).
 //               In general it should be true. If it does not, change according to your requirements.
 
 #define kryptos_noekeon_Gamma(a, t) {\

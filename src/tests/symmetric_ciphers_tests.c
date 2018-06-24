@@ -886,6 +886,10 @@ CUTE_TEST_CASE(kryptos_noekeon_d_tests)
     kryptos_run_block_cipher_tests(noekeon_d, KRYPTOS_NOEKEON_BLOCKSIZE);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_gost_tests)
+    kryptos_run_block_cipher_tests(gost, KRYPTOS_GOST_BLOCKSIZE);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_des_weak_keys_detection_tests)
 #define REGISTER_DES_WEAK_KEY(k) (k)
     static kryptos_u8_t *wkey[] = {

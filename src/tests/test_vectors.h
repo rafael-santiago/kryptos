@@ -32,6 +32,7 @@
 #include "shacal1_test_vector.h"
 #include "shacal2_test_vector.h"
 #include "noekeon_test_vector.h"
+#include "gost_test_vector.h"
 #include "sha1_test_vector.h"
 #include "sha224_test_vector.h"
 #include "sha256_test_vector.h"

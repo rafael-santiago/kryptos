@@ -26,6 +26,7 @@
 #include <kryptos_shacal1.h>
 #include <kryptos_shacal2.h>
 #include <kryptos_noekeon.h>
+#include <kryptos_gost.h>
 #include <kryptos_rabbit.h>
 #include <kryptos_rsa.h>
 #include <kryptos_elgamal.h>
@@ -411,6 +412,10 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
         case kKryptosCipherNOEKEON:
         case kKryptosCipherNOEKEOND:
             return ((*ktask)->iv_size == KRYPTOS_NOEKEON_BLOCKSIZE);
+            break;
+
+        case kKryptosCipherGOST:
+            return ((*ktask)->iv_size == KRYPTOS_GOST_BLOCKSIZE);
             break;
 
         case kKryptosCipherRABBIT:
