@@ -101,11 +101,9 @@ static void kryptos_gost_block_encrypt(kryptos_u8_t *block, const struct kryptos
 
 static void kryptos_gost_block_decrypt(kryptos_u8_t *block, const struct kryptos_gost_subkeys *sks);
 
-// TODO(Rafael): Implement 'gost_s', this version must allow the passing of the s-boxes besides the key.
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(gost_ds, kKryptosCipherGOSTDS, KRYPTOS_GOST_BLOCKSIZE)
 
-KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(gost, kKryptosCipherGOST, KRYPTOS_GOST_BLOCKSIZE)
-
-KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(gost,
+KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(gost_ds,
                                     ktask,
                                     kryptos_gost_subkeys,
                                     sks,
@@ -121,6 +119,114 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(gost,
                                         sks.s6 = &kryptos_gost_s6[0];
                                         sks.s7 = &kryptos_gost_s7[0];
                                         sks.s8 = &kryptos_gost_s8[0];
+                                    },
+                                    kryptos_gost_block_encrypt, /* No additional steps before encrypting */,
+                                    kryptos_gost_block_decrypt, /* No additional steps before decrypting */,
+                                    KRYPTOS_GOST_BLOCKSIZE,
+                                    gost_cipher_epilogue,
+                                    outblock,
+                                    gost_block_processor(outblock, &sks))
+
+void kryptos_gost_setup(kryptos_task_ctx *ktask,
+                                  kryptos_u8_t *key,
+                                  const size_t key_size,
+                                  const kryptos_cipher_mode_t mode,
+                                  kryptos_u8_t *s1, kryptos_u8_t *s2, kryptos_u8_t *s3, kryptos_u8_t *s4,
+                                  kryptos_u8_t *s5, kryptos_u8_t *s6, kryptos_u8_t *s7, kryptos_u8_t *s8) {
+    if (ktask == NULL) {
+        return;
+    }
+
+    if (s1 != NULL) {
+        ktask->arg[0] = (void *)s1;
+    } else {
+        ktask->arg[0] = NULL;
+    }
+
+    if (s2 != NULL) {
+        ktask->arg[1] = (void *)s2;
+    } else {
+        ktask->arg[1] = NULL;
+    }
+
+    if (s3 != NULL) {
+        ktask->arg[2] = (void *)s3;
+    } else {
+        ktask->arg[2] = NULL;
+    }
+
+    if (s4 != NULL) {
+        ktask->arg[3] = (void *)s4;
+    } else {
+        ktask->arg[3] = NULL;
+    }
+
+    if (s5 != NULL) {
+        ktask->arg[4] = (void *)s5;
+    } else {
+        ktask->arg[4] = NULL;
+    }
+
+    if (s6 != NULL) {
+        ktask->arg[5] = (void *)s6;
+    } else {
+        ktask->arg[5] = NULL;
+    }
+
+    if (s7 != NULL) {
+        ktask->arg[6] = (void *)s7;
+    } else {
+        ktask->arg[6] = NULL;
+    }
+
+    if (s8 != NULL) {
+        ktask->arg[7] = (void *)s8;
+    } else {
+        ktask->arg[7] = NULL;
+    }
+
+    ktask->key = key;
+    ktask->key_size = key_size;
+    ktask->mode = mode;
+    ktask->cipher = kKryptosCipherGOST;
+
+    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB || ktask->mode == kKryptosCTR) && ktask->iv == NULL) {
+        ktask->iv = kryptos_get_random_block(KRYPTOS_GOST_BLOCKSIZE);
+        ktask->iv_size = KRYPTOS_GOST_BLOCKSIZE;
+    }
+
+    if (ktask->mode == kKryptosCTR && ktask->ctr != NULL) {
+        ktask->iv[KRYPTOS_GOST_BLOCKSIZE - 4] = (*ktask->ctr) >> 24;
+        ktask->iv[KRYPTOS_GOST_BLOCKSIZE - 3] = ((*ktask->ctr) & 0xFF0000) >> 16;
+        ktask->iv[KRYPTOS_GOST_BLOCKSIZE - 2] = ((*ktask->ctr) & 0xFF00) >> 8;
+        ktask->iv[KRYPTOS_GOST_BLOCKSIZE - 1] = (*ktask->ctr) & 0xFF;
+    }
+}
+
+KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(gost,
+                                    ktask,
+                                    kryptos_gost_subkeys,
+                                    sks,
+                                    kryptos_gost_block_processor,
+                                    gost_block_processor,
+                                    {
+                                        if ((*ktask)->arg[0] == NULL || (*ktask)->arg[1] == NULL ||
+                                            (*ktask)->arg[2] == NULL || (*ktask)->arg[3] == NULL ||
+                                            (*ktask)->arg[4] == NULL || (*ktask)->arg[5] == NULL ||
+                                            (*ktask)->arg[6] == NULL || (*ktask)->arg[7] == NULL) {
+                                            (*ktask)->result = kKryptosInvalidParams;
+                                            (*ktask)->result_verbose = "GOST s-boxes are incomplete.";
+                                            goto kryptos_gost_cipher_epilogue;
+                                        }
+                                        kryptos_gost_load_user_key((*ktask)->key, (*ktask)->key_size, &sks);
+                                        sks.s1 = (kryptos_u8_t *)(*ktask)->arg[0];
+                                        sks.s2 = (kryptos_u8_t *)(*ktask)->arg[1];
+                                        sks.s3 = (kryptos_u8_t *)(*ktask)->arg[2];
+                                        sks.s4 = (kryptos_u8_t *)(*ktask)->arg[3];
+                                        sks.s5 = (kryptos_u8_t *)(*ktask)->arg[4];
+                                        sks.s6 = (kryptos_u8_t *)(*ktask)->arg[5];
+                                        sks.s7 = (kryptos_u8_t *)(*ktask)->arg[6];
+                                        sks.s8 = (kryptos_u8_t *)(*ktask)->arg[7];
                                     },
                                     kryptos_gost_block_encrypt, /* No additional steps before encrypting */,
                                     kryptos_gost_block_decrypt, /* No additional steps before decrypting */,

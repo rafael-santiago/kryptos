@@ -82,6 +82,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_shacal2_tests);
     CUTE_RUN_TEST(kryptos_noekeon_tests);
     CUTE_RUN_TEST(kryptos_noekeon_d_tests);
+    CUTE_RUN_TEST(kryptos_gost_ds_tests);
     CUTE_RUN_TEST(kryptos_gost_tests);
 
     // INFO(Rafael): Operation modes (complementary tests).

@@ -414,6 +414,7 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
             return ((*ktask)->iv_size == KRYPTOS_NOEKEON_BLOCKSIZE);
             break;
 
+        case kKryptosCipherGOSTDS:
         case kKryptosCipherGOST:
             return ((*ktask)->iv_size == KRYPTOS_GOST_BLOCKSIZE);
             break;

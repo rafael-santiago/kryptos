@@ -171,6 +171,30 @@ CUTE_TEST_CASE(kryptos_hmac_tests)
     kryptos_task_ctx t;
     kryptos_u8_t *triple_des_key2, *triple_des_key3;
     size_t triple_des_key2_size, triple_des_key3_size;
+    kryptos_u8_t s1[16] = {
+         4, 10,  9,  2, 13,  8,  0, 14,  6, 11,  1, 12,  7, 15,  5,  3
+    };
+    kryptos_u8_t s2[16] = {
+        14, 11,  4, 12,  6, 13, 15, 10,  2,  3,  8,  1,  0,  7,  5,  9
+    };
+    kryptos_u8_t s3[16] = {
+        5,  8,  1, 13, 10,  3,  4,  2, 14, 15, 12,  7,  6,  0,  9, 11
+    };
+    kryptos_u8_t s4[16] = {
+        7, 13, 10,  1,  0,  8,  9, 15, 14,  4,  6, 12, 11,  2,  5,  3
+    };
+    kryptos_u8_t s5[16] = {
+        6, 12,  7,  1,  5, 15, 13,  8,  4, 10,  9, 14,  0,  3, 11,  2
+    };
+    kryptos_u8_t s6[16] = {
+        4, 11, 10,  0,  7,  2,  1, 13,  3,  6,  8,  5,  9, 12, 15, 14
+    };
+    kryptos_u8_t s7[16] = {
+        13, 11,  4,  1,  3, 15,  5,  9,  0, 10, 14,  7,  6,  8,  2, 12
+    };
+    kryptos_u8_t s8[16] = {
+         1, 15, 13,  0,  5,  7, 10,  4,  9,  2,  3, 14,  6, 11,  8, 12
+    };
 
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, des, sha1, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, des, sha224, key, key_size, kKryptosECB);
@@ -1530,25 +1554,123 @@ CUTE_TEST_CASE(kryptos_hmac_tests)
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, noekeon_d, tiger, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, tv, tv_nr, data_size, noekeon_d, whirlpool, key, key_size, kKryptosCBC);
 
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha1, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha224, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha256, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha384, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha512, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha3_224, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha3_256, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha3_384, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha3_512, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, keccak224, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, keccak256, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, keccak384, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, keccak512, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, md4, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, md5, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, ripemd128, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, ripemd160, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, tiger, key, key_size, kKryptosECB);
-    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, whirlpool, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha1, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha3_224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha3_256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha3_384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha3_512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, keccak224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, keccak256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, keccak384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, keccak512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, md4, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, md5, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, ripemd128, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, ripemd160, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, tiger, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, whirlpool, key, key_size, kKryptosECB);
+
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha1, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha3_224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha3_256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha3_384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, sha3_512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, keccak224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, keccak256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, keccak384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, keccak512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, md4, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, md5, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, ripemd128, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, ripemd160, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, tiger, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost_ds, whirlpool, key, key_size, kKryptosCBC);
+
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha1, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha224, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha256, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha384, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha512, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha3_224, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha3_256, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha3_384, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha3_512, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, keccak224, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, keccak256, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, keccak384, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, keccak512, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, md4, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, md5, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, ripemd128, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, ripemd160, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, tiger, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, whirlpool, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha1, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha224, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha256, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha384, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha512, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha3_224, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha3_256, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha3_384, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, sha3_512, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, keccak224, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, keccak256, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, keccak384, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, keccak512, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, md4, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, md5, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, ripemd128, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, ripemd160, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, tiger, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, tv, tv_nr, data_size, gost, whirlpool, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
 
 #else
 # if !defined(KRYPTOS_NO_HMAC_TESTS)

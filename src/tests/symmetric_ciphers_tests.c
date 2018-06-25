@@ -886,9 +886,101 @@ CUTE_TEST_CASE(kryptos_noekeon_d_tests)
     kryptos_run_block_cipher_tests(noekeon_d, KRYPTOS_NOEKEON_BLOCKSIZE);
 CUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_gost_tests)
-    kryptos_run_block_cipher_tests(gost, KRYPTOS_GOST_BLOCKSIZE);
+CUTE_TEST_CASE(kryptos_gost_ds_tests)
+    kryptos_run_block_cipher_tests(gost_ds, KRYPTOS_GOST_BLOCKSIZE);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_gost_tests)
+    struct gost_sboxes_ctx {
+        kryptos_u8_t *s1, *s2, *s3, *s4, *s5, *s6, *s7, *s8;
+    };
+    kryptos_u8_t s1[16] = {
+         4, 10,  9,  2, 13,  8,  0, 14,  6, 11,  1, 12,  7, 15,  5,  3
+    };
+    kryptos_u8_t s2[16] = {
+        14, 11,  4, 12,  6, 13, 15, 10,  2,  3,  8,  1,  0,  7,  5,  9
+    };
+    kryptos_u8_t s3[16] = {
+        5,  8,  1, 13, 10,  3,  4,  2, 14, 15, 12,  7,  6,  0,  9, 11
+    };
+    kryptos_u8_t s4[16] = {
+        7, 13, 10,  1,  0,  8,  9, 15, 14,  4,  6, 12, 11,  2,  5,  3
+    };
+    kryptos_u8_t s5[16] = {
+        6, 12,  7,  1,  5, 15, 13,  8,  4, 10,  9, 14,  0,  3, 11,  2
+    };
+    kryptos_u8_t s6[16] = {
+        4, 11, 10,  0,  7,  2,  1, 13,  3,  6,  8,  5,  9, 12, 15, 14
+    };
+    kryptos_u8_t s7[16] = {
+        13, 11,  4,  1,  3, 15,  5,  9,  0, 10, 14,  7,  6,  8,  2, 12
+    };
+    kryptos_u8_t s8[16] = {
+         1, 15, 13,  0,  5,  7, 10,  4,  9,  2,  3, 14,  6, 11,  8, 12
+    };
+    struct gost_sboxes_ctx gost_sboxes[] = {
+        { s1, s2, s3, s4, s5, s6, s7, s8 },
+        { s1, s2, s3, s4, s5, s6, s7, s8 }
+    };
+    size_t gost_sboxes_nr = sizeof(gost_sboxes) / sizeof(gost_sboxes[0]);
+    kryptos_task_ctx t;
+    size_t tv;
+
+    kryptos_run_block_cipher_tests_with_custom_setup(gost,
+                                                     KRYPTOS_GOST_BLOCKSIZE,
+                                                     t,
+                                                     tv,
+                                                     gost_sboxes, gost_sboxes_nr,
+                                                     kryptos_gost_setup(&t,
+                                                                        gost_test_vector[tv % gost_sboxes_nr].key,
+                                                                        gost_test_vector[tv % gost_sboxes_nr].key_size,
+                                                                        kKryptosECB,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s1,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s2,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s3,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s4,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s5,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s6,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s7,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s8),
+                                                    kryptos_gost_setup(&t,
+                                                                        gost_test_vector[tv % gost_sboxes_nr].key,
+                                                                        gost_test_vector[tv % gost_sboxes_nr].key_size,
+                                                                        kKryptosCBC,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s1,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s2,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s3,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s4,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s5,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s6,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s7,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s8),
+                                                    kryptos_gost_setup(&t,
+                                                                        gost_test_vector[tv % gost_sboxes_nr].key,
+                                                                        gost_test_vector[tv % gost_sboxes_nr].key_size,
+                                                                        kKryptosOFB,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s1,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s2,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s3,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s4,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s5,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s6,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s7,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s8),
+                                                    kryptos_gost_setup(&t,
+                                                                        gost_test_vector[tv % gost_sboxes_nr].key,
+                                                                        gost_test_vector[tv % gost_sboxes_nr].key_size,
+                                                                        kKryptosCTR,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s1,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s2,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s3,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s4,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s5,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s6,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s7,
+                                                                        gost_sboxes[tv % gost_sboxes_nr].s8));
+CUTE_TEST_CASE_END
+
 
 CUTE_TEST_CASE(kryptos_des_weak_keys_detection_tests)
 #define REGISTER_DES_WEAK_KEY(k) (k)

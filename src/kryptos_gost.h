@@ -12,7 +12,12 @@
 
 #define KRYPTOS_GOST_BLOCKSIZE 8
 
-KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(gost)
+KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(gost_ds)
+
+KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR(gost_ds)
+
+KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_SETUP(gost, ktask, kryptos_u8_t *s1, kryptos_u8_t *s2, kryptos_u8_t *s3, kryptos_u8_t *s4,
+                                                    kryptos_u8_t *s5, kryptos_u8_t *s6, kryptos_u8_t *s7, kryptos_u8_t *s8)
 
 KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR(gost)
 

@@ -136,7 +136,7 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 | ``SHACAL-2``                    | Block  |       ``kKryptosCipherSHACAL2``  |       ``shacal2``  |
 | ``NOEKEON`` (indirect key mode) | Block  |       ``kKryptosCipherNOEKEON``  |       ``noekeon``  |
 | ``NOEKEON`` (direct key mode)   | Block  |       ``kKryptosCipherNOEKEOND`` |       ``noekeon_d``|
-|  ``GOST`` (with DES s-boxes)    | Block  |       ``kKryptosCipherGOST``     |       ``gost``     |
+|  ``GOST`` (with DES s-boxes)    | Block  |       ``kKryptosCipherGOSTDS``   |       ``gost_ds``  |
 
 The available modes of operation for the block ciphers are: ``ECB``, ``CBC``, ``CTR`` and ``OFB``. So in practice, considering
 the ``OFB`` mode, we have 36 stream ciphers instead of only three. More on cipher modes will be treated later.
@@ -699,6 +699,7 @@ The **Table 3** lists the other ciphers which use additional parameters during t
 | SAFER K-64 |  Rounds total                     |          ``int``                                    | ``kryptos_run_cipher(saferk64, &task, "saferk64", 8, kKryptosECB, &saferk64_rounds)``                |
 |    3DES    |  Key2, Key2 size, Key3, Key3 size | ``unsigned char`` for keys and ``size_t`` for sizes | ``kryptos_run_cipher(triple_des, &task, k1, &k1_size, kKryptosECB, k2, &k2_size, k3, &k3_size)``     |
 |  3DES-EDE  |  Key2, Key2 size, Key3, Key3 size | ``unsigned char`` for keys and ``size_t`` for sizes | ``kryptos_run_cipher(triple_des_ede, &task, k1, &k1_size, kKryptosECB, k2, &k2_size, k3, &k3_size)`` |
+|    GOST    |  Eight custom s-boxes             |      ``unsigned char[16]``                          | ``kryptos_run_cipher(gost, &task, "gost", 4, kKryptosCBC, s1, s2, s3, s4, s5, s6, s7, s8)``          |
 
 ### Hashes
 

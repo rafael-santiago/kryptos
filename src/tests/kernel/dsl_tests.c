@@ -33,6 +33,30 @@ KUTE_TEST_CASE(kryptos_dsl_tests)
     int xtea_rounds;
     int rc5_rounds;
     int rc6_rounds;
+    kryptos_u8_t s1[16] = {
+         4, 10,  9,  2, 13,  8,  0, 14,  6, 11,  1, 12,  7, 15,  5,  3
+    };
+    kryptos_u8_t s2[16] = {
+        14, 11,  4, 12,  6, 13, 15, 10,  2,  3,  8,  1,  0,  7,  5,  9
+    };
+    kryptos_u8_t s3[16] = {
+        5,  8,  1, 13, 10,  3,  4,  2, 14, 15, 12,  7,  6,  0,  9, 11
+    };
+    kryptos_u8_t s4[16] = {
+        7, 13, 10,  1,  0,  8,  9, 15, 14,  4,  6, 12, 11,  2,  5,  3
+    };
+    kryptos_u8_t s5[16] = {
+        6, 12,  7,  1,  5, 15, 13,  8,  4, 10,  9, 14,  0,  3, 11,  2
+    };
+    kryptos_u8_t s6[16] = {
+        4, 11, 10,  0,  7,  2,  1, 13,  3,  6,  8,  5,  9, 12, 15, 14
+    };
+    kryptos_u8_t s7[16] = {
+        13, 11,  4,  1,  3, 15,  5,  9,  0, 10, 14,  7,  6,  8,  2, 12
+    };
+    kryptos_u8_t s8[16] = {
+         1, 15, 13,  0,  5,  7, 10,  4,  9,  2,  3, 14,  6, 11,  8, 12
+    };
 
     kryptos_task_set_ecb_mode(&task);
     KUTE_ASSERT(task.mode == kKryptosECB);
@@ -1347,19 +1371,55 @@ KUTE_TEST_CASE(kryptos_dsl_tests)
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
     kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 
-    // GOST ECB
+    // GOST-DS ECB
 
     kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
 
-    kryptos_run_cipher(gost, &task, "gost", 4, kKryptosECB);
+    kryptos_run_cipher(gost_ds, &task, "gost_ds", 7, kKryptosECB);
 
     KUTE_ASSERT(task.out != NULL);
 
     kryptos_task_set_in(&task, task.out, task.out_size);
     kryptos_task_set_decrypt_action(&task);
 
-    kryptos_run_cipher(gost, &task, "gost", 4, kKryptosECB);
+    kryptos_run_cipher(gost_ds, &task, "gost_ds", 7, kKryptosECB);
+
+    KUTE_ASSERT(task.out_size == data_size);
+    KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+
+    // GOST-DS CBC
+
+    kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_encrypt_action(&task);
+
+    kryptos_run_cipher(gost_ds, &task, "gost_ds", 7, kKryptosCBC);
+
+    KUTE_ASSERT(task.out != NULL);
+
+    kryptos_task_set_in(&task, task.out, task.out_size);
+    kryptos_task_set_decrypt_action(&task);
+
+    kryptos_run_cipher(gost_ds, &task, "gost_ds", 7, kKryptosCBC);
+
+    KUTE_ASSERT(task.out_size == data_size);
+    KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
+    kryptos_task_free(&task, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
+    // GOST ECB
+
+    kryptos_task_set_in(&task, data, data_size);
+    kryptos_task_set_encrypt_action(&task);
+
+    kryptos_run_cipher(gost, &task, "gost", 4, kKryptosECB, s1, s2, s3, s4, s5, s6, s7, s8);
+
+    KUTE_ASSERT(task.out != NULL);
+
+    kryptos_task_set_in(&task, task.out, task.out_size);
+    kryptos_task_set_decrypt_action(&task);
+
+    kryptos_run_cipher(gost, &task, "gost", 4, kKryptosECB, s1, s2, s3, s4, s5, s6, s7, s8);
 
     KUTE_ASSERT(task.out_size == data_size);
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);
@@ -1370,14 +1430,14 @@ KUTE_TEST_CASE(kryptos_dsl_tests)
     kryptos_task_set_in(&task, data, data_size);
     kryptos_task_set_encrypt_action(&task);
 
-    kryptos_run_cipher(gost, &task, "gost", 4, kKryptosCBC);
+    kryptos_run_cipher(gost, &task, "gost", 4, kKryptosCBC, s1, s2, s3, s4, s5, s6, s7, s8);
 
     KUTE_ASSERT(task.out != NULL);
 
     kryptos_task_set_in(&task, task.out, task.out_size);
     kryptos_task_set_decrypt_action(&task);
 
-    kryptos_run_cipher(gost, &task, "gost", 4, kKryptosCBC);
+    kryptos_run_cipher(gost, &task, "gost", 4, kKryptosCBC, s1, s2, s3, s4, s5, s6, s7, s8);
 
     KUTE_ASSERT(task.out_size == data_size);
     KUTE_ASSERT(memcmp(task.out, data, task.out_size) == 0);

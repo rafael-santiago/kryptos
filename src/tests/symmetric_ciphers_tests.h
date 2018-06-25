@@ -84,6 +84,8 @@ CUTE_DECLARE_TEST_CASE(kryptos_noekeon_d_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_des_weak_keys_detection_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_gost_ds_tests);
+
 CUTE_DECLARE_TEST_CASE(kryptos_gost_tests);
 
 #endif
