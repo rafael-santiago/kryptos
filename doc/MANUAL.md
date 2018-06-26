@@ -137,7 +137,7 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 | ``NOEKEON`` (indirect key mode) | Block  |       ``kKryptosCipherNOEKEON``  |       ``noekeon``  |
 | ``NOEKEON`` (direct key mode)   | Block  |       ``kKryptosCipherNOEKEOND`` |       ``noekeon_d``|
 |  ``GOST`` (with DES s-boxes)    | Block  |       ``kKryptosCipherGOSTDS``   |       ``gost_ds``  |
-|  ``GOST``                       | Block  |       ``kKryptosCipherGOST``     |
+|  ``GOST``                       | Block  |       ``kKryptosCipherGOST``     |       ``gost``     |
 
 The available modes of operation for the block ciphers are: ``ECB``, ``CBC``, ``CTR`` and ``OFB``. So in practice, considering
 the ``OFB`` mode, we have 37 stream ciphers instead of only three. More on cipher modes will be treated later.
