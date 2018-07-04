@@ -77,9 +77,9 @@ kryptos_u8_t *kryptos_uuencode_encode_buffer(const kryptos_u8_t *buffer, const s
 
         pad_size = 3 - block_size;
 
-        if (pad_size == 1) {
+        if (pad_size == 2) {
             block = block << 16 | 0x00000101;
-        } else if (pad_size == 2) {
+        } else if (pad_size == 1) {
             block = block << 8 | 0x01;
         }
 
@@ -116,6 +116,10 @@ kryptos_u8_t *kryptos_uuencode_encode_buffer(const kryptos_u8_t *buffer, const s
     *(out_p + 1) = '`';
     *(out_p + 2) = '\n';
 
+    out_p += 3;
+
+    *out_size = out_p - out;
+
     block = 0;
     pad_size = block_size = enc_total = 0;
     bp = bp_end = NULL;
@@ -124,7 +128,6 @@ kryptos_u8_t *kryptos_uuencode_encode_buffer(const kryptos_u8_t *buffer, const s
 
     return out;
 }
-
 
 static kryptos_u8_t *kryptos_uuencode_decode_buffer(const kryptos_u8_t *buffer, const size_t buffer_size, size_t *out_size) {
     const kryptos_u8_t *bp, *bp_end;
@@ -147,6 +150,11 @@ static kryptos_u8_t *kryptos_uuencode_decode_buffer(const kryptos_u8_t *buffer, 
     bp = buffer;
     bp_end = bp + buffer_size;
 
+    if (bp_end > (bp + 3) && bp_end[-3] == '\n' && bp_end[-2] == '`' && bp_end[-1] == '\n') {
+        // INFO(Rafael): Reducing the stopping criterion !(bp[0] == '`' && bp[1] == '\n' && &bp[2] == bp_end) to (bp < bp_end).
+        bp_end -= 3;
+    }
+
     if (*out_size < *bp - 32) {
         // CLUE(Rafael): Rather tiny buffers case.
         *out_size = *bp - 32;
@@ -160,9 +168,10 @@ static kryptos_u8_t *kryptos_uuencode_decode_buffer(const kryptos_u8_t *buffer, 
     out_p = out;
     memset(out, 0, *out_size + KRYPTOS_UUENCODE_BYTES_PER_LINE);
 
-    while (bp < bp_end && *bp != '`') {
+    while (bp < bp_end) {
         enc_total = *bp - 32;
         bp++;
+
         while (enc_total > 0 && bp < bp_end) {
             block = (kryptos_u32_t)    (*bp - 32)    << 18 |
                     (kryptos_u32_t) (*(bp + 1) - 32) << 12 |
@@ -172,7 +181,7 @@ static kryptos_u8_t *kryptos_uuencode_decode_buffer(const kryptos_u8_t *buffer, 
             shlv = 16;
 
             while (enc_total > 0 && shlv >= 0) {
-                *out_p = (block & (0xff << shlv)) >> shlv;
+                *out_p = (block & (0xFF << shlv)) >> shlv;
                 shlv -= 8;
                 out_p++;
                 enc_total--;
@@ -180,8 +189,11 @@ static kryptos_u8_t *kryptos_uuencode_decode_buffer(const kryptos_u8_t *buffer, 
 
             bp += 4;
         }
+
         bp++;
     }
+
+    *out_size = out_p - out;
 
     bp = bp_end = NULL;
     out_p = NULL;
