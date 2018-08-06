@@ -32,6 +32,7 @@
   //               keep the 'cleanup memset' even with the -O optimizing flag. If you have
   //               doubts, try to inspect the final assembly on your own, it also would be
   //               prudent since the compiler heuristics can change.
+# undef memset
 # define memset kryptos_memset
   void *kryptos_memset(void *s, int c, size_t n);
 #else

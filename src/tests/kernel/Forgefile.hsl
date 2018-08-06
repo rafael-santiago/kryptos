@@ -92,6 +92,7 @@ kryptos-test-mod.prologue() {
     #               kryptos are automatically linked together.
     $cflags.add_item("-DKRYPTOS_KERNEL_MODE=1");
     $cflags.add_item("-DKRYPTOS_MITIGATE_TIMING_ATTACKS=1");
+    $cflags.add_item("-DKRYPTOS_ENSURE_MEMSET_CLEANUPS=1");
 
     $modname = "kryptos_test";
 }
