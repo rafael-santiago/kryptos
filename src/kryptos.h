@@ -9,6 +9,7 @@
 #define KRYPTOS_KRYPTOS_H 1
 
 #include <kryptos_types.h>
+#include <kryptos_userland_funcs.h>
 #include <kryptos_memory.h>
 #include <kryptos_block_parser.h>
 #include <kryptos_iv_utils.h>

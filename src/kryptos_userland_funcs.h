@@ -24,9 +24,16 @@
 #endif
 
 #if defined(KRYPTOS_ENSURE_MEMSET_CLEANUPS)
-  // TODO(Rafael): Unstable, find a clean way of doing it but that works! :-/
+  // INFO(Rafael): Depending on the compiler flag (as instance -O) the compiler will
+  //               strip off memset calls at the end of the function. In this case, the
+  //               memset call is for cleanup issues and must be done. Using the following
+  //               scheme (define a macro called 'memset' that is replaced to 'kryptos_memset'
+  //                       a.k.a. the libraries' local memset implementation) is possible to
+  //               keep the 'cleanup memset' even with the -O optimizing flag. If you have
+  //               doubts, try to inspect the final assembly on your own, it also would be
+  //               prudent since the compiler heuristics can change.
+# define memset kryptos_memset
   void *kryptos_memset(void *s, int c, size_t n);
-  void * (volatile *memset)(void *, int, size_t) = kryptos_memset;
 #else
 # warning Memset calls used in cleanups are not being ensured.
 #endif

@@ -41,10 +41,6 @@ int memcmp(const void *s1, const void *s2, size_t n) {
 void *kryptos_memset(void *s, int c, size_t n) {
     kryptos_u8_t *bp, *bp_end, b;
 
-    if (s == NULL) {
-        return NULL;
-    }
-
     bp = (kryptos_u8_t *)s;
     bp_end = bp + n;
     b = (kryptos_u8_t)c;
