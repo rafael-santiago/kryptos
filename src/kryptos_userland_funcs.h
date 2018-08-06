@@ -24,7 +24,7 @@
 #endif
 
 #if defined(KRYPTOS_ENSURE_MEMSET_CLEANUPS)
-  // TODO(Rafael): Unstable, find a clean way of doing it but that works! :-\
+  // TODO(Rafael): Unstable, find a clean way of doing it but that works! :-/
   void *kryptos_memset(void *s, int c, size_t n);
   void * (volatile *memset)(void *, int, size_t) = kryptos_memset;
 #else

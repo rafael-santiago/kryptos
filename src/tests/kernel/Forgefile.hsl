@@ -91,6 +91,7 @@ kryptos-test-mod.prologue() {
     #               Notice that no .ar file is generated. When adding the path "../.." to the includes list the object files from
     #               kryptos are automatically linked together.
     $cflags.add_item("-DKRYPTOS_KERNEL_MODE=1");
+    $cflags.add_item("-DKRYPTOS_MITIGATE_TIMING_ATTACKS=1");
 
     $modname = "kryptos_test";
 }
