@@ -38,6 +38,7 @@ void kryptos_freeseg(void *seg, const size_t ssize) {
     if (seg != NULL) {
         if (ssize > 0) {
             // PARANOID-TODO(Rafael): To be paranoid enough and go ahead with some data wiping over RAM data or not to be?
+            // TODO(Rafael): Yes, apply data wiping here too.
             memset(seg, 0, ssize);
         }
 #if defined(KRYPTOS_USER_MODE)

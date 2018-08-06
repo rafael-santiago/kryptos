@@ -1150,6 +1150,7 @@ int kryptos_mp_eq(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b) {
 }
 
 const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b) {
+    // TODO(Rafael): Mitigate timing attacks.
     ssize_t d;
     const kryptos_mp_value_t *aa, *bb;
     kryptos_u8_t x, y;
@@ -1237,6 +1238,7 @@ const kryptos_mp_value_t *kryptos_mp_get_gt(const kryptos_mp_value_t *a, const k
 }
 
 kryptos_mp_value_t *kryptos_mp_pow(const kryptos_mp_value_t *g, const kryptos_mp_value_t *e) {
+    // TODO(Rafael): Mitigate timing attacks.
     kryptos_mp_value_t *A = NULL;
     ssize_t t;
 

@@ -1,1 +1,1 @@
---forgefiles=Forgefile.hsl --Forgefile-projects=kryptos --bin-output-dir=../lib --obj-output-dir=o --includes=. --quick-dh-tests
+--forgefiles=Forgefile.hsl --Forgefile-projects=kryptos --bin-output-dir=../lib --obj-output-dir=o --includes=. --quick-dh-tests --cflags=-DKRYPTOS_MITIGATE_TIMING_ATTACKS=1
