@@ -7,6 +7,17 @@
  */
 #include <kryptos_memory.h>
 
+#if defined(KRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY_FREAK_PARANOID_PERSON)
+# include <kryptos_random.h>
+# if !defined(KRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY)
+# define KRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY 1
+# endif
+#endif
+
+#if !defined(KRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY)
+# warning No data wiping is being applied when freeing memory.
+#endif
+
 #if defined(KRYPTOS_USER_MODE)
 # include <stdio.h>
 # include <unistd.h>
@@ -35,11 +46,31 @@ void *kryptos_newseg(const size_t ssize) {
 }
 
 void kryptos_freeseg(void *seg, const size_t ssize) {
+#if defined(KRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY_FREAK_PARANOID_PERSON)
+    kryptos_u8_t *bp, *bp_end;
+    size_t n;
+#endif
     if (seg != NULL) {
         if (ssize > 0) {
-            // PARANOID-TODO(Rafael): To be paranoid enough and go ahead with some data wiping over RAM data or not to be?
-            // TODO(Rafael): Yes, apply data wiping here too.
+#if !defined(KRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY)
             memset(seg, 0, ssize);
+#else
+            memset(seg, 255, ssize);
+            memset(seg, 0, ssize);
+# if defined(KRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY_FREAK_PARANOID_PERSON)
+            // WARN(Rafael): It slow down a bunch the library, however, if you can wait and you are this kind of person,
+            //               I would recommend you to define this long macro when building this library.
+            n = 5;
+            while (n-- > 0) {
+                bp = (kryptos_u8_t *)seg;
+                bp_end = bp + ssize;
+                while (bp != bp_end) {
+                    *bp = kryptos_get_random_byte();
+                    bp++;
+                }
+            }
+# endif
+#endif
         }
 #if defined(KRYPTOS_USER_MODE)
         free(seg);
