@@ -17,7 +17,16 @@
 #include <kryptos_hex.h>
 #include <kryptos_hash_common.h>
 #include <kryptos_sha1.h>
+#include <kryptos_userland_funcs.h>
 #include <string.h>
+#if !defined(_WIN32)
+# include <dlfcn.h>
+# if !defined(RTLD_NEXT)
+#  define RTLD_NEXT -1
+# endif
+# else
+# include <windows.h>
+#endif
 
 CUTE_TEST_CASE(kryptos_padding_tests)
     struct padding_tests_ctx {
@@ -1355,4 +1364,60 @@ CUTE_TEST_CASE(kryptos_csprng_context_change_tests)
             kryptos_get_random_byte();
         }
     }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_memset_tests)
+#if defined(KRYPTOS_ENSURE_MEMSET_CLEANUPS)
+    char buf[10];
+    void *(*curr_libmemset)(void *, int, size_t) = memset;
+    CUTE_ASSERT(curr_libmemset == kryptos_memset);
+    CUTE_ASSERT(kryptos_memset(buf, '.', sizeof(buf)) == &buf[0]);
+    CUTE_ASSERT(memcmp(buf, "..........", sizeof(buf)) == 0);
+#else
+    printf("WARN: KRYPTOS_ENSURE_MEMSET_CLEANUPS is undefined, this test was skipped.\n");
+#endif
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_memcmp_tests)
+#if defined(KRYPTOS_MITIGATE_TIMING_ATTACKS)
+    // INFO(Rafael): If this test has passed the memcmp will be tested in the test case 'kryptos_memset_tests'.
+# if !defined(_WIN32)
+    void *libc_so = (void *)RTLD_NEXT;
+    int (*libc_memcmp)(const void *, const void *, size_t);
+    CUTE_ASSERT((libc_memcmp = (void *)dlsym(libc_so, "memcmp")) !=  NULL);
+    CUTE_ASSERT(libc_memcmp != memcmp);
+# else
+    HMODULE libc_handle = NULL;
+    char *libc_dll[] = {
+        "MSVCRT.dll",
+        "MSVCR70.dll",
+        "MSVCR70d.dll",
+        "MSVCR71.dll",
+        "MSVCR71d.dll",
+        "MSVCR80.dll",
+        "MSCVR80d.dll",
+        "MSVCR90.dll",
+        "MSVCR90d.dll",
+        "MSVCR100.dll",
+        "MSVCR100d.dll",
+        "MSVCR110.dll",
+        "MSVCR110d.dll",
+        "MSVCR120.dll",
+        "MSCVR120d.dll"
+    };
+    size_t libc_dll_nr = sizeof(libc_dll) / sizeof(libc_dll[0]), l;
+    int (*libc_memcmp)(const void *, const void *, size_t);
+
+    for (l = 0; libc_handle == NULL && l < libc_dll_nr; l++) {
+        libc_handle = GetModuleHandle(libc_dll[l]);
+    }
+
+    CUTE_ASSERT(libc_handle != NULL);
+
+    CUTE_ASSERT((libc_memcmp = (void *)GetProcAddress(libc_handle, "memcmp")) != NULL);
+    CUTE_ASSERT(libc_memcmp != memcmp);
+#endif
+#else
+    printf("WARN: KRYPTOS_MITIGATE_TIMING_ATTACKS is undefined, this test was skipped.\n");
+#endif
 CUTE_TEST_CASE_END

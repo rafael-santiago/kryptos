@@ -40,4 +40,8 @@ CUTE_DECLARE_TEST_CASE(kryptos_fortuna_general_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_csprng_context_change_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_memset_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_memcmp_tests);
+
 #endif

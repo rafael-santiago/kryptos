@@ -17,6 +17,7 @@
 #include <kryptos_hex.h>
 #include <kryptos_hash_common.h>
 #include <kryptos_sha1.h>
+#include <kryptos_userland_funcs.h>
 #include <kstring.h>
 
 KUTE_TEST_CASE(kryptos_padding_tests)
@@ -1345,3 +1346,20 @@ KUTE_TEST_CASE(kryptos_csprng_context_change_tests)
         }
     }
 KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_memset_tests)
+#if defined(KRYPTOS_ENSURE_MEMSET_CLEANUPS)
+    char buf[10];
+    void *(*curr_libmemset)(void *, int, size_t) = memset;
+    KUTE_ASSERT(curr_libmemset == kryptos_memset);
+    KUTE_ASSERT(kryptos_memset(buf, '.', sizeof(buf)) == &buf[0]);
+    KUTE_ASSERT(memcmp(buf, "..........", sizeof(buf)) == 0);
+#else
+# if defined(__linux__)
+    printk(KERN_INFO "WARN: KRYPTOS_ENSURE_MEMSET_CLEANUPS is undefined, this test was skipped.\n");
+# elif defined(__FreeBSD__) || defined(__NetBSD__)
+    uprintf("WARN: KRYPTOS_ENSURE_MEMSET_CLEANUPS is undefined, this test was skipped.\n");
+# endif
+#endif
+KUTE_TEST_CASE_END
+

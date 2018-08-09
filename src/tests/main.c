@@ -21,6 +21,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     // INFO(Rafael): Generic/shared stuff.
 
+    CUTE_RUN_TEST(kryptos_memcmp_tests);
+    CUTE_RUN_TEST(kryptos_memset_tests);
     CUTE_RUN_TEST(kryptos_padding_tests);
     CUTE_RUN_TEST(kryptos_sys_get_random_block_tests);
     CUTE_RUN_TEST(kryptos_get_random_block_tests);
