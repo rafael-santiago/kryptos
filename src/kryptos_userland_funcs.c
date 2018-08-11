@@ -26,7 +26,7 @@ kryptos_u8_t toupper(const kryptos_u8_t c) {
 
 int memcmp(const void *s1, const void *s2, size_t n) {
     int result = 0;
-    kryptos_u8_t *b1 = (kryptos_u8_t *)s1, *b2 = (kryptos_u8_t *)s2;
+    const kryptos_u8_t *b1 = (const kryptos_u8_t *)s1, *b2 = (const kryptos_u8_t *)s2;
 
     while (n-- > 0) {
         result |= *(b1++) - *(b2++);
