@@ -192,6 +192,21 @@ additional options. The **Table 3** gathers the options related with the kernel 
 | ``--skip-rsa-signature-tests``           | Skips the RSA signature tests. The tests execution becomes faster.           |
 | ``--skip-dsa-signature-tests``           | Skips the DSA signature tests. The tests execution becomes faster.           |
 
+### Mitigating some side-channel attacks
+
+If you are paranoid enough maybe the following C macros listed in **Table 4** could be useful to you.
+
+**Table 4**: C macros related to side-channel attacks mitigation.
+
+|               **C Macro**                |           **Description**                                                    |
+|:----------------------------------------:|:----------------------------------------------------------------------------:|
+|  ``KRYPTOS_MITIGATE_TIMING_ATTACKS``     |       Makes the ``memcmp`` function processing time constant.                |
+|  ``KRYPTOS_ENSURE_MEMSET_CLEANUPS``      |       Makes sure that ``memset`` called at function epilogues always will be called (disable the compiler optimization). |
+|  ``KRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY`` | Applies some data wiping when freeing allocated memory.                  |
+| ``KRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY_FREAK_PARANOID_PERSON`` | Applies a slower data wiping when freeing allocated memory. |
+
+The first three macros are defined by default. All those macros in **Table 4** are defined through ``--cflags`` option.
+
 ### How the kernel mode tests are executed
 
 The kernel mode tests are almost the same of the user mode tests. However, the correctness of the ciphers are not verified since
