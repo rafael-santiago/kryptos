@@ -3706,7 +3706,7 @@ int main(int argc, char **argv) {
 ## Avoiding RAM swap
 
 Sometimes you need to hold (for short periods of time) sensible data into RAM. In this case, a swap would be harmful because
-it would leak data for a smart attacker. There is a way of avoiding those cumbersome swaps.
+it would leak data to a smart attacker. There is a way of avoiding those cumbersome swaps.
 
 You need to call ``kryptos_avoid_ram_swap()``. After this call all allocated memory with ``kryptos_newseg`` will stay in RAM
 without being swapped to disk.
