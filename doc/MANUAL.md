@@ -3703,6 +3703,26 @@ int main(int argc, char **argv) {
 }
 ```
 
+## Avoiding RAM swap
+
+Sometimes you need to store for (short periods of time) sensible data into RAM. In this case, a swap would be harmful because
+it would leak data for a smart attacker. There is a way of avoiding those cumbersome swaps.
+
+You need to call ``kryptos_avoid_ram_swap()``. After this call all allocated memory with ``kryptos_newseg`` will stay in RAM
+without being swapped to disk.
+
+Internally kryptos uses mlock/munlock POSIX functions. As you may know, it is better to allocate blocks having a size multiple
+of the page size. If you do not know nothing about mlock/unlock, please, read the related man page.
+
+When you call ``kryptos_freeseg`` the page related with the freed data will be unlocked. In this case, if you are locking
+two addresses that fit into the same page, one of them will be available for swaps after the first ``kryptos_freeseg``. The
+better approach is hold all locked data into a huge sensible area or only free locked areas at the same time.
+
+By default, any allocated memory by ``kryptos_newseg`` is able to be swapped. In order to disable the RAM swap avoidance call
+the function ``kryptos_allow_ram_swap()``.
+
+Until now no RAM swap avoidance approach is available for Windows.
+
 ## So it is enough
 
 If you have understood every single sample code presented in here, I think that you are ready for some action

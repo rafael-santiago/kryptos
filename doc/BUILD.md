@@ -55,11 +55,11 @@ MrsHudson@221B:~/src/kryptos/src# hefesto --uninstall
 ### Building the kernel mode version
 
 ``Kryptos`` has some parts designed to be used in kernel mode. Until now it supports ``FreeBSD``, ``NetBSD`` and ``Linux``. However, there is no "kernel mode" build.
-The library was written taking in consideration that the users will compile ``kryptos`` together with their own stuff (as a monolithic project).
+The library was written taking into consideration that the users will compile ``kryptos`` together with their own stuff (as a monolithic project).
 The only thing you should do is define the macro ``KRYPTOS_KERNEL_MODE`` and ``kryptos`` will "become" a kernel mode stuff.
 
 You should use some features with care. Personally I find that execute some features in kernel mode is overkill. You should do only the
-most "straightforward" cryptographic stuff in kernel but you are free... But take my point in consideration. ;)
+most "straightforward" cryptographic stuff in kernel but you are free... But take my point into consideration. ;)
 
 ## Advanced build commands for contributors
 
