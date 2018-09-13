@@ -1421,3 +1421,39 @@ CUTE_TEST_CASE(kryptos_memcmp_tests)
     printf("WARN: KRYPTOS_MITIGATE_TIMING_ATTACKS is undefined, this test was skipped.\n");
 #endif
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_memory_tests)
+    char *data = NULL;
+
+    data = kryptos_newseg(1024);
+
+    CUTE_ASSERT(data != NULL);
+
+    CUTE_ASSERT(memset(data, 0, 1024) == data);
+
+    data = kryptos_realloc(data, 8192);
+
+    CUTE_ASSERT(data != NULL);
+
+    CUTE_ASSERT(memset(data, 0, 8192) == data);
+
+    kryptos_freeseg(data, 8192);
+
+    kryptos_avoid_ram_swap();
+
+    data = kryptos_newseg(1024);
+
+    CUTE_ASSERT(data != NULL);
+
+    CUTE_ASSERT(memset(data, 0, 1024) == data);
+
+    data = kryptos_realloc(data, 8192);
+
+    CUTE_ASSERT(data != NULL);
+
+    CUTE_ASSERT(memset(data, 0, 8192) == data);
+
+    kryptos_freeseg(data, 8192);
+
+    kryptos_allow_ram_swap();
+CUTE_TEST_CASE_END

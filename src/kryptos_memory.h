@@ -24,6 +24,11 @@ void *kryptos_realloc(void *addr, const size_t ssize);
 
 void kryptos_freeseg(void *seg, const size_t ssize);
 
+#if defined(KRYPTOS_USER_MODE)
+ void kryptos_avoid_ram_swap(void);
+ void kryptos_allow_ram_swap(void);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
