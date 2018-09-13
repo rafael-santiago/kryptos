@@ -40,11 +40,15 @@ static int g_kryptos_memory_avoid_ram_swap = 0;
 #if defined(KRYPTOS_USER_MODE)
 
 void kryptos_avoid_ram_swap(void) {
+#ifndef _WIN32
     g_kryptos_memory_avoid_ram_swap = 1;
+#endif
 }
 
 void kryptos_allow_ram_swap(void) {
+#ifndef _WIN32
     g_kryptos_memory_avoid_ram_swap = 0;
+#endif
 }
 
 #endif
