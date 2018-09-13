@@ -1425,35 +1425,35 @@ CUTE_TEST_CASE_END
 CUTE_TEST_CASE(kryptos_memory_tests)
     char *data = NULL;
 
-    data = kryptos_newseg(1024);
+    data = kryptos_newseg(102);
 
     CUTE_ASSERT(data != NULL);
 
-    CUTE_ASSERT(memset(data, 0, 1024) == data);
+    CUTE_ASSERT(memset(data, 0, 102) == data);
 
-    data = kryptos_realloc(data, 8192);
+    data = kryptos_realloc(data, 819);
 
     CUTE_ASSERT(data != NULL);
 
-    CUTE_ASSERT(memset(data, 0, 8192) == data);
+    CUTE_ASSERT(memset(data, 0, 819) == data);
 
-    kryptos_freeseg(data, 8192);
+    kryptos_freeseg(data, 819);
 
     kryptos_avoid_ram_swap();
 
-    data = kryptos_newseg(1024);
+    data = kryptos_newseg(102);
 
     CUTE_ASSERT(data != NULL);
 
-    CUTE_ASSERT(memset(data, 0, 1024) == data);
+    CUTE_ASSERT(memset(data, 0, 102) == data);
 
-    data = kryptos_realloc(data, 8192);
+    data = kryptos_realloc(data, 819);
 
     CUTE_ASSERT(data != NULL);
 
-    CUTE_ASSERT(memset(data, 0, 8192) == data);
+    CUTE_ASSERT(memset(data, 0, 819) == data);
 
-    kryptos_freeseg(data, 8192);
+    kryptos_freeseg(data, 819);
 
     kryptos_allow_ram_swap();
 CUTE_TEST_CASE_END

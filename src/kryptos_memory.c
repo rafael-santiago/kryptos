@@ -6,8 +6,11 @@
  *
  */
 #include <kryptos_memory.h>
-#if defined(KRYPTOS_USER_NAME) && defined(__linux__)
+#if defined(KRYPTOS_USER_MODE) && !defined(_WIN32)
 # include <sys/mman.h>
+# if !defined(__linux__)
+#  include <unistd.h>
+# endif
 #endif
 
 #if defined(KRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY_FREAK_PARANOID_PERSON)
@@ -49,6 +52,9 @@ void kryptos_allow_ram_swap(void) {
 void *kryptos_newseg(const size_t ssize) {
     void *segment;
 #ifdef KRYPTOS_USER_MODE
+# if !defined(_WIN32)
+    size_t offset = 0;
+# endif
     segment = malloc(ssize);
     if (segment == NULL) {
         printf("kryptos panic: no memory!\n");
@@ -64,11 +70,12 @@ void *kryptos_newseg(const size_t ssize) {
 
 #if defined(KRYPTOS_USER_MODE) && !defined(_WIN32)
 
-    if (g_kryptos_memory_avoid_ram_swap) {
-#if !defined(__linux__)
+    if (g_kryptos_memory_avoid_ram_swap && segment != NULL) {
+#if !defined(__linux__) && !defined(_WIN32)
         //INFO(Rafael): The lock address must be page aligned.
+        offset = (size_t)segment % sysconf(_SC_PAGE_SIZE);
 #endif
-        if (mlock(segment, ssize) != 0) {
+        if (mlock(segment - offset, ssize + offset) != 0) {
             perror("libkryptos/mlock()");
             // INFO(Rafael): If we cannot ensure the swap avoidance it is better to return a NULL segment.
             kryptos_freeseg(segment, ssize);
@@ -85,6 +92,9 @@ void kryptos_freeseg(void *seg, const size_t ssize) {
 #if defined(KRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY_FREAK_PARANOID_PERSON)
     kryptos_u8_t *bp, *bp_end;
     size_t n;
+#endif
+#if defined(KRYPTOS_USER_MODE) && !defined(_WIN32)
+    size_t offset = 0;
 #endif
     if (seg != NULL) {
         if (ssize > 0) {
@@ -110,8 +120,9 @@ void kryptos_freeseg(void *seg, const size_t ssize) {
         }
 
 #if defined(KRYPTOS_USER_MODE) && !defined(_WIN32)
+    offset = (size_t)seg % sysconf(_SC_PAGE_SIZE);
     if (g_kryptos_memory_avoid_ram_swap && ssize > 0) {
-        munlock(seg, ssize);
+        munlock(seg - offset, ssize + offset);
     }
 #endif
 
@@ -132,7 +143,7 @@ void *kryptos_realloc(void *addr, const size_t ssize) {
 # else
     void *new_area = realloc(addr, ssize);
     if (g_kryptos_memory_avoid_ram_swap) {
-#  if !defined(__linux__)
+#  if !defined(__linux__) && !defined(__FreeBSD__)
         //INFO(Rafael): The lock address must be page aligned.
 #  endif
         if (mlock(new_area, ssize) != 0) {
