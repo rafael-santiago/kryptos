@@ -44,7 +44,7 @@ void kryptos_hmac(kryptos_task_ctx **ktask,
         return;
     }
 
-    if ((*ktask)->key == NULL || (*ktask)->key_size == 0) {
+    if ((*ktask)->key == NULL) {
         (*ktask)->result = kKryptosHMACError;
         (*ktask)->result_verbose = "Null key.";
         return;

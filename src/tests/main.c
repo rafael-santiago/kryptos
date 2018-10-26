@@ -141,8 +141,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     // INFO(Rafael): KDF stuff.
 
-    //CUTE_RUN_TEST(kryptos_do_hkdf_tests);
-    //CUTE_RUN_TEST(kryptos_hkdf_macro_tests);
+    CUTE_RUN_TEST(kryptos_do_hkdf_tests);
+    CUTE_RUN_TEST(kryptos_hkdf_macro_tests);
 
     // INFO(Rafael): Encoding stuff.
     CUTE_RUN_TEST(kryptos_base64_tests);
