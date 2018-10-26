@@ -22,6 +22,7 @@
 #include <dsl_tests.h>
 #include <encoding_tests.h>
 #include <hash_tests.h>
+#include <kdf_tests.h>
 #include <mp_tests.h>
 #include <symmetric_ciphers_tests.h>
 #include <asymmetric_ciphers_tests.h>
@@ -59,6 +60,9 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_hash_tests);
     KUTE_RUN_TEST(kryptos_hmac_basic_tests);
     KUTE_RUN_TEST(kryptos_hmac_tests);
+
+    KUTE_RUN_TEST(kryptos_do_hkdf_tests);
+    KUTE_RUN_TEST(kryptos_hkdf_macro_tests);
 
     KUTE_RUN_TEST(kryptos_mp_new_value_tests);
     KUTE_RUN_TEST(kryptos_mp_hex_value_as_mp_tests);
