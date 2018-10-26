@@ -374,7 +374,7 @@ CUTE_TEST_CASE(kryptos_hmac_basic_tests)
                            "\x6b\x56\xd0\x37\xe0\x5f\x25\x98\xbd\x0f\xd2\x21\x5d\x6a\x1e\x52"
                            "\x95\xe6\x4f\x73\xf6\x3f\x0a\xec\x8b\x91\x5a\x98\x5d\x78\x65\x98", 64)
     };
-    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), t, o;
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;
     kryptos_task_ctx task, *ktask = &task;
 
     for (t = 0; t < test_vector_nr; t++) {

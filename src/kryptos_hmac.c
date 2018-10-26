@@ -165,7 +165,7 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
     //
 
     kryptos_u8_t *k_xor_ipad = NULL, *k_xor_opad = NULL, *kp = NULL, *kp_end = NULL, *lkey = NULL;
-    size_t hash_input_size = 0, hash_size = 0, k_xor_size = 0, lkey_size;
+    size_t hash_input_size = 0, hash_size = 0, k_xor_size = 0, lkey_size = 0;
     kryptos_task_ctx iktask, oktask;
     kryptos_u8_t *temp_data = NULL;
     size_t temp_size = 0;

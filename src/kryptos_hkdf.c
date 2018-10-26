@@ -25,7 +25,7 @@ kryptos_u8_t *kryptos_do_hkdf(kryptos_u8_t *ikm,
     kryptos_hash_size_func lh_size = (h_size == NULL) ? kryptos_sha256_hash_size : h_size;
     kryptos_u8_t sfx, *T = NULL;
     kryptos_u8_t *okm = NULL, *okm_h, *okm_t;
-    size_t okm_size = 0, T_size;
+    size_t T_size;
     kryptos_task_ctx t, *ktask = &t;
 
     kryptos_task_init_as_null(ktask);
