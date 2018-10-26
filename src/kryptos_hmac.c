@@ -164,13 +164,12 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
     //                our new x and so the out_size will be the new x_size.
     //
 
-    kryptos_u8_t *k_xor_ipad = NULL, *k_xor_opad = NULL, *kp = NULL, *kp_end = NULL;
-    size_t hash_input_size = 0, hash_size = 0, input_key_delta = 0, k_xor_size = 0;
+    kryptos_u8_t *k_xor_ipad = NULL, *k_xor_opad = NULL, *kp = NULL, *kp_end = NULL, *lkey = NULL;
+    size_t hash_input_size = 0, hash_size = 0, k_xor_size = 0, lkey_size;
     kryptos_task_ctx iktask, oktask;
     kryptos_u8_t *temp_data = NULL;
     size_t temp_size = 0;
     kryptos_u8_t *out = NULL;
-    ssize_t delta;
 
     // INFO(Rafael): Boring necessary check code.
 
@@ -198,10 +197,29 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
     hash_input_size = h_input_size();
     hash_size = h_size();
 
-    delta = hash_input_size - key_size;
+    iktask.mirror_p = &iktask;
+    oktask.mirror_p = &oktask;
 
-    if (delta > 0) {
-        input_key_delta = delta;
+    if (key_size > hash_input_size) {
+        // INFO(Rafael): If the key size is greater than the hash block size, we need hash it
+        //               and consider its hash result as the effective HMAC key.
+        iktask.in = (kryptos_u8_t *)key;
+        iktask.in_size = key_size;
+
+        h(&iktask.mirror_p, 0);
+
+        if (!kryptos_last_task_succeed(&iktask)) {
+            *result = kKryptosHMACError;
+            *result_verbose = iktask.result_verbose;
+            goto kryptos_hmac_gen_epilogue;
+        }
+
+        lkey = iktask.out;
+        lkey_size = iktask.out_size;
+        iktask.out = NULL;
+    } else {
+        lkey = (kryptos_u8_t *)key;
+        lkey_size = key_size;
     }
 
     k_xor_size = hash_input_size;
@@ -222,17 +240,11 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
 
     // INFO(Rafael): Key padding (inner, outter).
 
-    if (delta > 0) {
-        delta = key_size;
-    } else {
-        delta = k_xor_size;
-    }
-
     memset(k_xor_ipad, 0, k_xor_size);
-    memcpy(k_xor_ipad + input_key_delta, key, delta);
+    memcpy(k_xor_ipad, lkey, lkey_size);
 
     memset(k_xor_opad, 0, k_xor_size);
-    memcpy(k_xor_opad + input_key_delta, key, delta);
+    memcpy(k_xor_opad, lkey, lkey_size);
 
     // INFO(Rafael): Key xoring (inner, outter).
 
@@ -251,9 +263,6 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
         *kp = *kp ^ KRYPTOS_HMAC_OPAD;
         kp++;
     }
-
-    iktask.mirror_p = &iktask;
-    oktask.mirror_p = &oktask;
 
     // INFO(Rafael): Evaluating h((k+ ^ ipad)||x).
 
@@ -336,6 +345,12 @@ kryptos_hmac_gen_epilogue:
         k_xor_opad = NULL;
     }
 
+    if (lkey != key) {
+        kryptos_freeseg(lkey, lkey_size);
+        lkey = NULL;
+        lkey_size = 0;
+    }
+
     kryptos_task_free(&iktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
     kryptos_task_init_as_null(&iktask);
     kryptos_task_free(&oktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
@@ -346,9 +361,7 @@ kryptos_hmac_gen_epilogue:
         temp_size = 0;
     }
 
-    input_key_delta = hash_input_size = hash_size = k_xor_size = 0;
-
-    delta = 0;
+    hash_input_size = hash_size = k_xor_size = 0;
 
     return out;
 }

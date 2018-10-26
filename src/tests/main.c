@@ -11,6 +11,7 @@
 #include "dsl_tests.h"
 #include "symmetric_ciphers_tests.h"
 #include "hash_tests.h"
+#include "kdf_tests.h"
 #include "encoding_tests.h"
 #include "mp_tests.h"
 #include "asymmetric_ciphers_tests.h"
@@ -135,7 +136,13 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     //  -=-=-=-=-=-=- New block ciphers/hash functions should be added to HMAC tests. -=-=-=-=-=-=-=-
 
     // INFO(Rafael): HMAC tests.
+    CUTE_RUN_TEST(kryptos_hmac_basic_tests);
     CUTE_RUN_TEST(kryptos_hmac_tests);
+
+    // INFO(Rafael): KDF stuff.
+
+    //CUTE_RUN_TEST(kryptos_do_hkdf_tests);
+    //CUTE_RUN_TEST(kryptos_hkdf_macro_tests);
 
     // INFO(Rafael): Encoding stuff.
     CUTE_RUN_TEST(kryptos_base64_tests);
