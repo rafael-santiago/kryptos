@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
         temp[temp_size--] = 0;
     }
 
-    key = kryptos_hkdf(temp, temp_size, sha3_256, "", 0, "", 0, 16);
+    key = kryptos_hkdf(temp, temp_size, sha3_256, "salt", 4, "info", 4, 16);
 
     if (key != NULL) {
         kp = key;
