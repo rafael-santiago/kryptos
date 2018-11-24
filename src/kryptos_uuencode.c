@@ -46,8 +46,9 @@ kryptos_u8_t *kryptos_uuencode_encode_buffer(const kryptos_u8_t *buffer, const s
         return NULL;
     }
 
-    *out_size = (buffer_size * 8) / 6;
-    *out_size += *out_size / KRYPTOS_UUENCODE_BYTES_PER_LINE + (*out_size % KRYPTOS_UUENCODE_BYTES_PER_LINE != 0) + 4;
+    //*out_size = (buffer_size * 8) / 6;
+    //*out_size += *out_size / KRYPTOS_UUENCODE_BYTES_PER_LINE + (*out_size % KRYPTOS_UUENCODE_BYTES_PER_LINE != 0) + 4;
+    *out_size = (buffer_size << 3) << 1;
 
     out = (kryptos_u8_t *) kryptos_newseg(*out_size + KRYPTOS_UUENCODE_BYTES_PER_LINE);
     if (out == NULL) {
@@ -126,7 +127,7 @@ kryptos_u8_t *kryptos_uuencode_encode_buffer(const kryptos_u8_t *buffer, const s
     cp = cp_end = out_p = NULL;
     memset(curr_line, 0, sizeof(curr_line));
 
-    return out;
+    return kryptos_realloc(out, *out_size);
 }
 
 static kryptos_u8_t *kryptos_uuencode_decode_buffer(const kryptos_u8_t *buffer, const size_t buffer_size, size_t *out_size) {
