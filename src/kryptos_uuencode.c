@@ -48,7 +48,7 @@ kryptos_u8_t *kryptos_uuencode_encode_buffer(const kryptos_u8_t *buffer, const s
 
     //*out_size = (buffer_size * 8) / 6;
     //*out_size += *out_size / KRYPTOS_UUENCODE_BYTES_PER_LINE + (*out_size % KRYPTOS_UUENCODE_BYTES_PER_LINE != 0) + 4;
-    *out_size = (buffer_size << 3) << 1;
+    *out_size = buffer_size << 4;
 
     out = (kryptos_u8_t *) kryptos_newseg(*out_size + KRYPTOS_UUENCODE_BYTES_PER_LINE);
     if (out == NULL) {
