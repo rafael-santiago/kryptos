@@ -49,8 +49,8 @@ void kryptos_gcm_gf_mul(const kryptos_u32_t *x, const kryptos_u32_t *y, kryptos_
 
     v[0] = v[1] = v[2] = v[3] =
     t[0] = t[1] = t[2] = t[3] = 0;
-}
 
 #undef kryptos_gcm_lsh128
 
 #undef kryptos_gcm_rsh128
+}
