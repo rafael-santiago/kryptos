@@ -14,9 +14,9 @@ struct gcm_ghash_block_ctx {
     kryptos_u32_t u32[4];
 };
 
-static void kryptos_gcm_ghash(const kryptos_u8_t *h,
-                              const kryptos_u8_t *a, const size_t a_size,
-                              const kryptos_u8_t *c, const size_t c_size, kryptos_u8_t *y);
+static int kryptos_gcm_ghash(const kryptos_u8_t *h,
+                             const kryptos_u8_t *a, const size_t a_size,
+                             const kryptos_u8_t *c, const size_t c_size, kryptos_u8_t *y);
 
 void kryptos_gcm_gf_mul(const kryptos_u32_t *x, const kryptos_u32_t *y, kryptos_u32_t *z) {
     kryptos_u32_t v[4], t[4];
@@ -65,15 +65,16 @@ void kryptos_gcm_gf_mul(const kryptos_u32_t *x, const kryptos_u32_t *y, kryptos_
 #undef kryptos_gcm_rsh128
 }
 
-static void kryptos_gcm_ghash(const kryptos_u8_t *h,
-                              const kryptos_u8_t *a, const size_t a_size,
-                              const kryptos_u8_t *c, const size_t c_size, kryptos_u8_t *y) {
+static int kryptos_gcm_ghash(const kryptos_u8_t *h,
+                             const kryptos_u8_t *a, const size_t a_size,
+                             const kryptos_u8_t *c, const size_t c_size, kryptos_u8_t *y) {
     kryptos_u32_t H[4];
     kryptos_u64_t l[2];
     size_t block_nr, b, offset;
     struct gcm_ghash_block_ctx *X = NULL, *A = NULL, *C = NULL, L;
-
-    y = NULL;
+    kryptos_u8_t *temp = NULL;
+    size_t temp_size;
+    int no_error = 0;
 
     H[0] = kryptos_get_u32_as_big_endian(h, 16);
     H[1] = kryptos_get_u32_as_big_endian(h +  4, 12);
@@ -116,25 +117,56 @@ static void kryptos_gcm_ghash(const kryptos_u8_t *h,
         goto kryptos_gcm_ghash_epilogue;
     }
 
-    A = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * a_size);
+    temp_size = a_size;
+
+    while ((temp_size % 4)) {
+        temp_size++;
+    }
+
+    if ((temp = (kryptos_u8_t *) kryptos_newseg(temp_size)) == NULL) {
+        goto kryptos_gcm_ghash_epilogue;
+    }
+
+    memset(temp, 0, temp_size);
+    memcpy(temp, a, a_size);
+
+    A = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * temp_size);
 
     if (A == NULL) {
         goto kryptos_gcm_ghash_epilogue;
     }
 
-    memset(A, 0, sizeof(struct gcm_ghash_block_ctx) * a_size);
+    memset(A, 0, sizeof(struct gcm_ghash_block_ctx) * temp_size);
 
-    GCM_GHASH_LD_BYTES(A, a, a_size, offset, b)
+    GCM_GHASH_LD_BYTES(A, temp, temp_size, offset, b)
 
-    C = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * c_size);
+    kryptos_freeseg(temp, temp_size);
+
+    temp_size = c_size;
+
+    while ((temp_size % 4)) {
+        temp_size++;
+    }
+
+    if ((temp = (kryptos_u8_t *) kryptos_newseg(temp_size)) == NULL) {
+        goto kryptos_gcm_ghash_epilogue;
+    }
+
+    memset(temp, 0, temp_size);
+    memcpy(temp, c, c_size);
+
+    C = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * temp_size);
 
     if (C == NULL) {
         goto kryptos_gcm_ghash_epilogue;
     }
 
-    memset(C, 0, sizeof(struct gcm_ghash_block_ctx) * c_size);
+    memset(C, 0, sizeof(struct gcm_ghash_block_ctx) * temp_size);
 
-    GCM_GHASH_LD_BYTES(C, c, c_size, offset, b)
+    GCM_GHASH_LD_BYTES(C, temp, temp_size, offset, b)
+
+    kryptos_freeseg(temp, temp_size);
+    temp = NULL;
 
     GCM_GHASH_WORD(X, 0, 0) = GCM_GHASH_WORD(X, 0, 1) = GCM_GHASH_WORD(X, 0, 2) = GCM_GHASH_WORD(X, 0, 3) = 0;
 
@@ -183,6 +215,8 @@ static void kryptos_gcm_ghash(const kryptos_u8_t *h,
     l[0] = l[1] = 0;
     L.u32[0] = L.u32[1] = L.u32[2] = L.u32[3] = 0;
 
+    no_error = 1;
+
 #undef GCM_GHASH_BLOCK
 #undef GCM_GHASH_WORD
 #undef GCM_GHASH_LD_BYTES
@@ -197,4 +231,13 @@ kryptos_gcm_ghash_epilogue:
         kryptos_freeseg(A, sizeof(struct gcm_ghash_block_ctx) * a_size);
     }
 
+    if (c != NULL) {
+        kryptos_freeseg(C, sizeof(struct gcm_ghash_block_ctx) * c_size);
+    }
+
+    if (temp != NULL) {
+        kryptos_freeseg(temp, temp_size);
+    }
+
+    return no_error;
 }
