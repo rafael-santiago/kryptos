@@ -127,7 +127,10 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
         goto kryptos_gcm_ghash_epilogue;
     }
 
-    memset(temp, 0, temp_size);
+    if (temp_size != a_size) {
+        memset(temp, 0, temp_size);
+    }
+
     memcpy(temp, a, a_size);
 
     A = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * temp_size);
@@ -152,7 +155,10 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
         goto kryptos_gcm_ghash_epilogue;
     }
 
-    memset(temp, 0, temp_size);
+    if (temp_size != c_size) {
+        memset(temp, 0, temp_size);
+    }
+
     memcpy(temp, c, c_size);
 
     C = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * temp_size);
