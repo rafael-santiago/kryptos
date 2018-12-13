@@ -22,6 +22,12 @@ kryptos_task_result_t kryptos_gcm_auth(kryptos_u8_t **c, size_t *c_size,
                                        const kryptos_u8_t *a, const size_t a_size,
                                        kryptos_gcm_h_func h);
 
+kryptos_task_result_t kryptos_gcm_verify(kryptos_u8_t **c, size_t *c_size,
+                                         const size_t iv_size,
+                                         const kryptos_u8_t *key, const size_t key_size,
+                                         const kryptos_u8_t *a, const size_t a_size,
+                                         kryptos_gcm_h_func h);
+
 #ifdef __cplusplus
 }
 #endif

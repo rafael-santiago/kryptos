@@ -19,88 +19,73 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
                              const kryptos_u8_t *a, const size_t a_size,
                              const kryptos_u8_t *c, const size_t c_size, kryptos_u8_t *y);
 
+static kryptos_task_result_t kryptos_gcm_tag(kryptos_u8_t *c, const size_t c_size,
+                                             const size_t iv_size,
+                                             const kryptos_u8_t *key, const size_t key_size,
+                                             const kryptos_u8_t *a, const size_t a_size,
+                                             kryptos_gcm_h_func h, kryptos_u8_t *tag);
+
 kryptos_task_result_t kryptos_gcm_auth(kryptos_u8_t **c, size_t *c_size,
                                        const size_t iv_size,
                                        const kryptos_u8_t *key, const size_t key_size,
                                        const kryptos_u8_t *a, const size_t a_size,
                                        kryptos_gcm_h_func h) {
-    kryptos_u8_t *H = NULL, *Y0 = NULL, *C = *c, *T = NULL, *tp, *tp_end, *hp, *hp_end;
-    kryptos_task_result_t result = kKryptosProcessError;
-    size_t H_size, Y_size;
+    kryptos_u8_t tag[16];
+    kryptos_task_result_t result;
+    kryptos_u8_t *nc;
 
-    // INFO(Rafael): 'H = E(K, 0^{128})'.
-
-    if (h == NULL || h(&H, &H_size, (kryptos_u8_t *)key, key_size) != kKryptosSuccess) {
-        goto kryptos_gcm_auth_epilogue;
-    }
-
-    // INFO(Rafael): 'Y_0 = IV||0^{31}1'. If len(IV) = 96, otherwise
-    //               'Y_0 = GHASH(H, {}, IV)'.
-
-    if (iv_size != 12) {
-        if (kryptos_gcm_ghash(H, NULL, 0, *c, 16, Y0) == 0) {
+    if ((result = kryptos_gcm_tag(*c, *c_size, iv_size, key, key_size, a, a_size, h, tag)) == kKryptosSuccess) {
+        if ((nc = (kryptos_u8_t *) kryptos_newseg(*c_size + 16)) == NULL) {
+            result = kKryptosProcessError;
             goto kryptos_gcm_auth_epilogue;
         }
-    } else {
-        // WARN(Rafael): By design iv_size is always equals to 16. So this code, until now, will never be hit.
-        if ((Y0 = (kryptos_u8_t *) kryptos_newseg(16)) == NULL) {
-            goto kryptos_gcm_auth_epilogue;
-        }
-        memcpy(Y0, *c, 12);
-        Y0[12] = Y0[13] = Y0[14] = 0x00;
-        Y0[15] = 0x01;
+        memcpy(nc, tag, 16);
+        memcpy(nc + 16, *c, *c_size);
+        kryptos_freeseg(*c, *c_size);
+        *c = nc;
+        *c_size += 16;
     }
-
-    // INFO(Rafael): 'T = MSB_t(GHASH(H, A, C) ^ E(K, Y_0))'. Here we will assume t equals to 128.
-
-    if (kryptos_gcm_ghash(H, a, a_size + 16, C, *c_size - 16, T) == 0) {
-        goto kryptos_gcm_auth_epilogue;
-    }
-
-    Y_size = 16;
-
-    if (h(&Y0, &Y_size, (kryptos_u8_t *)key, key_size) != kKryptosSuccess) {
-        goto kryptos_gcm_auth_epilogue;
-    }
-
-    tp = T;
-    tp_end = T + 16;
-    hp = H;
-    hp_end = H + H_size;
-
-    while (tp != tp_end && hp != hp_end) {
-        *tp = *tp ^ *hp;
-        tp++;
-        hp++;
-    }
-
-    if ((C = (kryptos_u8_t *) kryptos_newseg(*c_size + 16)) == NULL) {
-        goto kryptos_gcm_auth_epilogue;
-    }
-
-    // INFO(Rafael): GCM is done. Now all we should do is append tag and cryptogram.
-
-    memcpy(C, T, 16);
-    memcpy(C + 16, *c, *c_size);
-    kryptos_freeseg(*c, *c_size);
-    *c = C;
-    *c_size += 16;
-
-    result = kKryptosSuccess;
 
 kryptos_gcm_auth_epilogue:
 
-    if (H != NULL) {
-        kryptos_freeseg(H, H_size);
-    }
-
-    if (Y0 != NULL) {
-        kryptos_freeseg(Y0, 16);
-    }
+    memset(tag, 0, sizeof(tag));
 
     return result;
 }
 
+kryptos_task_result_t kryptos_gcm_verify(kryptos_u8_t **c, size_t *c_size,
+                                         const size_t iv_size,
+                                         const kryptos_u8_t *key, const size_t key_size,
+                                         const kryptos_u8_t *a, const size_t a_size,
+                                         kryptos_gcm_h_func h) {
+    kryptos_task_result_t result = kKryptosProcessError;
+    kryptos_u8_t tag[16];
+    kryptos_u8_t *nc;
+
+    if (*c_size >= 16 &&
+        (result = kryptos_gcm_tag(*c + 16, *c_size - 16, iv_size, key, key_size, a, a_size, h, tag)) == kKryptosSuccess) {
+        if (memcmp(tag, *c, 16) != 0) {
+            result = kKryptosProcessError;
+            goto kryptos_gcm_verify_epilogue;
+        }
+
+        if ((nc = (kryptos_u8_t *) kryptos_newseg(*c_size - 16)) == NULL) {
+            result = kKryptosProcessError;
+            goto kryptos_gcm_verify_epilogue;
+        }
+
+        memcpy(nc, *c, *c_size - 16);
+        kryptos_freeseg(*c, *c_size);
+        *c = nc;
+        *c_size -= 16;
+    }
+
+kryptos_gcm_verify_epilogue:
+
+    memset(tag, 0, sizeof(tag));
+
+    return result;
+}
 
 void kryptos_gcm_gf_mul(const kryptos_u32_t *x, const kryptos_u32_t *y, kryptos_u32_t *z) {
     kryptos_u32_t v[4], t[4];
@@ -147,6 +132,76 @@ void kryptos_gcm_gf_mul(const kryptos_u32_t *x, const kryptos_u32_t *y, kryptos_
 #undef kryptos_gcm_lsh128
 
 #undef kryptos_gcm_rsh128
+}
+
+static kryptos_task_result_t kryptos_gcm_tag(kryptos_u8_t *c, const size_t c_size,
+                                             const size_t iv_size,
+                                             const kryptos_u8_t *key, const size_t key_size,
+                                             const kryptos_u8_t *a, const size_t a_size,
+                                             kryptos_gcm_h_func h, kryptos_u8_t *tag) {
+    kryptos_u8_t *H = NULL, *Y0 = NULL, *tp, *tp_end, *hp, *hp_end;
+    kryptos_task_result_t result = kKryptosProcessError;
+    size_t H_size, Y_size;
+
+    // INFO(Rafael): 'H = E(K, 0^{128})'.
+
+    if (h == NULL || h(&H, &H_size, (kryptos_u8_t *)key, key_size) != kKryptosSuccess) {
+        goto kryptos_gcm_tag_epilogue;
+    }
+
+    // INFO(Rafael): 'Y_0 = IV||0^{31}1'. If len(IV) = 96, otherwise
+    //               'Y_0 = GHASH(H, {}, IV)'.
+
+    if (iv_size != 12) {
+        if (kryptos_gcm_ghash(H, NULL, 0, c, 16, Y0) == 0) {
+            goto kryptos_gcm_tag_epilogue;
+        }
+    } else {
+        // WARN(Rafael): By design iv_size is always equals to 16. So this code, until now, will never be hit.
+        if ((Y0 = (kryptos_u8_t *) kryptos_newseg(16)) == NULL) {
+            goto kryptos_gcm_tag_epilogue;
+        }
+        memcpy(Y0, c, 12);
+        Y0[12] = Y0[13] = Y0[14] = 0x00;
+        Y0[15] = 0x01;
+    }
+
+    // INFO(Rafael): 'T = MSB_t(GHASH(H, A, C) ^ E(K, Y_0))'. Here we will assume t equals to 128.
+
+    if (kryptos_gcm_ghash(H, a, a_size + 16, c, c_size - 16, tag) == 0) {
+        goto kryptos_gcm_tag_epilogue;
+    }
+
+    Y_size = 16;
+
+    if (h(&Y0, &Y_size, (kryptos_u8_t *)key, key_size) != kKryptosSuccess) {
+        goto kryptos_gcm_tag_epilogue;
+    }
+
+    tp = tag;
+    tp_end = tag + 16;
+    hp = H;
+    hp_end = H + H_size;
+
+    while (tp != tp_end && hp != hp_end) {
+        *tp = *tp ^ *hp;
+        tp++;
+        hp++;
+    }
+
+    result = kKryptosSuccess;
+
+kryptos_gcm_tag_epilogue:
+
+    if (H != NULL) {
+        kryptos_freeseg(H, H_size);
+    }
+
+    if (Y0 != NULL) {
+        kryptos_freeseg(Y0, 16);
+    }
+
+    return result;
 }
 
 static int kryptos_gcm_ghash(const kryptos_u8_t *h,
