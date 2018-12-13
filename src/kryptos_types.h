@@ -251,6 +251,8 @@ typedef void (*kryptos_hash_func)(kryptos_task_ctx **ktask, const int to_hex);
 
 typedef size_t (*kryptos_hash_size_func)(void);
 
+typedef kryptos_task_result_t (*kryptos_gcm_h_func)(kryptos_u8_t **h, size_t *h_size, kryptos_u8_t *key, size_t key_size);
+
 // WARN(Rafael): When this macro is undefined the multiprecision operations will become slower, since the radix base 2^8 will
 //               be used. Anyway, if you want to use kryptos in a 8-bit processor, undefine the following macro
 //               is the starting point.

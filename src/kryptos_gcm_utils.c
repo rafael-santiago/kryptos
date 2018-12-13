@@ -8,6 +8,7 @@
 #include <kryptos_gcm_utils.h>
 #include <kryptos_endianness_utils.h>
 #include <kryptos_memory.h>
+#include <kryptos.h>
 #include <string.h>
 
 struct gcm_ghash_block_ctx {
@@ -17,6 +18,89 @@ struct gcm_ghash_block_ctx {
 static int kryptos_gcm_ghash(const kryptos_u8_t *h,
                              const kryptos_u8_t *a, const size_t a_size,
                              const kryptos_u8_t *c, const size_t c_size, kryptos_u8_t *y);
+
+kryptos_task_result_t kryptos_gcm_auth(kryptos_u8_t **c, size_t *c_size,
+                                       const size_t iv_size,
+                                       const kryptos_u8_t *key, const size_t key_size,
+                                       const kryptos_u8_t *a, const size_t a_size,
+                                       kryptos_gcm_h_func h) {
+    kryptos_u8_t *H = NULL, *Y0 = NULL, *C = *c, *T = NULL, *tp, *tp_end, *hp, *hp_end;
+    kryptos_task_result_t result = kKryptosProcessError;
+    size_t H_size, Y_size;
+
+    // INFO(Rafael): 'H = E(K, 0^{128})'.
+
+    if (h == NULL || h(&H, &H_size, (kryptos_u8_t *)key, key_size) != kKryptosSuccess) {
+        goto kryptos_gcm_auth_epilogue;
+    }
+
+    // INFO(Rafael): 'Y_0 = IV||0^{31}1'. If len(IV) = 96, otherwise
+    //               'Y_0 = GHASH(H, {}, IV)'.
+
+    if (iv_size != 12) {
+        if (kryptos_gcm_ghash(H, NULL, 0, *c, 16, Y0) == 0) {
+            goto kryptos_gcm_auth_epilogue;
+        }
+    } else {
+        // WARN(Rafael): By design iv_size is always equals to 16. So this code, until now, will never be hit.
+        if ((Y0 = (kryptos_u8_t *) kryptos_newseg(16)) == NULL) {
+            goto kryptos_gcm_auth_epilogue;
+        }
+        memcpy(Y0, *c, 12);
+        Y0[12] = Y0[13] = Y0[14] = 0x00;
+        Y0[15] = 0x01;
+    }
+
+    // INFO(Rafael): 'T = MSB_t(GHASH(H, A, C) ^ E(K, Y_0))'. Here we will assume t equals to 128.
+
+    if (kryptos_gcm_ghash(H, a, a_size + 16, C, *c_size - 16, T) == 0) {
+        goto kryptos_gcm_auth_epilogue;
+    }
+
+    Y_size = 16;
+
+    if (h(&Y0, &Y_size, (kryptos_u8_t *)key, key_size) != kKryptosSuccess) {
+        goto kryptos_gcm_auth_epilogue;
+    }
+
+    tp = T;
+    tp_end = T + 16;
+    hp = H;
+    hp_end = H + H_size;
+
+    while (tp != tp_end && hp != hp_end) {
+        *tp = *tp ^ *hp;
+        tp++;
+        hp++;
+    }
+
+    if ((C = (kryptos_u8_t *) kryptos_newseg(*c_size + 16)) == NULL) {
+        goto kryptos_gcm_auth_epilogue;
+    }
+
+    // INFO(Rafael): GCM is done. Now all we should do is append tag and cryptogram.
+
+    memcpy(C, T, 16);
+    memcpy(C + 16, *c, *c_size);
+    kryptos_freeseg(*c, *c_size);
+    *c = C;
+    *c_size += 16;
+
+    result = kKryptosSuccess;
+
+kryptos_gcm_auth_epilogue:
+
+    if (H != NULL) {
+        kryptos_freeseg(H, H_size);
+    }
+
+    if (Y0 != NULL) {
+        kryptos_freeseg(Y0, 16);
+    }
+
+    return result;
+}
+
 
 void kryptos_gcm_gf_mul(const kryptos_u32_t *x, const kryptos_u32_t *y, kryptos_u32_t *z) {
     kryptos_u32_t v[4], t[4];
@@ -73,7 +157,7 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
     size_t block_nr, b, offset;
     struct gcm_ghash_block_ctx *X = NULL, *A = NULL, *C = NULL, L;
     kryptos_u8_t *temp = NULL;
-    size_t temp_size;
+    size_t temp_size[2] = { 0, 0 };
     int no_error = 0;
 
     H[0] = kryptos_get_u32_as_big_endian(h, 16);
@@ -111,68 +195,76 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
     }\
 }
 
+    if (a_size > 0) {
+        temp_size[0] = a_size;
+
+        while ((temp_size[0] % 4)) {
+            temp_size[0]++;
+        }
+
+        block_nr = temp_size[0];
+
+        if ((temp = (kryptos_u8_t *) kryptos_newseg(temp_size[0])) == NULL) {
+            goto kryptos_gcm_ghash_epilogue;
+        }
+
+        if (temp_size[0] != a_size) {
+            memset(temp, 0, temp_size[0]);
+        }
+
+        memcpy(temp, a, a_size);
+
+        A = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * (temp_size[0] >> 2));
+
+        if (A == NULL) {
+            goto kryptos_gcm_ghash_epilogue;
+        }
+
+        memset(A, 0, sizeof(struct gcm_ghash_block_ctx) * (temp_size[0] >> 2));
+
+        GCM_GHASH_LD_BYTES(A, temp, temp_size[0], offset, b)
+
+        kryptos_freeseg(temp, temp_size[0]);
+    }
+
+    temp_size[1] = c_size;
+
+    while ((temp_size[1] % 4)) {
+        temp_size[1]++;
+    }
+
+    if ((temp = (kryptos_u8_t *) kryptos_newseg(temp_size[1])) == NULL) {
+        goto kryptos_gcm_ghash_epilogue;
+    }
+
+    block_nr += temp_size[1];
+
+    if (temp_size[1] != c_size) {
+        memset(temp, 0, temp_size[1]);
+    }
+
+    memcpy(temp, c, c_size);
+
+    C = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * (temp_size[1] >> 4));
+
+    if (C == NULL) {
+        goto kryptos_gcm_ghash_epilogue;
+    }
+
+    memset(C, 0, sizeof(struct gcm_ghash_block_ctx) * (temp_size[1] >> 4));
+
+    GCM_GHASH_LD_BYTES(C, temp, temp_size[1], offset, b)
+
+    kryptos_freeseg(temp, temp_size[1]);
+    temp = NULL;
+
+    block_nr >>= 2;
     X = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * (block_nr + 1));
 
     if (X == NULL) {
         goto kryptos_gcm_ghash_epilogue;
     }
 
-    temp_size = a_size;
-
-    while ((temp_size % 4)) {
-        temp_size++;
-    }
-
-    if ((temp = (kryptos_u8_t *) kryptos_newseg(temp_size)) == NULL) {
-        goto kryptos_gcm_ghash_epilogue;
-    }
-
-    if (temp_size != a_size) {
-        memset(temp, 0, temp_size);
-    }
-
-    memcpy(temp, a, a_size);
-
-    A = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * temp_size);
-
-    if (A == NULL) {
-        goto kryptos_gcm_ghash_epilogue;
-    }
-
-    memset(A, 0, sizeof(struct gcm_ghash_block_ctx) * temp_size);
-
-    GCM_GHASH_LD_BYTES(A, temp, temp_size, offset, b)
-
-    kryptos_freeseg(temp, temp_size);
-
-    temp_size = c_size;
-
-    while ((temp_size % 4)) {
-        temp_size++;
-    }
-
-    if ((temp = (kryptos_u8_t *) kryptos_newseg(temp_size)) == NULL) {
-        goto kryptos_gcm_ghash_epilogue;
-    }
-
-    if (temp_size != c_size) {
-        memset(temp, 0, temp_size);
-    }
-
-    memcpy(temp, c, c_size);
-
-    C = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * temp_size);
-
-    if (C == NULL) {
-        goto kryptos_gcm_ghash_epilogue;
-    }
-
-    memset(C, 0, sizeof(struct gcm_ghash_block_ctx) * temp_size);
-
-    GCM_GHASH_LD_BYTES(C, temp, temp_size, offset, b)
-
-    kryptos_freeseg(temp, temp_size);
-    temp = NULL;
 
     GCM_GHASH_WORD(X, 0, 0) = GCM_GHASH_WORD(X, 0, 1) = GCM_GHASH_WORD(X, 0, 2) = GCM_GHASH_WORD(X, 0, 3) = 0;
 
@@ -197,8 +289,8 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
 
     // INFO(Rafael): 'X_i = (X_{m + n} ^ (len(A)||len(C))) x H'.
 
-    l[0] = (kryptos_u64_t) a_size;
-    l[1] = (kryptos_u64_t) c_size;
+    l[0] = (kryptos_u64_t) a_size << 3;
+    l[1] = (kryptos_u64_t) c_size << 3;
 
     L.u32[0] = l[0] >> 32;
     L.u32[1] = l[0] & 0xFFFFFF;
@@ -234,15 +326,15 @@ kryptos_gcm_ghash_epilogue:
     }
 
     if (A != NULL) {
-        kryptos_freeseg(A, sizeof(struct gcm_ghash_block_ctx) * a_size);
+        kryptos_freeseg(A, sizeof(struct gcm_ghash_block_ctx) * (temp[0] >> 2));
     }
 
     if (c != NULL) {
-        kryptos_freeseg(C, sizeof(struct gcm_ghash_block_ctx) * c_size);
+        kryptos_freeseg(C, sizeof(struct gcm_ghash_block_ctx) * (temp[1] >> 2));
     }
 
     if (temp != NULL) {
-        kryptos_freeseg(temp, temp_size);
+        kryptos_freeseg(temp, (temp_size[0] != 0) ? temp_size[0] : temp_size[1]);
     }
 
     return no_error;
