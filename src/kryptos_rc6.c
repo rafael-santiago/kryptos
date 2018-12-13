@@ -109,6 +109,11 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(rc6_128,
                                     outblock,
                                     rc6_block_processor(outblock, &sks))
 
+KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_GCM_E(rc6_128, key, key_size, int *rounds, ktask,
+                                       {
+                                            kryptos_rc6_128_setup(ktask, key, key_size, kKryptosECB, rounds);
+                                       })
+
 KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(rc6_192, ktask, kKryptosCipherRC6192, KRYPTOS_RC6_BLOCKSIZE, int *rounds,
                                        {
                                             if (rounds != NULL) {
@@ -155,6 +160,11 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(rc6_192,
                                     outblock,
                                     rc6_block_processor(outblock, &sks))
 
+KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_GCM_E(rc6_192, key, key_size, int *rounds, ktask,
+                                       {
+                                            kryptos_rc6_192_setup(ktask, key, key_size, kKryptosECB, rounds);
+                                       })
+
 KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_SETUP(rc6_256, ktask, kKryptosCipherRC6256, KRYPTOS_RC6_BLOCKSIZE, int *rounds,
                                        {
                                             if (rounds != NULL) {
@@ -200,6 +210,11 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(rc6_256,
                                     rc6_256_cipher_epilogue,
                                     outblock,
                                     rc6_block_processor(outblock, &sks))
+
+KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_GCM_E(rc6_256, key, key_size, int *rounds, ktask,
+                                       {
+                                            kryptos_rc6_256_setup(ktask, key, key_size, kKryptosECB, rounds);
+                                       })
 
 void kryptos_rc6_ld_user_key(kryptos_u32_t *l, const kryptos_u8_t *key, const size_t key_size) {
     const kryptos_u8_t *kp, *kp_end;

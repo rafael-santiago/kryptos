@@ -177,6 +177,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes128,
                                     outblock,
                                     aes_block_processor(outblock, &sks))
 
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(aes128)
+
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(aes192, kKryptosCipherAES192, KRYPTOS_AES_BLOCKSIZE)
 
 KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes192,
@@ -193,6 +195,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes192,
                                     outblock,
                                     aes_block_processor(outblock, &sks))
 
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(aes192)
+
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(aes256, kKryptosCipherAES256, KRYPTOS_AES_BLOCKSIZE)
 
 KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes256,
@@ -208,6 +212,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes256,
                                     aes256_cipher_epilogue,
                                     outblock,
                                     aes_block_processor(outblock, &sks))
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(aes256)
 
 static void kryptos_aes_sto_u32_into_byte_matrix(const kryptos_u32_t *word, struct kryptos_128bit_u8_matrix *u8m) {
     size_t i, j, k, c;

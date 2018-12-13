@@ -158,6 +158,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(camellia128,
                                     outblock,
                                     camellia_block_processor(outblock, &sks))
 
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(camellia128)
+
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(camellia192, kKryptosCipherCAMELLIA, KRYPTOS_CAMELLIA_BLOCKSIZE)
 
 KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(camellia192,
@@ -177,6 +179,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(camellia192,
                                     outblock,
                                     camellia_block_processor(outblock, &sks))
 
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(camellia192)
+
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(camellia256, kKryptosCipherCAMELLIA, KRYPTOS_CAMELLIA_BLOCKSIZE)
 
 KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(camellia256,
@@ -195,6 +199,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(camellia256,
                                     camellia_cipher_epilogue,
                                     outblock,
                                     camellia_block_processor(outblock, &sks))
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(camellia256)
 
 static void kryptos_camellia_roll128b(kryptos_u32_t *x, int s) {
     kryptos_u32_t t0, t1, t2, t3;

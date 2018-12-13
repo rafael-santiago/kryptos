@@ -251,7 +251,8 @@ typedef void (*kryptos_hash_func)(kryptos_task_ctx **ktask, const int to_hex);
 
 typedef size_t (*kryptos_hash_size_func)(void);
 
-typedef kryptos_task_result_t (*kryptos_gcm_h_func)(kryptos_u8_t **h, size_t *h_size, kryptos_u8_t *key, size_t key_size);
+typedef kryptos_task_result_t (*kryptos_gcm_e_func)(kryptos_u8_t **h, size_t *h_size,
+                                                    kryptos_u8_t *key, size_t key_size, void *additional_arg);
 
 // WARN(Rafael): When this macro is undefined the multiprecision operations will become slower, since the radix base 2^8 will
 //               be used. Anyway, if you want to use kryptos in a 8-bit processor, undefine the following macro
@@ -356,6 +357,91 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
 #else
 #define KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR(cipher_name) extern "C" void kryptos_## cipher_name ##_cipher(kryptos_task_ctx **);
 #endif
+
+#ifndef __cplusplus
+#define KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_GCM_E(cipher_name)\
+    kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_size,\
+                                                      kryptos_u8_t *key, size_t key_size, void *additional_arg);
+#else
+#define KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_GCM_E(cipher_name)\
+    extern "C" kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h,\
+                                                                 size_t *h_size,\
+                                                                 kryptos_u8_t *key,\
+                                                                 size_t key_size, void *additional_arg);
+
+#endif
+
+#define KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(cipher_name)\
+kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_size,\
+                                                  kryptos_u8_t *key, size_t key_size, void *additional_arg) {\
+    kryptos_task_ctx t, *ktask = &t;\
+    kryptos_task_result_t result = kKryptosProcessError;\
+    kryptos_task_init_as_null(ktask);\
+    kryptos_## cipher_name ##_setup(ktask, key, key_size, kKryptosECB);\
+    if (*h == NULL) {\
+        if ((ktask->in = (kryptos_u8_t *) kryptos_newseg(16)) == NULL) {\
+            goto kryptos_## cipher_name ##_e_epilogue;\
+        }\
+        ktask->in[ 0] = ktask->in[ 1] = ktask->in[ 2] = ktask->in[ 3] =\
+        ktask->in[ 4] = ktask->in[ 5] = ktask->in[ 6] = ktask->in[ 7] =\
+        ktask->in[ 8] = ktask->in[ 9] = ktask->in[10] = ktask->in[11] =\
+        ktask->in[12] = ktask->in[13] = ktask->in[14] = ktask->in[15] = 0;\
+        ktask->in_size = 16;\
+    } else {\
+        ktask->in = *h;\
+        ktask->in_size = *h_size;\
+    }\
+    kryptos_## cipher_name ##_cipher(&ktask);\
+    if (kryptos_last_task_succeed(ktask)) {\
+        kryptos_freeseg(*h, *h_size);\
+        *h = ktask->out;\
+        *h_size = ktask->out_size;\
+        result = kKryptosSuccess;\
+    }\
+kryptos_## cipher_name ##_e_epilogue:\
+    return result;\
+}
+
+#ifndef __cplusplus
+#define KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_GCM_E(cipher_name, additional_args...)\
+    kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_size,\
+                                                      kryptos_u8_t *key, size_t key_size, additional_args);
+#else
+#define KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_GCM_E(cipher_name, additional_args...)\
+    extern "C" kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_size,\
+                                                                 kryptos_u8_t *key, size_t key_size, additional_args);
+#endif
+
+#define KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_GCM_E(cipher_name, key, key_size, additional_arg, ktask, setup_stmt)\
+kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_size,\
+                                                  kryptos_u8_t *key, size_t key_size, additional_arg) {\
+    kryptos_task_ctx t, *ktask = &t;\
+    kryptos_task_result_t result = kKryptosProcessError;\
+    kryptos_task_init_as_null(ktask);\
+    setup_stmt;\
+    if (*h == NULL) {\
+        if ((ktask->in = (kryptos_u8_t *) kryptos_newseg(16)) == NULL) {\
+            goto kryptos_## cipher_name ##_e_epilogue;\
+        }\
+        ktask->in[ 0] = ktask->in[ 1] = ktask->in[ 2] = ktask->in[ 3] =\
+        ktask->in[ 4] = ktask->in[ 5] = ktask->in[ 6] = ktask->in[ 7] =\
+        ktask->in[ 8] = ktask->in[ 9] = ktask->in[10] = ktask->in[11] =\
+        ktask->in[12] = ktask->in[13] = ktask->in[14] = ktask->in[15] = 0;\
+        ktask->in_size = 16;\
+    } else {\
+        ktask->in = *h;\
+        ktask->in_size = *h_size;\
+    }\
+    kryptos_## cipher_name ##_cipher(&ktask);\
+    if (kryptos_last_task_succeed(ktask)) {\
+        kryptos_freeseg(*h, *h_size);\
+        *h = ktask->out;\
+        *h_size = ktask->out_size;\
+        result = kKryptosSuccess;\
+    }\
+kryptos_## cipher_name ##_e_epilogue:\
+    return result;\
+}
 
 #ifndef KRYPTOS_KERNEL_MODE
 

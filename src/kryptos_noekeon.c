@@ -111,6 +111,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(noekeon,
                                     outblock,
                                     noekeon_block_processor(outblock, &sks))
 
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(noekeon)
+
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(noekeon_d, kKryptosCipherNOEKEOND, KRYPTOS_NOEKEON_BLOCKSIZE)
 
 KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(noekeon_d,
@@ -131,6 +133,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(noekeon_d,
                                     outblock,
                                     noekeon_block_processor(outblock, &sks))
 
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(noekeon_d)
 
 static void kryptos_noekeon_key_sched(const kryptos_u8_t *key, const size_t key_size, struct kryptos_noekeon_subkeys *sks,
                                       const int indirect_key_mode) {

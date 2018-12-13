@@ -9,7 +9,9 @@
 #include <kryptos_endianness_utils.h>
 #include <kryptos_memory.h>
 #include <kryptos.h>
-#include <string.h>
+#if !defined(KRYPTOS_KERNEL_MODE)
+# include <string.h>
+#endif
 
 struct gcm_ghash_block_ctx {
     kryptos_u32_t u32[4];
@@ -23,18 +25,18 @@ static kryptos_task_result_t kryptos_gcm_tag(kryptos_u8_t *c, const size_t c_siz
                                              const size_t iv_size,
                                              const kryptos_u8_t *key, const size_t key_size,
                                              const kryptos_u8_t *a, const size_t a_size,
-                                             kryptos_gcm_h_func h, kryptos_u8_t *tag);
+                                             kryptos_gcm_e_func E, void *E_arg, kryptos_u8_t *tag);
 
 kryptos_task_result_t kryptos_gcm_auth(kryptos_u8_t **c, size_t *c_size,
                                        const size_t iv_size,
                                        const kryptos_u8_t *key, const size_t key_size,
                                        const kryptos_u8_t *a, const size_t a_size,
-                                       kryptos_gcm_h_func h) {
+                                       kryptos_gcm_e_func E, void *E_arg) {
     kryptos_u8_t tag[16];
     kryptos_task_result_t result;
     kryptos_u8_t *nc;
 
-    if ((result = kryptos_gcm_tag(*c, *c_size, iv_size, key, key_size, a, a_size, h, tag)) == kKryptosSuccess) {
+    if ((result = kryptos_gcm_tag(*c, *c_size, iv_size, key, key_size, a, a_size, E, E_arg, tag)) == kKryptosSuccess) {
         if ((nc = (kryptos_u8_t *) kryptos_newseg(*c_size + 16)) == NULL) {
             result = kKryptosProcessError;
             goto kryptos_gcm_auth_epilogue;
@@ -57,13 +59,14 @@ kryptos_task_result_t kryptos_gcm_verify(kryptos_u8_t **c, size_t *c_size,
                                          const size_t iv_size,
                                          const kryptos_u8_t *key, const size_t key_size,
                                          const kryptos_u8_t *a, const size_t a_size,
-                                         kryptos_gcm_h_func h) {
+                                         kryptos_gcm_e_func E, void *E_arg) {
     kryptos_task_result_t result = kKryptosProcessError;
     kryptos_u8_t tag[16];
     kryptos_u8_t *nc;
 
     if (*c_size >= 16 &&
-        (result = kryptos_gcm_tag(*c + 16, *c_size - 16, iv_size, key, key_size, a, a_size, h, tag)) == kKryptosSuccess) {
+        (result = kryptos_gcm_tag(*c + 16, *c_size - 16, iv_size,
+                                  key, key_size, a, a_size, E, E_arg, tag)) == kKryptosSuccess) {
         if (memcmp(tag, *c, 16) != 0) {
             result = kKryptosProcessError;
             goto kryptos_gcm_verify_epilogue;
@@ -138,14 +141,14 @@ static kryptos_task_result_t kryptos_gcm_tag(kryptos_u8_t *c, const size_t c_siz
                                              const size_t iv_size,
                                              const kryptos_u8_t *key, const size_t key_size,
                                              const kryptos_u8_t *a, const size_t a_size,
-                                             kryptos_gcm_h_func h, kryptos_u8_t *tag) {
+                                             kryptos_gcm_e_func E, void *E_arg, kryptos_u8_t *tag) {
     kryptos_u8_t *H = NULL, *Y0 = NULL, *tp, *tp_end, *hp, *hp_end;
     kryptos_task_result_t result = kKryptosProcessError;
     size_t H_size, Y_size;
 
     // INFO(Rafael): 'H = E(K, 0^{128})'.
 
-    if (h == NULL || h(&H, &H_size, (kryptos_u8_t *)key, key_size) != kKryptosSuccess) {
+    if (E == NULL || E(&H, &H_size, (kryptos_u8_t *)key, key_size, E_arg) != kKryptosSuccess) {
         goto kryptos_gcm_tag_epilogue;
     }
 
@@ -174,7 +177,7 @@ static kryptos_task_result_t kryptos_gcm_tag(kryptos_u8_t *c, const size_t c_siz
 
     Y_size = 16;
 
-    if (h(&Y0, &Y_size, (kryptos_u8_t *)key, key_size) != kKryptosSuccess) {
+    if (E(&Y0, &Y_size, (kryptos_u8_t *)key, key_size, E_arg) != kKryptosSuccess) {
         goto kryptos_gcm_tag_epilogue;
     }
 

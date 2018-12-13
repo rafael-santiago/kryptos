@@ -451,6 +451,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(serpent,
                                     outblock,
                                     serpent_block_processor(outblock, &sks))
 
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(serpent)
+
 static void kryptos_serpent_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
     size_t w, b;

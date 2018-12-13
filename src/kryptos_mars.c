@@ -165,6 +165,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(mars128,
                                     outblock,
                                     mars_block_processor(outblock, &sks))
 
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(mars128)
+
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(mars192, kKryptosCipherMARS192, KRYPTOS_MARS_BLOCKSIZE)
 
 KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(mars192,
@@ -181,6 +183,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(mars192,
                                     outblock,
                                     mars_block_processor(outblock, &sks))
 
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(mars192)
+
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(mars256, kKryptosCipherMARS256, KRYPTOS_MARS_BLOCKSIZE)
 
 KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(mars256,
@@ -196,6 +200,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(mars256,
                                     mars128_cipher_epilogue,
                                     outblock,
                                     mars_block_processor(outblock, &sks))
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(mars256)
 
 static void kryptos_mars_ld_user_key_bytes(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;
