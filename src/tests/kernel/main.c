@@ -26,6 +26,7 @@
 #include <mp_tests.h>
 #include <symmetric_ciphers_tests.h>
 #include <asymmetric_ciphers_tests.h>
+#include <bad_buf_tests.h>
 
 KUTE_DECLARE_TEST_CASE(ktest_monkey);
 
@@ -56,6 +57,8 @@ KUTE_TEST_CASE(ktest_monkey)
 
     KUTE_RUN_TEST(kryptos_ctr_mode_sequencing_tests);
     KUTE_RUN_TEST(kryptos_des_weak_keys_detection_tests);
+
+    KUTE_RUN_TEST(kryptos_bad_decryption_tests);
 
     KUTE_RUN_TEST(kryptos_hash_tests);
     KUTE_RUN_TEST(kryptos_hmac_basic_tests);

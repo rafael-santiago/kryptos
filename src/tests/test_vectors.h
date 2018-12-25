@@ -544,8 +544,6 @@ static kryptos_u8_t *hmac_test_data[] = {
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
 }
 
-//TODO(Rafael): 'kryptos_bad_buf_run_block_cipher_with_custom_setup(cipher_name, setup_stmt, ktask)'.
-
 #define kryptos_bad_buf_run_block_cipher_with_custom_setup(cipher_name,\
                                          setup_stmt_ecb, setup_stmt_cbc, setup_stmt_ofb, setup_stmt_ctr, ktask) {\
     kryptos_task_init_as_null(ktask);\
