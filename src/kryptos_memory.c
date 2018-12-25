@@ -61,8 +61,7 @@ void *kryptos_newseg(const size_t ssize) {
 # endif
     segment = malloc(ssize);
     if (segment == NULL) {
-        printf("kryptos panic: no memory!\n");
-        exit(1);
+        fprintf(stderr, "kryptos panic: no memory!\n");
     }
 #elif defined(__FreeBSD__) || defined(__NetBSD__)
     segment = malloc(ssize, M_KRYPTOS, M_NOWAIT);

@@ -15,6 +15,7 @@
 #include "encoding_tests.h"
 #include "mp_tests.h"
 #include "asymmetric_ciphers_tests.h"
+#include "bad_buf_tests.h"
 
 CUTE_TEST_CASE(kryptos_test_monkey)
     // CLUE(Rafael): Before adding a new test try to find out the best place that it fits.
@@ -92,6 +93,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     // INFO(Rafael): Operation modes (complementary tests).
 
     CUTE_RUN_TEST(kryptos_ctr_mode_sequencing_tests);
+
+    CUTE_RUN_TEST(kryptos_bad_decryption_tests);
 
     // INFO(Rafael): Hash validation (also official data).
     CUTE_RUN_TEST(kryptos_sha1_tests);

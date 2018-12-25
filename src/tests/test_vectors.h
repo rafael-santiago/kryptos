@@ -435,6 +435,227 @@ static kryptos_u8_t *hmac_test_data[] = {
     }\
 }
 
+#define kryptos_bad_buf_run_block_cipher(cipher_name, ktask) {\
+    kryptos_task_init_as_null(ktask);\
+    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in_size = 39;\
+    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosECB);\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
+    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in_size = 39;\
+    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosCBC);\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
+    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in_size = 39;\
+    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosOFB);\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
+    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in_size = 39;\
+    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosCTR);\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_IV | KRYPTOS_TASK_OUT);\
+    kryptos_task_init_as_null(ktask);\
+    ktask->in = kryptos_get_random_block(1024);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 1024;\
+    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosECB);\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+    ktask->in = kryptos_get_random_block(1024);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 1024;\
+    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosCBC);\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+    ktask->in = kryptos_get_random_block(1024);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 1024;\
+    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosOFB);\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+    ktask->in = kryptos_get_random_block(1024);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 1024;\
+    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosCTR);\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+    ktask->in = kryptos_get_random_block(3);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 3;\
+    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosECB);\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+    ktask->in = kryptos_get_random_block(3);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 3;\
+    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosCBC);\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+    ktask->in = kryptos_get_random_block(3);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 3;\
+    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosOFB);\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+    ktask->in = kryptos_get_random_block(3);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 3;\
+    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosCTR);\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+}
+
+//TODO(Rafael): 'kryptos_bad_buf_run_block_cipher_with_custom_setup(cipher_name, setup_stmt, ktask)'.
+
+#define kryptos_bad_buf_run_block_cipher_with_custom_setup(cipher_name,\
+                                         setup_stmt_ecb, setup_stmt_cbc, setup_stmt_ofb, setup_stmt_ctr, ktask) {\
+    kryptos_task_init_as_null(ktask);\
+    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in_size = 39;\
+    setup_stmt_ecb;\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
+    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in_size = 39;\
+    setup_stmt_cbc;\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
+    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in_size = 39;\
+    setup_stmt_ofb;\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
+    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in_size = 39;\
+    setup_stmt_ctr;\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_IV | KRYPTOS_TASK_OUT);\
+    kryptos_task_init_as_null(ktask);\
+    ktask->in = kryptos_get_random_block(1024);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 1024;\
+    setup_stmt_ecb;\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+    ktask->in = kryptos_get_random_block(1024);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 1024;\
+    setup_stmt_cbc;\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+    ktask->in = kryptos_get_random_block(1024);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 1024;\
+    setup_stmt_ofb;\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+    ktask->in = kryptos_get_random_block(1024);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 1024;\
+    setup_stmt_ofb;\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+    ktask->in = kryptos_get_random_block(3);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 3;\
+    setup_stmt_ecb;\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+    ktask->in = kryptos_get_random_block(3);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 3;\
+    setup_stmt_cbc;\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+    ktask->in = kryptos_get_random_block(3);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 3;\
+    setup_stmt_ofb;\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+    ktask->in = kryptos_get_random_block(3);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 3;\
+    setup_stmt_ofb;\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_ ## cipher_name  ## _cipher(&ktask);\
+    CUTE_ASSERT(ktask->out != NULL);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+}
+
 #endif
 
 #endif // KRYPTOS_TESTS_TEST_VECTORS_H
