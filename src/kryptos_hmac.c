@@ -17,7 +17,7 @@
 
 #define KRYPTOS_HMAC_OPAD 0x5C
 
-static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_size,
+static kryptos_u8_t *kryptos_hmac_gen(kryptos_u8_t *key, const size_t key_size,
                                       kryptos_u8_t *x, const size_t x_size,
                                       kryptos_hash_func h,
                                       kryptos_hash_size_func h_input_size,
@@ -153,7 +153,7 @@ static void kryptos_hmac_check(kryptos_task_ctx **ktask,
     temp_size = 0;
 }
 
-static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_size,
+static kryptos_u8_t *kryptos_hmac_gen(kryptos_u8_t *key, const size_t key_size,
                                       kryptos_u8_t *x, const size_t x_size,
                                       kryptos_hash_func h,
                                       kryptos_hash_size_func h_input_size,
@@ -203,7 +203,7 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
     if (key_size > hash_input_size) {
         // INFO(Rafael): If the key size is greater than the hash block size, we need hash it
         //               and consider its hash result as the effective HMAC key.
-        iktask.in = (kryptos_u8_t *)key;
+        iktask.in = key;
         iktask.in_size = key_size;
 
         h(&iktask.mirror_p, 0);
@@ -218,7 +218,7 @@ static kryptos_u8_t *kryptos_hmac_gen(const kryptos_u8_t *key, const size_t key_
         lkey_size = iktask.out_size;
         iktask.out = NULL;
     } else {
-        lkey = (kryptos_u8_t *)key;
+        lkey = key;
         lkey_size = key_size;
     }
 

@@ -12,4 +12,6 @@
 
 KUTE_DECLARE_TEST_CASE(kryptos_bad_decryption_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_bad_hmac_tests);
+
 #endif

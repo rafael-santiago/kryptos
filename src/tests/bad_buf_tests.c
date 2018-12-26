@@ -198,9 +198,6 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     int xtea_rounds = 72;
     int rc5_rounds = 48;
     int rc6_rounds = 90;
-    kryptos_u8_t *rabbit_iv = "abcdefghijklmnopqrstuvwxyz"
-                              "abcdefghijklmnopqrstuvwxyz"
-                              "abcdefghijkl";
     kryptos_u8_t gost_s1[16] = {
          4, 10,  9,  2, 13,  8,  0, 14,  6, 11,  1, 12,  7, 15,  5,  3
     };
