@@ -95,6 +95,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_ctr_mode_sequencing_tests);
 
     CUTE_RUN_TEST(kryptos_bad_decryption_tests);
+    CUTE_RUN_TEST(kryptos_bad_hmac_tests);
 
     // INFO(Rafael): Hash validation (also official data).
     CUTE_RUN_TEST(kryptos_sha1_tests);

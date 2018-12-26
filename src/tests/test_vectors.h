@@ -435,12 +435,48 @@ static kryptos_u8_t *hmac_test_data[] = {
     }\
 }
 
+#define kryptos_bad_buf_run_hmac(cname, hname, ktask, cipher_args...) {\
+    kryptos_task_init_as_null(ktask);\
+    ktask->out = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->out_size = 39;\
+    kryptos_task_set_decrypt_action(ktask);\
+    kryptos_run_cipher_hmac(cname, hname, ktask, cipher_args);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
+    CUTE_ASSERT(ktask->result == kKryptosHMACError);\
+    if (ktask->mode != kKryptosECB) {\
+        kryptos_task_free(ktask, KRYPTOS_TASK_IV);\
+    }\
+    ktask->in = "abc";\
+    ktask->in_size = 3;\
+    kryptos_task_set_decrypt_action(ktask);\
+    kryptos_run_cipher_hmac(cname, hname, ktask, cipher_args);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
+    CUTE_ASSERT(ktask->result == kKryptosHMACError);\
+    if (ktask->mode != kKryptosECB) {\
+        kryptos_task_free(ktask, KRYPTOS_TASK_IV);\
+    }\
+    ktask->in = kryptos_get_random_block(1024);\
+    CUTE_ASSERT(ktask->in != NULL);\
+    ktask->in_size = 1024;\
+    kryptos_task_set_decrypt_action(ktask);\
+    kryptos_run_cipher_hmac(cname, hname, ktask, cipher_args);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
+    CUTE_ASSERT(ktask->result == kKryptosHMACError);\
+    if (ktask->mode != kKryptosECB) {\
+        kryptos_task_free(ktask, KRYPTOS_TASK_IV | KRYPTOS_TASK_IN);\
+    } else {\
+        kryptos_task_free(ktask, KRYPTOS_TASK_IN);\
+    }\
+}
+
+#endif
+
 #define kryptos_bad_buf_run_block_cipher(cipher_name, ktask) {\
     kryptos_task_init_as_null(ktask);\
     ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
     ktask->in_size = 39;\
     kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosECB);\
-    kryptos_task_set_encrypt_action(&t);\
+    kryptos_task_set_encrypt_action(ktask);\
     kryptos_ ## cipher_name  ## _cipher(&ktask);\
     CUTE_ASSERT(ktask->out != NULL);\
     CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
@@ -653,7 +689,5 @@ static kryptos_u8_t *hmac_test_data[] = {
     CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
 }
-
-#endif
 
 #endif // KRYPTOS_TESTS_TEST_VECTORS_H

@@ -12,4 +12,6 @@
 
 CUTE_DECLARE_TEST_CASE(kryptos_bad_decryption_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_bad_hmac_tests);
+
 #endif
