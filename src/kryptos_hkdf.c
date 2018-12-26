@@ -13,12 +13,12 @@ kryptos_u8_t *kryptos_do_hkdf(kryptos_u8_t *ikm,
                               kryptos_hash_func h,
                               kryptos_hash_size_func h_input_size,
                               kryptos_hash_size_func h_size,
-                              const kryptos_u8_t *salt, const size_t salt_size,
+                              kryptos_u8_t *salt, const size_t salt_size,
                               const kryptos_u8_t *info, const size_t info_size,
                               const size_t intended_osize) {
     kryptos_u8_t *prk = NULL;
     size_t prk_size;
-    const kryptos_u8_t *lsalt = (salt == NULL) ? (const kryptos_u8_t *)"" : salt;
+    kryptos_u8_t *lsalt = (salt == NULL) ? (kryptos_u8_t *)"" : salt;
     size_t lsalt_size = (salt == NULL) ? 0 : salt_size;
     kryptos_hash_func lh = (h == NULL) ? kryptos_sha256_hash : h;
     kryptos_hash_size_func lh_input_size = (h_input_size == NULL) ? kryptos_sha256_hash_input_size : h_input_size;
@@ -38,7 +38,7 @@ kryptos_u8_t *kryptos_do_hkdf(kryptos_u8_t *ikm,
     // INFO(Rafael): Step 1 extract.
 
     ktask->action = kKryptosEncrypt;
-    ktask->key = (kryptos_u8_t *)lsalt;
+    ktask->key = lsalt;
     ktask->key_size = lsalt_size;
 
     ktask->out = (kryptos_u8_t *)kryptos_newseg(ikm_size);

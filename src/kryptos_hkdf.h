@@ -19,7 +19,7 @@ kryptos_u8_t *kryptos_do_hkdf(kryptos_u8_t *ikm,
                               kryptos_hash_func h,
                               kryptos_hash_size_func h_input_size,
                               kryptos_hash_size_func h_size,
-                              const kryptos_u8_t *salt, const size_t salt_size,
+                              kryptos_u8_t *salt, const size_t salt_size,
                               const kryptos_u8_t *info, const size_t info_size,
                               const size_t intended_osize);
 

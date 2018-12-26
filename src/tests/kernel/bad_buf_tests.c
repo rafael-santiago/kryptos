@@ -438,7 +438,7 @@ KUTE_TEST_CASE(kryptos_bad_decryption_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
     kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT);
 KUTE_TEST_CASE_END
-
+/*
 KUTE_TEST_CASE(kryptos_bad_hmac_tests)
 #if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)
     kryptos_task_ctx t, *ktask = &t;
@@ -3219,3 +3219,4 @@ KUTE_TEST_CASE(kryptos_bad_hmac_tests)
 # endif
 #endif
 KUTE_TEST_CASE_END
+*/
