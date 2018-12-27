@@ -230,8 +230,8 @@
 #if defined(KRYPTOS_C99)
 #define kryptos_bad_buf_run_hmac(cname, hname, ktask, cipher_args...) {\
     kryptos_task_init_as_null(ktask);\
-    ktask->out = "Wabba labba dub dub Wabba labba dub dub";\
-    ktask->out_size = 39;\
+    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in_size = 39;\
     kryptos_task_set_decrypt_action(ktask);\
     kryptos_run_cipher_hmac(cname, hname, ktask, cipher_args);\
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
