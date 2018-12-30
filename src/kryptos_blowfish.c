@@ -13,6 +13,7 @@
 #include <kryptos.h>
 #ifndef KRYPTOS_KERNEL_MODE
 # include <string.h>
+# include <stdio.h>
 #endif
 
 #define KRYPTOS_BLOWFISH_MAX_KEY_NR 14
@@ -209,6 +210,46 @@ static kryptos_u32_t kryptos_blowfish_parray[18] = {
     0xc0ac29b7L, 0xc97c50ddL, 0x3f84d5b5L, 0xb5470917L, 0x9216d5d9L, 0x8979fb1bL
 };
 
+static kryptos_u8_t kryptos_messy_base64_state[] = {
+    '.', '/', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+    'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+    'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e',
+    'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
+    'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0',
+    '1', '2', '3', '4', '5', '6', '7', '8', '9'
+};
+
+static kryptos_u8_t kryptos_messy_base64_state_1 [] = {
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255,   0,   1,
+     54,  55,  56,  57,  58,  59,  60,  61,  62,  63,
+    255, 255, 255,   0, 255, 255, 255,                // INFO(Rafael): '0'..'9' and '='.
+      2,   3,   4,   5,   6,   7,   8,   9,  10,  11,
+     12,  13,  14,  15,  16,  17,  18,  19,  20,  21,
+     22,  23,  24,  25,  26,  27,                     // INFO(Rafael): 'A'..'Z'.
+      0,   0,   0,   0,   0,   0,
+     28,  29,  30,  31,  32,  33,  34,  35,  36,  37,
+     38,  39,  40,  41,  42,  43,  44,  45,  46,  47,
+     48,  49,  50,  51,  52,  53,                     // INFO(Rafael): 'a'..'z'.
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255
+};
+
 struct kryptos_blowfish_subkeys {
     kryptos_u32_t P[19];
     kryptos_u32_t S1[257], S2[257], S3[257], S4[257];
@@ -231,6 +272,19 @@ static void kryptos_blowfish_ld_user_key(kryptos_u32_t *key,
                                          const kryptos_u8_t *user_key, const size_t user_key_size);
 
 static void kryptos_blowfish_puff_up(const kryptos_u8_t *key, size_t key_size, struct kryptos_blowfish_subkeys *sks);
+
+static void kryptos_bcrypt_puff_up(const kryptos_u8_t *password, size_t password_size,
+                                   const kryptos_u8_t *salt, struct kryptos_blowfish_subkeys *sks, const int init);
+
+static void kryptos_eks_blowfish_setup(const int cost, const kryptos_u8_t *salt,
+                                       const kryptos_u8_t *password, const size_t password_size,
+                                       struct kryptos_blowfish_subkeys *sks);
+
+static kryptos_u8_t *kryptos_bcrypt_encode_buffer(const kryptos_u8_t *buffer, const size_t buffer_size, size_t *out_size);
+
+static kryptos_u8_t *kryptos_bcrypt_decode_buffer(const kryptos_u8_t *buffer, const size_t buffer_size, size_t *out_size);
+
+#define kryptos_base64_get_encoded_byte(b) ( (b) != '=' ? (b) : 0 )
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(blowfish, kKryptosCipherBLOWFISH, KRYPTOS_BLOWFISH_BLOCKSIZE)
 
@@ -378,18 +432,20 @@ static void kryptos_blowfish_puff_up(const kryptos_u8_t *key, size_t key_size, s
     size_t i, j , w_size = 0;
     kryptos_u8_t pl[8];
 
-    w_size = key_size / sizeof(kryptos_u32_t);
-
-    while ((w_size % 4) != 0) {
-        w_size++;
+    if (key_size < 5) {
+        w_size =  1;
+    } else {
+        w_size = key_size;
+        while ((w_size % 4) != 0) {
+            w_size++;
+        }
+        w_size /= sizeof(kryptos_u32_t);
     }
-
-    w_size /= sizeof(kryptos_u32_t);
 
     kryptos_blowfish_ld_user_key(w_key, key, key_size);
 
     for (i = 0, j = 0; i < 18; i++, j++) {
-        if (j > w_size) {
+        if (j == w_size) {
             j = 0;
         }
         sks->P[i] = kryptos_blowfish_parray[i] ^ w_key[j];
@@ -433,8 +489,410 @@ static void kryptos_blowfish_puff_up(const kryptos_u8_t *key, size_t key_size, s
     xr = NULL;
 }
 
+kryptos_u8_t *kryptos_bcrypt(const int cost,
+                             const kryptos_u8_t *salt, const size_t salt_size,
+                             const kryptos_u8_t *password, const size_t password_size, size_t *hash_size) {
+    struct kryptos_blowfish_subkeys sks;
+    kryptos_u8_t ctext[24] = {
+        'O', 'r', 'p', 'h', 'e', 'a', 'n', 'B',
+        'e', 'h', 'o', 'l', 'd', 'e', 'r', 'S',
+        'c', 'r', 'y', 'D', 'o', 'u', 'b', 't'
+    };
+    kryptos_u8_t *hash = NULL, pfx[32];
+    size_t pfx_size, salt64_size, ctext64_size;
+    kryptos_u8_t *salt64 = NULL, *ctext64 = NULL;
+    kryptos_u8_t *null_term_password = NULL;
+
+    if (cost < 4 || cost > 31 || salt_size != 16 || password == NULL || password_size > 72 || hash_size == NULL) {
+        return NULL;
+    }
+
+    // WARN(Rafael): This is a mitigation of a historical bad idea: in the original implementation
+    //               is always expected a null terminated string, because it is also considered a part
+    //               of the user password! This "leaks" one byte used during the key whitening over the P array.
+
+    null_term_password = (kryptos_u8_t *) kryptos_newseg(password_size + 1);
+
+    if (null_term_password == NULL) {
+        goto bcrypt_epilogue;
+    }
+
+    memset(null_term_password, 0, password_size + 1);
+
+    if (password_size > 0) {
+        memcpy(null_term_password, password, password_size);
+    }
+
+    kryptos_eks_blowfish_setup(cost, salt, null_term_password, password_size + 1, &sks);
+
+#define kryptos_bcrypt_encrypt(c, s) {\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[ 0]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[ 8]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[16]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[ 0]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[ 8]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[16]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[ 0]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[ 8]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[16]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[ 0]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[ 8]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[16]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[ 0]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[ 8]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[16]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[ 0]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[ 8]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[16]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[ 0]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[ 8]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[16]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[ 0]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[ 8]), (s));\
+    kryptos_blowfish_block_encrypt((kryptos_u8_t *)(&(c)[16]), (s));\
+}
+
+    kryptos_bcrypt_encrypt(ctext, &sks);
+    kryptos_bcrypt_encrypt(ctext, &sks);
+    kryptos_bcrypt_encrypt(ctext, &sks);
+    kryptos_bcrypt_encrypt(ctext, &sks);
+    kryptos_bcrypt_encrypt(ctext, &sks);
+    kryptos_bcrypt_encrypt(ctext, &sks);
+    kryptos_bcrypt_encrypt(ctext, &sks);
+    kryptos_bcrypt_encrypt(ctext, &sks);
+
+#undef kryptos_bcrypt_encrypt
+
+    // INFO(Rafael): Codifica com esse base64 usando o alfabeto perdido alienígena.
+    salt64 = kryptos_bcrypt_encode_buffer(salt, salt_size, &salt64_size);
+
+    if (salt64 == NULL) {
+        goto bcrypt_epilogue;
+    }
+
+    salt64_size -= 2; // INFO(Rafael): Excepting the padding.
+
+    // INFO(Rafael): Para estar certo é preciso estar errado e ter esse bug escroto
+    //               de codificar 23 ao invés de 24 bytes.
+    ctext64 = kryptos_bcrypt_encode_buffer(ctext, 23, &ctext64_size);
+    ctext64_size -= 1;
+
+    if (ctext64 != NULL) {
+        sprintf(pfx, "$2a$%.2d$", cost);
+        pfx_size = strlen(pfx);
+        *hash_size = pfx_size + salt64_size + ctext64_size;
+        if ((hash = (kryptos_u8_t *) kryptos_newseg(*hash_size + 1)) != NULL) {
+            memset(hash, 0, *hash_size + 1);
+            memcpy(hash, pfx, pfx_size);
+            memcpy(hash + pfx_size, salt64, salt64_size);
+            memcpy(hash + pfx_size + salt64_size, ctext64, ctext64_size);
+        }
+    }
+
+bcrypt_epilogue:
+
+    if (null_term_password != NULL) {
+        kryptos_freeseg(null_term_password, password_size + 1);
+    }
+
+    if (salt64 != NULL) {
+        kryptos_freeseg(salt64, salt64_size);
+    }
+
+    if (ctext64 != NULL) {
+        kryptos_freeseg(ctext64, ctext64_size);
+    }
+
+    memset(&sks, 0, sizeof(sks));
+
+    return hash;
+}
+
+int kryptos_bcrypt_verify(const kryptos_u8_t *password, const size_t password_size,
+                          const kryptos_u8_t *hash, const size_t hash_size) {
+    int cost;
+    kryptos_u8_t *salt = NULL, *temp_hash = NULL;
+    size_t salt_size, temp_hash_size;
+    int is_ok = 0;
+
+    if (password == NULL || hash == NULL || hash_size <= 22) {
+        return 0;
+    }
+
+    if (hash[0] != '$' || hash[1] != '2' || hash[2] != 'a') {
+        goto kryptos_bcrypt_verify_epilogue;
+    }
+
+    if (hash[3] != '$' || !(hash[4] >= '0' && hash[4] <= '9') ||
+                          !(hash[5] >= '0' && hash[5] <= '9') ||
+        hash[6] != '$') {
+        goto kryptos_bcrypt_verify_epilogue;
+    }
+
+    cost = 10 * (hash[4] - '0') + (hash[5] - '0');
+
+    if (cost < 4 || cost > 31) {
+        goto kryptos_bcrypt_verify_epilogue;
+    }
+
+    salt = kryptos_bcrypt_decode_buffer(&hash[7], 22, &salt_size);
+
+    if (salt == NULL) {
+        goto kryptos_bcrypt_verify_epilogue;
+    }
+
+    temp_hash = kryptos_bcrypt(cost, salt, salt_size, password, password_size, &temp_hash_size);
+
+    if (temp_hash == NULL || temp_hash_size != hash_size) {
+        goto kryptos_bcrypt_verify_epilogue;
+    }
+
+    is_ok = (memcmp(temp_hash, hash, temp_hash_size) == 0);
+
+kryptos_bcrypt_verify_epilogue:
+
+    if (salt != NULL) {
+        kryptos_freeseg(salt, salt_size);
+    }
+
+    if (temp_hash != NULL) {
+        kryptos_freeseg(temp_hash, temp_hash_size);
+    }
+
+    return is_ok;
+}
+
+static void kryptos_eks_blowfish_setup(const int cost, const kryptos_u8_t *salt,
+                                       const kryptos_u8_t *password, const size_t password_size,
+                                       struct kryptos_blowfish_subkeys *sks) {
+    size_t r_nr = 1 << cost;
+    size_t r;
+    kryptos_u8_t all_zeros[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    // WARN(Rafael): In the original implementation the algorithm considers the NULL at the end of the string as part of
+    //               this string, and yes: the user password is always expected to be null terminated. So you know, at
+    //               least, the last byte of this string, a.k.a password. Hahaha!
+    //
+    //               Cool off at this point the user password was previously padded with the (pretty) dummy null byte.
+    //
+
+    kryptos_bcrypt_puff_up(password, password_size, salt, sks, 1);
+
+    for (r = 0; r < r_nr; r++) {
+        kryptos_bcrypt_puff_up(password, password_size, all_zeros, sks, 0);
+        kryptos_bcrypt_puff_up(salt, 16, all_zeros, sks, 0);
+    }
+}
+
+static void kryptos_bcrypt_puff_up(const kryptos_u8_t *password, size_t password_size,
+                                   const kryptos_u8_t *salt, struct kryptos_blowfish_subkeys *sks, const int init) {
+    kryptos_u32_t *xl, *xr, w_key;
+    size_t i, j , w_size = 0, x;
+    kryptos_u8_t pl[8], *pl_c, *pl_end;
+    const kryptos_u8_t *s_c, *s_end;
+
+    s_c = password;
+    s_end = s_c + password_size;
+
+    for (i = 0, j = 0; i < 18; i++, j++) {
+        w_key = 0;
+
+        for (w_size = 0; w_size < 4; w_size++) {
+            w_key = (w_key << 8) | *s_c;
+            s_c++;
+            if (s_c == s_end) {
+                s_c = password;
+            }
+        }
+
+        if (!init) {
+            sks->P[i] ^= w_key;
+        } else {
+            sks->P[i] = kryptos_blowfish_parray[i] ^ w_key;
+        }
+    }
+
+    if (init) {
+        for (i = 0; i < 256; i++) {
+            sks->S1[i] = kryptos_blowfish_sbox0[i];
+            sks->S2[i] = kryptos_blowfish_sbox1[i];
+            sks->S3[i] = kryptos_blowfish_sbox2[i];
+            sks->S4[i] = kryptos_blowfish_sbox3[i];
+        }
+    }
+
+    memcpy(pl, salt, 8);
+    s_c = salt + 8;
+    s_end = salt + 16;
+
+    for (i = 0; i < 521; i++) {
+        kryptos_blowfish_block_encrypt(pl, sks);
+
+        if (i < 9) {
+            xl = &sks->P[i << 1];
+            xr = &sks->P[(i << 1) + 1];
+        } else if (i < 137) {
+            xl = &sks->S1[((i - 9) << 1)];
+            xr = &sks->S1[((i - 9) << 1) + 1];
+        } else if (i < 265) {
+            xl = &sks->S2[((i - 137) << 1)];
+            xr = &sks->S2[((i - 137) << 1) + 1];
+        } else if (i < 393) {
+            xl = &sks->S3[((i - 265) << 1)];
+            xr = &sks->S3[((i - 265) << 1) + 1];
+        } else if (i < 521) {
+            xl = &sks->S4[((i - 393) << 1)];
+            xr = &sks->S4[((i - 393) << 1) + 1];
+        }
+
+        *xl = kryptos_get_u32_as_big_endian(pl, 4);
+        *xr = kryptos_get_u32_as_big_endian(pl + 4, 4);
+
+        pl_c = &pl[0];
+        pl_end = pl_c + 8;
+
+        while (pl_c != pl_end) {
+            *pl_c = *pl_c ^ *s_c;
+            pl_c++;
+            s_c++;
+            if (s_c == s_end) {
+                s_c = salt;
+            }
+        }
+    }
+
+    w_key = 0;
+    w_size = 0;
+    memset(pl, 0, sizeof(pl));
+    xl = NULL;
+    xr = NULL;
+}
+
+static kryptos_u8_t *kryptos_bcrypt_encode_buffer(const kryptos_u8_t *buffer, const size_t buffer_size, size_t *out_size) {
+    const kryptos_u8_t *bp, *bp_end;
+    kryptos_u8_t *out, *out_p;
+    kryptos_u32_t block;
+    size_t block_size, pad_size = 0;
+
+    if (buffer == NULL || buffer_size == 0) {
+        *out_size = 0;
+        return NULL;
+    }
+
+    bp = buffer;
+    bp_end = bp + buffer_size;
+
+    *out_size = (buffer_size * 8) / 6;
+
+    while ((*out_size % 4) != 0) {
+        *out_size += 1;
+    }
+
+    out = (kryptos_u8_t *) kryptos_newseg(*out_size);
+    out_p = out;
+
+    while (bp != bp_end) {
+
+        block = 0;
+        block_size = 0;
+
+        while (bp != bp_end && block_size < 3) {
+            block = block << 8 | *bp;
+            block_size++;
+            bp++;
+        }
+
+        pad_size = 3 - block_size;
+
+        block = block << (pad_size << 3);
+
+        *out_p       = kryptos_messy_base64_state[(block & 0x00FC0000) >> 18];
+        *(out_p + 1) = kryptos_messy_base64_state[(block & 0x0003F000) >> 12];
+        *(out_p + 2) = kryptos_messy_base64_state[(block & 0x00000FC0) >>  6];
+        *(out_p + 3) = kryptos_messy_base64_state[block & 0x0000003F];
+
+        out_p += 4 - pad_size;
+    }
+
+    while (pad_size > 0) {
+        *out_p = '=';
+        out_p++;
+        pad_size--;
+    }
+
+    bp = NULL;
+    bp_end = NULL;
+    block = 0;
+
+    return out;
+}
+
+static kryptos_u8_t *kryptos_bcrypt_decode_buffer(const kryptos_u8_t *buffer, const size_t buffer_size, size_t *out_size) {
+    const kryptos_u8_t *bp, *bp_end;
+    kryptos_u8_t *out, *out_p, *out_end;
+    kryptos_u32_t block;
+    size_t pad_size = 0;
+
+    if (buffer == NULL || buffer_size == 0) {
+        *out_size = 0;
+        return NULL;
+    }
+
+    bp_end = buffer + buffer_size;
+    bp = bp_end - 1;
+
+    while (*bp == '=') {
+        pad_size++;
+        bp--;
+    }
+
+    bp = buffer;
+
+    *out_size = ((buffer_size * 6) / 8) - pad_size;
+    out = (kryptos_u8_t *) kryptos_newseg(*out_size + 1);
+    memset(out, 0, *out_size + 1);
+    out_p = out;
+    out_end = out_p + *out_size;
+
+    while (out_p != out_end && bp != bp_end) {
+        block = (kryptos_u32_t) kryptos_messy_base64_state_1[kryptos_base64_get_encoded_byte(    *bp  )] << 18 |
+                (kryptos_u32_t) kryptos_messy_base64_state_1[kryptos_base64_get_encoded_byte(*(bp + 1))] << 12 |
+                (kryptos_u32_t) kryptos_messy_base64_state_1[kryptos_base64_get_encoded_byte(*(bp + 2))] <<  6 |
+                (kryptos_u32_t) kryptos_messy_base64_state_1[kryptos_base64_get_encoded_byte(*(bp + 3))];
+
+        *out_p = (block & 0x00FF0000) >> 16;
+        out_p++;
+
+        if (out_p == out_end) {
+            continue;
+        }
+
+        *out_p = (block & 0x0000FF00) >>  8;
+        out_p++;
+
+        if (out_p == out_end) {
+            continue;
+        }
+
+        *out_p = (block & 0x000000FF);
+        out_p++;
+
+        bp += 4;
+    }
+
+    pad_size = 0;
+    bp = NULL;
+    bp_end = NULL;
+    block = 0;
+    out_end = NULL;
+
+    return out;
+}
+
 #undef KRYPTOS_BLOWFISH_MAX_KEY_NR
 
 #undef kryptos_blowfish_get_byte_from_u32
 
 #undef kryptos_blowfish_F
+
+#undef kryptos_base64_get_encoded_byte

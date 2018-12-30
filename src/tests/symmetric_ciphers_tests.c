@@ -1066,3 +1066,100 @@ CUTE_TEST_CASE(kryptos_des_weak_keys_detection_tests)
         CUTE_ASSERT(ktask->result == kKryptosKeyError);
     }
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_bcrypt_tests)
+    struct bcrypt_test {
+        const kryptos_u8_t *password;
+        const size_t password_size;
+        const int cost;
+        const kryptos_u8_t *salt;
+        const size_t salt_size;
+        const kryptos_u8_t *hash;
+        const size_t hash_size;
+    };
+#define add_test_step(p, p_sz, c, s, s_sz, h, h_sz) { p, p_sz, c, s, s_sz, h, h_sz }
+    struct bcrypt_test test_vector[] = {
+        add_test_step("", 0,
+                       4, "\xD5\x72\x68\x31\x2B\xC8\x21\x2A\x9D\x01\xD0\x4F\x7B\xD9\xFF\x3D", 16,
+                      "$2a$04$zVHmKQtGGQob.b/Nc7l9NO8UlrYcW05FiuCj/SxsFO/ZtiN9.mNzy", 60),
+        add_test_step("", 0,
+                       5, "\xD5\x72\x68\x31\x2B\xC8\x21\x2A\x9D\x01\xD0\x4F\x7B\xD9\xFF\x3D", 16,
+                      "$2a$05$zVHmKQtGGQob.b/Nc7l9NOWES.1hkVBgy5IWImh9DOjKNU8atY4Iy", 60),
+        add_test_step("", 0,
+                       6, "\xD5\x72\x68\x31\x2B\xC8\x21\x2A\x9D\x01\xD0\x4F\x7B\xD9\xFF\x3D", 16,
+                      "$2a$06$zVHmKQtGGQob.b/Nc7l9NOjOl7l4oz3WSh5fJ6414Uw8IXRAUoiaO", 60),
+        add_test_step("", 0,
+                       7, "\xD5\x72\x68\x31\x2B\xC8\x21\x2A\x9D\x01\xD0\x4F\x7B\xD9\xFF\x3D", 16,
+                      "$2a$07$zVHmKQtGGQob.b/Nc7l9NOBsj1dQpBA1HYNGpIETIByoNX9jc.hOi", 60),
+        add_test_step("", 0,
+                       8, "\xD5\x72\x68\x31\x2B\xC8\x21\x2A\x9D\x01\xD0\x4F\x7B\xD9\xFF\x3D", 16,
+                      "$2a$08$zVHmKQtGGQob.b/Nc7l9NOiLTUh/9MDpX86/DLyEzyiFjqjBFePgO", 60),
+        add_test_step("messycrypt", 10,
+                       4, "\xD5\x72\x68\x31\x2B\xC8\x21\x2A\x9D\x01\xD0\x4F\x7B\xD9\xFF\x3D", 16,
+                      "$2a$04$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC", 60)
+    };
+#undef add_test_step
+    size_t t, test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+    kryptos_u8_t *hash;
+    size_t hash_size;
+
+    for (t = 0; t < test_vector_nr; t++) {
+        hash = kryptos_bcrypt(test_vector[t].cost,
+                              test_vector[t].salt, test_vector[t].salt_size,
+                              test_vector[t].password, test_vector[t].password_size, &hash_size);
+        CUTE_ASSERT(hash != NULL);
+        CUTE_ASSERT(hash_size == test_vector[t].hash_size);
+        CUTE_ASSERT(memcmp(hash, test_vector[t].hash, hash_size) == 0);
+        kryptos_freeseg(hash, hash_size);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_bcrypt_verify_tests)
+    kryptos_u8_t *password[] = {
+        "messycrypt", "No Good, Mr. Holden", "Bad idea.", "Nothing Ventured"
+    };
+    size_t password_nr = sizeof(password) / sizeof(password[0]), p;
+    kryptos_u8_t *hash;
+    size_t hash_size;
+    kryptos_u8_t *salt;
+
+    // INFO(Rafael): Malformed or unsuported hashes.
+
+    hash = "$3a$04$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
+    CUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+
+    hash = "$2x$04$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
+    CUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+
+    hash = "2x$04$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
+    CUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+
+    hash = "$2a04$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
+    CUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+
+    hash = "$2x$0a$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
+    CUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+
+    hash = "$2x$a4$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
+    CUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+
+    hash = "$2x$32$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
+    CUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+
+    hash = "$2x$00$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
+    CUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+
+    hash = "$2x$04$zVHmKQtGGQo";
+    CUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+
+    for (p = 0; p < password_nr; p++) {
+        salt = kryptos_get_random_block(16);
+        CUTE_ASSERT(salt != NULL);
+        hash = kryptos_bcrypt(4 + p, salt, 16, password[p], strlen(password[p]), &hash_size);
+        CUTE_ASSERT(hash != NULL);
+        CUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, hash_size) == 0);
+        CUTE_ASSERT(kryptos_bcrypt_verify(password[p], strlen(password[p]), hash, hash_size) == 1);
+        kryptos_freeseg(hash, hash_size);
+        kryptos_freeseg(salt, 16);
+    }
+CUTE_TEST_CASE_END

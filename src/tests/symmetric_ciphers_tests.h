@@ -88,4 +88,8 @@ CUTE_DECLARE_TEST_CASE(kryptos_gost_ds_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_gost_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_bcrypt_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_bcrypt_verify_tests);
+
 #endif

@@ -16,4 +16,24 @@ KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(blowfish)
 
 KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR(blowfish)
 
+#ifndef __cplusplus
+kryptos_u8_t *kryptos_bcrypt(const int cost,
+                             const kryptos_u8_t *salt, const size_t salt_size,
+                             const kryptos_u8_t *password, const size_t password_size,
+                             size_t *hash_size);
+
+int kryptos_bcrypt_verify(const kryptos_u8_t *password, const size_t password_size,
+                          const kryptos_u8_t *hash, const size_t hash_size);
+#else
+extern "C" kryptos_u8_t *kryptos_bcrypt(const int cost,
+                                        const kryptos_u8_t *salt, const size_t salt_size,
+                                        const kryptos_u8_t *password, const size_t password_size,
+                                        size_t *hash_size);
+
+extern "C" int kryptos_bcrypt_verify(const kryptos_u8_t *password, const size_t password_size,
+                                     const kryptos_u8_t *hash, const size_t hash_size);
+
+
+#endif
+
 #endif
