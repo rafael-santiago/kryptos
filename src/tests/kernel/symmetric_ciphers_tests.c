@@ -186,7 +186,7 @@ KUTE_TEST_CASE(kryptos_bcrypt_verify_tests)
     size_t hash_size;
     kryptos_u8_t *salt;
 
-    // INFO(Rafael): Malformed or unsuported hashes.
+    // INFO(Rafael): Malformed or unsupported hashes.
 
     hash = "$3a$04$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
     KUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
