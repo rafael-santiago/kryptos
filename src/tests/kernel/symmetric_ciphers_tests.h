@@ -14,4 +14,8 @@ KUTE_DECLARE_TEST_CASE(kryptos_ctr_mode_sequencing_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_des_weak_keys_detection_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_bcrypt_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_bcrypt_verify_tests);
+
 #endif

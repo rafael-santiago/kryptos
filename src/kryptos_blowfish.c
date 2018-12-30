@@ -687,7 +687,7 @@ static void kryptos_eks_blowfish_setup(const int cost, const kryptos_u8_t *salt,
 static void kryptos_bcrypt_puff_up(const kryptos_u8_t *password, size_t password_size,
                                    const kryptos_u8_t *salt, struct kryptos_blowfish_subkeys *sks, const int init) {
     kryptos_u32_t *xl, *xr, w_key;
-    size_t i, j , w_size = 0, x;
+    size_t i, j , w_size = 0;
     kryptos_u8_t pl[8], *pl_c, *pl_end;
     const kryptos_u8_t *s_c, *s_end;
 

@@ -58,6 +58,9 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_ctr_mode_sequencing_tests);
     KUTE_RUN_TEST(kryptos_des_weak_keys_detection_tests);
 
+    KUTE_RUN_TEST(kryptos_bcrypt_tests);
+    KUTE_RUN_TEST(kryptos_bcrypt_verify_tests);
+
     KUTE_RUN_TEST(kryptos_bad_decryption_tests);
     //KUTE_RUN_TEST(kryptos_bad_hmac_tests);
 
