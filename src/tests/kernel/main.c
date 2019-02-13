@@ -39,6 +39,8 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_endianness_utils_tests);
     KUTE_RUN_TEST(kryptos_apply_iv_tests);
     KUTE_RUN_TEST(kryptos_iv_data_flush_tests);
+    KUTE_RUN_TEST(kryptos_gcm_gf_mul_tests);
+    KUTE_RUN_TEST(kryptos_gcm_tests);
     KUTE_RUN_TEST(kryptos_task_check_tests);
     KUTE_RUN_TEST(kryptos_hex_tests);
     KUTE_RUN_TEST(kryptos_hash_common_tests);
