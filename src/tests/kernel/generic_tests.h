@@ -40,4 +40,8 @@ KUTE_DECLARE_TEST_CASE(kryptos_csprng_context_change_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_memset_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_gcm_gf_mul_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_gcm_tests);
+
 #endif

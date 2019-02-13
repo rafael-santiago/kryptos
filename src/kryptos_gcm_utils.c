@@ -27,6 +27,16 @@ static kryptos_task_result_t kryptos_gcm_tag(kryptos_u8_t *c, const size_t c_siz
                                              const kryptos_u8_t *a, const size_t a_size,
                                              kryptos_gcm_e_func E, void *E_arg, kryptos_u8_t *tag);
 
+/*static void print_buf(kryptos_u8_t *buf, size_t buf_size) {
+    kryptos_u8_t *bp, *bp_end;
+    bp = buf;
+    bp_end = bp + buf_size;
+    while (bp != bp_end) {
+        printf("%.2X", *bp);
+        bp++;
+    }
+}*/
+
 kryptos_task_result_t kryptos_gcm_auth(kryptos_u8_t **c, size_t *c_size,
                                        const size_t iv_size,
                                        kryptos_u8_t *key, const size_t key_size,
@@ -77,7 +87,7 @@ kryptos_task_result_t kryptos_gcm_verify(kryptos_u8_t **c, size_t *c_size,
             goto kryptos_gcm_verify_epilogue;
         }
 
-        memcpy(nc, *c, *c_size - 16);
+        memcpy(nc, *c + 16, *c_size - 16);
         kryptos_freeseg(*c, *c_size);
         *c = nc;
         *c_size -= 16;
@@ -91,10 +101,10 @@ kryptos_gcm_verify_epilogue:
 }
 
 void kryptos_gcm_gf_mul(const kryptos_u32_t *x, const kryptos_u32_t *y, kryptos_u32_t *z) {
-    kryptos_u32_t v[4], t[4];
+    kryptos_u32_t v[4], t[4], zz[4];
     size_t i;
 
-    z[0] = z[1] = z[2] = z[3] = 0;
+    zz[0] = zz[1] = zz[2] = zz[3] = 0;
     v[0] = y[0]; v[1] = y[1]; v[2] = y[2]; v[3] = y[3];
     t[0] = x[0]; t[1] = x[1]; t[2] = x[2]; t[3] = x[3];
 
@@ -114,10 +124,10 @@ void kryptos_gcm_gf_mul(const kryptos_u32_t *x, const kryptos_u32_t *y, kryptos_
 
     for (i = 0; i < 128; i++) {
         if (t[0] >> 31) {
-            z[0] ^= v[0];
-            z[1] ^= v[1];
-            z[2] ^= v[2];
-            z[3] ^= v[3];
+            zz[0] ^= v[0];
+            zz[1] ^= v[1];
+            zz[2] ^= v[2];
+            zz[3] ^= v[3];
         }
 
         if (v[3] & 0x1) {
@@ -132,6 +142,8 @@ void kryptos_gcm_gf_mul(const kryptos_u32_t *x, const kryptos_u32_t *y, kryptos_
 
     v[0] = v[1] = v[2] = v[3] = 0;
 
+    z[0] = zz[0]; z[1] = zz[1]; z[2] = zz[2]; z[3] = zz[3];
+
 #undef kryptos_gcm_lsh128
 
 #undef kryptos_gcm_rsh128
@@ -145,6 +157,8 @@ static kryptos_task_result_t kryptos_gcm_tag(kryptos_u8_t *c, const size_t c_siz
     kryptos_u8_t *H = NULL, *Y0 = NULL, *tp, *tp_end, *hp, *hp_end;
     kryptos_task_result_t result = kKryptosProcessError;
     size_t H_size, Y_size;
+
+    // INFO(Rafael): By design, the iv is embbeded in the ciphertext (as its first block).
 
     // INFO(Rafael): 'H = E(K, 0^{128})'.
 
@@ -171,7 +185,7 @@ static kryptos_task_result_t kryptos_gcm_tag(kryptos_u8_t *c, const size_t c_siz
 
     // INFO(Rafael): 'T = MSB_t(GHASH(H, A, C) ^ E(K, Y_0))'. Here we will assume t equals to 128.
 
-    if (kryptos_gcm_ghash(H, a, a_size + 16, c, c_size - 16, tag) == 0) {
+    if (kryptos_gcm_ghash(H, a, a_size, c + iv_size, c_size - iv_size, tag) == 0) {
         goto kryptos_gcm_tag_epilogue;
     }
 
@@ -183,8 +197,8 @@ static kryptos_task_result_t kryptos_gcm_tag(kryptos_u8_t *c, const size_t c_siz
 
     tp = tag;
     tp_end = tag + 16;
-    hp = H;
-    hp_end = H + H_size;
+    hp = Y0;
+    hp_end = Y0 + 16;
 
     while (tp != tp_end && hp != hp_end) {
         *tp = *tp ^ *hp;
@@ -223,7 +237,7 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
     H[2] = kryptos_get_u32_as_big_endian(h +  8,  8);
     H[3] = kryptos_get_u32_as_big_endian(h + 12,  4);
 
-    block_nr = a_size + c_size;
+    block_nr = a_size;
 
 #define GCM_GHASH_BLOCK(d, i) (d)[(i)].u32
 
@@ -233,22 +247,23 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
     ctr = 0;\
     off = 0;\
     while (off < buf_size) {\
-        GCM_GHASH_WORD(A, ctr, 0) = kryptos_get_u32_as_big_endian(buf + off, buf_size - off);\
+        GCM_GHASH_WORD(ctx, ctr, 0) = kryptos_get_u32_as_big_endian(buf + off, buf_size - off);\
         off += 4;\
         if (offset == buf_size) {\
             continue;\
         }\
-        GCM_GHASH_WORD(A, ctr, 1) = kryptos_get_u32_as_big_endian(buf + off, buf_size - off);\
+        GCM_GHASH_WORD(ctx, ctr, 1) = kryptos_get_u32_as_big_endian(buf + off, buf_size - off);\
         offset += 4;\
         if (off == buf_size) {\
             continue;\
         }\
-        GCM_GHASH_WORD(A, ctr, 2) = kryptos_get_u32_as_big_endian(buf + off, buf_size - off);\
+        GCM_GHASH_WORD(ctx, ctr, 2) = kryptos_get_u32_as_big_endian(buf + off, buf_size - off);\
         offset += 4;\
         if (off == buf_size) {\
             continue;\
         }\
-        GCM_GHASH_WORD(A, ctr, 3) = kryptos_get_u32_as_big_endian(buf + off, buf_size - off);\
+        GCM_GHASH_WORD(ctx, ctr, 3) = kryptos_get_u32_as_big_endian(buf + off, buf_size - off);\
+        off += 4;\
         ctr++;\
     }\
 }
@@ -272,13 +287,13 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
 
         memcpy(temp, a, a_size);
 
-        A = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * (temp_size[0] >> 2));
+        A = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * (temp_size[0] >> 4));
 
         if (A == NULL) {
             goto kryptos_gcm_ghash_epilogue;
         }
 
-        memset(A, 0, sizeof(struct gcm_ghash_block_ctx) * (temp_size[0] >> 2));
+        memset(A, 0, sizeof(struct gcm_ghash_block_ctx) * (temp_size[0] >> 4));
 
         GCM_GHASH_LD_BYTES(A, temp, temp_size[0], offset, b)
 
@@ -316,13 +331,12 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
     kryptos_freeseg(temp, temp_size[1]);
     temp = NULL;
 
-    block_nr >>= 2;
+    block_nr = (temp_size[0] >> 4) + (temp_size[1] >> 4) + 1;
     X = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * (block_nr + 1));
 
     if (X == NULL) {
         goto kryptos_gcm_ghash_epilogue;
     }
-
 
     GCM_GHASH_WORD(X, 0, 0) = GCM_GHASH_WORD(X, 0, 1) = GCM_GHASH_WORD(X, 0, 2) = GCM_GHASH_WORD(X, 0, 3) = 0;
 
@@ -330,19 +344,20 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
         if (b >= 1 && b < a_size) {
             // INFO(Rafael): 'X_i = (X_{i-1} ^ A_i) x H', and also,
             //               'X_i = (X_{m - 1} ^ (A*_{m}||0^{128-v})) x H'. Because 'A' was previously padded.
-            GCM_GHASH_WORD(X, b, 0) = GCM_GHASH_WORD(X, b - 1, 0) ^ GCM_GHASH_WORD(A, b, 0);
-            GCM_GHASH_WORD(X, b, 1) = GCM_GHASH_WORD(X, b - 1, 1) ^ GCM_GHASH_WORD(A, b, 1);
-            GCM_GHASH_WORD(X, b, 2) = GCM_GHASH_WORD(X, b - 1, 2) ^ GCM_GHASH_WORD(A, b, 2);
-            GCM_GHASH_WORD(X, b, 3) = GCM_GHASH_WORD(X, b - 1, 3) ^ GCM_GHASH_WORD(A, b, 3);
+            GCM_GHASH_WORD(X, b - 1, 0) = GCM_GHASH_WORD(X, b - 1, 0) ^ GCM_GHASH_WORD(A, b - 1, 0);
+            GCM_GHASH_WORD(X, b - 1, 1) = GCM_GHASH_WORD(X, b - 1, 1) ^ GCM_GHASH_WORD(A, b - 1, 1);
+            GCM_GHASH_WORD(X, b - 1, 2) = GCM_GHASH_WORD(X, b - 1, 2) ^ GCM_GHASH_WORD(A, b - 1, 2);
+            GCM_GHASH_WORD(X, b - 1, 3) = GCM_GHASH_WORD(X, b - 1, 3) ^ GCM_GHASH_WORD(A, b - 1, 3);
         } else {
             // INFO(Rafael): 'X_i = (X_{i-1} ^ C_{i - m}) x H', and also,
             //               'X_i = (X_{i-1} ^ (C*_{n}||0^{128-u})) x H'. Because 'C' was previously padded.
-            GCM_GHASH_WORD(X, b, 0) = GCM_GHASH_WORD(X, b - 1, 0) ^ GCM_GHASH_WORD(C, b - a_size, 0);
-            GCM_GHASH_WORD(X, b, 1) = GCM_GHASH_WORD(X, b - 1, 1) ^ GCM_GHASH_WORD(C, b - a_size, 1);
-            GCM_GHASH_WORD(X, b, 2) = GCM_GHASH_WORD(X, b - 1, 0) ^ GCM_GHASH_WORD(C, b - a_size, 2);
-            GCM_GHASH_WORD(X, b, 3) = GCM_GHASH_WORD(X, b - 1, 0) ^ GCM_GHASH_WORD(C, b - a_size, 3);
+            GCM_GHASH_WORD(X, b, 0) = GCM_GHASH_WORD(X, b - 1, 0) ^ GCM_GHASH_WORD(C, b - a_size - 1, 0);
+            GCM_GHASH_WORD(X, b, 1) = GCM_GHASH_WORD(X, b - 1, 1) ^ GCM_GHASH_WORD(C, b - a_size - 1, 1);
+            GCM_GHASH_WORD(X, b, 2) = GCM_GHASH_WORD(X, b - 1, 2) ^ GCM_GHASH_WORD(C, b - a_size - 1, 2);
+            GCM_GHASH_WORD(X, b, 3) = GCM_GHASH_WORD(X, b - 1, 3) ^ GCM_GHASH_WORD(C, b - a_size - 1, 3);
         }
         kryptos_gcm_gf_mul(GCM_GHASH_BLOCK(X, b), H, GCM_GHASH_BLOCK(X, b));
+        b++;
     }
 
     // INFO(Rafael): 'X_i = (X_{m + n} ^ (len(A)||len(C))) x H'.
@@ -384,11 +399,11 @@ kryptos_gcm_ghash_epilogue:
     }
 
     if (A != NULL) {
-        kryptos_freeseg(A, sizeof(struct gcm_ghash_block_ctx) * (temp[0] >> 2));
+        kryptos_freeseg(A, sizeof(struct gcm_ghash_block_ctx) * (temp_size[0] >> 4));
     }
 
-    if (c != NULL) {
-        kryptos_freeseg(C, sizeof(struct gcm_ghash_block_ctx) * (temp[1] >> 2));
+    if (C != NULL) {
+        kryptos_freeseg(C, sizeof(struct gcm_ghash_block_ctx) * (temp_size[1] >> 4));
     }
 
     if (temp != NULL) {

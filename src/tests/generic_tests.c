@@ -18,6 +18,7 @@
 #include <kryptos_hash_common.h>
 #include <kryptos_sha1.h>
 #include <kryptos_userland_funcs.h>
+#include <kryptos_gcm_utils.h>
 #include <string.h>
 #if !defined(_WIN32)
 # include <dlfcn.h>
@@ -27,6 +28,10 @@
 # else
 # include <windows.h>
 #endif
+
+static kryptos_task_result_t E_stub(kryptos_u8_t **h, size_t *h_size, kryptos_u8_t *key, size_t key_size, void *arg);
+
+static kryptos_task_result_t E_bad_stub(kryptos_u8_t **h, size_t *h_size, kryptos_u8_t *key, size_t key_size, void *arg);
 
 CUTE_TEST_CASE(kryptos_padding_tests)
     struct padding_tests_ctx {
@@ -1456,4 +1461,168 @@ CUTE_TEST_CASE(kryptos_memory_tests)
     kryptos_freeseg(data, 819);
 
     kryptos_allow_ram_swap();
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_gcm_gf_mul_tests)
+    kryptos_u32_t  x[4] = { 0x66E94BD4, 0xEF8A2C3B, 0x884CFA59, 0xCA342B2E };
+    kryptos_u32_t  y[4] = { 0x0388DACE, 0x60B6A392, 0xF328C2B9, 0x71B2FE78 };
+    kryptos_u32_t ez[4] = { 0x5E2EC746, 0x91706288, 0x2C85B068, 0x5353DEB7 };
+
+    // INFO(Rafael): It is important to use x or y as the destination variable,
+    //               the internals of GCM implementation takes advantage of this convenience.
+
+    kryptos_gcm_gf_mul(x, y, x);
+
+    CUTE_ASSERT(memcmp(x, ez, sizeof(x)) == 0);
+CUTE_TEST_CASE_END
+
+static kryptos_task_result_t E_stub(kryptos_u8_t **h, size_t *h_size, kryptos_u8_t *key, size_t key_size, void *arg) {
+    kryptos_u8_t *hp;
+    hp = (kryptos_u8_t *)kryptos_newseg(16);
+    if (*h == NULL) {
+        hp[ 0] = 0x66;
+        hp[ 1] = 0xE9;
+        hp[ 2] = 0x4B;
+        hp[ 3] = 0xD4;
+        hp[ 4] = 0xEF;
+        hp[ 5] = 0x8A;
+        hp[ 6] = 0x2C;
+        hp[ 7] = 0x3B;
+        hp[ 8] = 0x88;
+        hp[ 9] = 0x4C;
+        hp[10] = 0xFA;
+        hp[11] = 0x59;
+        hp[12] = 0xCA;
+        hp[13] = 0x34;
+        hp[14] = 0x2B;
+        hp[15] = 0x2E;
+    } else if (*h != NULL) {
+        kryptos_freeseg(*h, 0);
+        hp[ 0] = 0x58;
+        hp[ 1] = 0xE2;
+        hp[ 2] = 0xFC;
+        hp[ 3] = 0xCE;
+        hp[ 4] = 0xFA;
+        hp[ 5] = 0x7E;
+        hp[ 6] = 0x30;
+        hp[ 7] = 0x61;
+        hp[ 8] = 0x36;
+        hp[ 9] = 0x7F;
+        hp[10] = 0x1D;
+        hp[11] = 0x57;
+        hp[12] = 0xA4;
+        hp[13] = 0xE7;
+        hp[14] = 0x45;
+        hp[15] = 0x5A;
+    }
+    *h = hp;
+    *h_size = 16;
+    return kKryptosSuccess;
+}
+
+static kryptos_task_result_t E_bad_stub(kryptos_u8_t **h, size_t *h_size, kryptos_u8_t *key, size_t key_size, void *arg) {
+    kryptos_u8_t *hp;
+    hp = (kryptos_u8_t *)kryptos_newseg(16);
+    if (*h == NULL) {
+        hp[ 0] = 0x66;
+        hp[ 1] = 0xE9;
+        hp[ 2] = 0x4B;
+        hp[ 3] = 0xD4;
+        hp[ 4] = 0xEF;
+        hp[ 5] = 0x8A;
+        hp[ 6] = 0x2C;
+        hp[ 7] = 0x3B;
+        hp[ 8] = 0x88;
+        hp[ 9] = 0x4C;
+        hp[10] = 0xFA;
+        hp[11] = 0x59;
+        hp[12] = 0xCA;
+        hp[13] = 0x34;
+        hp[14] = 0x2B;
+        hp[15] = 0x2E;
+    } else if (*h != NULL) {
+        kryptos_freeseg(*h, 0);
+        hp[ 0] = 0x58;
+        hp[ 1] = 0xE2;
+        hp[ 2] = 0xFC;
+        hp[ 3] = 0xCE;
+        hp[ 4] = 0xFA;
+        hp[ 5] = 0x7E;
+        hp[ 6] = 0x31; // INFO(Rafael): Flipping one bit. It is equivalent of flipping one bit in the cryptogram (user data).
+        hp[ 7] = 0x61;
+        hp[ 8] = 0x36;
+        hp[ 9] = 0x7F;
+        hp[10] = 0x1D;
+        hp[11] = 0x57;
+        hp[12] = 0xA4;
+        hp[13] = 0xE7;
+        hp[14] = 0x45;
+        hp[15] = 0x5A;
+    }
+    *h = hp;
+    *h_size = 16;
+    return kKryptosSuccess;
+}
+
+CUTE_TEST_CASE(kryptos_gcm_tests)
+    // INFO(Rafael): This test data was picked from Nist spec 'The Galois/Counter Mode of Operation' (revised) [Test case 2].
+    kryptos_u8_t *c;
+    size_t c_size;
+    kryptos_u8_t *key = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *etag = "\xAB\x6E\x47\xD4\x2C\xEC\x13\xBD\xF5\x3A\x67\xB2\x12\x57\xBD\xDF";
+    kryptos_u8_t *ec = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"                  // INFO(Rafael): IV.
+                       "\x03\x88\xDA\xCE\x60\xB6\xA3\x92\xF3\x28\xC2\xB9\x71\xB2\xFE\x78"; // INFO(Rafael): Cryptogram.
+    size_t ec_size = 28;
+
+    //INFO (Rafael): ----- No corrupted data case -----
+
+    c = (kryptos_u8_t *)kryptos_newseg(28);
+    CUTE_ASSERT(c != NULL);
+    memcpy(c, ec, ec_size);
+    c_size = ec_size;
+
+    // INFO(Rafael): GMAC generation test.
+
+    CUTE_ASSERT(kryptos_gcm_auth(&c, &c_size, 12, key, 16, NULL, 0, E_stub, NULL) == kKryptosSuccess);
+
+    // INFO(Rafael): After a well-succeeded generation the tag is appended to the cryptogram (the first 16-bytes).
+
+    CUTE_ASSERT(memcmp(c, etag, 16) == 0);
+
+    // INFO(Rafael): GMAC verification test.
+
+    CUTE_ASSERT(kryptos_gcm_verify(&c, &c_size, 12, key, 16, NULL, 0, E_stub, NULL) == kKryptosSuccess);
+
+    // INFO(Rafael): After a well-succeeded verification the tag is removed from the cryptogram.
+
+    CUTE_ASSERT(c_size == ec_size);
+    CUTE_ASSERT(memcmp(c, ec, c_size) == 0);
+
+    kryptos_freeseg(c, c_size);
+
+    //INFO (Rafael): ----- Corrupted data case -----
+
+    c = (kryptos_u8_t *)kryptos_newseg(28);
+    CUTE_ASSERT(c != NULL);
+    memcpy(c, ec, ec_size);
+    c_size = ec_size;
+
+    // INFO(Rafael): GMAC generation test.
+
+    CUTE_ASSERT(kryptos_gcm_auth(&c, &c_size, 12, key, 16, NULL, 0, E_stub, NULL) == kKryptosSuccess);
+
+    // INFO(Rafael): After a well-succeeded generation the tag is appended to the cryptogram (the first 16-bytes).
+
+    CUTE_ASSERT(memcmp(c, etag, 16) == 0);
+
+    // INFO(Rafael): GMAC verification test. Let's flip just one bit by passing the "bad" encryption stub.
+
+    CUTE_ASSERT(kryptos_gcm_verify(&c, &c_size, 12, key, 16, NULL, 0, E_bad_stub, NULL) == kKryptosProcessError);
+
+    // INFO(Rafael): After a non well-succeeded verification the tag is not removed from the cryptogram.
+
+    CUTE_ASSERT(c_size != ec_size);
+    CUTE_ASSERT(memcmp(c, ec, ec_size) != 0);
+
+    kryptos_freeseg(c, c_size);
 CUTE_TEST_CASE_END

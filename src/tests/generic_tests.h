@@ -46,4 +46,8 @@ CUTE_DECLARE_TEST_CASE(kryptos_memcmp_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_memory_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_gcm_gf_mul_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_gcm_tests);
+
 #endif
