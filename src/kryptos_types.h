@@ -131,6 +131,7 @@ typedef enum {
     kKryptosCBC,
     kKryptosOFB,
     kKryptosCTR,
+    kKryptosGCM,
     kKryptosCipherModeNr
 }kryptos_cipher_mode_t;
 
@@ -203,6 +204,7 @@ typedef enum {
     kKryptosInvalidParams,
     kKryptosInvalidCipher,
     kKryptosHMACError,
+    kKryptosGMACError,
     kKryptosInvalidSignature,
     kKryptosTaskResultNr
 }kryptos_task_result_t;
@@ -402,6 +404,12 @@ kryptos_## cipher_name ##_e_epilogue:\
     return result;\
 }
 
+#define KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(cipher_name)\
+kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_size,\
+                                                  kryptos_u8_t *key, size_t key_size, void *additional_arg) {\
+    return kKryptosProcessError;\
+}
+
 #ifndef __cplusplus
 #define KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_GCM_E(cipher_name, additional_args...)\
     kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_size,\
@@ -443,6 +451,12 @@ kryptos_## cipher_name ##_e_epilogue:\
     return result;\
 }
 
+#define KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_GCM_E_NO_SUPPORT(cipher_name, additional_arg)\
+kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_size,\
+                                                  kryptos_u8_t *key, size_t key_size, additional_arg) {\
+    return kKryptosProcessError;\
+}
+
 #ifndef KRYPTOS_KERNEL_MODE
 
 #define KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(cipher_name,\
@@ -459,7 +473,8 @@ kryptos_## cipher_name ##_e_epilogue:\
                                             cipher_block_size,\
                                             cipher_epilogue,\
                                             outblock,\
-                                            cipher_block_processor_stmt)\
+                                            cipher_block_processor_stmt,\
+                                            e_arg)\
 void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
     struct cipher_subkeys_struct cipher_subkeys_struct_var;\
     cipher_block_processor_t cipher_block_processor;\
@@ -470,12 +485,27 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
         return;\
     }\
     cipher_key_expansion_stmt;\
-    if ((*ktask)->action == kKryptosEncrypt || (*ktask)->mode == kKryptosOFB || (*ktask)->mode == kKryptosCTR) {\
+    if ((*ktask)->action == kKryptosEncrypt || (*ktask)->mode == kKryptosOFB ||\
+                                               (*ktask)->mode == kKryptosCTR ||\
+                                               (*ktask)->mode == kKryptosGCM) {\
         cipher_block_processor = cipher_block_encrypt;\
         cipher_additional_stmts_before_encrypting;\
     } else {\
         cipher_block_processor = cipher_block_decrypt;\
         cipher_additional_stmts_before_decrypting;\
+    }\
+    if ((*ktask)->mode == kKryptosGCM && (*ktask)->action == kKryptosDecrypt) {\
+        (*ktask)->result = kryptos_gcm_verify(&(*ktask)->in, &(*ktask)->in_size, (*ktask)->iv_size,\
+                                              (*ktask)->key, (*ktask)->key_size,\
+                                              (*ktask)->aux_buffers.buf1,\
+                                              ((*ktask)->aux_buffers.buf1 != NULL) ? (*ktask)->aux_buffers.buf1_size : 0,\
+                                              kryptos_ ## cipher_name ## _e, e_arg);\
+        if ((*ktask)->result != kKryptosSuccess) {\
+            if ((*ktask)->result == kKryptosGMACError) {\
+                (*ktask)->result_verbose = "Corrupted data.";\
+            }\
+            goto kryptos_ ## cipher_epilogue;\
+        }\
     }\
     kryptos_meta_block_processing_prologue(cipher_block_size,\
                                            inblock, inblock_p,\
@@ -494,6 +524,13 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
                                   outblock_p,\
                                   &(*ktask)->aux_buffers, (*ktask)->ctr,\
                                   cipher_epilogue, cipher_block_processor_stmt);\
+    if ((*ktask)->action == kKryptosEncrypt && (*ktask)->result == kKryptosSuccess && (*ktask)->mode == kKryptosGCM) {\
+        (*ktask)->result = kryptos_gcm_auth(&(*ktask)->out, &(*ktask)->out_size, (*ktask)->iv_size,\
+                                            (*ktask)->key, (*ktask)->key_size,\
+                                            (*ktask)->aux_buffers.buf1,\
+                                            ((*ktask)->aux_buffers.buf1 != NULL) ? (*ktask)->aux_buffers.buf1_size : 0,\
+                                            kryptos_ ## cipher_name ## _e, e_arg);\
+    }\
     kryptos_meta_block_processing_epilogue(cipher_epilogue,\
                                            inblock, inblock_p, in_p, in_end,\
                                            outblock, outblock_p, out_p,\
@@ -518,7 +555,8 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
                                             cipher_block_size,\
                                             cipher_epilogue,\
                                             outblock,\
-                                            cipher_block_processor_stmt)\
+                                            cipher_block_processor_stmt,\
+                                            e_arg)\
 void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
     static struct cipher_subkeys_struct cipher_subkeys_struct_var;\
     cipher_block_processor_t cipher_block_processor;\
@@ -529,12 +567,24 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
         return;\
     }\
     cipher_key_expansion_stmt;\
-    if ((*ktask)->action == kKryptosEncrypt || (*ktask)->mode == kKryptosOFB || (*ktask)->mode == kKryptosCTR) {\
+    if ((*ktask)->action == kKryptosEncrypt || (*ktask)->mode == kKryptosOFB ||\
+                                               (*ktask)->mode == kKryptosCTR ||\
+                                               (*ktask)->mode == kKryptosGCM) {\
         cipher_block_processor = cipher_block_encrypt;\
         cipher_additional_stmts_before_encrypting;\
     } else {\
         cipher_block_processor = cipher_block_decrypt;\
         cipher_additional_stmts_before_decrypting;\
+    }\
+    if ((*ktask)->mode == kKryptosGCM && (*ktask)->action == kKryptosDecrypt) {\
+        (*ktask)->result = kryptos_gcm_verify(&(*ktask)->in, &(*ktask)->in_size, (*ktask)->iv_size,\
+                                              (*ktask)->key, (*ktask)->key_size,\
+                                              (*ktask)->aux_buffers.buf1,\
+                                              ((*ktask)->aux_buffers.buf1 != NULL) ? (*ktask)->aux_buffers.buf1_size : 0,\
+                                              kryptos_ ## cipher_name ## _e, e_arg);\
+        if ((*ktask)->result != kKryptosSuccess) {\
+            goto kryptos_ ## cipher_epilogue;\
+        }\
     }\
     kryptos_meta_block_processing_prologue(cipher_block_size,\
                                            inblock, inblock_p,\
@@ -553,6 +603,13 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
                                   outblock_p,\
                                   &(*ktask)->aux_buffers, (*ktask)->ctr,\
                                   cipher_epilogue, cipher_block_processor_stmt);\
+    if ((*ktask)->action == kKryptosEncrypt && (*ktask)->result == kKryptosSuccess && (*ktask)->mode == kKryptosGCM) {\
+        (*ktask)->result = kryptos_gcm_auth(&(*ktask)->out, &(*ktask)->out_size, (*ktask)->iv_size,\
+                                            (*ktask)->key, (*ktask)->key_size,\
+                                            (*ktask)->aux_buffers.buf1,\
+                                            ((*ktask)->aux_buffers.buf1 != NULL) ? (*ktask)->aux_buffers.buf1_size : 0,\
+                                            kryptos_ ## cipher_name ## _e, e_arg);\
+    }\
     kryptos_meta_block_processing_epilogue(cipher_epilogue,\
                                            inblock, inblock_p, in_p, in_end,\
                                            outblock, outblock_p, out_p,\

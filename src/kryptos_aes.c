@@ -175,7 +175,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes128,
                                     KRYPTOS_AES_BLOCKSIZE,
                                     aes128_cipher_epilogue,
                                     outblock,
-                                    aes_block_processor(outblock, &sks))
+                                    aes_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg */)
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(aes128)
 
@@ -193,7 +194,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes192,
                                     KRYPTOS_AES_BLOCKSIZE,
                                     aes192_cipher_epilogue,
                                     outblock,
-                                    aes_block_processor(outblock, &sks))
+                                    aes_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg */)
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(aes192)
 
@@ -211,7 +213,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(aes256,
                                     KRYPTOS_AES_BLOCKSIZE,
                                     aes256_cipher_epilogue,
                                     outblock,
-                                    aes_block_processor(outblock, &sks))
+                                    aes_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg */)
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(aes256)
 

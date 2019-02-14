@@ -163,7 +163,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(mars128,
                                     KRYPTOS_MARS_BLOCKSIZE,
                                     mars128_cipher_epilogue,
                                     outblock,
-                                    mars_block_processor(outblock, &sks))
+                                    mars_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg */)
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(mars128)
 
@@ -181,7 +182,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(mars192,
                                     KRYPTOS_MARS_BLOCKSIZE,
                                     mars128_cipher_epilogue,
                                     outblock,
-                                    mars_block_processor(outblock, &sks))
+                                    mars_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg */)
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(mars192)
 
@@ -199,7 +201,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(mars256,
                                     KRYPTOS_MARS_BLOCKSIZE,
                                     mars128_cipher_epilogue,
                                     outblock,
-                                    mars_block_processor(outblock, &sks))
+                                    mars_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg */)
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(mars256)
 

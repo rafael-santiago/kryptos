@@ -1617,7 +1617,7 @@ CUTE_TEST_CASE(kryptos_gcm_tests)
 
     // INFO(Rafael): GMAC verification test. Let's flip just one bit by passing the "bad" encryption stub.
 
-    CUTE_ASSERT(kryptos_gcm_verify(&c, &c_size, 12, key, 16, NULL, 0, E_bad_stub, NULL) == kKryptosProcessError);
+    CUTE_ASSERT(kryptos_gcm_verify(&c, &c_size, 12, key, 16, NULL, 0, E_bad_stub, NULL) == kKryptosGMACError);
 
     // INFO(Rafael): After a non well-succeeded verification the tag is not removed from the cryptogram.
 

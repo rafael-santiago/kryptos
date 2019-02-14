@@ -47,7 +47,10 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(tea,
                                     KRYPTOS_TEA_BLOCKSIZE,
                                     tea_cipher_epilogue,
                                     outblock,
-                                    tea_block_processor(outblock, (*ktask)->key))
+                                    tea_block_processor(outblock, (*ktask)->key),
+                                    NULL /* GCM E function arg (No GCM) */)
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(tea)
 
 static void kryptos_tea_block_encryption(kryptos_u8_t *block, kryptos_u8_t *key) {
     kryptos_u32_t y, z, k[4];

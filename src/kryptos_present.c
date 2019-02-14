@@ -201,7 +201,10 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(present80,
                                     KRYPTOS_PRESENT_BLOCKSIZE,
                                     present80_cipher_epilogue,
                                     outblock,
-                                    present_block_processor(outblock, &sks))
+                                    present_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg (No GCM) */)
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(present80)
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_SETUP(present128, kKryptosCipherPRESENT, KRYPTOS_PRESENT_BLOCKSIZE)
 
@@ -217,7 +220,10 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(present128,
                                     KRYPTOS_PRESENT_BLOCKSIZE,
                                     present128_cipher_epilogue,
                                     outblock,
-                                    present_block_processor(outblock, &sks))
+                                    present_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg (No GCM) */)
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(present128)
 
 static void kryptos_present_rotl_u80(struct kryptos_present_kbuf *key, const size_t n) {
     size_t l;

@@ -13,6 +13,7 @@
 #include <kryptos_memory.h>
 #include <kryptos_block_parser.h>
 #include <kryptos_iv_utils.h>
+#include <kryptos_gcm_utils.h>
 #include <kryptos_pem.h>
 #include <kryptos_random.h>
 
@@ -75,6 +76,12 @@
 #define kryptos_task_set_cbc_mode(ktask) ( (ktask)->mode = kKryptosCBC )
 
 #define kryptos_task_set_ctr_mode(ktask, uctr) ( (ktask)->mode = kKryptosCTR, (ktask)->ctr = (uctr) )
+
+#define kryptos_task_set_gcm_mode(ktask, uctr, aad, add_size) (\
+    (ktask)->mode = kKryptosGCM,\
+    (ktask)->ctr = (uctr),\
+    (ktask)->aux_buffers.buf1 = aad,\
+    (ktask)->aux_buffers.buf1_size = add_size )
 
 #define kryptos_task_set_encrypt_action(ktask) ( (ktask)->action = kKryptosEncrypt )
 
@@ -237,7 +244,7 @@ epilogue:\
                                           out, out_p, out_size,\
                                           in_block, out_block,\
                                           epilogue, block_processor_call_scheme);\
-    } else if (mode == kKryptosCTR) {\
+    } else if (mode == kKryptosCTR || mode == kKryptosGCM) {\
         kryptos_meta_block_processing_ctr(block_size_in_bytes,\
                                           action,\
                                           iv,\

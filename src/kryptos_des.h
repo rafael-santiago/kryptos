@@ -16,16 +16,22 @@ KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(des)
 
 KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR(des)
 
+KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_GCM_E(des)
+
 KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_SETUP(triple_des, ktask,
                                        kryptos_u8_t *key2, size_t *key2_size,
                                        kryptos_u8_t *key3, size_t *key3_size)
 
 KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR(triple_des)
 
+KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_GCM_E(triple_des)
+
 KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_SETUP(triple_des_ede, ktask,
                                        kryptos_u8_t *key2, size_t *key2_size,
                                        kryptos_u8_t *key3, size_t *key3_size)
 
 KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR(triple_des_ede)
+
+KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_GCM_E(triple_des_ede)
 
 #endif

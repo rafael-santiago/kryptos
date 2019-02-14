@@ -156,7 +156,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(camellia128,
                                     KRYPTOS_CAMELLIA_BLOCKSIZE,
                                     camellia_cipher_epilogue,
                                     outblock,
-                                    camellia_block_processor(outblock, &sks))
+                                    camellia_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg */)
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(camellia128)
 
@@ -177,7 +178,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(camellia192,
                                     KRYPTOS_CAMELLIA_BLOCKSIZE,
                                     camellia_cipher_epilogue,
                                     outblock,
-                                    camellia_block_processor(outblock, &sks))
+                                    camellia_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg */)
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(camellia192)
 
@@ -198,7 +200,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(camellia256,
                                     KRYPTOS_CAMELLIA_BLOCKSIZE,
                                     camellia_cipher_epilogue,
                                     outblock,
-                                    camellia_block_processor(outblock, &sks))
+                                    camellia_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg */)
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(camellia256)
 

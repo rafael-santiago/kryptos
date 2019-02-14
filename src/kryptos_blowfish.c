@@ -300,7 +300,10 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(blowfish,
                                     KRYPTOS_BLOWFISH_BLOCKSIZE,
                                     blowfish_cipher_epilogue,
                                     outblock,
-                                    blowfish_block_processor(outblock, &sks))
+                                    blowfish_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg (No GCM) */)
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(blowfish)
 
 static void kryptos_blowfish_block_encrypt(kryptos_u8_t *block, const struct kryptos_blowfish_subkeys *sks) {
     size_t i;

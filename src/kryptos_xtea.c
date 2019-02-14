@@ -61,7 +61,10 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(xtea,
                                     KRYPTOS_XTEA_BLOCKSIZE,
                                     xtea_cipher_epilogue,
                                     outblock,
-                                    xtea_block_processor(outblock, (*ktask)->key, *(int *)(*ktask)->arg[0]))
+                                    xtea_block_processor(outblock, (*ktask)->key, *(int *)(*ktask)->arg[0]),
+                                    NULL /* GCM E function arg (No GCM) */)
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(xtea)
 
 static void kryptos_xtea_block_encrypt(kryptos_u8_t *block, kryptos_u8_t *key, const int rounds) {
     int r;

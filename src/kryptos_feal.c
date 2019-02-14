@@ -86,7 +86,10 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(feal,
                                     KRYPTOS_FEAL_BLOCKSIZE,
                                     feal_cipher_epilogue,
                                     outblock,
-                                    feal_block_processor(outblock, &sks))
+                                    feal_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg (No GCM) */)
+
+KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_GCM_E_NO_SUPPORT(feal, void *rounds)
 
 static kryptos_u8_t kryptos_feal_Sd(kryptos_u8_t T, kryptos_u8_t U, int d) {
     T = (T + U + d) % 256;

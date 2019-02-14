@@ -109,7 +109,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(noekeon,
                                     KRYPTOS_NOEKEON_BLOCKSIZE,
                                     noekeon_cipher_epilogue,
                                     outblock,
-                                    noekeon_block_processor(outblock, &sks))
+                                    noekeon_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg */)
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(noekeon)
 
@@ -131,7 +132,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(noekeon_d,
                                     KRYPTOS_NOEKEON_BLOCKSIZE,
                                     noekeon_cipher_epilogue,
                                     outblock,
-                                    noekeon_block_processor(outblock, &sks))
+                                    noekeon_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg */)
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(noekeon_d)
 

@@ -98,7 +98,10 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(rc5,
                                     KRYPTOS_RC5_BLOCKSIZE,
                                     rc5_cipher_epilogue,
                                     outblock,
-                                    rc5_block_processor(outblock, &sks))
+                                    rc5_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg (No GCM) */)
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(rc5)
 
 static void kryptos_rc5_ld_user_key(kryptos_u32_t *l, const kryptos_u8_t *key, const size_t key_size) {
     const kryptos_u8_t *kp, *kp_end;

@@ -16,6 +16,8 @@ KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(blowfish)
 
 KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR(blowfish)
 
+KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_GCM_E(blowfish)
+
 #ifndef __cplusplus
 kryptos_u8_t *kryptos_bcrypt(const int cost,
                              const kryptos_u8_t *salt, const size_t salt_size,

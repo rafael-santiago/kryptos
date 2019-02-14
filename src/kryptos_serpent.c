@@ -449,7 +449,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(serpent,
                                     KRYPTOS_SERPENT_BLOCKSIZE,
                                     serpent_cipher_epilogue,
                                     outblock,
-                                    serpent_block_processor(outblock, &sks))
+                                    serpent_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg */)
 
 KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(serpent)
 

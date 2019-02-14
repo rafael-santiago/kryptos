@@ -226,7 +226,14 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(des,
                                     KRYPTOS_DES_BLOCKSIZE,
                                     des_cipher_epilogue,
                                     outblock,
-                                    des_block_processor(outblock, &sks))
+                                    des_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg (No GCM) */)
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(des)
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(triple_des)
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(triple_des_ede)
 
 void kryptos_triple_des_ede_setup(kryptos_task_ctx *ktask,
                                   kryptos_u8_t *key1,

@@ -78,7 +78,7 @@ kryptos_task_result_t kryptos_gcm_verify(kryptos_u8_t **c, size_t *c_size,
         (result = kryptos_gcm_tag(*c + 16, *c_size - 16, iv_size,
                                   key, key_size, a, a_size, E, E_arg, tag)) == kKryptosSuccess) {
         if (memcmp(tag, *c, 16) != 0) {
-            result = kKryptosProcessError;
+            result = kKryptosGMACError;
             goto kryptos_gcm_verify_epilogue;
         }
 

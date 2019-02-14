@@ -98,7 +98,8 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
           (*ktask)->cipher != kKryptosCipherELGAMALOAEP   ) && (*ktask)->mode != kKryptosECB  &&
                                                                (*ktask)->mode != kKryptosCBC  &&
                                                                (*ktask)->mode != kKryptosOFB  &&
-                                                               (*ktask)->mode != kKryptosCTR) {
+                                                               (*ktask)->mode != kKryptosCTR  &&
+                                                               (*ktask)->mode != kKryptosGCM) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Invalid operation mode.";
         goto kryptos_task_check_error;
@@ -113,6 +114,7 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
           (*ktask)->cipher != kKryptosCipherELGAMAL ) && ( (*ktask)->mode == kKryptosCBC ||
                                                            (*ktask)->mode == kKryptosOFB ||
                                                            (*ktask)->mode == kKryptosCTR ||
+                                                           (*ktask)->mode == kKryptosGCM ||
                                                            (*ktask)->cipher == kKryptosCipherRABBIT) &&
                                                               kryptos_task_check_iv_data(ktask) == 0) {
         (*ktask)->result = kKryptosInvalidParams;
@@ -240,7 +242,7 @@ kryptos_task_check_sign_rsa_error:
 }
 
 int kryptos_task_check_verify(kryptos_task_ctx **ktask) {
-    // CLUE(Rafael): Keep reading the code and you will discover the standard meaning of the jargon "verify"
+    // CLUE(Rafael): Keep on reading the code and you will discover the standard meaning of the jargon "verify"
     //               in Cryptology.
 
     if (ktask == NULL || *ktask == NULL) {

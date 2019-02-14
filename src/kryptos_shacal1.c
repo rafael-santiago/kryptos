@@ -69,7 +69,10 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(shacal1,
                                     KRYPTOS_SHACAL1_BLOCKSIZE,
                                     shacal1_cipher_epilogue,
                                     outblock,
-                                    shacal1_block_processor(outblock, &sks))
+                                    shacal1_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg (No GCM) */)
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(shacal1)
 
 static void kryptos_shacal1_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
     const kryptos_u8_t *kp, *kp_end;

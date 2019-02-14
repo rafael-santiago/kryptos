@@ -55,7 +55,10 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(idea,
                                     KRYPTOS_IDEA_BLOCKSIZE,
                                     idea_cipher_epilogue,
                                     outblock,
-                                    idea_block_processor(outblock, &sks))
+                                    idea_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg (No GCM) */)
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(idea)
 
 static void kryptos_idea_128bit_roll(kryptos_u32_t *x, int degree) {
     kryptos_u32_t xx[4];

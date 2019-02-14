@@ -125,7 +125,10 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(gost_ds,
                                     KRYPTOS_GOST_BLOCKSIZE,
                                     gost_cipher_epilogue,
                                     outblock,
-                                    gost_block_processor(outblock, &sks))
+                                    gost_block_processor(outblock, &sks),
+                                    NULL /* GCM E function arg (No GCM) */)
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(gost_ds)
 
 void kryptos_gost_setup(kryptos_task_ctx *ktask,
                                   kryptos_u8_t *key,
@@ -233,7 +236,10 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(gost,
                                     KRYPTOS_GOST_BLOCKSIZE,
                                     gost_cipher_epilogue,
                                     outblock,
-                                    gost_block_processor(outblock, &sks))
+                                    gost_block_processor(outblock, &sks),
+                                    NULL /* GCM E functio arg (No GCM) */)
+
+KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(gost)
 
 static void kryptos_gost_load_user_key(const kryptos_u8_t *key, const size_t key_size, struct kryptos_gost_subkeys *sks) {
     const kryptos_u8_t *kp, *kp_end;
