@@ -142,8 +142,8 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 The available modes of operation for block ciphers are: ``ECB``, ``CBC``, ``CTR``, ``OFB`` and ``GCM``. So in practice,
 considering the ``OFB`` and ``CTR`` modes (also ``GCM`` indirectly), we have 37 stream ciphers instead of only three.
 
-As you should know, originally, the GCM mode is only supported by block cipher which works with 128-bit blocks. Currently
-those are the cipher with support for GCM mode in kryptos: ``AES-128``, ``AES-192``, ``AES-256``, ``RC6-128``, ``RC6-192``,
+As you should know, originally, the GCM mode is only supported by block ciphers which work with 128-bit blocks. Currently
+these are the ciphers with support for GCM mode in kryptos: ``AES-128``, ``AES-192``, ``AES-256``, ``RC6-128``, ``RC6-192``,
 ``RC6-256``, ``CAMELLIA-128``, ``CAMELLIA-192``, ``CAMELLIA-256``, ``SERPENT``, ``MARS-128``, ``MARS-192``, ``MARS-256``,
 ``NOEKEON`` (indirect key mode), ``NOEKEON`` (direct key mode).
 
