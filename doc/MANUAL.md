@@ -147,7 +147,7 @@ these are the ciphers with support for GCM mode in kryptos: ``AES-128``, ``AES-1
 ``RC6-256``, ``CAMELLIA-128``, ``CAMELLIA-192``, ``CAMELLIA-256``, ``SERPENT``, ``MARS-128``, ``MARS-192``, ``MARS-256``,
 ``NOEKEON`` (indirect key mode), ``NOEKEON`` (direct key mode).
 
-When you try to run a cipher whithout support for GCM mode a error will be returned (``kKryptosNoSupport``).
+When you try to run a cipher whithout support for GCM mode an error will be returned (``kKryptosNoSupport``).
 More on cipher modes will be treated later. Similarly, more details about how to use GCM will be shown later, too.
 
 The way of indicating the desired cipher for an encryption task is by setting the field ``cipher`` from the ``kryptos_task_ctx``
