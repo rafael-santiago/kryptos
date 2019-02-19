@@ -232,7 +232,7 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
     struct gcm_ghash_data_ancillary_ctx {
         struct gcm_ghash_block_ctx *block;
         size_t block_size;
-    } ublocks[2], *ubp, *ubp_end;
+    } ublocks[3], *ubp, *ubp_end;
     kryptos_u8_t *temp = NULL;
     size_t temp_size[2] = { 0, 0 }, A_size = 0, C_size = 0;
     int no_error = 0;
@@ -348,14 +348,30 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
     //          'X_i = (X_{i-1} ^ (C*_{n}||0^{128-u})) x H'. Because 'C' was previously padded.
     //
     // It avoids tricky and less intuitive indexing by offsets as suggested by the original spec.
+    //
+    // This simplification also generalizes the last step of GHASH as a last additional iteration.
+    // Thus, the loop over ublocks[2] is equivalent to:
+    //          'X_i = (X_{m + n} ^ (len(A)||len(C))) x H'.
+    //
 
     ublocks[0].block = A;
     ublocks[0].block_size = A_size;
     ublocks[1].block = C;
     ublocks[1].block_size = C_size;
 
+    l[0] = (kryptos_u64_t) a_size << 3;
+    l[1] = (kryptos_u64_t) c_size << 3;
+
+    L.u32[0] = l[0] >> 32;
+    L.u32[1] = l[0] & 0xFFFFFF;
+    L.u32[2] = l[1] >> 32;
+    L.u32[3] = l[1] & 0xFFFFFF;
+
+    ublocks[2].block = &L;
+    ublocks[2].block_size = 1;
+
     ubp = &ublocks[0];
-    ubp_end = ubp + 2;
+    ubp_end = ubp + 3;
 
     X[0] = X[1] = X[2] = X[3] = 0;
 
@@ -389,7 +405,7 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
             X[3] ^= GCM_GHASH_WORD(C, b - A_size - 1, 3);
         }
         kryptos_gcm_gf_mul(X, H, X);
-    } ----- DEPRECATED ----- */
+    }
 
     // INFO(Rafael): 'X_i = (X_{m + n} ^ (len(A)||len(C))) x H'.
 
@@ -405,7 +421,7 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
     X[1] ^= GCM_GHASH_WORD(&L, 0, 1);
     X[2] ^= GCM_GHASH_WORD(&L, 0, 2);
     X[3] ^= GCM_GHASH_WORD(&L, 0, 3);
-    kryptos_gcm_gf_mul(X, H, X);
+    kryptos_gcm_gf_mul(X, H, X); ----- DEPRECATED -----*/
 
     // INFO(Rafael): Considering 'y' fits, at least, 16 bytes (our 128-bit GHASH output).
 
