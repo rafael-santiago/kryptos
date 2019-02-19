@@ -61,7 +61,7 @@ KUTE_TEST_CASE(ktest_monkey)
 
     // INFO(Rafael): We only test the GCM mode after ensuring that everything is fine with CTR.
 
-    /*KUTE_RUN_TEST(kryptos_des_gcm_tests);
+    KUTE_RUN_TEST(kryptos_des_gcm_tests);
     KUTE_RUN_TEST(kryptos_idea_gcm_tests);
     KUTE_RUN_TEST(kryptos_blowfish_gcm_tests);
     KUTE_RUN_TEST(kryptos_feal_gcm_tests);
@@ -94,7 +94,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_noekeon_gcm_tests);
     KUTE_RUN_TEST(kryptos_noekeon_d_gcm_tests);
     KUTE_RUN_TEST(kryptos_gost_ds_gcm_tests);
-    KUTE_RUN_TEST(kryptos_gost_gcm_tests);*/
+    KUTE_RUN_TEST(kryptos_gost_gcm_tests);
 
     KUTE_RUN_TEST(kryptos_des_weak_keys_detection_tests);
 

@@ -572,7 +572,7 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
                                             cipher_block_processor_stmt,\
                                             e_arg)\
 void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
-    static struct cipher_subkeys_struct cipher_subkeys_struct_var;\
+    static struct cipher_subkeys_struct cipher_subkeys_struct_var, cipher_subkeys_struct_var ## _cpy;\
     cipher_block_processor_t cipher_block_processor;\
     kryptos_u8_t *in_p = NULL, *in_end = NULL, *out_p = NULL;\
     kryptos_u8_t *outblock = NULL, *outblock_p = NULL, *inblock = NULL, *inblock_p = NULL;\
@@ -591,14 +591,21 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
         cipher_additional_stmts_before_decrypting;\
     }\
     if ((*ktask)->mode == kKryptosGCM && (*ktask)->action == kKryptosDecrypt) {\
+        /*WARN(Rafael): This data swapping is necessary. Because the cipher\
+                        context is static in order to save heap memory when in kernel mode*/\
+        memcpy(&cipher_subkeys_struct_var ## _cpy, &(cipher_subkeys_struct_var), sizeof(cipher_subkeys_struct_var));\
         (*ktask)->result = kryptos_gcm_verify(&(*ktask)->in, &(*ktask)->in_size, (*ktask)->iv_size,\
                                               (*ktask)->key, (*ktask)->key_size,\
                                               (*ktask)->aux_buffers.buf1,\
                                               ((*ktask)->aux_buffers.buf1 != NULL) ? (*ktask)->aux_buffers.buf1_size : 0,\
                                               kryptos_ ## cipher_name ## _e, e_arg);\
         if ((*ktask)->result != kKryptosSuccess) {\
+            if ((*ktask)->result == kKryptosGMACError) {\
+                (*ktask)->result_verbose = "Corrupted data.";\
+            }\
             goto kryptos_ ## cipher_epilogue;\
         }\
+        memcpy(&(cipher_subkeys_struct_var), &cipher_subkeys_struct_var ## _cpy, sizeof(cipher_subkeys_struct_var ## _cpy));\
     }\
     kryptos_meta_block_processing_prologue(cipher_block_size,\
                                            inblock, inblock_p,\
@@ -618,6 +625,9 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
                                   &(*ktask)->aux_buffers, (*ktask)->ctr,\
                                   cipher_epilogue, cipher_block_processor_stmt);\
     if ((*ktask)->action == kKryptosEncrypt && (*ktask)->result == kKryptosSuccess && (*ktask)->mode == kKryptosGCM) {\
+        /*WARN(Rafael): This data swapping is necessary. Because the cipher\
+                        context is static in order to save heap memory when in kernel mode*/\
+        memcpy(&cipher_subkeys_struct_var ## _cpy, &(cipher_subkeys_struct_var), sizeof(cipher_subkeys_struct_var));\
         (*ktask)->result = kryptos_gcm_auth(&(*ktask)->out, &(*ktask)->out_size, (*ktask)->iv_size,\
                                             (*ktask)->key, (*ktask)->key_size,\
                                             (*ktask)->aux_buffers.buf1,\
@@ -628,6 +638,7 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
             (*ktask)->out = NULL;\
             (*ktask)->out_size = 0;\
         }\
+        memcpy(&(cipher_subkeys_struct_var), &cipher_subkeys_struct_var ## _cpy, sizeof(cipher_subkeys_struct_var ## _cpy));\
     }\
     kryptos_meta_block_processing_epilogue(cipher_epilogue,\
                                            inblock, inblock_p, in_p, in_end,\

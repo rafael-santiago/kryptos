@@ -70,7 +70,6 @@ static kryptos_u8_t *gcm_test_data[] = {
         "\t\t\"Time for you to leave.\" -- The Tao of Programming"
 };
 
-
 #define kryptos_run_gcm_tests_no_support(cipher_name) {\
     kryptos_task_ctx t, *ktask = &t;\
     kryptos_u8_t *key = "GCMTest";\
@@ -195,8 +194,7 @@ static kryptos_u8_t *gcm_test_data[] = {
 #define kryptos_run_gcm_tests_with_custom_setup(cipher_name, ktask, setup_stmt) {\
     size_t tv, tv_nr = sizeof(gcm_test_data) / sizeof(gcm_test_data[0]);\
     kryptos_task_ctx t, *ktask = &t;\
-    kryptos_u8_t *key = "GCMTest";\
-    size_t key_size = 7, data_size;\
+    size_t data_size;\
     for (tv = 0; tv < tv_nr; tv++) {\
         /*INFO(Rafael): Authentication success without aad.*/\
         kryptos_task_init_as_null(ktask);\
