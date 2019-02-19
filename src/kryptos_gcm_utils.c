@@ -158,11 +158,15 @@ static kryptos_task_result_t kryptos_gcm_tag(kryptos_u8_t *c, const size_t c_siz
     kryptos_task_result_t result = kKryptosProcessError;
     size_t H_size, Y_size;
 
-    // INFO(Rafael): By design, the iv is embbeded in the ciphertext (as its first block).
+    // INFO(Rafael): By design, the iv is embedded in the ciphertext (as its first block).
 
     // INFO(Rafael): 'H = E(K, 0^{128})'.
 
-    if (E == NULL || E(&H, &H_size, key, key_size, E_arg) != kKryptosSuccess) {
+    if (E == NULL || (result = E(&H, &H_size, key, key_size, E_arg)) != kKryptosSuccess) {
+        goto kryptos_gcm_tag_epilogue;
+    }
+
+    if ((Y0 = (kryptos_u8_t *) kryptos_newseg(16)) == NULL) {
         goto kryptos_gcm_tag_epilogue;
     }
 
@@ -175,9 +179,6 @@ static kryptos_task_result_t kryptos_gcm_tag(kryptos_u8_t *c, const size_t c_siz
         }
     } else {
         // WARN(Rafael): By design iv_size is always equals to 16. So this code, until now, will never be hit.
-        if ((Y0 = (kryptos_u8_t *) kryptos_newseg(16)) == NULL) {
-            goto kryptos_gcm_tag_epilogue;
-        }
         memcpy(Y0, c, 12);
         Y0[12] = Y0[13] = Y0[14] = 0x00;
         Y0[15] = 0x01;
@@ -191,7 +192,7 @@ static kryptos_task_result_t kryptos_gcm_tag(kryptos_u8_t *c, const size_t c_siz
 
     Y_size = 16;
 
-    if (E(&Y0, &Y_size, key, key_size, E_arg) != kKryptosSuccess) {
+    if ((result = E(&Y0, &Y_size, key, key_size, E_arg)) != kKryptosSuccess) {
         goto kryptos_gcm_tag_epilogue;
     }
 
@@ -224,22 +225,22 @@ kryptos_gcm_tag_epilogue:
 static int kryptos_gcm_ghash(const kryptos_u8_t *h,
                              const kryptos_u8_t *a, const size_t a_size,
                              const kryptos_u8_t *c, const size_t c_size, kryptos_u8_t *y) {
-    kryptos_u32_t H[4];
+    kryptos_u32_t H[4], X[4];
     kryptos_u64_t l[2];
-    size_t block_nr, b, offset;
-    struct gcm_ghash_block_ctx *X = NULL, *A = NULL, *C = NULL, L;
+    size_t b, offset;
+    struct gcm_ghash_block_ctx *A = NULL, *C = NULL, L;
+    struct gcm_ghash_data_ancillary_ctx {
+        struct gcm_ghash_block_ctx *block;
+        size_t block_size;
+    } ublocks[2], *ubp, *ubp_end;
     kryptos_u8_t *temp = NULL;
-    size_t temp_size[2] = { 0, 0 };
+    size_t temp_size[2] = { 0, 0 }, A_size = 0, C_size = 0;
     int no_error = 0;
 
     H[0] = kryptos_get_u32_as_big_endian(h, 16);
     H[1] = kryptos_get_u32_as_big_endian(h +  4, 12);
     H[2] = kryptos_get_u32_as_big_endian(h +  8,  8);
     H[3] = kryptos_get_u32_as_big_endian(h + 12,  4);
-
-    block_nr = a_size;
-
-#define GCM_GHASH_BLOCK(d, i) (d)[(i)].u32
 
 #define GCM_GHASH_WORD(d, i, j) (d)[(i)].u32[(j)]
 
@@ -269,13 +270,16 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
 }
 
     if (a_size > 0) {
+        // WARN(Rafael): The original spec states that the size of the additional authenticated data
+        //               can vary from 1 to 128-bits. Here I am not limiting it, thus this GHASH implementation
+        //               accepts AAD buffers greater than 16 bytes. Handling the AAD as the same way of C, consuming
+        //               the buffer as 128-bit blocks per iteration (XORing + GF multiplication).
+
         temp_size[0] = a_size;
 
-        while ((temp_size[0] % 4)) {
+        while ((temp_size[0] % 16)) {
             temp_size[0]++;
         }
-
-        block_nr = temp_size[0];
 
         if ((temp = (kryptos_u8_t *) kryptos_newseg(temp_size[0])) == NULL) {
             goto kryptos_gcm_ghash_epilogue;
@@ -287,13 +291,15 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
 
         memcpy(temp, a, a_size);
 
-        A = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * (temp_size[0] >> 4));
+        A_size = temp_size[0] >> 4;
+
+        A = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * A_size);
 
         if (A == NULL) {
             goto kryptos_gcm_ghash_epilogue;
         }
 
-        memset(A, 0, sizeof(struct gcm_ghash_block_ctx) * (temp_size[0] >> 4));
+        memset(A, 0, sizeof(struct gcm_ghash_block_ctx) * A_size);
 
         GCM_GHASH_LD_BYTES(A, temp, temp_size[0], offset, b)
 
@@ -302,7 +308,7 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
 
     temp_size[1] = c_size;
 
-    while ((temp_size[1] % 4)) {
+    while ((temp_size[1] % 16)) {
         temp_size[1]++;
     }
 
@@ -310,55 +316,80 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
         goto kryptos_gcm_ghash_epilogue;
     }
 
-    block_nr += temp_size[1];
-
     if (temp_size[1] != c_size) {
         memset(temp, 0, temp_size[1]);
     }
 
     memcpy(temp, c, c_size);
 
-    C = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * (temp_size[1] >> 4));
+    C_size = temp_size[1] >> 4;
+
+    C = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * C_size);
 
     if (C == NULL) {
         goto kryptos_gcm_ghash_epilogue;
     }
 
-    memset(C, 0, sizeof(struct gcm_ghash_block_ctx) * (temp_size[1] >> 4));
+    memset(C, 0, sizeof(struct gcm_ghash_block_ctx) * C_size);
 
     GCM_GHASH_LD_BYTES(C, temp, temp_size[1], offset, b)
 
     kryptos_freeseg(temp, temp_size[1]);
     temp = NULL;
 
-    block_nr = (temp_size[0] >> 4) + (temp_size[1] >> 4) + 1;
-    X = (struct gcm_ghash_block_ctx *) kryptos_newseg(sizeof(struct gcm_ghash_block_ctx) * (block_nr + 1));
+    // INFO(Rafael): Here is my simplified version of the GHASH loop.
+    //
+    // The loop over ublocks[0] is equivalent to:
+    //         'X_i = (X_{i-1} ^ A_i) x H', and also,
+    //         'X_i = (X_{m - 1} ^ (A*_{m}||0^{128-v})) x H'. Because 'A' was previously padded.
+    //
+    // The loop over ublocks[1] is equivalent to:
+    //          'X_i = (X_{i-1} ^ C_{i - m}) x H', and also,
+    //          'X_i = (X_{i-1} ^ (C*_{n}||0^{128-u})) x H'. Because 'C' was previously padded.
+    //
+    // It avoids tricky and less intuitive indexing by offsets as suggested by the original spec.
 
-    if (X == NULL) {
-        goto kryptos_gcm_ghash_epilogue;
+    ublocks[0].block = A;
+    ublocks[0].block_size = A_size;
+    ublocks[1].block = C;
+    ublocks[1].block_size = C_size;
+
+    ubp = &ublocks[0];
+    ubp_end = ubp + 2;
+
+    X[0] = X[1] = X[2] = X[3] = 0;
+
+    while (ubp != ubp_end) {
+        for (b = 0; b < ubp->block_size; b++) {
+            X[0] ^= GCM_GHASH_WORD(ubp->block, b, 0);
+            X[1] ^= GCM_GHASH_WORD(ubp->block, b, 1);
+            X[2] ^= GCM_GHASH_WORD(ubp->block, b, 2);
+            X[3] ^= GCM_GHASH_WORD(ubp->block, b, 3);
+            kryptos_gcm_gf_mul(X, H, X);
+        }
+        ubp++;
     }
 
-    GCM_GHASH_WORD(X, 0, 0) = GCM_GHASH_WORD(X, 0, 1) = GCM_GHASH_WORD(X, 0, 2) = GCM_GHASH_WORD(X, 0, 3) = 0;
-
+    /* ----- DEPRECATED -----
+    // WARN(Rafael): The old GHASH loop based on the spec. I find it worse than the current one. Deprecated.
     for (b = 1; b < block_nr; b++) {
-        if (b >= 1 && b < a_size) {
+        if (b >= 1 && (b - 1) < A_size) {
             // INFO(Rafael): 'X_i = (X_{i-1} ^ A_i) x H', and also,
             //               'X_i = (X_{m - 1} ^ (A*_{m}||0^{128-v})) x H'. Because 'A' was previously padded.
-            GCM_GHASH_WORD(X, b - 1, 0) = GCM_GHASH_WORD(X, b - 1, 0) ^ GCM_GHASH_WORD(A, b - 1, 0);
-            GCM_GHASH_WORD(X, b - 1, 1) = GCM_GHASH_WORD(X, b - 1, 1) ^ GCM_GHASH_WORD(A, b - 1, 1);
-            GCM_GHASH_WORD(X, b - 1, 2) = GCM_GHASH_WORD(X, b - 1, 2) ^ GCM_GHASH_WORD(A, b - 1, 2);
-            GCM_GHASH_WORD(X, b - 1, 3) = GCM_GHASH_WORD(X, b - 1, 3) ^ GCM_GHASH_WORD(A, b - 1, 3);
+            X[0] ^= GCM_GHASH_WORD(A, b - 1, 0);
+            X[1] ^= GCM_GHASH_WORD(A, b - 1, 1);
+            X[2] ^= GCM_GHASH_WORD(A, b - 1, 2);
+            X[3] ^= GCM_GHASH_WORD(A, b - 1, 3);
         } else {
             // INFO(Rafael): 'X_i = (X_{i-1} ^ C_{i - m}) x H', and also,
             //               'X_i = (X_{i-1} ^ (C*_{n}||0^{128-u})) x H'. Because 'C' was previously padded.
-            GCM_GHASH_WORD(X, b, 0) = GCM_GHASH_WORD(X, b - 1, 0) ^ GCM_GHASH_WORD(C, b - a_size - 1, 0);
-            GCM_GHASH_WORD(X, b, 1) = GCM_GHASH_WORD(X, b - 1, 1) ^ GCM_GHASH_WORD(C, b - a_size - 1, 1);
-            GCM_GHASH_WORD(X, b, 2) = GCM_GHASH_WORD(X, b - 1, 2) ^ GCM_GHASH_WORD(C, b - a_size - 1, 2);
-            GCM_GHASH_WORD(X, b, 3) = GCM_GHASH_WORD(X, b - 1, 3) ^ GCM_GHASH_WORD(C, b - a_size - 1, 3);
+            X[0] ^= GCM_GHASH_WORD(C, b - A_size - 1, 0);
+            X[1] ^= GCM_GHASH_WORD(C, b - A_size - 1, 1);
+            X[2] ^= GCM_GHASH_WORD(C, b - A_size - 1, 2);
+            X[3] ^= GCM_GHASH_WORD(C, b - A_size - 1, 3);
         }
-        kryptos_gcm_gf_mul(GCM_GHASH_BLOCK(X, b), H, GCM_GHASH_BLOCK(X, b));
-        b++;
-    }
+        kryptos_gcm_gf_mul(X, H, X);
+    } ----- DEPRECATED ----- */
 
     // INFO(Rafael): 'X_i = (X_{m + n} ^ (len(A)||len(C))) x H'.
 
@@ -370,40 +401,35 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
     L.u32[2] = l[1] >> 32;
     L.u32[3] = l[1] & 0xFFFFFF;
 
-    GCM_GHASH_WORD(X, block_nr, 0) = GCM_GHASH_WORD(X, block_nr - 1, 0) ^ GCM_GHASH_WORD(&L, 0, 0);
-    GCM_GHASH_WORD(X, block_nr, 1) = GCM_GHASH_WORD(X, block_nr - 1, 1) ^ GCM_GHASH_WORD(&L, 0, 1);
-    GCM_GHASH_WORD(X, block_nr, 2) = GCM_GHASH_WORD(X, block_nr - 1, 2) ^ GCM_GHASH_WORD(&L, 0, 2);
-    GCM_GHASH_WORD(X, block_nr, 3) = GCM_GHASH_WORD(X, block_nr - 1, 3) ^ GCM_GHASH_WORD(&L, 0, 3);
-    kryptos_gcm_gf_mul(GCM_GHASH_BLOCK(X, block_nr), H, GCM_GHASH_BLOCK(X, block_nr));
+    X[0] ^= GCM_GHASH_WORD(&L, 0, 0);
+    X[1] ^= GCM_GHASH_WORD(&L, 0, 1);
+    X[2] ^= GCM_GHASH_WORD(&L, 0, 2);
+    X[3] ^= GCM_GHASH_WORD(&L, 0, 3);
+    kryptos_gcm_gf_mul(X, H, X);
 
     // INFO(Rafael): Considering 'y' fits, at least, 16 bytes (our 128-bit GHASH output).
 
-    kryptos_cpy_u32_as_big_endian(y, 16, GCM_GHASH_WORD(X, block_nr, 0));
-    kryptos_cpy_u32_as_big_endian(y +  4, 12, GCM_GHASH_WORD(X, block_nr, 1));
-    kryptos_cpy_u32_as_big_endian(y +  8,  8, GCM_GHASH_WORD(X, block_nr, 2));
-    kryptos_cpy_u32_as_big_endian(y + 12,  4, GCM_GHASH_WORD(X, block_nr, 3));
+    kryptos_cpy_u32_as_big_endian(y, 16, X[0]);
+    kryptos_cpy_u32_as_big_endian(y +  4, 12, X[1]);
+    kryptos_cpy_u32_as_big_endian(y +  8,  8, X[2]);
+    kryptos_cpy_u32_as_big_endian(y + 12,  4, X[3]);
 
     l[0] = l[1] = 0;
     L.u32[0] = L.u32[1] = L.u32[2] = L.u32[3] = 0;
 
     no_error = 1;
 
-#undef GCM_GHASH_BLOCK
 #undef GCM_GHASH_WORD
 #undef GCM_GHASH_LD_BYTES
 
 kryptos_gcm_ghash_epilogue:
 
-    if (X != NULL) {
-        kryptos_freeseg(X, sizeof(struct gcm_ghash_block_ctx) * (block_nr + 1));
-    }
-
     if (A != NULL) {
-        kryptos_freeseg(A, sizeof(struct gcm_ghash_block_ctx) * (temp_size[0] >> 4));
+        kryptos_freeseg(A, sizeof(struct gcm_ghash_block_ctx) * A_size);
     }
 
     if (C != NULL) {
-        kryptos_freeseg(C, sizeof(struct gcm_ghash_block_ctx) * (temp_size[1] >> 4));
+        kryptos_freeseg(C, sizeof(struct gcm_ghash_block_ctx) * C_size);
     }
 
     if (temp != NULL) {

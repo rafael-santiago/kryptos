@@ -206,6 +206,7 @@ typedef enum {
     kKryptosHMACError,
     kKryptosGMACError,
     kKryptosInvalidSignature,
+    kKryptosNoSupport,
     kKryptosTaskResultNr
 }kryptos_task_result_t;
 
@@ -300,7 +301,8 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
     ktask->mode = mode;\
     ktask->key = key;\
     ktask->key_size = key_size;\
-    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB || ktask->mode == kKryptosCTR) && ktask->iv == NULL) {\
+    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB || ktask->mode == kKryptosCTR || ktask->mode == kKryptosGCM)\
+        && ktask->iv == NULL) {\
         ktask->iv = kryptos_get_random_block(cipher_block_size);\
         ktask->iv_size = cipher_block_size;\
     }\
@@ -341,7 +343,8 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
     ktask->mode = mode;\
     ktask->key = key;\
     ktask->key_size = key_size;\
-    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB || ktask->mode == kKryptosCTR) && ktask->iv == NULL) {\
+    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB || ktask->mode == kKryptosCTR || ktask->mode == kKryptosGCM)\
+        && ktask->iv == NULL) {\
         ktask->iv = kryptos_get_random_block(cipher_block_size);\
         ktask->iv_size = cipher_block_size;\
     }\
@@ -389,15 +392,18 @@ kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_si
         ktask->in[ 8] = ktask->in[ 9] = ktask->in[10] = ktask->in[11] =\
         ktask->in[12] = ktask->in[13] = ktask->in[14] = ktask->in[15] = 0;\
         ktask->in_size = 16;\
+        *h = ktask->in;\
+        *h_size = 16;\
     } else {\
         ktask->in = *h;\
         ktask->in_size = *h_size;\
     }\
+    kryptos_task_set_encrypt_action(ktask);\
     kryptos_## cipher_name ##_cipher(&ktask);\
     if (kryptos_last_task_succeed(ktask)) {\
         kryptos_freeseg(*h, *h_size);\
         *h = ktask->out;\
-        *h_size = ktask->out_size;\
+        *h_size = 16;\
         result = kKryptosSuccess;\
     }\
 kryptos_## cipher_name ##_e_epilogue:\
@@ -407,7 +413,7 @@ kryptos_## cipher_name ##_e_epilogue:\
 #define KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(cipher_name)\
 kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_size,\
                                                   kryptos_u8_t *key, size_t key_size, void *additional_arg) {\
-    return kKryptosProcessError;\
+    return kKryptosNoSupport;\
 }
 
 #ifndef __cplusplus
@@ -436,15 +442,18 @@ kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_si
         ktask->in[ 8] = ktask->in[ 9] = ktask->in[10] = ktask->in[11] =\
         ktask->in[12] = ktask->in[13] = ktask->in[14] = ktask->in[15] = 0;\
         ktask->in_size = 16;\
+        *h = ktask->in;\
+        *h_size = 16;\
     } else {\
         ktask->in = *h;\
         ktask->in_size = *h_size;\
     }\
+    ktask->action = kKryptosEncryptWithoutRandomPad;\
     kryptos_## cipher_name ##_cipher(&ktask);\
     if (kryptos_last_task_succeed(ktask)) {\
         kryptos_freeseg(*h, *h_size);\
         *h = ktask->out;\
-        *h_size = ktask->out_size;\
+        *h_size = 16;\
         result = kKryptosSuccess;\
     }\
 kryptos_## cipher_name ##_e_epilogue:\
@@ -454,7 +463,7 @@ kryptos_## cipher_name ##_e_epilogue:\
 #define KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_GCM_E_NO_SUPPORT(cipher_name, additional_arg)\
 kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_size,\
                                                   kryptos_u8_t *key, size_t key_size, additional_arg) {\
-    return kKryptosProcessError;\
+    return kKryptosNoSupport;\
 }
 
 #ifndef KRYPTOS_KERNEL_MODE
@@ -530,6 +539,11 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
                                             (*ktask)->aux_buffers.buf1,\
                                             ((*ktask)->aux_buffers.buf1 != NULL) ? (*ktask)->aux_buffers.buf1_size : 0,\
                                             kryptos_ ## cipher_name ## _e, e_arg);\
+        if ((*ktask)->result != kKryptosSuccess) {\
+            kryptos_freeseg((*ktask)->out, (*ktask)->out_size);\
+            (*ktask)->out = NULL;\
+            (*ktask)->out_size = 0;\
+        }\
     }\
     kryptos_meta_block_processing_epilogue(cipher_epilogue,\
                                            inblock, inblock_p, in_p, in_end,\
@@ -609,6 +623,11 @@ void kryptos_ ## cipher_name ## _cipher(kryptos_task_ctx **ktask) {\
                                             (*ktask)->aux_buffers.buf1,\
                                             ((*ktask)->aux_buffers.buf1 != NULL) ? (*ktask)->aux_buffers.buf1_size : 0,\
                                             kryptos_ ## cipher_name ## _e, e_arg);\
+        if ((*ktask)->result != kKryptosSuccess) {\
+            kryptos_freeseg((*ktask)->out, (*ktask)->out_size);\
+            (*ktask)->out = NULL;\
+            (*ktask)->out_size = 0;\
+        }\
     }\
     kryptos_meta_block_processing_epilogue(cipher_epilogue,\
                                            inblock, inblock_p, in_p, in_end,\

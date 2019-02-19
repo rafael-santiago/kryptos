@@ -328,6 +328,218 @@ static kryptos_u8_t *hmac_test_data[] = {
     }\
 }
 
+#define kryptos_run_gcm_tests_no_support(cipher_name) {\
+    kryptos_task_ctx t, *ktask = &t;\
+    kryptos_u8_t *key = "GCMTest";\
+    size_t key_size = 7;\
+    kryptos_task_init_as_null(ktask);\
+    ktask->in = "nosupp";\
+    ktask->in_size = 6;\
+    kryptos_ ## cipher_name ## _setup(ktask, key, key_size, kKryptosGCM);\
+    kryptos_task_set_encrypt_action(ktask);\
+    kryptos_ ## cipher_name ## _cipher(&ktask);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
+    CUTE_ASSERT(ktask->result == kKryptosNoSupport);\
+    CUTE_ASSERT(ktask->out == NULL);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_IV);\
+}
+
+#define kryptos_run_gcm_tests_no_support_with_custom_setup(cipher_name, ktask, setup_stmt) {\
+    kryptos_task_ctx t, *ktask = &t;\
+    kryptos_task_init_as_null(ktask);\
+    ktask->in = "nosupp";\
+    ktask->in_size = 6;\
+    setup_stmt;\
+    kryptos_task_set_encrypt_action(ktask);\
+    kryptos_ ## cipher_name ## _cipher(&ktask);\
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
+    CUTE_ASSERT(ktask->result == kKryptosNoSupport);\
+    CUTE_ASSERT(ktask->out == NULL);\
+    kryptos_task_free(ktask, KRYPTOS_TASK_IV);\
+}
+
+#define kryptos_run_gcm_tests(cipher_name) {\
+    size_t tv, tv_nr = sizeof(cbc_test_data) / sizeof(cbc_test_data[0]);\
+    kryptos_task_ctx t, *ktask = &t;\
+    kryptos_u8_t *key = "GCMTest";\
+    size_t key_size = 7, data_size;\
+    for (tv = 0; tv < tv_nr; tv++) {\
+        /*INFO(Rafael): Authentication success without aad.*/\
+        kryptos_task_init_as_null(ktask);\
+        ktask->in = cbc_test_data[tv];\
+        data_size = strlen(ktask->in);\
+        ktask->in_size = data_size;\
+        kryptos_ ## cipher_name ## _setup(ktask, key, key_size, kKryptosGCM);\
+        kryptos_task_set_encrypt_action(ktask);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+        CUTE_ASSERT(ktask->out != NULL);\
+        ktask->in = ktask->out;\
+        ktask->in_size = ktask->out_size;\
+        kryptos_task_set_decrypt_action(ktask);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+        CUTE_ASSERT(ktask->out != NULL);\
+        CUTE_ASSERT(ktask->out_size == data_size);\
+        CUTE_ASSERT(memcmp(ktask->out, cbc_test_data[tv], data_size) == 0);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+        /*INFO(Rafael): Authentication failure without add.*/\
+        kryptos_task_init_as_null(ktask);\
+        ktask->in = cbc_test_data[tv];\
+        data_size = strlen(ktask->in);\
+        ktask->in_size = data_size;\
+        kryptos_ ## cipher_name ## _setup(ktask, key, key_size, kKryptosGCM);\
+        kryptos_task_set_encrypt_action(ktask);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+        CUTE_ASSERT(ktask->out != NULL);\
+        ktask->in = ktask->out;\
+        ktask->in_size = ktask->out_size;\
+        ktask->out = NULL;\
+        ktask->out_size = 0;\
+        ktask->in[ktask->in_size >> 1] = ~ktask->in[ktask->in_size >> 1];\
+        kryptos_task_set_decrypt_action(ktask);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
+        CUTE_ASSERT(ktask->result == kKryptosGMACError);\
+        CUTE_ASSERT(ktask->out == NULL);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+        /*INFO(Rafael): Authentication success with aad.*/\
+        kryptos_task_init_as_null(ktask);\
+        kryptos_task_set_gcm_aad(ktask, "boo", 3);\
+        ktask->in = cbc_test_data[tv];\
+        data_size = strlen(ktask->in);\
+        ktask->in_size = data_size;\
+        kryptos_ ## cipher_name ## _setup(ktask, key, key_size, kKryptosGCM);\
+        kryptos_task_set_encrypt_action(ktask);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+        CUTE_ASSERT(ktask->out != NULL);\
+        ktask->in = ktask->out;\
+        ktask->in_size = ktask->out_size;\
+        kryptos_task_set_decrypt_action(ktask);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+        CUTE_ASSERT(ktask->out != NULL);\
+        CUTE_ASSERT(ktask->out_size == data_size);\
+        CUTE_ASSERT(memcmp(ktask->out, cbc_test_data[tv], data_size) == 0);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+        /*INFO(Rafael): Authentication failure with add.*/\
+        kryptos_task_init_as_null(ktask);\
+        kryptos_task_set_gcm_aad(ktask, "boo", 3);\
+        ktask->in = cbc_test_data[tv];\
+        data_size = strlen(ktask->in);\
+        ktask->in_size = data_size;\
+        kryptos_ ## cipher_name ## _setup(ktask, key, key_size, kKryptosGCM);\
+        kryptos_task_set_encrypt_action(ktask);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+        CUTE_ASSERT(ktask->out != NULL);\
+        ktask->in = ktask->out;\
+        ktask->in_size = ktask->out_size;\
+        ktask->out = NULL;\
+        ktask->out_size = 0;\
+        kryptos_task_set_gcm_aad(ktask, "bo", 2);\
+        kryptos_task_set_decrypt_action(ktask);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
+        CUTE_ASSERT(ktask->result == kKryptosGMACError);\
+        CUTE_ASSERT(ktask->out == NULL);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+    }\
+}
+
+#define kryptos_run_gcm_tests_with_custom_setup(cipher_name, ktask, setup_stmt) {\
+    size_t tv, tv_nr = sizeof(cbc_test_data) / sizeof(cbc_test_data[0]);\
+    kryptos_task_ctx t, *ktask = &t;\
+    kryptos_u8_t *key = "GCMTest";\
+    size_t key_size = 7, data_size;\
+    for (tv = 0; tv < tv_nr; tv++) {\
+        /*INFO(Rafael): Authentication success without aad.*/\
+        kryptos_task_init_as_null(ktask);\
+        ktask->in = cbc_test_data[tv];\
+        data_size = strlen(ktask->in);\
+        ktask->in_size = data_size;\
+        setup_stmt;\
+        kryptos_task_set_encrypt_action(ktask);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+        CUTE_ASSERT(ktask->out != NULL);\
+        ktask->in = ktask->out;\
+        ktask->in_size = ktask->out_size;\
+        kryptos_task_set_decrypt_action(ktask);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+        CUTE_ASSERT(ktask->out != NULL);\
+        CUTE_ASSERT(ktask->out_size == data_size);\
+        CUTE_ASSERT(memcmp(ktask->out, cbc_test_data[tv], data_size) == 0);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+        /*INFO(Rafael): Authentication failure without add.*/\
+        kryptos_task_init_as_null(ktask);\
+        ktask->in = cbc_test_data[tv];\
+        data_size = strlen(ktask->in);\
+        ktask->in_size = data_size;\
+        setup_stmt;\
+        kryptos_task_set_encrypt_action(ktask);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+        CUTE_ASSERT(ktask->out != NULL);\
+        ktask->in = ktask->out;\
+        ktask->in_size = ktask->out_size;\
+        ktask->out = NULL;\
+        ktask->out_size = 0;\
+        ktask->in[ktask->in_size >> 1] = ~ktask->in[ktask->in_size >> 1];\
+        kryptos_task_set_decrypt_action(ktask);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
+        CUTE_ASSERT(ktask->result == kKryptosGMACError);\
+        CUTE_ASSERT(ktask->out == NULL);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+        /*INFO(Rafael): Authentication success with aad.*/\
+        kryptos_task_init_as_null(ktask);\
+        kryptos_task_set_gcm_aad(ktask, "boo", 3);\
+        ktask->in = cbc_test_data[tv];\
+        data_size = strlen(ktask->in);\
+        ktask->in_size = data_size;\
+        setup_stmt;\
+        kryptos_task_set_encrypt_action(ktask);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+        CUTE_ASSERT(ktask->out != NULL);\
+        ktask->in = ktask->out;\
+        ktask->in_size = ktask->out_size;\
+        kryptos_task_set_decrypt_action(ktask);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+        CUTE_ASSERT(ktask->out != NULL);\
+        CUTE_ASSERT(ktask->out_size == data_size);\
+        CUTE_ASSERT(memcmp(ktask->out, cbc_test_data[tv], data_size) == 0);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+        /*INFO(Rafael): Authentication failure with add.*/\
+        kryptos_task_init_as_null(ktask);\
+        kryptos_task_set_gcm_aad(ktask, "boo", 3);\
+        ktask->in = cbc_test_data[tv];\
+        data_size = strlen(ktask->in);\
+        ktask->in_size = data_size;\
+        setup_stmt;\
+        kryptos_task_set_encrypt_action(ktask);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
+        CUTE_ASSERT(ktask->out != NULL);\
+        ktask->in = ktask->out;\
+        ktask->in_size = ktask->out_size;\
+        ktask->out = NULL;\
+        ktask->out_size = 0;\
+        kryptos_task_set_gcm_aad(ktask, "bo", 2);\
+        kryptos_task_set_decrypt_action(ktask);\
+        kryptos_ ## cipher_name ## _cipher(&ktask);\
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
+        CUTE_ASSERT(ktask->result == kKryptosGMACError);\
+        CUTE_ASSERT(ktask->out == NULL);\
+        kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+    }\
+}
+
 #define kryptos_run_hash_tests(hash, input_size, size) {\
     kryptos_task_ctx t, *ktask = &t;\
     size_t tv, tv_nr = sizeof(hash ## _test_vector) / sizeof(hash ## _test_vector[0]);\

@@ -58,6 +58,44 @@ KUTE_TEST_CASE(ktest_monkey)
     // INFO(Rafael): Operation modes (complementary tests).
 
     KUTE_RUN_TEST(kryptos_ctr_mode_sequencing_tests);
+
+    // INFO(Rafael): We only test the GCM mode after ensuring that everything is fine with CTR.
+
+    /*KUTE_RUN_TEST(kryptos_des_gcm_tests);
+    KUTE_RUN_TEST(kryptos_idea_gcm_tests);
+    KUTE_RUN_TEST(kryptos_blowfish_gcm_tests);
+    KUTE_RUN_TEST(kryptos_feal_gcm_tests);
+    KUTE_RUN_TEST(kryptos_rc2_gcm_tests);
+    KUTE_RUN_TEST(kryptos_camellia128_gcm_tests);
+    KUTE_RUN_TEST(kryptos_camellia192_gcm_tests);
+    KUTE_RUN_TEST(kryptos_camellia256_gcm_tests);
+    KUTE_RUN_TEST(kryptos_cast5_gcm_tests);
+    KUTE_RUN_TEST(kryptos_saferk64_gcm_tests);
+    KUTE_RUN_TEST(kryptos_aes128_gcm_tests);
+    KUTE_RUN_TEST(kryptos_aes192_gcm_tests);
+    KUTE_RUN_TEST(kryptos_aes256_gcm_tests);
+    KUTE_RUN_TEST(kryptos_serpent_gcm_tests);
+    KUTE_RUN_TEST(kryptos_triple_des_gcm_tests);
+    KUTE_RUN_TEST(kryptos_triple_des_ede_gcm_tests);
+    KUTE_RUN_TEST(kryptos_tea_gcm_tests);
+    KUTE_RUN_TEST(kryptos_xtea_gcm_tests);
+    KUTE_RUN_TEST(kryptos_misty1_gcm_tests);
+    KUTE_RUN_TEST(kryptos_rc5_gcm_tests);
+    KUTE_RUN_TEST(kryptos_rc6_128_gcm_tests);
+    KUTE_RUN_TEST(kryptos_rc6_192_gcm_tests);
+    KUTE_RUN_TEST(kryptos_rc6_256_gcm_tests);
+    KUTE_RUN_TEST(kryptos_mars128_gcm_tests);
+    KUTE_RUN_TEST(kryptos_mars192_gcm_tests);
+    KUTE_RUN_TEST(kryptos_mars256_gcm_tests);
+    KUTE_RUN_TEST(kryptos_present80_gcm_tests);
+    KUTE_RUN_TEST(kryptos_present128_gcm_tests);
+    KUTE_RUN_TEST(kryptos_shacal1_gcm_tests);
+    KUTE_RUN_TEST(kryptos_shacal2_gcm_tests);
+    KUTE_RUN_TEST(kryptos_noekeon_gcm_tests);
+    KUTE_RUN_TEST(kryptos_noekeon_d_gcm_tests);
+    KUTE_RUN_TEST(kryptos_gost_ds_gcm_tests);
+    KUTE_RUN_TEST(kryptos_gost_gcm_tests);*/
+
     KUTE_RUN_TEST(kryptos_des_weak_keys_detection_tests);
 
     KUTE_RUN_TEST(kryptos_bcrypt_tests);

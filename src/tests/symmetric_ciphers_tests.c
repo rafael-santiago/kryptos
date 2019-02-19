@@ -1163,3 +1163,190 @@ CUTE_TEST_CASE(kryptos_bcrypt_verify_tests)
         kryptos_freeseg(salt, 16);
     }
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_des_gcm_tests)
+    kryptos_run_gcm_tests_no_support(des);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_idea_gcm_tests)
+    kryptos_run_gcm_tests_no_support(idea);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blowfish_gcm_tests)
+    kryptos_run_gcm_tests_no_support(blowfish);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_feal_gcm_tests)
+    int rounds = 1;
+    kryptos_run_gcm_tests_no_support_with_custom_setup(feal, ktask, kryptos_feal_setup(ktask, "feal", 4,
+                                                                                       kKryptosGCM, &rounds));
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc2_gcm_tests)
+    int T1 = 32;
+    kryptos_run_gcm_tests_no_support_with_custom_setup(rc2, ktask, kryptos_rc2_setup(ktask, "rc2", 3, kKryptosGCM,
+                                                                                     &T1));
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_camellia128_gcm_tests)
+    kryptos_run_gcm_tests(camellia128);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_camellia192_gcm_tests)
+    kryptos_run_gcm_tests(camellia192);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_camellia256_gcm_tests)
+    kryptos_run_gcm_tests(camellia256);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_cast5_gcm_tests)
+    kryptos_run_gcm_tests_no_support(cast5);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_saferk64_gcm_tests)
+    int rounds = 67;
+    kryptos_run_gcm_tests_no_support_with_custom_setup(saferk64, ktask, kryptos_saferk64_setup(ktask, "saferk64", 8,
+                                                                                               kKryptosGCM, &rounds));
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_aes128_gcm_tests)
+    kryptos_run_gcm_tests(aes128);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_aes192_gcm_tests)
+    kryptos_run_gcm_tests(aes192);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_aes256_gcm_tests)
+    kryptos_run_gcm_tests(aes256);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_serpent_gcm_tests)
+    kryptos_run_gcm_tests(serpent);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_triple_des_gcm_tests)
+    kryptos_u8_t *k2 = "3des'", *k3 = "3des''";
+    size_t k2_size = 5, k3_size = 6;
+    kryptos_run_gcm_tests_no_support_with_custom_setup(triple_des, ktask, kryptos_triple_des_setup(ktask, "3des", 4,
+                                                                                                   kKryptosGCM,
+                                                                                                   k2, &k2_size,
+                                                                                                   k3, &k3_size));
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_triple_des_ede_gcm_tests)
+    kryptos_u8_t *k2 = "3des'", *k3 = "3des''";
+    size_t k2_size = 5, k3_size = 6;
+    kryptos_run_gcm_tests_no_support_with_custom_setup(triple_des_ede, ktask, kryptos_triple_des_ede_setup(ktask, "3des", 4,
+                                                                                                           kKryptosGCM,
+                                                                                                           k2, &k2_size,
+                                                                                                           k3, &k3_size));
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_tea_gcm_tests)
+    kryptos_run_gcm_tests_no_support_with_custom_setup(tea, ktask, kryptos_tea_setup(ktask,
+                                                                                     "teateateateateat", 16, kKryptosGCM));
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_xtea_gcm_tests)
+    int rounds = 17;
+    kryptos_run_gcm_tests_no_support_with_custom_setup(xtea, ktask, kryptos_xtea_setup(ktask, "teateateateateat", 16,
+                                                                                       kKryptosGCM, &rounds));
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_misty1_gcm_tests)
+    kryptos_run_gcm_tests_no_support(misty1);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc5_gcm_tests)
+    int rounds = 60;
+    kryptos_run_gcm_tests_no_support_with_custom_setup(rc5, ktask, kryptos_rc5_setup(ktask, "rc5", 3, kKryptosGCM, &rounds));
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc6_128_gcm_tests)
+    int rounds = 48;
+    kryptos_run_gcm_tests_with_custom_setup(rc6_128, ktask, kryptos_rc6_128_setup(ktask, "rc6", 3, kKryptosGCM, &rounds));
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc6_192_gcm_tests)
+    int rounds = 48;
+    kryptos_run_gcm_tests_with_custom_setup(rc6_192, ktask, kryptos_rc6_192_setup(ktask, "rc6", 3, kKryptosGCM, &rounds));
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc6_256_gcm_tests)
+    int rounds = 48;
+    kryptos_run_gcm_tests_with_custom_setup(rc6_256, ktask, kryptos_rc6_256_setup(ktask, "rc6", 3, kKryptosGCM, &rounds));
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mars128_gcm_tests)
+    kryptos_run_gcm_tests(mars128);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mars192_gcm_tests)
+    kryptos_run_gcm_tests(mars192);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mars256_gcm_tests)
+    kryptos_run_gcm_tests(mars256);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_present80_gcm_tests)
+    kryptos_run_gcm_tests_no_support(present80);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_present128_gcm_tests)
+    kryptos_run_gcm_tests_no_support(present128);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_shacal1_gcm_tests)
+    kryptos_run_gcm_tests_no_support(shacal1);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_shacal2_gcm_tests)
+    kryptos_run_gcm_tests_no_support(shacal2);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_noekeon_gcm_tests)
+    kryptos_run_gcm_tests(noekeon);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_noekeon_d_gcm_tests)
+    kryptos_run_gcm_tests(noekeon_d);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_gost_ds_gcm_tests)
+    kryptos_run_gcm_tests_no_support(gost_ds);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_gost_gcm_tests)
+    struct gost_sboxes_ctx {
+        kryptos_u8_t *s1, *s2, *s3, *s4, *s5, *s6, *s7, *s8;
+    };
+    kryptos_u8_t s1[16] = {
+         4, 10,  9,  2, 13,  8,  0, 14,  6, 11,  1, 12,  7, 15,  5,  3
+    };
+    kryptos_u8_t s2[16] = {
+        14, 11,  4, 12,  6, 13, 15, 10,  2,  3,  8,  1,  0,  7,  5,  9
+    };
+    kryptos_u8_t s3[16] = {
+        5,  8,  1, 13, 10,  3,  4,  2, 14, 15, 12,  7,  6,  0,  9, 11
+    };
+    kryptos_u8_t s4[16] = {
+        7, 13, 10,  1,  0,  8,  9, 15, 14,  4,  6, 12, 11,  2,  5,  3
+    };
+    kryptos_u8_t s5[16] = {
+        6, 12,  7,  1,  5, 15, 13,  8,  4, 10,  9, 14,  0,  3, 11,  2
+    };
+    kryptos_u8_t s6[16] = {
+        4, 11, 10,  0,  7,  2,  1, 13,  3,  6,  8,  5,  9, 12, 15, 14
+    };
+    kryptos_u8_t s7[16] = {
+        13, 11,  4,  1,  3, 15,  5,  9,  0, 10, 14,  7,  6,  8,  2, 12
+    };
+    kryptos_u8_t s8[16] = {
+         1, 15, 13,  0,  5,  7, 10,  4,  9,  2,  3, 14,  6, 11,  8, 12
+    };
+    kryptos_run_gcm_tests_no_support_with_custom_setup(gost, ktask, kryptos_gost_setup(ktask, "gost", 4, kKryptosGCM,
+                                                       s1, s2, s3, s4, s5, s6, s7, s8));
+CUTE_TEST_CASE_END

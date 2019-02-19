@@ -268,7 +268,8 @@ void kryptos_triple_des_setup(kryptos_task_ctx *ktask,
     ktask->key = key1;
     ktask->key_size = key1_size;
 
-    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB || ktask->mode == kKryptosCTR) && ktask->iv == NULL) {
+    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB ||
+         ktask->mode == kKryptosCTR || ktask->mode == kKryptosGCM) && ktask->iv == NULL) {
         ktask->iv = kryptos_get_random_block(KRYPTOS_DES_BLOCKSIZE);
         ktask->iv_size = KRYPTOS_DES_BLOCKSIZE;
     }
@@ -311,6 +312,12 @@ void kryptos_triple_des_cipher(kryptos_task_ctx **ktask) {
     size_t in_size;
 
     if (kryptos_task_check(ktask) == 0) {
+        return;
+    }
+
+    if ((*ktask)->mode == kKryptosGCM) {
+        (*ktask)->result = kKryptosNoSupport;
+        (*ktask)->result_verbose = "Unsupported action.";
         return;
     }
 

@@ -77,11 +77,15 @@
 
 #define kryptos_task_set_ctr_mode(ktask, uctr) ( (ktask)->mode = kKryptosCTR, (ktask)->ctr = (uctr) )
 
-#define kryptos_task_set_gcm_mode(ktask, uctr, aad, add_size) (\
+#define kryptos_task_set_gcm_mode(ktask, uctr, aad, aad_size) (\
     (ktask)->mode = kKryptosGCM,\
     (ktask)->ctr = (uctr),\
     (ktask)->aux_buffers.buf1 = aad,\
-    (ktask)->aux_buffers.buf1_size = add_size )
+    (ktask)->aux_buffers.buf1_size = aad_size )
+
+#define kryptos_task_set_gcm_aad(ktask, aad, aad_size) (\
+    (ktask)->aux_buffers.buf1 = aad,\
+    (ktask)->aux_buffers.buf1_size = aad_size )
 
 #define kryptos_task_set_encrypt_action(ktask) ( (ktask)->action = kKryptosEncrypt )
 
@@ -260,9 +264,12 @@ epilogue:\
                                                outblock, outblock_p, out_p,\
                                                in_size, block_size_in_bytes, sks, ktask) {\
 kryptos_ ## label_name:\
-    if ((*ktask)->out == NULL && (*ktask)->result != kKryptosKeyError) {\
+    if ((*ktask)->out == NULL && (*ktask)->result != kKryptosKeyError &&\
+                                 (*ktask)->result != kKryptosGMACError && (*ktask)->result != kKryptosNoSupport) {\
         (*ktask)->result = kKryptosProcessError;\
         (*ktask)->result_verbose = "No memory to get a valid output.";\
+    } else if ((*ktask)->result == kKryptosNoSupport && (*ktask)->result_verbose == NULL) {\
+        (*ktask)->result_verbose = "Unsupported action.";\
     }\
     if (inblock != NULL) {\
         kryptos_freeseg(inblock, block_size_in_bytes);\

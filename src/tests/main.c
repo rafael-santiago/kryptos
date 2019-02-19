@@ -47,6 +47,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     //  -=-=-=-=- If you have just added a new cipher take a look in "kryptos_dsl_tests" case, there is some work to
     //                                               be done there too! -=-=-=-=-=-=-
 
+    //  -=-=-=-=- If you have just added a new cipher you must implement a GCM test case for this new cipher, even being
+    //                 a unsupported mode for this cipher, take a look at previous gcm test cases -=-=-=-=-
+
     // INFO(Rafael): Internal DSL stuff.
     CUTE_RUN_TEST(kryptos_dsl_tests);
 
@@ -95,6 +98,43 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     // INFO(Rafael): Operation modes (complementary tests).
 
     CUTE_RUN_TEST(kryptos_ctr_mode_sequencing_tests);
+
+    // INFO(Rafael): We only test the GCM mode after ensuring that everything is fine with CTR.
+
+    CUTE_RUN_TEST(kryptos_des_gcm_tests);
+    CUTE_RUN_TEST(kryptos_idea_gcm_tests);
+    CUTE_RUN_TEST(kryptos_blowfish_gcm_tests);
+    CUTE_RUN_TEST(kryptos_feal_gcm_tests);
+    CUTE_RUN_TEST(kryptos_rc2_gcm_tests);
+    CUTE_RUN_TEST(kryptos_camellia128_gcm_tests);
+    CUTE_RUN_TEST(kryptos_camellia192_gcm_tests);
+    CUTE_RUN_TEST(kryptos_camellia256_gcm_tests);
+    CUTE_RUN_TEST(kryptos_cast5_gcm_tests);
+    CUTE_RUN_TEST(kryptos_saferk64_gcm_tests);
+    CUTE_RUN_TEST(kryptos_aes128_gcm_tests);
+    CUTE_RUN_TEST(kryptos_aes192_gcm_tests);
+    CUTE_RUN_TEST(kryptos_aes256_gcm_tests);
+    CUTE_RUN_TEST(kryptos_serpent_gcm_tests);
+    CUTE_RUN_TEST(kryptos_triple_des_gcm_tests);
+    CUTE_RUN_TEST(kryptos_triple_des_ede_gcm_tests);
+    CUTE_RUN_TEST(kryptos_tea_gcm_tests);
+    CUTE_RUN_TEST(kryptos_xtea_gcm_tests);
+    CUTE_RUN_TEST(kryptos_misty1_gcm_tests);
+    CUTE_RUN_TEST(kryptos_rc5_gcm_tests);
+    CUTE_RUN_TEST(kryptos_rc6_128_gcm_tests);
+    CUTE_RUN_TEST(kryptos_rc6_192_gcm_tests);
+    CUTE_RUN_TEST(kryptos_rc6_256_gcm_tests);
+    CUTE_RUN_TEST(kryptos_mars128_gcm_tests);
+    CUTE_RUN_TEST(kryptos_mars192_gcm_tests);
+    CUTE_RUN_TEST(kryptos_mars256_gcm_tests);
+    CUTE_RUN_TEST(kryptos_present80_gcm_tests);
+    CUTE_RUN_TEST(kryptos_present128_gcm_tests);
+    CUTE_RUN_TEST(kryptos_shacal1_gcm_tests);
+    CUTE_RUN_TEST(kryptos_shacal2_gcm_tests);
+    CUTE_RUN_TEST(kryptos_noekeon_gcm_tests);
+    CUTE_RUN_TEST(kryptos_noekeon_d_gcm_tests);
+    CUTE_RUN_TEST(kryptos_gost_ds_gcm_tests);
+    CUTE_RUN_TEST(kryptos_gost_gcm_tests);
 
     CUTE_RUN_TEST(kryptos_bad_decryption_tests);
     CUTE_RUN_TEST(kryptos_bad_hmac_tests);

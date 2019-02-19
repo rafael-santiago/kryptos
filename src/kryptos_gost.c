@@ -193,7 +193,8 @@ void kryptos_gost_setup(kryptos_task_ctx *ktask,
     ktask->mode = mode;
     ktask->cipher = kKryptosCipherGOST;
 
-    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB || ktask->mode == kKryptosCTR) && ktask->iv == NULL) {
+    if ((ktask->mode == kKryptosCBC || ktask->mode == kKryptosOFB ||
+         ktask->mode == kKryptosCTR || ktask->mode == kKryptosGCM) && ktask->iv == NULL) {
         ktask->iv = kryptos_get_random_block(KRYPTOS_GOST_BLOCKSIZE);
         ktask->iv_size = KRYPTOS_GOST_BLOCKSIZE;
     }
