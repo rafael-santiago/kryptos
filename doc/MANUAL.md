@@ -139,14 +139,23 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 |  ``GOST`` (with DES s-boxes)    | Block  |       ``kKryptosCipherGOSTDS``   |       ``gost_ds``  |
 |  ``GOST``                       | Block  |       ``kKryptosCipherGOST``     |       ``gost``     |
 
-The available modes of operation for the block ciphers are: ``ECB``, ``CBC``, ``CTR`` and ``OFB``. So in practice, considering
-the ``OFB`` mode, we have 37 stream ciphers instead of only three. More on cipher modes will be treated later.
+The available modes of operation for block ciphers are: ``ECB``, ``CBC``, ``CTR``, ``OFB`` and ``GCM``. So in practice,
+considering the ``OFB`` and ``CTR`` modes (also ``GCM`` indirectly), we have 37 stream ciphers instead of only three.
+
+As you should know, originally, the GCM mode is only supported by block cipher which works with 128-bit blocks. Currently
+those are the cipher with support for GCM mode in kryptos: ``AES-128``, ``AES-192``, ``AES-256``, ``RC6-128``, ``RC6-192``,
+``RC6-256``, ``CAMELLIA-128``, ``CAMELLIA-192``, ``CAMELLIA-256``, ``SERPENT``, ``MARS-128``, ``MARS-192``, ``MARS-256``,
+``NOEKEON`` (indirect key mode), ``NOEKEON`` (direct key mode).
+
+When you try to run a cipher whithout support for GCM mode a error will be returned (``kKryptosNoSupport``).
+More on cipher modes will be treated later. Similarly, more details about how to use GCM will be shown later, too.
 
 The way of indicating the desired cipher for an encryption task is by setting the field ``cipher`` from the ``kryptos_task_ctx``
 to the ``Internal constant ID`` listed in **Table 1**.
 
 Similarly the indication of the operation mode is done by setting the field ``mode``. The values could be: ``kKryptosECB``,
-``kKryptosCBC``, ``kKryptosOFB``. Of course, this field is only relevant when you are dealing with block ciphers.
+``kKryptosCBC``, ``kKryptosOFB``, ``kKryptosCTR``, ``kKryptosGCM``. Of course, this field is only relevant when you are
+dealing with block ciphers.
 
 The following code is an example of how to use the algorithm ``ARC4`` to encrypt and decrypt data:
 
