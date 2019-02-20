@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
         ktask->out_size = 0;
 
         // TIP(Rafael): Try to tamper with ktask->in just by uncommenting the following line.
-        //ktask->in[ktask->in_size >> 1] = 0;
+        //ktask->in[ktask->in_size >> 1] = ~ktask->in[ktask->in_size >> 1];
 
         kryptos_task_set_decrypt_action(ktask);
         kryptos_run_cipher(aes256, ktask, key, strlen(key), kKryptosGCM);
