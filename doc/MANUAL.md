@@ -640,7 +640,7 @@ epilogue:
 }
 ```
 
-All ciphers that uses 128-bit data block supports the Galois counter mode (``GCM``) mode. This mode implements confidentiality
+All ciphers that uses 128-bit data block supports the Galois counter mode (``GCM``). This mode implements confidentiality
 and authenticity. If someone tamper with the cryptogram during its transmission, it will be detected. The following sample uses
 AES-256 in ``GCM`` mode:
 

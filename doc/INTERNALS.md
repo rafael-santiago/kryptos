@@ -454,7 +454,10 @@ also provides conveniences for implementing those E functions:
 Or:
 
 ```c
-    KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_GCM_E(type2, key, key_size, void *arg, ktask, { type2_setup(ktask, key, kKryptosECB) })
+    KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_GCM_E(type2, key, key_size, void *arg, ktask,
+                                           {
+                                                type2_setup(ktask, key, kKryptosECB)
+                                           })
 ```
 
 For ciphers without support there are two functions. One for ciphers without additional parameters and another for ciphers with
