@@ -10,6 +10,6 @@
 
 #include <cutest.h>
 
-CUTE_DECLARE_TEST_CASE(kryptos_dsl_tests);
+CUTE_DECLARE_TEST_CASE_SUITE(kryptos_dsl_tests);
 
 #endif
