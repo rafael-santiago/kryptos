@@ -8,8 +8,8 @@
 #ifndef KRYPTOS_TESTS_DSL_TESTS_H
 #define KRYPTOS_TESTS_DSL_TESTS_H 1
 
-#include <tests/cutests/src/kutest.h>
+#include <tests/cutest/src/kutest.h>
 
-KUTE_DECLARE_TEST_CASE_SUITE(kryptos_dsl_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_dsl_tests);
 
 #endif

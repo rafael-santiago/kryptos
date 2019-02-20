@@ -5,9 +5,9 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#include "dsl_tests.h"
+#include <dsl_tests.h>
 #include <kryptos.h>
-#include <string.h>
+#include <kstring.h>
 
 static kryptos_u8_t *dsl_tests_data = "IDIOT, n. A member of a large and powerful tribe whose influence in "
                             "human affairs has always been dominant and controlling. The Idiot's "
@@ -60,7 +60,7 @@ KUTE_DECLARE_TEST_CASE(kryptos_gost_ds_dsl_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_gost_dsl_tests);
 #endif
 
-KUTE_TEST_CASE_SUITE(kryptos_dsl_tests)
+KUTE_TEST_CASE(kryptos_dsl_tests)
     // WARN(Rafael): The correctness of each available cipher must not be tested here. It
     //               should be done within a dedicated test case. Here only the mechanics about
     //               using these ciphers indirectly is tested (when C99 support is present).
@@ -106,7 +106,7 @@ KUTE_TEST_CASE_SUITE(kryptos_dsl_tests)
     KUTE_RUN_TEST(kryptos_gost_ds_dsl_tests);
     KUTE_RUN_TEST(kryptos_gost_dsl_tests);
 #endif
-KUTE_TEST_CASE_SUITE_END
+KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_dsl_general_tests)
     kryptos_task_ctx task;
@@ -153,30 +153,6 @@ KUTE_TEST_CASE(kryptos_dsl_general_tests)
     task.out_size = dsl_tests_data_size;
     KUTE_ASSERT(kryptos_task_get_out(&task) == dsl_tests_data);
     KUTE_ASSERT(kryptos_task_get_out_size(&task) == dsl_tests_data_size);
-
-    if (g_cute_leak_check == 1) {
-        task.out = (kryptos_u8_t *) kryptos_newseg(0x10);
-        task.out_size = 0x10;
-        kryptos_task_free(&task, KRYPTOS_TASK_OUT);
-        KUTE_ASSERT(task.out == NULL);
-        KUTE_ASSERT(task.out_size == 0);
-
-        task.in = (kryptos_u8_t *) kryptos_newseg(0x10);
-        task.in_size = 0x10;
-        task.out = (kryptos_u8_t *) kryptos_newseg(0x10);
-        task.out_size = 0x10;
-        kryptos_task_free(&task, KRYPTOS_TASK_OUT|KRYPTOS_TASK_IN);
-        KUTE_ASSERT(task.in == NULL);
-        KUTE_ASSERT(task.in_size == 0);
-        KUTE_ASSERT(task.out == NULL);
-        KUTE_ASSERT(task.out_size == 0);
-        // WARN(Rafael): If the out block was not actually freed, the cutest leak check system will complain.
-    } else {
-        // WARN(Rafael): This is bad. Avoid it. If you have freed every single trinket that you alloc'd,
-        //               you should have no fear. ;) The Leak System is your friend or supposed to be...
-        printf("=== WARN: The leak check system is deactivated, due to it was not possible test the kryptos_task_free() macro."
-               " It was SKIPPED.\n===\n");
-    }
 KUTE_TEST_CASE_END
 
 #if defined(KRYPTOS_C99)
