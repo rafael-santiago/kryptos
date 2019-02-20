@@ -411,7 +411,71 @@ There is also a "magic" to implement the cipher setup function:
 Notice that "setup" in kryptos is not the key expansion. The setup phase is when the user supplies basic information
 for the desired encryption/decryption task. This will load the task context with the relevant supplied data.
 
-I showed you the way of implementing the two important components of a block cipher in a more automated way, however,
+Since kryptos implements the Galois counter mode, even if your block cipher does not support it, you still need to
+implement the E function used by this mode. In cases where the GCM is not applicable, the E function should return
+the kKryptosNoSupport error code.
+
+E functions can have the following prototypes:
+
+```c
+    kryptos_task_result_t kryptos_type1_e(kryptos_u8_t **h, size_t *h_size,
+                                            kryptos_u8_t *key, size_t key_size, void *additional_arg);
+```
+
+Or:
+
+```c
+    kryptos_task_result_t kryptos_type2_e(kryptos_u8_t **h, size_t *h_size,
+                                          kryptos_u8_t *key, size_t key_size, additional_args);
+```
+
+The type1 is suitable for block cipher without any additional parameter. The type2 is suitable for block cipher that
+receive additional arguments.
+
+Fortunately the kryptos DSL includes statements to save you from always remembering those tricky prototypes:
+
+```c
+    KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_GCM_E(type1)
+```
+
+Or:
+
+```c
+    KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_GCM_E(type2, void *arg)
+```
+
+In GCM an E function is a function that encrypts a zeroed block by using the user key. This is pretty mechanical, thus the DSL
+also provides conveniences for implementing those E functions:
+
+```c
+    KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(type1)
+```
+
+Or:
+
+```c
+    KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_GCM_E(type2, key, key_size, void *arg, ktask, { type2_setup(ktask, key, kKryptosECB) })
+```
+
+For ciphers without support there are two functions. One for ciphers without additional parameters and another for ciphers with
+additional parameters:
+
+```c
+    KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(type1)
+```
+
+```c
+    KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_GCM_E_NO_SUPPORT(type2, void *arg)
+```
+
+The ``foofish`` cipher encrypts 128-bit blocks so it supports ``GCM``. In its implementation file we need to implement an E
+function. Just by doing the following:
+
+```c
+    KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(foofish)
+```
+
+I showed you the way of implementing the three important components of a block cipher in a more automated way, however,
 you also need to make those functions visible outside the block cipher module. In order to do it you should include
 the following basic content into the ``kryptos_foofish.h`` header file:
 
@@ -427,6 +491,8 @@ KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(foofish)
 
 KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR(foofish)
 
+KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_GCM_E(foofish)
+
 #endif
 ```
 
@@ -434,6 +500,8 @@ The macro ``KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP`` will make visible the fun
 ``kryptos_foofish_setup(kryptos_task_ctx *, kryptos_u8_t *, const size_t, const kryptos_cipher_mode_t)``.
 The macro ``KRYPTOS_DECL_BLOCK_CIPHER_PROCESSOR`` will make visible the function
 ``kryptos_foofish_cipher(kryptos_task_ctx **)``.
+The macro ``KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_GCM_E`` will make visible the function
+``kryptos_foofish_e(kryptos_u8_t **h, size_t *h_size, kryptos_u8_t *key, size_t key_size, void *additional_arg)``
 
 The macro ``KRYPTOS_FOOFISH_BLOCKSIZE`` is also important it states in bytes the size of processed blocks.
 

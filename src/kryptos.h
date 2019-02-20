@@ -87,6 +87,8 @@
     (ktask)->aux_buffers.buf1 = aad,\
     (ktask)->aux_buffers.buf1_size = aad_size )
 
+#define kryptos_task_set_gcm_ctr(ktask, uctr) ( (ktask)->ctr = (uctr) )
+
 #define kryptos_task_set_encrypt_action(ktask) ( (ktask)->action = kKryptosEncrypt )
 
 #define kryptos_task_set_decrypt_action(ktask) ( (ktask)->action = kKryptosDecrypt )
