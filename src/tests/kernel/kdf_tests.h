@@ -14,4 +14,8 @@ KUTE_DECLARE_TEST_CASE(kryptos_do_hkdf_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_hkdf_macro_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_do_pbkdf2_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_pbkdf2_macro_tests);
+
 #endif

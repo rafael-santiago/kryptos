@@ -372,7 +372,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(foofish,
                                     KRYPTOS_FOOFISH_BLOCKSIZE,
                                     foofish_cipher_epilogue,
                                     outblock,
-                                    foofish_block_processor(outblock, &sks))
+                                    foofish_block_processor(outblock, &sks),
+                                    NULL)
 ```
 
 Explaining:
@@ -392,7 +393,8 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(<internal cipher name>,
                                     <the block size (in bytes) of the cipher>,
                                     <the epilogue/escape label>,
                                     <name given for the current processed data block>,
-                                    <the block processing statement>)
+                                    <the block processing statement>,
+                                    <E function additional argument>)
 ```
 
 The encrypt and decrypt block functions in foofish return the data into the own input block. Due to it the block

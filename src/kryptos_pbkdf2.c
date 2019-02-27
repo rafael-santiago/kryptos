@@ -9,7 +9,9 @@
 #include <kryptos_memory.h>
 #include <kryptos_hmac.h>
 #include <kryptos.h>
-#include <string.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+#endif
 
 static kryptos_u8_t *kryptos_pbkdf2_f(kryptos_u8_t *p, const size_t p_size,
                                       kryptos_u8_t *s, const size_t s_size,

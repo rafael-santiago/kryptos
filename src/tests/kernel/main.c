@@ -110,6 +110,8 @@ KUTE_TEST_CASE(ktest_monkey)
 
     KUTE_RUN_TEST(kryptos_do_hkdf_tests);
     KUTE_RUN_TEST(kryptos_hkdf_macro_tests);
+    KUTE_RUN_TEST(kryptos_do_pbkdf2_tests);
+    KUTE_RUN_TEST(kryptos_pbkdf2_macro_tests);
 
     KUTE_RUN_TEST(kryptos_mp_new_value_tests);
     KUTE_RUN_TEST(kryptos_mp_hex_value_as_mp_tests);
