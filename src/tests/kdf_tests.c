@@ -8,6 +8,181 @@
 #include "kdf_tests.h"
 #include <kryptos.h>
 
+CUTE_TEST_CASE(kryptos_do_pbkdf2_tests)
+    struct test_step {
+        kryptos_hash_func prf;
+        kryptos_hash_size_func prf_input_size;
+        kryptos_hash_size_func prf_size;
+        kryptos_u8_t *password;
+        size_t password_size;
+        kryptos_u8_t *salt;
+        size_t salt_size;
+        size_t count;
+        size_t dklen;
+        kryptos_u8_t *expected;
+    };
+#define add_pbkdf2_test_case(h, p, p_size, s, s_size, c, d, e)\
+    { kryptos_ ## h ## _hash, kryptos_ ## h ## _hash_input_size, kryptos_ ## h ## _hash_size, p, p_size, s, s_size, c, d, e }
+    // INFO(Rafael): Test vectors from RFC-6070.
+    struct test_step test_vector[] = {
+        add_pbkdf2_test_case(sha1,
+                             "password",
+                             8,
+                             "salt",
+                             4,
+                             1,
+                             20,
+                             "\x0C\x60\xC8\x0F\x96\x1F\x0E\x71\xF3\xA9"
+                             "\xB5\x24\xAF\x60\x12\x06\x2F\xE0\x37\xA6"),
+        add_pbkdf2_test_case(sha1,
+                             "password",
+                             8,
+                             "salt",
+                             4,
+                             2,
+                             20,
+                             "\xEA\x6C\x01\x4D\xC7\x2D\x6F\x8C\xCD\x1E"
+                             "\xD9\x2A\xCE\x1D\x41\xF0\xD8\xDE\x89\x57"),
+        add_pbkdf2_test_case(sha1,
+                             "password",
+                             8,
+                             "salt",
+                             4,
+                             4096,
+                             20,
+                             "\x4B\x00\x79\x01\xB7\x65\x48\x9A\xBE\xAD"
+                             "\x49\xD9\x26\xF7\x21\xD0\x65\xA4\x29\xC1"),
+        /*add_pbkdf2_test_case(sha1,
+                             "password",
+                             8,
+                             "salt",
+                             4,
+                             16777216,
+                             20,
+                             "\xEE\xFE\x3D\x61\xCD\x4D\xA4\xE4\xE9\x94"
+                             "\x5B\x3D\x6B\xA2\x15\x8C\x26\x34\xE9\x84"),*/ // INFO(Rafael): Too slow! But passing.
+        add_pbkdf2_test_case(sha1,
+                             "passwordPASSWORDpassword",
+                             24,
+                             "saltSALTsaltSALTsaltSALTsaltSALTsalt",
+                             36,
+                             4096,
+                             25,
+                             "\x3D\x2E\xEC\x4F\xE4\x1C\x84\x9B\x80\xC8"
+                             "\xD8\x36\x62\xC0\xE4\x4A\x8B\x29\x1A\x96"
+                             "\x4C\xF2\xF0\x70\x38"),
+        add_pbkdf2_test_case(sha1,
+                             "pass\x00word",
+                             9,
+                             "sa\x00lt",
+                             5,
+                             4096,
+                             16,
+                             "\x56\xFA\x6A\xA7\x55\x48\x09\x9D\xCC\x37\xD7\xF0\x34\x25\xE0\xC3"),
+    };
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;
+    kryptos_u8_t *dk;
+    for (t = 0; t < test_vector_nr; t++) {
+        dk = kryptos_do_pbkdf2(test_vector[t].password, test_vector[t].password_size,
+                               test_vector[t].prf, test_vector[t].prf_input_size, test_vector[t].prf_size,
+                               test_vector[t].salt, test_vector[t].salt_size,
+                               test_vector[t].count, test_vector[t].dklen);
+        CUTE_ASSERT(dk != NULL);
+        CUTE_ASSERT(memcmp(dk, test_vector[t].expected, test_vector[t].dklen) == 0);
+        kryptos_freeseg(dk, test_vector[t].dklen);
+    }
+#undef add_pbkdkf2_test_case
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_pbkdf2_macro_tests)
+    // WARN(Rafael): Keep the prints. It is trying to access n expected bytes.
+    //               If n bytes were not returned this test will explode and we will know that something went wrong here.
+    kryptos_u8_t *dk, *dk_p, *dk_p_end;
+    dk = kryptos_pbkdf2("Gardenia", 8, sha3_512, "", 0, 188, 18);
+    CUTE_ASSERT(dk != NULL);
+    dk_p = dk;
+    dk_p_end = dk_p + 18;
+    printf("\t DK = ");
+    while (dk_p != dk_p_end) {
+        printf("%.2X", *dk_p);
+        dk_p++;
+    }
+    printf("\n");
+    kryptos_freeseg(dk, 18);
+
+    dk = kryptos_pbkdf2("Slow Cheetah", 12, whirlpool, "RHCP", 4, 16, 22);
+    CUTE_ASSERT(dk != NULL);
+    dk_p = dk;
+    dk_p_end = dk_p + 22;
+    printf("\t DK = ");
+    while (dk_p != dk_p_end) {
+        printf("%.2X", *dk_p);
+        dk_p++;
+    }
+    printf("\n");
+    kryptos_freeseg(dk, 22);
+
+    dk = kryptos_pbkdf2("Joe Cool", 8, tiger, "", 0, 27, 113);
+    CUTE_ASSERT(dk != NULL);
+    dk_p = dk;
+    dk_p_end = dk_p + 113;
+    printf("\t DK = ");
+    while (dk_p != dk_p_end) {
+        printf("%.2X", *dk_p);
+        dk_p++;
+    }
+    printf("\n");
+    kryptos_freeseg(dk, 113);
+
+    dk = kryptos_pbkdf2("PBKDF2", 6, tiger, "2FDKBP", 6, 5, 256);
+    CUTE_ASSERT(dk != NULL);
+    dk_p = dk;
+    dk_p_end = dk_p + 256;
+    printf("\t DK = ");
+    while (dk_p != dk_p_end) {
+        printf("%.2X", *dk_p);
+        dk_p++;
+    }
+    printf("\n");
+    kryptos_freeseg(dk, 256);
+
+    dk = kryptos_pbkdf2("Dulcimer Stomp", 14, md5, "Pump", 4, 14, 1024);
+    CUTE_ASSERT(dk != NULL);
+    dk_p = dk;
+    dk_p_end = dk_p + 1024;
+    printf("\t DK = ");
+    while (dk_p != dk_p_end) {
+        printf("%.2X", *dk_p);
+        dk_p++;
+    }
+    printf("\n");
+    kryptos_freeseg(dk, 1024);
+
+    dk = kryptos_pbkdf2("Ahhhhh", 6, md4, "", 0, 32, 2048);
+    CUTE_ASSERT(dk != NULL);
+    dk_p = dk;
+    dk_p_end = dk_p + 2048;
+    printf("\t DK = ");
+    while (dk_p != dk_p_end) {
+        printf("%.2X", *dk_p);
+        dk_p++;
+    }
+    printf("\n");
+    kryptos_freeseg(dk, 2048);
+
+    dk = kryptos_pbkdf2("boo!", 4, sha3_256, "ahh!", 4, 4, 8);
+    CUTE_ASSERT(dk != NULL);
+    dk_p = dk;
+    dk_p_end = dk_p + 8;
+    printf("\t DK = ");
+    while (dk_p != dk_p_end) {
+        printf("%.2X", *dk_p);
+        dk_p++;
+    }
+    printf("\n");
+    kryptos_freeseg(dk, 8);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_do_hkdf_tests)
     struct test_step {
         kryptos_hash_func h;

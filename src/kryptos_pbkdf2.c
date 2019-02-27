@@ -18,6 +18,7 @@ static kryptos_u8_t *kryptos_pbkdf2_f(kryptos_u8_t *p, const size_t p_size,
                                       kryptos_hash_func prf,
                                       kryptos_hash_size_func prf_input_size,
                                       kryptos_hash_size_func prf_size,
+                                      size_t hlen,
                                       size_t *osize);
 
 kryptos_u8_t *kryptos_do_pbkdf2(kryptos_u8_t *password, const size_t password_size,
@@ -39,7 +40,7 @@ kryptos_u8_t *kryptos_do_pbkdf2(kryptos_u8_t *password, const size_t password_si
         goto kryptos_pbkdf2_epilogue;
     }
 
-    if ((dk = (kryptos_u8_t *) kryptos_newseg(dklen)) == NULL) {
+    if ((dk = (kryptos_u8_t *)kryptos_newseg(dklen)) == NULL) {
         goto kryptos_pbkdf2_epilogue;
     }
 
@@ -50,8 +51,7 @@ kryptos_u8_t *kryptos_do_pbkdf2(kryptos_u8_t *password, const size_t password_si
 
     while (dk_p != dk_p_end) {
         temp = kryptos_pbkdf2_f(password, password_size, salt, salt_size, count, i++,
-                                &ktask, prf, prf_input_size, prf_size,
-                                &temp_size);
+                                &ktask, prf, prf_input_size, prf_size, hlen, &temp_size);
 
         if (temp == NULL || !kryptos_last_task_succeed(ktask)) {
             kryptos_freeseg(dk, dklen);
@@ -76,8 +76,6 @@ kryptos_u8_t *kryptos_do_pbkdf2(kryptos_u8_t *password, const size_t password_si
 
 kryptos_pbkdf2_epilogue:
 
-    kryptos_task_free(ktask, KRYPTOS_TASK_IN);
-
     if (temp != NULL) {
         kryptos_freeseg(temp, temp_size);
     }
@@ -92,42 +90,71 @@ static kryptos_u8_t *kryptos_pbkdf2_f(kryptos_u8_t *p, const size_t p_size,
                                       kryptos_hash_func prf,
                                       kryptos_hash_size_func prf_input_size,
                                       kryptos_hash_size_func prf_size,
+                                      size_t hlen,
                                       size_t *osize) {
-    size_t ct;
+    size_t ct, b;
+    kryptos_u8_t *dk = NULL;
 
     kryptos_task_init_as_null(*io);
+    *osize = 0;
 
-    (*io)->in_size = s_size + sizeof(kryptos_u32_t);
+    if ((dk = (kryptos_u8_t *)kryptos_newseg(hlen)) == NULL) {
+        goto kryptos_pbkdf2_f_epilogue;
+    }
 
+    (*io)->out_size = s_size + sizeof(kryptos_u32_t);
+    (*io)->key = p;
+    (*io)->key_size = p_size;
+    kryptos_task_set_encrypt_action(*io);
 
-    if (((*io)->in = (kryptos_u8_t *) kryptos_newseg((*io)->in_size)) == NULL) {
+    if (((*io)->out = (kryptos_u8_t *) kryptos_newseg((*io)->out_size)) == NULL) {
+        kryptos_freeseg(dk, hlen);
+        dk = NULL;
         goto kryptos_pbkdf2_f_epilogue;
     }
 
     if (s != NULL && s_size > 0) {
-        memcpy((*io)->in, s, s_size);
+        memcpy((*io)->out, s, s_size);
     }
 
-    ((*io)->in + s_size)[0] = i >> 24;
-    ((*io)->in + s_size)[1] = (i >> 16) & 0xFF;
-    ((*io)->in + s_size)[2] = (i >>  8) & 0xFF;
-    ((*io)->in + s_size)[3] = i & 0xFF;
+    ((*io)->out + s_size)[0] = i >> 24;
+    ((*io)->out + s_size)[1] = (i >> 16) & 0xFF;
+    ((*io)->out + s_size)[2] = (i >>  8) & 0xFF;
+    ((*io)->out + s_size)[3] = i & 0xFF;
 
-    for (ct = 0; ct < c; ct++) {
+    kryptos_hmac(io, prf, prf_input_size, prf_size);
+
+    if (!kryptos_last_task_succeed(*io)) {
+        kryptos_freeseg(dk, hlen);
+        dk = NULL;
+        goto kryptos_pbkdf2_f_epilogue;
+    }
+
+    memcpy(dk, (*io)->out, hlen);
+
+    for (ct = 1; ct < c; ct++) {
+        memset((*io)->out + hlen, 0, (*io)->out_size - hlen);
+        (*io)->out_size = hlen;
+
         kryptos_hmac(io, prf, prf_input_size, prf_size);
-        (*io)->in = (*io)->out;
-        (*io)->in_size = (*io)->out_size;
-        kryptos_task_free(*io, KRYPTOS_TASK_IN);
+
+        for (b = 0; b < hlen; b++) {
+            dk[b] ^= (*io)->out[b];
+        }
+
+        if (!kryptos_last_task_succeed(*io)) {
+            kryptos_freeseg(dk, hlen);
+            dk = NULL;
+            goto kryptos_pbkdf2_f_epilogue;
+        }
     }
+
+    *osize = hlen;
 
 kryptos_pbkdf2_f_epilogue:
 
-    kryptos_task_free(*io, KRYPTOS_TASK_IN);
+    kryptos_freeseg((*io)->out, (*io)->out_size);
+    (*io)->out = NULL;
 
-    if (kryptos_last_task_succeed(*io)) {
-        *osize = (*io)->out_size;
-        (*io)->out = NULL;
-    }
-
-    return (*io)->out;
+    return dk;
 }

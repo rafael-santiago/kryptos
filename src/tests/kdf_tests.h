@@ -14,4 +14,8 @@ CUTE_DECLARE_TEST_CASE(kryptos_do_hkdf_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_hkdf_macro_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_do_pbkdf2_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_pbkdf2_macro_tests);
+
 #endif
