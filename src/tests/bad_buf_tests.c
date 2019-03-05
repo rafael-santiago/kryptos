@@ -9,6 +9,45 @@
 #include "test_vectors.h"
 #include <kryptos.h>
 
+#if defined(KRYPTOS_C99)
+
+CUTE_DECLARE_TEST_CASE(kryptos_des_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_idea_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_blowfish_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_camellia128_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_camellia192_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_camellia256_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_cast5_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_aes128_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_aes192_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_aes256_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_serpent_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_tea_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_xtea_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_misty1_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_mars128_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_mars192_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_mars256_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_present80_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_present128_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_shacal1_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_shacal2_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_noekeon_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_noekeon_d_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_gost_ds_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_feal_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_rc2_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_rc5_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_rc6_128_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_rc6_192_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_rc6_256_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_saferk64_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_triple_des_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_triple_des_ede_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_gost_bad_hmac_tests);
+
+#endif
+
 CUTE_TEST_CASE(kryptos_bad_decryption_tests)
     kryptos_task_ctx t, *ktask = &t;
     size_t feal_rounds = 19;
@@ -185,43 +224,61 @@ CUTE_TEST_CASE(kryptos_bad_decryption_tests)
     kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT);
 CUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_bad_hmac_tests)
+CUTE_TEST_CASE_SUITE(kryptos_bad_hmac_tests)
 #if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)
+
+    CUTE_RUN_TEST(kryptos_des_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_idea_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_blowfish_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_camellia128_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_camellia192_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_camellia256_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_cast5_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_aes128_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_aes192_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_aes256_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_serpent_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_tea_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_misty1_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_mars128_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_mars192_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_mars256_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_present80_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_present128_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_shacal1_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_shacal2_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_noekeon_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_noekeon_d_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_gost_ds_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_feal_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_rc2_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_rc5_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_rc6_128_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_rc6_192_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_rc6_256_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_saferk64_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_triple_des_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_triple_des_ede_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_xtea_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_gost_bad_hmac_tests);
+
+#else
+# if !defined(KRYPTOS_NO_HMAC_TESTS)
+    // TODO(Rafael): When there is no C99 support add a simple bare bone test with at least one block cipher and all
+    //               available hash functions.
+    printf("WARN: This test runs only when libkryptos is compiled with C99 support. It will be skipped.\n");
+# else
+    printf("WARN: You have requested build this binary without the HMAC tests.\n");
+# endif
+#endif
+CUTE_TEST_CASE_SUITE_END
+
+#if defined(KRYPTOS_C99)
+
+CUTE_TEST_CASE(kryptos_des_bad_hmac_tests)
     kryptos_task_ctx t, *ktask = &t;
     kryptos_u8_t *key = "BoOmM!";
     size_t key_size = 6;
-    size_t feal_rounds = 19;
-    int rc2_t1 = 128;
-    int saferk64_n = 6;
-    kryptos_u8_t *tdes_k2 = "abc", *tdes_k3 = "def";
-    size_t tdes_k2_size = 3, tdes_k3_size = 3;
-    int xtea_rounds = 72;
-    int rc5_rounds = 48;
-    int rc6_rounds = 90;
-    kryptos_u8_t gost_s1[16] = {
-         4, 10,  9,  2, 13,  8,  0, 14,  6, 11,  1, 12,  7, 15,  5,  3
-    };
-    kryptos_u8_t gost_s2[16] = {
-        14, 11,  4, 12,  6, 13, 15, 10,  2,  3,  8,  1,  0,  7,  5,  9
-    };
-    kryptos_u8_t gost_s3[16] = {
-        5,  8,  1, 13, 10,  3,  4,  2, 14, 15, 12,  7,  6,  0,  9, 11
-    };
-    kryptos_u8_t gost_s4[16] = {
-        7, 13, 10,  1,  0,  8,  9, 15, 14,  4,  6, 12, 11,  2,  5,  3
-    };
-    kryptos_u8_t gost_s5[16] = {
-        6, 12,  7,  1,  5, 15, 13,  8,  4, 10,  9, 14,  0,  3, 11,  2
-    };
-    kryptos_u8_t gost_s6[16] = {
-        4, 11, 10,  0,  7,  2,  1, 13,  3,  6,  8,  5,  9, 12, 15, 14
-    };
-    kryptos_u8_t gost_s7[16] = {
-        13, 11,  4,  1,  3, 15,  5,  9,  0, 10, 14,  7,  6,  8,  2, 12
-    };
-    kryptos_u8_t gost_s8[16] = {
-         1, 15, 13,  0,  5,  7, 10,  4,  9,  2,  3, 14,  6, 11,  8, 12
-    };
 
     kryptos_bad_buf_run_hmac(des, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(des, sha256, ktask, key, key_size, kKryptosECB);
@@ -298,6 +355,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(des, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(des, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(des, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_idea_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(idea, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(idea, sha256, ktask, key, key_size, kKryptosECB);
@@ -374,6 +437,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(idea, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(idea, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(idea, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blowfish_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(blowfish, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(blowfish, sha256, ktask, key, key_size, kKryptosECB);
@@ -450,6 +519,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(blowfish, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(blowfish, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(blowfish, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_camellia128_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(camellia128, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(camellia128, sha256, ktask, key, key_size, kKryptosECB);
@@ -526,6 +601,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(camellia128, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(camellia128, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(camellia128, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_camellia192_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(camellia192, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(camellia192, sha256, ktask, key, key_size, kKryptosECB);
@@ -602,6 +683,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(camellia192, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(camellia192, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(camellia192, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_camellia256_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(camellia256, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(camellia256, sha256, ktask, key, key_size, kKryptosECB);
@@ -678,6 +765,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(camellia256, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(camellia256, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(camellia256, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_cast5_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(cast5, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(cast5, sha256, ktask, key, key_size, kKryptosECB);
@@ -754,6 +847,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(cast5, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(cast5, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(cast5, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_aes128_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(aes128, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(aes128, sha256, ktask, key, key_size, kKryptosECB);
@@ -830,6 +929,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(aes128, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(aes128, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(aes128, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_aes192_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(aes192, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(aes192, sha256, ktask, key, key_size, kKryptosECB);
@@ -906,6 +1011,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(aes192, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(aes192, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(aes192, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_aes256_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(aes256, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(aes256, sha256, ktask, key, key_size, kKryptosECB);
@@ -982,6 +1093,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(aes256, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(aes256, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(aes256, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_serpent_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(serpent, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(serpent, sha256, ktask, key, key_size, kKryptosECB);
@@ -1058,6 +1175,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(serpent, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(serpent, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(serpent, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_tea_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(tea, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(tea, sha256, ktask, key, key_size, kKryptosECB);
@@ -1134,6 +1257,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(tea, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(tea, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(tea, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_misty1_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(misty1, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(misty1, sha256, ktask, key, key_size, kKryptosECB);
@@ -1210,6 +1339,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(misty1, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(misty1, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(misty1, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mars128_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(mars128, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(mars128, sha256, ktask, key, key_size, kKryptosECB);
@@ -1286,6 +1421,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(mars128, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(mars128, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(mars128, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mars192_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(mars192, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(mars192, sha256, ktask, key, key_size, kKryptosECB);
@@ -1362,6 +1503,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(mars192, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(mars192, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(mars192, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mars256_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(mars256, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(mars256, sha256, ktask, key, key_size, kKryptosECB);
@@ -1438,6 +1585,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(mars256, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(mars256, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(mars256, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_present80_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(present80, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(present80, sha256, ktask, key, key_size, kKryptosECB);
@@ -1514,6 +1667,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(present80, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(present80, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(present80, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_present128_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(present128, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(present128, sha256, ktask, key, key_size, kKryptosECB);
@@ -1590,6 +1749,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(present128, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(present128, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(present128, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_shacal1_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(shacal1, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(shacal1, sha256, ktask, key, key_size, kKryptosECB);
@@ -1666,6 +1831,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(shacal1, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(shacal1, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(shacal1, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_shacal2_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(shacal2, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(shacal2, sha256, ktask, key, key_size, kKryptosECB);
@@ -1742,6 +1913,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(shacal2, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(shacal2, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(shacal2, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_noekeon_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(noekeon, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(noekeon, sha256, ktask, key, key_size, kKryptosECB);
@@ -1818,6 +1995,12 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(noekeon, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(noekeon, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(noekeon, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_noekeon_d_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
 
     kryptos_bad_buf_run_hmac(noekeon_d, sha1, ktask, key, key_size, kKryptosECB);
     kryptos_bad_buf_run_hmac(noekeon_d, sha256, ktask, key, key_size, kKryptosECB);
@@ -1894,6 +2077,97 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(noekeon_d, ripemd160, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(noekeon_d, tiger, ktask, key, key_size, kKryptosCTR);
     kryptos_bad_buf_run_hmac(noekeon_d, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_gost_ds_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
+
+    kryptos_bad_buf_run_hmac(gost_ds, sha1, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, sha256, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, sha384, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, sha512, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, sha3_224, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, sha3_256, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, sha3_384, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, sha3_512, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, keccak224, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, keccak256, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, keccak384, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, keccak512, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, md4, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, md5, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, ripemd128, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, ripemd160, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, tiger, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(gost_ds, whirlpool, ktask, key, key_size, kKryptosECB);
+
+    kryptos_bad_buf_run_hmac(gost_ds, sha1, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, sha256, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, sha384, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, sha512, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, sha3_224, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, sha3_256, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, sha3_384, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, sha3_512, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, keccak224, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, keccak256, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, keccak384, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, keccak512, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, md4, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, md5, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, ripemd128, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, ripemd160, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, tiger, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(gost_ds, whirlpool, ktask, key, key_size, kKryptosCBC);
+
+    kryptos_bad_buf_run_hmac(gost_ds, sha1, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, sha256, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, sha384, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, sha512, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, sha3_224, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, sha3_256, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, sha3_384, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, sha3_512, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, keccak224, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, keccak256, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, keccak384, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, keccak512, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, md4, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, md5, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, ripemd128, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, ripemd160, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, tiger, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(gost_ds, whirlpool, ktask, key, key_size, kKryptosOFB);
+
+    kryptos_bad_buf_run_hmac(gost_ds, sha1, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, sha256, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, sha384, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, sha512, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, sha3_224, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, sha3_256, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, sha3_384, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, sha3_512, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, keccak224, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, keccak256, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, keccak384, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, keccak512, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, md4, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, md5, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, ripemd128, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, ripemd160, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, tiger, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(gost_ds, whirlpool, ktask, key, key_size, kKryptosCTR);
+
+
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_feal_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
+    int feal_rounds = 19;
 
     kryptos_bad_buf_run_hmac(feal, sha1, ktask, key, key_size, kKryptosECB, &feal_rounds);
     kryptos_bad_buf_run_hmac(feal, sha256, ktask, key, key_size, kKryptosECB, &feal_rounds);
@@ -1970,6 +2244,13 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(feal, ripemd160, ktask, key, key_size, kKryptosCTR, &feal_rounds);
     kryptos_bad_buf_run_hmac(feal, tiger, ktask, key, key_size, kKryptosCTR, &feal_rounds);
     kryptos_bad_buf_run_hmac(feal, whirlpool, ktask, key, key_size, kKryptosCTR, &feal_rounds);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc2_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
+    int rc2_t1 = 128;
 
     kryptos_bad_buf_run_hmac(rc2, sha1, ktask, key, key_size, kKryptosECB, &rc2_t1);
     kryptos_bad_buf_run_hmac(rc2, sha256, ktask, key, key_size, kKryptosECB, &rc2_t1);
@@ -2046,6 +2327,345 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(rc2, ripemd160, ktask, key, key_size, kKryptosCTR, &rc2_t1);
     kryptos_bad_buf_run_hmac(rc2, tiger, ktask, key, key_size, kKryptosCTR, &rc2_t1);
     kryptos_bad_buf_run_hmac(rc2, whirlpool, ktask, key, key_size, kKryptosCTR, &rc2_t1);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc5_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
+    int rc5_rounds = 48;
+
+    kryptos_bad_buf_run_hmac(rc5, sha1, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha256, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha384, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha512, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha3_224, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha3_256, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha3_384, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha3_512, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, keccak224, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, keccak256, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, keccak384, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, keccak512, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, md4, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, md5, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, ripemd128, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, ripemd160, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, tiger, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, whirlpool, ktask, key, key_size, kKryptosECB, &rc5_rounds);
+
+    kryptos_bad_buf_run_hmac(rc5, sha1, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha256, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha384, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha512, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha3_224, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha3_256, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha3_384, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha3_512, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, keccak224, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, keccak256, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, keccak384, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, keccak512, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, md4, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, md5, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, ripemd128, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, ripemd160, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, tiger, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, whirlpool, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
+
+    kryptos_bad_buf_run_hmac(rc5, sha1, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha256, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha384, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha512, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha3_224, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha3_256, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha3_384, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha3_512, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, keccak224, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, keccak256, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, keccak384, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, keccak512, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, md4, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, md5, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, ripemd128, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, ripemd160, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, tiger, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, whirlpool, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
+
+    kryptos_bad_buf_run_hmac(rc5, sha1, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha256, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha384, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha512, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha3_224, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha3_256, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha3_384, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, sha3_512, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, keccak224, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, keccak256, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, keccak384, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, keccak512, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, md4, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, md5, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, ripemd128, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, ripemd160, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, tiger, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_bad_buf_run_hmac(rc5, whirlpool, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc6_128_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
+    int rc6_rounds = 90;
+
+    kryptos_bad_buf_run_hmac(rc6_128, sha1, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha3_224, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha3_256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha3_384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha3_512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, keccak224, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, keccak256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, keccak384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, keccak512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, md4, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, md5, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, ripemd128, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, ripemd160, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, tiger, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, whirlpool, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+
+    kryptos_bad_buf_run_hmac(rc6_128, sha1, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha3_224, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha3_256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha3_384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha3_512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, keccak224, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, keccak256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, keccak384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, keccak512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, md4, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, md5, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, ripemd128, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, ripemd160, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, tiger, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, whirlpool, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+
+    kryptos_bad_buf_run_hmac(rc6_128, sha1, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha3_224, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha3_256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha3_384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha3_512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, keccak224, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, keccak256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, keccak384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, keccak512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, md4, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, md5, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, ripemd128, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, ripemd160, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, tiger, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, whirlpool, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+
+    kryptos_bad_buf_run_hmac(rc6_128, sha1, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha3_224, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha3_256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha3_384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, sha3_512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, keccak224, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, keccak256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, keccak384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, keccak512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, md4, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, md5, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, ripemd128, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, ripemd160, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, tiger, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_128, whirlpool, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc6_192_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
+    int rc6_rounds = 90;
+
+    kryptos_bad_buf_run_hmac(rc6_192, sha1, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha3_224, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha3_256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha3_384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha3_512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, keccak224, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, keccak256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, keccak384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, keccak512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, md4, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, md5, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, ripemd128, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, ripemd160, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, tiger, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, whirlpool, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+
+    kryptos_bad_buf_run_hmac(rc6_192, sha1, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha3_224, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha3_256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha3_384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha3_512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, keccak224, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, keccak256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, keccak384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, keccak512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, md4, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, md5, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, ripemd128, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, ripemd160, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, tiger, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, whirlpool, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+
+    kryptos_bad_buf_run_hmac(rc6_192, sha1, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha3_224, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha3_256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha3_384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha3_512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, keccak224, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, keccak256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, keccak384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, keccak512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, md4, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, md5, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, ripemd128, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, ripemd160, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, tiger, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, whirlpool, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+
+    kryptos_bad_buf_run_hmac(rc6_192, sha1, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha3_224, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha3_256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha3_384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, sha3_512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, keccak224, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, keccak256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, keccak384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, keccak512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, md4, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, md5, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, ripemd128, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, ripemd160, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, tiger, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_192, whirlpool, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc6_256_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
+    int rc6_rounds = 90;
+
+    kryptos_bad_buf_run_hmac(rc6_256, sha1, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha3_224, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha3_256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha3_384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha3_512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, keccak224, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, keccak256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, keccak384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, keccak512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, md4, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, md5, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, ripemd128, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, ripemd160, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, tiger, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, whirlpool, ktask, key, key_size, kKryptosECB, &rc6_rounds);
+
+    kryptos_bad_buf_run_hmac(rc6_256, sha1, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha3_224, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha3_256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha3_384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha3_512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, keccak224, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, keccak256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, keccak384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, keccak512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, md4, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, md5, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, ripemd128, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, ripemd160, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, tiger, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, whirlpool, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
+
+    kryptos_bad_buf_run_hmac(rc6_256, sha1, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha3_224, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha3_256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha3_384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha3_512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, keccak224, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, keccak256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, keccak384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, keccak512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, md4, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, md5, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, ripemd128, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, ripemd160, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, tiger, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, whirlpool, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
+
+    kryptos_bad_buf_run_hmac(rc6_256, sha1, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha3_224, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha3_256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha3_384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, sha3_512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, keccak224, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, keccak256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, keccak384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, keccak512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, md4, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, md5, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, ripemd128, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, ripemd160, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, tiger, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_bad_buf_run_hmac(rc6_256, whirlpool, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_saferk64_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
+    int saferk64_n = 6;
 
     kryptos_bad_buf_run_hmac(saferk64, sha1, ktask, key, key_size, kKryptosECB, &saferk64_n);
     kryptos_bad_buf_run_hmac(saferk64, sha256, ktask, key, key_size, kKryptosECB, &saferk64_n);
@@ -2122,6 +2742,14 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(saferk64, ripemd160, ktask, key, key_size, kKryptosCTR, &saferk64_n);
     kryptos_bad_buf_run_hmac(saferk64, tiger, ktask, key, key_size, kKryptosCTR, &saferk64_n);
     kryptos_bad_buf_run_hmac(saferk64, whirlpool, ktask, key, key_size, kKryptosCTR, &saferk64_n);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_triple_des_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
+    kryptos_u8_t *tdes_k2 = "abc", *tdes_k3 = "def";
+    size_t tdes_k2_size = 3, tdes_k3_size = 3;
 
     kryptos_bad_buf_run_hmac(triple_des, sha1, ktask, key, key_size, kKryptosECB,
                              tdes_k2, &tdes_k2_size, tdes_k3, &tdes_k3_size);
@@ -2270,6 +2898,14 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
                              tdes_k2, &tdes_k2_size, tdes_k3, &tdes_k3_size);
     kryptos_bad_buf_run_hmac(triple_des, whirlpool, ktask, key, key_size, kKryptosCTR,
                              tdes_k2, &tdes_k2_size, tdes_k3, &tdes_k3_size);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_triple_des_ede_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
+    kryptos_u8_t *tdes_k2 = "abc", *tdes_k3 = "def";
+    size_t tdes_k2_size = 3, tdes_k3_size = 3;
 
     kryptos_bad_buf_run_hmac(triple_des_ede, sha1, ktask, key, key_size, kKryptosECB,
                              tdes_k2, &tdes_k2_size, tdes_k3, &tdes_k3_size);
@@ -2418,6 +3054,13 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
                              tdes_k2, &tdes_k2_size, tdes_k3, &tdes_k3_size);
     kryptos_bad_buf_run_hmac(triple_des_ede, whirlpool, ktask, key, key_size, kKryptosCTR,
                              tdes_k2, &tdes_k2_size, tdes_k3, &tdes_k3_size);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_xtea_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
+    int xtea_rounds = 72;
 
     kryptos_bad_buf_run_hmac(xtea, sha1, ktask, key, key_size, kKryptosECB, &xtea_rounds);
     kryptos_bad_buf_run_hmac(xtea, sha256, ktask, key, key_size, kKryptosECB, &xtea_rounds);
@@ -2494,310 +3137,36 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
     kryptos_bad_buf_run_hmac(xtea, ripemd160, ktask, key, key_size, kKryptosCTR, &xtea_rounds);
     kryptos_bad_buf_run_hmac(xtea, tiger, ktask, key, key_size, kKryptosCTR, &xtea_rounds);
     kryptos_bad_buf_run_hmac(xtea, whirlpool, ktask, key, key_size, kKryptosCTR, &xtea_rounds);
+CUTE_TEST_CASE_END
 
-    kryptos_bad_buf_run_hmac(rc5, sha1, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha256, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha384, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha512, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha3_224, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha3_256, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha3_384, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha3_512, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, keccak224, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, keccak256, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, keccak384, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, keccak512, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, md4, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, md5, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, ripemd128, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, ripemd160, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, tiger, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, whirlpool, ktask, key, key_size, kKryptosECB, &rc5_rounds);
-
-    kryptos_bad_buf_run_hmac(rc5, sha1, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha256, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha384, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha512, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha3_224, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha3_256, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha3_384, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha3_512, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, keccak224, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, keccak256, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, keccak384, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, keccak512, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, md4, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, md5, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, ripemd128, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, ripemd160, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, tiger, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, whirlpool, ktask, key, key_size, kKryptosCBC, &rc5_rounds);
-
-    kryptos_bad_buf_run_hmac(rc5, sha1, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha256, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha384, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha512, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha3_224, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha3_256, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha3_384, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha3_512, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, keccak224, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, keccak256, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, keccak384, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, keccak512, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, md4, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, md5, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, ripemd128, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, ripemd160, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, tiger, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, whirlpool, ktask, key, key_size, kKryptosOFB, &rc5_rounds);
-
-    kryptos_bad_buf_run_hmac(rc5, sha1, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha256, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha384, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha512, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha3_224, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha3_256, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha3_384, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, sha3_512, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, keccak224, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, keccak256, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, keccak384, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, keccak512, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, md4, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, md5, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, ripemd128, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, ripemd160, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, tiger, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-    kryptos_bad_buf_run_hmac(rc5, whirlpool, ktask, key, key_size, kKryptosCTR, &rc5_rounds);
-
-    kryptos_bad_buf_run_hmac(rc6_128, sha1, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha3_224, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha3_256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha3_384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha3_512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, keccak224, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, keccak256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, keccak384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, keccak512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, md4, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, md5, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, ripemd128, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, ripemd160, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, tiger, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, whirlpool, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-
-    kryptos_bad_buf_run_hmac(rc6_128, sha1, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha3_224, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha3_256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha3_384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha3_512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, keccak224, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, keccak256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, keccak384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, keccak512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, md4, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, md5, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, ripemd128, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, ripemd160, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, tiger, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, whirlpool, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-
-    kryptos_bad_buf_run_hmac(rc6_128, sha1, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha3_224, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha3_256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha3_384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha3_512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, keccak224, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, keccak256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, keccak384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, keccak512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, md4, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, md5, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, ripemd128, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, ripemd160, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, tiger, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, whirlpool, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-
-    kryptos_bad_buf_run_hmac(rc6_128, sha1, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha3_224, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha3_256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha3_384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, sha3_512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, keccak224, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, keccak256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, keccak384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, keccak512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, md4, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, md5, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, ripemd128, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, ripemd160, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, tiger, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_128, whirlpool, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-
-    kryptos_bad_buf_run_hmac(rc6_192, sha1, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha3_224, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha3_256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha3_384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha3_512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, keccak224, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, keccak256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, keccak384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, keccak512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, md4, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, md5, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, ripemd128, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, ripemd160, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, tiger, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, whirlpool, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-
-    kryptos_bad_buf_run_hmac(rc6_192, sha1, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha3_224, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha3_256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha3_384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha3_512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, keccak224, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, keccak256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, keccak384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, keccak512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, md4, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, md5, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, ripemd128, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, ripemd160, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, tiger, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, whirlpool, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-
-    kryptos_bad_buf_run_hmac(rc6_192, sha1, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha3_224, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha3_256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha3_384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha3_512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, keccak224, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, keccak256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, keccak384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, keccak512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, md4, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, md5, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, ripemd128, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, ripemd160, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, tiger, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, whirlpool, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-
-    kryptos_bad_buf_run_hmac(rc6_192, sha1, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha3_224, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha3_256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha3_384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, sha3_512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, keccak224, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, keccak256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, keccak384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, keccak512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, md4, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, md5, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, ripemd128, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, ripemd160, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, tiger, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_192, whirlpool, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-
-    kryptos_bad_buf_run_hmac(rc6_256, sha1, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha3_224, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha3_256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha3_384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha3_512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, keccak224, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, keccak256, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, keccak384, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, keccak512, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, md4, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, md5, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, ripemd128, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, ripemd160, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, tiger, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, whirlpool, ktask, key, key_size, kKryptosECB, &rc6_rounds);
-
-    kryptos_bad_buf_run_hmac(rc6_256, sha1, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha3_224, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha3_256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha3_384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha3_512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, keccak224, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, keccak256, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, keccak384, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, keccak512, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, md4, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, md5, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, ripemd128, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, ripemd160, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, tiger, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, whirlpool, ktask, key, key_size, kKryptosCBC, &rc6_rounds);
-
-    kryptos_bad_buf_run_hmac(rc6_256, sha1, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha3_224, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha3_256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha3_384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha3_512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, keccak224, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, keccak256, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, keccak384, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, keccak512, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, md4, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, md5, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, ripemd128, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, ripemd160, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, tiger, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, whirlpool, ktask, key, key_size, kKryptosOFB, &rc6_rounds);
-
-    kryptos_bad_buf_run_hmac(rc6_256, sha1, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha3_224, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha3_256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha3_384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, sha3_512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, keccak224, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, keccak256, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, keccak384, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, keccak512, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, md4, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, md5, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, ripemd128, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, ripemd160, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, tiger, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
-    kryptos_bad_buf_run_hmac(rc6_256, whirlpool, ktask, key, key_size, kKryptosCTR, &rc6_rounds);
+CUTE_TEST_CASE(kryptos_gost_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
+    kryptos_u8_t gost_s1[16] = {
+         4, 10,  9,  2, 13,  8,  0, 14,  6, 11,  1, 12,  7, 15,  5,  3
+    };
+    kryptos_u8_t gost_s2[16] = {
+        14, 11,  4, 12,  6, 13, 15, 10,  2,  3,  8,  1,  0,  7,  5,  9
+    };
+    kryptos_u8_t gost_s3[16] = {
+        5,  8,  1, 13, 10,  3,  4,  2, 14, 15, 12,  7,  6,  0,  9, 11
+    };
+    kryptos_u8_t gost_s4[16] = {
+        7, 13, 10,  1,  0,  8,  9, 15, 14,  4,  6, 12, 11,  2,  5,  3
+    };
+    kryptos_u8_t gost_s5[16] = {
+        6, 12,  7,  1,  5, 15, 13,  8,  4, 10,  9, 14,  0,  3, 11,  2
+    };
+    kryptos_u8_t gost_s6[16] = {
+        4, 11, 10,  0,  7,  2,  1, 13,  3,  6,  8,  5,  9, 12, 15, 14
+    };
+    kryptos_u8_t gost_s7[16] = {
+        13, 11,  4,  1,  3, 15,  5,  9,  0, 10, 14,  7,  6,  8,  2, 12
+    };
+    kryptos_u8_t gost_s8[16] = {
+         1, 15, 13,  0,  5,  7, 10,  4,  9,  2,  3, 14,  6, 11,  8, 12
+    };
 
     kryptos_bad_buf_run_hmac(gost, sha1, ktask, key, key_size, kKryptosECB,
                              gost_s1, gost_s2, gost_s3, gost_s4, gost_s5, gost_s6, gost_s7, gost_s8);
@@ -2946,14 +3315,6 @@ CUTE_TEST_CASE(kryptos_bad_hmac_tests)
                              gost_s1, gost_s2, gost_s3, gost_s4, gost_s5, gost_s6, gost_s7, gost_s8);
     kryptos_bad_buf_run_hmac(gost, whirlpool, ktask, key, key_size, kKryptosCTR,
                              gost_s1, gost_s2, gost_s3, gost_s4, gost_s5, gost_s6, gost_s7, gost_s8);
-
-#else
-# if !defined(KRYPTOS_NO_HMAC_TESTS)
-    // TODO(Rafael): When there is no C99 support add a simple bare bone test with at least one block cipher and all
-    //               available hash functions.
-    printf("WARN: This test runs only when libkryptos is compiled with C99 support. It will be skipped.\n");
-# else
-    printf("WARN: You have requested build this binary without the HMAC tests.\n");
-# endif
-#endif
 CUTE_TEST_CASE_END
+
+#endif
