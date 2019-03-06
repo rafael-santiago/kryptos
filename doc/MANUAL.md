@@ -723,10 +723,10 @@ int main(int argc, char **argv) {
             fwrite(ktask->out, 1, ktask->out_size, stdout);
             printf("'\n");
         } else {
-            if (ktask->result_verbose != NULL) {
-                printf("ERROR: %s\n", ktask->result_verbose);
+            if (ktask->result == kKryptosGMACError && ktask->result_verbose != NULL) {
+                printf("GMAC ERROR: %s\n", ktask->result_verbose);
             } else {
-                printf("ERROR: What?\n");
+                printf("ERROR: %s\n", (ktask->result_verbose != NULL) ? ktask->result_verbose : "What?");
             }
             exit_code = 1;
         }
