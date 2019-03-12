@@ -52,6 +52,10 @@
 #include "keccak512_test_vector.h"
 #include "tiger_test_vector.h"
 #include "whirlpool_test_vector.h"
+//#include "blake2s224_test_vector.h"
+#include "blake2s256_test_vector.h"
+//#include "blake2b384_test_vector.h"
+#include "blake2b512_test_vector.h"
 #include <string.h>
 
 static kryptos_u8_t *cbc_test_data[] = {
@@ -544,6 +548,7 @@ static kryptos_u8_t *hmac_test_data[] = {
     size_t tv, tv_nr = sizeof(hash ## _test_vector) / sizeof(hash ## _test_vector[0]);\
     CUTE_ASSERT(kryptos_ ## hash ## _hash_input_size() == input_size);\
     CUTE_ASSERT(kryptos_ ## hash ## _hash_size() == size);\
+    kryptos_task_init_as_null(ktask);\
     for (tv = 0; tv < tv_nr; tv++) {\
         t.in = hash ## _test_vector[tv].message;\
         t.in_size = hash ## _test_vector[tv].message_size;\
@@ -568,6 +573,7 @@ static kryptos_u8_t *hmac_test_data[] = {
     size_t tv, tv_nr = sizeof(hash ## _test_vector) / sizeof(hash ## _test_vector[0]);\
     CUTE_ASSERT(kryptos_ ## hash ## _hash_input_size() == input_size);\
     CUTE_ASSERT(kryptos_ ## hash ## _hash_size() == size);\
+    kryptos_task_init_as_null(ktask);\
     for (tv = 0; tv < tv_nr; tv++) {\
         kryptos_hash(hash, ktask, hash ## _test_vector[tv].message, hash ## _test_vector[tv].message_size, 0);\
         CUTE_ASSERT(t.out != NULL);\

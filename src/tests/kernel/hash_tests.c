@@ -9,7 +9,7 @@
 #include <kstring.h>
 #include <kryptos.h>
 
-#if defined(KRYPTOS_C99)
+#if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)
 
 // INFO(Rafael): This is pretty crazy, because is uncommon execute this stuff in kernel mode, but if
 //               the code is okay it should work.
@@ -702,7 +702,7 @@ KUTE_TEST_CASE(kryptos_hmac_basic_tests)
 #undef add_hmac_test_step
 KUTE_TEST_CASE_END
 
-#if defined(KRYPTOS_C99)
+#if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)
 
 KUTE_TEST_CASE(kryptos_des_hmac_tests)
     kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";

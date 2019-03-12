@@ -1626,3 +1626,13 @@ CUTE_TEST_CASE(kryptos_gcm_tests)
 
     kryptos_freeseg(c, c_size);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_u32_rev_tests)
+    kryptos_u32_t value = 0xEFBEADDE;
+    CUTE_ASSERT(kryptos_u32_rev(value) == 0xDEADBEEF);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_u64_rev_tests)
+    kryptos_u64_t value = 0x00CABABA5EDAF000;
+    CUTE_ASSERT(kryptos_u64_rev(value) == 0x00F0DA5EBABACA00);
+CUTE_TEST_CASE_END

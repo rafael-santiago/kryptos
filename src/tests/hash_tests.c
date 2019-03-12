@@ -9,7 +9,7 @@
 #include "test_vectors.h"
 #include <kryptos.h>
 
-#if defined(KRYPTOS_C99)
+#if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)
 
 CUTE_DECLARE_TEST_CASE(kryptos_des_hmac_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_idea_hmac_tests);
@@ -199,6 +199,80 @@ CUTE_TEST_CASE_END
 CUTE_TEST_CASE(kryptos_whirlpool_hash_macro_tests)
     kryptos_run_hash_macro_tests(whirlpool, 64, 64);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blake2s256_tests)
+    kryptos_run_hash_tests(blake2s256, 64, 32)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blake2s256_hash_macro_tests)
+    kryptos_run_hash_macro_tests(blake2s256, 64, 32)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blake2b512_tests)
+    kryptos_run_hash_tests(blake2b512, 128, 64)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blake2b512_hash_macro_tests)
+    kryptos_run_hash_macro_tests(blake2b512, 128, 64)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blake2s256_keyed_tests)
+    size_t test_vector_nr = sizeof(blake2s256_keyed_test_vector) / sizeof(blake2s256_keyed_test_vector[0]), t;
+    kryptos_task_ctx tsk, *ktask = &tsk;
+
+    kryptos_task_init_as_null(ktask);
+
+    for (t = 0; t < test_vector_nr; t++) {
+        ktask->in = blake2s256_keyed_test_vector[t].in;
+        ktask->in_size = blake2s256_keyed_test_vector[t].in_size;
+        ktask->key = blake2s256_keyed_test_vector[t].key;
+        ktask->key_size = blake2s256_keyed_test_vector[t].key_size;
+        kryptos_blake2s256_hash(&ktask, 0);
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        CUTE_ASSERT(ktask->out != NULL);
+        CUTE_ASSERT(ktask->out_size == blake2s256_keyed_test_vector[t].hash_size);
+        CUTE_ASSERT(memcmp(ktask->out, blake2s256_keyed_test_vector[t].hash, ktask->out_size) == 0);
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+        ktask->in = blake2s256_keyed_test_vector[t].in;
+        ktask->in_size = blake2s256_keyed_test_vector[t].in_size;
+        ktask->key = blake2s256_keyed_test_vector[t].key;
+        ktask->key_size = blake2s256_keyed_test_vector[t].key_size;
+        kryptos_blake2s256_hash(&ktask, 1);
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        CUTE_ASSERT(ktask->out != NULL);
+        CUTE_ASSERT(ktask->out_size == blake2s256_keyed_test_vector[t].xhash_size);
+        CUTE_ASSERT(memcmp(ktask->out, blake2s256_keyed_test_vector[t].xhash, ktask->out_size) == 0);
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blake2s256_hash_macro_keyed_tests)
+    size_t test_vector_nr = sizeof(blake2s256_keyed_test_vector) / sizeof(blake2s256_keyed_test_vector[0]), t;
+    kryptos_task_ctx tsk, *ktask = &tsk;
+
+    kryptos_task_init_as_null(ktask);
+
+    for (t = 0; t < test_vector_nr; t++) {
+        ktask->key = blake2s256_keyed_test_vector[t].key;
+        ktask->key_size = blake2s256_keyed_test_vector[t].key_size;
+        kryptos_hash(blake2s256, ktask, blake2s256_keyed_test_vector[t].in, blake2s256_keyed_test_vector[t].in_size, 0);
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        CUTE_ASSERT(ktask->out != NULL);
+        CUTE_ASSERT(ktask->out_size == blake2s256_keyed_test_vector[t].hash_size);
+        CUTE_ASSERT(memcmp(ktask->out, blake2s256_keyed_test_vector[t].hash, ktask->out_size) == 0);
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+        ktask->key = blake2s256_keyed_test_vector[t].key;
+        ktask->key_size = blake2s256_keyed_test_vector[t].key_size;
+        kryptos_hash(blake2s256, ktask, blake2s256_keyed_test_vector[t].in, blake2s256_keyed_test_vector[t].in_size, 1);
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        CUTE_ASSERT(ktask->out != NULL);
+        CUTE_ASSERT(ktask->out_size == blake2s256_keyed_test_vector[t].xhash_size);
+        CUTE_ASSERT(memcmp(ktask->out, blake2s256_keyed_test_vector[t].xhash, ktask->out_size) == 0);
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+    }
+CUTE_TEST_CASE_END
+
+// TODO(Rafael): Implement test cases for keyed blake2b512.
 
 CUTE_TEST_CASE(kryptos_hmac_basic_tests)
     struct test_step {
@@ -486,7 +560,7 @@ CUTE_TEST_CASE_SUITE(kryptos_hmac_tests)
 
 CUTE_TEST_CASE_SUITE_END
 
-#if defined(KRYPTOS_C99)
+#if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)
 
 CUTE_TEST_CASE(kryptos_des_hmac_tests)
     kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";

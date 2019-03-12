@@ -50,4 +50,8 @@ CUTE_DECLARE_TEST_CASE(kryptos_gcm_gf_mul_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_gcm_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_u32_rev_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_u64_rev_tests);
+
 #endif

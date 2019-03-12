@@ -26,6 +26,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_memcmp_tests);
     CUTE_RUN_TEST(kryptos_memset_tests);
     CUTE_RUN_TEST(kryptos_memory_tests);
+    CUTE_RUN_TEST(kryptos_u32_rev_tests);
+    CUTE_RUN_TEST(kryptos_u64_rev_tests);
     CUTE_RUN_TEST(kryptos_padding_tests);
     CUTE_RUN_TEST(kryptos_sys_get_random_block_tests);
     CUTE_RUN_TEST(kryptos_get_random_block_tests);
@@ -181,6 +183,12 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_tiger_hash_macro_tests);
     CUTE_RUN_TEST(kryptos_whirlpool_tests);
     CUTE_RUN_TEST(kryptos_whirlpool_hash_macro_tests);
+    CUTE_RUN_TEST(kryptos_blake2s256_tests);
+    CUTE_RUN_TEST(kryptos_blake2s256_hash_macro_tests);
+    CUTE_RUN_TEST(kryptos_blake2s256_keyed_tests);
+    CUTE_RUN_TEST(kryptos_blake2b512_tests);
+    CUTE_RUN_TEST(kryptos_blake2b512_hash_macro_tests);
+    CUTE_RUN_TEST(kryptos_blake2s256_hash_macro_keyed_tests);
 
     //  -=-=-=-=-=-=- New block ciphers/hash functions should be added to HMAC tests. -=-=-=-=-=-=-=-
 
@@ -315,6 +323,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     } else {
         printf("WARN: The DSA signature tests were skipped.\n");
     }
+
 //    CUTE_RUN_TEST(poke_bloody_poke);
 CUTE_TEST_CASE_END
 

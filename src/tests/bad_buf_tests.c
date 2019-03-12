@@ -9,7 +9,7 @@
 #include "test_vectors.h"
 #include <kryptos.h>
 
-#if defined(KRYPTOS_C99)
+#if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)
 
 CUTE_DECLARE_TEST_CASE(kryptos_des_bad_hmac_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_idea_bad_hmac_tests);
@@ -273,7 +273,7 @@ CUTE_TEST_CASE_SUITE(kryptos_bad_hmac_tests)
 #endif
 CUTE_TEST_CASE_SUITE_END
 
-#if defined(KRYPTOS_C99)
+#if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)
 
 CUTE_TEST_CASE(kryptos_des_bad_hmac_tests)
     kryptos_task_ctx t, *ktask = &t;

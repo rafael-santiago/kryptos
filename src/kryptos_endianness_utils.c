@@ -10,8 +10,6 @@
 # include <string.h>
 #endif
 
-#define kryptos_u32_rev(w) ( ((w) << 24) | (((w) & 0x0000FF00) << 8) | (((w) & 0x00FF0000) >> 8) | ((w) >> 24) )
-
 int kryptos_little_endian_cpu(void) {
     static int kryptos_little_endian = -1;
     static kryptos_u8_t *kryptos_test_seg = (kryptos_u8_t *)"\x01\x00\x00\x00";
@@ -141,4 +139,6 @@ kryptos_u64_t kryptos_get_u64_as_big_endian(const kryptos_u8_t *data, const size
     return value;
 }
 
-#undef kryptos_u32_rev
+kryptos_u64_t kryptos_get_u64_as_little_endian(const kryptos_u8_t *data, const size_t data_size) {
+    return kryptos_u64_rev(kryptos_get_u64_as_big_endian(data, data_size));
+}
