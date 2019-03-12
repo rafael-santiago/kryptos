@@ -725,9 +725,10 @@ static void kryptos_blake2s(struct kryptos_blake2_ctx *data) {
         dd = 1;
     }
 
-    if (dd % KRYPTOS_BLAKE2S_BYTES_PER_BLOCK) {
-        // INFO(Rafael): When the hash is keyed the key block must be processed as the first block.
-        dd += abs(((data->kk > 0) ? KRYPTOS_BLAKE2S_BYTES_PER_BLOCK : 0) - abs(KRYPTOS_BLAKE2S_BYTES_PER_BLOCK - dd));
+    // INFO(Rafael): When the hash is keyed the key block must be processed as the first block.
+
+    while (dd % KRYPTOS_BLAKE2S_BYTES_PER_BLOCK) {
+        dd++;
     }
 
     if ((in_head = (kryptos_u8_t *) kryptos_newseg(dd)) == NULL) {
@@ -854,9 +855,10 @@ static void kryptos_blake2b(struct kryptos_blake2_ctx *data) {
         dd = 1;
     }
 
-    if (dd % KRYPTOS_BLAKE2B_BYTES_PER_BLOCK) {
-        // INFO(Rafael): When the hash is keyed the key block must be processed as the first block.
-        dd += abs(((data->kk > 0) ? KRYPTOS_BLAKE2B_BYTES_PER_BLOCK : 0) - abs(KRYPTOS_BLAKE2B_BYTES_PER_BLOCK - dd));
+    // INFO(Rafael): When the hash is keyed the key block must be processed as the first block.
+
+    while (dd % KRYPTOS_BLAKE2B_BYTES_PER_BLOCK) {
+        dd++;
     }
 
     if ((in_head = (kryptos_u8_t *) kryptos_newseg(dd)) == NULL) {
