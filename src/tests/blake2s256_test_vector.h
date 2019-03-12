@@ -484,7 +484,8 @@ static struct keyed_blake2s_test_vector_ctx blake2s256_keyed_test_vector[] = {
                   "\xE9\x4F\x52\x6D\xE9\x01\x96\x33\xEC\xD5\x4A\xC6\x12\x0F\x23\x95"
                   "\x8D\x77\x18\xF1\xE7\x71\x7B\xF3\x29\x21\x1A\x4F\xAE\xED\x4E\x6D", 32,
                   "E94F526DE9019633ECD54AC6120F23958D7718F1E7717BF329211A4FAEED4E6D", 64)
-    };
+};
+
 #undef add_test_step
 
 #endif

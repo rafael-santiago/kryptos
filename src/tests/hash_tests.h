@@ -90,6 +90,10 @@ CUTE_DECLARE_TEST_CASE(kryptos_blake2b512_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_blake2b512_hash_macro_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_blake2b512_keyed_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_blake2b512_hash_macro_keyed_tests);
+
 CUTE_DECLARE_TEST_CASE(kryptos_tiger_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_tiger_hash_macro_tests);

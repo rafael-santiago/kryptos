@@ -186,9 +186,11 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_blake2s256_tests);
     CUTE_RUN_TEST(kryptos_blake2s256_hash_macro_tests);
     CUTE_RUN_TEST(kryptos_blake2s256_keyed_tests);
+    CUTE_RUN_TEST(kryptos_blake2s256_hash_macro_keyed_tests);
     CUTE_RUN_TEST(kryptos_blake2b512_tests);
     CUTE_RUN_TEST(kryptos_blake2b512_hash_macro_tests);
-    CUTE_RUN_TEST(kryptos_blake2s256_hash_macro_keyed_tests);
+    CUTE_RUN_TEST(kryptos_blake2b512_keyed_tests);
+    CUTE_RUN_TEST(kryptos_blake2b512_hash_macro_keyed_tests);
 
     //  -=-=-=-=-=-=- New block ciphers/hash functions should be added to HMAC tests. -=-=-=-=-=-=-=-
 
