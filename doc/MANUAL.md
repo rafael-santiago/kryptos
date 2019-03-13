@@ -961,8 +961,8 @@ The general idea behind ``kryptos_hash()`` is:
                  <to hex boolean flag>)
 ```
 
-The hash algorithm Blake2 supports a keyed hash. The following sample shows how to generated keyed hashes with Blake2 in
-kryptos:
+The hash algorithm Blake2 supports a keyed hash. The following sample shows how to generate keyed hashes with Blake2 in
+``kryptos``:
 
 ```c
 /*

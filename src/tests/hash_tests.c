@@ -222,6 +222,14 @@ CUTE_TEST_CASE(kryptos_blake2s256_keyed_tests)
 
     kryptos_task_init_as_null(ktask);
 
+    ktask->in = blake2s256_keyed_test_vector[0].in;
+    ktask->in_size = blake2s256_keyed_test_vector[0].in_size;
+    ktask->key = "";
+    ktask->key_size = 9999;
+    kryptos_blake2s256_hash(&ktask, 0);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosKeyError);
+
     for (t = 0; t < test_vector_nr; t++) {
         ktask->in = blake2s256_keyed_test_vector[t].in;
         ktask->in_size = blake2s256_keyed_test_vector[t].in_size;
@@ -252,6 +260,12 @@ CUTE_TEST_CASE(kryptos_blake2s256_hash_macro_keyed_tests)
 
     kryptos_task_init_as_null(ktask);
 
+    ktask->key = "";
+    ktask->key_size = 9999;
+    kryptos_hash(blake2s256, ktask, blake2s256_keyed_test_vector[0].in, blake2s256_keyed_test_vector[0].in_size, 0);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosKeyError);
+
     for (t = 0; t < test_vector_nr; t++) {
         ktask->key = blake2s256_keyed_test_vector[t].key;
         ktask->key_size = blake2s256_keyed_test_vector[t].key_size;
@@ -277,6 +291,14 @@ CUTE_TEST_CASE(kryptos_blake2b512_keyed_tests)
     kryptos_task_ctx tsk, *ktask = &tsk;
 
     kryptos_task_init_as_null(ktask);
+
+    ktask->in = blake2b512_keyed_test_vector[0].in;
+    ktask->in_size = blake2b512_keyed_test_vector[0].in_size;
+    ktask->key = "";
+    ktask->key_size = 9999;
+    kryptos_blake2b512_hash(&ktask, 0);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosKeyError);
 
     for (t = 0; t < test_vector_nr; t++) {
         ktask->in = blake2b512_keyed_test_vector[t].in;
@@ -307,6 +329,12 @@ CUTE_TEST_CASE(kryptos_blake2b512_hash_macro_keyed_tests)
     kryptos_task_ctx tsk, *ktask = &tsk;
 
     kryptos_task_init_as_null(ktask);
+
+    ktask->key = "";
+    ktask->key_size = 9999;
+    kryptos_hash(blake2b512, ktask, blake2b512_keyed_test_vector[0].in, blake2b512_keyed_test_vector[0].in_size, 0);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);
+    CUTE_ASSERT(ktask->result == kKryptosKeyError);
 
     for (t = 0; t < test_vector_nr; t++) {
         ktask->key = blake2b512_keyed_test_vector[t].key;

@@ -377,6 +377,11 @@ KRYPTOS_IMPL_HASH_INPUT_SIZE(blake2s256, KRYPTOS_BLAKE2S_BYTES_PER_BLOCK)
 
 KRYPTOS_IMPL_HASH_PROCESSOR(blake2s256, ktask, kryptos_blake2_ctx, ctx, blake2s256_epilogue,
                             {
+                                if ((*ktask)->key_size > KRYPTOS_BLAKE2S256_HASH_SIZE) {
+                                    (*ktask)->result = kKryptosKeyError;
+                                    (*ktask)->result_verbose = "The key is too long.";
+                                    goto kryptos_blake2s256_epilogue;
+                                }
                                 ctx.input = (*ktask)->in;
                                 ctx.key = (*ktask)->key;
                                 ctx.bb = KRYPTOS_BLAKE2S_BYTES_PER_BLOCK;
@@ -450,6 +455,11 @@ KRYPTOS_IMPL_HASH_INPUT_SIZE(blake2b512, KRYPTOS_BLAKE2B_BYTES_PER_BLOCK)
 
 KRYPTOS_IMPL_HASH_PROCESSOR(blake2b512, ktask, kryptos_blake2_ctx, ctx, blake2b512_epilogue,
                             {
+                                if ((*ktask)->key_size > KRYPTOS_BLAKE2B512_HASH_SIZE) {
+                                    (*ktask)->result = kKryptosKeyError;
+                                    (*ktask)->result_verbose = "The key is too long.";
+                                    goto kryptos_blake2b512_epilogue;
+                                }
                                 ctx.input = (*ktask)->in;
                                 ctx.key = (*ktask)->key;
                                 ctx.bb = KRYPTOS_BLAKE2B_BYTES_PER_BLOCK;
