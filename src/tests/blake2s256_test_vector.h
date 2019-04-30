@@ -16,7 +16,53 @@ test_vector(blake2s256, hash) = {
                          "508C5E8C327C14E2E1A72BA34EEB452F"
                          "37458B209ED63A294D999B4C86675982", 64,
                          "\x50\x8C\x5E\x8C\x32\x7C\x14\xE2\xE1\xA7\x2B\xA3\x4E\xEB\x45\x2F"
-                         "\x37\x45\x8B\x20\x9E\xD6\x3A\x29\x4D\x99\x9B\x4C\x86\x67\x59\x82", 32)
+                         "\x37\x45\x8B\x20\x9E\xD6\x3A\x29\x4D\x99\x9B\x4C\x86\x67\x59\x82", 32),
+    // INFO(Rafael): Test vector from reference implementation.
+    add_test_vector_data("", 0,
+                         "69217A3079908094E11121D042354A7C"
+                         "1F55B6482CA1A51E1B250DFD1ED0EEF9", 64,
+                         "\x69\x21\x7A\x30\x79\x90\x80\x94\xE1\x11\x21\xD0\x42\x35\x4A\x7C"
+                         "\x1F\x55\xB6\x48\x2C\xA1\xA5\x1E\x1B\x25\x0D\xFD\x1E\xD0\xEE\xF9", 32),
+    add_test_vector_data("a", 1,
+                         "4A0D129873403037C2CD9B9048203687"
+                         "F6233FB6738956E0349BD4320FEC3E90", 64,
+                         "\x4A\x0D\x12\x98\x73\x40\x30\x37\xC2\xCD\x9B\x90\x48\x20\x36\x87"
+                         "\xF6\x23\x3F\xB6\x73\x89\x56\xE0\x34\x9B\xD4\x32\x0F\xEC\x3E\x90", 32),
+    add_test_vector_data("ab", 2,
+                         "19C3EBEED2EE90063CB5A8A4DD700ED7"
+                         "E5852DFC6108C84FAC85888682A18F0E", 64,
+                         "\x19\xC3\xEB\xEE\xD2\xEE\x90\x06\x3C\xB5\xA8\xA4\xDD\x70\x0E\xD7"
+                         "\xE5\x85\x2D\xFC\x61\x08\xC8\x4F\xAC\x85\x88\x86\x82\xA1\x8F\x0E", 32),
+    add_test_vector_data("abcdefghijklmnopqrstuvwxyz0123456789a", 37,
+                         "452D83737FB3DC327D6198E2B45AA0E9"
+                         "9F95140AAB94ED94E554F384C52E4BF2", 64,
+                         "\x45\x2D\x83\x73\x7F\xB3\xDC\x32\x7D\x61\x98\xE2\xB4\x5A\xA0\xE9"
+                         "\x9F\x95\x14\x0A\xAB\x94\xED\x94\xE5\x54\xF3\x84\xC5\x2E\x4B\xF2", 32),
+    add_test_vector_data("abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnop", 52,
+                         "44ECBEF584B20453776BDC9C7F416945"
+                         "BC63B89227BFEA06B8777B659F1B49A0", 64,
+                         "\x44\xEC\xBE\xF5\x84\xB2\x04\x53\x77\x6B\xDC\x9C\x7F\x41\x69\x45"
+                         "\xBC\x63\xB8\x92\x27\xBF\xEA\x06\xB8\x77\x7B\x65\x9F\x1B\x49\xA0", 32),
+    add_test_vector_data("abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrs", 55,
+                         "190509A4B4723A767E1F138390359912"
+                         "39F8240187BA08B7E995BB1E4525385C", 64,
+                         "\x19\x05\x09\xA4\xB4\x72\x3A\x76\x7E\x1F\x13\x83\x90\x35\x99\x12"
+                         "\x39\xF8\x24\x01\x87\xBA\x08\xB7\xE9\x95\xBB\x1E\x45\x25\x38\x5C", 32),
+    add_test_vector_data("abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz", 62,
+                         "4710F86DA62B70813FE3C2DFFAB8EF81"
+                         "E097C7B10FD674B362F0C90EA2CED4ED", 64,
+                         "\x47\x10\xF8\x6D\xA6\x2B\x70\x81\x3F\xE3\xC2\xDF\xFA\xB8\xEF\x81"
+                         "\xE0\x97\xC7\xB1\x0F\xD6\x74\xB3\x62\xF0\xC9\x0E\xA2\xCE\xD4\xED", 32),
+    add_test_vector_data("abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz01234567", 70,
+                         "CEB19A9C697C122E4DEFAD4ABC34092B"
+                         "3E8248E5A638AACC84B9529B47F03E73", 64,
+                         "\xCE\xB1\x9A\x9C\x69\x7C\x12\x2E\x4D\xEF\xAD\x4A\xBC\x34\x09\x2B"
+                         "\x3E\x82\x48\xE5\xA6\x38\xAA\xCC\x84\xB9\x52\x9B\x47\xF0\x3E\x73", 32),
+    add_test_vector_data("abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789", 72,
+                         "44DDDB39BDB2AF80C147894C1D756ADA"
+                         "3D1C2AC2B100541E04FE87B4A59E1243", 64,
+                         "\x44\xDD\xDB\x39\xBD\xB2\xAF\x80\xC1\x47\x89\x4C\x1D\x75\x6A\xDA"
+                         "\x3D\x1C\x2A\xC2\xB1\x00\x54\x1E\x04\xFE\x87\xB4\xA5\x9E\x12\x43", 32)
 };
 
 struct keyed_blake2s_test_vector_ctx {
