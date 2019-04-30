@@ -29,9 +29,6 @@ kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const size_t password_si
                                 kryptos_u8_t *associated_data, const size_t associated_data_size,
                                 const kryptos_argon2_hash_type_t htype);
 
-// INFO(Rafael): When using those convenience macros you do not need to pass memory_size in kilobytes.
-//               Just pass it as an integer amount and the macro will convert it to kbyte for you.
-
 #define kryptos_argon2d(p, p_size, s, s_size, pl, t_size, m, i, k, k_size, a, a_size)\
     kryptos_do_argon2(p, p_size, s, s_size, pl, t_size, m, i, k, k_size, a, a_size, kArgon2d)
 
