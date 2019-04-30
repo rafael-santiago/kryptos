@@ -20,7 +20,94 @@ test_vector(blake2b512, hash) = {
                          "\xBA\x80\xA5\x3F\x98\x1C\x4D\x0D\x6A\x27\x97\xB6\x9F\x12\xF6\xE9"
                          "\x4C\x21\x2F\x14\x68\x5A\xC4\xB7\x4B\x12\xBB\x6F\xDB\xFF\xA2\xD1"
                          "\x7D\x87\xC5\x39\x2A\xAB\x79\x2D\xC2\x52\xD5\xDE\x45\x33\xCC\x95"
-                         "\x18\xD3\x8A\xA8\xDB\xF1\x92\x5A\xB9\x23\x86\xED\xD4\x00\x99\x23", 64)
+                         "\x18\xD3\x8A\xA8\xDB\xF1\x92\x5A\xB9\x23\x86\xED\xD4\x00\x99\x23", 64),
+    // INFO(Rafael): Test vector from reference implementation.
+    add_test_vector_data("", 0,
+                         "786A02F742015903C6C6FD852552D272"
+                         "912F4740E15847618A86E217F71F5419"
+                         "D25E1031AFEE585313896444934EB04B"
+                         "903A685B1448B755D56F701AFE9BE2CE", 128,
+                         "\x78\x6A\x02\xF7\x42\x01\x59\x03\xC6\xC6\xFD\x85\x25\x52\xD2\x72"
+                         "\x91\x2F\x47\x40\xE1\x58\x47\x61\x8A\x86\xE2\x17\xF7\x1F\x54\x19"
+                         "\xD2\x5E\x10\x31\xAF\xEE\x58\x53\x13\x89\x64\x44\x93\x4E\xB0\x4B"
+                         "\x90\x3A\x68\x5B\x14\x48\xB7\x55\xD5\x6F\x70\x1A\xFE\x9B\xE2\xCE", 64),
+    add_test_vector_data("a", 1,
+                         "333FCB4EE1AA7C115355EC66CEAC917C"
+                         "8BFD815BF7587D325AEC1864EDD24E34"
+                         "D5ABE2C6B1B5EE3FACE62FED78DBEF80"
+                         "2F2A85CB91D455A8F5249D330853CB3C", 128,
+                         "\x33\x3F\xCB\x4E\xE1\xAA\x7C\x11\x53\x55\xEC\x66\xCE\xAC\x91\x7C"
+                         "\x8B\xFD\x81\x5B\xF7\x58\x7D\x32\x5A\xEC\x18\x64\xED\xD2\x4E\x34"
+                         "\xD5\xAB\xE2\xC6\xB1\xB5\xEE\x3F\xAC\xE6\x2F\xED\x78\xDB\xEF\x80"
+                         "\x2F\x2A\x85\xCB\x91\xD4\x55\xA8\xF5\x24\x9D\x33\x08\x53\xCB\x3C", 64),
+    add_test_vector_data("ab", 2,
+                         "B32C0573D242B3A987D8F66BD43266B7"
+                         "925CEFAB3A854950641A81EF6A3F4B97"
+                         "928443850545770F64ABAC2A75F18475"
+                         "653FA3D9A52C66A840DA3B8617AE9607", 128,
+                         "\xB3\x2C\x05\x73\xD2\x42\xB3\xA9\x87\xD8\xF6\x6B\xD4\x32\x66\xB7"
+                         "\x92\x5C\xEF\xAB\x3A\x85\x49\x50\x64\x1A\x81\xEF\x6A\x3F\x4B\x97"
+                         "\x92\x84\x43\x85\x05\x45\x77\x0F\x64\xAB\xAC\x2A\x75\xF1\x84\x75"
+                         "\x65\x3F\xA3\xD9\xA5\x2C\x66\xA8\x40\xDA\x3B\x86\x17\xAE\x96\x07", 64),
+    add_test_vector_data("abcd", 4,
+                         "26BC14024D5D6818AD7C4DEE519353C2"
+                         "90E38B6535F16F62B6CE5C6FF346C354"
+                         "542496F89B84EACFFA1DA51F0AC5E643"
+                         "F965637CC24E0B3F819BDAE05F3932B0", 128,
+                         "\x26\xBC\x14\x02\x4D\x5D\x68\x18\xAD\x7C\x4D\xEE\x51\x93\x53\xC2"
+                         "\x90\xE3\x8B\x65\x35\xF1\x6F\x62\xB6\xCE\x5C\x6F\xF3\x46\xC3\x54"
+                         "\x54\x24\x96\xF8\x9B\x84\xEA\xCF\xFA\x1D\xA5\x1F\x0A\xC5\xE6\x43"
+                         "\xF9\x65\x63\x7C\xC2\x4E\x0B\x3F\x81\x9B\xDA\xE0\x5F\x39\x32\xB0", 64),
+    add_test_vector_data("abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz"
+                         "0123456789abcdefghijklmnopqrstuvwxyz0123456", 105,
+                         "7246CF8442726FC1A2B0ED8EB9DAE1CB"
+                         "DF8413F08B559C04FD176C1B63A70F31"
+                         "ACF91574AACF48C07CFCE7BE8799CD6D"
+                         "BA0238EB09373802251D26AFD49B80A8", 128,
+                         "\x72\x46\xCF\x84\x42\x72\x6F\xC1\xA2\xB0\xED\x8E\xB9\xDA\xE1\xCB"
+                         "\xDF\x84\x13\xF0\x8B\x55\x9C\x04\xFD\x17\x6C\x1B\x63\xA7\x0F\x31"
+                         "\xAC\xF9\x15\x74\xAA\xCF\x48\xC0\x7C\xFC\xE7\xBE\x87\x99\xCD\x6D"
+                         "\xBA\x02\x38\xEB\x09\x37\x38\x02\x25\x1D\x26\xAF\xD4\x9B\x80\xA8", 64),
+    add_test_vector_data("abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz"
+                         "0123456789abcdefghijklmnopqrstuvwxyz012345", 104,
+                         "D323DC3CD03C1F229C69B67E5FC87125"
+                         "525D8A815089E8F455C17AD841717316"
+                         "7D69D25B840D877255599469704DDD2B"
+                         "2F34DD1D888C9F85AEC2A69C7EF63A5B", 128,
+                         "\xD3\x23\xDC\x3C\xD0\x3C\x1F\x22\x9C\x69\xB6\x7E\x5F\xC8\x71\x25"
+                         "\x52\x5D\x8A\x81\x50\x89\xE8\xF4\x55\xC1\x7A\xD8\x41\x71\x73\x16"
+                         "\x7D\x69\xD2\x5B\x84\x0D\x87\x72\x55\x59\x94\x69\x70\x4D\xDD\x2B"
+                         "\x2F\x34\xDD\x1D\x88\x8C\x9F\x85\xAE\xC2\xA6\x9C\x7E\xF6\x3A\x5B", 64),
+    add_test_vector_data("abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz"
+                         "0123456789abcdefghijklmnopqrstuvwxyz0123456789", 108,
+                         "8AEE4B3C7A179BDC818083479F5D24DD"
+                         "3B8FEE8954569A5DDC75FFD2ACC16EF1"
+                         "EE82CE99A03EC0761332183674E02928"
+                         "FD9534E2D5EAAA5704732BEB5883328F", 128,
+                         "\x8A\xEE\x4B\x3C\x7A\x17\x9B\xDC\x81\x80\x83\x47\x9F\x5D\x24\xDD"
+                         "\x3B\x8F\xEE\x89\x54\x56\x9A\x5D\xDC\x75\xFF\xD2\xAC\xC1\x6E\xF1"
+                         "\xEE\x82\xCE\x99\xA0\x3E\xC0\x76\x13\x32\x18\x36\x74\xE0\x29\x28"
+                         "\xFD\x95\x34\xE2\xD5\xEA\xAA\x57\x04\x73\x2B\xEB\x58\x83\x32\x8F", 64),
+    add_test_vector_data("abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz"
+                         "0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrst", 128,
+                         "72CDE85B5599CE143069E14C30B2DBA3"
+                         "1394747331AB4226B012E09431073DB9"
+                         "53794DF50E26F43E4AB4B6BF351AC37B"
+                         "CEFA8CAAE142CAAFAC1EA516D2C4D7AC", 128,
+                         "\x72\xCD\xE8\x5B\x55\x99\xCE\x14\x30\x69\xE1\x4C\x30\xB2\xDB\xA3"
+                         "\x13\x94\x74\x73\x31\xAB\x42\x26\xB0\x12\xE0\x94\x31\x07\x3D\xB9"
+                         "\x53\x79\x4D\xF5\x0E\x26\xF4\x3E\x4A\xB4\xB6\xBF\x35\x1A\xC3\x7B"
+                         "\xCE\xFA\x8C\xAA\xE1\x42\xCA\xAF\xAC\x1E\xA5\x16\xD2\xC4\xD7\xAC", 64),
+    add_test_vector_data("abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz"
+                         "0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789", 144,
+                         "FFD4A61F80D55FFA83BA8D2BD62DCFC3"
+                         "3148ADE507A8F7F85A5AF2C619E126FF"
+                         "11E9284F12BF3EE6A2B5CBC711FA84C3"
+                         "7DA343AB7D29BCDF722DF0171E41297A", 128,
+                         "\xFF\xD4\xA6\x1F\x80\xD5\x5F\xFA\x83\xBA\x8D\x2B\xD6\x2D\xCF\xC3"
+                         "\x31\x48\xAD\xE5\x07\xA8\xF7\xF8\x5A\x5A\xF2\xC6\x19\xE1\x26\xFF"
+                         "\x11\xE9\x28\x4F\x12\xBF\x3E\xE6\xA2\xB5\xCB\xC7\x11\xFA\x84\xC3"
+                         "\x7D\xA3\x43\xAB\x7D\x29\xBC\xDF\x72\x2D\xF0\x17\x1E\x41\x29\x7A", 64)
 };
 
 struct keyed_blake2b_test_vector_ctx {

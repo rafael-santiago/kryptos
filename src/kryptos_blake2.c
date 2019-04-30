@@ -66,11 +66,11 @@ struct kryptos_blake2_ctx {
 
 #define KRYPTOS_BLAKE2B_BYTES_PER_BLOCK 128
 
-#define KRYPTOS_BLAKE2S224_HASH_SIZE 28
+//#define KRYPTOS_BLAKE2S224_HASH_SIZE 28
 
 #define KRYPTOS_BLAKE2S256_HASH_SIZE 32
 
-#define KRYPTOS_BLAKE2B384_HASH_SIZE 48
+//#define KRYPTOS_BLAKE2B384_HASH_SIZE 48
 
 #define KRYPTOS_BLAKE2B512_HASH_SIZE 64
 
@@ -449,6 +449,43 @@ KRYPTOS_IMPL_HASH_PROCESSOR(blake2s256, ktask, kryptos_blake2_ctx, ctx, blake2s2
                                 kryptos_freeseg(ctx.h, ctx.h_size);
                             })
 
+KRYPTOS_IMPL_HASH_PROCESSOR(blake2sN, ktask, kryptos_blake2_ctx, ctx, blake2sN_epilogue,
+                            {
+                                if ((*ktask)->key_size > KRYPTOS_BLAKE2S256_HASH_SIZE) {
+                                    (*ktask)->result = kKryptosKeyError;
+                                    (*ktask)->result_verbose = "The key is too long.";
+                                    goto kryptos_blake2sN_epilogue;
+                                }
+                                if ((*ktask)->out_size == 0 || (*ktask)->out_size > KRYPTOS_BLAKE2S256_HASH_SIZE) {
+                                    (*ktask)->result = kKryptosProcessError;
+                                    (*ktask)->result_verbose = "The hash size must be specified in out_size field. "
+                                                               "It must be >= 0 and <= 32 bytes.";
+                                    goto kryptos_blake2sN_epilogue;
+                                }
+                                ctx.input = (*ktask)->in;
+                                ctx.key = (*ktask)->key;
+                                ctx.bb = KRYPTOS_BLAKE2S_BYTES_PER_BLOCK;
+                                ctx.nn = (*ktask)->out_size;
+                                ctx.kk = (*ktask)->key_size;
+                                ctx.ll = (*ktask)->in_size;
+                            },
+                            kryptos_blake2s(&ctx),
+                            {
+                                if (ctx.h == NULL || ctx.h_size != ctx.nn || (*ktask)->out_size != ctx.nn) {
+                                    (*ktask)->out_size = 0;
+                                    (*ktask)->result = kKryptosProcessError;
+                                    (*ktask)->result_verbose = "No memory to get a valid output.";
+                                    goto kryptos_blake2sN_epilogue;
+                                }
+                                (*ktask)->out = ctx.h;
+                                ctx.h = NULL;
+                            },
+                            {
+                                // INFO(Rafael): Not implemented. It is being used only in Argon2.
+                                (*ktask)->result = kKryptosProcessError;
+                                (*ktask)->result_verbose = "Not implemented.";
+                            })
+
 KRYPTOS_IMPL_HASH_SIZE(blake2b512, KRYPTOS_BLAKE2B512_HASH_SIZE)
 
 KRYPTOS_IMPL_HASH_INPUT_SIZE(blake2b512, KRYPTOS_BLAKE2B_BYTES_PER_BLOCK)
@@ -557,6 +594,43 @@ KRYPTOS_IMPL_HASH_PROCESSOR(blake2b512, ktask, kryptos_blake2_ctx, ctx, blake2b5
                                                                               ((kryptos_u64_t)ctx.h[ 62]) <<  8 |
                                                                               ((kryptos_u64_t)ctx.h[ 63]));
                                 kryptos_freeseg(ctx.h, ctx.h_size);
+                            })
+
+KRYPTOS_IMPL_HASH_PROCESSOR(blake2bN, ktask, kryptos_blake2_ctx, ctx, blake2bN_epilogue,
+                            {
+                                if ((*ktask)->key_size > KRYPTOS_BLAKE2B512_HASH_SIZE) {
+                                    (*ktask)->result = kKryptosKeyError;
+                                    (*ktask)->result_verbose = "The key is too long.";
+                                    goto kryptos_blake2bN_epilogue;
+                                }
+                                if ((*ktask)->out_size == 0 || (*ktask)->out_size > KRYPTOS_BLAKE2B512_HASH_SIZE) {
+                                    (*ktask)->result = kKryptosProcessError;
+                                    (*ktask)->result_verbose = "The hash size must be specified in out_size field. "
+                                                               "It must be >= 0 and <= 64 bytes.";
+                                    goto kryptos_blake2bN_epilogue;
+                                }
+                                ctx.input = (*ktask)->in;
+                                ctx.key = (*ktask)->key;
+                                ctx.bb = KRYPTOS_BLAKE2B_BYTES_PER_BLOCK;
+                                ctx.nn = (*ktask)->out_size;
+                                ctx.kk = (*ktask)->key_size;
+                                ctx.ll = (*ktask)->in_size;
+                            },
+                            kryptos_blake2b(&ctx),
+                            {
+                                if (ctx.h == NULL || ctx.h_size != ctx.nn || (*ktask)->out_size != ctx.nn) {
+                                    (*ktask)->out_size = 0;
+                                    (*ktask)->result = kKryptosProcessError;
+                                    (*ktask)->result_verbose = "No memory to get a valid output.";
+                                    goto kryptos_blake2bN_epilogue;
+                                }
+                                (*ktask)->out = ctx.h;
+                                ctx.h = NULL;
+                            },
+                            {
+                                // INFO(Rafael): Not implemented. It is being used only in Argon2.
+                                (*ktask)->result = kKryptosProcessError;
+                                (*ktask)->result_verbose = "Not implemented.";
                             })
 
 static void kryptos_blake2s(struct kryptos_blake2_ctx *data) {
@@ -814,7 +888,7 @@ kryptos_blake2b_epilogue:
     }
 
     memset(temp, 0, sizeof(temp));
-    memset(p, 0, sizeof(struct kryptos_blake2s_ctx));
+    memset(p, 0, sizeof(struct kryptos_blake2b_ctx));
     i = t = dd = 0;
     in_head = in_tail = in = NULL;
 }
