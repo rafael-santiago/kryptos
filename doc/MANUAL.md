@@ -3881,8 +3881,8 @@ Until now no RAM swap avoidance approach is available for Windows.
 
 ## Key derivation functions
 
-Until now ``kryptos`` has two key derivation functions implemented: ``HKDF`` and ``PBKDF2``. The usage of them is very
-straightforward:
+Until now ``kryptos`` has three key derivation functions implemented: ``HKDF``, ``PBKDF2`` and ``Argon2`` (version 19). The
+usage of them is very straightforward:
 
 ```c
 /*
@@ -3988,6 +3988,81 @@ int main(int argc, char **argv) {
 
 The ``PBKDF2`` implementation considers PRF as HMAC combined with the passed hash algorithm. The current implementation
 is compliant to RFC-6070.
+
+The ``Argon2`` algorithm is more complicated. The three variants are implemented: ``Argon2d``, ``Argon2i`` and ``Argon2id``.
+The following code shows how to use them:
+
+```c
+/*
+ *                                Copyright (C) 2019 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+    kryptos_u8_t *tag[3] = { NULL, NULL, NULL }, *p, *p_end;
+    kryptos_u32_t parallelism = 20, tag_size = 32, memory_size_kb = 512, iterations = 50;
+    int exit_code = 0;
+    kryptos_u8_t *variant[3] = { "argon2d", "argon2i", "argon2id" };
+    size_t i;
+
+    tag[0] = kryptos_argon2d("Tales of Brave Ulysses", 22,
+                             "salt", 4,
+                             parallelism, tag_size, memory_size_kb, iterations,
+                             "key", 3,
+                             "associated data", 15);
+
+    if (tag[0] == NULL) {
+        printf("ERROR: when trying to expand the key by using argon2d.\n");
+        exit_code = 1;
+        goto epilogue;
+    }
+
+    tag[1] = kryptos_argon2i("Tales of Brave Ulysses", 11,
+                                     "salt", 4,
+                                     parallelism, tag_size, memory_size_kb, iterations,
+                                     "key", 3,
+                                     "associated data", 15);
+
+    if (tag[1] == NULL) {
+        printf("ERROR: when trying to expand the key by using argon2i.\n");
+        exit_code = 1;
+        goto epilogue;
+    }
+
+    tag[2] = kryptos_argon2id("Tales of Brave Ulysses", 11,
+                                      "salt", 4,
+                                      parallelism, tag_size, memory_size_kb, iterations,
+                                      "key", 3,
+                                      "associated data", 15);
+
+    if (tag[2] == NULL) {
+        printf("ERROR: when trying to expand the key by using argon2id.\n");
+        exit_code = 1;
+        goto epilogue;
+    }
+
+    for (i = 0; i < sizeof(variant) / sizeof(variant[0]); i++) {
+        printf("%s resulting tag: ", variant[i]);
+        p = tag[i];
+        p_end = p + tag_size;
+        while (p != p_end) {
+            printf("%.2X", *p);
+            p++;
+        }
+        printf("\n");
+        kryptos_freeseg(tag[i], tag_size);
+    }
+
+epilogue:
+
+    return exit_code;
+}
+```
 
 ## Bcrypt
 
