@@ -34,8 +34,8 @@
 //               Use it as a supplementary material. This code helped me a lot! In my opinion it is better than the entire
 //               current algorithm specification.
 //
-//               MT support here?! Nevermind! This is a crypto library, dude. I think it would bring extra native complications
-//               really out of scope when considering the main purpose of this piece of software: crypto.
+//               MT support here?! Nevermind! This is a crypto library. I think it would bring extra native complications
+//               really out of scope when considering the main purpose of this piece of software.
 
 #define KRYPTOS_ARGON2_PASSWORD_MAX_SIZE        (0xFFFFFFFF >> 3)
 #define KRYPTOS_ARGON2_SALT_MAX_SIZE            (0xFFFFFFFF >> 3)
@@ -118,7 +118,7 @@ kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const size_t password_si
         !kryptos_argon2_check_size_bounds(salt_size, 0, KRYPTOS_ARGON2_SALT_MAX_SIZE)                                     ||
         !kryptos_argon2_check_size_bounds(parallelism, 1, KRYPTOS_ARGON2_PARALLELISM_MAX_SIZE)                            ||
         !kryptos_argon2_check_size_bounds(tag_size, 1, KRYPTOS_ARGON2_TAG_MAX_SIZE)                                       ||
-        !kryptos_argon2_check_size_bounds(memory_size_kb, (8 * parallelism), KRYPTOS_ARGON2_MEMORY_SIZE_KB_MAX_SIZE)      ||
+        !kryptos_argon2_check_size_bounds(memory_size_kb, (parallelism << 3), KRYPTOS_ARGON2_MEMORY_SIZE_KB_MAX_SIZE)     ||
         !kryptos_argon2_check_size_bounds(iterations, 1, KRYPTOS_ARGON2_ITERATIONS_MAX_SIZE)                              ||
         !kryptos_argon2_check_size_bounds(key_size, 0, KRYPTOS_ARGON2_KEY_MAX_SIZE)                                       ||
         !kryptos_argon2_check_size_bounds(associated_data_size, 0, KRYPTOS_ARGON2_ASSOCIATED_DATA_MAX_SIZE)) {

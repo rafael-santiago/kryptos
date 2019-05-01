@@ -211,6 +211,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_pbkdf2_macro_tests);
     CUTE_RUN_TEST(kryptos_do_argon2_tests);
     CUTE_RUN_TEST(kryptos_argon2_macro_tests);
+    CUTE_RUN_TEST(kryptos_do_argon2_bounds_tests);
+    CUTE_RUN_TEST(kryptos_argon2_macro_bounds_tests);
 
     // INFO(Rafael): Encoding stuff.
     CUTE_RUN_TEST(kryptos_base64_tests);

@@ -22,4 +22,8 @@ CUTE_DECLARE_TEST_CASE(kryptos_do_argon2_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_argon2_macro_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_do_argon2_bounds_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_argon2_macro_bounds_tests);
+
 #endif
