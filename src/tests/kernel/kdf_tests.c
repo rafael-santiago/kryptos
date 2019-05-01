@@ -8,6 +8,500 @@
 #include "kdf_tests.h"
 #include <kryptos.h>
 
+KUTE_TEST_CASE(kryptos_do_argon2_tests)
+    struct test_step {
+        kryptos_argon2_hash_type_t htype;
+        kryptos_u32_t memory_size_kb;
+        kryptos_u32_t iterations;
+        kryptos_u32_t parallelism;
+        kryptos_u32_t tag_size;
+        kryptos_u8_t *password;
+        size_t password_size;
+        kryptos_u8_t *salt;
+        size_t salt_size;
+        kryptos_u8_t *key;
+        size_t key_size;
+        kryptos_u8_t *associated_data;
+        size_t associated_data_size;
+        kryptos_u8_t *expected;
+        size_t expected_size;
+    };
+#define add_argon2_test_case(t, m, i, pl, ts, p, ps, s, s_sz, k, ks, a, as, e, es)\
+    { t, m, i, pl, ts, p, ps, s, s_sz, k, ks, a, as, e, es }
+    // INFO(Rafael): This following test vector is picked from the Argon2's reference implementation.
+    struct test_step test_vector[] = {
+        add_argon2_test_case(kArgon2d, 32, 3, 4, 32,
+                             "\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01"
+                             "\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01", 32,
+                             "\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02", 16,
+                             "\x03\x03\x03\x03\x03\x03\x03\x03", 8,
+                             "\x04\x04\x04\x04\x04\x04\x04\x04\x04\x04\x04\x04", 12,
+                             "\x51\x2B\x39\x1B\x6F\x11\x62\x97\x53\x71\xD3\x09\x19\x73\x42\x94"
+                             "\xF8\x68\xE3\xBE\x39\x84\xF3\xC1\xA1\x3A\x4D\xB9\xFA\xBE\x4A\xCB", 32),
+        add_argon2_test_case(kArgon2i, 32, 3, 4, 32,
+                             "\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01"
+                             "\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01", 32,
+                             "\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02", 16,
+                             "\x03\x03\x03\x03\x03\x03\x03\x03", 8,
+                             "\x04\x04\x04\x04\x04\x04\x04\x04\x04\x04\x04\x04", 12,
+                             "\xC8\x14\xD9\xD1\xDC\x7F\x37\xAA\x13\xF0\xD7\x7F\x24\x94\xBD\xA1"
+                             "\xC8\xDE\x6B\x01\x6D\xD3\x88\xD2\x99\x52\xA4\xC4\x67\x2B\x6C\xE8", 32),
+        add_argon2_test_case(kArgon2id, 32, 3, 4, 32,
+                             "\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01"
+                             "\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01", 32,
+                             "\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02", 16,
+                             "\x03\x03\x03\x03\x03\x03\x03\x03", 8,
+                             "\x04\x04\x04\x04\x04\x04\x04\x04\x04\x04\x04\x04", 12,
+                             "\x0D\x64\x0D\xF5\x8D\x78\x76\x6C\x08\xC0\x37\xA3\x4A\x8B\x53\xC9"
+                             "\xD0\x1E\xF0\x45\x2D\x75\xB6\x5E\xB5\x25\x20\xE9\x6B\x01\xE6\x59", 32)
+    };
+    size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+    kryptos_u8_t *tag;
+    for (t = 0; t < tv_nr; t++) {
+        tag = kryptos_do_argon2(test_vector[t].password, test_vector[t].password_size,
+                                test_vector[t].salt, test_vector[t].salt_size,
+                                test_vector[t].parallelism,
+                                test_vector[t].tag_size,
+                                test_vector[t].memory_size_kb, test_vector[t].iterations,
+                                test_vector[t].key, test_vector[t].key_size,
+                                test_vector[t].associated_data, test_vector[t].associated_data_size,
+                                test_vector[t].htype);
+        KUTE_ASSERT(tag != NULL);
+        KUTE_ASSERT(memcmp(tag, test_vector[t].expected, test_vector[t].expected_size) == 0);
+        kryptos_freeseg(tag, test_vector[t].tag_size);
+    }
+#undef add_argon2_test_case
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_argon2_macro_tests)
+    // WARN(Rafael): Keep the prints. It is trying to access n expected bytes.
+    //               If n bytes were not returned this test will explode and we will know that something went wrong here.
+    kryptos_u8_t *okm, *op, *op_end;
+    okm = kryptos_argon2d("Gardenia", 8, "", 0, 5, 128, 64, 20, "slow", 4, "", 0);
+    KUTE_ASSERT(okm != NULL);
+    op = okm;
+    op_end = op + 128;
+
+#if !defined(__linux__)
+    uprintf("\t OKM = ");
+#else
+    printk(KERN_ERR "\t DK = ");
+#endif
+    while (op != op_end) {
+#if !defined(__linux__)
+        uprintf("%.2X", *op);
+#else
+        printk(KERN_ERR "%.2X", *op);
+#endif
+        op++;
+    }
+#if !defined(__linux__)
+    uprintf("\n");
+#else
+    printk(KERN_ERR "\n");
+#endif
+    kryptos_freeseg(okm, 128);
+
+    okm = kryptos_argon2i("Gardenia", 8, "", 0, 5, 128, 64, 20, "slow", 4, "", 0);
+    KUTE_ASSERT(okm != NULL);
+    op = okm;
+    op_end = op + 128;
+#if !defined(__linux__)
+    uprintf("\t OKM = ");
+#else
+    printk(KERN_ERR "\t DK = ");
+#endif
+    while (op != op_end) {
+#if !defined(__linux__)
+        uprintf("%.2X", *op);
+#else
+        printk(KERN_ERR "%.2X", *op);
+#endif
+        op++;
+    }
+#if !defined(__linux__)
+    uprintf("\n");
+#else
+    printk(KERN_ERR "\n");
+#endif
+    kryptos_freeseg(okm, 128);
+
+    okm = kryptos_argon2id("Gardenia", 8, "", 0, 5, 128, 64, 20, "slow", 4, "", 0);
+    KUTE_ASSERT(okm != NULL);
+    op = okm;
+    op_end = op + 128;
+#if !defined(__linux__)
+    uprintf("\t OKM = ");
+#else
+    printk(KERN_ERR "\t DK = ");
+#endif
+    while (op != op_end) {
+#if !defined(__linux__)
+        uprintf("%.2X", *op);
+#else
+        printk(KERN_ERR "%.2X", *op);
+#endif
+        op++;
+    }
+#if !defined(__linux__)
+    uprintf("\n");
+#else
+    printk(KERN_ERR "\n");
+#endif
+    kryptos_freeseg(okm, 128);
+
+    okm = kryptos_argon2d("Ash Gray Sunday", 15, "Revelator", 9, 5, 16, 64, 20, "Black Rose Way", 14, "Anita Grey", 10);
+    KUTE_ASSERT(okm != NULL);
+    op = okm;
+    op_end = op + 16;
+#if !defined(__linux__)
+    uprintf("\t OKM = ");
+#else
+    printk(KERN_ERR "\t DK = ");
+#endif
+    while (op != op_end) {
+#if !defined(__linux__)
+        uprintf("%.2X", *op);
+#else
+        printk(KERN_ERR "%.2X", *op);
+#endif
+        op++;
+    }
+#if !defined(__linux__)
+    uprintf("\n");
+#else
+    printk(KERN_ERR "\n");
+#endif
+    kryptos_freeseg(okm, 16);
+
+    okm = kryptos_argon2i("Ash Gray Sunday", 15, "Revelator", 9, 5, 16, 64, 20, "Black Rose Way", 14, "Anita Grey", 10);
+    KUTE_ASSERT(okm != NULL);
+    op = okm;
+    op_end = op + 16;
+#if !defined(__linux__)
+    uprintf("\t OKM = ");
+#else
+    printk(KERN_ERR "\t DK = ");
+#endif
+    while (op != op_end) {
+#if !defined(__linux__)
+        uprintf("%.2X", *op);
+#else
+        printk(KERN_ERR "%.2X", *op);
+#endif
+        op++;
+    }
+#if !defined(__linux__)
+    uprintf("\n");
+#else
+    printk(KERN_ERR "\n");
+#endif
+    kryptos_freeseg(okm, 16);
+
+    okm = kryptos_argon2id("Ash Gray Sunday", 15, "Revelator", 9, 5, 16, 64, 20, "Black Rose Way", 14, "Anita Grey", 10);
+    KUTE_ASSERT(okm != NULL);
+    op = okm;
+    op_end = op + 16;
+#if !defined(__linux__)
+    uprintf("\t OKM = ");
+#else
+    printk(KERN_ERR "\t DK = ");
+#endif
+    while (op != op_end) {
+#if !defined(__linux__)
+        uprintf("%.2X", *op);
+#else
+        printk(KERN_ERR "%.2X", *op);
+#endif
+        op++;
+    }
+#if !defined(__linux__)
+    uprintf("\n");
+#else
+    printk(KERN_ERR "\n");
+#endif
+    kryptos_freeseg(okm, 16);
+
+    okm = kryptos_argon2d("Ash Gray Sunday", 15, "Revelator", 9, 5, 1024, 64, 20, "Black Rose Way", 14, "Anita Grey", 10);
+    KUTE_ASSERT(okm != NULL);
+    op = okm;
+    op_end = op + 1024;
+#if !defined(__linux__)
+    uprintf("\t OKM = ");
+#else
+    printk(KERN_ERR "\t DK = ");
+#endif
+    while (op != op_end) {
+#if !defined(__linux__)
+        uprintf("%.2X", *op);
+#else
+        printk(KERN_ERR "%.2X", *op);
+#endif
+        op++;
+    }
+#if !defined(__linux__)
+    uprintf("\n");
+#else
+    printk(KERN_ERR "\n");
+#endif
+    kryptos_freeseg(okm, 1024);
+
+    okm = kryptos_argon2i("Ash Gray Sunday", 15, "Revelator", 9, 5, 1024, 64, 20, "Black Rose Way", 14, "Anita Grey", 10);
+    KUTE_ASSERT(okm != NULL);
+    op = okm;
+    op_end = op + 1024;
+#if !defined(__linux__)
+    uprintf("\t OKM = ");
+#else
+    printk(KERN_ERR "\t DK = ");
+#endif
+    while (op != op_end) {
+#if !defined(__linux__)
+        uprintf("%.2X", *op);
+#else
+        printk(KERN_ERR "%.2X", *op);
+#endif
+        op++;
+    }
+#if !defined(__linux__)
+    uprintf("\n");
+#else
+    printk(KERN_ERR "\n");
+#endif
+    kryptos_freeseg(okm, 1024);
+
+    okm = kryptos_argon2id("Ash Gray Sunday", 15, "Revelator", 9, 5, 1024, 64, 20, "Black Rose Way", 14, "Anita Grey", 10);
+    KUTE_ASSERT(okm != NULL);
+    op = okm;
+    op_end = op + 1024;
+#if !defined(__linux__)
+    uprintf("\t OKM = ");
+#else
+    printk(KERN_ERR "\t DK = ");
+#endif
+    while (op != op_end) {
+#if !defined(__linux__)
+        uprintf("%.2X", *op);
+#else
+        printk(KERN_ERR "%.2X", *op);
+#endif
+        op++;
+    }
+#if !defined(__linux__)
+    uprintf("\n");
+#else
+    printk(KERN_ERR "\n");
+#endif
+    kryptos_freeseg(okm, 1024);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_do_argon2_bounds_tests)
+    kryptos_u32_t memory_size_kb = (0xFFFFFFFF >> 3) + 1;
+    kryptos_u32_t iterations = (0xFFFFFFFF >> 3) + 1;
+    kryptos_u32_t parallelism = 0x00FFFFFF + 1;
+    kryptos_u32_t tag_size = (0xFFFFFFFF >> 3) + 1;
+    size_t password_size = (0xFFFFFFFF >> 3) + 1;
+    size_t salt_size = (0xFFFFFFFF >> 3) + 1;
+    size_t key_size = (0xFFFFFFFF >> 3) + 1;
+    size_t associated_data_size = (0xFFFFFFFF >> 3) + 1;
+    kryptos_u8_t *tag;
+
+    KUTE_ASSERT(kryptos_do_argon2(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                  iterations, NULL, key_size, NULL, associated_data_size, kArgon2d) == NULL);
+
+    password_size = 0;
+
+    KUTE_ASSERT(kryptos_do_argon2(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                  iterations, NULL, key_size, NULL, associated_data_size, kArgon2d) == NULL);
+
+    salt_size = 0;
+
+    KUTE_ASSERT(kryptos_do_argon2(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                  iterations, NULL, key_size, NULL, associated_data_size, kArgon2d) == NULL);
+
+    parallelism = 3;
+
+    KUTE_ASSERT(kryptos_do_argon2(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                  iterations, NULL, key_size, NULL, associated_data_size, kArgon2d) == NULL);
+
+    tag_size = 32;
+
+    KUTE_ASSERT(kryptos_do_argon2(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                  iterations, NULL, key_size, NULL, associated_data_size, kArgon2d) == NULL);
+
+    memory_size_kb = 32;
+
+    KUTE_ASSERT(kryptos_do_argon2(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                  iterations, NULL, key_size, NULL, associated_data_size, kArgon2d) == NULL);
+
+    iterations = 3;
+
+    KUTE_ASSERT(kryptos_do_argon2(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                  iterations, NULL, key_size, NULL, associated_data_size, kArgon2d) == NULL);
+
+    key_size = 0;
+
+    KUTE_ASSERT(kryptos_do_argon2(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                  iterations, NULL, key_size, NULL, associated_data_size, kArgon2d) == NULL);
+
+    associated_data_size = 0;
+
+    KUTE_ASSERT((tag = kryptos_do_argon2(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                         iterations, NULL, key_size, NULL, associated_data_size, kArgon2d)) != NULL);
+
+    kryptos_freeseg(tag, tag_size);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_argon2_macro_bounds_tests)
+    kryptos_u32_t memory_size_kb = (0xFFFFFFFF >> 3) + 1;
+    kryptos_u32_t iterations = (0xFFFFFFFF >> 3) + 1;
+    kryptos_u32_t parallelism = 0x00FFFFFF + 1;
+    kryptos_u32_t tag_size = (0xFFFFFFFF >> 3) + 1;
+    size_t password_size = (0xFFFFFFFF >> 3) + 1;
+    size_t salt_size = (0xFFFFFFFF >> 3) + 1;
+    size_t key_size = (0xFFFFFFFF >> 3) + 1;
+    size_t associated_data_size = (0xFFFFFFFF >> 3) + 1;
+    kryptos_u8_t *tag;
+
+    KUTE_ASSERT(kryptos_argon2d(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+
+    password_size = 0;
+
+    KUTE_ASSERT(kryptos_argon2d(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+
+    salt_size = 0;
+
+    KUTE_ASSERT(kryptos_argon2d(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+    parallelism = 3;
+
+    KUTE_ASSERT(kryptos_argon2d(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+
+    tag_size = 32;
+
+    KUTE_ASSERT(kryptos_argon2d(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+    memory_size_kb = 32;
+
+    KUTE_ASSERT(kryptos_argon2d(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+    iterations = 3;
+
+    KUTE_ASSERT(kryptos_argon2d(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+    key_size = 0;
+
+    KUTE_ASSERT(kryptos_argon2d(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+    associated_data_size = 0;
+
+    KUTE_ASSERT((tag = kryptos_argon2d(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                       iterations, NULL, key_size, NULL, associated_data_size)) != NULL);
+
+    kryptos_freeseg(tag, tag_size);
+
+    memory_size_kb = (0xFFFFFFFF >> 3) + 1;
+    iterations = (0xFFFFFFFF >> 3) + 1;
+    parallelism = 0x00FFFFFF + 1;
+    tag_size = (0xFFFFFFFF >> 3) + 1;
+    password_size = (0xFFFFFFFF >> 3) + 1;
+    salt_size = (0xFFFFFFFF >> 3) + 1;
+    key_size = (0xFFFFFFFF >> 3) + 1;
+    associated_data_size = (0xFFFFFFFF >> 3) + 1;
+
+    KUTE_ASSERT(kryptos_argon2i(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+
+    password_size = 0;
+
+    KUTE_ASSERT(kryptos_argon2i(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+
+    salt_size = 0;
+
+    KUTE_ASSERT(kryptos_argon2i(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+    parallelism = 3;
+
+    KUTE_ASSERT(kryptos_argon2i(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+
+    tag_size = 32;
+
+    KUTE_ASSERT(kryptos_argon2i(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+    memory_size_kb = 32;
+
+    KUTE_ASSERT(kryptos_argon2i(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+    iterations = 3;
+
+    KUTE_ASSERT(kryptos_argon2i(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+    key_size = 0;
+
+    KUTE_ASSERT(kryptos_argon2i(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+    associated_data_size = 0;
+
+    KUTE_ASSERT((tag = kryptos_argon2i(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                       iterations, NULL, key_size, NULL, associated_data_size)) != NULL);
+
+    kryptos_freeseg(tag, tag_size);
+
+    memory_size_kb = (0xFFFFFFFF >> 3) + 1;
+    iterations = (0xFFFFFFFF >> 3) + 1;
+    parallelism = 0x00FFFFFF + 1;
+    tag_size = (0xFFFFFFFF >> 3) + 1;
+    password_size = (0xFFFFFFFF >> 3) + 1;
+    salt_size = (0xFFFFFFFF >> 3) + 1;
+    key_size = (0xFFFFFFFF >> 3) + 1;
+    associated_data_size = (0xFFFFFFFF >> 3) + 1;
+
+    KUTE_ASSERT(kryptos_argon2id(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                 iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+
+    password_size = 0;
+
+    KUTE_ASSERT(kryptos_argon2id(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                 iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+
+    salt_size = 0;
+
+    KUTE_ASSERT(kryptos_argon2id(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                 iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+    parallelism = 3;
+
+    KUTE_ASSERT(kryptos_argon2id(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                 iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+
+    tag_size = 32;
+
+    KUTE_ASSERT(kryptos_argon2id(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                 iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+    memory_size_kb = 32;
+
+    KUTE_ASSERT(kryptos_argon2id(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                 iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+    iterations = 3;
+
+    KUTE_ASSERT(kryptos_argon2id(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                 iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+    key_size = 0;
+
+    KUTE_ASSERT(kryptos_argon2id(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                 iterations, NULL, key_size, NULL, associated_data_size) == NULL);
+    associated_data_size = 0;
+
+    KUTE_ASSERT((tag = kryptos_argon2id(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
+                                        iterations, NULL, key_size, NULL, associated_data_size)) != NULL);
+
+    kryptos_freeseg(tag, tag_size);
+KUTE_TEST_CASE_END
+
 KUTE_TEST_CASE(kryptos_do_pbkdf2_tests)
     struct test_step {
         kryptos_hash_func prf;
