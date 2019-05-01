@@ -118,7 +118,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_pbkdf2_macro_tests);
     KUTE_RUN_TEST(kryptos_do_argon2_tests);
     KUTE_RUN_TEST(kryptos_argon2_macro_tests);
-    //KUTE_RUN_TEST(kryptos_do_argon2_bounds_tests);
+    KUTE_RUN_TEST(kryptos_do_argon2_bounds_tests);
     //KUTE_RUN_TEST(kryptos_argon2_macro_bounds_tests);
 
     KUTE_RUN_TEST(kryptos_mp_new_value_tests);
