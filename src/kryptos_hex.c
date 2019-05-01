@@ -7,7 +7,9 @@
  */
 #include <kryptos_hex.h>
 #include <kryptos_memory.h>
-#include <ctype.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <ctype.h>
+#endif
 
 #define kryptos_hex_nibble2ascii(n) ( ( (n) >= 0 && (n) <= 9 ) ? 48 + (n) : 55 + (n) )
 

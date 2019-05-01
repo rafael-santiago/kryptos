@@ -44,4 +44,6 @@ KUTE_DECLARE_TEST_CASE(kryptos_gcm_gf_mul_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_gcm_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_u8_ptr_to_hex_tests);
+
 #endif

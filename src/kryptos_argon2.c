@@ -191,6 +191,7 @@ kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const size_t password_si
 
     params.mm = ((memory_size_kb) / (parallelism << 2)) * (parallelism << 2);
     params.col_count = params.mm / parallelism;
+
     params.segment_length = params.col_count >> 2;
 
     B = (struct kryptos_argon2_array_ctx **)kryptos_newseg(parallelism * sizeof(struct kryptos_argon2_array_ctx *));
@@ -514,7 +515,12 @@ static void kryptos_argon2_get_indexes(struct kryptos_argon2_array_ctx **B,
         start_pos = (params->segment + 1) * params->segment_length;
     }
 
+#if defined(KRYPTOS_KERNEL_MODE) && defined(__linux__)
+    start_pos += rel_pos;
+    *jj = do_div(start_pos, params->col_count);
+#else
     *jj = (start_pos + rel_pos) % params->col_count;
+#endif
 
     J_1 = J_2 = 0;
     rel_pos = start_pos = ref_area_size = 0;
@@ -739,7 +745,6 @@ static void kryptos_argon2_P(kryptos_u8_t *s0, kryptos_u8_t *s1, kryptos_u8_t *s
     // INFO(Rafael): Each argument is a 16-byte array.
 
     kryptos_u64_t v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15;
-    kryptos_u8_t *sp, *sp_end;
 
     // INFO(Rafael): The relationship between S and V is given by: s_i = (v_2_{i+1}||v_2_i).
 
