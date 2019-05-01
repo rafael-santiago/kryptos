@@ -16,4 +16,8 @@ KUTE_DECLARE_TEST_CASE(kryptos_hmac_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_hmac_basic_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_blake2sN_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_blake2bN_tests);
+
 #endif
