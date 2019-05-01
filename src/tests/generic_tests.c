@@ -1636,3 +1636,22 @@ CUTE_TEST_CASE(kryptos_u64_rev_tests)
     kryptos_u64_t value = 0x00CABABA5EDAF000;
     CUTE_ASSERT(kryptos_u64_rev(value) == 0x00F0DA5EBABACA00);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_u8_ptr_to_hex_tests)
+    kryptos_u8_t *result;
+    size_t result_size;
+    kryptos_u8_t *u8 = "\xDE\xAD\xBe\xeF\xba\xBA\xCA\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0b\x0C\x0D\x0E\x0F";
+    size_t u8_size = 23;
+
+    CUTE_ASSERT(kryptos_u8_ptr_to_hex(NULL, u8_size, &result_size) == NULL);
+    CUTE_ASSERT(kryptos_u8_ptr_to_hex(u8, 0, &result_size) == NULL);
+    CUTE_ASSERT(kryptos_u8_ptr_to_hex(u8, u8_size, NULL) == NULL);
+
+    CUTE_ASSERT((result = kryptos_u8_ptr_to_hex(u8, u8_size, &result_size)) != NULL);
+
+    CUTE_ASSERT(result_size == (u8_size << 1));
+
+    CUTE_ASSERT(memcmp(result, "DEADBEEFBABACA000102030405060708090A0B0C0D0E0F", result_size) == 0);
+
+    kryptos_freeseg(result, result_size);
+CUTE_TEST_CASE_END

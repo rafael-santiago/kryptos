@@ -6,8 +6,37 @@
  *
  */
 #include <kryptos_hex.h>
+#include <kryptos_memory.h>
+#include <ctype.h>
 
 #define kryptos_hex_nibble2ascii(n) ( ( (n) >= 0 && (n) <= 9 ) ? 48 + (n) : 55 + (n) )
+
+kryptos_u8_t *kryptos_u8_ptr_to_hex(const kryptos_u8_t *u8, const size_t u8_size, size_t *o_size) {
+    static kryptos_u8_t nibble_lt[16] = {
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+    };
+    kryptos_u8_t *hex = NULL, *hp;
+    const kryptos_u8_t *u8_p, *u8_p_end;
+
+    if (o_size != NULL && u8 != NULL && u8_size > 0 && (hex = (kryptos_u8_t *)kryptos_newseg((u8_size << 1) + 1)) != NULL) {
+        u8_p = u8;
+        u8_p_end = u8_p + u8_size;
+
+        hp = hex;
+
+        while (u8_p != u8_p_end) {
+            hp[0] = nibble_lt[(*u8_p) >> 0x4];
+            hp[1] = nibble_lt[(*u8_p) &  0xF];
+            hp += 2;
+            u8_p += 1;
+        }
+
+        *o_size = hp - hex;
+        *hp = 0;
+    }
+
+    return hex;
+}
 
 void kryptos_u32_to_hex(kryptos_u8_t *buf, const size_t buf_size, const kryptos_u32_t u32) {
     if (buf == NULL || buf_size < 9) {

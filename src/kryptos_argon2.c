@@ -111,11 +111,14 @@ kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const size_t password_si
     kryptos_u32_t i, j;
     const kryptos_u32_t version = 0x13;
 
+    kryptos_task_init_as_null(ktask);
+    memset(&params, 0, sizeof(params));
+
     if (!kryptos_argon2_check_size_bounds(password_size, 0, KRYPTOS_ARGON2_PASSWORD_MAX_SIZE)                             ||
         !kryptos_argon2_check_size_bounds(salt_size, 0, KRYPTOS_ARGON2_SALT_MAX_SIZE)                                     ||
         !kryptos_argon2_check_size_bounds(parallelism, 1, KRYPTOS_ARGON2_PARALLELISM_MAX_SIZE)                            ||
         !kryptos_argon2_check_size_bounds(tag_size, 1, KRYPTOS_ARGON2_TAG_MAX_SIZE)                                       ||
-        !kryptos_argon2_check_size_bounds(memory_size_kb, (8 * parallelism) >> 3, KRYPTOS_ARGON2_MEMORY_SIZE_KB_MAX_SIZE) ||
+        !kryptos_argon2_check_size_bounds(memory_size_kb, (8 * parallelism), KRYPTOS_ARGON2_MEMORY_SIZE_KB_MAX_SIZE)      ||
         !kryptos_argon2_check_size_bounds(iterations, 1, KRYPTOS_ARGON2_ITERATIONS_MAX_SIZE)                              ||
         !kryptos_argon2_check_size_bounds(key_size, 0, KRYPTOS_ARGON2_KEY_MAX_SIZE)                                       ||
         !kryptos_argon2_check_size_bounds(associated_data_size, 0, KRYPTOS_ARGON2_ASSOCIATED_DATA_MAX_SIZE)) {
@@ -169,7 +172,6 @@ kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const size_t password_si
 
     bp = buffer;
 
-    kryptos_task_init_as_null(ktask);
     kryptos_hash(blake2b512, ktask, buffer, buffer_size, 0);
 
     if (!kryptos_last_task_succeed(ktask)) {
@@ -191,7 +193,7 @@ kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const size_t password_si
     params.col_count = params.mm / parallelism;
     params.segment_length = params.col_count >> 2;
 
-    B = (struct kryptos_argon2_array_ctx **)kryptos_newseg(parallelism * sizeof(struct kryptos_argon2_array_ctx **));
+    B = (struct kryptos_argon2_array_ctx **)kryptos_newseg(parallelism * sizeof(struct kryptos_argon2_array_ctx *));
 
     if (B == NULL) {
         goto kryptos_argon2_epilogue;

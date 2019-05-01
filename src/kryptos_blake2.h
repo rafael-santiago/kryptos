@@ -22,8 +22,27 @@ KRYPTOS_DECL_HASH_SIZE(blake2s256)
 
 KRYPTOS_DECL_HASH_SIZE(blake2b512)
 
+KRYPTOS_DECL_HASH_SIZE(blake2sN)
+
+// WARN(Rafael): The hash_size functions for blake2sN and blake2bN are not defined nor implemented. The user must implement it
+//               from outside. This situation can happen when using those variable length hash functions with some HMAC stuff.
+
+#ifndef __cplusplus
+extern KRYPTOS_DECL_HASH_SIZE(blake2sN)
+
+extern KRYPTOS_DECL_HASH_SIZE(blake2bN)
+#else
+KRYPTOS_DECL_HASH_SIZE(blake2bN)
+
+KRYPTOS_DECL_HASH_SIZE(blake2bN)
+#endif
+
 KRYPTOS_DECL_HASH_INPUT_SIZE(blake2s256)
 
 KRYPTOS_DECL_HASH_INPUT_SIZE(blake2b512)
+
+KRYPTOS_DECL_HASH_INPUT_SIZE(blake2sN)
+
+KRYPTOS_DECL_HASH_INPUT_SIZE(blake2bN)
 
 #endif

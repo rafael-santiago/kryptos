@@ -449,6 +449,8 @@ KRYPTOS_IMPL_HASH_PROCESSOR(blake2s256, ktask, kryptos_blake2_ctx, ctx, blake2s2
                                 kryptos_freeseg(ctx.h, ctx.h_size);
                             })
 
+KRYPTOS_IMPL_HASH_INPUT_SIZE(blake2sN, KRYPTOS_BLAKE2S_BYTES_PER_BLOCK)
+
 KRYPTOS_IMPL_HASH_PROCESSOR(blake2sN, ktask, kryptos_blake2_ctx, ctx, blake2sN_epilogue,
                             {
                                 if ((*ktask)->key_size > KRYPTOS_BLAKE2S256_HASH_SIZE) {
@@ -481,9 +483,14 @@ KRYPTOS_IMPL_HASH_PROCESSOR(blake2sN, ktask, kryptos_blake2_ctx, ctx, blake2sN_e
                                 ctx.h = NULL;
                             },
                             {
-                                // INFO(Rafael): Not implemented. It is being used only in Argon2.
-                                (*ktask)->result = kKryptosProcessError;
-                                (*ktask)->result_verbose = "Not implemented.";
+                                if (ctx.h == NULL || ctx.h_size != ctx.nn || (*ktask)->out_size != ctx.nn) {
+                                    (*ktask)->out_size = 0;
+                                    (*ktask)->result = kKryptosProcessError;
+                                    (*ktask)->result_verbose = "No memory to get a valid output.";
+                                    goto kryptos_blake2sN_epilogue;
+                                }
+                                (*ktask)->out = kryptos_u8_ptr_to_hex(ctx.h, ctx.h_size, &(*ktask)->out_size);
+                                kryptos_freeseg(ctx.h, ctx.h_size);
                             })
 
 KRYPTOS_IMPL_HASH_SIZE(blake2b512, KRYPTOS_BLAKE2B512_HASH_SIZE)
@@ -596,6 +603,8 @@ KRYPTOS_IMPL_HASH_PROCESSOR(blake2b512, ktask, kryptos_blake2_ctx, ctx, blake2b5
                                 kryptos_freeseg(ctx.h, ctx.h_size);
                             })
 
+KRYPTOS_IMPL_HASH_INPUT_SIZE(blake2bN, KRYPTOS_BLAKE2S_BYTES_PER_BLOCK)
+
 KRYPTOS_IMPL_HASH_PROCESSOR(blake2bN, ktask, kryptos_blake2_ctx, ctx, blake2bN_epilogue,
                             {
                                 if ((*ktask)->key_size > KRYPTOS_BLAKE2B512_HASH_SIZE) {
@@ -628,9 +637,14 @@ KRYPTOS_IMPL_HASH_PROCESSOR(blake2bN, ktask, kryptos_blake2_ctx, ctx, blake2bN_e
                                 ctx.h = NULL;
                             },
                             {
-                                // INFO(Rafael): Not implemented. It is being used only in Argon2.
-                                (*ktask)->result = kKryptosProcessError;
-                                (*ktask)->result_verbose = "Not implemented.";
+                                if (ctx.h == NULL || ctx.h_size != ctx.nn || (*ktask)->out_size != ctx.nn) {
+                                    (*ktask)->out_size = 0;
+                                    (*ktask)->result = kKryptosProcessError;
+                                    (*ktask)->result_verbose = "No memory to get a valid output.";
+                                    goto kryptos_blake2bN_epilogue;
+                                }
+                                (*ktask)->out = kryptos_u8_ptr_to_hex(ctx.h, ctx.h_size, &(*ktask)->out_size);
+                                kryptos_freeseg(ctx.h, ctx.h_size);
                             })
 
 static void kryptos_blake2s(struct kryptos_blake2_ctx *data) {

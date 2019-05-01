@@ -44,6 +44,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_task_check_sign_tests);
     CUTE_RUN_TEST(kryptos_task_check_verify_tests);
     CUTE_RUN_TEST(kryptos_hex_tests);
+    CUTE_RUN_TEST(kryptos_u8_ptr_to_hex_tests);
     CUTE_RUN_TEST(kryptos_hash_common_tests);
 
     //  -=-=-=-=- If you have just added a new cipher take a look in "kryptos_dsl_tests" case, there is some work to
@@ -191,6 +192,10 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_blake2b512_hash_macro_tests);
     CUTE_RUN_TEST(kryptos_blake2b512_keyed_tests);
     CUTE_RUN_TEST(kryptos_blake2b512_hash_macro_keyed_tests);
+    CUTE_RUN_TEST(kryptos_blake2sN_tests);
+    CUTE_RUN_TEST(kryptos_blake2sN_hash_macro_tests);
+    CUTE_RUN_TEST(kryptos_blake2bN_tests);
+    CUTE_RUN_TEST(kryptos_blake2bN_hash_macro_tests);
 
     //  -=-=-=-=-=-=- New block ciphers/hash functions should be added to HMAC tests. -=-=-=-=-=-=-=-
 

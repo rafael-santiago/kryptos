@@ -216,6 +216,106 @@ CUTE_TEST_CASE(kryptos_blake2b512_hash_macro_tests)
     kryptos_run_hash_macro_tests(blake2b512, 128, 64)
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_blake2sN_tests)
+    // INFO(Rafael): Tests for Blake2sN are simpler than Blake2s256 because all
+    //               here depends on Blake2s256 parts (tested against official test vectors).
+
+    kryptos_task_ctx t, *ktask = &t;
+
+    kryptos_task_init_as_null(ktask);
+
+    ktask->in = "abc";
+    ktask->in_size = 3;
+
+    ktask->out_size = 33; // INFO(Rafael): Greater than Blake2s hash size limit.
+    kryptos_blake2sN_hash(&ktask, 0);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);
+
+    ktask->out_size = 28; // INFO(Rafael): Blaske2s224 raw output.
+    kryptos_blake2sN_hash(&ktask, 0);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    ktask->out_size = 28; // INFO(Rafael): Blaske2s224 hex output.
+    kryptos_blake2sN_hash(&ktask, 1);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blake2sN_hash_macro_tests)
+    // INFO(Rafael): Tests for Blake2sN are simpler than Blake2s256 because all
+    //               here depends on Blake2s256 parts (tested against official test vectors).
+
+    kryptos_task_ctx t, *ktask = &t;
+
+    kryptos_task_init_as_null(ktask);
+
+    ktask->out_size = 33; // INFO(Rafael): Greater than Blake2s hash size limit.
+    kryptos_hash(blake2sN, ktask, "abc", 3, 0);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);
+
+    ktask->out_size = 28; // INFO(Rafael): Blaske2s224 raw output.
+    kryptos_hash(blake2sN, ktask, "abc", 3, 0);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    ktask->out_size = 28; // INFO(Rafael): Blaske2s224 hex output.
+    kryptos_hash(blake2sN, ktask, "abc", 3, 0);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blake2bN_tests)
+    // INFO(Rafael): Tests for Blake2bN are simpler than Blake2b512 because all
+    //               here depends on Blake2b512 parts (tested against official test vectors).
+    //               Moreover, it is being used in Argon2 (also tested against its official test vectors).
+
+    kryptos_task_ctx t, *ktask = &t;
+
+    kryptos_task_init_as_null(ktask);
+
+    ktask->in = "abc";
+    ktask->in_size = 3;
+
+    ktask->out_size = 65; // INFO(Rafael): Greater than Blake2b hash size limit.
+    kryptos_blake2bN_hash(&ktask, 0);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);
+
+    ktask->out_size = 48; // INFO(Rafael): Blaske2b384 raw output.
+    kryptos_blake2bN_hash(&ktask, 0);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    ktask->out_size = 48; // INFO(Rafael): Blaske2b384 hex output.
+    kryptos_blake2bN_hash(&ktask, 1);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blake2bN_hash_macro_tests)
+    // INFO(Rafael): Tests for Blake2bN are simpler than Blake2b512 because all
+    //               here depends on Blake2b512 parts (tested against official test vectors).
+    //               Moreover, it is being used in Argon2 (also tested against its official test vectors).
+
+    kryptos_task_ctx t, *ktask = &t;
+
+    kryptos_task_init_as_null(ktask);
+
+    ktask->out_size = 65; // INFO(Rafael): Greater than Blake2b hash size limit.
+    kryptos_hash(blake2bN, ktask, "abc", 3, 0);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);
+
+    ktask->out_size = 48; // INFO(Rafael): Blaske2b384 raw output.
+    kryptos_hash(blake2bN, ktask, "abc", 3, 0);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    ktask->out_size = 48; // INFO(Rafael): Blaske2b384 hex output.
+    kryptos_hash(blake2bN, ktask, "abc", 3, 0);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_blake2s256_keyed_tests)
     size_t test_vector_nr = sizeof(blake2s256_keyed_test_vector) / sizeof(blake2s256_keyed_test_vector[0]), t;
     kryptos_task_ctx tsk, *ktask = &tsk;
