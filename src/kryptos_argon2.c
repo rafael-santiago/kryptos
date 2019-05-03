@@ -100,7 +100,12 @@ kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const size_t password_si
                                 kryptos_u8_t *associated_data, const size_t associated_data_size,
                                 const kryptos_argon2_hash_type_t htype) {
 
-    kryptos_u8_t *tag = NULL, *buffer = NULL, *bp, *tp, *tp_end, *tt, *tt_end, *cp, *cp_end, C[KRYPTOS_ARGON2_DATA_SIZE];
+    kryptos_u8_t *tag = NULL, *buffer = NULL, *bp, *tp, *tp_end, *tt, *tt_end, *cp, *cp_end;
+#if defined(KRYPTOS_KERNEL_MODE) && defined(__NetBSD__)
+    static kryptos_u8_t C[KRYPTOS_ARGON2_DATA_SIZE];
+#else
+    kryptos_u8_t C[KRYPTOS_ARGON2_DATA_SIZE];
+#endif
     size_t buffer_size;
     kryptos_u32_t hash_type = htype;
     kryptos_task_ctx t, *ktask = &t;
