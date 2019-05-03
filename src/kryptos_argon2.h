@@ -21,7 +21,7 @@ typedef enum kryptos_argon2_hash_type {
 }kryptos_argon2_hash_type_t;
 
 kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const size_t password_size,
-                                kryptos_u8_t *salt, const size_t salt_size,
+                                kryptos_u8_t *salt, const kryptos_u32_t salt_size,
                                 const kryptos_u32_t parallelism,
                                 const kryptos_u32_t tag_size,
                                 const kryptos_u32_t memory_size_kb, const kryptos_u32_t iterations,
