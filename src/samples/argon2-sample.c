@@ -10,8 +10,9 @@
 
 int main(int argc, char **argv) {
     kryptos_u8_t *tag[3] = { NULL, NULL, NULL }, *p, *p_end;
-    // INFO(Rafael): You should never use parallelism greater than 1 because kryptos does not support multi-threading
-    //               and due to it timing attacks can be done when using parallelism greater than 1.
+    // INFO(Rafael): You should never use parallelism greater than 1 because kryptos does not support
+    //               multi-threading and due to it timing attacks can be done when using parallelism
+    //               greater than 1.
     kryptos_u32_t parallelism = 1, tag_size = 32, memory_size_kb = 512, iterations = 50;
     int exit_code = 0;
     kryptos_u8_t *variant[3] = { "argon2d", "argon2i", "argon2id" };
