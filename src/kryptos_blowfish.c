@@ -14,6 +14,8 @@
 #ifndef KRYPTOS_KERNEL_MODE
 # include <string.h>
 # include <stdio.h>
+#elif defined(KRYPTOS_KERNEL_MODE) && defined(__NetBSD__)
+# include <sys/systm.h>
 #endif
 
 #define KRYPTOS_BLOWFISH_MAX_KEY_NR 14
@@ -581,7 +583,11 @@ kryptos_u8_t *kryptos_bcrypt(const int cost,
     ctext64_size -= 1;
 
     if (ctext64 != NULL) {
+#if defined(KRYPTOS_KERNEL_MODE) && defined(__NetBSD__)
+        snprintf((char *)pfx, sizeof(pfx), "$2a$%.2d$", cost);
+#else
         sprintf((char *)pfx, "$2a$%.2d$", cost);
+#endif
         pfx_size = strlen((char *)pfx);
         *hash_size = pfx_size + salt64_size + ctext64_size;
         if ((hash = (kryptos_u8_t *) kryptos_newseg(*hash_size + 1)) != NULL) {
