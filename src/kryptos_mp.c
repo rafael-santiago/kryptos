@@ -393,7 +393,7 @@ kryptos_mp_value_t *kryptos_hex_value_as_mp(const char *value, const size_t valu
 
 kryptos_u8_t *kryptos_mp_value_as_hex(const kryptos_mp_value_t *value, size_t *hex_size) {
     ssize_t d;
-    kryptos_u8_t *hex, *hp, *hp_end;
+    kryptos_u8_t *hex, *hp;
 
     if (value == NULL || hex_size == NULL) {
         return NULL;
@@ -417,7 +417,6 @@ kryptos_u8_t *kryptos_mp_value_as_hex(const kryptos_mp_value_t *value, size_t *h
     d = value->data_size - 1;
 
     hp = hex;
-    hp_end = hp + *hex_size;
 
 #ifndef KRYPTOS_MP_U32_DIGIT
 

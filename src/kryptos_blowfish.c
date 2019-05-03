@@ -581,8 +581,8 @@ kryptos_u8_t *kryptos_bcrypt(const int cost,
     ctext64_size -= 1;
 
     if (ctext64 != NULL) {
-        sprintf(pfx, "$2a$%.2d$", cost);
-        pfx_size = strlen(pfx);
+        sprintf((char *)pfx, "$2a$%.2d$", cost);
+        pfx_size = strlen((char *)pfx);
         *hash_size = pfx_size + salt64_size + ctext64_size;
         if ((hash = (kryptos_u8_t *) kryptos_newseg(*hash_size + 1)) != NULL) {
             memset(hash, 0, *hash_size + 1);

@@ -528,7 +528,7 @@ static void kryptos_argon2_get_indexes(struct kryptos_argon2_array_ctx **B,
 
 static void kryptos_argon2_G(struct kryptos_argon2_array_ctx **B, struct kryptos_argon2_params_ctx *params) {
     size_t ii, jj, lj, pr_buf_size;
-    kryptos_u8_t pr_buf[KRYPTOS_ARGON2_DATA_SIZE], *pr_p, *pr_p_end, *bp, *bp_end;
+    kryptos_u8_t pr_buf[KRYPTOS_ARGON2_DATA_SIZE], *pr_p, *pr_p_end;
     static kryptos_u8_t zero_buf[KRYPTOS_ARGON2_DATA_SIZE];
     int is_di;
     size_t index, j;
@@ -591,9 +591,6 @@ static void kryptos_argon2_G(struct kryptos_argon2_array_ctx **B, struct kryptos
             pr_buf_size = sizeof(pr_buf);
             pr_p_end = pr_p + pr_buf_size;
             kryptos_argon2_GB2(pr_p, pr_buf_size, zero_buf, sizeof(zero_buf));
-
-            bp = &pr_buf[0];
-            bp_end = bp + sizeof(pr_buf);
 
             while (index < params->pr_buf_size && pr_p != pr_p_end) {
                 params->pr_buf[index] = *pr_p;
