@@ -10,7 +10,9 @@
 
 int main(int argc, char **argv) {
     kryptos_u8_t *tag[3] = { NULL, NULL, NULL }, *p, *p_end;
-    kryptos_u32_t parallelism = 20, tag_size = 32, memory_size_kb = 512, iterations = 50;
+    // INFO(Rafael): You should never use parallelism greater than 1 because kryptos does not support multi-threading
+    //               and due to it timing attacks can be done when using parallelism greater than 1.
+    kryptos_u32_t parallelism = 1, tag_size = 32, memory_size_kb = 512, iterations = 50;
     int exit_code = 0;
     kryptos_u8_t *variant[3] = { "argon2d", "argon2i", "argon2id" };
     size_t i;
@@ -28,10 +30,10 @@ int main(int argc, char **argv) {
     }
 
     tag[1] = kryptos_argon2i("Tales of Brave Ulysses", 11,
-                                     "salt", 4,
-                                     parallelism, tag_size, memory_size_kb, iterations,
-                                     "key", 3,
-                                     "associated data", 15);
+                             "salt", 4,
+                             parallelism, tag_size, memory_size_kb, iterations,
+                             "key", 3,
+                             "associated data", 15);
 
     if (tag[1] == NULL) {
         printf("ERROR: when trying to expand the key by using argon2i.\n");
@@ -40,10 +42,10 @@ int main(int argc, char **argv) {
     }
 
     tag[2] = kryptos_argon2id("Tales of Brave Ulysses", 11,
-                                      "salt", 4,
-                                      parallelism, tag_size, memory_size_kb, iterations,
-                                      "key", 3,
-                                      "associated data", 15);
+                              "salt", 4,
+                              parallelism, tag_size, memory_size_kb, iterations,
+                              "key", 3,
+                              "associated data", 15);
 
     if (tag[2] == NULL) {
         printf("ERROR: when trying to expand the key by using argon2id.\n");

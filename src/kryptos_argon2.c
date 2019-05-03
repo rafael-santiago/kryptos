@@ -15,7 +15,7 @@
 
 // WARN(Rafael): Until now (2019) Argon2 algorithm counts with a specification that has some really bad and cruel
 //               inconsistences. Additionally it has a bunch of unclearer points. The way of getting the prime indexes i' and j'
-//               is textual and rather abstract. My main intention here was produce a more sane and self contained code.
+//               is textual and rather abstract. My main intention here was produce a more sane and self-contained code.
 //               Excluding Blake2, all stuff related to Argon2 can be found here in this single implementation file.
 //               You do not need to enter in a crazy 'trebuchet mode' when reading my code to really understand what
 //               the algorithm specification was trying to say. In fact it would be a useless additional difficulty...
@@ -785,13 +785,13 @@ static void kryptos_argon2_P(kryptos_u8_t *s0, kryptos_u8_t *s1, kryptos_u8_t *s
 #define kryptos_argon2_xl(x) ( (x) & 0xFFFFFFFF )
 
 #define kryptos_argon2_p(a, b, c, d) {\
-    (a) = (a) + (b) + 2 * (kryptos_argon2_xl(a) * kryptos_argon2_xl(b));\
+    (a) = (a) + (b) + ((kryptos_argon2_xl(a) * kryptos_argon2_xl(b)) << 1);\
     (d) = kryptos_argon2_rr((d) ^ (a), 32);\
-    (c) = (c) + (d) + 2 * (kryptos_argon2_xl(c) * kryptos_argon2_xl(d));\
+    (c) = (c) + (d) + ((kryptos_argon2_xl(c) * kryptos_argon2_xl(d)) << 1);\
     (b) = kryptos_argon2_rr((b) ^ (c), 24);\
-    (a) = (a) + (b) + 2 * (kryptos_argon2_xl(a) * kryptos_argon2_xl(b));\
+    (a) = (a) + (b) + ((kryptos_argon2_xl(a) * kryptos_argon2_xl(b)) << 1);\
     (d) = kryptos_argon2_rr((d) ^ (a), 16);\
-    (c) = (c) + (d) + 2 * (kryptos_argon2_xl(c) * kryptos_argon2_xl(d));\
+    (c) = (c) + (d) + ((kryptos_argon2_xl(c) * kryptos_argon2_xl(d)) << 1);\
     (b) = kryptos_argon2_rr((b) ^ (c), 63);\
 }
 
