@@ -222,7 +222,7 @@ static void kryptos_rabbit_ld_user_key(kryptos_u16_t *K, const kryptos_u8_t *key
     K[6] = KK[1];
     K[7] = KK[0];
 
-    memset(KK, 0, sizeof(kryptos_u32_t) << 3);
+    memset(KK, 0, sizeof(kryptos_u16_t) << 3);
 }
 
 
