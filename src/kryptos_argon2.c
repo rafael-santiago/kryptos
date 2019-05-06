@@ -123,7 +123,7 @@ kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const size_t password_si
         !kryptos_argon2_check_size_bounds(key_size, 0, KRYPTOS_ARGON2_KEY_MAX_SIZE)                                       ||
         !kryptos_argon2_check_size_bounds(associated_data_size, 0, KRYPTOS_ARGON2_ASSOCIATED_DATA_MAX_SIZE)) {
 
-        goto kryptos_argon2_epilogue;
+        goto kryptos_do_argon2_epilogue;
 
     }
 
@@ -133,7 +133,7 @@ kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const size_t password_si
                   sizeof(iterations) + sizeof(hash_type) + sizeof(kryptos_u32_t);
 
     if ((buffer = (kryptos_u8_t *)kryptos_newseg(buffer_size)) == NULL) {
-        goto kryptos_argon2_epilogue;
+        goto kryptos_do_argon2_epilogue;
     }
 
     bp = buffer;
@@ -177,7 +177,7 @@ kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const size_t password_si
     if (!kryptos_last_task_succeed(ktask)) {
         ktask->in = NULL;
         ktask->in_size = 0;
-        goto kryptos_argon2_epilogue;
+        goto kryptos_do_argon2_epilogue;
     }
 
     H0 = ktask->out;
@@ -197,14 +197,14 @@ kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const size_t password_si
     B = (struct kryptos_argon2_array_ctx **)kryptos_newseg(parallelism * sizeof(struct kryptos_argon2_array_ctx *));
 
     if (B == NULL) {
-        goto kryptos_argon2_epilogue;
+        goto kryptos_do_argon2_epilogue;
     }
 
     for (i = 0; i < parallelism; i++) {
         B[i] = (struct kryptos_argon2_array_ctx *)kryptos_newseg(params.col_count * sizeof(struct kryptos_argon2_array_ctx));
         if (B[i] == NULL) {
-            B = NULL; // WARN(Rafael): 'Live and let leak guy...'
-            goto kryptos_argon2_epilogue;
+            B = NULL; // WARN(Rafael): 'Live and let it leak guy...'
+            goto kryptos_do_argon2_epilogue;
         }
         memset(B[i], 0, params.col_count * sizeof(struct kryptos_argon2_array_ctx));
     }
@@ -214,7 +214,7 @@ kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const size_t password_si
     buffer_size = H0_size + sizeof(kryptos_u32_t) + sizeof(kryptos_u32_t);
 
     if ((buffer = (kryptos_u8_t *)kryptos_newseg(buffer_size)) == NULL) {
-        goto kryptos_argon2_epilogue;
+        goto kryptos_do_argon2_epilogue;
     }
 
     bp = buffer;
@@ -305,7 +305,7 @@ kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const size_t password_si
 
     tag = kryptos_argon2_H(C, sizeof(C), tag_size, NULL);
 
-kryptos_argon2_epilogue:
+kryptos_do_argon2_epilogue:
 
     // INFO(Rafael): Just housekeeping.
 
@@ -339,7 +339,7 @@ kryptos_argon2_epilogue:
             kryptos_freeseg(B[i], params.col_count * sizeof(struct kryptos_argon2_array_ctx));
         }
 
-        kryptos_freeseg(B, parallelism * sizeof(struct kryptos_argon2_array_ctx **));
+        kryptos_freeseg(B, parallelism * sizeof(struct kryptos_argon2_array_ctx *));
     }
 
     memset(&params, 0, sizeof(params));
@@ -651,7 +651,7 @@ static void kryptos_argon2_GB(kryptos_u8_t **z, size_t *z_size,
             *z_size = 0;
         }
     } else if ((do_xor = (params != NULL && params->version == 0x13 && params->iteration != 0)) != 0) {
-        // INFO(Rafael): params->iteration != 0 is useless here because every block in iteration zero will be NULL,
+        // INFO(Rafael): params->iteration != 0 is useless here because every block at iteration zero will be NULL,
         //               anyway, let's follow the original algorithm condition.
         memcpy(temp_z, *z, *z_size);
     }
