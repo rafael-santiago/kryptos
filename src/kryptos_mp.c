@@ -292,7 +292,7 @@ kryptos_mp_value_t *kryptos_assign_mp_value(kryptos_mp_value_t **dest,
 
 kryptos_mp_value_t *kryptos_hex_value_as_mp(const char *value, const size_t value_size) {
     kryptos_mp_value_t *mp;
-    const char *vp, *vp_end;
+    const kryptos_u8_t *vp, *vp_end;
     ssize_t d;
     kryptos_u8_t nb;
 #ifdef KRYPTOS_MP_U32_DIGIT
@@ -324,7 +324,7 @@ kryptos_mp_value_t *kryptos_hex_value_as_mp(const char *value, const size_t valu
         return NULL;
     }
 
-    vp = value;
+    vp = (kryptos_u8_t *)value;
     vp_end = vp + value_size;
 
     d = mp->data_size - 1;
@@ -358,7 +358,7 @@ kryptos_mp_value_t *kryptos_hex_value_as_mp(const char *value, const size_t valu
         memset(padded_value, 0, v + 1);
         memset(padded_value, '0', v);
         memcpy(padded_value + (v - value_size), value, value_size);
-        vp = padded_value;
+        vp = (kryptos_u8_t *)padded_value;
         vp_end = vp + v;
     }
 
@@ -887,7 +887,7 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
 
 kryptos_mp_value_t *kryptos_assign_hex_value_to_mp(kryptos_mp_value_t **dest,
                                                    const char *value, const size_t value_size) {
-    const char *vp, *vp_end;
+    const kryptos_u8_t *vp, *vp_end;
     ssize_t d;
     kryptos_u8_t nb;
 #ifdef KRYPTOS_MP_U32_DIGIT
@@ -903,7 +903,7 @@ kryptos_mp_value_t *kryptos_assign_hex_value_to_mp(kryptos_mp_value_t **dest,
         return (*dest);
     }
 
-    vp = value;
+    vp = (kryptos_u8_t *)value;
     vp_end = vp + value_size;
 
     memset((*dest)->data, 0, (*dest)->data_size);
