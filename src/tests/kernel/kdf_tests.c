@@ -8,6 +8,8 @@
 #include "kdf_tests.h"
 #include <kryptos.h>
 
+#if !defined(__NetBSD__)
+
 KUTE_TEST_CASE(kryptos_do_argon2_tests)
     struct test_step {
         kryptos_argon2_hash_type_t htype;
@@ -501,6 +503,8 @@ KUTE_TEST_CASE(kryptos_argon2_macro_bounds_tests)
 
     kryptos_freeseg(tag, tag_size);
 KUTE_TEST_CASE_END
+
+#endif
 
 KUTE_TEST_CASE(kryptos_do_pbkdf2_tests)
     struct test_step {

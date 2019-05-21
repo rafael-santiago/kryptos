@@ -5,6 +5,11 @@
  * the terms of the GNU General Public License version 2.
  *
  */
+#if !(defined(__NetBSD__) && defined(KRYPTOS_KERNEL_MODE))
+// WARN(Rafael): During my tests I got double faults with NetBSD I find it is related to the entire stack size consumption.
+//               Under Linux and FreeBSD this code works well in kernel space. It seems to be a limitation imposed by NetBSD.
+//               Due to it I am deactivating it in NetBSD for security issues.
+
 #include <kryptos_argon2.h>
 #include <kryptos_memory.h>
 #include <kryptos_blake2.h>
@@ -856,3 +861,5 @@ static void kryptos_argon2_P(kryptos_u8_t *s0, kryptos_u8_t *s1, kryptos_u8_t *s
 #undef kryptos_argon2_put_u32
 
 #undef KRYPTOS_ARGON2_DATA_SIZE
+
+#endif

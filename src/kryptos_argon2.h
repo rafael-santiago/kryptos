@@ -8,6 +8,8 @@
 #ifndef KRYPTOS_KRYPTOS_ARGON2_H
 #define KRYPTOS_KRYPTOS_ARGON2_H 1
 
+#if !(defined(__NetBSD__) && defined(KRYPTOS_KERNEL_MODE))
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,6 +42,8 @@ kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const size_t password_si
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif
