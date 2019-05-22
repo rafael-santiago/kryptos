@@ -304,8 +304,112 @@ kryptos_ec_dbl_epilogue:
     }
 }
 
-void kryptos_ec_mul(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_pt_t *q, kryptos_ec_t *curve) {
-    // TODO(Rafael): Guess what?!
+void kryptos_ec_mul(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_mp_value_t *d, kryptos_ec_t *curve) {
+    kryptos_ec_pt_t q = { NULL, NULL }, *t = NULL;
+    kryptos_mp_value_t *_0 = NULL;
+    ssize_t w;
+    int done = 0;
+
+    *r = NULL;
+
+    KRYPTOS_EC_UTILS_DO_OR_DIE(_0 = kryptos_hex_value_as_mp("00", 2), kryptos_ec_mul_epilogue);
+
+    if ((done = kryptos_mp_eq(d, _0)) != 0) {
+        kryptos_ec_set_point(r, _0, _0);
+        goto kryptos_ec_mul_epilogue;
+    }
+
+    kryptos_assign_mp_value(&q.x, p->x);
+    kryptos_assign_mp_value(&q.y, p->y);
+
+#define kryptos_ec_mul_step(r, t, q, d, w, bit, curve) {\
+    if ((w) == 0 && (bit) == 0) {\
+        continue;\
+    }\
+    kryptos_ec_dbl(&(t), &(q), (curve));\
+    KRYPTOS_EC_UTILS_DO_OR_DIE((t), kryptos_ec_mul_epilogue);\
+    KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(q).x, (t)->x), kryptos_ec_mul_epilogue);\
+    KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(q).y, (t)->y), kryptos_ec_mul_epilogue);\
+    kryptos_ec_del_point((t));\
+    (t) = NULL;\
+    if (( ((d)->data[w] & (1 << (bit))) >> (bit) )) {\
+        kryptos_ec_add(&(t), &(q), *(r), (curve));\
+        KRYPTOS_EC_UTILS_DO_OR_DIE(t, kryptos_ec_mul_epilogue);\
+        KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(*(r))->x, (t)->x), kryptos_ec_mul_epilogue);\
+        KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(*(r))->y, (t)->y), kryptos_ec_mul_epilogue);\
+        kryptos_ec_del_point((t));\
+        (t) = NULL;\
+    }\
+}
+
+    if (!(d->data[0] & 0x1)) {
+        kryptos_ec_set_point(r, _0, _0);
+    } else {
+        kryptos_ec_set_point(r, p->x, p->y);
+    }
+
+    for (w = d->data_size - 1; w >= 0; w--) {
+#ifdef KRYPTOS_MP_U32_DIGIT
+        kryptos_ec_mul_step(r, t, q, d, w, 31, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 30, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 29, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 28, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 27, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 26, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 25, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 24, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 23, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 22, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 21, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 20, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 19, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 18, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 17, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 16, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 15, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 14, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 13, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 12, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 11, curve);
+        kryptos_ec_mul_step(r, t, q, d, w, 10, curve);
+        kryptos_ec_mul_step(r, t, q, d, w,  9, curve);
+        kryptos_ec_mul_step(r, t, q, d, w,  8, curve);
+#endif
+        kryptos_ec_mul_step(r, t, q, d, w,  7, curve);
+        kryptos_ec_mul_step(r, t, q, d, w,  6, curve);
+        kryptos_ec_mul_step(r, t, q, d, w,  5, curve);
+        kryptos_ec_mul_step(r, t, q, d, w,  4, curve);
+        kryptos_ec_mul_step(r, t, q, d, w,  3, curve);
+        kryptos_ec_mul_step(r, t, q, d, w,  2, curve);
+        kryptos_ec_mul_step(r, t, q, d, w,  1, curve);
+        kryptos_ec_mul_step(r, t, q, d, w,  0, curve);
+    }
+
+#undef kryptos_ec_mul_step
+
+    done = 1;
+
+kryptos_ec_mul_epilogue:
+
+    if (_0 != NULL) {
+        kryptos_del_mp_value(_0);
+    }
+
+    if (t != NULL) {
+        kryptos_ec_del_point(t);
+    }
+
+    if (q.x != NULL) {
+        kryptos_del_mp_value(q.x);
+    }
+
+    if (q.y != NULL) {
+        kryptos_del_mp_value(q.y);
+    }
+
+    if (!done) {
+        kryptos_ec_del_point(*r);
+    }
 }
 
 #undef kryptos_ec_new_point
