@@ -16,6 +16,7 @@
 #include "mp_tests.h"
 #include "asymmetric_ciphers_tests.h"
 #include "bad_buf_tests.h"
+#include "ecc_tests.h"
 
 CUTE_TEST_CASE(kryptos_test_monkey)
     // CLUE(Rafael): Before adding a new test try to find out the best place that it fits.
@@ -267,6 +268,11 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     //               to test it later than other encoding stuff.
 
     CUTE_RUN_TEST(kryptos_pem_get_mp_data_tests);
+
+    // INFO(Rafael): Elliptic curve base functions.
+
+    CUTE_RUN_TEST(kryptos_ec_set_point_tests);
+    CUTE_RUN_TEST(kryptos_ec_set_curve_tests);
 
     // INFO(Rafael): Asymmetric stuff
 
