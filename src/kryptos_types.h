@@ -274,6 +274,14 @@ typedef struct kryptos_mp_value {
     kryptos_mp_digit_t *data;
 }kryptos_mp_value_t;
 
+typedef struct kryptos_ec {
+    kryptos_mp_value_t *a, *b, *p;
+}kryptos_ec_t;
+
+typedef struct kryptos_ec_pt {
+    kryptos_mp_value_t *x, *y;
+}kryptos_ec_pt_t;
+
 #ifndef __cplusplus
 #define KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(cipher_name)\
 void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
