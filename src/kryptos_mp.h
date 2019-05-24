@@ -82,6 +82,14 @@ kryptos_mp_value_t *kryptos_mp_mul_digit(kryptos_mp_value_t **x, const kryptos_m
 
 kryptos_mp_value_t *kryptos_raw_buffer_as_mp(const kryptos_u8_t *buf, const size_t buf_size);
 
+int kryptos_mp_mod(kryptos_mp_value_t **dest, kryptos_mp_value_t *src);
+
+kryptos_mp_value_t *kryptos_mp_add_s(kryptos_mp_value_t **dest, kryptos_mp_value_t *src);
+
+kryptos_mp_value_t *kryptos_mp_sub_s(kryptos_mp_value_t **dest, kryptos_mp_value_t *src);
+
+kryptos_mp_value_t *kryptos_mp_mul_s(kryptos_mp_value_t **dest, kryptos_mp_value_t *src);
+
 #ifdef __cplusplus
 }
 #endif

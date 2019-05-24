@@ -14,4 +14,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_ec_set_point_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_ec_set_curve_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_ec_add_tests);
+
 #endif

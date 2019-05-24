@@ -1975,6 +1975,321 @@ kryptos_mp_div_epilogue:
 
 #endif
 
+int kryptos_mp_mod(kryptos_mp_value_t **dest, kryptos_mp_value_t *src) {
+    // INFO(Rafael): This function does not take into consideration signal.
+    kryptos_mp_value_t *dest_copy = NULL, *temp = NULL, *q = NULL;
+    int done = 0;
+    if (dest == NULL || src == NULL) {
+        return 0;
+    }
+
+    if (kryptos_assign_mp_value(&dest_copy, *dest) == NULL) {
+        return 0;
+    }
+
+    kryptos_del_mp_value(*dest);
+    *dest = NULL;
+
+    if (kryptos_mp_is_neg(dest_copy)) {
+        KRYPTOS_MP_ABORT_WHEN_NULL(temp = kryptos_hex_value_as_mp("01", 2), kryptos_mp_mod_epilogue);
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_not(dest_copy), kryptos_mp_mod_epilogue);
+        // INFO(Rafael): Because here we are actually inverting instead of only getting its complement.
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&dest_copy, temp), kryptos_mp_mod_epilogue);
+        kryptos_del_mp_value(temp);
+        temp = NULL;
+        if (kryptos_mp_le(dest_copy, src)) {
+            temp = dest_copy;
+            dest_copy = NULL;
+            KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&dest_copy, src), kryptos_mp_mod_epilogue);
+            KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub(&dest_copy, temp), kryptos_mp_mod_epilogue);
+            *dest = dest_copy;
+            dest_copy = NULL;
+            done = 1;
+            goto kryptos_mp_mod_epilogue;
+        }
+    }
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(q = kryptos_mp_div(dest_copy, src, dest), kryptos_mp_mod_epilogue);
+    kryptos_del_mp_value(q);
+    q = NULL;
+
+    done = 1;
+
+kryptos_mp_mod_epilogue:
+
+    if (temp != NULL) {
+        kryptos_del_mp_value(temp);
+    }
+
+    if (q != NULL) {
+        kryptos_del_mp_value(q);
+    }
+
+    if (dest_copy != NULL) {
+        kryptos_del_mp_value(dest_copy);
+    }
+
+    return done;
+}
+
+kryptos_mp_value_t *kryptos_mp_inv(kryptos_mp_value_t **dest) {
+    kryptos_mp_value_t *_1 = NULL;
+
+    if ((_1 = kryptos_hex_value_as_mp("01", 2)) == NULL) {
+        return NULL;
+    }
+
+    kryptos_mp_not(*dest);
+    kryptos_mp_add(dest, _1);
+    kryptos_del_mp_value(_1);
+
+    return *dest;
+}
+
+kryptos_mp_value_t *kryptos_mp_add_s(kryptos_mp_value_t **dest, kryptos_mp_value_t *src) {
+    // INFO(Rafael): This function takes into consideration signal when adding ("_s"...).
+    kryptos_mp_value_t *dc = NULL, *sc = NULL, *result = NULL;
+    int dc_neg, sc_neg, dc_is_greater;
+    kryptos_mp_value_t *(*kmp_op)(kryptos_mp_value_t **, const kryptos_mp_value_t *) = NULL;
+
+    if (dest == NULL || src == NULL) {
+        return NULL;
+    }
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&dc, *dest), kryptos_mp_add_s_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&sc, src), kryptos_mp_add_s_epilogue);
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(result = kryptos_hex_value_as_mp("00", 2), kryptos_mp_add_s_epilogue);
+
+    dc_neg = kryptos_mp_eq(dc, result);
+    sc_neg = kryptos_mp_eq(sc, result);
+
+    if (sc_neg || dc_neg) { // INFO(Rafael): At least one of them is zero.
+        if (sc_neg && dc_neg) {
+            kryptos_del_mp_value(*dest);
+            *dest = result;
+            goto kryptos_mp_add_s_epilogue;
+        } else {
+            kryptos_del_mp_value(result);
+            kryptos_del_mp_value(*dest);
+            if (sc_neg) {
+                *dest = result = dc;
+                dc = NULL;
+                goto kryptos_mp_add_s_epilogue;
+            } else if (dc_neg) {
+                *dest = result = sc;
+                sc = NULL;
+                goto kryptos_mp_add_s_epilogue;
+            }
+        }
+    }
+
+    kryptos_del_mp_value(result);
+    result = NULL;
+
+    if ((dc_neg = kryptos_mp_is_neg(dc))) {
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_inv(&dc), kryptos_mp_add_s_epilogue);
+    }
+
+    if ((sc_neg = kryptos_mp_is_neg(sc))) {
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_inv(&sc), kryptos_mp_add_s_epilogue);
+    }
+
+    if (dc_neg ^ sc_neg) {
+        kmp_op = kryptos_mp_sub;
+    } else {
+        kmp_op = kryptos_mp_add;
+    }
+
+    if (kmp_op == kryptos_mp_sub && !(dc_is_greater = kryptos_mp_gt(dc, sc))) {
+        result = dc;
+        dc = sc;
+        sc = result;
+        result = NULL;
+        //t = dc_neg;
+        dc_neg = sc_neg;
+        //sc_neg = t;
+        dc_is_greater = kryptos_mp_gt(dc, sc);
+    }
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(kmp_op(&dc, sc), kryptos_mp_add_s_epilogue);
+
+    if (dc_neg && dc_is_greater) {
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_inv(&dc), kryptos_mp_add_s_epilogue);
+    }
+
+    kryptos_del_mp_value(*dest);
+    *dest = result = dc;
+    dc = NULL;
+
+kryptos_mp_add_s_epilogue:
+
+    if (sc != NULL) {
+        kryptos_del_mp_value(sc);
+    }
+
+    if (dc != NULL) {
+        kryptos_del_mp_value(dc);
+    }
+
+    return result;
+}
+
+kryptos_mp_value_t *kryptos_mp_sub_s(kryptos_mp_value_t **dest, kryptos_mp_value_t *src) {
+    kryptos_mp_value_t *dc = NULL, *sc = NULL, *result = NULL;
+    int dc_neg, sc_neg, do_inv;
+    kryptos_mp_value_t *(*kmp_op)(kryptos_mp_value_t **, const kryptos_mp_value_t *) = NULL;
+
+    if (dest == NULL || src == NULL) {
+        return NULL;
+    }
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&dc, *dest), kryptos_mp_sub_s_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&sc, src), kryptos_mp_sub_s_epilogue);
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(result = kryptos_hex_value_as_mp("00", 2), kryptos_mp_sub_s_epilogue);
+
+    sc_neg = kryptos_mp_eq(sc, result);
+    dc_neg = kryptos_mp_eq(dc, result);
+
+    if (sc_neg || dc_neg) { // INFO(Rafael): We got at least one zero.
+        kryptos_del_mp_value(result);
+        result = NULL;
+        if (dc_neg && !sc_neg) {
+            kryptos_del_mp_value(dc);
+            dc = NULL;
+            KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&dc, sc), kryptos_mp_sub_s_epilogue);
+            KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_inv(&dc), kryptos_mp_sub_s_epilogue);
+            kryptos_del_mp_value(*dest);
+            *dest = result = dc;
+            dc = NULL;
+            goto kryptos_mp_sub_s_epilogue;
+        } else if (!dc_neg && sc_neg) {
+            result = *dest;
+            goto kryptos_mp_sub_s_epilogue;
+        } else if (dc_neg && sc_neg) {
+            kryptos_del_mp_value(dc);
+            dc = NULL;
+            KRYPTOS_MP_ABORT_WHEN_NULL(dc = kryptos_hex_value_as_mp("00", 2), kryptos_mp_sub_s_epilogue);
+            kryptos_del_mp_value(*dest);
+            *dest = result = dc;
+            dc = NULL;
+            goto kryptos_mp_sub_s_epilogue;
+        }
+    }
+
+    kryptos_del_mp_value(result);
+    result = NULL;
+
+    if ((dc_neg = kryptos_mp_is_neg(dc))) {
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_inv(&dc), kryptos_mp_sub_s_epilogue);
+    }
+
+    if ((sc_neg = kryptos_mp_is_neg(sc))) {
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_inv(&sc), kryptos_mp_sub_s_epilogue);
+    }
+
+    if (dc_neg == sc_neg && kryptos_mp_eq(dc, sc)) {
+        kryptos_del_mp_value(*dest);
+        KRYPTOS_MP_ABORT_WHEN_NULL(*dest = kryptos_hex_value_as_mp("00", 2), kryptos_mp_sub_s_epilogue);
+        result = *dest;
+        goto kryptos_mp_sub_s_epilogue;
+    }
+
+    if (dc_neg ^ sc_neg) {
+        kmp_op = kryptos_mp_add;
+    } else {
+        kmp_op = kryptos_mp_sub;
+    }
+
+    if (sc_neg && kmp_op == kryptos_mp_sub) {
+        sc_neg = 0;
+    } else if (!sc_neg && kmp_op == kryptos_mp_sub) {
+        sc_neg = 1;
+    }
+
+    // INFO(Rafael): Basic inversion rules.
+
+    do_inv = (kryptos_mp_ge(dc, sc) && dc_neg &&  sc_neg) ||
+             (kryptos_mp_ge(dc, sc) && dc_neg && !sc_neg) ||
+             (kryptos_mp_ge(sc, dc) && dc_neg && !sc_neg);
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(kmp_op(&dc, sc), kryptos_mp_sub_s_epilogue);
+
+    if (do_inv) {
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_inv(&dc), kryptos_mp_sub_s_epilogue);
+    }
+
+    kryptos_del_mp_value(*dest);
+    *dest = result = dc;
+    dc = NULL;
+
+kryptos_mp_sub_s_epilogue:
+
+    if (sc != NULL) {
+        kryptos_del_mp_value(sc);
+    }
+
+    if (dc != NULL) {
+        kryptos_del_mp_value(dc);
+    }
+
+    return result;
+}
+
+kryptos_mp_value_t *kryptos_mp_mul_s(kryptos_mp_value_t **dest, kryptos_mp_value_t *src) {
+    kryptos_mp_value_t *dc = NULL, *sc = NULL, *result = NULL;
+    int dc_neg, sc_neg;
+
+    if (dest == NULL || src == NULL) {
+        return NULL;
+    }
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&dc, *dest), kryptos_mp_mul_s_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&sc, src), kryptos_mp_mul_s_epilogue);
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(result = kryptos_hex_value_as_mp("00", 2), kryptos_mp_mul_s_epilogue);
+
+    if (kryptos_mp_eq(src, result) || kryptos_mp_eq(*dest, result)) {
+        kryptos_del_mp_value(*dest);
+        *dest = result;
+        goto kryptos_mp_mul_s_epilogue;
+    }
+
+    kryptos_del_mp_value(result);
+    result = NULL;
+
+    if ((dc_neg = kryptos_mp_is_neg(dc))) {
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_inv(&dc), kryptos_mp_mul_s_epilogue);
+    }
+
+    if ((sc_neg = kryptos_mp_is_neg(sc))) {
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_inv(&sc), kryptos_mp_mul_s_epilogue);
+    }
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_mul(&dc, sc), kryptos_mp_mul_s_epilogue);
+
+    if (dc_neg != sc_neg) {
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_inv(&dc), kryptos_mp_mul_s_epilogue);
+    }
+
+    kryptos_del_mp_value(*dest);
+    *dest = result = dc;
+    dc = NULL;
+
+kryptos_mp_mul_s_epilogue:
+
+    if (dc != NULL) {
+        kryptos_del_mp_value(dc);
+    }
+
+    if (sc != NULL) {
+        kryptos_del_mp_value(sc);
+    }
+
+    return result;
+}
+
 kryptos_mp_value_t *kryptos_mp_div_2p(const kryptos_mp_value_t *x, const kryptos_u32_t power, kryptos_mp_value_t **r) {
     kryptos_mp_value_t *q = NULL;
     kryptos_mp_value_t *p = NULL, *tr = NULL;
@@ -3386,7 +3701,7 @@ kryptos_mp_value_t *kryptos_mp_signed_sub(kryptos_mp_value_t **dest, const krypt
 //        }
     }
 
-kryptos_mp_signed_sub_epilogue:
+//kryptos_mp_signed_sub_epilogue:
 
     if (d != NULL) {
         if (src->data_size > (*dest)->data_size) {
@@ -3461,7 +3776,7 @@ kryptos_mp_value_t *kryptos_mp_signed_add(kryptos_mp_value_t **dest, const krypt
 //        }
     }
 
-kryptos_mp_signed_add_epilogue:
+//kryptos_mp_signed_add_epilogue:
 
     if (d != NULL) {
         if (src->data_size > (*dest)->data_size) {
@@ -3524,8 +3839,8 @@ kryptos_mp_signed_mul_epilogue:
     }
 
     return (*dest);
-}*/
-
+}
+*/
 static int kryptos_mp_gen_prime_small_primes_test(const kryptos_mp_value_t *n, kryptos_mp_value_t **prime) {
     size_t sp;
     kryptos_mp_value_t *p = NULL, *q = NULL, *r = NULL, *_0 = NULL;

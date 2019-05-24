@@ -2389,3 +2389,171 @@ CUTE_TEST_CASE(kryptos_mp_as_task_out_tests)
 kryptos_mp_as_raw_buffer_tests_epilogue:
     exit(1);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_mod_tests)
+    struct test_ctx {
+        kryptos_u8_t *a;
+        size_t a_size;
+        kryptos_u8_t *b;
+        size_t b_size;
+        kryptos_u8_t *e;
+        size_t e_size;
+    };
+    struct test_ctx test_vector[] = {
+        { "FFFFFFF2", 8, "11", 2, "03", 2 },
+        {       "0E", 2, "11", 2, "0E", 2 },
+        {     "9C40", 4, "11", 2, "10", 2 }
+    };
+    size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+    kryptos_mp_value_t *a_value, *b_value, *e_value;
+
+    for (t = 0; t < tv_nr; t++) {
+        a_value = kryptos_hex_value_as_mp(test_vector[t].a, test_vector[t].a_size);
+        CUTE_ASSERT(a_value != NULL);
+        b_value = kryptos_hex_value_as_mp(test_vector[t].b, test_vector[t].b_size);
+        CUTE_ASSERT(b_value != NULL);
+        e_value = kryptos_hex_value_as_mp(test_vector[t].e, test_vector[t].e_size);
+        CUTE_ASSERT(e_value != NULL);
+        CUTE_ASSERT(kryptos_mp_mod(&a_value, b_value) == 1);
+        CUTE_ASSERT(a_value != NULL);
+        CUTE_ASSERT(kryptos_mp_eq(a_value, e_value) == 1);
+        kryptos_del_mp_value(a_value);
+        kryptos_del_mp_value(b_value);
+        kryptos_del_mp_value(e_value);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_add_s_tests)
+    struct test_ctx {
+        kryptos_u8_t *a;
+        size_t a_size;
+        kryptos_u8_t *b;
+        size_t b_size;
+        kryptos_u8_t *e;
+        size_t e_size;
+    };
+    struct test_ctx test_vector[] = {
+        { "FFFFFFF2", 8,       "11", 2,       "03", 2 },
+        {       "0E", 2,       "11", 2,       "1F", 2 },
+        {     "9C40", 4,       "11", 2,     "9C51", 4 },
+        { "FFFFFFF2", 8, "FFFFFFEF", 8, "FFFFFFE1", 8 },
+        { "FFFFFFEF", 8,       "0E", 2, "FFFFFFFD", 8 },
+        { "FFFFFFEF", 8, "FFFFFFF2", 8, "FFFFFFE1", 8 },
+        {       "0E", 2, "FFFFFFEF", 8, "FFFFFFFD", 8 },
+        { "FFFFFFEF", 8,       "11", 2,       "00", 2 },
+        {       "00", 2,       "00", 2,       "00", 2 }
+    };
+    size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+    kryptos_mp_value_t *a_value, *b_value, *e_value;
+
+    for (t = 0; t < tv_nr; t++) {
+        a_value = kryptos_hex_value_as_mp(test_vector[t].a, test_vector[t].a_size);
+        CUTE_ASSERT(a_value != NULL);
+        b_value = kryptos_hex_value_as_mp(test_vector[t].b, test_vector[t].b_size);
+        CUTE_ASSERT(b_value != NULL);
+        e_value = kryptos_hex_value_as_mp(test_vector[t].e, test_vector[t].e_size);
+        CUTE_ASSERT(e_value != NULL);
+        //printf("A = "); kryptos_print_mp(a_value); printf("\n");
+        CUTE_ASSERT(kryptos_mp_add_s(&a_value, b_value) != NULL);
+        //printf("B = "); kryptos_print_mp(b_value); printf("\n");
+        //printf("R = "); kryptos_print_mp(a_value); printf("\n");
+        //printf("E = "); kryptos_print_mp(e_value); printf("\n");
+        CUTE_ASSERT(a_value != NULL);
+        CUTE_ASSERT(kryptos_mp_eq(a_value, e_value) == 1);
+        kryptos_del_mp_value(a_value);
+        kryptos_del_mp_value(b_value);
+        kryptos_del_mp_value(e_value);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_sub_s_tests)
+    struct test_ctx {
+        kryptos_u8_t *a;
+        size_t a_size;
+        kryptos_u8_t *b;
+        size_t b_size;
+        kryptos_u8_t *e;
+        size_t e_size;
+    };
+    struct test_ctx test_vector[] = {
+        { "FFFFFFF2", 8,       "11", 2, "FFFFFFE1", 8 },
+        {       "0E", 2,       "11", 2, "FFFFFFFD", 8 },
+        {     "9C40", 4,       "11", 2,     "9C2F", 4 },
+        { "FFFFFFF2", 8, "FFFFFFEF", 8,       "03", 2 },
+        { "FFFFFFEF", 8,       "0E", 2, "FFFFFFE1", 8 },
+        { "FFFFFFEF", 8, "FFFFFFF2", 8, "FFFFFFFD", 8 },
+        {       "0E", 2, "FFFFFFEF", 8,       "1F", 2 },
+        { "FFFFFFEF", 8,       "11", 2, "FFFFFFDE", 8 },
+        { "FFFFFFEF", 8, "FFFFFFEF", 8,       "00", 2 },
+        { "FFFFFFEF", 8,       "00", 2, "FFFFFFEF", 8 },
+        {       "00", 2, "FFFFFFEF", 8,       "11", 2 },
+        {       "00", 2,       "11", 2, "FFFFFFEF", 8 },
+        {       "00", 2,       "00", 2,       "00", 2 }
+    };
+    size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+    kryptos_mp_value_t *a_value, *b_value, *e_value;
+
+    for (t = 0; t < tv_nr; t++) {
+        a_value = kryptos_hex_value_as_mp(test_vector[t].a, test_vector[t].a_size);
+        CUTE_ASSERT(a_value != NULL);
+        b_value = kryptos_hex_value_as_mp(test_vector[t].b, test_vector[t].b_size);
+        CUTE_ASSERT(b_value != NULL);
+        e_value = kryptos_hex_value_as_mp(test_vector[t].e, test_vector[t].e_size);
+        CUTE_ASSERT(e_value != NULL);
+        //printf("A = "); kryptos_print_mp(a_value); printf("\n");
+        CUTE_ASSERT(kryptos_mp_sub_s(&a_value, b_value) != NULL);
+        //printf("B = "); kryptos_print_mp(b_value); printf("\n");
+        //printf("R = "); kryptos_print_mp(a_value); printf("\n");
+        //printf("E = "); kryptos_print_mp(e_value); printf("\n");
+        CUTE_ASSERT(a_value != NULL);
+        CUTE_ASSERT(kryptos_mp_eq(a_value, e_value) == 1);
+        kryptos_del_mp_value(a_value);
+        kryptos_del_mp_value(b_value);
+        kryptos_del_mp_value(e_value);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_mul_s_tests)
+    struct test_ctx {
+        kryptos_u8_t *a;
+        size_t a_size;
+        kryptos_u8_t *b;
+        size_t b_size;
+        kryptos_u8_t *e;
+        size_t e_size;
+    };
+    struct test_ctx test_vector[] = {
+        { "FFFFFFF2", 8,       "11", 2, "FFFFFF12", 8 },
+        {       "0E", 2,       "11", 2,       "EE", 2 },
+        {     "9C40", 4,       "11", 2,    "A6040", 5 },
+        { "FFFFFFF2", 8, "FFFFFFEF", 8,       "EE", 2 },
+        { "FFFFFFEF", 8,       "0E", 2, "FFFFFF12", 8 },
+        { "FFFFFFEF", 8, "FFFFFFF2", 8,       "EE", 2 },
+        {       "0E", 2, "FFFFFFEF", 8, "FFFFFF12", 8 },
+        { "FFFFFFEF", 8,       "11", 2, "FFFFFEDF", 8 },
+        { "FFFFFFEF", 8, "FFFFFFEF", 8,      "121", 3 },
+        { "FFFFFFEF", 8,       "00", 2,       "00", 2 },
+        {       "00", 2, "FFFFFFEF", 8,       "00", 2 }
+    };
+    size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+    kryptos_mp_value_t *a_value, *b_value, *e_value;
+
+    for (t = 0; t < tv_nr; t++) {
+        a_value = kryptos_hex_value_as_mp(test_vector[t].a, test_vector[t].a_size);
+        CUTE_ASSERT(a_value != NULL);
+        b_value = kryptos_hex_value_as_mp(test_vector[t].b, test_vector[t].b_size);
+        CUTE_ASSERT(b_value != NULL);
+        e_value = kryptos_hex_value_as_mp(test_vector[t].e, test_vector[t].e_size);
+        CUTE_ASSERT(e_value != NULL);
+        //printf("A = "); kryptos_print_mp(a_value); printf("\n");
+        CUTE_ASSERT(kryptos_mp_mul_s(&a_value, b_value) != NULL);
+        //printf("B = "); kryptos_print_mp(b_value); printf("\n");
+        //printf("R = "); kryptos_print_mp(a_value); printf("\n");
+        //printf("E = "); kryptos_print_mp(e_value); printf("\n");
+        CUTE_ASSERT(a_value != NULL);
+        CUTE_ASSERT(kryptos_mp_eq(a_value, e_value) == 1);
+        kryptos_del_mp_value(a_value);
+        kryptos_del_mp_value(b_value);
+        kryptos_del_mp_value(e_value);
+    }
+CUTE_TEST_CASE_END
