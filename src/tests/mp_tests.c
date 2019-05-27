@@ -2400,9 +2400,14 @@ CUTE_TEST_CASE(kryptos_mp_mod_tests)
         size_t e_size;
     };
     struct test_ctx test_vector[] = {
-        { "FFFFFFF2", 8, "11", 2, "03", 2 },
-        {       "0E", 2, "11", 2, "0E", 2 },
-        {     "9C40", 4, "11", 2, "10", 2 }
+        { "FFFFFFF2", 8,  "11", 2,  "03", 2 },
+        {       "0E", 2,  "11", 2,  "0E", 2 },
+        {     "9C40", 4,  "11", 2,  "10", 2 },
+        { "FFFFFFEE", 8,  "11", 2,  "10", 2 },
+        { "FFFFFFE5", 8,  "0D", 2,  "0C", 2 },
+        { "FFFFFFEE", 8, "3E8", 3, "3D6", 3 },
+        { "FFFFFFFE", 8,  "02", 2,  "00", 2 },
+        {       "12", 2,  "11", 2,  "01", 2 }
     };
     size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
     kryptos_mp_value_t *a_value, *b_value, *e_value;

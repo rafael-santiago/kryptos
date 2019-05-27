@@ -263,10 +263,10 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_modinv_tests);
     CUTE_RUN_TEST(kryptos_raw_buffer_as_mp_tests);
     CUTE_RUN_TEST(kryptos_mp_as_task_out_tests);
-    CUTE_RUN_TEST(kryptos_mp_mod_tests);
     CUTE_RUN_TEST(kryptos_mp_add_s_tests);
     CUTE_RUN_TEST(kryptos_mp_sub_s_tests);
     CUTE_RUN_TEST(kryptos_mp_mul_s_tests);
+    CUTE_RUN_TEST(kryptos_mp_mod_tests);
 
     // INFO(Rafael): This encoding function depends on multiprecision stuff, this is because we need
     //               to test it later than other encoding stuff.

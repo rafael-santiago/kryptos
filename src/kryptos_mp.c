@@ -1979,6 +1979,7 @@ int kryptos_mp_mod(kryptos_mp_value_t **dest, kryptos_mp_value_t *src) {
     // INFO(Rafael): This function does not take into consideration signal.
     kryptos_mp_value_t *dest_copy = NULL, *temp = NULL, *q = NULL;
     int done = 0;
+
     if (dest == NULL || src == NULL) {
         return 0;
     }
@@ -1991,22 +1992,15 @@ int kryptos_mp_mod(kryptos_mp_value_t **dest, kryptos_mp_value_t *src) {
     *dest = NULL;
 
     if (kryptos_mp_is_neg(dest_copy)) {
-        KRYPTOS_MP_ABORT_WHEN_NULL(temp = kryptos_hex_value_as_mp("01", 2), kryptos_mp_mod_epilogue);
-        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_not(dest_copy), kryptos_mp_mod_epilogue);
-        // INFO(Rafael): Because here we are actually inverting instead of only getting its complement.
-        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&dest_copy, temp), kryptos_mp_mod_epilogue);
-        kryptos_del_mp_value(temp);
-        temp = NULL;
-        if (kryptos_mp_le(dest_copy, src)) {
-            temp = dest_copy;
-            dest_copy = NULL;
-            KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&dest_copy, src), kryptos_mp_mod_epilogue);
-            KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub(&dest_copy, temp), kryptos_mp_mod_epilogue);
-            *dest = dest_copy;
-            dest_copy = NULL;
-            done = 1;
-            goto kryptos_mp_mod_epilogue;
-        }
+        do {
+            KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add_s(&dest_copy, src), kryptos_mp_mod_epilogue);
+        } while (kryptos_mp_is_neg(dest_copy));
+
+        *dest = dest_copy;
+        dest_copy = NULL;
+        done = 1;
+
+        goto kryptos_mp_mod_epilogue;
     }
 
     KRYPTOS_MP_ABORT_WHEN_NULL(q = kryptos_mp_div(dest_copy, src, dest), kryptos_mp_mod_epilogue);
