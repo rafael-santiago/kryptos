@@ -46,75 +46,161 @@ CUTE_TEST_CASE(kryptos_ec_set_curve_tests)
     kryptos_ec_del_curve(ec); // INFO(Rafael): In case of any memory leak, the memory leak check system will warn us.
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_ec_dbl_tests)
+    struct test_ctx {
+        kryptos_u8_t *a;
+        size_t a_size;
+        kryptos_u8_t *b;
+        size_t b_size;
+        kryptos_u8_t *p;
+        size_t p_size;
+        kryptos_u8_t *x;
+        size_t x_size;
+        kryptos_u8_t *y;
+        size_t y_size;
+        kryptos_u8_t *ex;
+        size_t ex_size;
+        kryptos_u8_t *ey;
+        size_t ey_size;
+    };
+    struct test_ctx test_vector[] = {
+        { "02", 2, "02", 2, "11", 2, "05", 2, "01", 2, "06", 2, "03", 2 }
+    };
+    size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+    kryptos_ec_pt_t *P = NULL, *R = NULL;
+    kryptos_ec_t *EC = NULL;
+    kryptos_mp_value_t *p = NULL, *a = NULL, *b = NULL, *x = NULL, *y = NULL, *ex = NULL, *ey = NULL;
+
+    for (t = 0; t < tv_nr; t++) {
+        a = kryptos_hex_value_as_mp(test_vector[t].a, test_vector[t].a_size);
+        CUTE_ASSERT(a != NULL);
+
+        b = kryptos_hex_value_as_mp(test_vector[t].b, test_vector[t].b_size);
+        CUTE_ASSERT(b != NULL);
+
+        p = kryptos_hex_value_as_mp(test_vector[t].p, test_vector[t].p_size);
+        CUTE_ASSERT(p != NULL);
+
+        x = kryptos_hex_value_as_mp(test_vector[t].x, test_vector[t].x_size);
+        CUTE_ASSERT(x != NULL);
+
+        y = kryptos_hex_value_as_mp(test_vector[t].y, test_vector[t].y_size);
+        CUTE_ASSERT(y != NULL);
+
+        ex = kryptos_hex_value_as_mp(test_vector[t].ex, test_vector[t].ex_size);
+        CUTE_ASSERT(ex != NULL);
+
+        ey = kryptos_hex_value_as_mp(test_vector[t].ey, test_vector[t].ey_size);
+        CUTE_ASSERT(ey != NULL);
+
+        CUTE_ASSERT(kryptos_ec_set_curve(&EC, a, b, p) == 1);
+
+        CUTE_ASSERT(kryptos_ec_set_point(&P, x, y) == 1);
+
+        kryptos_ec_dbl(&R, P, EC);
+
+        CUTE_ASSERT(R != NULL);
+
+        CUTE_ASSERT(kryptos_mp_eq(R->x, ex) == 1);
+        CUTE_ASSERT(kryptos_mp_eq(R->y, ey) == 1);
+
+        kryptos_ec_del_curve(EC);
+        kryptos_ec_del_point(P);
+        kryptos_ec_del_point(R);
+
+        kryptos_del_mp_value(a);
+        kryptos_del_mp_value(b);
+        kryptos_del_mp_value(p);
+        kryptos_del_mp_value(x);
+        kryptos_del_mp_value(y);
+        kryptos_del_mp_value(ex);
+        kryptos_del_mp_value(ey);
+    }
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_ec_add_tests)
+    struct test_ctx {
+        kryptos_u8_t *a;
+        size_t a_size;
+        kryptos_u8_t *b;
+        size_t b_size;
+        kryptos_u8_t *p;
+        size_t p_size;
+        kryptos_u8_t *x1;
+        size_t x1_size;
+        kryptos_u8_t *y1;
+        size_t y1_size;
+        kryptos_u8_t *x2;
+        size_t x2_size;
+        kryptos_u8_t *y2;
+        size_t y2_size;
+        kryptos_u8_t *ex;
+        size_t ex_size;
+        kryptos_u8_t *ey;
+        size_t ey_size;
+    };
+    struct test_ctx test_vector[] = {
+        { "02", 2, "02", 2, "11", 2, "05", 2, "01", 2, "05", 2, "01", 2, "06", 2, "03", 2 }
+    };
+    size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
     kryptos_ec_pt_t *P = NULL, *Q = NULL, *R = NULL;
     kryptos_ec_t *EC = NULL;
-    kryptos_mp_value_t *p = NULL, *_5 = NULL, *_1 = NULL, *_6 = NULL, *_3 = NULL, *_2 = NULL;
-    kryptos_mp_value_t *a = NULL, *b = NULL, *r = NULL, *q = NULL;
+    kryptos_mp_value_t *p = NULL, *a = NULL, *b = NULL, *x1 = NULL, *y1 = NULL, *x2 = NULL, *y2 = NULL, *ex = NULL, *ey = NULL;
 
-    p = kryptos_hex_value_as_mp("11", 2);
-    CUTE_ASSERT(p != NULL);
+    for (t = 0; t < tv_nr; t++) {
+        a = kryptos_hex_value_as_mp(test_vector[t].a, test_vector[t].a_size);
+        CUTE_ASSERT(a != NULL);
 
-    _5 = kryptos_hex_value_as_mp("05", 2);
-    CUTE_ASSERT(_5 != NULL);
+        b = kryptos_hex_value_as_mp(test_vector[t].b, test_vector[t].b_size);
+        CUTE_ASSERT(b != NULL);
 
-    _1 = kryptos_hex_value_as_mp("01", 2);
-    CUTE_ASSERT(_1 != NULL);
+        p = kryptos_hex_value_as_mp(test_vector[t].p, test_vector[t].p_size);
+        CUTE_ASSERT(p != NULL);
 
-    _6 = kryptos_hex_value_as_mp("06", 2);
-    CUTE_ASSERT(_6 != NULL);
+        x1 = kryptos_hex_value_as_mp(test_vector[t].x1, test_vector[t].x1_size);
+        CUTE_ASSERT(x1 != NULL);
 
-    _3 = kryptos_hex_value_as_mp("03", 2);
-    CUTE_ASSERT(_3 != NULL);
+        y1 = kryptos_hex_value_as_mp(test_vector[t].y1, test_vector[t].y1_size);
+        CUTE_ASSERT(y1 != NULL);
 
-    _2 = kryptos_hex_value_as_mp("02", 2);
-    CUTE_ASSERT(_2 != NULL);
+        x2 = kryptos_hex_value_as_mp(test_vector[t].x2, test_vector[t].x2_size);
+        CUTE_ASSERT(x2 != NULL);
 
-    CUTE_ASSERT(kryptos_ec_set_point(&P, _5, _1) == 1);
-    CUTE_ASSERT(kryptos_ec_set_point(&Q, _5, _1) == 1);
-    CUTE_ASSERT(kryptos_ec_set_curve(&EC, _2, _2, p) == 1);
+        y2 = kryptos_hex_value_as_mp(test_vector[t].y2, test_vector[t].y2_size);
+        CUTE_ASSERT(y2 != NULL);
 
-    kryptos_ec_add(&R, P, Q, EC);
+        ex = kryptos_hex_value_as_mp(test_vector[t].ex, test_vector[t].ex_size);
+        CUTE_ASSERT(ex != NULL);
 
-    CUTE_ASSERT(R != NULL);
+        ey = kryptos_hex_value_as_mp(test_vector[t].ey, test_vector[t].ey_size);
+        CUTE_ASSERT(ey != NULL);
 
-    /*a = kryptos_hex_value_as_mp("FFFFFFF2", 8);
-    b = kryptos_hex_value_as_mp("11", 2);
-    q = kryptos_mp_div(a, b, &r);
-    printf("q = "); kryptos_print_mp(q); printf("\n");
-    printf("r = "); kryptos_print_mp(r); printf("\n");
-    printf("a = "); kryptos_print_mp(a); printf("\n");
-    kryptos_mp_not(a);
-    printf("a(inv) = "); kryptos_print_mp(a); printf("\n");
-    kryptos_mp_add(&a, _1);
-    kryptos_mp_sub(&b, a);
-    kryptos_mp_sub(&a, b);
-    //printf("r' = "); kryptos_print_mp(a); printf("\n");
-    printf("r' = "); kryptos_print_mp(b); printf("\n");
-    exit(1);*/
+        CUTE_ASSERT(kryptos_ec_set_curve(&EC, a, b, p) == 1);
 
-    printf("P.x = "); kryptos_print_mp(P->x); printf("\n");
-    printf("P.y = "); kryptos_print_mp(P->y); printf("\n");
+        CUTE_ASSERT(kryptos_ec_set_point(&P, x1, y1) == 1);
 
-    printf("Q.x = "); kryptos_print_mp(Q->x); printf("\n");
-    printf("Q.y = "); kryptos_print_mp(Q->y); printf("\n");
+        CUTE_ASSERT(kryptos_ec_set_point(&Q, x2, y2) == 1);
 
-    printf("R.X = "); kryptos_print_mp(R->x); printf("\n");
-    printf("R.Y = "); kryptos_print_mp(R->y); printf("\n");
+        kryptos_ec_add(&R, P, Q, EC);
 
-    CUTE_ASSERT(kryptos_mp_eq(R->x, _6) == 1);
-    CUTE_ASSERT(kryptos_mp_eq(R->y, _3) == 1);
+        CUTE_ASSERT(R != NULL);
 
-    kryptos_del_mp_value(_1);
-    kryptos_del_mp_value(_2);
-    kryptos_del_mp_value(_3);
-    kryptos_del_mp_value(_5);
-    kryptos_del_mp_value(_6);
-    kryptos_del_mp_value(p);
+        CUTE_ASSERT(kryptos_mp_eq(R->x, ex) == 1);
+        CUTE_ASSERT(kryptos_mp_eq(R->y, ey) == 1);
 
-    kryptos_ec_del_point(P);
-    kryptos_ec_del_point(Q);
-    kryptos_ec_del_point(R);
+        kryptos_ec_del_curve(EC);
+        kryptos_ec_del_point(P);
+        kryptos_ec_del_point(Q);
+        kryptos_ec_del_point(R);
 
-    kryptos_ec_del_curve(EC);
+        kryptos_del_mp_value(a);
+        kryptos_del_mp_value(b);
+        kryptos_del_mp_value(p);
+        kryptos_del_mp_value(x1);
+        kryptos_del_mp_value(y1);
+        kryptos_del_mp_value(x2);
+        kryptos_del_mp_value(y2);
+        kryptos_del_mp_value(ex);
+        kryptos_del_mp_value(ey);
+    }
 CUTE_TEST_CASE_END

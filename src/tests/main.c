@@ -277,6 +277,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     CUTE_RUN_TEST(kryptos_ec_set_point_tests);
     CUTE_RUN_TEST(kryptos_ec_set_curve_tests);
+    CUTE_RUN_TEST(kryptos_ec_add_tests);
+    CUTE_RUN_TEST(kryptos_ec_dbl_tests);
 
     // INFO(Rafael): Asymmetric stuff
 
