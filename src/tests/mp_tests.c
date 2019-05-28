@@ -867,6 +867,7 @@ CUTE_TEST_CASE(kryptos_mp_add_tests)
     }
 CUTE_TEST_CASE_END
 
+/*
 CUTE_TEST_CASE(kryptos_mp_bitcount_tests)
     struct bitcount_tests_ctx {
         kryptos_u8_t *n;
@@ -891,6 +892,7 @@ CUTE_TEST_CASE(kryptos_mp_bitcount_tests)
         kryptos_del_mp_value(n);
     }
 CUTE_TEST_CASE_END
+*/
 
 CUTE_TEST_CASE(kryptos_mp_sub_tests)
     kryptos_mp_value_t *a, *b, *e;

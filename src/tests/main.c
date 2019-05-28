@@ -238,7 +238,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_lt_tests);
     CUTE_RUN_TEST(kryptos_mp_le_tests);
     CUTE_RUN_TEST(kryptos_mp_is_neg_tests);
-    CUTE_RUN_TEST(kryptos_mp_bitcount_tests);
+    //CUTE_RUN_TEST(kryptos_mp_bitcount_tests);
     CUTE_RUN_TEST(kryptos_mp_add_tests);
     CUTE_RUN_TEST(kryptos_mp_sub_tests);
     CUTE_RUN_TEST(kryptos_mp_mul_tests);
@@ -281,7 +281,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_ec_set_curve_tests);
     CUTE_RUN_TEST(kryptos_ec_add_tests);
     CUTE_RUN_TEST(kryptos_ec_dbl_tests);
-    //CUTE_RUN_TEST(kryptos_ec_mul_tests);
+    CUTE_RUN_TEST(kryptos_ec_mul_tests);
 
     // INFO(Rafael): Asymmetric stuff
 

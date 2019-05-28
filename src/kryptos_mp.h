@@ -78,7 +78,7 @@ kryptos_mp_value_t *kryptos_mp_inv(kryptos_mp_value_t **dest);
 
 int kryptos_mp_bits_total_in_base2(kryptos_mp_value_t *value);
 
-ssize_t kryptos_mp_bitcount(const kryptos_mp_value_t *n);
+//ssize_t kryptos_mp_bitcount(const kryptos_mp_value_t *n);
 
 kryptos_mp_value_t *kryptos_mp_mul_digit(kryptos_mp_value_t **x, const kryptos_mp_digit_t digit);
 

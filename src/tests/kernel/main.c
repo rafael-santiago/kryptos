@@ -138,7 +138,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_mp_lt_tests);
     KUTE_RUN_TEST(kryptos_mp_le_tests);
     KUTE_RUN_TEST(kryptos_mp_is_neg_tests);
-    KUTE_RUN_TEST(kryptos_mp_bitcount_tests);
+    //KUTE_RUN_TEST(kryptos_mp_bitcount_tests);
     KUTE_RUN_TEST(kryptos_mp_add_tests);
     KUTE_RUN_TEST(kryptos_mp_sub_tests);
     KUTE_RUN_TEST(kryptos_mp_mul_tests);

@@ -607,6 +607,7 @@ kryptos_mp_add_epilogue:
     return (*dest);
 }
 
+/*
 ssize_t kryptos_mp_bitcount(const kryptos_mp_value_t *n) {
     ssize_t b, dn;
 
@@ -706,7 +707,7 @@ ssize_t kryptos_mp_bitcount(const kryptos_mp_value_t *n) {
 
     return b;
 }
-
+*/
 /*static kryptos_mp_value_t *kryptos_mp_multibyte_sub(const kryptos_mp_value_t *a, const kryptos_mp_value_t *b) {
     kryptos_mp_value_t *a4 = NULL, *b4 = NULL, *delta = NULL;
     kryptos_u64_t u64sub;

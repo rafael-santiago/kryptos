@@ -276,7 +276,7 @@ kryptos_ec_dbl_epilogue:
 void kryptos_ec_mul(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_mp_value_t *d, kryptos_ec_t *curve) {
     kryptos_ec_pt_t q = { NULL, NULL }, *t = NULL;
     kryptos_mp_value_t *_0 = NULL;
-    ssize_t w;
+    int w, bits_nr;
     int done = 0;
 
     *r = NULL;
@@ -291,90 +291,33 @@ void kryptos_ec_mul(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_mp_value_t 
     kryptos_assign_mp_value(&q.x, p->x);
     kryptos_assign_mp_value(&q.y, p->y);
 
-#define kryptos_ec_mul_step(r, t, q, d, w, bit, curve) {\
-    if ((w) == 0 && (bit) == 0) {\
-        continue;\
-    }\
+    if (!kryptos_mp_bit_n(d, 0)) {
+        kryptos_ec_set_point(r, _0, _0);
+    } else {
+        kryptos_ec_set_point(r, p->x, p->y);
+    }
+
+    bits_nr = kryptos_mp_bits_total_in_base2(d);
+
+#define kryptos_ec_mul_step(r, t, q, d, w, zero, curve) {\
     kryptos_ec_dbl(&(t), &(q), (curve));\
-    printf("[dbl] Q.x = ");\
-    kryptos_print_mp(q.x);\
-    printf(" Q.y = ");\
-    kryptos_print_mp(q.y);\
-    printf(" T.x = ");\
-    kryptos_print_mp(t->x);\
-    printf(" T.y = ");\
-    kryptos_print_mp(t->y);\
-    printf("\n");\
     KRYPTOS_EC_UTILS_DO_OR_DIE((t), kryptos_ec_mul_epilogue);\
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(q).x, (t)->x), kryptos_ec_mul_epilogue);\
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(q).y, (t)->y), kryptos_ec_mul_epilogue);\
     kryptos_ec_del_point((t));\
     (t) = NULL;\
-    if (( ((d)->data[w] & (1 << (bit))) >> (bit) )) {\
+    if (kryptos_mp_bit_n(d, w)) {\
         kryptos_ec_add(&(t), &(q), *(r), (curve));\
-        printf("[add] T.x = ");\
-        kryptos_print_mp((*(r))->x);\
-        printf(" T.y = ");\
-        kryptos_print_mp((*(r))->y);\
-        printf(" Q.x = ");\
-        kryptos_print_mp(q.x);\
-        printf(" Q.y = ");\
-        kryptos_print_mp(q.y);\
-        printf(" R.x = ");\
-        kryptos_print_mp(t->x);\
-        printf(" R.y = ");\
-        kryptos_print_mp(t->y);\
-        printf("\n");\
         KRYPTOS_EC_UTILS_DO_OR_DIE(t, kryptos_ec_mul_epilogue);\
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(*(r))->x, (t)->x), kryptos_ec_mul_epilogue);\
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(*(r))->y, (t)->y), kryptos_ec_mul_epilogue);\
         kryptos_ec_del_point((t));\
         (t) = NULL;\
     }\
-    printf("--\n");\
 }
 
-    if (!(d->data[0] & 0x1)) {
-        kryptos_ec_set_point(r, _0, _0);
-    } else {
-        kryptos_ec_set_point(r, p->x, p->y);
-    }
-
-    for (w = d->data_size - 1; w >= 0; w--) {
-#ifdef KRYPTOS_MP_U32_DIGIT
-        kryptos_ec_mul_step(r, t, q, d, w, 31, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 30, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 29, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 28, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 27, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 26, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 25, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 24, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 23, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 22, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 21, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 20, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 19, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 18, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 17, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 16, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 15, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 14, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 13, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 12, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 11, curve);
-        kryptos_ec_mul_step(r, t, q, d, w, 10, curve);
-        kryptos_ec_mul_step(r, t, q, d, w,  9, curve);
-        kryptos_ec_mul_step(r, t, q, d, w,  8, curve);
-#endif
-        kryptos_ec_mul_step(r, t, q, d, w,  7, curve);
-        kryptos_ec_mul_step(r, t, q, d, w,  6, curve);
-        kryptos_ec_mul_step(r, t, q, d, w,  5, curve);
-        kryptos_ec_mul_step(r, t, q, d, w,  4, curve);
-        kryptos_ec_mul_step(r, t, q, d, w,  3, curve);
-        kryptos_ec_mul_step(r, t, q, d, w,  2, curve);
-        kryptos_ec_mul_step(r, t, q, d, w,  1, curve);
-        kryptos_ec_mul_step(r, t, q, d, w,  0, curve);
+    for (w = 1; w < bits_nr; w++) {
+        kryptos_ec_mul_step(r, t, q, d, w, _0, curve);
     }
 
 #undef kryptos_ec_mul_step

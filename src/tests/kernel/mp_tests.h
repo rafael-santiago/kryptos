@@ -36,7 +36,7 @@ KUTE_DECLARE_TEST_CASE(kryptos_mp_le_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_mp_is_neg_tests);
 
-KUTE_DECLARE_TEST_CASE(kryptos_mp_bitcount_tests);
+//KUTE_DECLARE_TEST_CASE(kryptos_mp_bitcount_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_mp_add_tests);
 
