@@ -27,6 +27,7 @@
 #include <symmetric_ciphers_tests.h>
 #include <asymmetric_ciphers_tests.h>
 #include <bad_buf_tests.h>
+#include <ecc_tests.h>
 
 KUTE_DECLARE_TEST_CASE(ktest_monkey);
 
@@ -144,7 +145,6 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_mp_mul_tests);
     KUTE_RUN_TEST(kryptos_mp_mul_digit_tests);
     KUTE_RUN_TEST(kryptos_mp_not_tests);
-    KUTE_RUN_TEST(kryptos_mp_inv_signal_tests);
     KUTE_RUN_TEST(kryptos_mp_lsh_tests);
     KUTE_RUN_TEST(kryptos_mp_rsh_tests);
     KUTE_RUN_TEST(kryptos_mp_signed_rsh_tests);
@@ -163,8 +163,20 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_mp_modinv_tests);
     KUTE_RUN_TEST(kryptos_raw_buffer_as_mp_tests);
     KUTE_RUN_TEST(kryptos_mp_as_task_out_tests);
+    KUTE_RUN_TEST(kryptos_mp_add_s_tests);
+    KUTE_RUN_TEST(kryptos_mp_sub_s_tests);
+    KUTE_RUN_TEST(kryptos_mp_mul_s_tests);
+    KUTE_RUN_TEST(kryptos_mp_mod_tests);
+    KUTE_RUN_TEST(kryptos_mp_bits_total_in_base2_tests);
+    KUTE_RUN_TEST(kryptos_mp_bit_n_tests);
 
     KUTE_RUN_TEST(kryptos_pem_get_mp_data_tests);
+
+    KUTE_RUN_TEST(kryptos_ec_set_point_tests);
+    KUTE_RUN_TEST(kryptos_ec_set_curve_tests);
+    KUTE_RUN_TEST(kryptos_ec_add_tests);
+    KUTE_RUN_TEST(kryptos_ec_dbl_tests);
+    KUTE_RUN_TEST(kryptos_ec_mul_tests);
 
     KUTE_RUN_TEST(kryptos_verify_dl_params_tests);
     KUTE_RUN_TEST(kryptos_generate_dl_params_tests);

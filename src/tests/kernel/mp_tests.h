@@ -46,8 +46,6 @@ KUTE_DECLARE_TEST_CASE(kryptos_mp_mul_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_mp_not_tests);
 
-KUTE_DECLARE_TEST_CASE(kryptos_mp_inv_signal_tests);
-
 KUTE_DECLARE_TEST_CASE(kryptos_mp_signed_add_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_mp_signed_sub_tests);
@@ -93,5 +91,17 @@ KUTE_DECLARE_TEST_CASE(kryptos_mp_mul_digit_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_raw_buffer_as_mp_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_mp_as_task_out_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_mp_mod_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_mp_add_s_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_mp_sub_s_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_mp_mul_s_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_mp_bits_total_in_base2_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_mp_bit_n_tests);
 
 #endif
