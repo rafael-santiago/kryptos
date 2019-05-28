@@ -43,6 +43,7 @@ int kryptos_ec_set_point(kryptos_ec_pt_t **p, kryptos_mp_value_t *x, kryptos_mp_
 
         if (!done) {
             kryptos_ec_del_point(*p);
+            *p = NULL;
         }
     }
 
@@ -65,6 +66,7 @@ int kryptos_ec_set_curve(kryptos_ec_t **c, kryptos_mp_value_t *a, kryptos_mp_val
 
         if (!done) {
             kryptos_ec_del_curve(*c);
+            *c = NULL;
         }
     }
 
@@ -201,6 +203,7 @@ kryptos_ec_add_epilogue:
 
     if (!done) {
         kryptos_ec_del_point(*r);
+        *r = NULL;
     }
 }
 
@@ -231,12 +234,14 @@ void kryptos_ec_dbl(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_t *curve
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_add_s(&slope, curve->a), kryptos_ec_dbl_epilogue);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_mul_s(&slope, temp1), kryptos_ec_dbl_epilogue);
         kryptos_mp_mod(&slope, curve->p);
+        KRYPTOS_EC_UTILS_DO_OR_DIE(slope, kryptos_ec_dbl_epilogue);
         kryptos_ec_new_point(*r);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(*r)->x, slope), kryptos_ec_dbl_epilogue);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_mul_s(&(*r)->x, slope), kryptos_ec_dbl_epilogue);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&(*r)->x, p->x), kryptos_ec_dbl_epilogue);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&(*r)->x, p->x), kryptos_ec_dbl_epilogue);
         kryptos_mp_mod(&(*r)->x, curve->p);
+        KRYPTOS_EC_UTILS_DO_OR_DIE((*r)->x, kryptos_ec_dbl_epilogue);
         kryptos_del_mp_value(temp1);
         temp1 = NULL;
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&temp1, p->x), kryptos_ec_dbl_epilogue);
@@ -245,6 +250,7 @@ void kryptos_ec_dbl(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_t *curve
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_mul_s(&(*r)->y, temp1), kryptos_ec_dbl_epilogue);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&(*r)->y, p->y), kryptos_ec_dbl_epilogue);
         kryptos_mp_mod(&(*r)->y, curve->p);
+        KRYPTOS_EC_UTILS_DO_OR_DIE((*r)->y, kryptos_ec_dbl_epilogue);
     }
 
     done = 1;
@@ -269,6 +275,7 @@ kryptos_ec_dbl_epilogue:
 
     if (!done) {
         kryptos_ec_del_point(*r);
+        *r = NULL;
     }
 }
 
@@ -343,6 +350,7 @@ kryptos_ec_mul_epilogue:
 
     if (!done) {
         kryptos_ec_del_point(*r);
+        *r = NULL;
     }
 }
 
