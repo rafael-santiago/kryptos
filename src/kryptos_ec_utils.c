@@ -296,6 +296,15 @@ void kryptos_ec_mul(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_mp_value_t 
         continue;\
     }\
     kryptos_ec_dbl(&(t), &(q), (curve));\
+    printf("[dbl] Q.x = ");\
+    kryptos_print_mp(q.x);\
+    printf(" Q.y = ");\
+    kryptos_print_mp(q.y);\
+    printf(" T.x = ");\
+    kryptos_print_mp(t->x);\
+    printf(" T.y = ");\
+    kryptos_print_mp(t->y);\
+    printf("\n");\
     KRYPTOS_EC_UTILS_DO_OR_DIE((t), kryptos_ec_mul_epilogue);\
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(q).x, (t)->x), kryptos_ec_mul_epilogue);\
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(q).y, (t)->y), kryptos_ec_mul_epilogue);\
@@ -303,12 +312,26 @@ void kryptos_ec_mul(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_mp_value_t 
     (t) = NULL;\
     if (( ((d)->data[w] & (1 << (bit))) >> (bit) )) {\
         kryptos_ec_add(&(t), &(q), *(r), (curve));\
+        printf("[add] T.x = ");\
+        kryptos_print_mp((*(r))->x);\
+        printf(" T.y = ");\
+        kryptos_print_mp((*(r))->y);\
+        printf(" Q.x = ");\
+        kryptos_print_mp(q.x);\
+        printf(" Q.y = ");\
+        kryptos_print_mp(q.y);\
+        printf(" R.x = ");\
+        kryptos_print_mp(t->x);\
+        printf(" R.y = ");\
+        kryptos_print_mp(t->y);\
+        printf("\n");\
         KRYPTOS_EC_UTILS_DO_OR_DIE(t, kryptos_ec_mul_epilogue);\
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(*(r))->x, (t)->x), kryptos_ec_mul_epilogue);\
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(*(r))->y, (t)->y), kryptos_ec_mul_epilogue);\
         kryptos_ec_del_point((t));\
         (t) = NULL;\
     }\
+    printf("--\n");\
 }
 
     if (!(d->data[0] & 0x1)) {

@@ -244,7 +244,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_mul_tests);
     CUTE_RUN_TEST(kryptos_mp_mul_digit_tests);
     CUTE_RUN_TEST(kryptos_mp_not_tests);
-    CUTE_RUN_TEST(kryptos_mp_inv_signal_tests);
+    CUTE_RUN_TEST(kryptos_mp_inv_tests);
     CUTE_RUN_TEST(kryptos_mp_lsh_tests);
     CUTE_RUN_TEST(kryptos_mp_rsh_tests);
     CUTE_RUN_TEST(kryptos_mp_signed_rsh_tests);
@@ -267,6 +267,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_sub_s_tests);
     CUTE_RUN_TEST(kryptos_mp_mul_s_tests);
     CUTE_RUN_TEST(kryptos_mp_mod_tests);
+    CUTE_RUN_TEST(kryptos_mp_bits_total_in_base2_tests);
+    CUTE_RUN_TEST(kryptos_mp_bit_n_tests);
 
     // INFO(Rafael): This encoding function depends on multiprecision stuff, this is because we need
     //               to test it later than other encoding stuff.
@@ -279,6 +281,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_ec_set_curve_tests);
     CUTE_RUN_TEST(kryptos_ec_add_tests);
     CUTE_RUN_TEST(kryptos_ec_dbl_tests);
+    //CUTE_RUN_TEST(kryptos_ec_mul_tests);
 
     // INFO(Rafael): Asymmetric stuff
 

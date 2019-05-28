@@ -18,4 +18,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_ec_add_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_ec_dbl_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_ec_mul_tests);
+
 #endif

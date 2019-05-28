@@ -3596,6 +3596,10 @@ kryptos_mp_modinv_epilogue:
         kryptos_del_mp_value(q);
     }
 
+    if (inv == NULL) {
+        inv = kryptos_hex_value_as_mp("00", 2);
+    }
+
     return inv;
 }
 
@@ -3615,30 +3619,6 @@ kryptos_mp_value_t *kryptos_mp_not(kryptos_mp_value_t *n) {
     return n;
 }
 
-kryptos_mp_value_t *kryptos_mp_inv_signal(kryptos_mp_value_t *n) {
-    kryptos_mp_value_t *_1 = NULL;
-
-    if (n == NULL) {
-        return NULL;
-    }
-
-    if ((n = kryptos_mp_not(n)) == NULL) {
-        return NULL;
-    }
-
-    if ((_1 = kryptos_hex_value_as_mp("1", 1)) == NULL) {
-        return NULL;
-    }
-
-    if ((n = kryptos_mp_add(&n, _1)) == NULL) {
-        kryptos_del_mp_value(_1);
-        return NULL;
-    }
-
-    kryptos_del_mp_value(_1);
-
-    return n;
-}
 /*
 kryptos_mp_value_t *kryptos_mp_signed_sub(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
     // TODO(Rafael): Make this code resilient to NULL returns.
@@ -3921,6 +3901,105 @@ kryptos_mp_value_t *kryptos_raw_buffer_as_mp(const kryptos_u8_t *buf, const size
     kryptos_freeseg(hex, hex_size);
 
     return mp;
+}
+
+int kryptos_mp_bits_total_in_base2(kryptos_mp_value_t *value) {
+    int total = 0;
+    ssize_t w, s;
+    ssize_t b = -1;
+
+    if (value == NULL) {
+        return 0;
+    }
+
+#define bitsettest(v, w, b, s, b_var, s_var) {\
+    if ((((v)->data[(w)] >> (b)) & 0x1)) {\
+        s_var = (s);\
+        b_var = (b);\
+        break;\
+    }\
+}
+    for (w = value->data_size - 1; w >= 0; w--) {
+#if defined(KRYPTOS_MP_U32_DIGIT)
+        bitsettest(value, w, 31, 32, b, s);
+        bitsettest(value, w, 30, 32, b, s);
+        bitsettest(value, w, 29, 32, b, s);
+        bitsettest(value, w, 28, 32, b, s);
+        bitsettest(value, w, 27, 32, b, s);
+        bitsettest(value, w, 26, 32, b, s);
+        bitsettest(value, w, 25, 32, b, s);
+        bitsettest(value, w, 24, 32, b, s);
+        bitsettest(value, w, 23, 32, b, s);
+        bitsettest(value, w, 22, 32, b, s);
+        bitsettest(value, w, 21, 32, b, s);
+        bitsettest(value, w, 20, 32, b, s);
+        bitsettest(value, w, 19, 32, b, s);
+        bitsettest(value, w, 18, 32, b, s);
+        bitsettest(value, w, 17, 32, b, s);
+        bitsettest(value, w, 16, 32, b, s);
+        bitsettest(value, w, 15, 32, b, s);
+        bitsettest(value, w, 14, 32, b, s);
+        bitsettest(value, w, 13, 32, b, s);
+        bitsettest(value, w, 12, 32, b, s);
+        bitsettest(value, w, 11, 32, b, s);
+        bitsettest(value, w, 10, 32, b, s);
+        bitsettest(value, w,  9, 32, b, s);
+        bitsettest(value, w,  8, 32, b, s);
+        bitsettest(value, w,  7, 32, b, s);
+        bitsettest(value, w,  6, 32, b, s);
+        bitsettest(value, w,  5, 32, b, s);
+        bitsettest(value, w,  4, 32, b, s);
+        bitsettest(value, w,  3, 32, b, s);
+        bitsettest(value, w,  2, 32, b, s);
+        bitsettest(value, w,  1, 32, b, s);
+        bitsettest(value, w,  0, 32, b, s);
+#else
+        bitsettest(value, w, 7, 8, b, s);
+        bitsettest(value, w, 6, 8, b, s);
+        bitsettest(value, w, 5, 8, b, s);
+        bitsettest(value, w, 4, 8, b, s);
+        bitsettest(value, w, 3, 8, b, s);
+        bitsettest(value, w, 2, 8, b, s);
+        bitsettest(value, w, 1, 8, b, s);
+        bitsettest(value, w, 0, 8, b, s);
+#endif
+    }
+
+#undef bitsettest
+
+    total = (b == -1) ? 1 : (s - (s - b - 1)) + (w * s);
+
+    return total;
+}
+
+size_t kryptos_mp_bit_n(kryptos_mp_value_t *value, const size_t bn) {
+    ssize_t w, b;
+
+    if (value == NULL || bn >= kryptos_mp_byte2bit(value->data_size)) {
+        return 0;
+    }
+
+    w = value->data_size - 1;
+
+    for (b = 1; b <= bn; b++) {
+#if defined(KRYPTOS_MP_U32_DIGIT)
+        if ((b & 0x1F) == 0) {
+            w -= 1;
+        }
+#else
+        if ((b & 0x07) == 0) {
+            w -= 1;
+        }
+#endif
+    }
+
+#if defined(KRYPTOS_MP_U32_DIGIT)
+    b = bn & 0x1F;
+#else
+    b = bn & 0x07;
+#endif
+
+    return ((value->data[w] >> b) & 0x1);
 }
 
 #undef kryptos_mp_xnb

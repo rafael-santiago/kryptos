@@ -74,7 +74,9 @@ kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *a, const kryptos
 
 kryptos_mp_value_t *kryptos_mp_not(kryptos_mp_value_t *n);
 
-kryptos_mp_value_t *kryptos_mp_inv_signal(kryptos_mp_value_t *n);
+kryptos_mp_value_t *kryptos_mp_inv(kryptos_mp_value_t **dest);
+
+int kryptos_mp_bits_total_in_base2(kryptos_mp_value_t *value);
 
 ssize_t kryptos_mp_bitcount(const kryptos_mp_value_t *n);
 
@@ -89,6 +91,8 @@ kryptos_mp_value_t *kryptos_mp_add_s(kryptos_mp_value_t **dest, kryptos_mp_value
 kryptos_mp_value_t *kryptos_mp_sub_s(kryptos_mp_value_t **dest, kryptos_mp_value_t *src);
 
 kryptos_mp_value_t *kryptos_mp_mul_s(kryptos_mp_value_t **dest, kryptos_mp_value_t *src);
+
+size_t kryptos_mp_bit_n(kryptos_mp_value_t *value, const size_t bn);
 
 #ifdef __cplusplus
 }

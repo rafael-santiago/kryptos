@@ -44,7 +44,7 @@ CUTE_DECLARE_TEST_CASE(kryptos_mp_mul_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_mp_not_tests);
 
-CUTE_DECLARE_TEST_CASE(kryptos_mp_inv_signal_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_mp_inv_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_mp_signed_add_tests);
 
@@ -99,6 +99,10 @@ CUTE_DECLARE_TEST_CASE(kryptos_mp_add_s_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_mp_sub_s_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_mp_mul_s_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_mp_bits_total_in_base2_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_mp_bit_n_tests);
 
 //CUTE_DECLARE_TEST_CASE(poke_bloody_poke);
 
