@@ -282,6 +282,34 @@ typedef struct kryptos_ec_pt {
     kryptos_mp_value_t *x, *y;
 }kryptos_ec_pt_t;
 
+typedef enum {
+    kBrainPoolP160R1,
+    kBrainPoolP160T1,
+    kBrainPoolP192R1,
+    kBrainPoolP192T1,
+    kBrainPoolP224R1,
+    kBrainPoolP224T1,
+    kBrainPoolP256R1,
+    kBrainPoolP256T1,
+    kBrainPoolP320R1,
+    kBrainPoolP320T1,
+    kBrainPoolP384R1,
+    kBrainPoolP384T1,
+    kBrainPoolP512R1,
+    kBrainPoolP512T1
+}kryptos_curve_id_t;
+
+struct kryptos_std_curve_ctx {
+    kryptos_curve_id_t id;
+    char *p, *a, *b, *x, *y, *q;
+};
+
+typedef struct kryptos_curve {
+    kryptos_ec_t *ec;
+    kryptos_mp_value_t *q;
+    kryptos_ec_pt_t *g;
+}kryptos_curve_ctx;
+
 #ifndef __cplusplus
 #define KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(cipher_name)\
 void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
