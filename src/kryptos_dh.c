@@ -822,10 +822,10 @@ kryptos_task_result_t kryptos_dh_get_random_s(kryptos_mp_value_t **s, const kryp
 #ifndef KRYPTOS_MP_U32_DIGIT
             (*s)->data[d] = kryptos_get_random_byte();
 #else
-            (*s)->data[d] = (kryptos_get_random_byte() << 24 |
-                             kryptos_get_random_byte() << 16 |
-                             kryptos_get_random_byte() <<  8 |
-                             kryptos_get_random_byte()) & mask;
+            (*s)->data[d] = (((kryptos_u32_t)kryptos_get_random_byte()) << 24 |
+                             ((kryptos_u32_t)kryptos_get_random_byte()) << 16 |
+                             ((kryptos_u32_t)kryptos_get_random_byte()) <<  8 |
+                             ((kryptos_u32_t)kryptos_get_random_byte())) & mask;
 #endif
         }
     } while (kryptos_mp_gt(*s, p_2) || kryptos_mp_lt(*s, _2));
