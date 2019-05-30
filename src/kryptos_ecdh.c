@@ -12,6 +12,10 @@
 #include <kryptos_memory.h>
 #include <kryptos_mp.h>
 #include <kryptos_random.h>
+#ifndef KRYPTOS_KERNEL_MODE
+# include <string.h>
+# include <stdio.h>
+#endif
 
 kryptos_task_result_t kryptos_ecdh_get_curve_from_params_buf(const kryptos_u8_t *params, const size_t params_size,
                                                              kryptos_curve_ctx **curve) {
@@ -160,4 +164,286 @@ kryptos_ecdh_get_random_k_epilogue:
 }
 
 void kryptos_ecdh_process_xchg(struct kryptos_ecdh_xchg_ctx **data) {
+    kryptos_ec_pt_t *kpub = NULL, *t = NULL;
+    char temp[40];
+    kryptos_mp_value_t *x = NULL, *y = NULL;
+
+    if (data == NULL) {
+        return;
+    }
+
+    (*data)->result = kKryptosProcessError;
+    (*data)->result_verbose = NULL;
+
+    if ((*data)->in == NULL) {
+        // INFO(Rafael): Sender Alice.
+
+        if ((*data)->k == NULL) {
+            // INFO(Rafael): Alice needs to pick a random k between { 2, ..., #q - 1 } and send it out to Bob.
+            (*data)->result = kryptos_ecdh_get_random_k(&(*data)->k, (*data)->curve->q, (*data)->curve->bits);
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on choosing K.";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            (*data)->result = kKryptosProcessError;
+
+            kryptos_ec_mul(&kpub, (*data)->curve->g, (*data)->k, (*data)->curve->ec);
+
+            if (kpub == NULL) {
+                (*data)->result_verbose = "Error on computing KPUB.";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            snprintf(temp, sizeof(temp) - 1, "%d", (*data)->curve->bits);
+
+            (*data)->result = kryptos_pem_put_data(&(*data)->out, &(*data)->out_size,
+                                                   KRYPTOS_ECDH_PEM_HDR_PARAM_EC_BITS,
+                                                   (kryptos_u8_t *)temp, strlen(temp));
+
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on making PEM output (bits).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            (*data)->result = kryptos_pem_put_data(&(*data)->out, &(*data)->out_size,
+                                                   KRYPTOS_ECDH_PEM_HDR_PARAM_EC_P,
+                                                   (kryptos_u8_t *)(*data)->curve->ec->p->data,
+                                                   ((*data)->curve->ec->p->data_size * sizeof(kryptos_mp_digit_t)));
+
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on making PEM output (P).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            (*data)->result = kryptos_pem_put_data(&(*data)->out, &(*data)->out_size,
+                                                   KRYPTOS_ECDH_PEM_HDR_PARAM_EC_A,
+                                                   (kryptos_u8_t *)(*data)->curve->ec->a->data,
+                                                   ((*data)->curve->ec->a->data_size * sizeof(kryptos_mp_digit_t)));
+
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on making PEM output (A).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            (*data)->result = kryptos_pem_put_data(&(*data)->out, &(*data)->out_size,
+                                                   KRYPTOS_ECDH_PEM_HDR_PARAM_EC_B,
+                                                   (kryptos_u8_t *)(*data)->curve->ec->b->data,
+                                                   ((*data)->curve->ec->b->data_size * sizeof(kryptos_mp_digit_t)));
+
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on making PEM output (B).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            (*data)->result = kryptos_pem_put_data(&(*data)->out, &(*data)->out_size,
+                                                   KRYPTOS_ECDH_PEM_HDR_PARAM_EC_GX,
+                                                   (kryptos_u8_t *)(*data)->curve->g->x->data,
+                                                   ((*data)->curve->g->x->data_size * sizeof(kryptos_mp_digit_t)));
+
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on making PEM output (GX).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            (*data)->result = kryptos_pem_put_data(&(*data)->out, &(*data)->out_size,
+                                                   KRYPTOS_ECDH_PEM_HDR_PARAM_EC_GY,
+                                                   (kryptos_u8_t *)(*data)->curve->g->y->data,
+                                                   ((*data)->curve->g->y->data_size * sizeof(kryptos_mp_digit_t)));
+
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on making PEM output (GY).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            (*data)->result = kryptos_pem_put_data(&(*data)->out, &(*data)->out_size,
+                                                   KRYPTOS_ECDH_PEM_HDR_PARAM_EC_Q,
+                                                   (kryptos_u8_t *)(*data)->curve->q->data,
+                                                   ((*data)->curve->q->data_size * sizeof(kryptos_mp_digit_t)));
+
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on making PEM output (Q).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            (*data)->result = kryptos_pem_put_data(&(*data)->out, &(*data)->out_size,
+                                                   KRYPTOS_ECDH_PEM_HDR_PARAM_KPX,
+                                                   (kryptos_u8_t *)kpub->x->data,
+                                                   (kpub->x->data_size * sizeof(kryptos_mp_digit_t)));
+
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on making PEM output (KPX).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            (*data)->result = kryptos_pem_put_data(&(*data)->out, &(*data)->out_size,
+                                                   KRYPTOS_ECDH_PEM_HDR_PARAM_KPY,
+                                                   (kryptos_u8_t *)kpub->y->data,
+                                                   (kpub->y->data_size * sizeof(kryptos_mp_digit_t)));
+
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on making PEM output (KPY).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+        } else {
+            // INFO(Rafael): Alice has received the KP(x,y) from Bob and she needs to compute the joint secret T_{ab}.
+            (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_ECDH_PEM_HDR_PARAM_KPX, (*data)->in, (*data)->in_size,
+                                                      &x);
+
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on getting data from PEM (KPX).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_ECDH_PEM_HDR_PARAM_KPY, (*data)->in, (*data)->in_size,
+                                                      &y);
+
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on getting data from PEM (KPY).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            (*data)->result = kKryptosProcessError;
+
+            if (kryptos_ec_set_point(&kpub, x, y) != 1) {
+                (*data)->result_verbose = "Error on setting point KP(x, y).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            kryptos_ec_mul(&t, kpub, (*data)->k, (*data)->curve->ec);
+
+            if (t == NULL) {
+                (*data)->result = kKryptosProcessError;
+                (*data)->result_verbose = "Error on computing final T.";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            (*data)->curve->bits = 0;
+            kryptos_del_mp_value((*data)->curve->q);
+            kryptos_del_curve_ctx((*data)->curve);
+            (*data)->curve = NULL;
+
+            (*data)->curve->q  = NULL;
+            (*data)->curve->g  = NULL;
+            (*data)->curve->ec = NULL;
+
+            kryptos_del_mp_value((*data)->k);
+
+            // INFO(Rafael): We do not need y.
+
+            (*data)->k = t->x;
+            t->x = NULL;
+        }
+    } else {
+        // INFO(Rafael): Receiver Bob.
+
+        if ((*data)->in != NULL && (*data)->curve == NULL) {
+            // INFO(Rafael): Bob has received from Alice all public parameters. He needs to load the curve info, create it
+            //               and finally compute locally the T_{ab} and send out to Alice his KP(x,y).
+
+            (*data)->result = kryptos_ecdh_get_curve_from_params_buf((*data)->in, (*data)->in_size, &(*data)->curve);
+
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on loading public parameters.";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            (*data)->result = kryptos_ecdh_get_random_k(&(*data)->k, (*data)->curve->q, (*data)->curve->bits);
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on choosing K.";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            kryptos_ec_mul(&kpub, (*data)->curve->g, (*data)->k, (*data)->curve->ec);
+
+            if (kpub == NULL) {
+                (*data)->result = kKryptosProcessError;
+                (*data)->result_verbose = "Error on computing KP(x, y).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            // INFO(Rafael): Now Bob packs the point KP into a PEM to send to Alice.
+
+            (*data)->result = kryptos_pem_put_data(&(*data)->out, &(*data)->out_size,
+                                                   KRYPTOS_ECDH_PEM_HDR_PARAM_KPX,
+                                                   (kryptos_u8_t *)kpub->x->data,
+                                                   (kpub->x->data_size * sizeof(kryptos_mp_digit_t)));
+
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on making PEM output (KPX).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            (*data)->result = kryptos_pem_put_data(&(*data)->out, &(*data)->out_size,
+                                                   KRYPTOS_ECDH_PEM_HDR_PARAM_KPY,
+                                                   (kryptos_u8_t *)kpub->y->data,
+                                                   (kpub->y->data_size * sizeof(kryptos_mp_digit_t)));
+
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on making PEM output (KPY).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            // INFO(Rafael): Now Bob computes the T_{ab}.
+
+            kryptos_ec_mul(&t, kpub, (*data)->k, (*data)->curve->ec);
+
+            if (t == NULL) {
+                (*data)->result = kKryptosProcessError;
+                (*data)->result_verbose = "Error on computing final T.";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            (*data)->curve->bits = 0;
+            kryptos_del_mp_value((*data)->curve->q);
+            kryptos_del_curve_ctx((*data)->curve);
+            (*data)->curve = NULL;
+
+            (*data)->curve->q  = NULL;
+            (*data)->curve->g  = NULL;
+            (*data)->curve->ec = NULL;
+
+            kryptos_del_mp_value((*data)->k);
+
+            // INFO(Rafael): We do not need y.
+
+            (*data)->k = t->x;
+            t->x = NULL;
+        }
+    }
+
+
+kryptos_ecdh_process_xchg_epilogue:
+
+    if ((*data)->result != kKryptosSuccess) {
+        kryptos_clear_ecdh_xchg_ctx(*data);
+        if ((*data)->out != NULL) {
+            kryptos_freeseg((*data)->out, (*data)->out_size);
+            (*data)->out_size = 0;
+            (*data)->out = NULL;
+        }
+    }
+
+    if (kpub != NULL) {
+        kryptos_ec_del_point(kpub);
+    }
+
+    if (t != NULL) {
+        kryptos_ec_del_point(t);
+    }
+
+    if (x != NULL) {
+        kryptos_del_mp_value(x);
+    }
+
+    if (y != NULL) {
+        kryptos_del_mp_value(y);
+    }
+}
+
+void kryptos_clear_ecdh_xchg_ctx(struct kryptos_ecdh_xchg_ctx *data) {
+    if (data != NULL) {
+        kryptos_del_curve_ctx(data->curve);
+        kryptos_ecdh_init_xchg_ctx(data);
+    }
 }

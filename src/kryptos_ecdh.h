@@ -24,9 +24,9 @@
 
 #define KRYPTOS_ECDH_PEM_HDR_PARAM_EC_Q    "ECDH PARAM EC Q"
 
-#define KRYPTOS_ECDH_PEM_HDR_PARAM_PX      "ECDH PARAM KP X"
+#define KRYPTOS_ECDH_PEM_HDR_PARAM_KPX     "ECDH PARAM KP X"
 
-#define KRYPTOS_ECDH_PEM_HDR_PARAM_PY      "ECDH PARAM KP Y"
+#define KRYPTOS_ECDH_PEM_HDR_PARAM_KPY     "ECDH PARAM KP Y"
 
 struct kryptos_ecdh_xchg_ctx {
     kryptos_curve_ctx *curve;
@@ -56,6 +56,8 @@ kryptos_task_result_t kryptos_ecdh_get_curve_from_params_buf(const kryptos_u8_t 
 kryptos_task_result_t kryptos_ecdh_get_random_k(kryptos_mp_value_t **k, const kryptos_mp_value_t *q, const size_t bits);
 
 void kryptos_ecdh_process_xchg(struct kryptos_ecdh_xchg_ctx **data);
+
+void kryptos_clear_ecdh_xchg_ctx(struct kryptos_ecdh_xchg_ctx *data);
 
 #ifdef __cplusplus
 }
