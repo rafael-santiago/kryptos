@@ -301,6 +301,7 @@ typedef enum {
 
 struct kryptos_std_curve_ctx {
     kryptos_curve_id_t id;
+    size_t bits;
     char *p, *a, *b, *x, *y, *q;
 };
 
@@ -308,6 +309,7 @@ typedef struct kryptos_curve {
     kryptos_ec_t *ec;
     kryptos_mp_value_t *q;
     kryptos_ec_pt_t *g;
+    size_t bits;
 }kryptos_curve_ctx;
 
 #ifndef __cplusplus

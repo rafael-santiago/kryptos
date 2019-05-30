@@ -349,6 +349,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     } else {
         printf("WARN: The DSA signature tests were skipped.\n");
     }
+
+    CUTE_RUN_TEST(kryptos_new_standard_curve_tests);
+
 //    CUTE_RUN_TEST(poke_bloody_poke);
 CUTE_TEST_CASE_END
 

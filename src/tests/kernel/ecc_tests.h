@@ -20,4 +20,6 @@ KUTE_DECLARE_TEST_CASE(kryptos_ec_dbl_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_ec_mul_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_new_standard_curve_tests);
+
 #endif

@@ -13,12 +13,13 @@
 # include <string.h>
 #endif
 
-#define KRYPTOS_REGISTER_STANDARD_CURVE(id, p, a, b, x, y, q)\
-    { (id), (p), (a), (b), (x), (y), (q) }
+#define KRYPTOS_REGISTER_STANDARD_CURVE(id, bits, p, a, b, x, y, q)\
+    { (id), (bits), (p), (a), (b), (x), (y), (q) }
 
 static struct kryptos_std_curve_ctx g_std_curves[] = {
     // INFO(Rafael): Standarnized curves from RFC5639.
     KRYPTOS_REGISTER_STANDARD_CURVE(kBrainPoolP160R1,
+                                    160,
                                     "E95E4A5F737059DC60DFC7AD95B3D8139515620F",
                                     "340E7BE2A280EB74E2BE61BADA745D97E8F7C300",
                                     "1E589A8595423412134FAA2DBDEC95C8D8675E58",
@@ -26,6 +27,7 @@ static struct kryptos_std_curve_ctx g_std_curves[] = {
                                     "1667CB477A1A8EC338F94741669C976316DA6321",
                                     "E95E4A5F737059DC60DF5991D45029409E60FC09"),
     KRYPTOS_REGISTER_STANDARD_CURVE(kBrainPoolP160T1,
+                                    160,
                                     "E95E4A5F737059DC60DFC7AD95B3D8139515620F",
                                     "E95E4A5F737059DC60DFC7AD95B3D8139515620C",
                                     "7A556B6DAE535B7B51ED2C4D7DAA7A0B5C55F380",
@@ -33,13 +35,15 @@ static struct kryptos_std_curve_ctx g_std_curves[] = {
                                     "ADD6718B7C7C1961F0991B842443772152C9E0AD",
                                     "E95E4A5F737059DC60DF5991D45029409E60FC09"),
     KRYPTOS_REGISTER_STANDARD_CURVE(kBrainPoolP192R1,
+                                    192,
                                     "C302F41D932A36CDA7A3463093D18DB78FCE476DE1A86297",
                                     "6A91174076B1E0E19C39C031FE8685C1CAE040E5C69A28EF",
                                     "469A28EF7C28CCA3DC721D044F4496BCCA7EF4146FBF25C9",
                                     "C0A0647EAAB6A48753B033C56CB0F0900A2F5C4853375FD6",
                                     "14B690866ABD5BB88B5F4828C1490002E6773FA2FA299B8F",
                                     "C302F41D932A36CDA7A3462F9E9E916B5BE8F1029AC4ACC1"),
-    KRYPTOS_REGISTER_STANDARD_CURVE(kBrainPoolP192R1,
+    KRYPTOS_REGISTER_STANDARD_CURVE(kBrainPoolP192T1,
+                                    192,
                                     "C302F41D932A36CDA7A3463093D18DB78FCE476DE1A86297",
                                     "C302F41D932A36CDA7A3463093D18DB78FCE476DE1A86294",
                                     "13D56FFAEC78681E68F9DEB43B35BEC2FB68542E27897B79",
@@ -47,6 +51,7 @@ static struct kryptos_std_curve_ctx g_std_curves[] = {
                                     "097E2C5667C2223A902AB5CA449D0084B7E5B3DE7CCC01C9",
                                     "C302F41D932A36CDA7A3462F9E9E916B5BE8F1029AC4ACC1"),
     KRYPTOS_REGISTER_STANDARD_CURVE(kBrainPoolP224R1,
+                                    224,
                                     "D7C134AA264366862A18302575D1D787B09F075797DA89F57EC8C0FF",
                                     "68A5E62CA9CE6C1C299803A6C1530B514E182AD8B0042A59CAD29F43",
                                     "2580F63CCFE44138870713B1A92369E33E2135D266DBB372386C400B",
@@ -54,6 +59,7 @@ static struct kryptos_std_curve_ctx g_std_curves[] = {
                                     "58AA56F772C0726F24C6B89E4ECDAC24354B9E99CAA3F6D3761402CD",
                                     "D7C134AA264366862A18302575D0FB98D116BC4B6DDEBCA3A5A7939F"),
     KRYPTOS_REGISTER_STANDARD_CURVE(kBrainPoolP224T1,
+                                    224,
                                     "D7C134AA264366862A18302575D1D787B09F075797DA89F57EC8C0FF",
                                     "D7C134AA264366862A18302575D1D787B09F075797DA89F57EC8C0FC",
                                     "4B337D934104CD7BEF271BF60CED1ED20DA14C08B3BB64F18A60888D",
@@ -61,6 +67,7 @@ static struct kryptos_std_curve_ctx g_std_curves[] = {
                                     "0374E9F5143E568CD23F3F4D7C0D4B1E41C8CC0D1C6ABD5F1A46DB4C",
                                     "D7C134AA264366862A18302575D0FB98D116BC4B6DDEBCA3A5A7939F"),
     KRYPTOS_REGISTER_STANDARD_CURVE(kBrainPoolP256R1,
+                                    256,
                                     "A9FB57DBA1EEA9BC3E660A909D838D726E3BF623D52620282013481D1F6E5377",
                                     "7D5A0975FC2C3057EEF67530417AFFE7FB8055C126DC5C6CE94A4B44F330B5D9",
                                     "26DC5C6CE94A4B44F330B5D9BBD77CBF958416295CF7E1CE6BCCDC18FF8C07B6",
@@ -68,6 +75,7 @@ static struct kryptos_std_curve_ctx g_std_curves[] = {
                                     "547EF835C3DAC4FD97F8461A14611DC9C27745132DED8E545C1D54C72F046997",
                                     "A9FB57DBA1EEA9BC3E660A909D838D718C397AA3B561A6F7901E0E82974856A7"),
     KRYPTOS_REGISTER_STANDARD_CURVE(kBrainPoolP256T1,
+                                    256,
                                     "A9FB57DBA1EEA9BC3E660A909D838D726E3BF623D52620282013481D1F6E5377",
                                     "A9FB57DBA1EEA9BC3E660A909D838D726E3BF623D52620282013481D1F6E5374",
                                     "662C61C430D84EA4FE66A7733D0B76B7BF93EBC4AF2F49256AE58101FEE92B04",
@@ -75,6 +83,7 @@ static struct kryptos_std_curve_ctx g_std_curves[] = {
                                     "2D996C823439C56D7F7B22E14644417E69BCB6DE39D027001DABE8F35B25C9BE",
                                     "A9FB57DBA1EEA9BC3E660A909D838D718C397AA3B561A6F7901E0E82974856A7"),
     KRYPTOS_REGISTER_STANDARD_CURVE(kBrainPoolP320R1,
+                                    320,
                                     "D35E472036BC4FB7E13C785ED201E065F98FCFA6F6F40DEF4F92B9EC7893EC28FCD412B1F1B32E27",
                                     "3EE30B568FBAB0F883CCEBD46D3F3BB8A2A73513F5EB79DA66190EB085FFA9F492F375A97D860EB4",
                                     "520883949DFDBC42D3AD198640688A6FE13F41349554B49ACC31DCCD884539816F5EB4AC8FB1F1A6",
@@ -82,6 +91,7 @@ static struct kryptos_std_curve_ctx g_std_curves[] = {
                                     "14FDD05545EC1CC8AB4093247F77275E0743FFED117182EAA9C77877AAAC6AC7D35245D1692E8EE1",
                                     "D35E472036BC4FB7E13C785ED201E065F98FCFA5B68F12A32D482EC7EE8658E98691555B44C59311"),
     KRYPTOS_REGISTER_STANDARD_CURVE(kBrainPoolP320T1,
+                                    320,
                                     "D35E472036BC4FB7E13C785ED201E065F98FCFA6F6F40DEF4F92B9EC7893EC28FCD412B1F1B32E27",
                                     "D35E472036BC4FB7E13C785ED201E065F98FCFA6F6F40DEF4F92B9EC7893EC28FCD412B1F1B32E24",
                                     "A7F561E038EB1ED560B3D147DB782013064C19F27ED27C6780AAF77FB8A547CEB5B4FEF422340353",
@@ -89,6 +99,7 @@ static struct kryptos_std_curve_ctx g_std_curves[] = {
                                     "63BA3A7A27483EBF6671DBEF7ABB30EBEE084E58A0B077AD42A5A0989D1EE71B1B9BC0455FB0D2C3",
                                     "D35E472036BC4FB7E13C785ED201E065F98FCFA5B68F12A32D482EC7EE8658E98691555B44C59311"),
     KRYPTOS_REGISTER_STANDARD_CURVE(kBrainPoolP384R1,
+                                    384,
                                     "8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B412B1DA197FB71123ACD3A729901D1A71"
                                     "874700133107EC53",
                                     "7BC382C63D8C150C3C72080ACE05AFA0C2BEA28E4FB22787139165EFBA91F90F8AA5814A503AD4EB"
@@ -102,6 +113,7 @@ static struct kryptos_std_curve_ctx g_std_curves[] = {
                                     "8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B31F166E6CAC0425A7CF3AB6AF6B7FC310"
                                     "883202E9046565"),
     KRYPTOS_REGISTER_STANDARD_CURVE(kBrainPoolP384T1,
+                                    384,
                                     "8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B412B1DA197FB71123ACD3A729901D1A71"
                                     "874700133107EC53",
                                     "8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B412B1DA197FB71123ACD3A729901D1A71"
@@ -115,6 +127,7 @@ static struct kryptos_std_curve_ctx g_std_curves[] = {
                                     "8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B31F166E6CAC0425A7CF3AB6AF6B7FC310"
                                     "3B883202E9046565"),
     KRYPTOS_REGISTER_STANDARD_CURVE(kBrainPoolP512R1,
+                                    512,
                                     "AADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA703308717D4D9B009BC66842"
                                     "AECDA12AE6A380E62881FF2F2D82C68528AA6056583A48F3",
                                     "7830A3318B603B89E2327145AC234CC594CBDD8D3DF91610A83441CAEA9863BC2DED5D5AA8253AA1"
@@ -128,6 +141,7 @@ static struct kryptos_std_curve_ctx g_std_curves[] = {
                                     "AADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA70330870553E5C414CA92619"
                                     "8661197FAC10471DB1D381085DDADDB58796829CA90069"),
     KRYPTOS_REGISTER_STANDARD_CURVE(kBrainPoolP512T1,
+                                    512,
                                     "AADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA703308717D4D9B009BC66842"
                                     "AECDA12AE6A380E62881FF2F2D82C68528AA6056583A48F3",
                                     "AADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA703308717D4D9B009BC66842"
@@ -193,6 +207,8 @@ kryptos_curve_ctx *kryptos_new_standard_curve(kryptos_curve_id_t id) {
         goto kryptos_new_standard_curve_epilogue;
     }
 
+    curve->bits = g_std_curves[c].bits;
+
     done = kryptos_ec_set_curve(&curve->ec, a, b, p);
 
     if (!done) {
@@ -250,6 +266,8 @@ void kryptos_del_curve_ctx(kryptos_curve_ctx *curve) {
         if (curve->q != NULL) {
             kryptos_del_mp_value(curve->q);
         }
+
+        kryptos_freeseg(curve, sizeof(kryptos_curve_ctx));
     }
 }
 

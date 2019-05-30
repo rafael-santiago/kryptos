@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-kryptos_curve_ctx *kryptos_curve_new_curve_ctx(kryptos_curve_id_t id);
+kryptos_curve_ctx *kryptos_new_standard_curve(kryptos_curve_id_t id);
 
 void kryptos_del_curve_ctx(kryptos_curve_ctx *curve);
 

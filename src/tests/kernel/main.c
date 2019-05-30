@@ -249,7 +249,6 @@ KUTE_TEST_CASE(ktest_monkey)
 # endif
 #endif
 
-
 #ifndef SKIP_DSA_SIGNATURE_TESTS
     KUTE_RUN_TEST(kryptos_dsa_mk_key_pair_tests);
     KUTE_RUN_TEST(kryptos_dsa_digital_signature_scheme_tests);
@@ -261,6 +260,8 @@ KUTE_TEST_CASE(ktest_monkey)
     printk(KERN_ERR "WARN: The DSA signature tests were skipped.\n");
 # endif
 #endif
+
+    //KUTE_RUN_TEST(kryptos_new_standard_curve_tests);
 KUTE_TEST_CASE_END
 
 KUTE_MAIN(ktest_monkey);
