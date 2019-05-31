@@ -70,6 +70,11 @@
 
 #include <kryptos_rsa.h>
 
+#include <kryptos_ec_utils.h>
+#include <kryptos_curves.h>
+
+//#include <kryptos_ecdh.h>
+
 #ifndef KRYPTOS_KERNEL_MODE
 # include <string.h>
 #endif

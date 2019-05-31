@@ -43,7 +43,7 @@ struct kryptos_ecdh_xchg_ctx {
     (c)->in_size = (c)->out_size = 0;\
     (c)->k = NULL;\
     (c)->result_verbose = NULL;\
-    (c)->result = kKryptosSuccess;\
+    (c)->result = kKryptosProcessError;\
 }
 
 #ifdef __cplusplus

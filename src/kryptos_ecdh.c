@@ -15,6 +15,7 @@
 #ifndef KRYPTOS_KERNEL_MODE
 # include <string.h>
 # include <stdio.h>
+# include <stdlib.h>
 #endif
 
 kryptos_task_result_t kryptos_ecdh_get_curve_from_params_buf(const kryptos_u8_t *params, const size_t params_size,
@@ -91,7 +92,11 @@ kryptos_task_result_t kryptos_ecdh_get_curve_from_params_buf(const kryptos_u8_t 
         goto kryptos_ecdh_get_curve_from_params_buf_epilogue;
     }
 
-    (*curve)->bits = atoi((char *)temp);
+#if defined(__linux__) && defined(KRYPTOS_KERNEL_MODE)
+    (*curve)->bits = simple_strtoul((char *)temp, NULL, 10);
+#else
+    (*curve)->bits = strtoul((char *)temp, NULL, 10);
+#endif
 
     result = kKryptosSuccess;
 
@@ -285,56 +290,8 @@ void kryptos_ecdh_process_xchg(struct kryptos_ecdh_xchg_ctx **data) {
                 (*data)->result_verbose = "Error on making PEM output (KPY).";
                 goto kryptos_ecdh_process_xchg_epilogue;
             }
-        } else {
-            // INFO(Rafael): Alice has received the KP(x,y) from Bob and she needs to compute the joint secret T_{ab}.
-            (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_ECDH_PEM_HDR_PARAM_KPX, (*data)->in, (*data)->in_size,
-                                                      &x);
-
-            if ((*data)->result != kKryptosSuccess) {
-                (*data)->result_verbose = "Error on getting data from PEM (KPX).";
-                goto kryptos_ecdh_process_xchg_epilogue;
-            }
-
-            (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_ECDH_PEM_HDR_PARAM_KPY, (*data)->in, (*data)->in_size,
-                                                      &y);
-
-            if ((*data)->result != kKryptosSuccess) {
-                (*data)->result_verbose = "Error on getting data from PEM (KPY).";
-                goto kryptos_ecdh_process_xchg_epilogue;
-            }
-
-            (*data)->result = kKryptosProcessError;
-
-            if (kryptos_ec_set_point(&kpub, x, y) != 1) {
-                (*data)->result_verbose = "Error on setting point KP(x, y).";
-                goto kryptos_ecdh_process_xchg_epilogue;
-            }
-
-            kryptos_ec_mul(&t, kpub, (*data)->k, (*data)->curve->ec);
-
-            if (t == NULL) {
-                (*data)->result = kKryptosProcessError;
-                (*data)->result_verbose = "Error on computing final T.";
-                goto kryptos_ecdh_process_xchg_epilogue;
-            }
-
-            (*data)->curve->bits = 0;
-            kryptos_del_mp_value((*data)->curve->q);
-            kryptos_del_curve_ctx((*data)->curve);
-            (*data)->curve = NULL;
-
-            (*data)->curve->q  = NULL;
-            (*data)->curve->g  = NULL;
-            (*data)->curve->ec = NULL;
-
-            kryptos_del_mp_value((*data)->k);
-
-            // INFO(Rafael): We do not need y.
-
-            (*data)->k = t->x;
-            t->x = NULL;
         }
-    } else {
+    } else if ((*data)->k == NULL) {
         // INFO(Rafael): Receiver Bob.
 
         if ((*data)->in != NULL && (*data)->curve == NULL) {
@@ -358,7 +315,7 @@ void kryptos_ecdh_process_xchg(struct kryptos_ecdh_xchg_ctx **data) {
 
             if (kpub == NULL) {
                 (*data)->result = kKryptosProcessError;
-                (*data)->result_verbose = "Error on computing KP(x, y).";
+                (*data)->result_verbose = "Error on computing KP(x,y).";
                 goto kryptos_ecdh_process_xchg_epilogue;
             }
 
@@ -384,6 +341,33 @@ void kryptos_ecdh_process_xchg(struct kryptos_ecdh_xchg_ctx **data) {
                 goto kryptos_ecdh_process_xchg_epilogue;
             }
 
+            // INFO(Rafael): Now loading the public point computed from Alice to get the session key T_{ab}.
+
+            kryptos_ec_del_point(kpub);
+
+            (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_ECDH_PEM_HDR_PARAM_KPX,
+                                                      (*data)->in, (*data)->in_size,
+                                                      &x);
+
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on loading public point KP(x,y).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_ECDH_PEM_HDR_PARAM_KPY,
+                                                      (*data)->in, (*data)->in_size,
+                                                      &y);
+
+            if ((*data)->result != kKryptosSuccess) {
+                (*data)->result_verbose = "Error on loading public point KP(x,y).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
+            if (kryptos_ec_set_point(&kpub, x, y) != 1) {
+                (*data)->result_verbose = "Error on loading public point KP(x,y).";
+                goto kryptos_ecdh_process_xchg_epilogue;
+            }
+
             // INFO(Rafael): Now Bob computes the T_{ab}.
 
             kryptos_ec_mul(&t, kpub, (*data)->k, (*data)->curve->ec);
@@ -395,13 +379,8 @@ void kryptos_ecdh_process_xchg(struct kryptos_ecdh_xchg_ctx **data) {
             }
 
             (*data)->curve->bits = 0;
-            kryptos_del_mp_value((*data)->curve->q);
             kryptos_del_curve_ctx((*data)->curve);
             (*data)->curve = NULL;
-
-            (*data)->curve->q  = NULL;
-            (*data)->curve->g  = NULL;
-            (*data)->curve->ec = NULL;
 
             kryptos_del_mp_value((*data)->k);
 
@@ -410,8 +389,53 @@ void kryptos_ecdh_process_xchg(struct kryptos_ecdh_xchg_ctx **data) {
             (*data)->k = t->x;
             t->x = NULL;
         }
-    }
+    } else {
+        // INFO(Rafael): Alice has received the KP(x,y) from Bob and she needs to compute the joint secret T_{ab}.
 
+        (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_ECDH_PEM_HDR_PARAM_KPX, (*data)->in, (*data)->in_size,
+                                                  &x);
+
+        if ((*data)->result != kKryptosSuccess) {
+            (*data)->result_verbose = "Error on getting data from PEM (KPX).";
+            goto kryptos_ecdh_process_xchg_epilogue;
+        }
+
+        (*data)->result = kryptos_pem_get_mp_data(KRYPTOS_ECDH_PEM_HDR_PARAM_KPY, (*data)->in, (*data)->in_size,
+                                                  &y);
+
+        if ((*data)->result != kKryptosSuccess) {
+            (*data)->result_verbose = "Error on getting data from PEM (KPY).";
+            goto kryptos_ecdh_process_xchg_epilogue;
+        }
+
+        (*data)->result = kKryptosProcessError;
+
+        if (kryptos_ec_set_point(&kpub, x, y) != 1) {
+            (*data)->result_verbose = "Error on setting point KP(x, y).";
+            goto kryptos_ecdh_process_xchg_epilogue;
+        }
+
+        kryptos_ec_mul(&t, kpub, (*data)->k, (*data)->curve->ec);
+
+        if (t == NULL) {
+            (*data)->result = kKryptosProcessError;
+            (*data)->result_verbose = "Error on computing final T.";
+            goto kryptos_ecdh_process_xchg_epilogue;
+        }
+
+        (*data)->curve->bits = 0;
+        kryptos_del_curve_ctx((*data)->curve);
+        (*data)->curve = NULL;
+
+        kryptos_del_mp_value((*data)->k);
+
+        // INFO(Rafael): We do not need y.
+
+        (*data)->k = t->x;
+        t->x = NULL;
+
+        (*data)->result = kKryptosSuccess;
+    }
 
 kryptos_ecdh_process_xchg_epilogue:
 
@@ -444,6 +468,19 @@ kryptos_ecdh_process_xchg_epilogue:
 void kryptos_clear_ecdh_xchg_ctx(struct kryptos_ecdh_xchg_ctx *data) {
     if (data != NULL) {
         kryptos_del_curve_ctx(data->curve);
+
+        if (data->in != NULL) {
+            kryptos_freeseg(data->in, data->in_size);
+        }
+
+        if (data->out != NULL) {
+            kryptos_freeseg(data->out, data->out_size);
+        }
+
+        if (data->k != NULL) {
+            kryptos_del_mp_value(data->k);
+        }
+
         kryptos_ecdh_init_xchg_ctx(data);
     }
 }

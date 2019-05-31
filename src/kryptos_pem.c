@@ -36,6 +36,7 @@ kryptos_task_result_t kryptos_pem_put_data(kryptos_u8_t **pem_buf, size_t *pem_b
     char *header_begin = NULL, *header_end = NULL;
     kryptos_task_ctx task, *ktask = &task;
     kryptos_u8_t *new_pem_buf = NULL;
+    char *full_header = NULL;
     size_t new_pem_buf_size = 0;
     size_t old_pem_buf_size = 0, header_begin_size = 0, header_end_size = 0;
     kryptos_task_result_t result = kKryptosProcessError;
@@ -46,9 +47,17 @@ kryptos_task_result_t kryptos_pem_put_data(kryptos_u8_t **pem_buf, size_t *pem_b
 
     if ((*pem_buf) != NULL) {
         old_pem_buf_size = (pem_buf_size == NULL) ? kryptos_pem_strlen((char *)*pem_buf) : *pem_buf_size;
-        if (kryptos_find_header(header, (*pem_buf), old_pem_buf_size) != NULL) {
+
+        if ((full_header = kryptos_pem_header(KRYPTOS_PEM_BEGIN_PFX, header, KRYPTOS_PEM_BEGIN_SFX)) == NULL) {
             return kKryptosInvalidParams;
         }
+
+        if (kryptos_find_header(full_header, (*pem_buf), old_pem_buf_size) != NULL) {
+            kryptos_freeseg(full_header, kryptos_pem_strlen(full_header));
+            return kKryptosInvalidParams;
+        }
+
+        kryptos_freeseg(full_header, kryptos_pem_strlen(full_header));
     }
 
     kryptos_task_init_as_null(ktask);
