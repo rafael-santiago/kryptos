@@ -2717,3 +2717,32 @@ CUTE_TEST_CASE(kryptos_mp_bit_n_tests)
         kryptos_del_mp_value(value);
     }
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mp_get_bitmap_tests)
+    struct test_ctx {
+        kryptos_u8_t *value;
+        kryptos_u8_t *expected;
+        size_t expected_size;
+    };
+    struct test_ctx test_vector[] = {
+        { "DEADBEEF",         "\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
+                              "\x1\x0\x1\x1\x1\x1\x1\x0\x1\x1\x1\x0\x1\x1\x1\x1", 32 },
+        { "DEADBEEFDEADBEEF", "\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
+                              "\x1\x0\x1\x1\x1\x1\x1\x0\x1\x1\x1\x0\x1\x1\x1\x1"
+                              "\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
+                              "\x1\x0\x1\x1\x1\x1\x1\x0\x1\x1\x1\x0\x1\x1\x1\x1", 64 }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *value = NULL;
+    kryptos_u8_t *bitmap = NULL;
+    size_t bitmap_size;
+    for (tv = 0; tv < tv_nr; tv++) {
+        value = kryptos_hex_value_as_mp(test_vector[tv].value, strlen(test_vector[tv].value));
+        CUTE_ASSERT(value != NULL);
+        bitmap = kryptos_mp_get_bitmap(value, &bitmap_size);
+        CUTE_ASSERT(bitmap_size == test_vector[tv].expected_size);
+        CUTE_ASSERT(memcmp(bitmap, test_vector[tv].expected, bitmap_size) == 0);
+        kryptos_freeseg(bitmap, bitmap_size);
+        kryptos_del_mp_value(value);
+    }
+CUTE_TEST_CASE_END

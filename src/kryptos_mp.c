@@ -2368,6 +2368,77 @@ static void kryptos_mp_add_positive_signal(kryptos_mp_value_t **dest) {
     kryptos_mp_add_signal(dest, 0x00);
 }
 
+kryptos_u8_t *kryptos_mp_get_bitmap(const kryptos_mp_value_t *src, size_t *bitmap_size) {
+    kryptos_u8_t *bitmap = NULL, *bp;
+    ssize_t d;
+
+    if (src == NULL || bitmap_size == NULL) {
+        goto kryptos_mp_get_bitmap_epilogue;
+    }
+
+    *bitmap_size = kryptos_mp_byte2bit(src->data_size);
+    bitmap = kryptos_newseg(*bitmap_size);
+
+    if (bitmap == NULL) {
+        *bitmap_size = 0;
+        goto kryptos_mp_get_bitmap_epilogue;
+    }
+
+    bp = bitmap;
+
+    for (d = src->data_size - 1; d >= 0; d--) {
+#if defined(KRYPTOS_MP_U32_DIGIT)
+        bp[ 0] = ((src->data[d] >> 31) & 0x1);
+        bp[ 1] = ((src->data[d] >> 30) & 0x1);
+        bp[ 2] = ((src->data[d] >> 29) & 0x1);
+        bp[ 3] = ((src->data[d] >> 28) & 0x1);
+        bp[ 4] = ((src->data[d] >> 27) & 0x1);
+        bp[ 5] = ((src->data[d] >> 26) & 0x1);
+        bp[ 6] = ((src->data[d] >> 25) & 0x1);
+        bp[ 7] = ((src->data[d] >> 24) & 0x1);
+        bp[ 8] = ((src->data[d] >> 23) & 0x1);
+        bp[ 9] = ((src->data[d] >> 22) & 0x1);
+        bp[10] = ((src->data[d] >> 21) & 0x1);
+        bp[11] = ((src->data[d] >> 20) & 0x1);
+        bp[12] = ((src->data[d] >> 19) & 0x1);
+        bp[13] = ((src->data[d] >> 18) & 0x1);
+        bp[14] = ((src->data[d] >> 17) & 0x1);
+        bp[15] = ((src->data[d] >> 16) & 0x1);
+        bp[16] = ((src->data[d] >> 15) & 0x1);
+        bp[17] = ((src->data[d] >> 14) & 0x1);
+        bp[18] = ((src->data[d] >> 13) & 0x1);
+        bp[19] = ((src->data[d] >> 12) & 0x1);
+        bp[20] = ((src->data[d] >> 11) & 0x1);
+        bp[21] = ((src->data[d] >> 10) & 0x1);
+        bp[22] = ((src->data[d] >>  9) & 0x1);
+        bp[23] = ((src->data[d] >>  8) & 0x1);
+        bp[24] = ((src->data[d] >>  7) & 0x1);
+        bp[25] = ((src->data[d] >>  6) & 0x1);
+        bp[26] = ((src->data[d] >>  5) & 0x1);
+        bp[27] = ((src->data[d] >>  4) & 0x1);
+        bp[28] = ((src->data[d] >>  3) & 0x1);
+        bp[29] = ((src->data[d] >>  2) & 0x1);
+        bp[30] = ((src->data[d] >>  1) & 0x1);
+        bp[31] = ((src->data[d] >>  0) & 0x1);
+        bp += 32;
+#else
+        bp[0] = ((src->data[d] >>  7) & 0x1);
+        bp[1] = ((src->data[d] >>  6) & 0x1);
+        bp[2] = ((src->data[d] >>  5) & 0x1);
+        bp[3] = ((src->data[d] >>  4) & 0x1);
+        bp[4] = ((src->data[d] >>  3) & 0x1);
+        bp[5] = ((src->data[d] >>  2) & 0x1);
+        bp[6] = ((src->data[d] >>  1) & 0x1);
+        bp[7] = ((src->data[d] >>  0) & 0x1);
+        bp += 8;
+#endif
+    }
+
+kryptos_mp_get_bitmap_epilogue:
+
+    return bitmap;
+}
+
 static void kryptos_mp_add_negative_signal(kryptos_mp_value_t **dest) {
 #if defined(KRYPTOS_MP_U32_DIGIT)
     kryptos_mp_add_signal(dest, 0xFFFFFFFF);
@@ -2402,7 +2473,7 @@ kryptos_mp_add_negative_signal_epilogue:
 
 
 kryptos_mp_value_t *kryptos_mp_mul_s(kryptos_mp_value_t **dest, kryptos_mp_value_t *src) {
-    kryptos_mp_value_t *dc = NULL, *sc = NULL, *result = NULL;/*, *temp = NULL*/;
+    kryptos_mp_value_t *dc = NULL, *sc = NULL, *result = NULL;
     int dc_neg, sc_neg;
 
     if (dest == NULL || src == NULL) {
@@ -2436,16 +2507,6 @@ kryptos_mp_value_t *kryptos_mp_mul_s(kryptos_mp_value_t **dest, kryptos_mp_value
     if (dc_neg != sc_neg) {
         KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_inv(&dc), kryptos_mp_mul_s_epilogue);
         if (!kryptos_mp_is_neg(dc)) {
-            /*KRYPTOS_MP_ABORT_WHEN_NULL(temp = kryptos_new_mp_value(kryptos_mp_byte2bit(dc->data_size + 1)),
-                                       kryptos_mp_mul_s_epilogue);
-            t = temp->data_size - 1;
-            temp->data[t--] = 0xFFFFFFFF;
-            for (d = dc->data_size - 1; d >= 0; d--) {
-                temp->data[t--] = dc->data[d];
-            }
-            kryptos_del_mp_value(dc);
-            dc = temp;
-            temp = NULL;*/
             kryptos_mp_add_negative_signal(&dc);
         }
     } else if (kryptos_mp_is_neg(dc)) {
@@ -2465,10 +2526,6 @@ kryptos_mp_mul_s_epilogue:
     if (sc != NULL) {
         kryptos_del_mp_value(sc);
     }
-
-    /*if (temp != NULL) {
-        kryptos_del_mp_value(temp);
-    }*/
 
     return result;
 }

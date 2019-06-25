@@ -313,8 +313,10 @@ kryptos_ec_dbl_epilogue:
 
 void kryptos_ec_mul(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_mp_value_t *d, kryptos_ec_t *curve) {
     kryptos_ec_pt_t q = { NULL, NULL }, *t = NULL;
-    kryptos_mp_value_t *_0 = NULL, *d_cpy = NULL;
+    kryptos_mp_value_t *_0 = NULL;
     int done = 0;
+    kryptos_u8_t *bitmap = NULL, *bp = NULL, *bp_end = NULL;
+    size_t bitmap_size = 0;
 
     *r = NULL;
 
@@ -325,18 +327,29 @@ void kryptos_ec_mul(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_mp_value_t 
         goto kryptos_ec_mul_epilogue;
     }
 
+    bitmap = kryptos_mp_get_bitmap(d, &bitmap_size);
+    KRYPTOS_EC_UTILS_DO_OR_DIE(bitmap, kryptos_ec_mul_epilogue);
+
+    bp = bitmap;
+    bp_end = bp + bitmap_size - 1;
+
+    while (*bp != 1) {
+        bp++;
+    }
+
     kryptos_assign_mp_value(&q.x, p->x);
     kryptos_assign_mp_value(&q.y, p->y);
 
-    if (kryptos_mp_is_even(d)) {
+    if (*bp_end == 0) {
         kryptos_ec_set_point(r, _0, _0);
     } else {
         kryptos_ec_set_point(r, p->x, p->y);
     }
 
-    KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&d_cpy, d), kryptos_ec_mul_epilogue);
+    kryptos_del_mp_value(_0);
+    _0 = NULL;
 
-#define kryptos_ec_mul_step(r, t, q, d, zero, curve) {\
+#define kryptos_ec_mul_step(r, t, q, bit, curve) {\
     kryptos_ec_dbl(&(t), &(q), (curve));\
     /*printf("[mul/dbl] Q.x = "); kryptos_print_mp((q).x);*/\
     /*printf("[mul/dbl] Q.y = "); kryptos_print_mp((q).y);*/\
@@ -347,7 +360,7 @@ void kryptos_ec_mul(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_mp_value_t 
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(q).y, (t)->y), kryptos_ec_mul_epilogue);\
     kryptos_ec_del_point((t));\
     (t) = NULL;\
-    if (kryptos_mp_is_odd(d)) {\
+    if (bit) {\
         /*printf("[mul/add] R.x = "); kryptos_print_mp((*(r))->x);*/\
         /*printf("[mul/add] R.y = "); kryptos_print_mp((*(r))->y);*/\
         /*printf("[mul/add] Q.x = "); kryptos_print_mp((q).x);*/\
@@ -363,12 +376,12 @@ void kryptos_ec_mul(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_mp_value_t 
     }\
 }
 
-    KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_rsh(&d_cpy, 1), kryptos_ec_mul_epilogue);
+    bp_end -= 1;
 
-    while (!kryptos_mp_is_zero(d_cpy)) {
-        kryptos_ec_mul_step(r, t, q, d_cpy, _0, curve);
-        KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_rsh(&d_cpy, 1), kryptos_ec_mul_epilogue);
-    }
+    do {
+        kryptos_ec_mul_step(r, t, q, *bp_end, curve);
+        bp_end--;
+    } while (bp_end >= bp);
 
 #undef kryptos_ec_mul_step
 
@@ -392,8 +405,10 @@ kryptos_ec_mul_epilogue:
         kryptos_del_mp_value(q.y);
     }
 
-    if (d_cpy != NULL) {
-        kryptos_del_mp_value(d_cpy);
+    if (bitmap != NULL) {
+        kryptos_freeseg(bitmap, bitmap_size);
+        bp = bp_end = NULL;
+        bitmap_size = 0;
     }
 
     if (!done) {

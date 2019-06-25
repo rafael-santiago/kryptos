@@ -268,7 +268,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_mul_s_tests);
     CUTE_RUN_TEST(kryptos_mp_mod_tests);
     CUTE_RUN_TEST(kryptos_mp_bits_total_in_base2_tests);
-    CUTE_RUN_TEST(kryptos_mp_bit_n_tests);
+    //CUTE_RUN_TEST(kryptos_mp_bit_n_tests);
+    CUTE_RUN_TEST(kryptos_mp_get_bitmap_tests);
 
     // INFO(Rafael): This encoding function depends on multiprecision stuff, this is because we need
     //               to test it later than other encoding stuff.
@@ -355,7 +356,6 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_ecdh_get_random_k_tests);
     CUTE_RUN_TEST(kryptos_ecdh_process_xchg_tests);
     CUTE_RUN_TEST(kryptos_ecdh_process_xchg_with_stdcurves_tests);
-
 
 //    CUTE_RUN_TEST(poke_bloody_poke);
 CUTE_TEST_CASE_END

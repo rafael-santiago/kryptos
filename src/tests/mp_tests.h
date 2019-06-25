@@ -104,6 +104,8 @@ CUTE_DECLARE_TEST_CASE(kryptos_mp_bits_total_in_base2_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_mp_bit_n_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_mp_get_bitmap_tests);
+
 //CUTE_DECLARE_TEST_CASE(poke_bloody_poke);
 
 #endif
