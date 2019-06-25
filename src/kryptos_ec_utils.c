@@ -315,7 +315,6 @@ void kryptos_ec_mul(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_mp_value_t 
     kryptos_ec_pt_t q = { NULL, NULL }, *t = NULL;
     kryptos_mp_value_t *_0 = NULL, *d_cpy = NULL;
     int done = 0;
-    ssize_t j;
 
     *r = NULL;
 

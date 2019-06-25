@@ -2404,7 +2404,6 @@ kryptos_mp_add_negative_signal_epilogue:
 kryptos_mp_value_t *kryptos_mp_mul_s(kryptos_mp_value_t **dest, kryptos_mp_value_t *src) {
     kryptos_mp_value_t *dc = NULL, *sc = NULL, *result = NULL;/*, *temp = NULL*/;
     int dc_neg, sc_neg;
-    ssize_t d, t;
 
     if (dest == NULL || src == NULL) {
         return NULL;

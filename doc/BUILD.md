@@ -150,6 +150,7 @@ The default build options are defined into the file ``src/.ivk``. The **Table 1*
 | ``--obj-output-dir=o``      |   Defines where the object files will be generated.                            |
 | ``--includes=./``           |   Defines the additional includes directories. This is a comma separated list. |
 | ``--quick-dh-tests``        |   Speeding up the Diffie-Hellman-Merkle tests.                                 |
+| ``--quick-ecdh-tests``      |   Speeding up the Elliptic curve Diffie-Hellman-Merkle tests.                  |
 
 
 ### The default build options (unit tests)

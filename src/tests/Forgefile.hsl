@@ -41,6 +41,11 @@ kryptos-tests.prologue() {
         $cflags.add_item("-DKRYPTOS_NO_HMAC_TESTS");
     }
 
+    $user_option = hefesto.sys.get_option("quick-ecdh-tests");
+    if ($user_option.count() > 0) {
+        $cflags.add_item("-DKRYPTOS_QUICK_ECDH_TESTS");
+    }
+
     if ($toolset_name.match("^clang") == 1) {
         $cflags.add_item("-Wno-pointer-sign");
         $cflags.add_item("-Wno-invalid-source-encoding");

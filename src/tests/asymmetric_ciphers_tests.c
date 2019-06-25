@@ -3466,6 +3466,7 @@ CUTE_TEST_CASE_END
 CUTE_TEST_CASE(kryptos_ecdh_process_xchg_with_stdcurves_tests)
     kryptos_curve_id_t cids[] = {
         kBrainPoolP160R1,
+#if !defined(KRYPTOS_QUICK_ECDH_TESTS)
         kBrainPoolP160T1,
         kBrainPoolP192R1,
         kBrainPoolP192T1,
@@ -3479,6 +3480,7 @@ CUTE_TEST_CASE(kryptos_ecdh_process_xchg_with_stdcurves_tests)
         kBrainPoolP384T1,
         kBrainPoolP512R1,
         kBrainPoolP512T1
+#endif
     };
     size_t cids_nr = sizeof(cids) / sizeof(cids[0]), c;
     struct kryptos_ecdh_xchg_ctx alice_ctx, *alice_ecdh = &alice_ctx, bob_ctx, *bob_ecdh = &bob_ctx;
