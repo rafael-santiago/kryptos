@@ -82,4 +82,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_ecdh_get_random_k_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_ecdh_process_xchg_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_ecdh_process_xchg_with_stdcurves_tests);
+
 #endif

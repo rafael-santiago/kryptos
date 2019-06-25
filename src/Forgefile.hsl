@@ -31,8 +31,8 @@ kryptos.prologue() {
     check_compiler_language();
     $includes = hefesto.sys.get_option("includes");
     $cflags = hefesto.sys.get_option("cflags");
-    $cflags.add_item("-Wall");
-    $cflags.add_item("-Werror");
+    #$cflags.add_item("-Wall");
+    #$cflags.add_item("-Werror");
     $deps = get_c_cpp_deps();
     $sources.ls(".*\\.c$");
 

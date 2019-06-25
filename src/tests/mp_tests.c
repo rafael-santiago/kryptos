@@ -748,9 +748,9 @@ CUTE_TEST_CASE(kryptos_mp_is_neg_tests)
         {         "0000000A", 0 },
         {         "FFFFFFF6", 1 },
         {         "21524111", 0 },
-        {         "DEADBEEF", 1 },
+        {         "DEADBEEF", 0 },
         { "2152411021524111", 0 },
-        { "DEADBEEFDEADBEEF", 1 }
+        { "DEADBEEFDEADBEEF", 0 }
     };
 #else
     struct is_neg_tests_ctx test_vector[] = {
@@ -761,9 +761,9 @@ CUTE_TEST_CASE(kryptos_mp_is_neg_tests)
         {         "0000000A", 0 },
         {         "FFFFFFF6", 1 },
         {         "21524111", 0 },
-        {         "DEADBEEF", 1 },
+        {         "DEADBEEF", 0 },
         { "2152411021524111", 0 },
-        { "DEADBEEFDEADBEEF", 1 }
+        { "DEADBEEFDEADBEEF", 0 }
     };
 #endif
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;

@@ -354,6 +354,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_ecdh_get_curve_from_params_buf_tests);
     CUTE_RUN_TEST(kryptos_ecdh_get_random_k_tests);
     CUTE_RUN_TEST(kryptos_ecdh_process_xchg_tests);
+    CUTE_RUN_TEST(kryptos_ecdh_process_xchg_with_stdcurves_tests);
+
 
 //    CUTE_RUN_TEST(poke_bloody_poke);
 CUTE_TEST_CASE_END

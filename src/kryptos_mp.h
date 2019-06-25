@@ -94,17 +94,19 @@ kryptos_mp_value_t *kryptos_mp_mul_s(kryptos_mp_value_t **dest, kryptos_mp_value
 
 size_t kryptos_mp_bit_n(kryptos_mp_value_t *value, const size_t bn);
 
+int kryptos_mp_is_zero(kryptos_mp_value_t *value);
+
 #ifdef __cplusplus
 }
 #endif
 
 #ifndef KRYPTOS_MP_U32_DIGIT
 
-# define kryptos_mp_is_neg(a) ( ((a)->data[(a)->data_size - 1] >> 7) )
+# define kryptos_mp_is_neg(a) ( (((a)->data[(a)->data_size - 1] & 0xF0) == 0xF0) )
 
 #else
 
-# define kryptos_mp_is_neg(a) ( ((a)->data[(a)->data_size - 1] >> 31) )
+# define kryptos_mp_is_neg(a) ( (((a)->data[(a)->data_size - 1] & 0xF0000000) == 0xF0000000) )
 
 #endif
 

@@ -3462,3 +3462,74 @@ CUTE_TEST_CASE(kryptos_ecdh_process_xchg_tests)
     kryptos_del_mp_value(x);
     kryptos_del_mp_value(y);
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_ecdh_process_xchg_with_stdcurves_tests)
+    kryptos_curve_id_t cids[] = {
+        kBrainPoolP160R1,
+        kBrainPoolP160T1,
+        kBrainPoolP192R1,
+        kBrainPoolP192T1,
+        kBrainPoolP224R1,
+        kBrainPoolP224T1,
+        kBrainPoolP256R1,
+        kBrainPoolP256T1,
+        kBrainPoolP320R1,
+        kBrainPoolP320T1,
+        kBrainPoolP384R1,
+        kBrainPoolP384T1,
+        kBrainPoolP512R1,
+        kBrainPoolP512T1
+    };
+    size_t cids_nr = sizeof(cids) / sizeof(cids[0]), c;
+    struct kryptos_ecdh_xchg_ctx alice_ctx, *alice_ecdh = &alice_ctx, bob_ctx, *bob_ecdh = &bob_ctx;
+
+    for (c = 0; c < cids_nr; c++) {
+        kryptos_ecdh_init_xchg_ctx(alice_ecdh);
+
+        alice_ecdh->curve = kryptos_new_standard_curve(cids[c]);
+
+        CUTE_ASSERT(alice_ecdh->curve != NULL);
+
+        // INFO(Rafael): Alice picks one random private K, computes a public point KP(x,y) and sends this point to Bob.
+
+        kryptos_ecdh_process_xchg(&alice_ecdh);
+
+        CUTE_ASSERT(alice_ecdh->result == kKryptosSuccess);
+
+        kryptos_ecdh_init_xchg_ctx(bob_ecdh);
+
+        // INFO(Rafael): So Alice has just send and bob has just receive all parameters besides the public point KP(x,y).
+        bob_ecdh->in = alice_ecdh->out;
+        bob_ecdh->in_size = alice_ecdh->out_size;
+
+        kryptos_ecdh_process_xchg(&bob_ecdh);
+
+        CUTE_ASSERT(bob_ecdh->result == kKryptosSuccess);
+
+        // INFO(Rafael): At this point Bob has the session key T_{ab}, however, he must send his out to Alice. Because
+        //               Alice needs the public point KP(x,y) from Bob in order to get the same session key T_{ab}.
+
+        alice_ecdh->out = NULL;
+
+        alice_ecdh->in = bob_ecdh->out;
+        alice_ecdh->in_size = bob_ecdh->out_size;
+
+        kryptos_ecdh_process_xchg(&alice_ecdh);
+
+        CUTE_ASSERT(alice_ecdh->result == kKryptosSuccess);
+
+        bob_ecdh->out = NULL;
+
+        // INFO(Rafael): At this point Alice must have the same session key T_{ab} previously computed by Bob.
+
+        printf("\tAlice K = "); kryptos_print_mp(alice_ecdh->k);
+        printf("\tBob   K = "); kryptos_print_mp(bob_ecdh->k);
+
+        CUTE_ASSERT(alice_ecdh->k != NULL);
+        CUTE_ASSERT(bob_ecdh->k != NULL);
+        CUTE_ASSERT(kryptos_mp_eq(alice_ecdh->k, bob_ecdh->k) == 1);
+
+        kryptos_clear_ecdh_xchg_ctx(alice_ecdh);
+        kryptos_clear_ecdh_xchg_ctx(bob_ecdh);
+    }
+CUTE_TEST_CASE_END

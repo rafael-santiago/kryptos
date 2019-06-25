@@ -216,6 +216,12 @@ static kryptos_mp_value_t *kryptos_mp_montgomery_reduction_2kx_mod_y(const krypt
 
 static int kryptos_mp_gen_prime_small_primes_test(const kryptos_mp_value_t *n, kryptos_mp_value_t **prime);
 
+static void kryptos_mp_add_negative_signal(kryptos_mp_value_t **dest);
+
+static void kryptos_mp_add_positive_signal(kryptos_mp_value_t **dest);
+
+static void kryptos_mp_add_signal(kryptos_mp_value_t **dest, const kryptos_mp_digit_t signal);
+
 kryptos_mp_value_t *kryptos_new_mp_value(const size_t bitsize) {
     kryptos_mp_value_t *mp;
 
@@ -782,7 +788,7 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
     kryptos_u64_t bsub;
     kryptos_u32_t c;
 #endif
-    kryptos_mp_value_t *delta;
+    kryptos_mp_value_t *delta, *temp;
     int is_zero = 0;
 
     if (dest == NULL || src == NULL) {
@@ -851,8 +857,43 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
         delta->data[s] = 0xFF;
     }
 #else
-    if (c == 0xFFFFFFFF && s < delta->data_size) {
-        delta->data[s] = 0xFFFFFFFF;
+    if (c == 0xFFFFFFFF /*&& s < delta->data_size*/) {
+        /*if ((delta->data[s - 1] & 0x0000000F) == 0) {
+            delta->data[s - 1] |= 0x0F;
+        } else if ((delta->data[s - 1] & 0x000000F0) == 0) {
+            delta->data[s - 1] |= 0xF0;
+        } else if ((delta->data[s - 1] & 0x00000F00) == 0) {
+            delta->data[s - 1] |= 0xF00;
+        } else if ((delta->data[s - 1] & 0x0000F000) == 0) {
+            delta->data[s - 1] |= 0xF000;
+        } else if ((delta->data[s - 1] & 0x000F0000) == 0) {
+            delta->data[s - 1] |= 0xF0000;
+        } else if ((delta->data[s - 1] & 0x00F00000) == 0) {
+            delta->data[s - 1] |= 0xF00000;
+        } else if ((delta->data[s - 1] & 0x0F000000) == 0) {
+            delta->data[s - 1] |= 0xF000000;
+        } else if ((delta->data[s - 1] & 0xF0000000) == 0) {
+            delta->data[s - 1] |= 0xF0000000;
+        }*/
+        if (!kryptos_mp_is_neg(delta)) {
+            temp = kryptos_new_mp_value(kryptos_mp_byte2bit(dn + 1));
+
+            if (temp == NULL) {
+                kryptos_del_mp_value(*dest);
+                *dest = NULL;
+            }
+
+            sn = temp->data_size - 1;
+            temp->data[sn--] = 0xFFFFFFFF;
+
+            for (d = delta->data_size - 1; d >= 0; d--) {
+                temp->data[sn--] = delta->data[d];
+            }
+
+            kryptos_del_mp_value(delta);
+            delta = temp;
+            temp = NULL;
+        }
     }
 /*
     if (delta->data_size > 1 && delta->data[delta->data_size - 1] == 0x1) {
@@ -1977,6 +2018,77 @@ kryptos_mp_div_epilogue:
 #endif
 
 int kryptos_mp_mod(kryptos_mp_value_t **dest, kryptos_mp_value_t *src) {
+    kryptos_mp_value_t *dest_copy = NULL, *temp = NULL, *q = NULL, *_1 = NULL;
+    int done = 0;
+
+    if (dest == NULL || src == NULL) {
+        return 0;
+    }
+
+    if (kryptos_assign_mp_value(&dest_copy, *dest) == NULL) {
+        return 0;
+    }
+
+    kryptos_del_mp_value(*dest);
+    *dest = NULL;
+
+    if (kryptos_mp_is_neg(dest_copy)) {
+        _1 = kryptos_hex_value_as_mp("01", 2);
+        // INFO(Rafael): In order to find modulo from a negative number here we are using: (-n) % k = k - (n % k).
+        //               ((k - 1) * n) mod k.
+        if (kryptos_mp_inv(&dest_copy) == NULL) {
+            goto kryptos_mp_mod_epilogue;
+        }
+
+        kryptos_assign_mp_value(&temp, src);
+        kryptos_mp_sub(&temp, _1);
+        kryptos_mp_mul(&dest_copy, temp);
+        kryptos_del_mp_value(temp);
+        temp = NULL;
+
+        q = kryptos_mp_div(dest_copy, src, dest);
+
+        if (q == NULL || dest == NULL) {
+            goto kryptos_mp_mod_epilogue;
+        }
+
+        /*if (kryptos_mp_eq(temp, _0) == 1) {
+            kryptos_assign_mp_value(dest, _0);
+            done = 1;
+            goto kryptos_mp_mod_epilogue;
+        } else if (kryptos_assign_mp_value(dest, src) == NULL) {
+            goto kryptos_mp_mod_epilogue;
+        }
+
+        if (kryptos_mp_sub(dest, temp) == NULL) {
+            goto kryptos_mp_mod_epilogue;
+        }*/
+    } else {
+        q = kryptos_mp_div(dest_copy, src, dest);
+    }
+
+    done = 1;
+
+kryptos_mp_mod_epilogue:
+
+    if (dest_copy != NULL) {
+        kryptos_del_mp_value(dest_copy);
+    }
+
+    if (q != NULL) {
+        kryptos_del_mp_value(q);
+    }
+
+    if (temp != NULL) {
+        kryptos_del_mp_value(temp);
+    }
+
+    if (_1 != NULL) {
+        kryptos_del_mp_value(_1);
+    }
+
+    return done;
+/*
     // INFO(Rafael): This function does not take into consideration signal.
     kryptos_mp_value_t *dest_copy = NULL, *temp = NULL, *q = NULL;
     int done = 0;
@@ -1992,19 +2104,28 @@ int kryptos_mp_mod(kryptos_mp_value_t **dest, kryptos_mp_value_t *src) {
     kryptos_del_mp_value(*dest);
     *dest = NULL;
 
+    // TODO(Rafael): Fazer esse trecho executar mais rápido.
     if (kryptos_mp_is_neg(dest_copy)) {
+        printf("while...\n");
+        printf("dest_copy = "); kryptos_print_mp(dest_copy);
+        printf("src       = "); kryptos_print_mp(src);
         do {
             KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add_s(&dest_copy, src), kryptos_mp_mod_epilogue);
+            printf("dest_copy' = "); kryptos_print_mp(dest_copy);
         } while (kryptos_mp_is_neg(dest_copy));
-
+        printf("while done!\n");
         *dest = dest_copy;
         dest_copy = NULL;
         done = 1;
 
         goto kryptos_mp_mod_epilogue;
+    } else {
+        printf("not neg.\n");
     }
 
+    printf("div...\n");
     KRYPTOS_MP_ABORT_WHEN_NULL(q = kryptos_mp_div(dest_copy, src, dest), kryptos_mp_mod_epilogue);
+    printf("div done!\n");
     kryptos_del_mp_value(q);
     q = NULL;
 
@@ -2025,6 +2146,7 @@ kryptos_mp_mod_epilogue:
     }
 
     return done;
+*/
 }
 
 kryptos_mp_value_t *kryptos_mp_inv(kryptos_mp_value_t **dest) {
@@ -2111,6 +2233,11 @@ kryptos_mp_value_t *kryptos_mp_add_s(kryptos_mp_value_t **dest, kryptos_mp_value
 
     if (dc_neg && dc_is_greater) {
         KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_inv(&dc), kryptos_mp_add_s_epilogue);
+        if (!kryptos_mp_is_neg(dc)) {
+            kryptos_mp_add_negative_signal(&dc);
+        }
+    } else if (kryptos_mp_is_neg(dc)) {
+        kryptos_mp_add_positive_signal(&dc);
     }
 
     kryptos_del_mp_value(*dest);
@@ -2213,7 +2340,12 @@ kryptos_mp_value_t *kryptos_mp_sub_s(kryptos_mp_value_t **dest, kryptos_mp_value
 
     if (do_inv) {
         KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_inv(&dc), kryptos_mp_sub_s_epilogue);
-    }
+        if (!kryptos_mp_is_neg(dc) && !(kryptos_mp_ge(sc, dc) && dc_neg && !sc_neg)) {
+            kryptos_mp_add_negative_signal(&dc);
+        }
+    }/* else if (kryptos_mp_is_neg(dc)) {
+        kryptos_mp_add_positive_signal(&dc);
+    }*/
 
     kryptos_del_mp_value(*dest);
     *dest = result = dc;
@@ -2232,9 +2364,47 @@ kryptos_mp_sub_s_epilogue:
     return result;
 }
 
+static void kryptos_mp_add_positive_signal(kryptos_mp_value_t **dest) {
+    kryptos_mp_add_signal(dest, 0x00);
+}
+
+static void kryptos_mp_add_negative_signal(kryptos_mp_value_t **dest) {
+#if defined(KRYPTOS_MP_U32_DIGIT)
+    kryptos_mp_add_signal(dest, 0xFFFFFFFF);
+#else
+    kryptos_mp_add_signal(dest, 0xFF);
+#endif
+}
+
+static void kryptos_mp_add_signal(kryptos_mp_value_t **dest, const kryptos_mp_digit_t signal) {
+    kryptos_mp_value_t *temp = NULL;
+    ssize_t t, d;
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(temp = kryptos_new_mp_value(kryptos_mp_byte2bit((*dest)->data_size + 1)),
+                               kryptos_mp_add_negative_signal_epilogue);
+
+        t = temp->data_size - 1;
+        temp->data[t--] = signal;
+        for (d = (*dest)->data_size - 1; d >= 0; d--) {
+            temp->data[t--] = (*dest)->data[d];
+        }
+
+        kryptos_del_mp_value(*dest);
+        *dest = temp;
+        temp = NULL;
+
+kryptos_mp_add_negative_signal_epilogue:
+
+    if (temp != NULL) {
+        kryptos_del_mp_value(temp);
+    }
+}
+
+
 kryptos_mp_value_t *kryptos_mp_mul_s(kryptos_mp_value_t **dest, kryptos_mp_value_t *src) {
-    kryptos_mp_value_t *dc = NULL, *sc = NULL, *result = NULL;
+    kryptos_mp_value_t *dc = NULL, *sc = NULL, *result = NULL;/*, *temp = NULL*/;
     int dc_neg, sc_neg;
+    ssize_t d, t;
 
     if (dest == NULL || src == NULL) {
         return NULL;
@@ -2266,6 +2436,21 @@ kryptos_mp_value_t *kryptos_mp_mul_s(kryptos_mp_value_t **dest, kryptos_mp_value
 
     if (dc_neg != sc_neg) {
         KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_inv(&dc), kryptos_mp_mul_s_epilogue);
+        if (!kryptos_mp_is_neg(dc)) {
+            /*KRYPTOS_MP_ABORT_WHEN_NULL(temp = kryptos_new_mp_value(kryptos_mp_byte2bit(dc->data_size + 1)),
+                                       kryptos_mp_mul_s_epilogue);
+            t = temp->data_size - 1;
+            temp->data[t--] = 0xFFFFFFFF;
+            for (d = dc->data_size - 1; d >= 0; d--) {
+                temp->data[t--] = dc->data[d];
+            }
+            kryptos_del_mp_value(dc);
+            dc = temp;
+            temp = NULL;*/
+            kryptos_mp_add_negative_signal(&dc);
+        }
+    } else if (kryptos_mp_is_neg(dc)) {
+        kryptos_mp_add_positive_signal(&dc);
     }
 
     kryptos_del_mp_value(*dest);
@@ -2281,6 +2466,10 @@ kryptos_mp_mul_s_epilogue:
     if (sc != NULL) {
         kryptos_del_mp_value(sc);
     }
+
+    /*if (temp != NULL) {
+        kryptos_del_mp_value(temp);
+    }*/
 
     return result;
 }
@@ -3971,6 +4160,23 @@ int kryptos_mp_bits_total_in_base2(kryptos_mp_value_t *value) {
     total = (b == -1) ? 1 : (s - (s - b - 1)) + (w * s);
 
     return total;
+}
+
+int kryptos_mp_is_zero(kryptos_mp_value_t *value) {
+    int is_zero;
+    ssize_t j;
+
+    if (value == NULL) {
+        return 0;
+    }
+
+    is_zero = 1;
+
+    for (j = value->data_size - 1; j >= 0 && is_zero; j--) {
+        is_zero = (value->data[j] == 0);
+    }
+
+    return is_zero;
 }
 
 size_t kryptos_mp_bit_n(kryptos_mp_value_t *value, const size_t bn) {

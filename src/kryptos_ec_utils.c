@@ -8,6 +8,7 @@
 #include <kryptos_ec_utils.h>
 #include <kryptos_mp.h>
 #include <kryptos_memory.h>
+#include <stdio.h>
 
 #define KRYPTOS_EC_UTILS_DO_OR_DIE(stmt, escape_label) {\
     if ((stmt) == NULL) {\
@@ -80,17 +81,19 @@ void kryptos_ec_add(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_pt_t *q,
 
     *r = NULL;
 
-#define kryptos_ec_pt_mod_p(pt, p, pt_rem, temp) {\
-    KRYPTOS_EC_UTILS_DO_OR_DIE((temp) = kryptos_mp_div((pt)->x, (p), &(pt_rem).x), kryptos_ec_add_epilogue);\
-    kryptos_del_mp_value((temp));\
-    (temp) = NULL;\
-    KRYPTOS_EC_UTILS_DO_OR_DIE((temp) = kryptos_mp_div((pt)->y, (p), &(pt_rem).y), kryptos_ec_add_epilogue);\
-    kryptos_del_mp_value((temp));\
-    (temp) = NULL;\
+#define kryptos_ec_pt_mod_p(pt, p, pt_rem) {\
+    KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(pt_rem).x, (pt)->x), kryptos_ec_add_epilogue);\
+    KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(pt_rem).y, (pt)->y), kryptos_ec_add_epilogue);\
+    kryptos_mp_mod(&(pt_rem).x, p);\
+    kryptos_mp_mod(&(pt_rem).y, p);\
 }
 
-    kryptos_ec_pt_mod_p(p, curve->p, p_mod, temp1);
-    kryptos_ec_pt_mod_p(q, curve->p, q_mod, temp1);
+    kryptos_ec_pt_mod_p(p, curve->p, p_mod);
+    //printf("[add] P.x = "); kryptos_print_mp(p_mod.x);
+    //printf("[add] P.y = "); kryptos_print_mp(p_mod.y);
+    kryptos_ec_pt_mod_p(q, curve->p, q_mod);
+    //printf("[add] Q.x = "); kryptos_print_mp(q_mod.x);
+    //printf("[add] Q.y = "); kryptos_print_mp(q_mod.y);
 
 #undef kryptos_ec_pt_mod_p
 
@@ -113,8 +116,10 @@ void kryptos_ec_add(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_pt_t *q,
     if (!kryptos_mp_eq(q_mod.y, _0)) {
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&temp1, curve->p), kryptos_ec_add_epilogue);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&temp1, q_mod.y), kryptos_ec_add_epilogue);
+        //printf("[add] Q.y = "); kryptos_print_mp(temp1);
         kryptos_mp_mod(&temp1, curve->p);
         KRYPTOS_EC_UTILS_DO_OR_DIE(temp1, kryptos_ec_add_epilogue);
+        //printf("[add] Q.y = "); kryptos_print_mp(temp1);
     } else {
         temp1 = kryptos_hex_value_as_mp("00", 2);
     }
@@ -133,33 +138,47 @@ void kryptos_ec_add(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_pt_t *q,
 
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&temp1, p_mod.x), kryptos_ec_add_epilogue);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&temp1, q_mod.x), kryptos_ec_add_epilogue);
+    //printf("[add] temp = "); kryptos_print_mp(temp1);
     kryptos_mp_mod(&temp1, curve->p);
     KRYPTOS_EC_UTILS_DO_OR_DIE(temp1, kryptos_ec_add_epilogue);
+    //printf("[add] temp = "); kryptos_print_mp(temp1);
     KRYPTOS_EC_UTILS_DO_OR_DIE(temp2 = kryptos_mp_modinv(temp1, curve->p), kryptos_ec_add_epilogue);
+    //printf("[add] temp = "); kryptos_print_mp(temp2);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&temp1, temp2), kryptos_ec_add_epilogue);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&slope, p_mod.y), kryptos_ec_add_epilogue);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&slope, q_mod.y), kryptos_ec_add_epilogue);
+    //printf("[add] slope = "); kryptos_print_mp(slope);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_mul_s(&slope, temp1), kryptos_ec_add_epilogue);
+    //printf("[add] slope = "); kryptos_print_mp(slope);
     kryptos_del_mp_value(temp2);
     temp2 = NULL;
     kryptos_mp_mod(&slope, curve->p);
     KRYPTOS_EC_UTILS_DO_OR_DIE(slope, kryptos_ec_add_epilogue);
+    //printf("[add] slope = "); kryptos_print_mp(slope);
     kryptos_ec_new_point(*r);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(*r)->x, slope), kryptos_ec_add_epilogue);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_mul_s(&(*r)->x, slope), kryptos_ec_add_epilogue);
+    //printf("[add] R.x = "); kryptos_print_mp((*r)->x);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&(*r)->x, p_mod.x), kryptos_ec_add_epilogue);
+    //printf("[add] R.x = "); kryptos_print_mp((*r)->x);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&(*r)->x, q_mod.x), kryptos_ec_add_epilogue);
+    //printf("[add] R.x = "); kryptos_print_mp((*r)->x);
     kryptos_mp_mod(&(*r)->x, curve->p);
     KRYPTOS_EC_UTILS_DO_OR_DIE((*r)->x, kryptos_ec_add_epilogue);
+    //printf("[add] R.x = "); kryptos_print_mp((*r)->x);
     kryptos_del_mp_value(temp1);
     temp1 = NULL;
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&temp1, p_mod.x), kryptos_ec_add_epilogue);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&temp1, (*r)->x), kryptos_ec_add_epilogue);
+    //printf("[add] temp = "); kryptos_print_mp(temp1);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(*r)->y, temp1), kryptos_ec_add_epilogue);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_mul_s(&(*r)->y, slope), kryptos_ec_add_epilogue);
+    //printf("[add] R.y = "); kryptos_print_mp((*r)->y);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&(*r)->y, p_mod.y), kryptos_ec_add_epilogue);
+    //printf("[add] R.y = "); kryptos_print_mp((*r)->y);
     kryptos_mp_mod(&(*r)->y, curve->p);
     KRYPTOS_EC_UTILS_DO_OR_DIE((*r)->y, kryptos_ec_add_epilogue);
+    //printf("[add] R.y = "); kryptos_print_mp((*r)->y);
 
     done = 1;
 
@@ -212,7 +231,6 @@ void kryptos_ec_dbl(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_t *curve
     int done = 0;
 
     *r = NULL;
-
     KRYPTOS_EC_UTILS_DO_OR_DIE(_0 = kryptos_hex_value_as_mp("00", 2), kryptos_ec_dbl_epilogue);
 
     if (kryptos_mp_eq(p->y, _0)) {
@@ -221,36 +239,50 @@ void kryptos_ec_dbl(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_t *curve
         KRYPTOS_EC_UTILS_DO_OR_DIE(temp1 = kryptos_hex_value_as_mp("02", 2), kryptos_ec_dbl_epilogue);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_mul_s(&temp1, p->y), kryptos_ec_dbl_epilogue);
         KRYPTOS_EC_UTILS_DO_OR_DIE(temp2 = kryptos_mp_modinv(temp1, curve->p), kryptos_ec_dbl_epilogue);
+        //printf("\t[dbl] temp = "); kryptos_print_mp(temp2);
         kryptos_del_mp_value(temp1);
         temp1 = temp2;
         temp2 = NULL;
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&slope, p->x), kryptos_ec_dbl_epilogue);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_mul_s(&slope, p->x), kryptos_ec_dbl_epilogue);
+        //printf("\t[dbl] slope = "); kryptos_print_mp(slope);
         KRYPTOS_EC_UTILS_DO_OR_DIE(temp2 = kryptos_hex_value_as_mp("03", 2), kryptos_ec_dbl_epilogue);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_mul_s(&temp2, slope), kryptos_ec_dbl_epilogue);
         kryptos_del_mp_value(slope);
         slope = temp2;
         temp2 = NULL;
+        //printf("\t[dbl] slope = "); kryptos_print_mp(slope);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_add_s(&slope, curve->a), kryptos_ec_dbl_epilogue);
+        //printf("\t[dbl] slope = "); kryptos_print_mp(slope);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_mul_s(&slope, temp1), kryptos_ec_dbl_epilogue);
+        //printf("\t[dbl] slope = "); kryptos_print_mp(slope);
         kryptos_mp_mod(&slope, curve->p);
         KRYPTOS_EC_UTILS_DO_OR_DIE(slope, kryptos_ec_dbl_epilogue);
+        //printf("\t[dbl] slope = "); kryptos_print_mp(slope);
         kryptos_ec_new_point(*r);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(*r)->x, slope), kryptos_ec_dbl_epilogue);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_mul_s(&(*r)->x, slope), kryptos_ec_dbl_epilogue);
+        //printf("\t[dbl] R.x = "); kryptos_print_mp((*r)->x);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&(*r)->x, p->x), kryptos_ec_dbl_epilogue);
+        //printf("\t[dbl] R.x = "); kryptos_print_mp((*r)->x);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&(*r)->x, p->x), kryptos_ec_dbl_epilogue);
+        //printf("\t[dbl] R.x = "); kryptos_print_mp((*r)->x);
         kryptos_mp_mod(&(*r)->x, curve->p);
         KRYPTOS_EC_UTILS_DO_OR_DIE((*r)->x, kryptos_ec_dbl_epilogue);
+        //printf("\t[dbl] R.x = "); kryptos_print_mp((*r)->x);
         kryptos_del_mp_value(temp1);
         temp1 = NULL;
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&temp1, p->x), kryptos_ec_dbl_epilogue);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&temp1, (*r)->x), kryptos_ec_dbl_epilogue);
+        //printf("\t[dbl] temp = "); kryptos_print_mp(temp1);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(*r)->y, slope), kryptos_ec_dbl_epilogue);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_mul_s(&(*r)->y, temp1), kryptos_ec_dbl_epilogue);
+        //printf("\t[dbl] R.y = "); kryptos_print_mp((*r)->y);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&(*r)->y, p->y), kryptos_ec_dbl_epilogue);
+        //printf("\t[dbl] R.y = "); kryptos_print_mp((*r)->y);
         kryptos_mp_mod(&(*r)->y, curve->p);
         KRYPTOS_EC_UTILS_DO_OR_DIE((*r)->y, kryptos_ec_dbl_epilogue);
+        //printf("\t[dbl] R.y = "); kryptos_print_mp((*r)->y);
     }
 
     done = 1;
@@ -281,9 +313,9 @@ kryptos_ec_dbl_epilogue:
 
 void kryptos_ec_mul(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_mp_value_t *d, kryptos_ec_t *curve) {
     kryptos_ec_pt_t q = { NULL, NULL }, *t = NULL;
-    kryptos_mp_value_t *_0 = NULL;
-    int w, bits_nr;
+    kryptos_mp_value_t *_0 = NULL, *d_cpy = NULL;
     int done = 0;
+    ssize_t j;
 
     *r = NULL;
 
@@ -297,33 +329,46 @@ void kryptos_ec_mul(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_mp_value_t 
     kryptos_assign_mp_value(&q.x, p->x);
     kryptos_assign_mp_value(&q.y, p->y);
 
-    if (!kryptos_mp_bit_n(d, 0)) {
+    if (kryptos_mp_is_even(d)) {
         kryptos_ec_set_point(r, _0, _0);
     } else {
         kryptos_ec_set_point(r, p->x, p->y);
     }
 
-    bits_nr = kryptos_mp_bits_total_in_base2(d);
+    KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&d_cpy, d), kryptos_ec_mul_epilogue);
 
-#define kryptos_ec_mul_step(r, t, q, d, w, zero, curve) {\
+#define kryptos_ec_mul_step(r, t, q, d, zero, curve) {\
     kryptos_ec_dbl(&(t), &(q), (curve));\
+    /*printf("[mul/dbl] Q.x = "); kryptos_print_mp((q).x);*/\
+    /*printf("[mul/dbl] Q.y = "); kryptos_print_mp((q).y);*/\
+    /*printf("[mul/dbl] T.x = "); kryptos_print_mp((t)->x);*/\
+    /*printf("[mul/dbl] T.y = "); kryptos_print_mp((t)->y);*/\
     KRYPTOS_EC_UTILS_DO_OR_DIE((t), kryptos_ec_mul_epilogue);\
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(q).x, (t)->x), kryptos_ec_mul_epilogue);\
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(q).y, (t)->y), kryptos_ec_mul_epilogue);\
     kryptos_ec_del_point((t));\
     (t) = NULL;\
-    if (kryptos_mp_bit_n(d, w)) {\
-        kryptos_ec_add(&(t), &(q), *(r), (curve));\
+    if (kryptos_mp_is_odd(d)) {\
+        /*printf("[mul/add] R.x = "); kryptos_print_mp((*(r))->x);*/\
+        /*printf("[mul/add] R.y = "); kryptos_print_mp((*(r))->y);*/\
+        /*printf("[mul/add] Q.x = "); kryptos_print_mp((q).x);*/\
+        /*printf("[mul/add] Q.y = "); kryptos_print_mp((q).y);*/\
+        kryptos_ec_add(&(t), *(r), &(q), (curve));\
         KRYPTOS_EC_UTILS_DO_OR_DIE(t, kryptos_ec_mul_epilogue);\
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(*(r))->x, (t)->x), kryptos_ec_mul_epilogue);\
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(*(r))->y, (t)->y), kryptos_ec_mul_epilogue);\
+        /*printf("[mul/add] R.x = "); kryptos_print_mp((*(r))->x);*/\
+        /*printf("[mul/add] R.y = "); kryptos_print_mp((*(r))->y);*/\
         kryptos_ec_del_point((t));\
         (t) = NULL;\
     }\
 }
 
-    for (w = 1; w < bits_nr; w++) {
-        kryptos_ec_mul_step(r, t, q, d, w, _0, curve);
+    KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_rsh(&d_cpy, 1), kryptos_ec_mul_epilogue);
+
+    while (!kryptos_mp_is_zero(d_cpy)) {
+        kryptos_ec_mul_step(r, t, q, d_cpy, _0, curve);
+        KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_rsh(&d_cpy, 1), kryptos_ec_mul_epilogue);
     }
 
 #undef kryptos_ec_mul_step
@@ -346,6 +391,10 @@ kryptos_ec_mul_epilogue:
 
     if (q.y != NULL) {
         kryptos_del_mp_value(q.y);
+    }
+
+    if (d_cpy != NULL) {
+        kryptos_del_mp_value(d_cpy);
     }
 
     if (!done) {
