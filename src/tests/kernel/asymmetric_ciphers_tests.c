@@ -9,6 +9,8 @@
 #include <kryptos.h>
 #include <kryptos_pem.h>
 #include <kryptos_padding.h>
+#include <kryptos_ec_utils.h>
+#include <kryptos_ecdh.h>
 #include <kstring.h>
 
 // WARN(Rafael): All this stuff is a little bit crazy because is not common run asymmetric ciphers into kernel, however if someone wants to do it, the stuff
@@ -3860,4 +3862,226 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     printk(KERN_ERR "WARN: No c99 support, this test was skipped.\n");
 # endif
 #endif
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_ecdh_get_curve_from_params_buf_tests)
+    kryptos_u8_t *params = "-----BEGIN ECDH PARAM EC BITS-----\n"
+                           "OA==\n"
+                           "-----END ECDH PARAM EC BITS-----\n"
+                           "-----BEGIN ECDH PARAM EC P-----\n"
+                           "EQAAAA==\n"
+                           "-----END ECDH PARAM EC P-----\n"
+                           "-----BEGIN ECDH PARAM EC A-----\n"
+                           "AgAAAA==\n"
+                           "-----END ECDH PARAM EC A-----\n"
+                           "-----BEGIN ECDH PARAM EC B-----\n"
+                           "AgAAAA==\n"
+                           "-----END ECDH PARAM EC B-----\n"
+                           "-----BEGIN ECDH PARAM EC G X-----\n"
+                           "BQAAAA==\n"
+                           "-----END ECDH PARAM EC G X-----\n"
+                           "-----BEGIN ECDH PARAM EC G Y-----\n"
+                           "AQAAAA==\n"
+                           "-----END ECDH PARAM EC G Y-----\n"
+                           "-----BEGIN ECDH PARAM EC Q-----\n"
+                           "EwAAAA==\n"
+                           "-----END ECDH PARAM EC Q-----\n";
+    kryptos_curve_ctx *curve = NULL;
+    kryptos_mp_value_t *a, *b, *p, *x, *y, *q;
+
+    a = kryptos_hex_value_as_mp("2", 1);
+    KUTE_ASSERT(a != NULL);
+
+    b = kryptos_hex_value_as_mp("2", 1);
+    KUTE_ASSERT(b != NULL);
+
+    p = kryptos_hex_value_as_mp("11", 2);
+    KUTE_ASSERT(p != NULL);
+
+    x = kryptos_hex_value_as_mp("05", 2);
+    KUTE_ASSERT(x != NULL);
+
+    y = kryptos_hex_value_as_mp("01", 2);
+    KUTE_ASSERT(y != NULL);
+
+    q = kryptos_hex_value_as_mp("13", 2);
+    KUTE_ASSERT(q != NULL);
+
+    KUTE_ASSERT(kryptos_ecdh_get_curve_from_params_buf(params, kstrlen(params), &curve) == kKryptosSuccess);
+
+    KUTE_ASSERT(kryptos_mp_eq(curve->ec->p, p) == 1);
+    KUTE_ASSERT(kryptos_mp_eq(curve->ec->a, a) == 1);
+    KUTE_ASSERT(kryptos_mp_eq(curve->ec->b, b) == 1);
+    KUTE_ASSERT(kryptos_mp_eq(curve->g->x, x) == 1);
+    KUTE_ASSERT(kryptos_mp_eq(curve->g->y, y) == 1);
+    KUTE_ASSERT(kryptos_mp_eq(curve->q, q) == 1);
+    KUTE_ASSERT(curve->bits == 8);
+
+    kryptos_del_curve_ctx(curve);
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(x);
+    kryptos_del_mp_value(y);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_ecdh_get_random_k_tests)
+    kryptos_mp_value_t *k = NULL;
+    kryptos_mp_value_t *q = NULL;
+    kryptos_u8_t *qx = "E95E4A5F737059DC60DF5991D45029409E60FC09";
+    kryptos_mp_value_t *_2 = NULL;
+
+    q = kryptos_hex_value_as_mp(qx, kstrlen(qx));
+    KUTE_ASSERT(q != NULL);
+
+    _2 = kryptos_hex_value_as_mp("2", 1);
+    KUTE_ASSERT(_2 != NULL);
+
+    KUTE_ASSERT(kryptos_ecdh_get_random_k(&k, q, 160) == kKryptosSuccess);
+
+    KUTE_ASSERT(kryptos_mp_ge(k, _2) && kryptos_mp_lt(k, q));
+
+    kryptos_del_mp_value(q);
+    kryptos_del_mp_value(k);
+    kryptos_del_mp_value(_2);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_ecdh_process_xchg_tests)
+    struct kryptos_ecdh_xchg_ctx alice_ctx, *alice_ecdh = &alice_ctx, bob_ctx, *bob_ecdh = &bob_ctx;
+    kryptos_mp_value_t *a, *b, *p, *x, *y;
+
+    a = kryptos_hex_value_as_mp("2", 1);
+    KUTE_ASSERT(a != NULL);
+
+    b = kryptos_hex_value_as_mp("2", 1);
+    KUTE_ASSERT(b != NULL);
+
+    p = kryptos_hex_value_as_mp("11", 2);
+    KUTE_ASSERT(p != NULL);
+
+    x = kryptos_hex_value_as_mp("05", 2);
+    KUTE_ASSERT(x != NULL);
+
+    y = kryptos_hex_value_as_mp("01", 2);
+    KUTE_ASSERT(y != NULL);
+
+    kryptos_ecdh_init_xchg_ctx(alice_ecdh);
+
+    alice_ecdh->curve = (kryptos_curve_ctx *) kryptos_newseg(sizeof(kryptos_curve_ctx));
+    KUTE_ASSERT(alice_ecdh->curve != NULL);
+
+    KUTE_ASSERT(kryptos_ec_set_curve(&alice_ecdh->curve->ec, a, b, p) == 1);
+    KUTE_ASSERT(kryptos_ec_set_point(&alice_ecdh->curve->g, x, y) == 1);
+    alice_ecdh->curve->q = kryptos_hex_value_as_mp("13", 2);
+    KUTE_ASSERT(alice_ecdh->curve->q != NULL);
+    alice_ecdh->curve->bits = 8;
+
+    // INFO(Rafael): Alice picks one random private K, computes a public point KP(x,y) and sends this point to Bob.
+
+    kryptos_ecdh_process_xchg(&alice_ecdh);
+
+    KUTE_ASSERT(alice_ecdh->result == kKryptosSuccess);
+
+    kryptos_ecdh_init_xchg_ctx(bob_ecdh);
+
+    // INFO(Rafael): So Alice has just send and bob has just receive all parameters besides the public point KP(x,y).
+    bob_ecdh->in = alice_ecdh->out;
+    bob_ecdh->in_size = alice_ecdh->out_size;
+
+    kryptos_ecdh_process_xchg(&bob_ecdh);
+
+    KUTE_ASSERT(bob_ecdh->result == kKryptosSuccess);
+
+    // INFO(Rafael): At this point Bob has the session key T_{ab}, however, he must send his out to Alice. Because
+    //               Alice needs the public point KP(x,y) from Bob in order to get the same session key T_{ab}.
+
+    alice_ecdh->out = NULL;
+
+    alice_ecdh->in = bob_ecdh->out;
+    alice_ecdh->in_size = bob_ecdh->out_size;
+
+    kryptos_ecdh_process_xchg(&alice_ecdh);
+
+    KUTE_ASSERT(alice_ecdh->result == kKryptosSuccess);
+
+    bob_ecdh->out = NULL;
+
+    // INFO(Rafael): At this point Alice must have the same session key T_{ab} previously computed by Bob.
+# if defined(__FreeBSD__) || defined(__NetBSD__)
+    uprintf("\tAlice K = "); kryptos_print_mp(alice_ecdh->k);
+    uprintf("\tBob   K = "); kryptos_print_mp(bob_ecdh->k);
+# endif
+
+    KUTE_ASSERT(alice_ecdh->k != NULL);
+    KUTE_ASSERT(bob_ecdh->k != NULL);
+    KUTE_ASSERT(kryptos_mp_eq(alice_ecdh->k, bob_ecdh->k) == 1);
+
+    kryptos_clear_ecdh_xchg_ctx(alice_ecdh);
+    kryptos_clear_ecdh_xchg_ctx(bob_ecdh);
+
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+    kryptos_del_mp_value(p);
+    kryptos_del_mp_value(x);
+    kryptos_del_mp_value(y);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_ecdh_process_xchg_with_stdcurves_tests)
+    kryptos_curve_id_t cids[] = {
+        kBrainPoolP160R1
+    };
+    size_t cids_nr = sizeof(cids) / sizeof(cids[0]), c;
+    struct kryptos_ecdh_xchg_ctx alice_ctx, *alice_ecdh = &alice_ctx, bob_ctx, *bob_ecdh = &bob_ctx;
+
+    for (c = 0; c < cids_nr; c++) {
+        kryptos_ecdh_init_xchg_ctx(alice_ecdh);
+
+        alice_ecdh->curve = kryptos_new_standard_curve(cids[c]);
+
+        KUTE_ASSERT(alice_ecdh->curve != NULL);
+
+        // INFO(Rafael): Alice picks one random private K, computes a public point KP(x,y) and sends this point to Bob.
+
+        kryptos_ecdh_process_xchg(&alice_ecdh);
+
+        KUTE_ASSERT(alice_ecdh->result == kKryptosSuccess);
+
+        kryptos_ecdh_init_xchg_ctx(bob_ecdh);
+
+        // INFO(Rafael): So Alice has just send and bob has just receive all parameters besides the public point KP(x,y).
+        bob_ecdh->in = alice_ecdh->out;
+        bob_ecdh->in_size = alice_ecdh->out_size;
+
+        kryptos_ecdh_process_xchg(&bob_ecdh);
+
+        KUTE_ASSERT(bob_ecdh->result == kKryptosSuccess);
+
+        // INFO(Rafael): At this point Bob has the session key T_{ab}, however, he must send his out to Alice. Because
+        //               Alice needs the public point KP(x,y) from Bob in order to get the same session key T_{ab}.
+
+        alice_ecdh->out = NULL;
+
+        alice_ecdh->in = bob_ecdh->out;
+        alice_ecdh->in_size = bob_ecdh->out_size;
+
+        kryptos_ecdh_process_xchg(&alice_ecdh);
+
+        KUTE_ASSERT(alice_ecdh->result == kKryptosSuccess);
+
+        bob_ecdh->out = NULL;
+
+        // INFO(Rafael): At this point Alice must have the same session key T_{ab} previously computed by Bob.
+# if defined(__FreeBSD__) || defined(__NetBSD__)
+        printf("\tAlice K = "); kryptos_print_mp(alice_ecdh->k);
+        printf("\tBob   K = "); kryptos_print_mp(bob_ecdh->k);
+# endif
+
+        KUTE_ASSERT(alice_ecdh->k != NULL);
+        KUTE_ASSERT(bob_ecdh->k != NULL);
+        KUTE_ASSERT(kryptos_mp_eq(alice_ecdh->k, bob_ecdh->k) == 1);
+
+        kryptos_clear_ecdh_xchg_ctx(alice_ecdh);
+        kryptos_clear_ecdh_xchg_ctx(bob_ecdh);
+    }
 KUTE_TEST_CASE_END

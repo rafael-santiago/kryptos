@@ -25,7 +25,7 @@ KUTE_TEST_CASE(kryptos_ec_set_point_tests)
     KUTE_ASSERT(kryptos_mp_eq(p->y, y) == 1);
     kryptos_del_mp_value(x);
     kryptos_del_mp_value(y);
-    kryptos_ec_del_point(p);
+    kryptos_ec_del_point(p); // INFO(Rafael): In case of any memory leak, the memory leak check system will warn us.
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_ec_set_curve_tests)
@@ -45,7 +45,7 @@ KUTE_TEST_CASE(kryptos_ec_set_curve_tests)
     kryptos_del_mp_value(a);
     kryptos_del_mp_value(b);
     kryptos_del_mp_value(p);
-    kryptos_ec_del_curve(ec);
+    kryptos_ec_del_curve(ec); // INFO(Rafael): In case of any memory leak, the memory leak check system will warn us.
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_ec_dbl_tests)
@@ -66,7 +66,14 @@ KUTE_TEST_CASE(kryptos_ec_dbl_tests)
         size_t ey_size;
     };
     struct test_ctx test_vector[] = {
-        { "02", 2, "02", 2, "11", 2, "05", 2, "01", 2, "06", 2, "03", 2 }
+        { "02", 2, "02", 2, "11", 2, "05", 2, "01", 2, "06", 2, "03", 2 },
+        { "340E7BE2A280EB74E2BE61BADA745D97E8F7C300", 40,
+          "1E589A8595423412134FAA2DBDEC95C8D8675E58", 40,
+          "E95E4A5F737059DC60DFC7AD95B3D8139515620F", 40,
+          "BED5AF16EA3F6A4F62938C4631EB5AF7BDBCDBC3", 40,
+          "1667CB477A1A8EC338F94741669C976316DA6321", 40,
+          "C750DB2AF5A6B9543147A858A3225161C2A2459D", 40,
+          "115E0A63D46BB965A09D3B195B44BCE791641EF7", 40 }
     };
     size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
     kryptos_ec_pt_t *P = NULL, *R = NULL;
@@ -150,7 +157,16 @@ KUTE_TEST_CASE(kryptos_ec_add_tests)
         { "02", 2, "02", 2, "11", 2, "12", 2, "09", 2, "07", 2, "14", 2, "0A", 2, "00", 2 },
         { "02", 2, "02", 2, "11", 2, "18", 2, "09", 2, "07", 2, "14", 2, "03", 2, "08", 2 },
         { "02", 2, "02", 2, "11", 2, "4E", 2, "63", 2, "0F", 2, "22", 2, "08", 2, "0B", 2 },
-        { "02", 2, "02", 2, "11", 2, "04", 2, "1E", 2, "1E", 2, "04", 2, "01", 2, "01", 2 }
+        { "02", 2, "02", 2, "11", 2, "04", 2, "1E", 2, "1E", 2, "04", 2, "01", 2, "01", 2 },
+        { "340E7BE2A280EB74E2BE61BADA745D97E8F7C300", 40,
+          "1E589A8595423412134FAA2DBDEC95C8D8675E58", 40,
+          "E95E4A5F737059DC60DFC7AD95B3D8139515620F", 40,
+          "BED5AF16EA3F6A4F62938C4631EB5AF7BDBCDBC3", 40,
+          "1667CB477A1A8EC338F94741669C976316DA6321", 40,
+          "E95E4A5F737059DC60DF5991D45029409E60FC09", 40,
+          "E95E4A5F737059DC60DF5991D45029409E60FC09", 40,
+          "11A6734CF148C4C1BDA891FB6454CE415A020EA3", 40,
+          "E18F99ED2DCA4A49A9F75BECFB8E5316FFB1658A", 40 }
     };
     size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
     kryptos_ec_pt_t *P = NULL, *Q = NULL, *R = NULL;
@@ -194,6 +210,11 @@ KUTE_TEST_CASE(kryptos_ec_add_tests)
         kryptos_ec_add(&R, P, Q, EC);
 
         KUTE_ASSERT(R != NULL);
+
+        //printf("X = "); kryptos_print_mp(R->x);
+        //printf("Y = "); kryptos_print_mp(R->y);
+        //printf("EX = "); kryptos_print_mp(ex);
+        //printf("EY = "); kryptos_print_mp(ey);
 
         KUTE_ASSERT(kryptos_mp_eq(R->x, ex) == 1);
         KUTE_ASSERT(kryptos_mp_eq(R->y, ey) == 1);
@@ -257,7 +278,15 @@ KUTE_TEST_CASE(kryptos_ec_mul_tests)
         { "02", 2, "02", 2, "11", 2, "05", 2, "01", 2, "10", 2, "0A", 2, "0B", 2 },
         { "02", 2, "02", 2, "11", 2, "05", 2, "01", 2, "11", 2, "06", 2, "0E", 2 },
         { "02", 2, "02", 2, "11", 2, "05", 2, "01", 2, "12", 2, "05", 2, "10", 2 },
-        { "02", 2, "02", 2, "11", 2, "05", 2, "01", 2, "13", 2, "00", 2, "00", 2 }
+        { "02", 2, "02", 2, "11", 2, "05", 2, "01", 2, "13", 2, "00", 2, "00", 2 },
+        { "340E7BE2A280EB74E2BE61BADA745D97E8F7C300", 40,
+          "1E589A8595423412134FAA2DBDEC95C8D8675E58", 40,
+          "E95E4A5F737059DC60DFC7AD95B3D8139515620F", 40,
+          "BED5AF16EA3F6A4F62938C4631EB5AF7BDBCDBC3", 40,
+          "1667CB477A1A8EC338F94741669C976316DA6321", 40,
+          "B053FF9AE1C2BD07C3502", 21,
+          "6C15F2439C6961EBD1206F88C15A8EB4D80FA2C4", 40,
+          "8DAC18543E416DD5007B7F8FD1C7A8F883984C09", 40 }
     };
     size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
     kryptos_ec_pt_t *P = NULL, *R = NULL;
@@ -469,17 +498,17 @@ KUTE_TEST_CASE(kryptos_new_standard_curve_tests)
     tp_end = tp + sizeof(test_vector) / sizeof(test_vector[0]);
 
     while (tp != tp_end) {
-        p = kryptos_hex_value_as_mp((kryptos_u8_t *)tp->p, strlen(tp->p));
+        p = kryptos_hex_value_as_mp((kryptos_u8_t *)tp->p, kstrlen(tp->p));
         KUTE_ASSERT(p != NULL);
-        a = kryptos_hex_value_as_mp((kryptos_u8_t *)tp->a, strlen(tp->a));
+        a = kryptos_hex_value_as_mp((kryptos_u8_t *)tp->a, kstrlen(tp->a));
         KUTE_ASSERT(a != NULL);
-        b = kryptos_hex_value_as_mp((kryptos_u8_t *)tp->b, strlen(tp->b));
+        b = kryptos_hex_value_as_mp((kryptos_u8_t *)tp->b, kstrlen(tp->b));
         KUTE_ASSERT(b != NULL);
-        x = kryptos_hex_value_as_mp((kryptos_u8_t *)tp->x, strlen(tp->x));
+        x = kryptos_hex_value_as_mp((kryptos_u8_t *)tp->x, kstrlen(tp->x));
         KUTE_ASSERT(x != NULL);
-        y = kryptos_hex_value_as_mp((kryptos_u8_t *)tp->y, strlen(tp->y));
+        y = kryptos_hex_value_as_mp((kryptos_u8_t *)tp->y, kstrlen(tp->y));
         KUTE_ASSERT(y != NULL);
-        q = kryptos_hex_value_as_mp((kryptos_u8_t *)tp->q, strlen(tp->q));
+        q = kryptos_hex_value_as_mp((kryptos_u8_t *)tp->q, kstrlen(tp->q));
         curve = kryptos_new_standard_curve(tp->id);
         KUTE_ASSERT(curve != NULL);
         KUTE_ASSERT(curve->bits == tp->bits);

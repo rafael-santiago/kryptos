@@ -5,8 +5,8 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#ifndef KRYPTOS_KRYPTOS_TESTS_KERNEL_ECC_TESTS_H
-#define KRYPTOS_KRYPTOS_TESTS_KERNEL_ECC_TESTS_H 1
+#ifndef KRYPTOS_TESTS_KERNEL_ECC_TESTS_H
+#define KRYPTOS_TESTS_KERNEL_ECC_TESTS_H 1
 
 #include <tests/cutest/src/kutest.h>
 

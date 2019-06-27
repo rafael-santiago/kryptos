@@ -176,6 +176,12 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_ec_dbl_tests);
     KUTE_RUN_TEST(kryptos_ec_mul_tests);
 
+    KUTE_RUN_TEST(kryptos_ec_set_point_tests);
+    KUTE_RUN_TEST(kryptos_ec_set_curve_tests);
+    KUTE_RUN_TEST(kryptos_ec_add_tests);
+    KUTE_RUN_TEST(kryptos_ec_dbl_tests);
+    KUTE_RUN_TEST(kryptos_ec_mul_tests);
+
     KUTE_RUN_TEST(kryptos_verify_dl_params_tests);
     KUTE_RUN_TEST(kryptos_generate_dl_params_tests);
 
@@ -258,6 +264,12 @@ KUTE_TEST_CASE(ktest_monkey)
     printk(KERN_ERR "WARN: The DSA signature tests were skipped.\n");
 # endif
 #endif
+
+    KUTE_RUN_TEST(kryptos_new_standard_curve_tests);
+    KUTE_RUN_TEST(kryptos_ecdh_get_curve_from_params_buf_tests);
+    KUTE_RUN_TEST(kryptos_ecdh_get_random_k_tests);
+    KUTE_RUN_TEST(kryptos_ecdh_process_xchg_tests);
+    KUTE_RUN_TEST(kryptos_ecdh_process_xchg_with_stdcurves_tests);
 
     //KUTE_RUN_TEST(kryptos_new_standard_curve_tests);
 KUTE_TEST_CASE_END
