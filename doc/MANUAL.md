@@ -1906,8 +1906,7 @@ epilogue:
 }
 ```
 
-Well, I think that we have done with DHKE. For awhile let's forget a little about discrete logarithm cryptosystems and dive
-into RSA available stuff...
+Well, I think that we have done with DHKE. For awhile let's forget a little about it and dive into RSA available stuff...
 
 ### RSA
 
