@@ -3757,36 +3757,6 @@ int kryptos_mp_is_zero(kryptos_mp_value_t *value) {
     return is_zero;
 }
 
-size_t kryptos_mp_bit_n(kryptos_mp_value_t *value, const size_t bn) {
-    ssize_t w, b;
-
-    if (value == NULL || bn >= kryptos_mp_byte2bit(value->data_size)) {
-        return 0;
-    }
-
-    w = value->data_size - 1;
-
-    for (b = 1; b <= bn; b++) {
-#if defined(KRYPTOS_MP_U32_DIGIT)
-        if ((b & 0x1F) == 0) {
-            w -= 1;
-        }
-#else
-        if ((b & 0x07) == 0) {
-            w -= 1;
-        }
-#endif
-    }
-
-#if defined(KRYPTOS_MP_U32_DIGIT)
-    b = bn & 0x1F;
-#else
-    b = bn & 0x07;
-#endif
-
-    return ((value->data[w] >> b) & 0x1);
-}
-
 #undef kryptos_mp_xnb
 
 #undef kryptos_mp_nbx
