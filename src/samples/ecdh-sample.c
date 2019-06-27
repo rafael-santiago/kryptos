@@ -17,6 +17,9 @@ int main(int argc, char **argv) {
     kryptos_ecdh_init_xchg_ctx(alice);
     kryptos_ecdh_init_xchg_ctx(bob);
 
+    // INFO: We will use the standard curve named BrainpoolP160R1.
+    //       Take a look at the enum kryptos_curve_id_t in kryptos_types.h to know more
+    //       available curves.
     alice->curve = kryptos_new_standard_curve(kBrainPoolP160R1);
 
     if (alice->curve == NULL) {
