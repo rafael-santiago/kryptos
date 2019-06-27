@@ -76,10 +76,6 @@ kryptos_mp_value_t *kryptos_mp_not(kryptos_mp_value_t *n);
 
 kryptos_mp_value_t *kryptos_mp_inv(kryptos_mp_value_t **dest);
 
-int kryptos_mp_bits_total_in_base2(kryptos_mp_value_t *value);
-
-//ssize_t kryptos_mp_bitcount(const kryptos_mp_value_t *n);
-
 kryptos_mp_value_t *kryptos_mp_mul_digit(kryptos_mp_value_t **x, const kryptos_mp_digit_t digit);
 
 kryptos_mp_value_t *kryptos_raw_buffer_as_mp(const kryptos_u8_t *buf, const size_t buf_size);
@@ -102,15 +98,7 @@ kryptos_u8_t *kryptos_mp_get_bitmap(const kryptos_mp_value_t *src, size_t *bitma
 }
 #endif
 
-#ifndef KRYPTOS_MP_U32_DIGIT
-
-# define kryptos_mp_is_neg(a) ( (((a)->data[(a)->data_size - 1] & 0xF0) == 0xF0) )
-
-#else
-
-# define kryptos_mp_is_neg(a) ( (((a)->data[(a)->data_size - 1] & 0xF0000000) == 0xF0000000) )
-
-#endif
+#define kryptos_mp_is_neg(a) ( (a)->neg )
 
 #define kryptos_mp_ne(a, b) ( kryptos_mp_eq((a), (b)) == 0 )
 
@@ -128,7 +116,7 @@ kryptos_u8_t *kryptos_mp_get_bitmap(const kryptos_mp_value_t *src, size_t *bitma
 
 #define kryptos_mp_rsh(a, l) ( kryptos_mp_rsh_op((a), (l), 0) )
 
-#define kryptos_mp_signed_rsh(a, l) ( kryptos_mp_rsh_op((a), (l), 1) )
+#define kryptos_mp_inv(dest) ( (*dest)->neg = !(*dest)->neg )
 
 #ifndef KRYPTOS_MP_U32_DIGIT
 # define kryptos_mp_bit2byte(b) ( (b) >> 3 )

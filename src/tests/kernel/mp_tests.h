@@ -36,8 +36,6 @@ KUTE_DECLARE_TEST_CASE(kryptos_mp_le_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_mp_is_neg_tests);
 
-//KUTE_DECLARE_TEST_CASE(kryptos_mp_bitcount_tests);
-
 KUTE_DECLARE_TEST_CASE(kryptos_mp_add_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_mp_sub_tests);
@@ -46,17 +44,9 @@ KUTE_DECLARE_TEST_CASE(kryptos_mp_mul_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_mp_not_tests);
 
-KUTE_DECLARE_TEST_CASE(kryptos_mp_signed_add_tests);
-
-KUTE_DECLARE_TEST_CASE(kryptos_mp_signed_sub_tests);
-
-KUTE_DECLARE_TEST_CASE(kryptos_mp_signed_mul_tests);
-
 KUTE_DECLARE_TEST_CASE(kryptos_mp_lsh_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_mp_rsh_tests);
-
-KUTE_DECLARE_TEST_CASE(kryptos_mp_signed_rsh_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_mp_div_tests);
 
@@ -100,8 +90,8 @@ KUTE_DECLARE_TEST_CASE(kryptos_mp_sub_s_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_mp_mul_s_tests);
 
-KUTE_DECLARE_TEST_CASE(kryptos_mp_bits_total_in_base2_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_mp_get_bitmap_tests);
 
-KUTE_DECLARE_TEST_CASE(kryptos_mp_bit_n_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_mp_inv_tests);
 
 #endif

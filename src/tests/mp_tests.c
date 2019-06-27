@@ -57,6 +57,35 @@ CUTE_TEST_CASE(kryptos_mp_hex_value_as_mp_tests)
     CUTE_ASSERT(mp->data[3] == 0xFFEEDDCC);
 #endif
     kryptos_del_mp_value(mp);
+
+    mp = kryptos_hex_value_as_mp("-FFEEDDCCBBAA00112233445566778899", 33);
+    CUTE_ASSERT(mp != NULL);
+    CUTE_ASSERT(kryptos_mp_byte2bit(mp->data_size) == 128);
+    CUTE_ASSERT(mp->neg == 1);
+#ifndef KRYPTOS_MP_U32_DIGIT
+    CUTE_ASSERT(mp->data[ 0] == 0x99);
+    CUTE_ASSERT(mp->data[ 1] == 0x88);
+    CUTE_ASSERT(mp->data[ 2] == 0x77);
+    CUTE_ASSERT(mp->data[ 3] == 0x66);
+    CUTE_ASSERT(mp->data[ 4] == 0x55);
+    CUTE_ASSERT(mp->data[ 5] == 0x44);
+    CUTE_ASSERT(mp->data[ 6] == 0x33);
+    CUTE_ASSERT(mp->data[ 7] == 0x22);
+    CUTE_ASSERT(mp->data[ 8] == 0x11);
+    CUTE_ASSERT(mp->data[ 9] == 0x00);
+    CUTE_ASSERT(mp->data[10] == 0xAA);
+    CUTE_ASSERT(mp->data[11] == 0xBB);
+    CUTE_ASSERT(mp->data[12] == 0xCC);
+    CUTE_ASSERT(mp->data[13] == 0xDD);
+    CUTE_ASSERT(mp->data[14] == 0xEE);
+    CUTE_ASSERT(mp->data[15] == 0xFF);
+#else
+    CUTE_ASSERT(mp->data[0] == 0x66778899);
+    CUTE_ASSERT(mp->data[1] == 0x22334455);
+    CUTE_ASSERT(mp->data[2] == 0xBBAA0011);
+    CUTE_ASSERT(mp->data[3] == 0xFFEEDDCC);
+#endif
+    kryptos_del_mp_value(mp);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_mp_value_as_hex_tests)
@@ -741,29 +770,27 @@ CUTE_TEST_CASE(kryptos_mp_is_neg_tests)
     };
 #ifndef KRYPTOS_MP_U32_DIGIT
     struct is_neg_tests_ctx test_vector[] = {
-        {                "2", 0 },
-        {               "FE", 1 },
-        {             "0002", 0 },
-        {             "FFFE", 1 },
-        {         "0000000A", 0 },
-        {         "FFFFFFF6", 1 },
-        {         "21524111", 0 },
-        {         "DEADBEEF", 0 },
-        { "2152411021524111", 0 },
-        { "DEADBEEFDEADBEEF", 0 }
+        {                 "2", 0 },
+        {                "-2", 1 },
+        {              "0002", 0 },
+        {             "-0002", 1 },
+        {          "0000000A", 0 },
+        {         "-0000000A", 1 },
+        {          "21524111", 0 },
+        {          "DEADBEEF", 0 },
+        {  "2152411021524111", 0 },
+        {  "DEADBEEFDEADBEEF", 0 }
     };
 #else
     struct is_neg_tests_ctx test_vector[] = {
-        {         "00000002", 0 },
-        {         "FFFFFFFE", 1 },
-        {         "00000002", 0 },
-        {         "FFFFFFFE", 1 },
-        {         "0000000A", 0 },
-        {         "FFFFFFF6", 1 },
-        {         "21524111", 0 },
-        {         "DEADBEEF", 0 },
-        { "2152411021524111", 0 },
-        { "DEADBEEFDEADBEEF", 0 }
+        {          "00000002", 0 },
+        {         "-00000002", 1 },
+        {          "0000000A", 0 },
+        {         "-0000000A", 1 },
+        {          "21524111", 0 },
+        {          "DEADBEEF", 0 },
+        {  "2152411021524111", 0 },
+        {  "DEADBEEFDEADBEEF", 0 }
     };
 #endif
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
@@ -867,33 +894,6 @@ CUTE_TEST_CASE(kryptos_mp_add_tests)
     }
 CUTE_TEST_CASE_END
 
-/*
-CUTE_TEST_CASE(kryptos_mp_bitcount_tests)
-    struct bitcount_tests_ctx {
-        kryptos_u8_t *n;
-        ssize_t c;
-    };
-    struct bitcount_tests_ctx test_vector[] = {
-        { "00", 0 }, { "01", 1 }, { "02", 2 }, { "03", 2 },
-        { "04", 3 }, { "05", 3 }, { "06", 3 }, { "07", 3 },
-        { "08", 4 }, { "09", 4 }, { "0A", 4 }, { "0B", 4 },
-        { "0C", 4 }, { "0D", 4 }, { "0E", 4 }, { "0F", 4 },
-        { "1F", 5 }, { "2F", 6 }, { "3F", 6 }, { "4F", 7 },
-        { "5F", 7 }, { "6F", 7 }, { "7F", 7 }, { "8F", 8 },
-        { "9F", 8 }, { "AF", 8 }, { "BF", 8 }, { "CF", 8 },
-        { "DF", 8 }, { "EF", 8 }, { "FF", 8 }
-    };
-    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
-    kryptos_mp_value_t *n = NULL;
-    for (tv = 0; tv < tv_nr; tv++) {
-        n = kryptos_hex_value_as_mp(test_vector[tv].n, strlen(test_vector[tv].n));
-        CUTE_ASSERT(n != NULL);
-        CUTE_ASSERT(kryptos_mp_bitcount(n) == test_vector[tv].c);
-        kryptos_del_mp_value(n);
-    }
-CUTE_TEST_CASE_END
-*/
-
 CUTE_TEST_CASE(kryptos_mp_sub_tests)
     kryptos_mp_value_t *a, *b, *e;
     struct sub_tests_ctx {
@@ -905,11 +905,11 @@ CUTE_TEST_CASE(kryptos_mp_sub_tests)
         {               "06",       "02",               "04" },
         {             "2001",     "1006",              "FFB" },
         {             "DEAD",     "BEEF",             "1FBE" },
-        {             "BEEF",     "DEAD",             "E042" },
-        {               "01",       "02",               "FF" },
+        {             "BEEF",     "DEAD",            "-1FBE" },
+        {               "01",       "02",              "-01" },
         {         "DEADBEEF", "BEEFDEAD",         "1FBDE042" },
-        {                "5",     "1006",             "EFFF" },
-        {               "10",     "1006",             "F00A" },
+        {                "5",     "1006",            "-1001" },
+        {               "10",     "1006",             "-FF6" },
         { "BABABABABABABABA",       "FD", "BABABABABABAB9BD" },
         { "2B2CC74FC1B75D0F"
           "9C18DC99223085A5"
@@ -986,11 +986,11 @@ CUTE_TEST_CASE(kryptos_mp_sub_tests)
         {               "06",       "02",               "04" },
         {             "2001",     "1006",              "FFB" },
         {             "DEAD",     "BEEF",             "1FBE" },
-        {             "BEEF",     "DEAD",         "FFFFE042" },
-        {               "01",       "02",         "FFFFFFFF" },
+        {             "BEEF",     "DEAD",            "-1FBE" },
+        {               "01",       "02",              "-01" },
         {         "DEADBEEF", "BEEFDEAD",         "1FBDE042" },
-        {                "5",     "1006",         "FFFFEFFF" },
-        {               "10",     "1006",         "FFFFF00A" },
+        {                "5",     "1006",            "-1001" },
+        {               "10",     "1006",             "-FF6" },
         { "BABABABABABABABA",       "FD", "BABABABABABAB9BD" },
         { "2B2CC74FC1B75D0F"
           "9C18DC99223085A5"
@@ -1223,47 +1223,47 @@ CUTE_TEST_CASE(kryptos_mp_inv_tests)
     //               We could continue testing beyond the infinity but I am in a rush.
 #ifndef KRYPTOS_MP_U32_DIGIT
     struct inv_signal_tests_ctx test_vector[] = {
-        { "FF", "01" }, { "FE", "02" }, { "FD", "03" }, { "FC", "04" }, { "FB", "05" }, { "FA", "06" }, { "F9", "07" },
-        { "F8", "08" }, { "F7", "09" }, { "F6", "0A" }, { "F5", "0B" }, { "F4", "0C" }, { "F3", "0D" }, { "F2", "0E" },
-        { "F1", "0F" }, { "F0", "10" }, { "EF", "11" }, { "EE", "12" }, { "ED", "13" }, { "EC", "14" }, { "EB", "15" },
-        { "EA", "16" }, { "E9", "17" }, { "E8", "18" }, { "E7", "19" }, { "E6", "1A" }, { "E5", "1B" }, { "E4", "1C" },
-        { "E3", "1D" }, { "E2", "1E" }, { "E1", "1F" }, { "E0", "20" }, { "DF", "21" }, { "DE", "22" }, { "DD", "23" },
-        { "DC", "24" }, { "DB", "25" }, { "DA", "26" }, { "D9", "27" }, { "D8", "28" }, { "D7", "29" }, { "D6", "2A" },
-        { "D5", "2B" }, { "D4", "2C" }, { "D3", "2D" }, { "D2", "2E" }, { "D1", "2F" }, { "D0", "30" }, { "CF", "31" },
-        { "CE", "32" }, { "CD", "33" }, { "CC", "34" }, { "CB", "35" }, { "CA", "36" }, { "C9", "37" }, { "C8", "38" },
-        { "C7", "39" }, { "C6", "3A" }, { "C5", "3B" }, { "C4", "3C" }, { "C3", "3D" }, { "C2", "3E" }, { "C1", "3F" },
-        { "C0", "40" }, { "BF", "41" }, { "BE", "42" }, { "BD", "43" }, { "BC", "44" }, { "BB", "45" }, { "BA", "46" },
-        { "B9", "47" }, { "B8", "48" }, { "B7", "49" }, { "B6", "4A" }, { "B5", "4B" }, { "B4", "4C" }, { "B3", "4D" },
-        { "B2", "4E" }, { "B1", "4F" }, { "B0", "50" }, { "AF", "51" }, { "AE", "52" }, { "AD", "53" }, { "AC", "54" },
-        { "AB", "55" }, { "AA", "56" }, { "A9", "57" }, { "A8", "58" }, { "A7", "59" }, { "A6", "5A" }, { "A5", "5B" },
-        { "A4", "5C" }, { "A3", "5D" }, { "A2", "5E" }, { "A1", "5F" }, { "A0", "60" }, { "9F", "61" }, { "9E", "62" },
-        { "9D", "63" }, { "9C", "64" }, { "9B", "65" }, { "9A", "66" }, { "99", "67" }, { "98", "68" }, { "97", "69" },
-        { "96", "6A" }, { "95", "6B" }, { "94", "6C" }, { "93", "6D" }, { "92", "6E" }, { "91", "6F" }, { "90", "70" },
-        { "8F", "71" }, { "8E", "72" }, { "8D", "73" }, { "8C", "74" }, { "8B", "75" }, { "8A", "76" }, { "89", "77" },
-        { "88", "78" }, { "87", "79" }, { "86", "7A" }, { "85", "7B" }, { "84", "7C" }, { "83", "7D" }, { "82", "7E" },
-        { "81", "7F" }, { "80", "80" }
+        { "FF", "-FF" }, { "FE", "-FE" }, { "FD", "-FD" }, { "FC", "-FC" }, { "FB", "-FB" }, { "FA", "-FA" }, { "F9", "-F9" },
+        { "F8", "-F8" }, { "F7", "-F7" }, { "F6", "-F6" }, { "F5", "-F5" }, { "F4", "-F4" }, { "F3", "-F3" }, { "F2", "-F2" },
+        { "F1", "-F1" }, { "F0", "-F0" }, { "EF", "-EF" }, { "EE", "-EE" }, { "ED", "-ED" }, { "EC", "-EC" }, { "EB", "-EB" },
+        { "EA", "-EA" }, { "E9", "-E9" }, { "E8", "-E8" }, { "E7", "-E7" }, { "E6", "-E6" }, { "E5", "-E5" }, { "E4", "-E4" },
+        { "E3", "-E3" }, { "E2", "-E2" }, { "E1", "-E1" }, { "E0", "-E0" }, { "DF", "-DF" }, { "DE", "-DE" }, { "DD", "-DD" },
+        { "DC", "-DC" }, { "DB", "-DB" }, { "DA", "-DA" }, { "D9", "-D9" }, { "D8", "-D8" }, { "D7", "-D7" }, { "D6", "-D6" },
+        { "D5", "-D5" }, { "D4", "-D4" }, { "D3", "-D3" }, { "D2", "-D2" }, { "D1", "-D1" }, { "D0", "-D0" }, { "CF", "-CF" },
+        { "CE", "-CE" }, { "CD", "-CD" }, { "CC", "-CC" }, { "CB", "-CB" }, { "CA", "-CA" }, { "C9", "-C9" }, { "C8", "-C8" },
+        { "C7", "-C7" }, { "C6", "-C6" }, { "C5", "-C5" }, { "C4", "-C4" }, { "C3", "-C3" }, { "C2", "-C2" }, { "C1", "-C1" },
+        { "C0", "-C0" }, { "BF", "-BF" }, { "BE", "-BE" }, { "BD", "-BD" }, { "BC", "-BC" }, { "BB", "-BB" }, { "BA", "-BA" },
+        { "B9", "-B9" }, { "B8", "-B8" }, { "B7", "-B7" }, { "B6", "-B6" }, { "B5", "-B5" }, { "B4", "-B4" }, { "B3", "-B3" },
+        { "B2", "-B2" }, { "B1", "-B1" }, { "B0", "-B0" }, { "AF", "-AF" }, { "AE", "-AE" }, { "AD", "-AD" }, { "AC", "-AC" },
+        { "AB", "-AB" }, { "AA", "-AA" }, { "A9", "-A9" }, { "A8", "-A8" }, { "A7", "-A7" }, { "A6", "-A6" }, { "A5", "-A5" },
+        { "A4", "-A4" }, { "A3", "-A3" }, { "A2", "-A2" }, { "A1", "-A1" }, { "A0", "-A0" }, { "9F", "-9F" }, { "9E", "-9E" },
+        { "9D", "-9D" }, { "9C", "-9C" }, { "9B", "-9B" }, { "9A", "-9A" }, { "99", "-99" }, { "98", "-98" }, { "97", "-97" },
+        { "96", "-96" }, { "95", "-95" }, { "94", "-94" }, { "93", "-93" }, { "92", "-92" }, { "91", "-91" }, { "90", "-90" },
+        { "8F", "-8F" }, { "8E", "-8E" }, { "8D", "-8D" }, { "8C", "-8C" }, { "8B", "-8B" }, { "8A", "-8A" }, { "89", "-89" },
+        { "88", "-88" }, { "87", "-87" }, { "86", "-86" }, { "85", "-85" }, { "84", "-84" }, { "83", "-83" }, { "82", "-82" },
+        { "81", "-81" }, { "80", "-80" }
     };
 #else
     struct inv_signal_tests_ctx test_vector[] = {
-        { "FF", "FFFFFF01" }, { "FE", "FFFFFF02" }, { "FD", "FFFFFF03" }, { "FC", "FFFFFF04" }, { "FB", "FFFFFF05" }, { "FA", "FFFFFF06" }, { "F9", "FFFFFF07" },
-        { "F8", "FFFFFF08" }, { "F7", "FFFFFF09" }, { "F6", "FFFFFF0A" }, { "F5", "FFFFFF0B" }, { "F4", "FFFFFF0C" }, { "F3", "FFFFFF0D" }, { "F2", "FFFFFF0E" },
-        { "F1", "FFFFFF0F" }, { "F0", "FFFFFF10" }, { "EF", "FFFFFF11" }, { "EE", "FFFFFF12" }, { "ED", "FFFFFF13" }, { "EC", "FFFFFF14" }, { "EB", "FFFFFF15" },
-        { "EA", "FFFFFF16" }, { "E9", "FFFFFF17" }, { "E8", "FFFFFF18" }, { "E7", "FFFFFF19" }, { "E6", "FFFFFF1A" }, { "E5", "FFFFFF1B" }, { "E4", "FFFFFF1C" },
-        { "E3", "FFFFFF1D" }, { "E2", "FFFFFF1E" }, { "E1", "FFFFFF1F" }, { "E0", "FFFFFF20" }, { "DF", "FFFFFF21" }, { "DE", "FFFFFF22" }, { "DD", "FFFFFF23" },
-        { "DC", "FFFFFF24" }, { "DB", "FFFFFF25" }, { "DA", "FFFFFF26" }, { "D9", "FFFFFF27" }, { "D8", "FFFFFF28" }, { "D7", "FFFFFF29" }, { "D6", "FFFFFF2A" },
-        { "D5", "FFFFFF2B" }, { "D4", "FFFFFF2C" }, { "D3", "FFFFFF2D" }, { "D2", "FFFFFF2E" }, { "D1", "FFFFFF2F" }, { "D0", "FFFFFF30" }, { "CF", "FFFFFF31" },
-        { "CE", "FFFFFF32" }, { "CD", "FFFFFF33" }, { "CC", "FFFFFF34" }, { "CB", "FFFFFF35" }, { "CA", "FFFFFF36" }, { "C9", "FFFFFF37" }, { "C8", "FFFFFF38" },
-        { "C7", "FFFFFF39" }, { "C6", "FFFFFF3A" }, { "C5", "FFFFFF3B" }, { "C4", "FFFFFF3C" }, { "C3", "FFFFFF3D" }, { "C2", "FFFFFF3E" }, { "C1", "FFFFFF3F" },
-        { "C0", "FFFFFF40" }, { "BF", "FFFFFF41" }, { "BE", "FFFFFF42" }, { "BD", "FFFFFF43" }, { "BC", "FFFFFF44" }, { "BB", "FFFFFF45" }, { "BA", "FFFFFF46" },
-        { "B9", "FFFFFF47" }, { "B8", "FFFFFF48" }, { "B7", "FFFFFF49" }, { "B6", "FFFFFF4A" }, { "B5", "FFFFFF4B" }, { "B4", "FFFFFF4C" }, { "B3", "FFFFFF4D" },
-        { "B2", "FFFFFF4E" }, { "B1", "FFFFFF4F" }, { "B0", "FFFFFF50" }, { "AF", "FFFFFF51" }, { "AE", "FFFFFF52" }, { "AD", "FFFFFF53" }, { "AC", "FFFFFF54" },
-        { "AB", "FFFFFF55" }, { "AA", "FFFFFF56" }, { "A9", "FFFFFF57" }, { "A8", "FFFFFF58" }, { "A7", "FFFFFF59" }, { "A6", "FFFFFF5A" }, { "A5", "FFFFFF5B" },
-        { "A4", "FFFFFF5C" }, { "A3", "FFFFFF5D" }, { "A2", "FFFFFF5E" }, { "A1", "FFFFFF5F" }, { "A0", "FFFFFF60" }, { "9F", "FFFFFF61" }, { "9E", "FFFFFF62" },
-        { "9D", "FFFFFF63" }, { "9C", "FFFFFF64" }, { "9B", "FFFFFF65" }, { "9A", "FFFFFF66" }, { "99", "FFFFFF67" }, { "98", "FFFFFF68" }, { "97", "FFFFFF69" },
-        { "96", "FFFFFF6A" }, { "95", "FFFFFF6B" }, { "94", "FFFFFF6C" }, { "93", "FFFFFF6D" }, { "92", "FFFFFF6E" }, { "91", "FFFFFF6F" }, { "90", "FFFFFF70" },
-        { "8F", "FFFFFF71" }, { "8E", "FFFFFF72" }, { "8D", "FFFFFF73" }, { "8C", "FFFFFF74" }, { "8B", "FFFFFF75" }, { "8A", "FFFFFF76" }, { "89", "FFFFFF77" },
-        { "88", "FFFFFF78" }, { "87", "FFFFFF79" }, { "86", "FFFFFF7A" }, { "85", "FFFFFF7B" }, { "84", "FFFFFF7C" }, { "83", "FFFFFF7D" }, { "82", "FFFFFF7E" },
-        { "81", "FFFFFF7F" }, { "80", "FFFFFF80" }
+        { "FF", "-FF" }, { "FE", "-FE" }, { "FD", "-FD" }, { "FC", "-FC" }, { "FB", "-FB" }, { "FA", "-FA" }, { "F9", "-F9" },
+        { "F8", "-F8" }, { "F7", "-F7" }, { "F6", "-F6" }, { "F5", "-F5" }, { "F4", "-F4" }, { "F3", "-F3" }, { "F2", "-F2" },
+        { "F1", "-F1" }, { "F0", "-F0" }, { "EF", "-EF" }, { "EE", "-EE" }, { "ED", "-ED" }, { "EC", "-EC" }, { "EB", "-EB" },
+        { "EA", "-EA" }, { "E9", "-E9" }, { "E8", "-E8" }, { "E7", "-E7" }, { "E6", "-E6" }, { "E5", "-E5" }, { "E4", "-E4" },
+        { "E3", "-E3" }, { "E2", "-E2" }, { "E1", "-E1" }, { "E0", "-E0" }, { "DF", "-DF" }, { "DE", "-DE" }, { "DD", "-DD" },
+        { "DC", "-DC" }, { "DB", "-DB" }, { "DA", "-DA" }, { "D9", "-D9" }, { "D8", "-D8" }, { "D7", "-D7" }, { "D6", "-D6" },
+        { "D5", "-D5" }, { "D4", "-D4" }, { "D3", "-D3" }, { "D2", "-D2" }, { "D1", "-D1" }, { "D0", "-D0" }, { "CF", "-CF" },
+        { "CE", "-CE" }, { "CD", "-CD" }, { "CC", "-CC" }, { "CB", "-CB" }, { "CA", "-CA" }, { "C9", "-C9" }, { "C8", "-C8" },
+        { "C7", "-C7" }, { "C6", "-C6" }, { "C5", "-C5" }, { "C4", "-C4" }, { "C3", "-C3" }, { "C2", "-C2" }, { "C1", "-C1" },
+        { "C0", "-C0" }, { "BF", "-BF" }, { "BE", "-BE" }, { "BD", "-BD" }, { "BC", "-BC" }, { "BB", "-BB" }, { "BA", "-BA" },
+        { "B9", "-B9" }, { "B8", "-B8" }, { "B7", "-B7" }, { "B6", "-B6" }, { "B5", "-B5" }, { "B4", "-B4" }, { "B3", "-B3" },
+        { "B2", "-B2" }, { "B1", "-B1" }, { "B0", "-B0" }, { "AF", "-AF" }, { "AE", "-AE" }, { "AD", "-AD" }, { "AC", "-AC" },
+        { "AB", "-AB" }, { "AA", "-AA" }, { "A9", "-A9" }, { "A8", "-A8" }, { "A7", "-A7" }, { "A6", "-A6" }, { "A5", "-A5" },
+        { "A4", "-A4" }, { "A3", "-A3" }, { "A2", "-A2" }, { "A1", "-A1" }, { "A0", "-A0" }, { "9F", "-9F" }, { "9E", "-9E" },
+        { "9D", "-9D" }, { "9C", "-9C" }, { "9B", "-9B" }, { "9A", "-9A" }, { "99", "-99" }, { "98", "-98" }, { "97", "-97" },
+        { "96", "-96" }, { "95", "-95" }, { "94", "-94" }, { "93", "-93" }, { "92", "-92" }, { "91", "-91" }, { "90", "-90" },
+        { "8F", "-8F" }, { "8E", "-8E" }, { "8D", "-8D" }, { "8C", "-8C" }, { "8B", "-8B" }, { "8A", "-8A" }, { "89", "-89" },
+        { "88", "-88" }, { "87", "-87" }, { "86", "-86" }, { "85", "-85" }, { "84", "-84" }, { "83", "-83" }, { "82", "-82" },
+        { "81", "-81" }, { "80", "-80" }
     };
 #endif
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
@@ -1273,186 +1273,12 @@ CUTE_TEST_CASE(kryptos_mp_inv_tests)
         CUTE_ASSERT(n != NULL);
         en = kryptos_hex_value_as_mp(test_vector[tv].en, strlen(test_vector[tv].en));
         CUTE_ASSERT(en != NULL);
-        CUTE_ASSERT(kryptos_mp_inv(&n) != NULL);
+        kryptos_mp_inv(&n);
         CUTE_ASSERT(kryptos_mp_eq(n, en) == 1);
         kryptos_del_mp_value(n);
         kryptos_del_mp_value(en);
     }
 CUTE_TEST_CASE_END
-
-/*
-CUTE_TEST_CASE(kryptos_mp_signed_add_tests)
-    struct signed_add_tests_ctx {
-        int a_neg;
-        kryptos_u8_t *a;
-        int b_neg;
-        kryptos_u8_t *b;
-        kryptos_u8_t *s;
-    };
-    kryptos_mp_value_t *a, *b, *s;
-    struct signed_add_tests_ctx test_vector[] = {
-        { 1, "02", 0, "04", "02" },
-        { 0, "02", 1, "04", "FE" },
-        { 1, "02", 1, "04", "FA" },
-        { 1, "02", 1, "02", "FC" },
-        { 1, "02", 0, "02", "00" },
-        { 1, "02", 0, "0A", "08" },
-        { 1, "02", 1, "0A", "F4" },
-        { 0, "02", 1, "0A", "F8" },
-        { 0, "07", 0, "07", "0E" },
-        { 1, "201", 0, "17F", "FF7E" }
-    };
-    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
-
-    for (tv = 0; tv < tv_nr; tv++) {
-        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
-
-        CUTE_ASSERT(a != NULL);
-
-        if (test_vector[tv].a_neg) {
-            a = kryptos_mp_inv_signal(a);
-        }
-
-        CUTE_ASSERT(a != NULL);
-
-        b = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));
-
-        CUTE_ASSERT(b != NULL);
-
-        if (test_vector[tv].b_neg) {
-            b = kryptos_mp_inv_signal(b);
-        }
-
-        CUTE_ASSERT(b != NULL);
-
-        CUTE_ASSERT(a != NULL);
-
-        s = kryptos_hex_value_as_mp(test_vector[tv].s, strlen(test_vector[tv].s));
-
-        CUTE_ASSERT(s != NULL);
-//printf("a = "); print_mp(a);
-//printf("b = "); print_mp(b);
-        a = kryptos_mp_signed_add(&a, b);
-//printf("s = "); print_mp(a);
-//printf("e = "); print_mp(s);
-//printf("--\n");
-
-        CUTE_ASSERT(kryptos_mp_eq(a, s) == 1);
-
-        kryptos_del_mp_value(a);
-        kryptos_del_mp_value(b);
-        kryptos_del_mp_value(s);
-    }
-CUTE_TEST_CASE_END
-
-CUTE_TEST_CASE(kryptos_mp_signed_sub_tests)
-    struct signed_sub_tests_ctx {
-        int a_neg;
-        kryptos_u8_t *a;
-        int b_neg;
-        kryptos_u8_t *b;
-        kryptos_u8_t *s;
-    };
-    kryptos_mp_value_t *a, *b, *s;
-    struct signed_sub_tests_ctx test_vector[] = {
-        { 0,   "13", 1,   "0C",   "1F" },
-        { 1,   "13", 0,   "0C",   "E1" },
-        { 1,   "13", 1,   "0C",   "F9" },
-        { 0,   "07", 0,   "07",   "00" },
-        { 1, "0087", 0,  "10F", "FE6A" },
-        { 0,   "00", 1,   "02",   "FE" },
-        { 0,   "00", 1, "00FE",   "FE" },
-        { 0,    "1", 0,    "3",   "FE" },
-        { 0, "006D", 1, "00FE",  "16B" },
-        { 1, "0024", 1, "00FE",   "DA" }
-    };
-    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
-
-    for (tv = 0; tv < tv_nr; tv++) {
-        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
-
-        CUTE_ASSERT(a != NULL);
-
-        if (test_vector[tv].a_neg) {
-            a = kryptos_mp_inv_signal(a);
-        }
-
-        CUTE_ASSERT(a != NULL);
-
-        b = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));
-
-        CUTE_ASSERT(b != NULL);
-
-        if (test_vector[tv].b_neg) {
-            b = kryptos_mp_inv_signal(b);
-        }
-
-        CUTE_ASSERT(b != NULL);
-
-        CUTE_ASSERT(a != NULL);
-
-        s = kryptos_hex_value_as_mp(test_vector[tv].s, strlen(test_vector[tv].s));
-
-        CUTE_ASSERT(s != NULL);
-//printf("a = "); print_mp(a);
-//printf("b = "); print_mp(b);
-        a = kryptos_mp_signed_sub(&a, b);
-//printf("s = "); print_mp(a);printf("\n");
-
-        CUTE_ASSERT(kryptos_mp_eq(a, s) == 1);
-
-        kryptos_del_mp_value(a);
-        kryptos_del_mp_value(b);
-        kryptos_del_mp_value(s);
-    }
-CUTE_TEST_CASE_END
-
-CUTE_TEST_CASE(kryptos_mp_signed_mul_tests)
-    struct signed_mul_tests_ctx {
-        int a_neg;
-        kryptos_u8_t *a;
-        int b_neg;
-        kryptos_u8_t *b;
-        kryptos_u8_t *p;
-    };
-    struct signed_mul_tests_ctx test_vector[] = {
-        { 1, "2", 0, "4", "F8" },
-        { 0, "2", 0, "4", "08" },
-        { 0, "2", 1, "4", "F8" },
-        { 1, "2", 1, "4", "08" }
-    };
-    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
-    kryptos_mp_value_t *a, *b, *p;
-    for (tv = 0; tv < tv_nr; tv++) {
-        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
-        CUTE_ASSERT(a != NULL);
-
-        if (test_vector[tv].a_neg) {
-            a = kryptos_mp_inv_signal(a);
-            CUTE_ASSERT(a != NULL);
-        }
-
-        b = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));
-        CUTE_ASSERT(b != NULL);
-
-        if (test_vector[tv].b_neg) {
-            b = kryptos_mp_inv_signal(b);
-            CUTE_ASSERT(b != NULL);
-        }
-
-        p = kryptos_hex_value_as_mp(test_vector[tv].p, strlen(test_vector[tv].p));
-        CUTE_ASSERT(p != NULL);
-
-        a = kryptos_mp_signed_mul(&a, b);
-        CUTE_ASSERT(a != NULL);
-        CUTE_ASSERT(kryptos_mp_eq(a, p) == 1);
-
-        kryptos_del_mp_value(a);
-        kryptos_del_mp_value(b);
-        kryptos_del_mp_value(p);
-    }
-CUTE_TEST_CASE_END
-*/
 
 CUTE_TEST_CASE(kryptos_mp_div_tests)
     kryptos_mp_value_t *x, *y, *q, *r, *eq, *er;
@@ -2054,47 +1880,6 @@ CUTE_TEST_CASE(kryptos_mp_rsh_tests)
     }
 CUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_mp_signed_rsh_tests)
-    struct signed_rsh_tests_ctx {
-        kryptos_u8_t *a;
-        int l;
-        kryptos_u8_t *e;
-    };
-    struct signed_rsh_tests_ctx test_vector[] = {
-#ifndef KRYPTOS_MP_U32_DIGIT
-        {        "FEF2",  1,       "FF79" },
-        {        "7FF2",  1,       "3FF9" },
-        {        "FFFF", 10,       "FFFF" },
-        {        "00FF",  3,       "001F" }
-#else
-        {        "FFFFFEF2",  1, "FFFFFF79" },
-        {        "7FFFFFF2",  1, "3FFFFFF9" },
-        {        "FFFFFFFF", 10, "FFFFFFFF" },
-        {        "000000FF",  3, "0000001F" }
-#endif
-    };
-    size_t test_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;
-    kryptos_mp_value_t *a, *e;
-    ssize_t d;
-
-    for (t = 0; t < test_nr; t++) {
-        a = kryptos_hex_value_as_mp(test_vector[t].a, strlen(test_vector[t].a));
-        e = kryptos_hex_value_as_mp(test_vector[t].e, strlen(test_vector[t].e));
-
-        CUTE_ASSERT(a != NULL && e != NULL);
-
-        a = kryptos_mp_signed_rsh(&a, test_vector[t].l);
-
-        CUTE_ASSERT(a != NULL);
-
-        CUTE_ASSERT(kryptos_mp_eq(a, e) == 1);
-
-        kryptos_del_mp_value(a);
-        kryptos_del_mp_value(e);
-    }
-CUTE_TEST_CASE_END
-
-
 CUTE_TEST_CASE(kryptos_mp_miller_rabin_test_tests)
     struct miller_rabin_test_ctx {
         kryptos_u8_t *n;
@@ -2402,13 +2187,13 @@ CUTE_TEST_CASE(kryptos_mp_mod_tests)
         size_t e_size;
     };
     struct test_ctx test_vector[] = {
-        { "FFFFFFF2", 8,  "11", 2,  "03", 2 },
+        {       "-E", 2,  "11", 2,  "03", 2 },
         {       "0E", 2,  "11", 2,  "0E", 2 },
         {     "9C40", 4,  "11", 2,  "10", 2 },
-        { "FFFFFFEE", 8,  "11", 2,  "10", 2 },
-        { "FFFFFFE5", 8,  "0D", 2,  "0C", 2 },
-        { "FFFFFFEE", 8, "3E8", 3, "3D6", 3 },
-        { "FFFFFFFE", 8,  "02", 2,  "00", 2 },
+        {      "-12", 3,  "11", 2,  "10", 2 },
+        {      "-1B", 3,  "0D", 2,  "0C", 2 },
+        {      "-12", 3, "3E8", 3, "3D6", 3 },
+        {       "-2", 2,  "02", 2,  "00", 2 },
         {       "12", 2,  "11", 2,  "01", 2 }
     };
     size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
@@ -2440,14 +2225,14 @@ CUTE_TEST_CASE(kryptos_mp_add_s_tests)
         size_t e_size;
     };
     struct test_ctx test_vector[] = {
-        { "FFFFFFF2", 8,       "11", 2,       "03", 2 },
+        {      "-0E", 3,       "11", 2,       "03", 2 },
         {       "0E", 2,       "11", 2,       "1F", 2 },
         {     "9C40", 4,       "11", 2,     "9C51", 4 },
-        { "FFFFFFF2", 8, "FFFFFFEF", 8, "FFFFFFE1", 8 },
-        { "FFFFFFEF", 8,       "0E", 2, "FFFFFFFD", 8 },
-        { "FFFFFFEF", 8, "FFFFFFF2", 8, "FFFFFFE1", 8 },
-        {       "0E", 2, "FFFFFFEF", 8, "FFFFFFFD", 8 },
-        { "FFFFFFEF", 8,       "11", 2,       "00", 2 },
+        {      "-0E", 3,      "-11", 3,      "-1F", 3 },
+        {      "-11", 3,       "0E", 2,      "-03", 3 },
+        {      "-11", 3,      "-0E", 3,      "-1F", 3 },
+        {       "0E", 2,      "-11", 3,      "-03", 3 },
+        {      "-11", 3,       "11", 2,       "00", 2 },
         {       "00", 2,       "00", 2,       "00", 2 }
     };
     size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
@@ -2483,18 +2268,18 @@ CUTE_TEST_CASE(kryptos_mp_sub_s_tests)
         size_t e_size;
     };
     struct test_ctx test_vector[] = {
-        { "FFFFFFF2", 8,       "11", 2, "FFFFFFE1", 8 },
-        {       "0E", 2,       "11", 2, "FFFFFFFD", 8 },
+        {      "-0E", 3,       "11", 2,      "-1F", 3 },
+        {       "0E", 2,       "11", 2,      "-03", 3 },
         {     "9C40", 4,       "11", 2,     "9C2F", 4 },
-        { "FFFFFFF2", 8, "FFFFFFEF", 8,       "03", 2 },
-        { "FFFFFFEF", 8,       "0E", 2, "FFFFFFE1", 8 },
-        { "FFFFFFEF", 8, "FFFFFFF2", 8, "FFFFFFFD", 8 },
-        {       "0E", 2, "FFFFFFEF", 8,       "1F", 2 },
-        { "FFFFFFEF", 8,       "11", 2, "FFFFFFDE", 8 },
-        { "FFFFFFEF", 8, "FFFFFFEF", 8,       "00", 2 },
-        { "FFFFFFEF", 8,       "00", 2, "FFFFFFEF", 8 },
-        {       "00", 2, "FFFFFFEF", 8,       "11", 2 },
-        {       "00", 2,       "11", 2, "FFFFFFEF", 8 },
+        {      "-0E", 3,      "-11", 3,       "03", 2 },
+        {      "-11", 3,       "0E", 2,      "-1F", 3 },
+        {      "-11", 3,      "-0E", 3,      "-03", 3 },
+        {       "0E", 2,      "-11", 3,       "1F", 2 },
+        {      "-11", 3,       "11", 2,      "-22", 3 },
+        {      "-11", 3,      "-11", 3,       "00", 2 },
+        {      "-11", 3,       "00", 2,      "-11", 3 },
+        {       "00", 2,      "-11", 3,       "11", 2 },
+        {       "00", 2,       "11", 2,      "-11", 3 },
         {       "00", 2,       "00", 2,       "00", 2 }
     };
     size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
@@ -2530,17 +2315,17 @@ CUTE_TEST_CASE(kryptos_mp_mul_s_tests)
         size_t e_size;
     };
     struct test_ctx test_vector[] = {
-        { "FFFFFFF2", 8,       "11", 2, "FFFFFF12", 8 },
+        {       "-E", 2,       "11", 2,      "-EE", 3 },
         {       "0E", 2,       "11", 2,       "EE", 2 },
         {     "9C40", 4,       "11", 2,    "A6040", 5 },
-        { "FFFFFFF2", 8, "FFFFFFEF", 8,       "EE", 2 },
-        { "FFFFFFEF", 8,       "0E", 2, "FFFFFF12", 8 },
-        { "FFFFFFEF", 8, "FFFFFFF2", 8,       "EE", 2 },
-        {       "0E", 2, "FFFFFFEF", 8, "FFFFFF12", 8 },
-        { "FFFFFFEF", 8,       "11", 2, "FFFFFEDF", 8 },
-        { "FFFFFFEF", 8, "FFFFFFEF", 8,      "121", 3 },
-        { "FFFFFFEF", 8,       "00", 2,       "00", 2 },
-        {       "00", 2, "FFFFFFEF", 8,       "00", 2 }
+        {      "-0E", 3,      "-11", 3,       "EE", 2 },
+        {      "-11", 3,       "0E", 2,      "-EE", 3 },
+        {      "-11", 3,      "-0E", 3,       "EE", 2 },
+        {       "0E", 2,      "-11", 3,      "-EE", 3 },
+        {      "-11", 3,       "11", 2,     "-121", 4 },
+        {      "-11", 3,      "-11", 3,      "121", 3 },
+        {      "-11", 3,       "00", 2,       "00", 2 },
+        {       "00", 2,      "-11", 3,       "00", 2 }
     };
     size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
     kryptos_mp_value_t *a_value, *b_value, *e_value;
@@ -2562,159 +2347,6 @@ CUTE_TEST_CASE(kryptos_mp_mul_s_tests)
         kryptos_del_mp_value(a_value);
         kryptos_del_mp_value(b_value);
         kryptos_del_mp_value(e_value);
-    }
-CUTE_TEST_CASE_END
-
-CUTE_TEST_CASE(kryptos_mp_bits_total_in_base2_tests)
-    struct test_ctx {
-        kryptos_u8_t *value;
-        size_t value_size;
-        int expected;
-    };
-    struct test_ctx test_vector[] = {
-        {                                 "03",  2,   2 },
-        {                                 "08",  2,   4 },
-        {                           "DEADBEEF",  8,  32 },
-        {                               "BEEF",  4,  16 },
-        {                                 "BE",  2,   8 },
-        { "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 34, 136 },
-        { "0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 34, 132 },
-        {                                 "00",  2,   1 },
-        {                                 "01",  2,   1 },
-        {                                 "02",  2,   2 },
-        {                                 "14",  2,   5 }
-    };
-    size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
-    kryptos_mp_value_t *value = NULL;
-
-    for (t = 0; t < tv_nr; t++) {
-        value = kryptos_hex_value_as_mp(test_vector[t].value, test_vector[t].value_size);
-        CUTE_ASSERT(value != NULL);
-        CUTE_ASSERT(kryptos_mp_bits_total_in_base2(value) == test_vector[t].expected);
-        kryptos_del_mp_value(value);
-    }
-CUTE_TEST_CASE_END
-
-CUTE_TEST_CASE(kryptos_mp_bit_n_tests)
-    struct test_ctx {
-        kryptos_u8_t *value;
-        size_t value_size;
-        size_t bn;
-        size_t expected;
-    };
-    struct test_ctx test_vector[] = {
-        {                                 "03",   2,  0, 1 },
-        {                                 "03",   2,  1, 1 },
-        {                                 "03",   2,  2, 0 },
-        {                           "80808080",   8,  0, 0 },
-        {                           "80808080",   8,  1, 0 },
-        {                           "80808080",   8,  2, 0 },
-        {                           "80808080",   8,  3, 0 },
-        {                           "80808080",   8,  4, 0 },
-        {                           "80808080",   8,  5, 0 },
-        {                           "80808080",   8,  6, 0 },
-        {                           "80808080",   8,  7, 1 },
-        {                           "80808080",   8,  8, 0 },
-        {                           "80808080",   8,  9, 0 },
-        {                           "80808080",   8, 10, 0 },
-        {                           "80808080",   8, 11, 0 },
-        {                           "80808080",   8, 12, 0 },
-        {                           "80808080",   8, 13, 0 },
-        {                           "80808080",   8, 14, 0 },
-        {                           "80808080",   8, 15, 1 },
-        {                           "80808080",   8, 16, 0 },
-        {                           "80808080",   8, 17, 0 },
-        {                           "80808080",   8, 18, 0 },
-        {                           "80808080",   8, 19, 0 },
-        {                           "80808080",   8, 20, 0 },
-        {                           "80808080",   8, 21, 0 },
-        {                           "80808080",   8, 22, 0 },
-        {                           "80808080",   8, 23, 1 },
-        {                           "80808080",   8, 24, 0 },
-        {                           "80808080",   8, 25, 0 },
-        {                           "80808080",   8, 26, 0 },
-        {                           "80808080",   8, 27, 0 },
-        {                           "80808080",   8, 28, 0 },
-        {                           "80808080",   8, 29, 0 },
-        {                           "80808080",   8, 30, 0 },
-        {                           "80808080",   8, 31, 1 },
-        {                   "8080808080808080",  16,  0, 0 },
-        {                   "8080808080808080",  16,  1, 0 },
-        {                   "8080808080808080",  16,  2, 0 },
-        {                   "8080808080808080",  16,  3, 0 },
-        {                   "8080808080808080",  16,  4, 0 },
-        {                   "8080808080808080",  16,  5, 0 },
-        {                   "8080808080808080",  16,  6, 0 },
-        {                   "8080808080808080",  16,  7, 1 },
-        {                   "8080808080808080",  16,  8, 0 },
-        {                   "8080808080808080",  16,  9, 0 },
-        {                   "8080808080808080",  16, 10, 0 },
-        {                   "8080808080808080",  16, 11, 0 },
-        {                   "8080808080808080",  16, 12, 0 },
-        {                   "8080808080808080",  16, 13, 0 },
-        {                   "8080808080808080",  16, 14, 0 },
-        {                   "8080808080808080",  16, 15, 1 },
-        {                   "8080808080808080",  16, 16, 0 },
-        {                   "8080808080808080",  16, 17, 0 },
-        {                   "8080808080808080",  16, 18, 0 },
-        {                   "8080808080808080",  16, 19, 0 },
-        {                   "8080808080808080",  16, 20, 0 },
-        {                   "8080808080808080",  16, 21, 0 },
-        {                   "8080808080808080",  16, 22, 0 },
-        {                   "8080808080808080",  16, 23, 1 },
-        {                   "8080808080808080",  16, 24, 0 },
-        {                   "8080808080808080",  16, 25, 0 },
-        {                   "8080808080808080",  16, 26, 0 },
-        {                   "8080808080808080",  16, 27, 0 },
-        {                   "8080808080808080",  16, 28, 0 },
-        {                   "8080808080808080",  16, 29, 0 },
-        {                   "8080808080808080",  16, 30, 0 },
-        {                   "8080808080808080",  16, 31, 1 },
-        {                   "8080808080808080",  16, 32, 0 },
-        {                   "8080808080808080",  16, 33, 0 },
-        {                   "8080808080808080",  16, 34, 0 },
-        {                   "8080808080808080",  16, 35, 0 },
-        {                   "8080808080808080",  16, 36, 0 },
-        {                   "8080808080808080",  16, 37, 0 },
-        {                   "8080808080808080",  16, 38, 0 },
-        {                   "8080808080808080",  16, 39, 1 },
-        {                   "8080808080808080",  16, 40, 0 },
-        {                   "8080808080808080",  16, 41, 0 },
-        {                   "8080808080808080",  16, 42, 0 },
-        {                   "8080808080808080",  16, 43, 0 },
-        {                   "8080808080808080",  16, 44, 0 },
-        {                   "8080808080808080",  16, 45, 0 },
-        {                   "8080808080808080",  16, 46, 0 },
-        {                   "8080808080808080",  16, 47, 1 },
-        {                   "8080808080808080",  16, 48, 0 },
-        {                   "8080808080808080",  16, 49, 0 },
-        {                   "8080808080808080",  16, 50, 0 },
-        {                   "8080808080808080",  16, 51, 0 },
-        {                   "8080808080808080",  16, 52, 0 },
-        {                   "8080808080808080",  16, 53, 0 },
-        {                   "8080808080808080",  16, 54, 0 },
-        {                   "8080808080808080",  16, 55, 1 },
-        {                   "8080808080808080",  16, 56, 0 },
-        {                   "8080808080808080",  16, 57, 0 },
-        {                   "8080808080808080",  16, 58, 0 },
-        {                   "8080808080808080",  16, 59, 0 },
-        {                   "8080808080808080",  16, 60, 0 },
-        {                   "8080808080808080",  16, 61, 0 },
-        {                   "8080808080808080",  16, 62, 0 },
-        {                   "8080808080808080",  16, 63, 1 },
-        {                           "80808080",   8, 32, 0 },
-        {                           "80808080",   8, 40, 0 },
-        {                   "8080808080808080",  16, 64, 0 },
-        {                   "8080808080808080",  16, 72, 0 }
-    };
-    size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
-    kryptos_mp_value_t *value = NULL;
-
-    for (t = 0; t < tv_nr; t++) {
-        value = kryptos_hex_value_as_mp(test_vector[t].value, test_vector[t].value_size);
-        CUTE_ASSERT(value != NULL);
-        CUTE_ASSERT(kryptos_mp_bit_n(value, test_vector[t].bn) == test_vector[t].expected);
-        kryptos_del_mp_value(value);
     }
 CUTE_TEST_CASE_END
 

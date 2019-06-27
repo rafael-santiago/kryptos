@@ -238,7 +238,6 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_lt_tests);
     CUTE_RUN_TEST(kryptos_mp_le_tests);
     CUTE_RUN_TEST(kryptos_mp_is_neg_tests);
-    //CUTE_RUN_TEST(kryptos_mp_bitcount_tests);
     CUTE_RUN_TEST(kryptos_mp_add_tests);
     CUTE_RUN_TEST(kryptos_mp_sub_tests);
     CUTE_RUN_TEST(kryptos_mp_mul_tests);
@@ -247,7 +246,6 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_inv_tests);
     CUTE_RUN_TEST(kryptos_mp_lsh_tests);
     CUTE_RUN_TEST(kryptos_mp_rsh_tests);
-    CUTE_RUN_TEST(kryptos_mp_signed_rsh_tests);
     CUTE_RUN_TEST(kryptos_mp_div_tests);
     CUTE_RUN_TEST(kryptos_mp_div_2p_tests);
     CUTE_RUN_TEST(kryptos_mp_pow_tests);
@@ -267,8 +265,6 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_sub_s_tests);
     CUTE_RUN_TEST(kryptos_mp_mul_s_tests);
     CUTE_RUN_TEST(kryptos_mp_mod_tests);
-    CUTE_RUN_TEST(kryptos_mp_bits_total_in_base2_tests);
-    //CUTE_RUN_TEST(kryptos_mp_bit_n_tests);
     CUTE_RUN_TEST(kryptos_mp_get_bitmap_tests);
 
     // INFO(Rafael): This encoding function depends on multiprecision stuff, this is because we need

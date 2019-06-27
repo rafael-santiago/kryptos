@@ -272,6 +272,7 @@ typedef kryptos_u32_t kryptos_mp_digit_t;
 typedef struct kryptos_mp_value {
     size_t data_size;
     kryptos_mp_digit_t *data;
+    kryptos_u8_t neg;
 }kryptos_mp_value_t;
 
 typedef struct kryptos_ec {
