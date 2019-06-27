@@ -8,7 +8,6 @@
 #include <kryptos_ec_utils.h>
 #include <kryptos_mp.h>
 #include <kryptos_memory.h>
-#include <stdio.h>
 
 #define KRYPTOS_EC_UTILS_DO_OR_DIE(stmt, escape_label) {\
     if ((stmt) == NULL) {\

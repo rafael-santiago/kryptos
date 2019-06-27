@@ -771,29 +771,29 @@ KUTE_TEST_CASE(kryptos_mp_is_neg_tests)
     };
 #ifndef KRYPTOS_MP_U32_DIGIT
     struct is_neg_tests_ctx test_vector[] = {
-        {                "2", 0 },
-        {               "FE", 1 },
-        {             "0002", 0 },
-        {             "FFFE", 1 },
-        {         "0000000A", 0 },
-        {         "FFFFFFF6", 1 },
-        {         "21524111", 0 },
-        {         "DEADBEEF", 1 },
-        { "2152411021524111", 0 },
-        { "DEADBEEFDEADBEEF", 1 }
+        {                 "2", 0 },
+        {                "-2", 1 },
+        {              "0002", 0 },
+        {             "-0002", 1 },
+        {          "0000000A", 0 },
+        {         "-0000000A", 1 },
+        {          "21524111", 0 },
+        {          "DEADBEEF", 0 },
+        {  "2152411021524111", 0 },
+        {  "DEADBEEFDEADBEEF", 0 }
     };
 #else
     struct is_neg_tests_ctx test_vector[] = {
-        {         "00000002", 0 },
-        {         "FFFFFFFE", 1 },
-        {         "00000002", 0 },
-        {         "FFFFFFFE", 1 },
-        {         "0000000A", 0 },
-        {         "FFFFFFF6", 1 },
-        {         "21524111", 0 },
-        {         "DEADBEEF", 1 },
-        { "2152411021524111", 0 },
-        { "DEADBEEFDEADBEEF", 1 }
+        {                 "2", 0 },
+        {                "-2", 1 },
+        {              "0002", 0 },
+        {             "-0002", 1 },
+        {          "0000000A", 0 },
+        {         "-0000000A", 1 },
+        {          "21524111", 0 },
+        {          "DEADBEEF", 0 },
+        {  "2152411021524111", 0 },
+        {  "DEADBEEFDEADBEEF", 0 }
     };
 #endif
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
