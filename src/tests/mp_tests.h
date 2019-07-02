@@ -42,6 +42,8 @@ CUTE_DECLARE_TEST_CASE(kryptos_mp_sub_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_mp_mul_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_mp_karatsuba_tests);
+
 CUTE_DECLARE_TEST_CASE(kryptos_mp_not_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_mp_inv_tests);

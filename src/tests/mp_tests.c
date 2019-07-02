@@ -1098,6 +1098,77 @@ CUTE_TEST_CASE(kryptos_mp_sub_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_mp_karatsuba_tests)
+    kryptos_mp_value_t *a, *b, *e, *r;
+    struct mul_tests_ctx {
+        kryptos_u8_t *a, *b, *e;
+    };
+    struct mul_tests_ctx test_vector[] = {
+        {                "2",        "4",                        "8" },
+        {                "2",       "44",                       "88" },
+        {               "22",       "44",                      "908" },
+        {              "101",     "1001",                   "101101" },
+        {             "DEAD",     "BEEF",                 "A6144983" },
+        {             "BEEF",     "DEAD",                 "A6144983" },
+        {               "FF",       "FF",                     "FE01" },
+        {             "FFFF",     "FFFF",                 "FFFE0001" },
+        {         "FFFFFFFF", "FFFFFFFF",         "FFFFFFFE00000001" },
+        {         "DEADBEEF",     "DEAD",             "C1B126FD4983" },
+        { "DEADBEEFDEADBEEF", "DEADBEEF", "C1B1CD12E31F7033216DA321" },
+        {           "FD02FF",       "FF",                 "FC05FC01" },
+        { "6F8F1F9BA8A356DE"
+          "F4487321A3E5BA50"
+          "07A40B06815BFB39"
+          "6D3671D5F9BC3",    "405BA915"
+                              "07DADF2C"
+                              "A15BB380"
+                              "B781B304"
+                              "7D10AF6C"
+                              "2E1A2EDD"
+                              "39F22861"
+                              "ABCA844A"
+                              "15631C",  "1C0BB975CC856CDF93AF5430D"
+                                         "72FA3524030BDF96FB40867D8"
+                                         "3A24E605FACA12EFA4BF18032"
+                                         "455AC2401D07F803634DD5092"
+                                         "E51E931A09EBB98A2A83A0D54"
+                                         "B07254"                    }
+    };
+    size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+
+    a = NULL;
+    b = kryptos_hex_value_as_mp("2", 1);
+    CUTE_ASSERT(b != NULL);
+    a = kryptos_mp_mul(&a, b);
+    CUTE_ASSERT(a != NULL);
+    CUTE_ASSERT(kryptos_mp_eq(a, b) == 1);
+    kryptos_del_mp_value(a);
+    kryptos_del_mp_value(b);
+
+    for (tv = 0; tv < test_vector_nr; tv++) {
+        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
+        b = kryptos_hex_value_as_mp(test_vector[tv].b, strlen(test_vector[tv].b));
+        e = kryptos_hex_value_as_mp(test_vector[tv].e, strlen(test_vector[tv].e));
+
+        CUTE_ASSERT(a != NULL && b != NULL && e != NULL);
+
+        r = kryptos_mp_karatsuba(a, b);
+
+        CUTE_ASSERT(r != NULL);
+
+//        printf("e = "); kryptos_print_mp(e);
+//        printf("r = "); kryptos_print_mp(r);
+
+        CUTE_ASSERT(kryptos_mp_eq(r, e) == 1);
+
+        kryptos_del_mp_value(a);
+        kryptos_del_mp_value(b);
+        kryptos_del_mp_value(e);
+        kryptos_del_mp_value(r);
+    }
+
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_mp_mul_tests)
     kryptos_mp_value_t *a, *b, *e;
     struct mul_tests_ctx {
@@ -1115,7 +1186,24 @@ CUTE_TEST_CASE(kryptos_mp_mul_tests)
         {         "FFFFFFFF", "FFFFFFFF",         "FFFFFFFE00000001" },
         {         "DEADBEEF",     "DEAD",             "C1B126FD4983" },
         { "DEADBEEFDEADBEEF", "DEADBEEF", "C1B1CD12E31F7033216DA321" },
-        {           "FD02FF",       "FF",                 "FC05FC01" }
+        {           "FD02FF",       "FF",                 "FC05FC01" },
+        { "6F8F1F9BA8A356DE"
+          "F4487321A3E5BA50"
+          "07A40B06815BFB39"
+          "6D3671D5F9BC3",    "405BA915"
+                              "07DADF2C"
+                              "A15BB380"
+                              "B781B304"
+                              "7D10AF6C"
+                              "2E1A2EDD"
+                              "39F22861"
+                              "ABCA844A"
+                              "15631C",  "1C0BB975CC856CDF93AF5430D"
+                                         "72FA3524030BDF96FB40867D8"
+                                         "3A24E605FACA12EFA4BF18032"
+                                         "455AC2401D07F803634DD5092"
+                                         "E51E931A09EBB98A2A83A0D54"
+                                         "B07254"                    }
     };
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
 

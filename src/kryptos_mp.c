@@ -222,6 +222,170 @@ static void kryptos_mp_add_positive_signal(kryptos_mp_value_t **dest);
 
 static void kryptos_mp_inv_cmplt(kryptos_mp_value_t **dest);
 
+static int kryptos_mp_zero_pad(kryptos_mp_value_t **dest, const size_t new_bitsize);
+
+static int kryptos_mp_zero_pad(kryptos_mp_value_t **dest, const size_t new_bitsize) {
+    kryptos_mp_value_t *nd;
+    ssize_t i, j;
+
+    nd = kryptos_new_mp_value(new_bitsize);
+
+    if (nd == NULL) {
+        return 0;
+    }
+
+    i = (*dest)->data_size - 1;
+
+    for (j = nd->data_size - 1; j >= 0; j--) {
+        if (j < (*dest)->data_size) {
+            nd->data[j] = (*dest)->data[i--];
+        } else {
+            nd->data[j] = 0;
+        }
+    }
+
+    kryptos_del_mp_value(*dest);
+    *dest = nd;
+
+    return 1;
+}
+
+kryptos_mp_value_t *kryptos_mp_karatsuba(kryptos_mp_value_t *dest, kryptos_mp_value_t *src) {
+    // TODO(Rafael): Try to preallocate all dynamic data. Avoid using directly the heap.
+    kryptos_mp_value_t *a = NULL, *b = NULL, *c = NULL, *d = NULL, *ac = NULL, *bd = NULL, *a_plus_b = NULL, *c_plus_d = NULL;
+    kryptos_mp_value_t *A = NULL, *B = NULL, *x = NULL, *y = NULL;
+    size_t n, fh, sh;
+    ssize_t k, di;
+
+    if (dest->data_size == 1 && src->data_size == 1) {
+        kryptos_assign_mp_value(&A, dest);
+        return kryptos_mp_mul(&A, src);
+    }
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&x, dest), kryptos_mp_karatsuba_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&y, src), kryptos_mp_karatsuba_epilogue);
+
+    if (x->data_size < y->data_size) {
+        if (kryptos_mp_zero_pad(&x, kryptos_mp_byte2bit(y->data_size)) == 0) {
+            goto kryptos_mp_karatsuba_epilogue;
+        }
+    } else if (y->data_size < x->data_size) {
+        if (kryptos_mp_zero_pad(&y, kryptos_mp_byte2bit(x->data_size)) == 0) {
+            goto kryptos_mp_karatsuba_epilogue;
+        }
+    }
+
+    n = x->data_size;
+
+    fh = n / 2;
+    sh = n - fh;
+
+    //printf("\tx = "); kryptos_print_mp(x);
+    //printf("\ty = "); kryptos_print_mp(y);
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(a = kryptos_new_mp_value(kryptos_mp_byte2bit(fh)), kryptos_mp_karatsuba_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(b = kryptos_new_mp_value(kryptos_mp_byte2bit(sh)), kryptos_mp_karatsuba_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(c = kryptos_new_mp_value(kryptos_mp_byte2bit(fh)), kryptos_mp_karatsuba_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(d = kryptos_new_mp_value(kryptos_mp_byte2bit(sh)), kryptos_mp_karatsuba_epilogue);
+
+    di = x->data_size - 1;
+
+    for (k = a->data_size - 1; k >= 0; k--) {
+        a->data[k] = x->data[di--];
+    }
+
+    for (k = b->data_size - 1; k >= 0; k--) {
+        b->data[k] = x->data[di--];
+    }
+
+    di = y->data_size - 1;
+
+    for (k = c->data_size - 1; k >= 0; k--) {
+        c->data[k] = y->data[di--];
+    }
+
+    for (k = d->data_size - 1; k >= 0; k--) {
+        d->data[k] = y->data[di--];
+    }
+
+    //printf("\ta = "); kryptos_print_mp(a);
+    //printf("\tb = "); kryptos_print_mp(b);
+    //printf("\tc = "); kryptos_print_mp(c);
+    //printf("\td = "); kryptos_print_mp(d);
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(ac = kryptos_mp_karatsuba(a, c), kryptos_mp_karatsuba_epilogue);
+    //printf("\tac = "); kryptos_print_mp(ac);
+    KRYPTOS_MP_ABORT_WHEN_NULL(bd = kryptos_mp_karatsuba(b, d), kryptos_mp_karatsuba_epilogue);
+    //printf("\tbd = "); kryptos_print_mp(bd);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&a_plus_b, a), kryptos_mp_karatsuba_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&a_plus_b, b), kryptos_mp_karatsuba_epilogue);
+    //printf("\ta + b = "); kryptos_print_mp(a_plus_b);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&c_plus_d, c), kryptos_mp_karatsuba_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&c_plus_d, d), kryptos_mp_karatsuba_epilogue);
+    //printf("\tc + d = "); kryptos_print_mp(c_plus_d);
+    KRYPTOS_MP_ABORT_WHEN_NULL(B = kryptos_mp_karatsuba(a_plus_b, c_plus_d), kryptos_mp_karatsuba_epilogue);
+    //printf("\tk = "); kryptos_print_mp(B);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub(&B, ac), kryptos_mp_karatsuba_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub(&B, bd), kryptos_mp_karatsuba_epilogue);
+    //printf("\tB = "); kryptos_print_mp(B);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_lsh(&B, kryptos_mp_byte2bit(sh)), kryptos_mp_karatsuba_epilogue);
+    //printf("\tB' = "); kryptos_print_mp(B);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&A, ac), kryptos_mp_karatsuba_epilogue);
+    //printf("\tA = "); kryptos_print_mp(A);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_lsh(&A, kryptos_mp_byte2bit(sh << 1)), kryptos_mp_karatsuba_epilogue);
+    //printf("\tA' = "); kryptos_print_mp(A);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&A, B), kryptos_mp_karatsuba_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&A, bd), kryptos_mp_karatsuba_epilogue);
+
+kryptos_mp_karatsuba_epilogue:
+
+    if (ac != NULL) {
+        kryptos_del_mp_value(ac);
+    }
+
+    if (bd != NULL) {
+        kryptos_del_mp_value(bd);
+    }
+
+    if (a_plus_b != NULL) {
+        kryptos_del_mp_value(a_plus_b);
+    }
+
+    if (c_plus_d != NULL) {
+        kryptos_del_mp_value(c_plus_d);
+    }
+
+    if (a != NULL) {
+        kryptos_del_mp_value(a);
+    }
+
+    if (b != NULL) {
+        kryptos_del_mp_value(b);
+    }
+
+    if (c != NULL) {
+        kryptos_del_mp_value(c);
+    }
+
+    if (d != NULL) {
+        kryptos_del_mp_value(d);
+    }
+
+    if (B != NULL) {
+        kryptos_del_mp_value(B);
+    }
+
+    if (x != NULL) {
+        kryptos_del_mp_value(x);
+    }
+
+    if (y != NULL) {
+        kryptos_del_mp_value(y);
+    }
+
+    return A;
+}
+
 kryptos_mp_value_t *kryptos_new_mp_value(const size_t bitsize) {
     kryptos_mp_value_t *mp;
 
