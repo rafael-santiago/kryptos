@@ -332,10 +332,14 @@ kryptos_mp_value_t *kryptos_mp_karatsuba(kryptos_mp_value_t *dest, kryptos_mp_va
     KRYPTOS_MP_ABORT_WHEN_NULL(bd = kryptos_mp_karatsuba(b, d), kryptos_mp_karatsuba_epilogue);
     //printf("\tbd = "); kryptos_print_mp(bd);
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&a_plus_b, a), kryptos_mp_karatsuba_epilogue);
-    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&a_plus_b, b), kryptos_mp_karatsuba_epilogue);
+    if (!kryptos_mp_is_zero(b)) {
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&a_plus_b, b), kryptos_mp_karatsuba_epilogue);
+    }
     //printf("\ta + b = "); kryptos_print_mp(a_plus_b);
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&c_plus_d, c), kryptos_mp_karatsuba_epilogue);
-    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&c_plus_d, d), kryptos_mp_karatsuba_epilogue);
+    if (!kryptos_mp_is_zero(d)) {
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&c_plus_d, d), kryptos_mp_karatsuba_epilogue);
+    }
     //printf("\tc + d = "); kryptos_print_mp(c_plus_d);
     KRYPTOS_MP_ABORT_WHEN_NULL(B = kryptos_mp_karatsuba(a_plus_b, c_plus_d), kryptos_mp_karatsuba_epilogue);
     //printf("\tk = "); kryptos_print_mp(B);
