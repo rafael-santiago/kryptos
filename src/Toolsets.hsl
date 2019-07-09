@@ -12,6 +12,8 @@ include ~/toolsets/clang/clang-lib.hsl
 include ~/toolsets/gcc/gcc-app.hsl
 include ~/toolsets/clang/clang-app.hsl
 
+include ~/fsutil.hsl
+
 function get_app_toolset() : result type string {
     result (get_toolset_option_data() + "-" + get_language_option_data() + "-app");
 }
@@ -78,4 +80,33 @@ local function runbkcmd(cmd type string) : result type int {
         $cmd = $cmd + " > /dev/null 2>&1";
     }
     result hefesto.sys.run($cmd);
+}
+
+function build_mnemosine() : result type none {
+    if (isfile("../lib/mnemosine/lib/libmnemosine.a") == 0) {
+        var old_cwd type string;
+        $old_cwd = hefesto.sys.pwd();
+        if (hefesto.sys.cd("../lib/mnemosine/src")) {
+            var exit_code type int;
+            var cmdline type string;
+            var option type list;
+            $cmdline = "hefesto --toolset=" + get_toolset_option_data();
+            $option = hefesto.sys.get_option("no-pthread");
+            if ($option.count() > 0) {
+                $cmdline = $cmdline + " --no-pthread";
+            }
+            $option = hefesto.sys.get_option("mnemosine-static-heap-size");
+            if ($option.count() > 0) {
+                $cmdline = $cmdline + " --mnemosine-static-heap-size=" + $option.item(0);
+            }
+            $exit_code = hefesto.sys.run($cmdline);
+            if ($exit_code != 0) {
+                hefesto.project.abort($exit_code);
+            }
+            hefesto.sys.cd($old_cwd);
+        } else {
+            hefesto.sys.echo("ERROR: Unable to find ../lib/mnemosine/src directory.\n");
+            hefesto.project.abort(1);
+        }
+    }
 }

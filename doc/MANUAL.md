@@ -24,6 +24,10 @@ Watson@221B:~/src/kryptos-test# gcc test.c -L/usr/well-known-place/ -lkryptos
 Of course, you should indicate where the ``kryptos`` headers are. In ``GCC``, ``Clang`` it can be done using the option
 ``-I<path>``.
 
+By default kryptos multiprecision stuff uses a dedicated heap of 2MB. The way of providing it is by using
+[Mnemosine](https://github.com/rafael-santiago/mnemosine). ``Mnemosine`` is thread-safe by default (under unixes),
+so by default kryptos also will require the following two additional linking flags: ``-lmnemosine``, ``-lpthread``.
+
 ### Linking kernel mode stuff
 
 For kernel mode, until now, kryptos can be used in ``FreeBSD``, ``NetBSD`` and ``Linux``. The main idea was create a tiny

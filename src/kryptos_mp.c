@@ -21,6 +21,10 @@
 # include <kryptos_userland_funcs.h>
 #endif
 
+#if defined(KRYPTOS_MP_WITH_MNEMOSINE)
+# include <mnemosine.h>
+#endif
+
 #define kryptos_mp_xnb(n) ( isdigit((n)) ? ( (n) - 48 ) : ( toupper((n)) - 55 )  )
 
 static kryptos_u8_t nbxlt[] = {
@@ -200,6 +204,16 @@ static char *g_kryptos_mp_small_primes[] = {
 };
 
 static size_t g_kryptos_mp_small_primes_nr = sizeof(g_kryptos_mp_small_primes) / sizeof(g_kryptos_mp_small_primes[0]);
+
+#if defined(KRYPTOS_MP_WITH_MNEMOSINE)
+struct mnemosine_ctx g_kryptos_mp_mn;
+static kryptos_u8_t g_kryptos_mp_mn_init = 0;
+
+#if !defined(KRYPTOS_MP_MNEMOSINE_HEAP_SIZE)
+# define KRYPTOS_MP_MNEMOSINE_HEAP_SIZE mnemosine_size_mb(2)
+#endif
+
+#endif
 
 #ifndef KRYPTOS_MP_U32_DIGIT
 
@@ -386,6 +400,8 @@ kryptos_mp_karatsuba_epilogue:
     return A;
 }
 
+#if !defined(KRYPTOS_MP_WITH_MNEMOSINE) && !defined(KRYPTOS_KERNEL_MODE)
+
 kryptos_mp_value_t *kryptos_new_mp_value(const size_t bitsize) {
     kryptos_mp_value_t *mp;
 
@@ -431,6 +447,93 @@ void kryptos_del_mp_value(kryptos_mp_value_t *mp) {
     kryptos_freeseg(mp, sizeof(kryptos_mp_value_t));
 }
 
+#else
+
+#define kryptos_mp_alloc(data, size, type) {\
+    if (g_kryptos_mp_mn_init) {\
+        (data) = type mnemosine_malloc(&g_kryptos_mp_mn, (size));\
+        /*if ((data) != NULL) {\
+            printf("[mnemosine memory segment acquired]\n");\
+        }*/\
+    }\
+    if ((data) == NULL || !g_kryptos_mp_mn_init) {\
+        (data) = type kryptos_newseg((size));\
+        /*if ((data) != NULL) {\
+            printf("[os memory segment acquired]\n");\
+        }*/\
+    }\
+}
+
+#define kryptos_mp_free(data, size) {\
+    if (g_kryptos_mp_mn_init) {\
+        if (mnemosine_free(&g_kryptos_mp_mn, (data)) == 0) {\
+            kryptos_freeseg((data), (size));\
+        }\
+    } else {\
+        kryptos_freeseg((data), (size));\
+    }\
+}
+
+kryptos_mp_value_t *kryptos_new_mp_value(const size_t bitsize) {
+    kryptos_mp_value_t *mp;
+
+    if (!g_kryptos_mp_mn_init) {
+        g_kryptos_mp_mn_init = mnemosine_init(&g_kryptos_mp_mn, KRYPTOS_MP_MNEMOSINE_HEAP_SIZE, 0);
+    }
+
+    kryptos_mp_alloc(mp, sizeof(kryptos_mp_value_t), (kryptos_mp_value_t *));
+
+    if (mp == NULL) {
+        return NULL;
+    }
+
+    mp->neg = 0;
+    mp->data_size = bitsize;
+
+    while (mp->data_size < 8) {
+        mp->data_size++;
+    }
+
+    while ((mp->data_size % (sizeof(kryptos_mp_digit_t) << 3)) != 0) {
+        mp->data_size++;
+    }
+
+    mp->data_size = kryptos_mp_bit2byte(mp->data_size);
+
+    if (mp->data_size == 0) {
+        mp->data_size = 1;
+    }
+
+    kryptos_mp_alloc(mp->data, mp->data_size * sizeof(kryptos_mp_digit_t), (kryptos_mp_digit_t *));
+    memset(mp->data, 0, mp->data_size * sizeof(kryptos_mp_digit_t));
+
+    return mp;
+}
+
+void kryptos_del_mp_value(kryptos_mp_value_t *mp) {
+    if (mp == NULL) {
+        return;
+    }
+
+    if (mp->data != NULL) {
+        kryptos_mp_free(mp->data, mp->data_size);
+        mp->data_size = 0;
+    }
+
+    kryptos_mp_free(mp, sizeof(kryptos_mp_value_t));
+}
+
+#endif
+
+void kryptos_mp_heap_free(void) {
+#if defined(KRYPTOS_MP_WITH_MNEMOSINE) && !defined(KRYPTOS_KERNEL_MODE)
+    if (g_kryptos_mp_mn_init) {
+        mnemosine_finis(&g_kryptos_mp_mn);
+        g_kryptos_mp_mn_init = 0;
+    }
+#endif
+}
+
 kryptos_mp_value_t *kryptos_assign_mp_value(kryptos_mp_value_t **dest,
                                             const kryptos_mp_value_t *src) {
     ssize_t d;
@@ -444,9 +547,15 @@ kryptos_mp_value_t *kryptos_assign_mp_value(kryptos_mp_value_t **dest,
     }
 
     if (src->data_size > (*dest)->data_size) {
+#if !defined(KRYPTOS_MP_WITH_MNEMOSINE)
         kryptos_freeseg((*dest)->data, (*dest)->data_size);
         (*dest)->data_size = src->data_size;
         (*dest)->data = (kryptos_mp_digit_t *) kryptos_newseg(kryptos_mp_byte2bit(src->data_size));
+#else
+        kryptos_mp_free((*dest)->data, (*dest)->data_size);
+        (*dest)->data_size = src->data_size;
+        kryptos_mp_alloc((*dest)->data, kryptos_mp_byte2bit(src->data_size), (kryptos_mp_digit_t *));
+#endif
     }
 
     memset((*dest)->data, 0, (*dest)->data_size * sizeof(kryptos_mp_digit_t));
@@ -776,11 +885,17 @@ kryptos_mp_add_epilogue:
     for (sn = sum->data_size - 1; sn >= 0 && sum->data[sn] == 0; sn--)
         ;
 
+#if !defined(KRYPTOS_MP_WITH_MNEMOSINE)
     kryptos_freeseg((*dest)->data, (*dest)->data_size);
     (*dest)->data_size = (sn < sum->data_size) ? sn + 1 : sum->data_size;
 
     (*dest)->data = (kryptos_mp_digit_t *) kryptos_newseg((*dest)->data_size * sizeof(kryptos_mp_digit_t));
+#else
+    kryptos_mp_free((*dest)->data, (*dest)->data_size);
+    (*dest)->data_size = (sn < sum->data_size) ? sn + 1 : sum->data_size;
 
+    kryptos_mp_alloc((*dest)->data, (*dest)->data_size * sizeof(kryptos_mp_digit_t), (kryptos_mp_digit_t *));
+#endif
     if ((*dest)->data != NULL) {
         for (s = sn; s >= 0; s--) {
             (*dest)->data[s] = sum->data[s];
@@ -965,10 +1080,17 @@ kryptos_mp_value_t *kryptos_mp_sub(kryptos_mp_value_t **dest, const kryptos_mp_v
     for (sn = delta->data_size - 1; sn >= 0 && delta->data[sn] == 0; sn--)
         ;
 
+#if !defined(KRYPTOS_MP_WITH_MNEMOSINE)
     kryptos_freeseg((*dest)->data, (*dest)->data_size);
     (*dest)->data_size = (sn < delta->data_size) ? sn + 1 : delta->data_size;
 
     (*dest)->data = (kryptos_mp_digit_t *) kryptos_newseg((*dest)->data_size * sizeof(kryptos_mp_digit_t));
+#else
+    kryptos_mp_free((*dest)->data, (*dest)->data_size);
+    (*dest)->data_size = (sn < delta->data_size) ? sn + 1 : delta->data_size;
+
+    kryptos_mp_alloc((*dest)->data, (*dest)->data_size * sizeof(kryptos_mp_digit_t), (kryptos_mp_digit_t *));
+#endif
     memset((*dest)->data, 0, (*dest)->data_size * sizeof(kryptos_mp_digit_t));
     if ((*dest)->data != NULL) {
         (*dest)->neg = delta->neg;

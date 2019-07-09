@@ -1,3 +1,6 @@
 [submodule "src/tests/cutest"]
 	path = src/tests/cutest
 	url = https://github.com/rafael-santiago/cutest
+[submodule "lib/mnemosine"]
+	path = lib/mnemosine
+	url = https://github.com/rafael-santiago/mnemosine

@@ -138,20 +138,35 @@ Sherlock@221B:~/src/kryptos/src# hefesto --no-hmac-tests --stress-tests \
 
 When you are dealing with random bugs this is a friendly way of trying to reproduce the bug.
 
+### Defining a dedicated heap for multiprecision stuff
+
+By default the option ``--kryptos-mp-with-mnemosine`` is defined. If you prefer using the regular ``malloc/free``
+calls for multiprecision (slower) drop this option from ``src/.ivk`` file.
+
+The default heap size is 2MB. If you want to increase or decrease it, you should explicitly pass the size (in megabytes)
+through the build option ``--kryptos-mp-mnemosine-heap-size=n``.
+
+By using a dedicated heap only when all heap is totally consumed that the regular ``malloc`` will be used.
+
+The pre-allocated heap convenience is implemented by using [Mnemosine](https://github.com/rafael-santiago/mnemosine).
+By default ``Mnemosine`` will be built with support for ``pthreads`` if you do not want it, read its manual to figure out
+how to get rid of it. Note that when ``Mnemosine`` is built with ``pthread`` support ``kryptos`` also will require
+``-lpthread`` at linking phase besides ``-lmnemosine`` (of course).
+
 ### The default build options (library)
 
 The default build options are defined into the file ``src/.ivk``. The **Table 1** gathers these options.
 
 **Table 1**: The default build options.
 
-|          **Option**         |                    **Description**                                             |
-|:---------------------------:|:------------------------------------------------------------------------------:|
-| ``--bin-output-dir=../lib`` |   Defines where the ar file will be generated.                                 |
-| ``--obj-output-dir=o``      |   Defines where the object files will be generated.                            |
-| ``--includes=./``           |   Defines the additional includes directories. This is a comma separated list. |
-| ``--quick-dh-tests``        |   Speeding up the Diffie-Hellman-Merkle tests.                                 |
-| ``--quick-ecdh-tests``      |   Speeding up the Elliptic curve Diffie-Hellman-Merkle tests.                  |
-
+|          **Option**             |                    **Description**                                             |
+|:-------------------------------:|:------------------------------------------------------------------------------:|
+| ``--bin-output-dir=../lib``     |   Defines where the ar file will be generated.                                 |
+| ``--obj-output-dir=o``          |   Defines where the object files will be generated.                            |
+| ``--includes=./``               |   Defines the additional includes directories. This is a comma separated list. |
+| ``--quick-dh-tests``            |   Speeding up the Diffie-Hellman-Merkle tests.                                 |
+| ``--quick-ecdh-tests``          |   Speeding up the Elliptic curve Diffie-Hellman-Merkle tests.                  |
+| ``--kryptos-mp-with-mnemosine`` |   Defines a dedicated heap to be used by multiprecision stuff.                 |
 
 ### The default build options (unit tests)
 

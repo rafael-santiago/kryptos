@@ -96,6 +96,8 @@ kryptos_u8_t *kryptos_mp_get_bitmap(const kryptos_mp_value_t *src, size_t *bitma
 
 kryptos_mp_value_t *kryptos_mp_karatsuba(kryptos_mp_value_t *dest, kryptos_mp_value_t *src);
 
+void kryptos_mp_heap_free(void);
+
 #ifdef __cplusplus
 }
 #endif

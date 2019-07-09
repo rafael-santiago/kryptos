@@ -6,7 +6,7 @@
  *
  */
 #include <cutest.h>
-#include <kryptos_random.h>
+#include <kryptos.h>
 #include "generic_tests.h"
 #include "dsl_tests.h"
 #include "symmetric_ciphers_tests.h"
@@ -355,6 +355,10 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_ecdh_get_random_k_tests);
     CUTE_RUN_TEST(kryptos_ecdh_process_xchg_tests);
     CUTE_RUN_TEST(kryptos_ecdh_process_xchg_with_stdcurves_tests);
+
+    if (CUTE_GET_OPTION("kryptos-mp-with-mnemosine")) {
+        kryptos_mp_heap_free(); // INFO(Rafael): If it is failing the memory leak check system will complain.
+    }
 
 //    CUTE_RUN_TEST(poke_bloody_poke);
 CUTE_TEST_CASE_END

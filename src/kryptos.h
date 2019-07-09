@@ -63,6 +63,8 @@
 #include <kryptos_pbkdf2.h>
 #include <kryptos_argon2.h>
 
+#include <kryptos_mp.h>
+
 #include <kryptos_dl_params.h>
 #include <kryptos_dh.h>
 #include <kryptos_elgamal.h>

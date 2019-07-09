@@ -45,6 +45,29 @@ kryptos.prologue() {
         # INFO(Rafael): Let's enable c99 capabilities by default.
         $cflags.add_item("-std=c99");
     }
+
+    var option type list;
+    $option = hefesto.sys.get_option("kryptos-mp-with-mnemosine");
+
+    if ($option.count() > 0) {
+        build_mnemosine();
+        $cflags.add_item("-DKRYPTOS_MP_WITH_MNEMOSINE=1");
+        $includes.add_item("../lib/mnemosine/src");
+        $libraries.add_item("../lib/mnemosine/lib");
+        $ldflags.add_item("-lmnemosine");
+
+        $option = hefesto.sys.get_option("kryptos-mp-mnemosine-heap-size");
+        if ($option.count() > 0) {
+            $cflags.add_item("-DKRYPTOS_MP_MNEMOSINE_HEAP_SIZE=\"mnemosine_size_mb(" +
+                             $option.item(0) + ")\"");
+            hefesto.sys.echo("*** BUILD INFO: Building kryptos with dedicated multiprecison heap of " +
+                             $option.item(0) + "MB.\n\n");
+        } else {
+            hefesto.sys.echo("*** BUILD INFO: Building kryptos with dedicated multiprecison heap of 2MB.\n\n");
+        }
+    } else {
+        hefesto.sys.echo("*** BUILD INFO: Building kryptos without dedicated multiprecisoon heap.\n\n");
+    }
 }
 
 kryptos.epilogue() {
