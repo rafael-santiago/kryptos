@@ -55,8 +55,6 @@ kryptos.prologue() {
         merge_mnemosine_into_kryptos();
         $cflags.add_item("-DKRYPTOS_MP_WITH_MNEMOSINE=1");
         $includes.add_item("../lib/mnemosine/src");
-        $libraries.add_item("../lib/mnemosine/lib");
-        $ldflags.add_item("-lmnemosine");
 
         $option = hefesto.sys.get_option("kryptos-mp-mnemosine-heap-size");
         if ($option.count() > 0) {

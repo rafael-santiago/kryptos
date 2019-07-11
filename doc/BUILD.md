@@ -150,8 +150,9 @@ By using a dedicated heap only when all heap is totally consumed that the regula
 
 The pre-allocated heap convenience is implemented by using [Mnemosine](https://github.com/rafael-santiago/mnemosine).
 By default ``Mnemosine`` will be built with support for ``pthreads`` if you do not want it, read its manual to figure out
-how to get rid of it. Note that when ``Mnemosine`` is built with ``pthread`` support ``kryptos`` also will require
-``-lpthread`` at linking phase. You do not need to link with ``-lmnemosine`` because it is embed into ``libkryptos.a``.
+how to get rid of it. Note that when ``Mnemosine`` is built with ``pthread`` support it means that all memory stuff
+related to multiprecision arithmetic will be thread-safe. You do not need to link with ``-lmnemosine`` because it
+is embed into ``libkryptos.a``.
 
 ### The default build options (library)
 

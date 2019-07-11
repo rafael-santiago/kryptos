@@ -2,7 +2,7 @@
 
 **Abstract**: This library was designed to be used in user mode applications and also in kernel mode. The following
 sections will guide the readers through the main aspects of how to use ``kryptos`` in their own stuff. This documentation
-considers that the readers have at least a minimal formal knowledge of modern cryptography. All complete sample code
+considers that the readers have at least a minimal formal knowledge of modern cryptography. All entire sample code
 presented here can be built with the command ``hefesto --mk-samples``.
 
 ## Link101
@@ -25,8 +25,7 @@ Of course, you should indicate where the ``kryptos`` headers are. In ``GCC``, ``
 ``-I<path>``.
 
 By default kryptos multiprecision stuff uses a dedicated heap of 2MB. The way of providing it is by using
-[Mnemosine](https://github.com/rafael-santiago/mnemosine). ``Mnemosine`` is thread-safe by default (under unixes),
-so by default kryptos also will require the following additional linker flags: ``-lpthread``.
+[Mnemosine](https://github.com/rafael-santiago/mnemosine). ``Mnemosine`` is thread-safe by default (under unixes).
 
 ### Linking kernel mode stuff
 
