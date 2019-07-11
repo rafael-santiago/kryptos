@@ -9,6 +9,7 @@
 include Toolsets.hsl
 include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
 include Install.hsl
+include ~/fsutil.hsl
 
 local var toolset_name type string;
 
@@ -51,6 +52,7 @@ kryptos.prologue() {
 
     if ($option.count() > 0) {
         build_mnemosine();
+        merge_mnemosine_into_kryptos();
         $cflags.add_item("-DKRYPTOS_MP_WITH_MNEMOSINE=1");
         $includes.add_item("../lib/mnemosine/src");
         $libraries.add_item("../lib/mnemosine/lib");
@@ -72,8 +74,8 @@ kryptos.prologue() {
 
 kryptos.epilogue() {
     if (hefesto.sys.last_forge_result() == 0) {
-        var oldcwd type string;
         var option type list;
+        var oldcwd type string;
 
         $option = hefesto.sys.get_option("no-tests");
         if ($option.count() > 0) {
@@ -141,5 +143,37 @@ kryptos.epilogue() {
                 hefesto.sys.exit(1);
             }
         }
+    }
+}
+
+local function merge_mnemosine_into_kryptos() : result type none {
+    var mnemosine_objs type list;
+    var old_cwd type string;
+
+    $old_cwd = hefesto.sys.pwd();
+
+    if (hefesto.sys.cd("../lib/mnemosine/src/o") == 0) {
+        hefesto.sys.echo("ERROR: Unable to find Mnemosine object directory.\n");
+        hefesto.project.abort(1);
+    }
+
+    $mnemosine_objs.ls(".*\\.o$");
+
+    hefesto.sys.cd($old_cwd);
+
+    var mnemosine_ofiles type string;
+
+    var m type int;
+    $m = 0;
+    while ($m < $mnemosine_objs.count()) {
+        $mnemosine_ofiles = $mnemosine_ofiles + $mnemosine_objs.item(0) + " ";
+        $m = $m + 1;
+    }
+
+    hefesto.sys.run("ar -d ../lib/libkryptos.a " + $mnemosine_ofiles);
+
+    if (hefesto.sys.run("ar -r ../lib/libkryptos.a " + $mnemosine_ofiles) != 0) {
+        hefesto.sys.echo("ERROR: Unable to merge Mnemosine into Kryptos.\n");
+        hefesto.project.abort(0);
     }
 }

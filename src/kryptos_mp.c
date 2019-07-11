@@ -25,6 +25,12 @@
 # include <mnemosine.h>
 #endif
 
+#undef KRYPTOS_MP_USE_KARATSUBA
+
+#if defined(KRYPTOS_MP_USE_KARATSUBA)
+# define KRYPTOS_MP_KARATSUBA_CUTOFF 1024
+#endif
+
 #define kryptos_mp_xnb(n) ( isdigit((n)) ? ( (n) - 48 ) : ( toupper((n)) - 55 )  )
 
 static kryptos_u8_t nbxlt[] = {
@@ -238,6 +244,12 @@ static void kryptos_mp_inv_cmplt(kryptos_mp_value_t **dest);
 
 static int kryptos_mp_zero_pad(kryptos_mp_value_t **dest, const size_t new_bitsize);
 
+#if defined(KRYPTOS_MP_USE_KARATSUBA)
+
+static kryptos_mp_value_t *kryptos_mp_long_mul(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src);
+
+#endif
+
 static int kryptos_mp_zero_pad(kryptos_mp_value_t **dest, const size_t new_bitsize) {
     kryptos_mp_value_t *nd;
     ssize_t i, j;
@@ -265,7 +277,6 @@ static int kryptos_mp_zero_pad(kryptos_mp_value_t **dest, const size_t new_bitsi
 }
 
 kryptos_mp_value_t *kryptos_mp_karatsuba(kryptos_mp_value_t *dest, kryptos_mp_value_t *src) {
-    // TODO(Rafael): Try to preallocate all dynamic data. Avoid using directly the heap.
     kryptos_mp_value_t *a = NULL, *b = NULL, *c = NULL, *d = NULL, *ac = NULL, *bd = NULL, *a_plus_b = NULL, *c_plus_d = NULL;
     kryptos_mp_value_t *A = NULL, *B = NULL, *x = NULL, *y = NULL;
     size_t n, fh, sh;
@@ -273,7 +284,11 @@ kryptos_mp_value_t *kryptos_mp_karatsuba(kryptos_mp_value_t *dest, kryptos_mp_va
 
     if (dest->data_size == 1 && src->data_size == 1) {
         kryptos_assign_mp_value(&A, dest);
+#if defined(KRYPTOS_MP_USE_KARATSUBA)
+        return kryptos_mp_long_mul(&A, src);
+#else
         return kryptos_mp_mul(&A, src);
+#endif
     }
 
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&x, dest), kryptos_mp_karatsuba_epilogue);
@@ -1237,7 +1252,36 @@ kryptos_mp_multibyte_mul_epilogue:
 
 #endif
 
+#if defined(KRYPTOS_MP_USE_KARATSUBA)
 kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
+    kryptos_mp_value_t *temp;
+
+    if (dest == NULL || src == NULL) {
+        return NULL;
+    }
+
+    if ((*dest) == NULL) {
+        (*dest) = kryptos_new_mp_value(src->data_size << 3);
+        memcpy((*dest)->data, src->data, src->data_size);
+        return (*dest);
+    }
+
+    if (kryptos_mp_byte2bit((*dest)->data_size) < KRYPTOS_MP_KARATSUBA_CUTOFF &&
+        kryptos_mp_byte2bit(src->data_size) < KRYPTOS_MP_KARATSUBA_CUTOFF) {
+        return kryptos_mp_long_mul(dest, src);
+    }
+
+    temp = kryptos_mp_karatsuba(*dest, (kryptos_mp_value_t *)src);
+    kryptos_del_mp_value(*dest);
+    (*dest) = temp;
+
+    return (*dest);
+}
+
+static kryptos_mp_value_t *kryptos_mp_long_mul(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
+#else
+kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
+#endif
     size_t r;
     kryptos_mp_value_t *m;
     const kryptos_mp_value_t *x, *y;
@@ -1257,11 +1301,13 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
         return NULL;
     }
 
+#if !defined(KRYPTOS_MP_USE_KARATSUBA)
     if ((*dest) == NULL) {
         (*dest) = kryptos_new_mp_value(src->data_size << 3);
         memcpy((*dest)->data, src->data, src->data_size);
         return (*dest);
     }
+#endif
 
     kryptos_mp_max_min(x, y, (*dest), src);
 

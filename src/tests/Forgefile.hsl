@@ -88,12 +88,12 @@ kryptos-tests.prologue() {
         }
     }
 
-    $user_option = hefesto.sys.get_option("kryptos-mp-with-mnemosine");
+#    $user_option = hefesto.sys.get_option("kryptos-mp-with-mnemosine");
 
-    if ($user_option.count() > 0) {
-        $libraries.add_item("../../lib/mnemosine/lib");
-        $ldflags.add_item("-lmnemosine");
-    }
+#    if ($user_option.count() > 0) {
+#        $libraries.add_item("../../lib/mnemosine/lib");
+#        $ldflags.add_item("-lmnemosine");
+#    }
 
     if (isdir("/usr/local/include")) {
         $includes.add_item("/usr/local/include");

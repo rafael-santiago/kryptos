@@ -26,7 +26,7 @@ Of course, you should indicate where the ``kryptos`` headers are. In ``GCC``, ``
 
 By default kryptos multiprecision stuff uses a dedicated heap of 2MB. The way of providing it is by using
 [Mnemosine](https://github.com/rafael-santiago/mnemosine). ``Mnemosine`` is thread-safe by default (under unixes),
-so by default kryptos also will require the following two additional linking flags: ``-lmnemosine``, ``-lpthread``.
+so by default kryptos also will require the following additional linker flags: ``-lpthread``.
 
 ### Linking kernel mode stuff
 
