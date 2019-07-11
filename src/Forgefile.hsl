@@ -164,7 +164,11 @@ local function merge_mnemosine_into_kryptos() : result type none {
     var m type int;
     $m = 0;
     while ($m < $mnemosine_objs.count()) {
-        $mnemosine_ofiles = $mnemosine_ofiles + $mnemosine_objs.item(0) + " ";
+        if (hefesto.sys.os_name() != "windows") {
+            $mnemosine_ofiles = $mnemosine_ofiles + $mnemosine_objs.item(0) + " ";
+        } else {
+            $mnemosine_ofiles = $mnemosine_ofiles + "\"" + $mnemosine_objs.item(0) + "\" ";
+        }
         $m = $m + 1;
     }
 
