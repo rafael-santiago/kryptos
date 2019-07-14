@@ -1285,8 +1285,8 @@ CUTE_TEST_CASE(kryptos_mp_karatsuba_tests)
 
         CUTE_ASSERT(r != NULL);
 
-//        printf("e = "); kryptos_print_mp(e);
-//        printf("r = "); kryptos_print_mp(r);
+        //printf("e = "); kryptos_print_mp(e);
+        //printf("r = "); kryptos_print_mp(r);
 
         CUTE_ASSERT(kryptos_mp_eq(r, e) == 1);
 

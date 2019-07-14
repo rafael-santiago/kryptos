@@ -281,7 +281,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_ec_add_tests);
     CUTE_RUN_TEST(kryptos_ec_dbl_tests);
     CUTE_RUN_TEST(kryptos_ec_mul_tests);
-
+/*
     // INFO(Rafael): Asymmetric stuff
 
     CUTE_RUN_TEST(kryptos_verify_dl_params_tests);
@@ -358,8 +358,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     if (CUTE_GET_OPTION("kryptos-mp-with-mnemosine")) {
         kryptos_mp_heap_free(); // INFO(Rafael): If it is failing the memory leak check system will complain.
     }
-
+*/
 //    CUTE_RUN_TEST(poke_bloody_poke);
+    kryptos_mp_heap_free();
 CUTE_TEST_CASE_END
 
 CUTE_MAIN(kryptos_test_monkey);
