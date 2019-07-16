@@ -66,6 +66,177 @@ static kryptos_u8_t nbxlt[] = {
     }\
 }
 
+#if defined(KRYPTOS_MP_WITH_MNEMOSINE) && !defined(KRYPTOS_KERNEL_MODE)
+# define kryptos_mp_alloc(data, size, type) {\
+    if (g_kryptos_mp_mn_init) {\
+        (data) = type mnemosine_malloc(&g_kryptos_mp_mn, (size));\
+        /*if ((data) != NULL) {\
+            printf("[mnemosine memory segment acquired]\n");\
+        }*/\
+    }\
+    if ((data) == NULL || !g_kryptos_mp_mn_init) {\
+        (data) = type kryptos_newseg((size));\
+        /*if ((data) != NULL) {\
+            printf("[os memory segment acquired]\n");\
+        }*/\
+    }\
+}
+
+# define kryptos_mp_free(data, size) {\
+    if (g_kryptos_mp_mn_init) {\
+        if (mnemosine_free(&g_kryptos_mp_mn, (data)) == 0) {\
+            kryptos_freeseg((data), (size));\
+        }\
+    } else {\
+        kryptos_freeseg((data), (size));\
+    }\
+}
+#endif
+
+#if defined(KRYPTOS_MP_U32_DIGIT)
+# define kryptos_mp_inline_add(dest, src, bsum, c, a, b, sum, d, s, sn, epilogue) {\
+    kryptos_mp_max_min((a), (b), (*(dest)), (src));\
+    sum = kryptos_new_mp_value(kryptos_mp_byte2bit(((src)->data_size + (*(dest))->data_size)));\
+    KRYPTOS_MP_ABORT_WHEN_NULL((sum), epilogue);\
+    (d) = (s) = 0;\
+    (c) = 0;\
+    while ((d) < (a)->data_size) {\
+        (bsum) = (kryptos_u64_t)(a)->data[d] + (kryptos_u64_t)(((d) < (b)->data_size) ? (b)->data[(d)] : 0) + (c);\
+        (c) = ((bsum) > 0xFFFFFFFF);\
+        (sum)->data[(s)] = (bsum) & 0xFFFFFFFF;\
+        s++;\
+        d++;\
+    }\
+    if ((c) > 0 && (s) < (sum)->data_size) {\
+        (sum)->data[(s)] = (c);\
+    }\
+    for ((sn) = (sum)->data_size - 1; (sn) >= 0 && (sum)->data[(sn)] == 0; (sn)--)\
+        ;\
+    kryptos_mp_free((*(dest))->data, (*(dest))->data_size);\
+    (*(dest))->data_size = ((sn) < (sum)->data_size) ? (sn) + 1 : (sum)->data_size;\
+    kryptos_mp_alloc((*(dest))->data, (*(dest))->data_size * sizeof(kryptos_mp_digit_t), (kryptos_mp_digit_t *));\
+    if ((*(dest))->data != NULL) {\
+        for ((s) = (sn); (s) >= 0; (s)--) {\
+            (*(dest))->data[(s)] = (sum)->data[(s)];\
+        }\
+    } else {\
+        (*(dest))->data = (sum)->data;\
+        (sum)->data = NULL;\
+    }\
+    kryptos_del_mp_value((sum));\
+}
+#else
+# define kryptos_mp_inline_add(dest, src, bsum, c, a, b, sum, d, s, sn) {\
+    kryptos_mp_max_min((a), (b), (*(dest)), (src));\
+    (sum) = kryptos_new_mp_value(kryptos_mp_byte2bit(((src)->data_size + (*(dest))->data_size)));\
+    KRYPTOS_MP_ABORT_WHEN_NULL((sum), epilogue);\
+    (d) = (s) = 0;\
+    (c) = 0;\
+    while ((d) < (a)->data_size) {\
+        (bsum) = (a)->data[(d)] + ( ((d) < (b)->data_size) ? (b)->data[(d)] : 0 ) + (c);\
+        (c) = ((bsum) > 0xFF);\
+        (sum)->data[(s)] = (bsum) & 0xFF;\
+        (s)++;\
+        (d)++;\
+    }\
+    if ((c) > 0 && (s) < (sum)->data_size) {\
+        (sum)->data[(s)] = (c);\
+    }\
+    for ((sn) = (sum)->data_size - 1; (sn) >= 0 && (sum)->data[(sn)] == 0; (sn)--)\
+        ;\
+    kryptos_mp_free((*(dest))->data, (*(dest))->data_size);\
+    (*(dest))->data_size = ((sn) < (sum)->data_size) ? (sn) + 1 : (sum)->data_size;\
+    kryptos_mp_alloc((*(dest))->data, (*(dest))->data_size * sizeof(kryptos_mp_digit_t), (kryptos_mp_digit_t *));\
+    if ((*(dest))->data != NULL) {\
+        for ((s) = (sn); (s) >= 0; (s)--) {\
+            (*(dest))->data[(s)] = sum->data[(s)];\
+        }\
+    } else {\
+        (*(dest))->data = (sum)->data;\
+        (sum)->data = NULL;\
+    }\
+    kryptos_del_mp_value((sum));\
+}
+#endif
+
+#if defined(KRYPTOS_MP_U32_DIGIT)
+# define kryptos_mp_inline_sub(dest, src, bsub, c, delta, d, s, sn, dn, epilogue) {\
+    (dn) = ((*(dest))->data_size > (src)->data_size) ? (*(dest))->data_size : (src)->data_size;\
+    (delta) = kryptos_new_mp_value(kryptos_mp_byte2bit((dn)));\
+    if ((delta) == NULL) {\
+        goto epilogue;\
+    }\
+    (d) = (s) = 0;\
+    (c) = 0;\
+    while ((d) < (dn)) {\
+        (bsub) = ( ((d) < (*(dest))->data_size) ? (kryptos_u64_t)(*(dest))->data[(d)] : 0 ) -\
+                ( ((d) < (src)->data_size) ? (kryptos_u64_t)(src)->data[d] : 0 ) + (kryptos_u64_t)(c);\
+        (c) += bsub >> 32;\
+        (delta)->data[s] = bsub & 0xFFFFFFFF;\
+        (s)++;\
+        (d)++;\
+    }\
+    if ((c) == 0xFFFFFFFF) {\
+        kryptos_mp_inv_cmplt(&(delta));\
+        kryptos_mp_add_negative_signal(&(delta));\
+    }\
+    for ((sn) = (delta)->data_size - 1; (sn) >= 0 && (delta)->data[(sn)] == 0; (sn)--)\
+        ;\
+    kryptos_mp_free((*(dest))->data, (*(dest))->data_size);\
+    (*(dest))->data_size = ((sn) < (delta)->data_size) ? (sn) + 1 : (delta)->data_size;\
+    kryptos_mp_alloc((*(dest))->data, (*(dest))->data_size * sizeof(kryptos_mp_digit_t), (kryptos_mp_digit_t *));\
+    memset((*(dest))->data, 0, (*(dest))->data_size * sizeof(kryptos_mp_digit_t));\
+    if ((*(dest))->data != NULL) {\
+        (*(dest))->neg = (delta)->neg;\
+        for ((s) = (sn); (s) >= 0; (s)--) {\
+            (*(dest))->data[(s)] = (delta)->data[(s)];\
+        }\
+    } else {\
+        (*(dest))->data = (delta)->data;\
+        (delta)->data = NULL;\
+    }\
+    kryptos_del_mp_value((delta));\
+}
+#else
+# define kryptos_mp_inline_sub(dest, src, bsub, c, delta, d, s, sn, dn, epilogue) {\
+    (dn) = ((*(dest))->data_size > (src)->data_size) ? (*(dest))->data_size : (src)->data_size;\
+    (delta) = kryptos_new_mp_value(kryptos_mp_byte2bit((dn)));\
+    if ((delta) == NULL) {\
+        goto epilogue;\
+    }\
+    (d) = (s) = 0;\
+    (c) = 0;\
+    while ((d) < (dn)) {\
+        (bsub) = ( ((d) < (*(dest))->data_size) ? (*(dest))->data[(d)] : 0 ) -\
+                    ( ((d) < (src)->data_size) ? (src)->data[(d)] : 0 ) + (c);\
+        (c) += (bsub) >> 8;\
+        (delta)->data[(s)] = (bsub) & 0xFF;\
+        (s)++;\
+        (d)++;\
+    }\
+    if ((c) == 0xFF) {\
+        kryptos_mp_inv_cmplt(&(delta));\
+        kryptos_mp_add_negative_signal(&(delta));\
+    }\
+    for ((sn) = (delta)->data_size - 1; (sn) >= 0 && (delta)->data[(sn)] == 0; (sn)--)\
+        ;\
+    kryptos_mp_free((*(dest))->data, (*(dest))->data_size);\
+    (*(dest))->data_size = ((sn) < (delta)->data_size) ? (sn) + 1 : (delta)->data_size;\
+    kryptos_mp_alloc((*(dest))->data, (*(dest))->data_size * sizeof(kryptos_mp_digit_t), (kryptos_mp_digit_t *));\
+    memset((*(dest))->data, 0, (*(dest))->data_size * sizeof(kryptos_mp_digit_t));\
+    if ((*(dest))->data != NULL) {\
+        (*(dest))->neg = (delta)->neg;\
+        for ((s) = (sn); (s) >= 0; (s)--) {\
+            (*(dest))->data[(s)] = (delta)->data[(s)];\
+        }\
+    } else {\
+        (*(dest))->data = (delta)->data;\
+        (delta)->data = NULL;\
+    }\
+    kryptos_del_mp_value((delta));\
+}
+#endif
+
 static char *g_kryptos_mp_small_primes[] = {
     "0003", "0005", "0007", "000B", "000D", "0011", "0013", "0017", "001D", "001F", "0025", "0029", "002B", "002F", "0035",
     "003B", "003D", "0043", "0047", "0049", "004F", "0053", "0059", "0061", "0065", "0067", "006B", "006D", "0071", "007F",
@@ -321,9 +492,17 @@ static kryptos_mp_value_t *kryptos_mp_karatsuba_iter(kryptos_mp_value_t *x, kryp
     ssize_t k, di;
 #if defined(KRYPTOS_MP_U32_DIGIT)
     register kryptos_u64_t p;
+    register ssize_t add_d, add_s, add_sn;
+    register kryptos_u64_t add_bsum;
+    register ssize_t sub_d, sub_s, sub_sn, sub_dn;
+    register kryptos_u64_t sub_bsub;
+    register kryptos_u32_t sub_c;
 #else
     register kryptos_u16_t p;
 #endif
+    kryptos_u8_t add_c;
+    kryptos_mp_value_t *sum, *delta;
+    const kryptos_mp_value_t *add_a, *add_b;
 
     if (x->data_size == 1 && y->data_size == 1) {
         p = (kryptos_u64_t)x->data[0] * (kryptos_u64_t)y->data[0];
@@ -391,22 +570,30 @@ static kryptos_mp_value_t *kryptos_mp_karatsuba_iter(kryptos_mp_value_t *x, kryp
     //printf("\tbd = "); kryptos_print_mp(bd);
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&a_plus_b, a), kryptos_mp_karatsuba_iter_epilogue);
     if (!kryptos_mp_is_zero(b)) {
-        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&a_plus_b, b), kryptos_mp_karatsuba_iter_epilogue);
+        //KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&a_plus_b, b), kryptos_mp_karatsuba_iter_epilogue);
+        kryptos_mp_inline_add(&a_plus_b, b, add_bsum, add_c, add_a, add_b, sum, add_d, add_s, add_sn,
+                              kryptos_mp_karatsuba_iter_epilogue);
     }
     //printf("\ta + b = "); kryptos_print_mp(a_plus_b);
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&c_plus_d, c), kryptos_mp_karatsuba_iter_epilogue);
     if (!kryptos_mp_is_zero(d)) {
-        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&c_plus_d, d), kryptos_mp_karatsuba_iter_epilogue);
+        //YPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&c_plus_d, d), kryptos_mp_karatsuba_iter_epilogue);
+        kryptos_mp_inline_add(&c_plus_d, d, add_bsum, add_c, add_a, add_b, sum, add_d, add_s, add_sn,
+                              kryptos_mp_karatsuba_iter_epilogue);
     }
     //printf("\tc + d = "); kryptos_print_mp(c_plus_d);
     KRYPTOS_MP_ABORT_WHEN_NULL(B = kryptos_mp_karatsuba(a_plus_b, c_plus_d), kryptos_mp_karatsuba_iter_epilogue);
     //printf("\tk = "); kryptos_print_mp(B);
     if (!kryptos_mp_is_zero(ac)) {
-        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub(&B, ac), kryptos_mp_karatsuba_iter_epilogue);
+        //KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub(&B, ac), kryptos_mp_karatsuba_iter_epilogue);
+        kryptos_mp_inline_sub(&B, ac, sub_bsub, sub_c, delta, sub_d, sub_s, sub_sn, sub_dn,
+                              kryptos_mp_karatsuba_iter_epilogue);
     }
 
     if (!kryptos_mp_is_zero(bd)) {
-        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub(&B, bd), kryptos_mp_karatsuba_iter_epilogue);
+        //KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub(&B, bd), kryptos_mp_karatsuba_iter_epilogue);
+        kryptos_mp_inline_sub(&B, bd, sub_bsub, sub_c, delta, sub_d, sub_s, sub_sn, sub_dn,
+                              kryptos_mp_karatsuba_iter_epilogue);
     }
     //printf("\tB = "); kryptos_print_mp(B);
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_lsh(&B, kryptos_mp_byte2bit(sh)), kryptos_mp_karatsuba_iter_epilogue);
@@ -415,8 +602,12 @@ static kryptos_mp_value_t *kryptos_mp_karatsuba_iter(kryptos_mp_value_t *x, kryp
     //printf("\tA = "); kryptos_print_mp(A);
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_lsh(&x, kryptos_mp_byte2bit(sh << 1)), kryptos_mp_karatsuba_iter_epilogue);
     //printf("\tA' = "); kryptos_print_mp(A);
-    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&x, B), kryptos_mp_karatsuba_iter_epilogue);
-    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&x, bd), kryptos_mp_karatsuba_iter_epilogue);
+    //KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&x, B), kryptos_mp_karatsuba_iter_epilogue);
+    kryptos_mp_inline_add(&x, B, add_bsum, add_c, add_a, add_b, sum, add_d, add_s, add_sn,
+                          kryptos_mp_karatsuba_iter_epilogue);
+    //KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add(&x, bd), kryptos_mp_karatsuba_iter_epilogue);
+    kryptos_mp_inline_add(&x, bd, add_bsum, add_c, add_a, add_b, sum, add_d, add_s, add_sn,
+                          kryptos_mp_karatsuba_iter_epilogue);
 
 kryptos_mp_karatsuba_iter_epilogue:
 
@@ -507,31 +698,6 @@ void kryptos_del_mp_value(kryptos_mp_value_t *mp) {
 }
 
 #else
-
-#define kryptos_mp_alloc(data, size, type) {\
-    if (g_kryptos_mp_mn_init) {\
-        (data) = type mnemosine_malloc(&g_kryptos_mp_mn, (size));\
-        /*if ((data) != NULL) {\
-            printf("[mnemosine memory segment acquired]\n");\
-        }*/\
-    }\
-    if ((data) == NULL || !g_kryptos_mp_mn_init) {\
-        (data) = type kryptos_newseg((size));\
-        /*if ((data) != NULL) {\
-            printf("[os memory segment acquired]\n");\
-        }*/\
-    }\
-}
-
-#define kryptos_mp_free(data, size) {\
-    if (g_kryptos_mp_mn_init) {\
-        if (mnemosine_free(&g_kryptos_mp_mn, (data)) == 0) {\
-            kryptos_freeseg((data), (size));\
-        }\
-    } else {\
-        kryptos_freeseg((data), (size));\
-    }\
-}
 
 kryptos_mp_value_t *kryptos_new_mp_value(const size_t bitsize) {
     kryptos_mp_value_t *mp;
