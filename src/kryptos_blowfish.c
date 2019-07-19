@@ -253,8 +253,8 @@ static kryptos_u8_t kryptos_messy_base64_state_1 [] = {
 };
 
 struct kryptos_blowfish_subkeys {
-    kryptos_u32_t P[19];
     kryptos_u32_t S1[257], S2[257], S3[257], S4[257];
+    kryptos_u32_t P[19];
 };
 
 typedef void (*kryptos_blowfish_block_processor)(kryptos_u8_t *block, const struct kryptos_blowfish_subkeys *sks);

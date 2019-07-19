@@ -106,12 +106,12 @@ typedef enum {
 
 struct kryptos_keccak_ctx {
     kryptos_u64_t state[5][5];
-    kryptos_u8_t *message;
     size_t message_size;
     size_t r, c;
-    kryptos_keccak_padding_t padtype;
-    kryptos_u8_t *z;
     size_t z_size;
+    kryptos_keccak_padding_t padtype;
+    kryptos_u8_t *message;
+    kryptos_u8_t *z;
 };
 
 static void kryptos_keccak_sponge_1600(struct kryptos_keccak_ctx *ctx);

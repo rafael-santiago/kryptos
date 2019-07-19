@@ -24,8 +24,8 @@
 #define kryptos_feal_get_byte_from_u16(w, n) ( ( (w) >> (8 - ((n) << 3)) ) & 0xff )
 
 struct kryptos_feal_subkeys {
- kryptos_u16_t K[KRYPTOS_FEAL_MAX];
  int rounds;
+ kryptos_u16_t K[KRYPTOS_FEAL_MAX];
 };
 
 typedef void (*kryptos_feal_block_processor)(kryptos_u8_t *block, const struct kryptos_feal_subkeys *sks);

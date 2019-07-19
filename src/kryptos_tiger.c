@@ -391,12 +391,12 @@ struct kryptos_tiger_input_message {
 };
 
 struct kryptos_tiger_ctx {
-    kryptos_u64_t a, b, c;
     struct kryptos_tiger_input_message input;
-    kryptos_u8_t *message;
+    kryptos_u64_t a, b, c;
     kryptos_u64_t curr_len;
     kryptos_u64_t total_len;
     int paddin2times;
+    kryptos_u8_t *message;
 };
 
 static void kryptos_tiger_init(struct kryptos_tiger_ctx *ctx);

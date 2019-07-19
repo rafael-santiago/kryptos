@@ -48,18 +48,18 @@ struct kryptos_blake2b_ctx {
 };
 
 struct kryptos_blake2s_ctx {
-    kryptos_u32_t h[8], m[16], v[16];
-    kryptos_u32_t *IV;
+    kryptos_u32_t m[16], v[16], h[8];
     kryptos_u32_t t[2];
     int f;
+    kryptos_u32_t *IV;
 };
 
 struct kryptos_blake2_ctx {
+    size_t ll, kk, nn, bb;
+    size_t h_size;
     kryptos_u8_t *input;
     kryptos_u8_t *key;
-    size_t ll, kk, nn, bb;
     kryptos_u8_t *h;
-    size_t h_size;
 };
 
 #define KRYPTOS_BLAKE2S_BYTES_PER_BLOCK  64

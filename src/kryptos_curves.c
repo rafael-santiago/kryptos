@@ -14,7 +14,7 @@
 #endif
 
 #define KRYPTOS_REGISTER_STANDARD_CURVE(id, bits, p, a, b, x, y, q)\
-    { (id), (bits), (p), (a), (b), (x), (y), (q) }
+    { (bits), (id), (p), (a), (b), (x), (y), (q) }
 
 static struct kryptos_std_curve_ctx g_std_curves[] = {
     // INFO(Rafael): Standarnized curves from RFC5639.

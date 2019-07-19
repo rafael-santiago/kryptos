@@ -15,28 +15,28 @@
 #endif
 
 struct kryptos_dh_modp_group_entry_ctx {
-    char *p;
     size_t p_size;
-    char *g;
     size_t g_size;
+    char *p;
+    char *g;
 };
 
 struct kryptos_dh_modp_group_ctx {
-    struct kryptos_dh_modp_group_entry_ctx *data;
     size_t data_nr;
+    struct kryptos_dh_modp_group_entry_ctx *data;
 };
 
 #define KRYPTOS_DH_MODP_GROUP_BEGIN(bits) static struct kryptos_dh_modp_group_entry_ctx dh_ ## bits ## _modp[] = {
 
 #define KRYPTOS_DH_MODP_GROUP_END };
 
-#define KRYPTOS_DH_ADD_GROUP_ENTRY(p, ps, g, gs) { p, ps, g, gs }
+#define KRYPTOS_DH_ADD_GROUP_ENTRY(p, ps, g, gs) { ps, gs, p, g }
 
 #define KRYPTOS_DH_GROUPS_BEGIN(name) static struct kryptos_dh_modp_group_ctx name [] = {
 
 #define KRYPTOS_DH_GROUPS_END };
 
-#define KRYPTOS_DH_ADD_BIT_GROUP(bits) { dh_ ## bits ## _modp, sizeof(dh_ ## bits ## _modp) / sizeof(dh_ ## bits ## _modp[0]) }
+#define KRYPTOS_DH_ADD_BIT_GROUP(bits) { sizeof(dh_ ## bits ## _modp) / sizeof(dh_ ## bits ## _modp[0]), dh_ ## bits ## _modp }
 
 KRYPTOS_DH_MODP_GROUP_BEGIN(1536)
     KRYPTOS_DH_ADD_GROUP_ENTRY("FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1"

@@ -15,8 +15,8 @@
 #endif
 
 struct kryptos_present_kbuf {
-    size_t bits;
     kryptos_u64_t h;
+    size_t bits;
     union {
         kryptos_u16_t u16;
         kryptos_u64_t u64;

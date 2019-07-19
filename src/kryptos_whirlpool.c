@@ -588,12 +588,12 @@ struct kryptos_whirlpool_input_message {
 };
 
 struct kryptos_whirlpool_ctx {
-    kryptos_u64_t K[8];
     struct kryptos_whirlpool_input_message input;
-    kryptos_u8_t *message;
+    kryptos_u64_t K[8];
     kryptos_u64_t curr_len;
     kryptos_u64_t total_len;
     int paddin2times;
+    kryptos_u8_t *message;
 };
 
 static void kryptos_whirlpool_do_block(struct kryptos_whirlpool_ctx *ctx);

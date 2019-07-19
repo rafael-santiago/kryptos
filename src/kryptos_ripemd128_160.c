@@ -65,12 +65,12 @@ typedef enum {
 }kryptos_ripemd_bitsize_t;
 
 struct kryptos_ripemd_ctx {
-    kryptos_ripemd_bitsize_t bits;
-    kryptos_u32_t state[5];
     struct kryptos_ripemd_input input;
-    kryptos_u8_t *message;
+    kryptos_u32_t state[5];
     kryptos_u64_t total_len, curr_len;
     int paddin2times;
+    kryptos_ripemd_bitsize_t bits;
+    kryptos_u8_t *message;
 };
 
 static size_t kryptos_ripemd_block_index_decision_table[KRYPTOS_RIPEMD_BYTES_PER_BLOCK] = {

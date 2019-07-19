@@ -78,12 +78,12 @@ struct kryptos_sha384_512_input_message {
 };
 
 struct kryptos_sha384_512_ctx {
-    kryptos_u64_t state[8];
     struct kryptos_sha384_512_input_message input;
-    kryptos_u8_t *message;
+    kryptos_u64_t state[8];
     kryptos_u64_t curr_len, total_len;
     int paddin2times;
     kryptos_sha384_512_bitsize_t bitsize;
+    kryptos_u8_t *message;
 };
 
 static void kryptos_sha384_init(struct kryptos_sha384_512_ctx *ctx);

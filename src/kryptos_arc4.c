@@ -21,8 +21,8 @@
                                 s->S[temp] )
 
 struct kryptos_arc4_subkey {
-    kryptos_u8_t S[256];
     int i, j;
+    kryptos_u8_t S[256];
 };
 
 static void kryptos_arc4_clear_and_go(struct kryptos_arc4_subkey *sk);

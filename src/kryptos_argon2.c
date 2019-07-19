@@ -62,21 +62,21 @@
 #define KRYPTOS_ARGON2_DATA_SIZE                (1 << 10)
 
 struct kryptos_argon2_array_ctx {
-    kryptos_u8_t *data;
     size_t data_size;
+    kryptos_u8_t *data;
 };
 
 struct kryptos_argon2_params_ctx {
-    kryptos_u32_t version;
     size_t i;
-    kryptos_u32_t parallelism;
     size_t col_count;
-    kryptos_argon2_hash_type_t htype;
     size_t segment, segment_length;
     size_t iteration, iterations;
     size_t mm;
-    kryptos_u8_t *pr_buf, *next_pr_chunk;
     size_t pr_buf_size;
+    kryptos_argon2_hash_type_t htype;
+    kryptos_u32_t version;
+    kryptos_u32_t parallelism;
+    kryptos_u8_t *pr_buf, *next_pr_chunk;
 };
 
 static kryptos_u8_t *kryptos_argon2_H(kryptos_u8_t *h, const size_t h_size,

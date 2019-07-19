@@ -218,36 +218,34 @@ typedef enum {
 #define KRYPTOS_KRYPTO_TASK_ARG_NR 10
 
 struct kryptos_task_aux_buffers_ctx {
-    kryptos_u8_t *buf0, *buf1, *buf2, *buf3;
     size_t buf0_size, buf1_size, buf2_size, buf3_size;
+    kryptos_u8_t *buf0, *buf1, *buf2, *buf3;
 };
 
 typedef struct kryptos_task {
+    struct kryptos_task_aux_buffers_ctx aux_buffers;
+
+    size_t key_size;
+    size_t iv_size;
+    size_t in_size;
+    size_t out_size;
+
+    kryptos_task_result_t result;
     kryptos_action_t action;
     kryptos_cipher_t cipher;
     kryptos_cipher_mode_t mode;
-
     kryptos_encoding_t encoder;
 
+    struct kryptos_task *mirror_p;
     kryptos_u8_t *key;
-    size_t key_size;
     kryptos_u8_t *iv;
-    size_t iv_size;
     kryptos_u32_t *ctr;
-
     kryptos_u8_t *in;
-    size_t in_size;
     kryptos_u8_t *out;
-    size_t out_size;
 
     void *arg[KRYPTOS_KRYPTO_TASK_ARG_NR];
 
-    kryptos_task_result_t result;
     char *result_verbose;
-
-    struct kryptos_task *mirror_p;
-
-    struct kryptos_task_aux_buffers_ctx aux_buffers;
 }kryptos_task_ctx;
 
 typedef void (*kryptos_hash_func)(kryptos_task_ctx **ktask, const int to_hex);
@@ -301,16 +299,16 @@ typedef enum {
 }kryptos_curve_id_t;
 
 struct kryptos_std_curve_ctx {
-    kryptos_curve_id_t id;
     size_t bits;
+    kryptos_curve_id_t id;
     char *p, *a, *b, *x, *y, *q;
 };
 
 typedef struct kryptos_curve {
+    size_t bits;
     kryptos_ec_t *ec;
     kryptos_mp_value_t *q;
     kryptos_ec_pt_t *g;
-    size_t bits;
 }kryptos_curve_ctx;
 
 #ifndef __cplusplus

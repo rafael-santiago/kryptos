@@ -230,8 +230,8 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
     size_t b, offset;
     struct gcm_ghash_block_ctx *A = NULL, *C = NULL, L;
     struct gcm_ghash_data_ancillary_ctx {
-        struct gcm_ghash_block_ctx *block;
         size_t block_size;
+        struct gcm_ghash_block_ctx *block;
     } ublocks[3], *ubp, *ubp_end;
     kryptos_u8_t *temp = NULL;
     size_t temp_size[2] = { 0, 0 }, A_size = 0, C_size = 0;

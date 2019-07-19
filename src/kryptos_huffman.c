@@ -40,19 +40,19 @@
 #define kryptos_huffman_get_code_bit(c) ( ((c) - 48) & 0x1 )
 
 struct kryptos_huffman_tree_ctx {
-    kryptos_u8_t byte;
     struct kryptos_huffman_tree_ctx *l, *r;
+    kryptos_u8_t byte;
 };
 
 struct kryptos_huffman_freq_ctx {
-    kryptos_u8_t byte;
     size_t freq;
     struct kryptos_huffman_tree_ctx *subtree;
+    kryptos_u8_t byte;
 };
 
 struct kryptos_huffman_code_ctx {
-    kryptos_u8_t data[KRYPTOS_HUFFMAN_MAX_CODE_SIZE];
     size_t data_size;
+    kryptos_u8_t data[KRYPTOS_HUFFMAN_MAX_CODE_SIZE];
 };
 
 static void kryptos_huffman_eval_byte_freq(struct kryptos_huffman_freq_ctx *freq_table, size_t *raw_freq,

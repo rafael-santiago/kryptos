@@ -111,9 +111,9 @@ typedef enum {
 }kryptos_camellia_keysize_t;
 
 struct kryptos_camellia_subkeys {
-    kryptos_u32_t kw[ 14][12]; // INFO(Rafael): kw1..kw4
     kryptos_u32_t  k[124][12]; // INFO(Rafael): k1..k18
     kryptos_u32_t ke[ 16][12]; // INFO(Rafael): ke1..ke4
+    kryptos_u32_t kw[ 14][12]; // INFO(Rafael): kw1..kw4
     kryptos_camellia_keysize_t keysize;
 };
 

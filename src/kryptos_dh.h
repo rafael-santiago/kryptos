@@ -34,13 +34,13 @@ typedef enum {
 }kryptos_dh_modp_group_bits_t;
 
 struct kryptos_dh_xchg_ctx {
+    size_t s_bits;
+    size_t in_size, out_size;
+    kryptos_task_result_t result;
     kryptos_mp_value_t *p, *q, *g;
     kryptos_mp_value_t *t, *s, *k;
-    size_t s_bits;
     kryptos_u8_t *in, *out;
-    size_t in_size, out_size;
     char *result_verbose;
-    kryptos_task_result_t result;
 };
 
 #define kryptos_dh_init_xchg_ctx(xc) {\

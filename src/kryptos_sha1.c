@@ -49,12 +49,12 @@ struct kryptos_sha1_input_message {
 };
 
 struct kryptos_sha1_ctx {
-    kryptos_u32_t state[5];
     struct kryptos_sha1_input_message input;
-    kryptos_u8_t *message;
     kryptos_u64_t curr_len;
     kryptos_u64_t total_len;
+    kryptos_u32_t state[5];
     int paddin2times;
+    kryptos_u8_t *message;
 };
 
 static size_t kryptos_sha1_block_index_decision_table[KRYPTOS_SHA1_BYTES_PER_BLOCK] = {

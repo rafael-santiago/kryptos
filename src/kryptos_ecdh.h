@@ -29,12 +29,12 @@
 #define KRYPTOS_ECDH_PEM_HDR_PARAM_KPY     "ECDH PARAM KP Y"
 
 struct kryptos_ecdh_xchg_ctx {
+    size_t in_size, out_size;
+    kryptos_task_result_t result;
     kryptos_curve_ctx *curve;
     kryptos_u8_t *in, *out;
-    size_t in_size, out_size;
     kryptos_mp_value_t *k;
     char *result_verbose;
-    kryptos_task_result_t result;
 };
 
 #define kryptos_ecdh_init_xchg_ctx(c) {\

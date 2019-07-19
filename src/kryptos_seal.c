@@ -319,7 +319,7 @@ static void kryptos_seal_keystream(const kryptos_u8_t *userkey, const size_t use
     // # WARN(Rafael): Hi, Tasmanian devel!                                                                #
     // #                                                                                                   #
     // #               The SEAL specification does not provide any "oracle" test vector.                   #
-    // #               I mean, "Input (X, K, ...) -> Output (X')". However, the spec provides              #
+    // #               I meant, "Input (X, K, ...) -> Output (X')". However, the spec provides             #
     // #               the content of the R, T, S tables, besides the keystream. Also is                   #
     // #               provided a value that denotes all words of the final keystream xored.               #
     // #                                                                                                   #

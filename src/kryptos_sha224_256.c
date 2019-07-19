@@ -78,13 +78,13 @@ struct kryptos_sha224_256_input_message {
 };
 
 struct kryptos_sha224_256_ctx {
-    kryptos_u32_t state[8];
     struct kryptos_sha224_256_input_message input;
-    kryptos_u8_t *message;
+    kryptos_u32_t state[8];
     kryptos_u64_t curr_len;
     kryptos_u64_t total_len;
     int paddin2times;
     kryptos_sha224_256_bitsize_t bitsize;
+    kryptos_u8_t *message;
 };
 
 static void kryptos_sha224_init(struct kryptos_sha224_256_ctx *ctx);

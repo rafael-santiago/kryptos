@@ -42,10 +42,10 @@ struct kryptos_md5_input_message {
 
 struct kryptos_md5_ctx {
     struct kryptos_md5_input_message input;
-    kryptos_u32_t state[4];
-    kryptos_u8_t *message;
     kryptos_u64_t total_len, curr_len;
+    kryptos_u32_t state[4];
     int paddin2times;
+    kryptos_u8_t *message;
 };
 
 static size_t kryptos_md5_block_index_decision_table[KRYPTOS_MD5_BYTES_PER_BLOCK] = {

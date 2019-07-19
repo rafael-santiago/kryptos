@@ -51,10 +51,10 @@ struct kryptos_md4_input_message {
 
 struct kryptos_md4_ctx {
     struct kryptos_md4_input_message input;
-    kryptos_u32_t state[4];
-    kryptos_u8_t *message;
     kryptos_u64_t curr_len, total_len;
+    kryptos_u32_t state[4];
     int paddin2times;
+    kryptos_u8_t *message;
 };
 
 static size_t kryptos_md4_block_index_decision_table[KRYPTOS_MD4_BYTES_PER_BLOCK] = {

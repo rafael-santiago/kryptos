@@ -15,12 +15,12 @@ extern "C" {
 #endif
 
 struct kryptos_fortuna_ctx {
-    kryptos_u8_t K[32];
     size_t K_size;
-    kryptos_u32_t C;
-    kryptos_u8_t seed[32];
     size_t seed_size;
     int call_nr;
+    kryptos_u32_t C;
+    kryptos_u8_t K[32];
+    kryptos_u8_t seed[32];
 };
 
 struct kryptos_fortuna_ctx *kryptos_fortuna_init(const int allocate);
