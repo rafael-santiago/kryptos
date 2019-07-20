@@ -59,6 +59,10 @@ static kryptos_u8_t nbxlt[] = {
     }\
 }
 
+#define kryptos_mp_add_positive_signal(dest) ( (*(dest))->neg = 0 )
+
+#define kryptos_mp_add_negative_signal(dest) ( (*(dest))->neg = 1 )
+
 static char *g_kryptos_mp_small_primes[] = {
     "0003", "0005", "0007", "000B", "000D", "0011", "0013", "0017", "001D", "001F", "0025", "0029", "002B", "002F", "0035",
     "003B", "003D", "0043", "0047", "0049", "004F", "0053", "0059", "0061", "0065", "0067", "006B", "006D", "0071", "007F",
@@ -215,10 +219,6 @@ static kryptos_mp_value_t *kryptos_mp_montgomery_reduction_2kx_mod_y(const krypt
                                                                      const kryptos_mp_value_t *y);
 
 static int kryptos_mp_gen_prime_small_primes_test(const kryptos_mp_value_t *n, kryptos_mp_value_t **prime);
-
-static void kryptos_mp_add_negative_signal(kryptos_mp_value_t **dest);
-
-static void kryptos_mp_add_positive_signal(kryptos_mp_value_t **dest);
 
 static void kryptos_mp_inv_cmplt(kryptos_mp_value_t **dest);
 
@@ -2178,14 +2178,6 @@ kryptos_mp_sub_s_epilogue:
     }
 
     return result;
-}
-
-static void kryptos_mp_add_positive_signal(kryptos_mp_value_t **dest) {
-    (*dest)->neg = 0;
-}
-
-static void kryptos_mp_add_negative_signal(kryptos_mp_value_t **dest) {
-    (*dest)->neg = 1;
 }
 
 kryptos_u8_t *kryptos_mp_get_bitmap(const kryptos_mp_value_t *src, size_t *bitmap_size) {
