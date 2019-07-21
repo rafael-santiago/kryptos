@@ -3551,6 +3551,10 @@ kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *u, const kryptos
 
     // TODO(Rafael): If the v is prime use the Fermat's little theorem instead of the Extended Euclidean.
 
+    if ((v->data[0] & 0x1)) {
+        return kryptos_mp_modinv_rs((kryptos_mp_value_t *)u, (kryptos_mp_value_t *)v);
+    }
+
     KRYPTOS_MP_ABORT_WHEN_NULL(_1 = kryptos_hex_value_as_mp("1", 1), kryptos_mp_modinv_epilogue);
     KRYPTOS_MP_ABORT_WHEN_NULL(_0 = kryptos_hex_value_as_mp("0", 1), kryptos_mp_modinv_epilogue);
 

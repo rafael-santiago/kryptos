@@ -159,8 +159,8 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_mp_gen_prime_tests);
     KUTE_RUN_TEST(kryptos_mp_montgomery_reduction_tests);
     KUTE_RUN_TEST(kryptos_mp_gcd_tests);
-    KUTE_RUN_TEST(kryptos_mp_modinv_tests);
     KUTE_RUN_TEST(kryptos_mp_modinv_rs_tests);
+    KUTE_RUN_TEST(kryptos_mp_modinv_tests);
     KUTE_RUN_TEST(kryptos_raw_buffer_as_mp_tests);
     KUTE_RUN_TEST(kryptos_mp_as_task_out_tests);
     KUTE_RUN_TEST(kryptos_mp_add_s_tests);
