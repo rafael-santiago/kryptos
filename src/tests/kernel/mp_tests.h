@@ -74,6 +74,8 @@ KUTE_DECLARE_TEST_CASE(kryptos_mp_gcd_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_mp_modinv_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_mp_modinv_rs_tests);
+
 KUTE_DECLARE_TEST_CASE(kryptos_mp_bitcount_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_mp_mul_digit_tests);

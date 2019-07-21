@@ -1931,6 +1931,34 @@ KUTE_TEST_CASE(kryptos_mp_modinv_tests)
     }
 KUTE_TEST_CASE_END
 
+KUTE_TEST_CASE(kryptos_mp_modinv_rs_tests)
+    struct egcd_tests_ctx {
+        kryptos_u8_t *a, *m, *v;
+    };
+    struct egcd_tests_ctx test_vector[] = {
+        {     "10F",       "17F",        "6A" },
+        {       "3",         "7",         "5" }
+    };
+    size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
+    kryptos_mp_value_t *a, *m, *ev, *v;
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        a = kryptos_hex_value_as_mp(test_vector[tv].a, strlen(test_vector[tv].a));
+        KUTE_ASSERT(a != NULL);
+        m = kryptos_hex_value_as_mp(test_vector[tv].m, strlen(test_vector[tv].m));
+        KUTE_ASSERT(m != NULL);
+        ev = kryptos_hex_value_as_mp(test_vector[tv].v, strlen(test_vector[tv].v));
+        KUTE_ASSERT(ev != NULL);
+        v = kryptos_mp_modinv_rs(a, m);
+        KUTE_ASSERT(v != NULL);
+        KUTE_ASSERT(kryptos_mp_eq(v, ev) == 1);
+        kryptos_del_mp_value(a);
+        kryptos_del_mp_value(m);
+        kryptos_del_mp_value(ev);
+        kryptos_del_mp_value(v);
+    }
+KUTE_TEST_CASE_END
+
 KUTE_TEST_CASE(kryptos_mp_montgomery_reduction_tests)
     kryptos_mp_value_t *m;
     kryptos_mp_value_t *x;

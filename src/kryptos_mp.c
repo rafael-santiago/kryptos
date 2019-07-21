@@ -3630,6 +3630,98 @@ kryptos_mp_modinv_epilogue:
 
 #endif
 
+kryptos_mp_value_t *kryptos_mp_modinv_rs(kryptos_mp_value_t *a, kryptos_mp_value_t *m) {
+    // WARN(Rafael): This technique only works for odd modulus.
+    kryptos_mp_value_t *u = NULL, *v = NULL, *r = NULL, *s = NULL, *_1 = NULL;
+    int done = 0;
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&u, m), kryptos_mp_modinv_rsh_binary_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&v, a), kryptos_mp_modinv_rsh_binary_epilogue);
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(_1 = kryptos_hex_value_as_mp("01", 2), kryptos_mp_modinv_rsh_binary_epilogue);
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(s = kryptos_hex_value_as_mp("01", 2), kryptos_mp_modinv_rsh_binary_epilogue);
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(r = kryptos_hex_value_as_mp("00", 2), kryptos_mp_modinv_rsh_binary_epilogue);
+
+    while (!kryptos_mp_is_zero(v)) {
+        if ((u->data[0] & 0x1) == 0) {
+            KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_rsh(&u, 1), kryptos_mp_modinv_rsh_binary_epilogue);
+            if ((r->data[0] & 0x1) == 0) {
+                KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_rsh(&r, 1), kryptos_mp_modinv_rsh_binary_epilogue);
+            } else {
+                KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add_s(&r, m), kryptos_mp_modinv_rsh_binary_epilogue);
+                KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_rsh(&r, 1), kryptos_mp_modinv_rsh_binary_epilogue);
+            }
+        } else if ((v->data[0] & 0x1) == 0) {
+            KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_rsh(&v, 1), kryptos_mp_modinv_rsh_binary_epilogue);
+            if ((s->data[0] & 0x1) == 0) {
+                KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_rsh(&s, 1), kryptos_mp_modinv_rsh_binary_epilogue);
+            } else {
+                KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add_s(&s, m), kryptos_mp_modinv_rsh_binary_epilogue);
+                KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_rsh(&s, 1), kryptos_mp_modinv_rsh_binary_epilogue);
+            }
+        } else {
+            if (kryptos_mp_gt(u, v)) {
+                KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub_s(&u, v), kryptos_mp_modinv_rsh_binary_epilogue);
+                KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub_s(&r, s), kryptos_mp_modinv_rsh_binary_epilogue);
+                if (r->neg) {
+                    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add_s(&r, m), kryptos_mp_modinv_rsh_binary_epilogue);
+                }
+            } else {
+                KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub_s(&v, u), kryptos_mp_modinv_rsh_binary_epilogue);
+                KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub_s(&s, r), kryptos_mp_modinv_rsh_binary_epilogue);
+                if (s->neg) {
+                    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add_s(&s, m), kryptos_mp_modinv_rsh_binary_epilogue);
+                }
+            }
+        }
+    }
+
+    if (kryptos_mp_gt(u, _1)) {
+        kryptos_del_mp_value(r);
+        kryptos_hex_value_as_mp("00", 2);
+        done = 1;
+        goto kryptos_mp_modinv_rsh_binary_epilogue;
+    }
+
+    if (kryptos_mp_gt(r, m)) {
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub_s(&r, m), kryptos_mp_modinv_rsh_binary_epilogue);
+        done = 1;
+        goto kryptos_mp_modinv_rsh_binary_epilogue;
+    }
+
+    if (r->neg) {
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_add_s(&r, m), kryptos_mp_modinv_rsh_binary_epilogue);
+    }
+
+    done = 1;
+
+kryptos_mp_modinv_rsh_binary_epilogue:
+
+    if (u != NULL) {
+        kryptos_del_mp_value(u);
+    }
+
+    if (v != NULL) {
+        kryptos_del_mp_value(v);
+    }
+
+    if (s != NULL) {
+        kryptos_del_mp_value(s);
+    }
+
+    if (_1 != NULL) {
+        kryptos_del_mp_value(_1);
+    }
+
+    if (!done && r != NULL) {
+        kryptos_del_mp_value(r);
+    }
+
+    return r;
+}
+
 kryptos_mp_value_t *kryptos_mp_not(kryptos_mp_value_t *n) {
     ssize_t d;
 

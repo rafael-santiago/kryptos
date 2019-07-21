@@ -82,6 +82,8 @@ CUTE_DECLARE_TEST_CASE(kryptos_mp_gcd_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_mp_modinv_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_mp_modinv_rs_tests);
+
 CUTE_DECLARE_TEST_CASE(kryptos_mp_mul_digit_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_raw_buffer_as_mp_tests);

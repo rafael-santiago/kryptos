@@ -72,9 +72,9 @@ kryptos_mp_value_t *kryptos_mp_gcd(const kryptos_mp_value_t *a, const kryptos_mp
 
 kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *a, const kryptos_mp_value_t *m);
 
-kryptos_mp_value_t *kryptos_mp_not(kryptos_mp_value_t *n);
+kryptos_mp_value_t *kryptos_mp_modinv_rs(kryptos_mp_value_t *a, kryptos_mp_value_t *m);
 
-kryptos_mp_value_t *kryptos_mp_inv(kryptos_mp_value_t **dest);
+kryptos_mp_value_t *kryptos_mp_not(kryptos_mp_value_t *n);
 
 kryptos_mp_value_t *kryptos_mp_mul_digit(kryptos_mp_value_t **x, const kryptos_mp_digit_t digit);
 

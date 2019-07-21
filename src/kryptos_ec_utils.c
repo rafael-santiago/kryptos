@@ -141,7 +141,7 @@ void kryptos_ec_add(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_pt_t *q,
     kryptos_mp_mod(&temp1, curve->p);
     KRYPTOS_EC_UTILS_DO_OR_DIE(temp1, kryptos_ec_add_epilogue);
     //printf("[add] temp = "); kryptos_print_mp(temp1);
-    KRYPTOS_EC_UTILS_DO_OR_DIE(temp2 = kryptos_mp_modinv(temp1, curve->p), kryptos_ec_add_epilogue);
+    KRYPTOS_EC_UTILS_DO_OR_DIE(temp2 = kryptos_mp_modinv_rs(temp1, curve->p), kryptos_ec_add_epilogue);
     //printf("[add] temp = "); kryptos_print_mp(temp2);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&temp1, temp2), kryptos_ec_add_epilogue);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&slope, p_mod.y), kryptos_ec_add_epilogue);
@@ -237,7 +237,7 @@ void kryptos_ec_dbl(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_t *curve
     } else {
         KRYPTOS_EC_UTILS_DO_OR_DIE(temp1 = kryptos_hex_value_as_mp("02", 2), kryptos_ec_dbl_epilogue);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_mul_s(&temp1, p->y), kryptos_ec_dbl_epilogue);
-        KRYPTOS_EC_UTILS_DO_OR_DIE(temp2 = kryptos_mp_modinv(temp1, curve->p), kryptos_ec_dbl_epilogue);
+        KRYPTOS_EC_UTILS_DO_OR_DIE(temp2 = kryptos_mp_modinv_rs(temp1, curve->p), kryptos_ec_dbl_epilogue);
         //printf("\t[dbl] temp = "); kryptos_print_mp(temp2);
         kryptos_del_mp_value(temp1);
         temp1 = temp2;
