@@ -2095,7 +2095,7 @@ KUTE_TEST_CASE(kryptos_mp_barret_reduction_tests)
         {       "FA", 2,  "11", 2,  "0C", 2 }
     };
     size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
-    kryptos_mp_value_t *x, *factor = NULL, *mod, *e, *r;
+    kryptos_mp_value_t *x, *factor = NULL, *mod = NULL, *e, *r;
     size_t sh;
 
     KUTE_ASSERT(kryptos_mp_barret_reduction(NULL, &factor, &sh, mod) == NULL);
