@@ -1981,6 +1981,87 @@ kryptos_mp_mod_epilogue:
     return done;
 }
 
+kryptos_mp_value_t *kryptos_mp_barret_reduction(kryptos_mp_value_t *x,
+                                                kryptos_mp_value_t **factor,
+                                                size_t *sh,
+                                                const kryptos_mp_value_t *mod) {
+
+    kryptos_mp_value_t *temp = NULL, *m = NULL, *r = NULL;
+    size_t bitmap_size;
+    kryptos_u8_t *bitmap = NULL, *bp, *bp_end;
+
+    if (x == NULL || mod == NULL || sh == NULL || factor == NULL) {
+        return NULL;
+    }
+
+    if (x->neg) {
+        // INFO(Rafael): x must be positive or zero.
+        return NULL;
+    }
+
+    // WARN(Rafael): Also, x cannot be greater than (mod << 1), but let's skip this check. Let's just assume that
+    //               the user know it.
+
+    if ((*factor) == NULL) {
+        if (mod->neg || kryptos_mp_is_zero(mod)) {
+            // INFO(Rafael): Modulus cannot be negative nor zero.
+            goto kryptos_mp_barret_reduction_epilogue;
+        }
+
+        KRYPTOS_MP_ABORT_WHEN_NULL(bitmap = kryptos_mp_get_bitmap(mod, &bitmap_size), kryptos_mp_barret_reduction_epilogue);
+
+        bp = bitmap;
+        bp_end = bp + bitmap_size;
+
+        while (bp != bp_end && *bp != 1) {
+            bp++;
+        }
+
+        *sh = (bp_end - bp) << 1;
+
+        if (*sh == 0) {
+            // INFO(Rafael): Modulus also must be a power of two.
+            *sh = 0;
+            goto kryptos_mp_barret_reduction_epilogue;
+        }
+
+        KRYPTOS_MP_ABORT_WHEN_NULL(temp = kryptos_hex_value_as_mp("01", 2), kryptos_mp_barret_reduction_epilogue);
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_lsh(&temp, *sh), kryptos_mp_barret_reduction_epilogue);
+        KRYPTOS_MP_ABORT_WHEN_NULL((*factor) = kryptos_mp_div(temp, mod, &m), kryptos_mp_barret_reduction_epilogue);
+        kryptos_del_mp_value(temp);
+        temp = NULL;
+        kryptos_del_mp_value(m);
+        m = NULL;
+    }
+
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&temp, x), kryptos_mp_barret_reduction_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_mul(&temp, *factor), kryptos_mp_barret_reduction_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_rsh(&temp, *sh), kryptos_mp_barret_reduction_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_mul(&temp, mod), kryptos_mp_barret_reduction_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&r, x), kryptos_mp_barret_reduction_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub(&r, temp), kryptos_mp_barret_reduction_epilogue);
+
+    if (kryptos_mp_gt(r, mod)) {
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub(&r, mod), kryptos_mp_barret_reduction_epilogue);
+    }
+
+kryptos_mp_barret_reduction_epilogue:
+
+    if (bitmap != NULL) {
+        kryptos_freeseg(bitmap, bitmap_size);
+    }
+
+    if (m != NULL) {
+        kryptos_del_mp_value(m);
+    }
+
+    if (temp != NULL) {
+        kryptos_del_mp_value(temp);
+    }
+
+    return r;
+}
+
 kryptos_mp_value_t *kryptos_mp_add_s(kryptos_mp_value_t **dest, kryptos_mp_value_t *src) {
     // INFO(Rafael): This function takes into consideration signal when adding ("_s"...).
     kryptos_mp_value_t *dc = NULL, *sc = NULL, *result = NULL;
@@ -3828,7 +3909,7 @@ kryptos_mp_value_t *kryptos_raw_buffer_as_mp(const kryptos_u8_t *buf, const size
     return mp;
 }
 
-int kryptos_mp_is_zero(kryptos_mp_value_t *value) {
+int kryptos_mp_is_zero(const kryptos_mp_value_t *value) {
     int is_zero;
     ssize_t j;
 

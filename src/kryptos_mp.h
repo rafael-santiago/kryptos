@@ -74,6 +74,11 @@ kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *a, const kryptos
 
 kryptos_mp_value_t *kryptos_mp_modinv_rs(kryptos_mp_value_t *a, kryptos_mp_value_t *m);
 
+kryptos_mp_value_t *kryptos_mp_barret_reduction(kryptos_mp_value_t *x,
+                                                kryptos_mp_value_t **factor,
+                                                size_t *sh,
+                                                const kryptos_mp_value_t *mod);
+
 kryptos_mp_value_t *kryptos_mp_not(kryptos_mp_value_t *n);
 
 kryptos_mp_value_t *kryptos_mp_mul_digit(kryptos_mp_value_t **x, const kryptos_mp_digit_t digit);
@@ -90,7 +95,7 @@ kryptos_mp_value_t *kryptos_mp_mul_s(kryptos_mp_value_t **dest, kryptos_mp_value
 
 size_t kryptos_mp_bit_n(kryptos_mp_value_t *value, const size_t bn);
 
-int kryptos_mp_is_zero(kryptos_mp_value_t *value);
+int kryptos_mp_is_zero(const kryptos_mp_value_t *value);
 
 kryptos_u8_t *kryptos_mp_get_bitmap(const kryptos_mp_value_t *src, size_t *bitmap_size);
 

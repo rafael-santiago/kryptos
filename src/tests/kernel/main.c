@@ -168,6 +168,8 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_mp_mul_s_tests);
     KUTE_RUN_TEST(kryptos_mp_mod_tests);
     KUTE_RUN_TEST(kryptos_mp_get_bitmap_tests);
+    // INFO(Rafael): Barret reduction depends on kryptos_mp_get_bitmap(), so it needs to run after that.
+    KUTE_RUN_TEST(kryptos_mp_barret_reduction_tests);
 
     KUTE_RUN_TEST(kryptos_pem_get_mp_data_tests);
 

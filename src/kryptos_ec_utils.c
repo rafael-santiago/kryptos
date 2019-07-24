@@ -332,7 +332,7 @@ void kryptos_ec_mul(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_mp_value_t 
     bp = bitmap;
     bp_end = bp + bitmap_size - 1;
 
-    while (*bp != 1) {
+    while (bp != bp_end && *bp != 1) {
         bp++;
     }
 

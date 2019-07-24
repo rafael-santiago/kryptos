@@ -2080,6 +2080,73 @@ KUTE_TEST_CASE(kryptos_mp_mod_tests)
     }
 KUTE_TEST_CASE_END
 
+KUTE_TEST_CASE(kryptos_mp_barret_reduction_tests)
+    struct test_ctx {
+        kryptos_u8_t *x;
+        size_t x_size;
+        kryptos_u8_t *m;
+        size_t m_size;
+        kryptos_u8_t *e;
+        size_t e_size;
+    };
+    struct test_ctx test_vector[] = {
+        {       "0E", 2,  "11", 2,  "0E", 2 },
+        {       "12", 2,  "11", 2,  "01", 2 },
+        {       "FA", 2,  "11", 2,  "0C", 2 }
+    };
+    size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+    kryptos_mp_value_t *x, *factor = NULL, *mod, *e, *r;
+    size_t sh;
+
+    KUTE_ASSERT(kryptos_mp_barret_reduction(NULL, &factor, &sh, mod) == NULL);
+
+    x = kryptos_hex_value_as_mp("9C40", 4);
+    KUTE_ASSERT(x != NULL);
+
+    KUTE_ASSERT(kryptos_mp_barret_reduction(x, NULL, &sh, mod) == NULL);
+    KUTE_ASSERT(kryptos_mp_barret_reduction(x, &factor, NULL, mod) == NULL);
+    KUTE_ASSERT(kryptos_mp_barret_reduction(x, &factor, &sh, NULL) == NULL);
+
+    mod = kryptos_hex_value_as_mp("11", 2);
+    KUTE_ASSERT(mod != NULL);
+
+    r = kryptos_mp_barret_reduction(x, &factor, &sh, mod);
+    KUTE_ASSERT(r != NULL);
+
+    // INFO(Rafael): Barret's reduction only works for x >= 0 && x <= mod^2.
+    //               Thus, the returned value should be something different from 16,
+    //               40000 > 289.
+
+    e = kryptos_hex_value_as_mp("10", 2);
+    KUTE_ASSERT(kryptos_mp_ne(r, e) == 1);
+
+    kryptos_del_mp_value(x);
+    kryptos_del_mp_value(r);
+    kryptos_del_mp_value(e);
+    kryptos_del_mp_value(factor);
+    factor = NULL;
+    kryptos_del_mp_value(mod);
+
+    for (t = 0; t < tv_nr; t++) {
+        x = kryptos_hex_value_as_mp(test_vector[t].x, test_vector[t].x_size);
+        KUTE_ASSERT(x != NULL);
+        mod = kryptos_hex_value_as_mp(test_vector[t].m, test_vector[t].m_size);
+        KUTE_ASSERT(mod != NULL);
+        e = kryptos_hex_value_as_mp(test_vector[t].e, test_vector[t].e_size);
+        KUTE_ASSERT(e != NULL);
+        r = kryptos_mp_barret_reduction(x, &factor, &sh, mod);
+        KUTE_ASSERT(factor != NULL);
+        KUTE_ASSERT(r != NULL);
+        KUTE_ASSERT(kryptos_mp_eq(r, e) == 1);
+        kryptos_del_mp_value(x);
+        kryptos_del_mp_value(mod);
+        kryptos_del_mp_value(e);
+        kryptos_del_mp_value(factor);
+        factor = NULL;
+        kryptos_del_mp_value(r);
+    }
+KUTE_TEST_CASE_END
+
 KUTE_TEST_CASE(kryptos_mp_add_s_tests)
     struct test_ctx {
         kryptos_u8_t *a;

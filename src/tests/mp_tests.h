@@ -92,6 +92,8 @@ CUTE_DECLARE_TEST_CASE(kryptos_mp_as_task_out_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_mp_mod_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_mp_barret_reduction_tests);
+
 CUTE_DECLARE_TEST_CASE(kryptos_mp_add_s_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_mp_sub_s_tests);
