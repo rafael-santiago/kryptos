@@ -2252,10 +2252,16 @@ CUTE_TEST_CASE(kryptos_mp_barret_reduction_tests)
         kryptos_u8_t *e;
         size_t e_size;
     };
+
     struct test_ctx test_vector[] = {
         {       "0E", 2,  "11", 2,  "0E", 2 },
+        {       "-E", 2,  "11", 2,  "03", 2 },
         {       "12", 2,  "11", 2,  "01", 2 },
-        {       "FA", 2,  "11", 2,  "0C", 2 }
+        {       "FA", 2,  "11", 2,  "0C", 2 },
+        {      "-12", 3,  "11", 2,  "10", 2 },
+        {      "-1B", 3,  "0D", 2,  "0C", 2 },
+        {      "-12", 3, "3E8", 3, "3D6", 3 },
+        {       "-2", 2,  "02", 2,  "00", 2 }
     };
     size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
     kryptos_mp_value_t *x, *factor = NULL, *mod, *e, *r;

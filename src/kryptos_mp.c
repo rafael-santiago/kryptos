@@ -1994,11 +1994,6 @@ kryptos_mp_value_t *kryptos_mp_barret_reduction(kryptos_mp_value_t *x,
         return NULL;
     }
 
-    if (x->neg) {
-        // INFO(Rafael): x must be positive or zero.
-        return NULL;
-    }
-
     // WARN(Rafael): Also, x cannot be greater than (mod << 1), but let's skip this check. Let's just assume that
     //               the user know it.
 
@@ -2035,6 +2030,14 @@ kryptos_mp_value_t *kryptos_mp_barret_reduction(kryptos_mp_value_t *x,
     }
 
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&temp, x), kryptos_mp_barret_reduction_epilogue);
+
+    if (x->neg) {
+        r = temp;
+        temp = NULL;
+        kryptos_mp_mod(&r, (kryptos_mp_value_t *)mod);
+        goto kryptos_mp_barret_reduction_epilogue;
+    }
+
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_mul(&temp, *factor), kryptos_mp_barret_reduction_epilogue);
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_rsh(&temp, *sh), kryptos_mp_barret_reduction_epilogue);
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_mul(&temp, mod), kryptos_mp_barret_reduction_epilogue);
