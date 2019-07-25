@@ -2092,6 +2092,10 @@ KUTE_TEST_CASE(kryptos_mp_barret_reduction_tests)
     struct test_ctx test_vector[] = {
         {       "0E", 2,  "11", 2,  "0E", 2 },
         {       "-E", 2,  "11", 2,  "03", 2 },
+        // INFO(Rafael): Barret's reduction only works for x >= 0 && x <= mod^2.
+        //               Anyway, for convenience issues, the function will use standard long division
+        //               when a negative x or x >= mod^2 is passed.
+        {     "9C40", 4,  "11", 2,  "10", 2 },
         {       "12", 2,  "11", 2,  "01", 2 },
         {       "FA", 2,  "11", 2,  "0C", 2 },
         {      "-12", 3,  "11", 2,  "10", 2 },
@@ -2118,16 +2122,8 @@ KUTE_TEST_CASE(kryptos_mp_barret_reduction_tests)
     r = kryptos_mp_barret_reduction(x, &factor, &sh, mod);
     KUTE_ASSERT(r != NULL);
 
-    // INFO(Rafael): Barret's reduction only works for x >= 0 && x <= mod^2.
-    //               Thus, the returned value should be something different from 16,
-    //               40000 > 289.
-
-    e = kryptos_hex_value_as_mp("10", 2);
-    KUTE_ASSERT(kryptos_mp_ne(r, e) == 1);
-
     kryptos_del_mp_value(x);
     kryptos_del_mp_value(r);
-    kryptos_del_mp_value(e);
     kryptos_del_mp_value(factor);
     factor = NULL;
     kryptos_del_mp_value(mod);

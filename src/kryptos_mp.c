@@ -2031,21 +2031,29 @@ kryptos_mp_value_t *kryptos_mp_barret_reduction(kryptos_mp_value_t *x,
 
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&temp, x), kryptos_mp_barret_reduction_epilogue);
 
-    if (x->neg) {
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&m, mod), kryptos_mp_barret_reduction_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_lsh(&m, 1), kryptos_mp_barret_reduction_epilogue);
+
+    if (x->neg || kryptos_mp_ge(x, m)) {
+        kryptos_del_mp_value(m);
+        m = NULL;
         r = temp;
         temp = NULL;
         kryptos_mp_mod(&r, (kryptos_mp_value_t *)mod);
         goto kryptos_mp_barret_reduction_epilogue;
     }
 
+    kryptos_del_mp_value(m);
+    m = NULL;
+
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_mul(&temp, *factor), kryptos_mp_barret_reduction_epilogue);
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_rsh(&temp, *sh), kryptos_mp_barret_reduction_epilogue);
-    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_mul(&temp, mod), kryptos_mp_barret_reduction_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_mul(&temp, (kryptos_mp_value_t *)mod), kryptos_mp_barret_reduction_epilogue);
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&r, x), kryptos_mp_barret_reduction_epilogue);
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub(&r, temp), kryptos_mp_barret_reduction_epilogue);
 
-    if (kryptos_mp_gt(r, mod)) {
-        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub(&r, mod), kryptos_mp_barret_reduction_epilogue);
+    if (kryptos_mp_ge(r, mod)) {
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub(&r, (kryptos_mp_value_t *)mod), kryptos_mp_barret_reduction_epilogue);
     }
 
 kryptos_mp_barret_reduction_epilogue:
