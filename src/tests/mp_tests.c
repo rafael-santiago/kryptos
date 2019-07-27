@@ -2243,7 +2243,7 @@ CUTE_TEST_CASE(kryptos_mp_mod_tests)
     }
 CUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_mp_barret_reduction_tests)
+CUTE_TEST_CASE(kryptos_mp_barrett_reduction_tests)
     struct test_ctx {
         kryptos_u8_t *x;
         size_t x_size;
@@ -2256,7 +2256,7 @@ CUTE_TEST_CASE(kryptos_mp_barret_reduction_tests)
     struct test_ctx test_vector[] = {
         {       "0E", 2,  "11", 2,  "0E", 2 },
         {       "-E", 2,  "11", 2,  "03", 2 },
-        // INFO(Rafael): Barret's reduction only works for x >= 0 && x <= mod^2.
+        // INFO(Rafael): Barrett's reduction only works for x >= 0 && x <= mod^2.
         //               Anyway, for convenience issues, the function will use standard long division
         //               when a negative x or x >= mod^2 is passed.
         {     "9C40", 4,  "11", 2,  "10", 2 },
@@ -2271,19 +2271,19 @@ CUTE_TEST_CASE(kryptos_mp_barret_reduction_tests)
     kryptos_mp_value_t *x, *factor = NULL, *mod, *e, *r;
     size_t sh;
 
-    CUTE_ASSERT(kryptos_mp_barret_reduction(NULL, &factor, &sh, mod) == NULL);
+    CUTE_ASSERT(kryptos_mp_barrett_reduction(NULL, &factor, &sh, mod) == NULL);
 
     x = kryptos_hex_value_as_mp("9C40", 4);
     CUTE_ASSERT(x != NULL);
 
-    CUTE_ASSERT(kryptos_mp_barret_reduction(x, NULL, &sh, mod) == NULL);
-    CUTE_ASSERT(kryptos_mp_barret_reduction(x, &factor, NULL, mod) == NULL);
-    CUTE_ASSERT(kryptos_mp_barret_reduction(x, &factor, &sh, NULL) == NULL);
+    CUTE_ASSERT(kryptos_mp_barrett_reduction(x, NULL, &sh, mod) == NULL);
+    CUTE_ASSERT(kryptos_mp_barrett_reduction(x, &factor, NULL, mod) == NULL);
+    CUTE_ASSERT(kryptos_mp_barrett_reduction(x, &factor, &sh, NULL) == NULL);
 
     mod = kryptos_hex_value_as_mp("11", 2);
     CUTE_ASSERT(mod != NULL);
 
-    r = kryptos_mp_barret_reduction(x, &factor, &sh, mod);
+    r = kryptos_mp_barrett_reduction(x, &factor, &sh, mod);
     CUTE_ASSERT(r != NULL);
 
     kryptos_del_mp_value(x);
@@ -2299,7 +2299,7 @@ CUTE_TEST_CASE(kryptos_mp_barret_reduction_tests)
         CUTE_ASSERT(mod != NULL);
         e = kryptos_hex_value_as_mp(test_vector[t].e, test_vector[t].e_size);
         CUTE_ASSERT(e != NULL);
-        r = kryptos_mp_barret_reduction(x, &factor, &sh, mod);
+        r = kryptos_mp_barrett_reduction(x, &factor, &sh, mod);
         CUTE_ASSERT(factor != NULL);
         CUTE_ASSERT(r != NULL);
         //printf("e = "); kryptos_print_mp(e);

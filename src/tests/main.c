@@ -19,6 +19,7 @@
 #include "ecc_tests.h"
 
 CUTE_TEST_CASE(kryptos_test_monkey)
+
     // CLUE(Rafael): Before adding a new test try to find out the best place that it fits.
     //               At first glance you should consider the utility that it implements into the library.
 
@@ -267,8 +268,8 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_mul_s_tests);
     CUTE_RUN_TEST(kryptos_mp_mod_tests);
     CUTE_RUN_TEST(kryptos_mp_get_bitmap_tests);
-    // INFO(Rafael): Barret reduction depends on kryptos_mp_get_bitmap(), so it needs to run after that.
-    CUTE_RUN_TEST(kryptos_mp_barret_reduction_tests);
+    // INFO(Rafael): Barrett reduction depends on kryptos_mp_get_bitmap(), so it needs to run after that.
+    CUTE_RUN_TEST(kryptos_mp_barrett_reduction_tests);
 
     // INFO(Rafael): This encoding function depends on multiprecision stuff, this is because we need
     //               to test it later than other encoding stuff.

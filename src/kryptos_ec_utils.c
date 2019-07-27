@@ -85,11 +85,11 @@ void kryptos_ec_add(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_pt_t *q,
 #define kryptos_ec_pt_mod_p(pt, p, pt_rem) {\
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(pt_rem).x, (pt)->x), kryptos_ec_add_epilogue);\
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&(pt_rem).y, (pt)->y), kryptos_ec_add_epilogue);\
-    KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barret_reduction((pt_rem).x, &factor, &sh, p), kryptos_ec_add_epilogue);\
+    KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barrett_reduction((pt_rem).x, &factor, &sh, p), kryptos_ec_add_epilogue);\
     kryptos_del_mp_value((pt_rem).x);\
     (pt_rem).x = md;\
     md = NULL;\
-    KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barret_reduction((pt_rem).y, &factor, &sh, p), kryptos_ec_add_epilogue);\
+    KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barrett_reduction((pt_rem).y, &factor, &sh, p), kryptos_ec_add_epilogue);\
     kryptos_del_mp_value((pt_rem).y);\
     (pt_rem).y = md;\
     md = NULL;\
@@ -128,7 +128,7 @@ void kryptos_ec_add(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_pt_t *q,
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&temp1, curve->p), kryptos_ec_add_epilogue);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&temp1, q_mod.y), kryptos_ec_add_epilogue);
         //printf("[add] Q.y = "); kryptos_print_mp(temp1);
-        KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barret_reduction(temp1, &factor, &sh, curve->p), kryptos_ec_add_epilogue);
+        KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barrett_reduction(temp1, &factor, &sh, curve->p), kryptos_ec_add_epilogue);
         kryptos_del_mp_value(temp1);
         temp1 = md;
         md = NULL;
@@ -152,7 +152,7 @@ void kryptos_ec_add(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_pt_t *q,
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_assign_mp_value(&temp1, p_mod.x), kryptos_ec_add_epilogue);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&temp1, q_mod.x), kryptos_ec_add_epilogue);
     //printf("[add] temp = "); kryptos_print_mp(temp1);
-    KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barret_reduction(temp1, &factor, &sh, curve->p), kryptos_ec_add_epilogue);
+    KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barrett_reduction(temp1, &factor, &sh, curve->p), kryptos_ec_add_epilogue);
     kryptos_del_mp_value(temp1);
     temp1 = md;
     md = NULL;
@@ -168,7 +168,7 @@ void kryptos_ec_add(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_pt_t *q,
     //printf("[add] slope = "); kryptos_print_mp(slope);
     kryptos_del_mp_value(temp2);
     temp2 = NULL;
-    KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barret_reduction(slope, &factor, &sh, curve->p), kryptos_ec_add_epilogue);
+    KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barrett_reduction(slope, &factor, &sh, curve->p), kryptos_ec_add_epilogue);
     kryptos_del_mp_value(slope);
     slope = md;
     md = NULL;
@@ -181,7 +181,7 @@ void kryptos_ec_add(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_pt_t *q,
     //printf("[add] R.x = "); kryptos_print_mp((*r)->x);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&(*r)->x, q_mod.x), kryptos_ec_add_epilogue);
     //printf("[add] R.x = "); kryptos_print_mp((*r)->x);
-    KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barret_reduction((*r)->x, &factor, &sh, curve->p), kryptos_ec_add_epilogue);
+    KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barrett_reduction((*r)->x, &factor, &sh, curve->p), kryptos_ec_add_epilogue);
     kryptos_del_mp_value((*r)->x);
     (*r)->x = md;
     md = NULL;
@@ -196,7 +196,7 @@ void kryptos_ec_add(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_pt_t *q,
     //printf("[add] R.y = "); kryptos_print_mp((*r)->y);
     KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&(*r)->y, p_mod.y), kryptos_ec_add_epilogue);
     //printf("[add] R.y = "); kryptos_print_mp((*r)->y);
-    KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barret_reduction((*r)->y, &factor, &sh, curve->p), kryptos_ec_add_epilogue);
+    KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barrett_reduction((*r)->y, &factor, &sh, curve->p), kryptos_ec_add_epilogue);
     kryptos_del_mp_value((*r)->y);
     (*r)->y = md;
     md = NULL;
@@ -291,7 +291,7 @@ void kryptos_ec_dbl(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_t *curve
         //printf("\t[dbl] slope = "); kryptos_print_mp(slope);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_mul_s(&slope, temp1), kryptos_ec_dbl_epilogue);
         //printf("\t[dbl] slope = "); kryptos_print_mp(slope);
-        KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barret_reduction(slope, &factor, &sh, curve->p), kryptos_ec_dbl_epilogue);
+        KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barrett_reduction(slope, &factor, &sh, curve->p), kryptos_ec_dbl_epilogue);
         kryptos_del_mp_value(slope);
         slope = md;
         md = NULL;
@@ -304,7 +304,7 @@ void kryptos_ec_dbl(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_t *curve
         //printf("\t[dbl] R.x = "); kryptos_print_mp((*r)->x);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&(*r)->x, p->x), kryptos_ec_dbl_epilogue);
         //printf("\t[dbl] R.x = "); kryptos_print_mp((*r)->x);
-        KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barret_reduction((*r)->x, &factor, &sh, curve->p), kryptos_ec_dbl_epilogue);
+        KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barrett_reduction((*r)->x, &factor, &sh, curve->p), kryptos_ec_dbl_epilogue);
         kryptos_del_mp_value((*r)->x);
         (*r)->x = md;
         md = NULL;
@@ -319,7 +319,7 @@ void kryptos_ec_dbl(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_t *curve
         //printf("\t[dbl] R.y = "); kryptos_print_mp((*r)->y);
         KRYPTOS_EC_UTILS_DO_OR_DIE(kryptos_mp_sub_s(&(*r)->y, p->y), kryptos_ec_dbl_epilogue);
         //printf("\t[dbl] R.y = "); kryptos_print_mp((*r)->y);
-        KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barret_reduction((*r)->y, &factor, &sh, curve->p), kryptos_ec_dbl_epilogue);
+        KRYPTOS_EC_UTILS_DO_OR_DIE(md = kryptos_mp_barrett_reduction((*r)->y, &factor, &sh, curve->p), kryptos_ec_dbl_epilogue);
         kryptos_del_mp_value((*r)->y);
         (*r)->y = md;
         md = NULL;

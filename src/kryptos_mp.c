@@ -1981,10 +1981,10 @@ kryptos_mp_mod_epilogue:
     return done;
 }
 
-kryptos_mp_value_t *kryptos_mp_barret_reduction(kryptos_mp_value_t *x,
-                                                kryptos_mp_value_t **factor,
-                                                size_t *sh,
-                                                const kryptos_mp_value_t *mod) {
+kryptos_mp_value_t *kryptos_mp_barrett_reduction(kryptos_mp_value_t *x,
+                                                 kryptos_mp_value_t **factor,
+                                                 size_t *sh,
+                                                 const kryptos_mp_value_t *mod) {
 
     kryptos_mp_value_t *temp = NULL, *m = NULL, *r = NULL;
     size_t bitmap_size;
