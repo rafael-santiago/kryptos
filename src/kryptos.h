@@ -74,6 +74,7 @@
 #include <kryptos_curves.h>
 
 #include <kryptos_ecdh.h>
+#include <kryptos_ecdsa.h>
 
 #ifndef KRYPTOS_KERNEL_MODE
 # include <string.h>
@@ -518,6 +519,8 @@ kryptos_ ## label_name:\
 #define kryptos_pss_hash(hname) kryptos_oaep_hash(hname)
 
 #define kryptos_dsa_hash(hname) kryptos_ ## hname ## _hash
+
+#define kryptos_ecdsa_hash(hname) kryptos_ ## hname ## _hash, kryptos_ ## hname ## _hash_size
 
 #define kryptos_hash(hname, ktask, data, data_size, hex) {\
     (ktask)->in = data;\

@@ -357,6 +357,14 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_ecdh_process_xchg_tests);
     CUTE_RUN_TEST(kryptos_ecdh_process_xchg_with_stdcurves_tests);
 
+    if (CUTE_GET_OPTION("skip-ecdsa-signature-tests") == NULL) {
+        CUTE_RUN_TEST(kryptos_ecdsa_mk_key_pair_tests);
+        CUTE_RUN_TEST(kryptos_ecdsa_digital_signature_scheme_tests);
+        CUTE_RUN_TEST(kryptos_ecdsa_digital_signature_scheme_c99_tests);
+    } else {
+        printf("WARN: The ECDSA signature tests were skipped.\n");
+    }
+
 //    CUTE_RUN_TEST(poke_bloody_poke);
 CUTE_TEST_CASE_END
 

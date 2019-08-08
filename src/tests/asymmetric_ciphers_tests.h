@@ -84,4 +84,10 @@ CUTE_DECLARE_TEST_CASE(kryptos_ecdh_process_xchg_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_ecdh_process_xchg_with_stdcurves_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_ecdsa_mk_key_pair_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests);
+
 #endif

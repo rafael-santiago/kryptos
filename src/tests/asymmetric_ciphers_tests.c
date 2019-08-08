@@ -3535,3 +3535,483 @@ CUTE_TEST_CASE(kryptos_ecdh_process_xchg_with_stdcurves_tests)
         kryptos_clear_ecdh_xchg_ctx(bob_ecdh);
     }
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_ecdsa_mk_key_pair_tests)
+    kryptos_u8_t *k_pub = NULL, *k_priv = NULL, *temp = NULL;
+    size_t k_pub_size, k_priv_size, temp_size;
+    kryptos_curve_ctx *curve;
+
+    curve = kryptos_new_standard_curve(kBrainPoolP160R1);
+
+    CUTE_ASSERT(curve != NULL);
+
+    CUTE_ASSERT(kryptos_ecdsa_mk_key_pair(NULL, &k_pub, &k_pub_size, &k_priv, &k_priv_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_ecdsa_mk_key_pair(curve, NULL, &k_pub_size, &k_priv, &k_priv_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_ecdsa_mk_key_pair(curve, &k_pub, NULL, &k_priv, &k_priv_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_ecdsa_mk_key_pair(curve, &k_pub, &k_pub_size, NULL, &k_priv_size) == kKryptosInvalidParams);
+    CUTE_ASSERT(kryptos_ecdsa_mk_key_pair(curve, &k_pub, &k_pub_size, &k_priv, NULL) == kKryptosInvalidParams);
+
+    CUTE_ASSERT(kryptos_ecdsa_mk_key_pair(curve, &k_pub, &k_pub_size, &k_priv, &k_priv_size) == kKryptosSuccess);
+
+    CUTE_ASSERT(k_pub != NULL);
+    CUTE_ASSERT(k_pub_size != 0);
+    CUTE_ASSERT(k_priv != NULL);
+    CUTE_ASSERT(k_priv_size != 0);
+
+    printf(" *** ECDSA PUBLIC KEY:\n\n");
+    printf("%s", k_pub);
+
+    printf("\n *** ECDSA PRIVATE KEY:\n\n");
+    printf("%s", k_priv);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_P, k_pub, k_pub_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_A, k_pub, k_pub_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_B, k_pub, k_pub_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_Q, k_pub, k_pub_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_AX, k_pub, k_pub_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_AY, k_pub, k_pub_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_BX, k_pub, k_pub_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_BY, k_pub, k_pub_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    CUTE_ASSERT(kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_D, k_pub, k_pub_size, &temp_size) == NULL);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_P, k_priv, k_priv_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_A, k_priv, k_priv_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_B, k_priv, k_priv_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_Q, k_priv, k_priv_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_AX, k_priv, k_priv_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_AY, k_priv, k_priv_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_D, k_priv, k_priv_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    // INFO(Rafael): Point B can be public but in the context of the private buffer it is useless.
+
+    CUTE_ASSERT(kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_BX, k_priv, k_priv_size, &temp_size) == NULL);
+
+    CUTE_ASSERT(kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_BY, k_priv, k_priv_size, &temp_size) == NULL);
+
+    kryptos_freeseg(k_pub, k_pub_size);
+    kryptos_freeseg(k_priv, k_priv_size);
+    kryptos_del_curve_ctx(curve);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
+    kryptos_u8_t *k_pub =  "-----BEGIN ECDSA P-----\n"
+                           "D2IVlRPYs5Wtx99g3Flwc19KXuk=\n"
+                           "-----END ECDSA P-----\n"
+                           "-----BEGIN ECDSA A-----\n"
+                           "AMP36JdddNq6Yb7idOuAouJ7DjQ=\n"
+                           "-----END ECDSA A-----\n"
+                           "-----BEGIN ECDSA B-----\n"
+                           "WF5n2MiV7L0tqk8TEjRClYWaWB4=\n"
+                           "-----END ECDSA B-----\n"
+                           "-----BEGIN ECDSA Q-----\n"
+                           "CfxgnkApUNSRWd9g3Flwc19KXuk=\n"
+                           "-----END ECDSA Q-----\n"
+                           "-----BEGIN ECDSA A X-----\n"
+                           "w9u8vfda6zFGjJNiT2o/6hav1b4=\n"
+                           "-----END ECDSA A X-----\n"
+                           "-----BEGIN ECDSA A Y-----\n"
+                           "IWPaFmOXnGZBR/k4w44aekfLZxY=\n"
+                           "-----END ECDSA A Y-----\n"
+                           "-----BEGIN ECDSA B X-----\n"
+                           "3T/6+Igmd9UL01UDsbNOs77YCJc=\n"
+                           "-----END ECDSA B X-----\n"
+                           "-----BEGIN ECDSA B Y-----\n"
+                           "Lyv51/HVjMULdIKWv33Np7TEaZo=\n"
+                           "-----END ECDSA B Y-----\n";
+    kryptos_u8_t *k_priv = "-----BEGIN ECDSA D-----\n"
+                           "sPJxcQ9mORQv2iJ76Y0g0zmMfFU=\n"
+                           "-----END ECDSA D-----\n"
+                           "-----BEGIN ECDSA P-----\n"
+                           "D2IVlRPYs5Wtx99g3Flwc19KXuk=\n"
+                           "-----END ECDSA P-----\n"
+                           "-----BEGIN ECDSA A-----\n"
+                           "AMP36JdddNq6Yb7idOuAouJ7DjQ=\n"
+                           "-----END ECDSA A-----\n"
+                           "-----BEGIN ECDSA B-----\n"
+                           "WF5n2MiV7L0tqk8TEjRClYWaWB4=\n"
+                           "-----END ECDSA B-----\n"
+                           "-----BEGIN ECDSA Q-----\n"
+                           "CfxgnkApUNSRWd9g3Flwc19KXuk=\n"
+                           "-----END ECDSA Q-----\n"
+                           "-----BEGIN ECDSA A X-----\n"
+                           "w9u8vfda6zFGjJNiT2o/6hav1b4=\n"
+                           "-----END ECDSA A X-----\n"
+                           "-----BEGIN ECDSA A Y-----\n"
+                           "IWPaFmOXnGZBR/k4w44aekfLZxY=\n"
+                           "-----END ECDSA A Y-----\n";
+    kryptos_task_ctx bob_task, alice_task, *bob = &bob_task, *alice = &alice_task;
+    kryptos_u8_t *message = "Ain't it hard to stumble\n"
+                            "And land in some funny lagoon?\n"
+                            "Ain't it hard to stumble\n"
+                            "And land in some muddy lagoon?\n"
+                            "Especially when it's nine below zero\n"
+                            "And three o'clock in the afternoon.";
+    kryptos_u8_t *temp;
+    size_t temp_size;
+
+    kryptos_task_init_as_null(bob);
+    kryptos_task_init_as_null(alice);
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+
+    bob->in_size = strlen(message);
+    bob->in = message;
+    bob->key = k_priv;
+    bob->key_size = strlen(k_priv);
+    bob->arg[0] = kryptos_sha256_hash;
+    bob->arg[1] = kryptos_sha256_hash_size;
+    bob->cipher = kKryptosCipherECDSA;
+
+    kryptos_ecdsa_sign(&bob);
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+
+    printf(" *** SIGNED OUTPUT:\n\n%s\n", bob->out);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_X, bob->out, bob->out_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_R, bob->out, bob->out_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_S, bob->out, bob->out_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    CUTE_ASSERT(kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_D, bob->out, bob->out_size, &temp_size) == NULL);
+
+    alice->in_size = bob->out_size;
+    alice->in = bob->out;
+    alice->key = k_pub;
+    alice->key_size = strlen(k_pub);
+    alice->arg[0] = kryptos_sha256_hash;
+    alice->arg[1] = kryptos_sha256_hash_size;
+    alice->cipher = kKryptosCipherECDSA;
+
+    kryptos_ecdsa_verify(&alice);
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+
+    CUTE_ASSERT(alice->out != NULL);
+    CUTE_ASSERT(memcmp(alice->out, message, alice->out_size) == 0);
+
+    printf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+
+    alice->in_size = bob->out_size;
+    alice->in = (kryptos_u8_t *) kryptos_newseg(alice->in_size + 1);
+    memcpy(alice->in, bob->out, alice->in_size);
+    alice->key = k_pub;
+    alice->key_size = strlen(k_pub);
+    alice->arg[0] = kryptos_sha256_hash;
+    alice->arg[1] = kryptos_sha256_hash_size;
+    alice->cipher = kKryptosCipherECDSA;
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_X, alice->in, alice->in_size) == 1);
+    printf(" *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", alice->in);
+
+    kryptos_ecdsa_verify(&alice);
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
+    CUTE_ASSERT(alice->result == kKryptosInvalidSignature);
+    CUTE_ASSERT(alice->result_verbose != NULL);
+    CUTE_ASSERT(alice->out == NULL);
+    CUTE_ASSERT(alice->out_size == 0);
+    kryptos_freeseg(alice->in, alice->in_size + 1);
+
+    printf(" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+
+    alice->in_size = bob->out_size;
+    alice->in = (kryptos_u8_t *) kryptos_newseg(alice->in_size + 1);
+    memset(alice->in, 0, alice->in_size + 1);
+    memcpy(alice->in, bob->out, alice->in_size);
+    alice->key = k_pub;
+    alice->key_size = strlen(k_pub);
+    alice->arg[0] = kryptos_sha256_hash;
+    alice->arg[1] = kryptos_sha256_hash_size;
+    alice->cipher = kKryptosCipherECDSA;
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_R, alice->in, alice->in_size) == 1);
+    printf(" *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", alice->in);
+
+    kryptos_ecdsa_verify(&alice);
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
+    CUTE_ASSERT(alice->result == kKryptosInvalidSignature);
+    CUTE_ASSERT(alice->result_verbose != NULL);
+    CUTE_ASSERT(alice->out == NULL);
+    CUTE_ASSERT(alice->out_size == 0);
+    kryptos_freeseg(alice->in, alice->in_size + 1);
+
+    printf(" *** Nice, the signed output with r corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+
+    alice->in_size = bob->out_size;
+    alice->in = (kryptos_u8_t *) kryptos_newseg(alice->in_size + 1);
+    memcpy(alice->in, bob->out, alice->in_size);
+    alice->key = k_pub;
+    alice->key_size = strlen(k_pub);
+    alice->arg[0] = kryptos_sha256_hash;
+    alice->arg[1] = kryptos_sha256_hash_size;
+    alice->cipher = kKryptosCipherECDSA;
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_S, alice->in, alice->in_size) == 1);
+    printf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", alice->in);
+
+    kryptos_ecdsa_verify(&alice);
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
+    CUTE_ASSERT(alice->result == kKryptosInvalidSignature);
+    CUTE_ASSERT(alice->result_verbose != NULL);
+    CUTE_ASSERT(alice->out == NULL);
+    CUTE_ASSERT(alice->out_size == 0);
+    kryptos_freeseg(alice->in, alice->in_size + 1);
+
+    printf(" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+
+    alice->in_size = bob->out_size;
+    alice->in = (kryptos_u8_t *) kryptos_newseg(alice->in_size + 1);
+    memset(alice->in, 0, alice->in_size + 1);
+    memcpy(alice->in, bob->out, alice->in_size);
+    alice->key = k_pub;
+    alice->key_size = strlen(k_pub);
+    alice->arg[0] = kryptos_sha256_hash;
+    alice->arg[1] = kryptos_sha256_hash_size;
+    alice->cipher = kKryptosCipherECDSA;
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_X, alice->in, alice->in_size) == 1);
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_R, alice->in, alice->in_size) == 1);
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_S, alice->in, alice->in_size) == 1);
+    printf(" *** SIGNED OUTPUT WITH ALL DATA CORRUPTED:\n\n%s\n", alice->in);
+
+    kryptos_ecdsa_verify(&alice);
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
+    CUTE_ASSERT(alice->result == kKryptosInvalidSignature);
+    CUTE_ASSERT(alice->out == NULL);
+    CUTE_ASSERT(alice->out_size == 0);
+    kryptos_freeseg(alice->in, alice->in_size + 1);
+
+    printf(" *** Nice, the signed output with all data corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
+    kryptos_u8_t *k_pub =  "-----BEGIN ECDSA P-----\n"
+                           "D2IVlRPYs5Wtx99g3Flwc19KXuk=\n"
+                           "-----END ECDSA P-----\n"
+                           "-----BEGIN ECDSA A-----\n"
+                           "AMP36JdddNq6Yb7idOuAouJ7DjQ=\n"
+                           "-----END ECDSA A-----\n"
+                           "-----BEGIN ECDSA B-----\n"
+                           "WF5n2MiV7L0tqk8TEjRClYWaWB4=\n"
+                           "-----END ECDSA B-----\n"
+                           "-----BEGIN ECDSA Q-----\n"
+                           "CfxgnkApUNSRWd9g3Flwc19KXuk=\n"
+                           "-----END ECDSA Q-----\n"
+                           "-----BEGIN ECDSA A X-----\n"
+                           "w9u8vfda6zFGjJNiT2o/6hav1b4=\n"
+                           "-----END ECDSA A X-----\n"
+                           "-----BEGIN ECDSA A Y-----\n"
+                           "IWPaFmOXnGZBR/k4w44aekfLZxY=\n"
+                           "-----END ECDSA A Y-----\n"
+                           "-----BEGIN ECDSA B X-----\n"
+                           "N+cMHywPRCiHn0K4dlt92Nu1cis=\n"
+                           "-----END ECDSA B X-----\n"
+                           "-----BEGIN ECDSA B Y-----\n"
+                           "4uOswC9GoazmV6zopR0OqX77Nm0=\n"
+                           "-----END ECDSA B Y-----\n";
+    kryptos_u8_t *k_priv = "-----BEGIN ECDSA D-----\n"
+                           "Lulg0pwcb42v8FiMaUc1B2PMntk=\n"
+                           "-----END ECDSA D-----\n"
+                           "-----BEGIN ECDSA P-----\n"
+                           "D2IVlRPYs5Wtx99g3Flwc19KXuk=\n"
+                           "-----END ECDSA P-----\n"
+                           "-----BEGIN ECDSA A-----\n"
+                           "AMP36JdddNq6Yb7idOuAouJ7DjQ=\n"
+                           "-----END ECDSA A-----\n"
+                           "-----BEGIN ECDSA B-----\n"
+                           "WF5n2MiV7L0tqk8TEjRClYWaWB4=\n"
+                           "-----END ECDSA B-----\n"
+                           "-----BEGIN ECDSA Q-----\n"
+                           "CfxgnkApUNSRWd9g3Flwc19KXuk=\n"
+                           "-----END ECDSA Q-----\n"
+                           "-----BEGIN ECDSA A X-----\n"
+                           "w9u8vfda6zFGjJNiT2o/6hav1b4=\n"
+                           "-----END ECDSA A X-----\n"
+                           "-----BEGIN ECDSA A Y-----\n"
+                           "IWPaFmOXnGZBR/k4w44aekfLZxY=\n"
+                           "-----END ECDSA A Y-----\n";
+    kryptos_task_ctx bob_task, alice_task, *bob = &bob_task, *alice = &alice_task;
+    kryptos_u8_t *message = "Ain't gonna hang no picture\n"
+                            "Ain't gonna hang no picture frame\n"
+                            "Ain't gonna hang no picture\n"
+                            "Or hang no picture frame\n"
+                            "Well, I might look like Robert Ford\n"
+                            "But I feel just like a'Jesse James.";
+    kryptos_u8_t *temp, *signature;
+    size_t temp_size;
+
+    kryptos_task_init_as_null(bob);
+    kryptos_task_init_as_null(alice);
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+
+    kryptos_sign(ecdsa, bob, message, strlen(message), k_priv, strlen(k_priv), kryptos_ecdsa_hash(sha256));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
+
+    printf(" *** SIGNED OUTPUT:\n\n%s\n", bob->out);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_X, bob->out, bob->out_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_R, bob->out, bob->out_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_S, bob->out, bob->out_size, &temp_size);
+    CUTE_ASSERT(temp != NULL);
+    kryptos_freeseg(temp, temp_size);
+
+    CUTE_ASSERT(kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_D, bob->out, bob->out_size, &temp_size) == NULL);
+
+    kryptos_verify(ecdsa, alice, bob->out, bob->out_size, k_pub, strlen(k_pub), kryptos_ecdsa_hash(sha256));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
+
+    CUTE_ASSERT(alice->out != NULL);
+    CUTE_ASSERT(memcmp(alice->out, message, alice->out_size) == 0);
+
+    printf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+
+    signature = (kryptos_u8_t *) kryptos_newseg(bob->out_size);
+    memcpy(signature, bob->out, bob->out_size);
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_X, signature, bob->out_size) == 1);
+    printf(" *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", signature);
+
+    kryptos_verify(ecdsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), kryptos_ecdsa_hash(sha256));
+    kryptos_freeseg(signature, bob->out_size);
+
+    printf(" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+
+    signature = (kryptos_u8_t *) kryptos_newseg(bob->out_size + 1);
+    memset(signature, 0, bob->out_size + 1);
+    memcpy(signature, bob->out, bob->out_size);
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_R, signature, bob->out_size) == 1);
+    printf(" *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", signature);
+
+    kryptos_verify(ecdsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), kryptos_ecdsa_hash(sha256));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
+    CUTE_ASSERT(alice->result == kKryptosInvalidSignature);
+    CUTE_ASSERT(alice->result_verbose != NULL);
+    CUTE_ASSERT(alice->out == NULL);
+    CUTE_ASSERT(alice->out_size == 0);
+    kryptos_freeseg(signature, bob->out_size + 1);
+
+    printf(" *** Nice, the signed output with r corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+
+    signature = (kryptos_u8_t *) kryptos_newseg(bob->out_size + 1);
+    memset(signature, 0, bob->out_size + 1);
+    memcpy(signature, bob->out, bob->out_size);
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_S, signature, bob->out_size) == 1);
+    printf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", signature);
+
+    kryptos_verify(ecdsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), kryptos_ecdsa_hash(sha256));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
+    CUTE_ASSERT(alice->result == kKryptosInvalidSignature);
+    CUTE_ASSERT(alice->result_verbose != NULL);
+    CUTE_ASSERT(alice->out == NULL);
+    CUTE_ASSERT(alice->out_size == 0);
+    kryptos_freeseg(signature, bob->out_size + 1);
+
+    printf(" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+
+    signature = (kryptos_u8_t *) kryptos_newseg(bob->out_size + 1);
+    memset(signature, 0, bob->out_size + 1);
+    memcpy(signature, bob->out, bob->out_size);
+
+    printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_X, signature, bob->out_size) == 1);
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_R, signature, bob->out_size) == 1);
+    CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_S, signature, bob->out_size) == 1);
+    printf(" *** SIGNED OUTPUT WITH ALL DATA CORRUPTED:\n\n%s\n", signature);
+
+    kryptos_verify(ecdsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), kryptos_ecdsa_hash(sha256));
+
+    CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
+    CUTE_ASSERT(alice->result == kKryptosInvalidSignature);
+    CUTE_ASSERT(alice->out == NULL);
+    CUTE_ASSERT(alice->out_size == 0);
+    kryptos_freeseg(signature, bob->out_size + 1);
+
+    printf(" *** Nice, the signed output with all data corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
