@@ -274,6 +274,18 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_ecdh_process_xchg_tests);
     KUTE_RUN_TEST(kryptos_ecdh_process_xchg_with_stdcurves_tests);
 
+#ifndef SKIP_ECDSA_SIGNATURE_TESTS
+    KUTE_RUN_TEST(kryptos_ecdsa_mk_key_pair_tests);
+    KUTE_RUN_TEST(kryptos_ecdsa_digital_signature_scheme_tests);
+    KUTE_RUN_TEST(kryptos_ecdsa_digital_signature_scheme_c99_tests);
+#else
+# if defined(__FreeBSD__) || defined(__NetBSD__)
+    uprintf("WARN: The ECDSA signature tests were skipped.\n");
+# elif defined(__linux__)
+    printk(KERN_ERR "WARN: The ECDSA signature tests were skipped.\n");
+# endif
+#endif
+
     //KUTE_RUN_TEST(kryptos_new_standard_curve_tests);
 KUTE_TEST_CASE_END
 
