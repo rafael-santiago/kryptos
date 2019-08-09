@@ -1195,7 +1195,8 @@ As you may have noticed the general form of using the ``kryptos_run_cipher_hmac`
 ## Asymmetric stuff
 
 Until now the ``Diffie-Hellman-Merkle`` key exchange scheme and the algorithms ``RSA`` and ``Elgamal`` are available.
-For digital signature the library includes ``RSA`` (basic scheme), ``RSA-EMSA-PSS`` and the widely used ``DSA``.
+For digital signature the library includes ``RSA`` (basic scheme), ``RSA-EMSA-PSS`` and the widely used ``DSA``, also
+its elliptic curve version, ``ECDSA`` is available.
 
 Firstly let's discuss the ``DHKE`` and after the other stuff.
 
@@ -2729,7 +2730,7 @@ Now is time to talk about digital signature.
 
 ### Digital signature
 
-Until now two digital signature algorithms are implemented: ``RSA`` and ``DSA``. The two implementions are
+Until now three digital signature algorithms are implemented: ``RSA``, ``DSA`` and ``ECDSA``. The three implementions are
 a general way of signing data so the details about the sign protocol is up to you. Maybe you want to encrypt
 and then sign or just signing, it depends on your requirements. Due to it, the sign process only focuses in ascertain
 if the input is authenticated or not. When the verification process fails the output buffer from the task will be
@@ -3006,11 +3007,11 @@ size, the private key buffer and its size.
 Similarly, the ``kryptos_verify()`` expects the signature algorithm name, a pointer to the task context, the signed buffer and
 its size, the public key buffer and its size.
 
-The ``RSA`` signature tends to be time consuming depending on the size of the input and of course the modulus. There is also
+The ``RSA`` signature tends to be time consuming depending on the size of the input and, of course, the modulus. There is also
 a trick that can speed up the verification process and it can be achieved by choosing a small public key factor,
 however, it is out of scope of the manual. You can also hash the input before signing. Moreover it is about generic tricks.
 
-The standard RSA digital signature is weak. The best practice to avoid some flaws present in the standard way is to pad the
+The standard RSA digital signature is weak. The best practice to avoid some flaws present in the standard way is by padding the
 input. Thus, kryptos implements the ``RSA-EMSA-PSS`` signature scheme. The following code sample shows how to use this
 stronger scheme with ``c99`` conveniences.
 
@@ -3428,6 +3429,171 @@ expects a ``HASHID`` and you can find the available hash ids in **Table 4**. Whe
 parameter, the ``SHA-1`` is chosen as the default hash function. In the sample above ``SHA-256`` is used, in order to
 pass it without the macro you should use ``kryptos_sha256_hash`` since it is the function name that performs ``SHA-256``
 stuff in kryptos (a.k.a the ``SHA-256`` hash processor).
+
+## ECDSA
+
+The algorithm ``ECDSA`` is the elliptic curve version of the standard ``DSA``. ``ECDSA`` also needs to a key pair calculation
+before signing and verifying stuff. The following code shows how to generate a ``ECDSA`` key pair:
+
+```c
+/*
+ *                                Copyright (C) 2019 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+int main(void) {
+    kryptos_u8_t *k_pub = NULL, *k_priv = NULL;
+    size_t k_pub_size, k_priv_size;
+    kryptos_curve_ctx *curve = NULL;
+    int exit_code = 0;
+
+    if ((curve = kryptos_new_standard_curve(kBrainPoolP160R1)) == NULL) {
+        printf("ERROR: on curve data loading.\n");
+        exit_code = 1;
+        goto epilogue;
+    }
+
+    if (kryptos_ecdsa_mk_key_pair(curve,
+                                  &k_pub, &k_pub_size, &k_priv, &k_priv_size) != kKryptosSuccess) {
+        printf("ERROR: on key pair calculation.\n");
+        exit_code = 1;
+        goto epilogue;
+    }
+
+    printf("*** PUBLIC KEY:\n\n%s\n*** PRIVATE KEY:\n\n%s\n", k_pub, k_priv);
+
+epilogue:
+
+    if (k_pub != NULL) {
+        kryptos_freeseg(k_pub, k_pub_size);
+    }
+
+    if (k_priv != NULL) {
+        kryptos_freeseg(k_priv, k_priv_size);
+    }
+
+    if (curve != NULL) {
+        kryptos_del_curve_ctx(curve);
+    }
+
+    return exit_code;
+}
+```
+
+The code below brings a general idea of how sign and verify data by using ``ECDSA`` and ``Kryptos C99`` conveniences:
+
+```c
+/*
+ *                                Copyright (C) 2019 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <stdio.h>
+
+int main(void) {
+    int exit_code = 0;
+    kryptos_u8_t *k_pub = "-----BEGIN ECDSA P-----\n"
+                          "D2IVlRPYs5Wtx99g3Flwc19KXuk=\n"
+                          "-----END ECDSA P-----\n"
+                          "-----BEGIN ECDSA A-----\n"
+                          "AMP36JdddNq6Yb7idOuAouJ7DjQ=\n"
+                          "-----END ECDSA A-----\n"
+                          "-----BEGIN ECDSA B-----\n"
+                          "WF5n2MiV7L0tqk8TEjRClYWaWB4=\n"
+                          "-----END ECDSA B-----\n"
+                          "-----BEGIN ECDSA Q-----\n"
+                          "CfxgnkApUNSRWd9g3Flwc19KXuk=\n"
+                          "-----END ECDSA Q-----\n"
+                          "-----BEGIN ECDSA A X-----\n"
+                          "w9u8vfda6zFGjJNiT2o/6hav1b4=\n"
+                          "-----END ECDSA A X-----\n"
+                          "-----BEGIN ECDSA A Y-----\n"
+                          "IWPaFmOXnGZBR/k4w44aekfLZxY=\n"
+                          "-----END ECDSA A Y-----\n"
+                          "-----BEGIN ECDSA B X-----\n"
+                          "C9yDV1KdKboG3FLz2hkjuxc6eHk=\n"
+                          "-----END ECDSA B X-----\n"
+                          "-----BEGIN ECDSA B Y-----\n"
+                          "o2LrZwgxAjDmOYoV6d+BotCbuuE=\n"
+                          "-----END ECDSA B Y-----\n";
+    kryptos_u8_t *k_priv = "-----BEGIN ECDSA D-----\n"
+                           "7DukDiEY0PFh2MuVORfJkudyJqE=\n"
+                           "-----END ECDSA D-----\n"
+                           "-----BEGIN ECDSA P-----\n"
+                           "D2IVlRPYs5Wtx99g3Flwc19KXuk=\n"
+                           "-----END ECDSA P-----\n"
+                           "-----BEGIN ECDSA A-----\n"
+                           "AMP36JdddNq6Yb7idOuAouJ7DjQ=\n"
+                           "-----END ECDSA A-----\n"
+                           "-----BEGIN ECDSA B-----\n"
+                           "WF5n2MiV7L0tqk8TEjRClYWaWB4=\n"
+                           "-----END ECDSA B-----\n"
+                           "-----BEGIN ECDSA Q-----\n"
+                           "CfxgnkApUNSRWd9g3Flwc19KXuk=\n"
+                           "-----END ECDSA Q-----\n"
+                           "-----BEGIN ECDSA A X-----\n"
+                           "w9u8vfda6zFGjJNiT2o/6hav1b4=\n"
+                           "-----END ECDSA A X-----\n"
+                           "-----BEGIN ECDSA A Y-----\n"
+                           "IWPaFmOXnGZBR/k4w44aekfLZxY=\n"
+                           "-----END ECDSA A Y-----\n";
+    kryptos_task_ctx a_ctx, b_ctx, *alice = &a_ctx, *bob = &b_ctx;
+    kryptos_u8_t *message = "Never ever hardcode keys Bob!";
+
+    kryptos_task_init_as_null(alice);
+    kryptos_task_init_as_null(bob);
+
+    printf("ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+
+    // INFO(Rafael): Alice signs the message and sends it to Bob...
+
+    kryptos_sign(ecdsa, alice, message, strlen(message),
+                 k_priv, strlen(k_priv), kryptos_ecdsa_hash(sha3_512));
+
+    if (!kryptos_last_task_succeed(alice)) {
+        printf("ERROR: when signing the input.\n");
+        exit_code = 1;
+        goto epilogue;
+    }
+
+    printf("SIGNED MESSAGE:\n\n%s\n\n", alice->out);
+
+    // INFO(Rafael): ... Now Bob verifies the authenticity of it...
+
+    kryptos_verify(ecdsa, bob, alice->out, alice->out_size,
+                   k_pub, strlen(k_pub), kryptos_ecdsa_hash(sha3_512));
+
+    if (!kryptos_last_task_succeed(bob)) {
+        if (bob->result == kKryptosInvalidSignature) {
+            // INFO(Rafael): Try to corrupt some parameter in the alice->out PEM buffer and you
+            //               will fall into this branch.
+            printf("SIGNATURE ERROR: %s\n", bob->result_verbose);
+        } else {
+            printf("GENERAL ERROR: when verifying signature.\n");
+        }
+    }
+
+    printf("AUTHENTICATED MESSAGE:\n\n'");
+    fwrite(bob->out, 1, bob->out_size, stdout);
+    printf("'\n\n");
+
+epilogue:
+
+    kryptos_task_free(alice, KRYPTOS_TASK_OUT);
+    kryptos_task_free(bob, KRYPTOS_TASK_OUT);
+
+    return exit_code;
+}
+```
 
 ## Secondary stuff
 

@@ -175,6 +175,7 @@ additional options. The **Table 3** gathers the options related with the kernel 
 | ``--dh-use-q-size``                      | Enables the DH tests to use recommended bit sizes for s parameters (slower)  |
 | ``--skip-rsa-signature-tests``           | Skips the RSA signature tests. The tests execution becomes faster.           |
 | ``--skip-dsa-signature-tests``           | Skips the DSA signature tests. The tests execution becomes faster.           |
+| ``--skip-ecdsa-signature-tests``         | Skips the ECDSA signature tests. The tests execution becomes faster.         |
 | ``--mk-samples``                         | Requests the code samples build.                                             |
 | ``--toolset=<gcc or clang>``             | Defines the C compiler (the default is ``GCC``).                             |
 | ``--language=<c or cc>``                 | Defines the compiler's language (samples only). Obviously the default is ``c``. |
