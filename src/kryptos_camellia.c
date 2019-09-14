@@ -237,27 +237,27 @@ static void kryptos_camellia_ld_128_user_key(kryptos_u32_t *key, const kryptos_u
     size_t w, b;
     kryptos_ld_user_key_prologue(key, 4, user_key, user_key_size, kp, kp_end, w, b, return);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 4, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 4, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 4, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 4, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 4, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 4, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 4, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 4, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 4, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 4, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 4, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 4, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 4, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 4, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 4, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 4, w, b, kp, kp_end, kryptos_camellia_ld_128_user_key_epilogue);
 
-    kryptos_ld_user_key_epilogue(kryptos_camellia_ld_128_user_key_epilogue, key, w, b, kp, kp_end);
+    kryptos_ld_user_key_epilogue(kryptos_camellia_ld_128_user_key_epilogue, key, 4, w, b, kp, kp_end);
 }
 
 static void kryptos_camellia_ld_192_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
@@ -265,37 +265,37 @@ static void kryptos_camellia_ld_192_user_key(kryptos_u32_t *key, const kryptos_u
     size_t w, b;
     kryptos_ld_user_key_prologue(key, 6, user_key, user_key_size, kp, kp_end, w, b, return);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 6, w, b, kp, kp_end, kryptos_camellia_ld_192_user_key_epilogue);
 
-    kryptos_ld_user_key_epilogue(kryptos_camellia_ld_192_user_key_epilogue, key, w, b, kp, kp_end);
+    kryptos_ld_user_key_epilogue(kryptos_camellia_ld_192_user_key_epilogue, key, 6, w, b, kp, kp_end);
 }
 
 static void kryptos_camellia_ld_256_user_key(kryptos_u32_t *key, const kryptos_u8_t *user_key, const size_t user_key_size) {
@@ -303,47 +303,47 @@ static void kryptos_camellia_ld_256_user_key(kryptos_u32_t *key, const kryptos_u
     size_t w, b;
     kryptos_ld_user_key_prologue(key, 8, user_key, user_key_size, kp, kp_end, w, b, return);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_camellia_ld_256_user_key_epilogue);
 
-    kryptos_ld_user_key_epilogue(kryptos_camellia_ld_256_user_key_epilogue, key, w, b, kp, kp_end);
+    kryptos_ld_user_key_epilogue(kryptos_camellia_ld_256_user_key_epilogue, key, 8, w, b, kp, kp_end);
 }
 
 static void kryptos_camellia_keyexp_128(const kryptos_u8_t *key, const size_t key_size, struct kryptos_camellia_subkeys *sks) {

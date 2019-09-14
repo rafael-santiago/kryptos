@@ -127,9 +127,11 @@
     w = 0;\
 }
 
-#define kryptos_ld_user_key_byte(state, w, b, kp, kp_end, epilogue) {\
+#define kryptos_ld_user_key_byte(state, state_nr, w, b, kp, kp_end, epilogue) {\
     if (kp == kp_end) goto epilogue;\
-    state[w] = (state[w] << 8) | *kp;\
+    if (w < state_nr) {\
+        state[w] = (state[w] << 8) | *kp;\
+    }\
     kp++;\
     b = (b + 1) % sizeof(state[0]);\
     if (b == 0) {\
@@ -137,17 +139,21 @@
     }\
 }
 
-#define kryptos_ld_user_key_epilogue(epilogue, state, w, b, kp, kp_end) {\
+#define kryptos_ld_user_key_epilogue(epilogue, state, state_nr, w, b, kp, kp_end) {\
 epilogue:\
-    state[w] = state[w] << (b << 3);\
+    if (w < state_nr) {\
+        state[w] = state[w] << (b << 3);\
+    }\
     b = w = 0;\
     kp = NULL;\
     kp_end = NULL;\
 }
 
-#define kryptos_custom_ld_user_key_epilogue(epilogue, state, w, b, kp, kp_end, stmt) {\
+#define kryptos_custom_ld_user_key_epilogue(epilogue, state, state_nr, w, b, kp, kp_end, stmt) {\
 epilogue:\
-    state[w] = state[w] << (b << 3);\
+    if (w < state_nr) {\
+        state[w] = state[w] << (b << 3);\
+    }\
     stmt;\
     b = w = 0;\
     kp = NULL;\

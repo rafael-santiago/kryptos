@@ -505,7 +505,7 @@ static void kryptos_serpent_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *
 
 #undef kryptos_ld_user_key_byte_serpent_craziness101
 
-    kryptos_ld_user_key_epilogue(kryptos_aes_ld_user_key_epilogue, key, w, b, kp, kp_end);
+    kryptos_ld_user_key_epilogue(kryptos_aes_ld_user_key_epilogue, key, 8, w, b, kp, kp_end);
 }
 
 static void kryptos_serpent_key_schedule(const kryptos_u8_t *key, const size_t key_size, struct kryptos_serpent_subkeys *sks) {

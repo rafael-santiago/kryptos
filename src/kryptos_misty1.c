@@ -146,23 +146,23 @@ static void kryptos_misty1_ld_user_key(kryptos_u16_t *key, const kryptos_u8_t *u
     size_t w, b;
 
     kryptos_ld_user_key_prologue(key, 8, user_key, user_key_size, kp, kp_end, w, b, return);
-        kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
-        kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
-        kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
-        kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
-        kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
-        kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
-        kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
-        kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
-        kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
-        kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
-        kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
-        kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
-        kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
-        kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
-        kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
-        kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
-    kryptos_ld_user_key_epilogue(kryptos_misty1_ld_user_key_epilogue, key, w, b, kp, kp_end);
+        kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
+        kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
+        kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
+        kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
+        kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
+        kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
+        kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
+        kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
+        kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
+        kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
+        kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
+        kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
+        kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
+        kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
+        kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
+        kryptos_ld_user_key_byte(key, 8, w, b, kp, kp_end, kryptos_misty1_ld_user_key_epilogue);
+    kryptos_ld_user_key_epilogue(kryptos_misty1_ld_user_key_epilogue, key, 8, w, b, kp, kp_end);
 }
 
 static void kryptos_misty1_sched_skeys(const kryptos_u8_t *key, const size_t key_size, struct kryptos_misty1_subkeys *sks) {

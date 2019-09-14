@@ -722,16 +722,16 @@ static void kryptos_des_ld_user_key(kryptos_u32_t *key, const kryptos_u8_t *user
 
     kryptos_ld_user_key_prologue(key, 2, user_key, user_key_size, kp, kp_end, w, b, return);
 
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_des_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_des_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_des_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_des_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_des_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_des_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_des_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(key, w, b, kp, kp_end, kryptos_des_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 2, w, b, kp, kp_end, kryptos_des_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 2, w, b, kp, kp_end, kryptos_des_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 2, w, b, kp, kp_end, kryptos_des_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 2, w, b, kp, kp_end, kryptos_des_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 2, w, b, kp, kp_end, kryptos_des_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 2, w, b, kp, kp_end, kryptos_des_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 2, w, b, kp, kp_end, kryptos_des_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(key, 2, w, b, kp, kp_end, kryptos_des_ld_user_key_epilogue);
 
-    kryptos_ld_user_key_epilogue(kryptos_des_ld_user_key_epilogue, key, w, b, kp, kp_end);
+    kryptos_ld_user_key_epilogue(kryptos_des_ld_user_key_epilogue, key, 2, w, b, kp, kp_end);
 }
 
 static int kryptos_des_expand_user_key(struct kryptos_des_subkeys *sks, const kryptos_u8_t *key, const size_t key_size) {

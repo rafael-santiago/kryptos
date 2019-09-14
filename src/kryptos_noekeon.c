@@ -168,23 +168,23 @@ static void kryptos_noekeon_key_sched(const kryptos_u8_t *key, const size_t key_
     } else {
         // INFO(Rafael): Let's save one call.
         kryptos_ld_user_key_prologue(sks->K, 4, key, key_size, kp, kp_end, w, b, return);
-            kryptos_ld_user_key_byte(sks->K, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
-            kryptos_ld_user_key_byte(sks->K, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
-            kryptos_ld_user_key_byte(sks->K, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
-            kryptos_ld_user_key_byte(sks->K, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
-            kryptos_ld_user_key_byte(sks->K, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
-            kryptos_ld_user_key_byte(sks->K, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
-            kryptos_ld_user_key_byte(sks->K, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
-            kryptos_ld_user_key_byte(sks->K, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
-            kryptos_ld_user_key_byte(sks->K, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
-            kryptos_ld_user_key_byte(sks->K, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
-            kryptos_ld_user_key_byte(sks->K, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
-            kryptos_ld_user_key_byte(sks->K, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
-            kryptos_ld_user_key_byte(sks->K, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
-            kryptos_ld_user_key_byte(sks->K, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
-            kryptos_ld_user_key_byte(sks->K, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
-            kryptos_ld_user_key_byte(sks->K, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
-        kryptos_ld_user_key_epilogue(kryptos_noekeon_ld_user_key_epilogue, sks->K, w, b, kp, kp_end);
+            kryptos_ld_user_key_byte(sks->K, 4, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
+            kryptos_ld_user_key_byte(sks->K, 4, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
+            kryptos_ld_user_key_byte(sks->K, 4, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
+            kryptos_ld_user_key_byte(sks->K, 4, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
+            kryptos_ld_user_key_byte(sks->K, 4, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
+            kryptos_ld_user_key_byte(sks->K, 4, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
+            kryptos_ld_user_key_byte(sks->K, 4, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
+            kryptos_ld_user_key_byte(sks->K, 4, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
+            kryptos_ld_user_key_byte(sks->K, 4, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
+            kryptos_ld_user_key_byte(sks->K, 4, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
+            kryptos_ld_user_key_byte(sks->K, 4, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
+            kryptos_ld_user_key_byte(sks->K, 4, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
+            kryptos_ld_user_key_byte(sks->K, 4, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
+            kryptos_ld_user_key_byte(sks->K, 4, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
+            kryptos_ld_user_key_byte(sks->K, 4, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
+            kryptos_ld_user_key_byte(sks->K, 4, w, b, kp, kp_end, kryptos_noekeon_ld_user_key_epilogue);
+        kryptos_ld_user_key_epilogue(kryptos_noekeon_ld_user_key_epilogue, sks->K, 4, w, b, kp, kp_end);
     }
 }
 

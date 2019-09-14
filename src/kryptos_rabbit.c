@@ -189,24 +189,24 @@ static void kryptos_rabbit_ld_user_key(kryptos_u16_t *K, const kryptos_u8_t *key
 
     kryptos_ld_user_key_prologue(KK, 8, ktemp, key_size, kp, kp_end, w, b, goto kryptos_rabbit_ld_user_key_epilogue);
 
-    kryptos_ld_user_key_byte(KK, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(KK, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(KK, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(KK, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(KK, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(KK, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(KK, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(KK, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(KK, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(KK, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(KK, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(KK, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(KK, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(KK, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(KK, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
-    kryptos_ld_user_key_byte(KK, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(KK, 8, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(KK, 8, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(KK, 8, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(KK, 8, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(KK, 8, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(KK, 8, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(KK, 8, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(KK, 8, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(KK, 8, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(KK, 8, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(KK, 8, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(KK, 8, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(KK, 8, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(KK, 8, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(KK, 8, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
+    kryptos_ld_user_key_byte(KK, 8, w, b, kp, kp_end, kryptos_rabbit_ld_user_key_epilogue);
 
-    kryptos_ld_user_key_epilogue(kryptos_rabbit_ld_user_key_epilogue, KK, w, b, kp, kp_end);
+    kryptos_ld_user_key_epilogue(kryptos_rabbit_ld_user_key_epilogue, KK, 8, w, b, kp, kp_end);
 
     if (ktemp != NULL && ktemp != key) {
         kryptos_freeseg(ktemp, key_size);
