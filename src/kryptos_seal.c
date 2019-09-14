@@ -75,10 +75,14 @@ static void kryptos_seal_ga(kryptos_u32_t *a, int i, kryptos_u32_t *o) {
 
     // INFO(Rafael): initializing X[0]..X[79]
     X[0] = (kryptos_u32_t) i;
-    for (w = 1; w < 16; X[w] = 0L, w++)
-        ;
-    for (; w < 80; X[w] = kryptos_seal_roll((X[w-3] ^ X[w-8] ^ X[w-14] ^ X[w-16]), 1), w++)
-        ;
+    for (w = 1; w < 16; w++) {
+        X[w] = 0L;
+    }
+
+    for (; w < 80; w++) {
+        X[w] = kryptos_seal_roll((X[w-3] ^ X[w-8] ^ X[w-14] ^ X[w-16]), 1);
+    }
+
     // INFO(Rafael): user key splitting
     A = a[0];
     B = a[1];
@@ -341,8 +345,9 @@ static void kryptos_seal_xor(const kryptos_u32_t *in,
                              kryptos_u32_t *out) {
     size_t k;
     //  INFO(Rafael): The additive stuff.
-    for (k = 0; k < key_size; out[k] = in[k] ^ key[k], k++)
-        ;
+    for (k = 0; k < key_size; k++) {
+         out[k] = in[k] ^ key[k];
+    }
 }
 
 void kryptos_seal_cipher(kryptos_task_ctx **ktask) {
