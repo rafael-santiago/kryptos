@@ -237,7 +237,7 @@ static void kryptos_seal_keystream(const kryptos_u8_t *userkey, const size_t use
     //               please do not improve! Just accept and use.
     //
 
-    memset(kstream->keystream, 0L, sizeof(kryptos_u32_t) * KRYPTOS_SEALKEYSTREAMSIZE);
+    memset(kstream->keystream, 0L, sizeof(kstream->keystream));
     LL = kstream->L >> 5;
     for (p = 0, l = 0; p < LL; l++) {
         kryptos_seal_initialize(kstream->n, l, A, B, C, D, n1, n2, n3, n4, R, T);
@@ -353,7 +353,7 @@ static void kryptos_seal_xor(const kryptos_u32_t *in,
 void kryptos_seal_cipher(kryptos_task_ctx **ktask) {
     size_t wordsize = 0, w, wt;
     const kryptos_u8_t *in_p, *in_end;
-    kryptos_u8_t *out_p;
+    kryptos_u8_t *out_p, *out_p_end;
 #ifdef KRYPTOS_KERNEL_MODE
     static struct kryptos_seal_keystream_ctx kstream;
     static kryptos_u32_t inblock[KRYPTOS_SEALKEYSTREAMSIZE], outblock[KRYPTOS_SEALKEYSTREAMSIZE];
@@ -413,6 +413,7 @@ void kryptos_seal_cipher(kryptos_task_ctx **ktask) {
 
     (*ktask)->out_size = (*ktask)->in_size;
     out_p = (*ktask)->out;
+    out_p_end = out_p + (*ktask)->out_size;
 
     w = 0;
 
@@ -425,20 +426,28 @@ void kryptos_seal_cipher(kryptos_task_ctx **ktask) {
         if ( (bb) == 0 ) (ww)++;\
 }
 
-#define kryptos_seal_fill_out(out, block, ww, ww_nr) {\
+#define kryptos_seal_fill_out(out, end, block, ww, ww_nr) {\
     for ((ww) = 0; (ww) < (ww_nr); (ww)++) {\
-        *(out) = (block)[(ww)] >> 24;\
-        (out)++;\
-        *(out) = ((block)[(ww)] >> 16) & 0xff;\
-        (out)++;\
-        *(out) = ((block)[(ww)] >> 8) & 0xff;\
-        (out)++;\
-        *(out) = (block)[(ww)] & 0xff;\
-        (out)++;\
+        if (out < end) {\
+            *(out) = (block)[(ww)] >> 24;\
+            (out)++;\
+            if (out < end) {\
+                *(out) = ((block)[(ww)] >> 16) & 0xff;\
+                (out)++;\
+                if (out < end) {\
+                    *(out) = ((block)[(ww)] >> 8) & 0xff;\
+                    (out)++;\
+                    if (out < end) {\
+                        *(out) = (block)[(ww)] & 0xff;\
+                        (out)++;\
+                    }\
+                }\
+            }\
+        }\
     }\
 }
 
-    memset(inblock, 0, sizeof(kryptos_u32_t) * KRYPTOS_SEALKEYSTREAMSIZE);
+    memset(inblock, 0, sizeof(inblock));
 
     while (in_p != in_end) {
         // INFO(Rafael).1.1: (...) Sometimes it sounds like a Monty Python sketch, isn't it?
@@ -463,7 +472,7 @@ void kryptos_seal_cipher(kryptos_task_ctx **ktask) {
             kryptos_seal_xor(inblock, kstream.keystream, wordsize, outblock);
             kstream.n++;
             if (wt > 0) {
-                kryptos_seal_fill_out(out_p, outblock, t, w - 1);
+                kryptos_seal_fill_out(out_p, out_p_end, outblock, t, w - 1);
             }
 
             switch (b) {
@@ -473,26 +482,30 @@ void kryptos_seal_cipher(kryptos_task_ctx **ktask) {
                     *(out_p + 1) = (outblock[w - 1] >> 16) & 0xff;
                     *(out_p + 2) = (outblock[w - 1] >>  8) & 0xff;
                     *(out_p + 3) =  outblock[w - 1] & 0xff;
+                    out_p += 4;
                     break;
 
                 case 1:
                     *out_p       = (outblock[w - 1] >> 24) & 0xff;
+                    out_p += 1;
                     break;
 
                 case 2:
                     *out_p       = (outblock[w - 1] >> 24) & 0xff;
                     *(out_p + 1) = (outblock[w - 1] >> 16) & 0xff;
+                    out_p += 2;
                     break;
 
                 case 3:
                     *out_p       = (outblock[w - 1] >> 24) & 0xff;
                     *(out_p + 1) = (outblock[w - 1] >> 16) & 0xff;
                     *(out_p + 2) = (outblock[w - 1] >>  8) & 0xff;
+                    out_p += 3;
                     break;
             }
 
             w = 0;
-            memset(inblock, 0, sizeof(kryptos_u32_t) * KRYPTOS_SEALKEYSTREAMSIZE);
+            memset(inblock, 0, sizeof(inblock));
             b = 0;
         }
     }
@@ -504,8 +517,8 @@ void kryptos_seal_cipher(kryptos_task_ctx **ktask) {
 #undef kryptos_seal_fill_out
 
 kryptos_seal_stream_epilogue:
-    memset(inblock, 0, sizeof(kryptos_u32_t) * KRYPTOS_SEALKEYSTREAMSIZE);
-    memset(outblock, 0, sizeof(kryptos_u32_t) * KRYPTOS_SEALKEYSTREAMSIZE);
+    memset(inblock, 0, sizeof(inblock));
+    memset(outblock, 0, sizeof(outblock));
     b = w = wordsize = 0;
     in_p = in_end = NULL;
     out_p = NULL;
