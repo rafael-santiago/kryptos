@@ -12,6 +12,9 @@
 #  include <unistd.h>
 # endif
 #endif
+#if defined(_WIN32)
+# include <windows.h>
+#endif
 
 #if defined(KRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY_FREAK_PARANOID_PERSON)
 # include <kryptos_random.h>
@@ -33,22 +36,32 @@
   MALLOC_DEFINE(M_KRYPTOS, "kryptos_general_memory_buffer", "buffer allocated by libkryptos");
 #endif // KRYPTOS_USER_MODE
 
-#if defined(KRYPTOS_USER_MODE) && !defined(_WIN32)
+#if defined(KRYPTOS_USER_MODE)
 static int g_kryptos_memory_avoid_ram_swap = 0;
+#endif
+
+#if defined(_WIN32)
+static BOOL g_kryptos_winproc_working_set_size_done = 0;
 #endif
 
 #if defined(KRYPTOS_USER_MODE)
 
 void kryptos_avoid_ram_swap(void) {
-#ifndef _WIN32
-    g_kryptos_memory_avoid_ram_swap = 1;
+#if defined(_WIN32)
+    SYSTEM_INFO sys_info;
+
+    if (!g_kryptos_winproc_working_set_size_done) {
+        GetSystemInfo(&sys_info);
+        g_kryptos_winproc_working_set_size_done = SetProcessWorkingSetSize(GetCurrentProcess(),
+                                                                           sys_info.dwPageSize,
+                                                                           sys_info.dwPageSize << 3);
+    }
 #endif
+    g_kryptos_memory_avoid_ram_swap = 1;
 }
 
 void kryptos_allow_ram_swap(void) {
-#ifndef _WIN32
     g_kryptos_memory_avoid_ram_swap = 0;
-#endif
 }
 
 #endif
@@ -85,7 +98,16 @@ void *kryptos_newseg(const size_t ssize) {
             segment = NULL;
         }
     }
+#elif defined(KRYPTOS_USER_MODE) && defined(_WIN32)
 
+    if (g_kryptos_memory_avoid_ram_swap && segment != NULL) {
+        if (VirtualLock(segment, ssize) == 0) {
+            perror("libkryptos/VirtualLock()");
+            // INFO(Rafael): If we cannot ensure the swap avoidance it is better to return a NULL segment.
+            kryptos_freeseg(segment, ssize);
+            segment = NULL;
+        }
+    }
 #endif
 
     return segment;
@@ -126,6 +148,10 @@ void kryptos_freeseg(void *seg, const size_t ssize) {
     offset = (size_t)seg % sysconf(_SC_PAGE_SIZE);
     if (g_kryptos_memory_avoid_ram_swap && ssize > 0) {
         munlock(seg - offset, ssize + offset);
+    }
+#elif defined(KRYPTOS_USER_MODE) && defined(_WIN32)
+    if (g_kryptos_memory_avoid_ram_swap && ssize > 0) {
+        VirtualUnlock(seg, ssize);
     }
 #endif
 
