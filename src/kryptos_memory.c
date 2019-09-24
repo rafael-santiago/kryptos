@@ -40,23 +40,9 @@
 static int g_kryptos_memory_avoid_ram_swap = 0;
 #endif
 
-#if defined(_WIN32)
-static BOOL g_kryptos_winproc_working_set_size_done = 0;
-#endif
-
 #if defined(KRYPTOS_USER_MODE)
 
 void kryptos_avoid_ram_swap(void) {
-#if defined(_WIN32)
-    SYSTEM_INFO sys_info;
-
-    if (!g_kryptos_winproc_working_set_size_done) {
-        GetSystemInfo(&sys_info);
-        g_kryptos_winproc_working_set_size_done = SetProcessWorkingSetSize(GetCurrentProcess(),
-                                                                           sys_info.dwPageSize,
-                                                                           sys_info.dwPageSize << 3);
-    }
-#endif
     g_kryptos_memory_avoid_ram_swap = 1;
 }
 
@@ -150,9 +136,12 @@ void kryptos_freeseg(void *seg, const size_t ssize) {
         munlock(seg - offset, ssize + offset);
     }
 #elif defined(KRYPTOS_USER_MODE) && defined(_WIN32)
-    if (g_kryptos_memory_avoid_ram_swap && ssize > 0) {
-        VirtualUnlock(seg, ssize);
-    }
+    // INFO(Rafael): Since the lock is page oriented. It is better hold it in memory
+    //               until process exits otherwise is possible unlock another locked
+    //               regions. By now we will not unlock anything.
+    //if (g_kryptos_memory_avoid_ram_swap && ssize > 0) {
+    //    VirtualUnlock(seg, ssize);
+    //}
 #endif
 
 #if defined(KRYPTOS_USER_MODE)

@@ -4222,10 +4222,8 @@ better approach is hold all locked data into a huge sensible area or only free l
 By default, any allocated memory by ``kryptos_newseg`` is able to be swapped. In order to disable the RAM swap avoidance call
 the function ``kryptos_allow_ram_swap()``.
 
-In Windows, the RAM swap avoidance is achieved by using VirtualLock from WINAPI function. When ``kryptos_avoid_ram_swap()``
-is called at first time, the minimum page size of the process will be defined for ``dwPageSize`` returned by GetSystemInfo
-function and the maximum page size will be set to ``dwPageSize * 8``. However, it is possible to change these range to any other
-by using the WINAPI function SetProcessWorkingSetSize.
+In Windows, the RAM swap avoidance is achieved by using VirtualLock from WINAPI function. The locked region will still locked
+until the related process exits.
 
 ## Key derivation functions
 
