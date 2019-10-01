@@ -2877,10 +2877,11 @@ CUTE_TEST_CASE(kryptos_dsa_mk_key_pair_tests)
     CUTE_ASSERT(k_pub != NULL && k_priv != NULL && k_pub_size > 0 && k_priv_size > 0);
 
     printf(" *** DSA PUBLIC KEY:\n\n");
-    printf("%s", k_pub);
+    fwrite(k_pub, 1, k_pub_size, stdout);
 
     printf("\n *** DSA PRIVATE KEY:\n\n");
-    printf("%s", k_priv);
+    fwrite(k_priv, 1, k_priv_size, stdout);
+    printf("\n");
 
     // INFO(Rafael): Verifying the public exported parameters.
 
@@ -3028,7 +3029,9 @@ CUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     CUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     CUTE_ASSERT(alice->out != NULL);
 
-    printf(" *** SIGNED OUTPUT:\n\n%s\n", alice->out);
+    printf(" *** SIGNED OUTPUT:\n\n");
+    fwrite(alice->out, 1, alice->out_size, stdout);
+    printf("\n");
 
     bob->in = alice->out;
     bob->in_size = alice->out_size;
@@ -3043,7 +3046,9 @@ CUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     CUTE_ASSERT(bob->out_size == m_size);
     CUTE_ASSERT(memcmp(bob->out, m, m_size) == 0);
 
-    printf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
+    printf(" *** AUTHENTICATED OUTPUT:\n\n'");
+    fwrite(bob->out, 1, bob->out_size, stdout);
+    printf("'\n\n");
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
 
@@ -3060,7 +3065,9 @@ CUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_R, bob->in, bob->in_size) == 1);
 
-    printf(" *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", bob->in);
+    printf(" *** SIGNED OUTPUT WITH R CORRUPTED:\n\n");
+    fwrite(bob->in, 1, bob->in_size, stdout);
+    printf("\n");
 
     kryptos_dsa_verify(&bob);
 
@@ -3086,7 +3093,9 @@ CUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_S, bob->in, bob->in_size) == 1);
 
-    printf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->in);
+    printf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n");
+    fwrite(bob->in, 1, bob->in_size, stdout);
+    printf("\n");
 
     kryptos_dsa_verify(&bob);
 
@@ -3113,7 +3122,9 @@ CUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_R, bob->in, bob->in_size) == 1);
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_S, bob->in, bob->in_size) == 1);
 
-    printf(" *** SIGNED OUTPUT WITH BOTH R AND S CORRUPTED:\n\n%s\n", bob->in);
+    printf(" *** SIGNED OUTPUT WITH BOTH R AND S CORRUPTED:\n\n");
+    fwrite(bob->in, 1, bob->in_size, stdout);
+    printf("\n");
 
     kryptos_dsa_verify(&bob);
 
@@ -3215,7 +3226,9 @@ CUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
     CUTE_ASSERT(bob->out != NULL);
 
-    printf(" *** SIGNED OUTPUT:\n\n%s\n", bob->out);
+    printf(" *** SIGNED OUTPUT:\n\n");
+    fwrite(bob->out, 1, bob->out_size, stdout);
+    printf("\n");
 
     kryptos_verify(dsa, alice, bob->out, bob->out_size, k_pub, strlen(k_pub), kryptos_dsa_hash(sha1));
 
@@ -3224,7 +3237,9 @@ CUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     CUTE_ASSERT(alice->out_size == m_size);
     CUTE_ASSERT(memcmp(alice->out, m, alice->out_size) == 0);
 
-    printf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
+    printf(" *** AUTHENTICATED OUTPUT:\n\n'");
+    fwrite(alice->out, 1, alice->out_size, stdout);
+    printf("'\n\n");
 
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
 
@@ -3559,10 +3574,11 @@ CUTE_TEST_CASE(kryptos_ecdsa_mk_key_pair_tests)
     CUTE_ASSERT(k_priv_size != 0);
 
     printf(" *** ECDSA PUBLIC KEY:\n\n");
-    printf("%s", k_pub);
+    fwrite(k_pub, 1, k_pub_size, stdout);
 
     printf("\n *** ECDSA PRIVATE KEY:\n\n");
-    printf("%s", k_priv);
+    fwrite(k_priv, 1, k_priv_size, stdout);
+    printf("\n");
 
     temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_P, k_pub, k_pub_size, &temp_size);
     CUTE_ASSERT(temp != NULL);
@@ -3709,7 +3725,9 @@ CUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
     kryptos_ecdsa_sign(&bob);
     CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
 
-    printf(" *** SIGNED OUTPUT:\n\n%s\n", bob->out);
+    printf(" *** SIGNED OUTPUT:\n\n");
+    fwrite(bob->out, 1, bob->out_size, stdout);
+    printf("\n");
 
     temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_X, bob->out, bob->out_size, &temp_size);
     CUTE_ASSERT(temp != NULL);
@@ -3739,7 +3757,9 @@ CUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
     CUTE_ASSERT(alice->out != NULL);
     CUTE_ASSERT(memcmp(alice->out, message, alice->out_size) == 0);
 
-    printf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
+    printf(" *** AUTHENTICATED OUTPUT:\n\n'");
+    fwrite(alice->out, 1, alice->out_size, stdout);
+    printf("'\n\n");
 
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
 
@@ -3755,7 +3775,9 @@ CUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
     printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_X, alice->in, alice->in_size) == 1);
-    printf(" *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", alice->in);
+    printf(" *** SIGNED OUTPUT WITH X CORRUPTED:\n\n");
+    fwrite(alice->in, 1, alice->in_size, stdout);
+    printf("\n");
 
     kryptos_ecdsa_verify(&alice);
     CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
@@ -3780,7 +3802,9 @@ CUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
     printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_R, alice->in, alice->in_size) == 1);
-    printf(" *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", alice->in);
+    printf(" *** SIGNED OUTPUT WITH R CORRUPTED:\n\n");
+    fwrite(alice->in, 1, alice->in_size, stdout);
+    printf("\n");
 
     kryptos_ecdsa_verify(&alice);
     CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
@@ -3804,7 +3828,9 @@ CUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
     printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
 
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_S, alice->in, alice->in_size) == 1);
-    printf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", alice->in);
+    printf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n");
+    fwrite(alice->in, 1, alice->in_size, stdout);
+    printf("\n");
 
     kryptos_ecdsa_verify(&alice);
     CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
@@ -3831,7 +3857,9 @@ CUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_X, alice->in, alice->in_size) == 1);
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_R, alice->in, alice->in_size) == 1);
     CUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_S, alice->in, alice->in_size) == 1);
-    printf(" *** SIGNED OUTPUT WITH ALL DATA CORRUPTED:\n\n%s\n", alice->in);
+    printf(" *** SIGNED OUTPUT WITH ALL DATA CORRUPTED:\n\n");
+    fwrite(alice->in, 1, alice->in_size, stdout);
+    printf("\n");
 
     kryptos_ecdsa_verify(&alice);
     CUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
@@ -3911,7 +3939,9 @@ CUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
 
     CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
 
-    printf(" *** SIGNED OUTPUT:\n\n%s\n", bob->out);
+    printf(" *** SIGNED OUTPUT:\n\n");
+    fwrite(bob->out, 1, bob->out_size, stdout);
+    printf("\n");
 
     temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_X, bob->out, bob->out_size, &temp_size);
     CUTE_ASSERT(temp != NULL);
@@ -3934,11 +3964,14 @@ CUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
     CUTE_ASSERT(alice->out != NULL);
     CUTE_ASSERT(memcmp(alice->out, message, alice->out_size) == 0);
 
-    printf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
+    printf(" *** AUTHENTICATED OUTPUT:\n\n'");
+    fwrite(alice->out, 1, alice->out_size, stdout);
+    printf("'\n\n");
 
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
 
-    signature = (kryptos_u8_t *) kryptos_newseg(bob->out_size);
+    signature = (kryptos_u8_t *) kryptos_newseg(bob->out_size + 1);
+    memset(signature, 0, bob->out_size + 1);
     memcpy(signature, bob->out, bob->out_size);
 
     printf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
