@@ -283,6 +283,9 @@ kryptos_mp_value_t *kryptos_assign_mp_value(kryptos_mp_value_t **dest,
         kryptos_freeseg((*dest)->data, (*dest)->data_size);
         (*dest)->data_size = src->data_size;
         (*dest)->data = (kryptos_mp_digit_t *) kryptos_newseg(src->data_size * sizeof(kryptos_mp_digit_t));
+        if ((*dest)->data == NULL) {
+            return NULL;
+        }
     }
 
     memset((*dest)->data, 0, (*dest)->data_size * sizeof(kryptos_mp_digit_t));
