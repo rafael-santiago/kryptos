@@ -3776,7 +3776,7 @@ kryptos_mp_value_t *kryptos_mp_modinv_rs(kryptos_mp_value_t *a, kryptos_mp_value
 
     if (kryptos_mp_gt(u, _1)) {
         kryptos_del_mp_value(r);
-        kryptos_hex_value_as_mp("00", 2);
+        r = kryptos_hex_value_as_mp("00", 2);
         done = 1;
         goto kryptos_mp_modinv_rsh_binary_epilogue;
     }
