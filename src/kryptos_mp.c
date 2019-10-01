@@ -276,13 +276,13 @@ kryptos_mp_value_t *kryptos_assign_mp_value(kryptos_mp_value_t **dest,
     }
 
     if ((*dest) == NULL) {
-        (*dest) = kryptos_new_mp_value(src->data_size << 3);
+        (*dest) = kryptos_new_mp_value(kryptos_mp_byte2bit(src->data_size));
     }
 
     if (src->data_size > (*dest)->data_size) {
         kryptos_freeseg((*dest)->data, (*dest)->data_size);
         (*dest)->data_size = src->data_size;
-        (*dest)->data = (kryptos_mp_digit_t *) kryptos_newseg(kryptos_mp_byte2bit(src->data_size));
+        (*dest)->data = (kryptos_mp_digit_t *) kryptos_newseg(src->data_size * sizeof(kryptos_mp_digit_t));
     }
 
     memset((*dest)->data, 0, (*dest)->data_size * sizeof(kryptos_mp_digit_t));
@@ -3813,6 +3813,7 @@ kryptos_mp_modinv_rsh_binary_epilogue:
 
     if (!done && r != NULL) {
         kryptos_del_mp_value(r);
+        r = NULL;
     }
 
     return r;
