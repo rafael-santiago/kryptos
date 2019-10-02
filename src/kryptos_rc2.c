@@ -319,7 +319,7 @@ static void kryptos_rc2_inflate_key(const kryptos_u8_t *key, const size_t key_si
     L[128 - Tn] = kryptos_rc2_PITABLE[L[128 - Tn] & TM];
 
     for (i = 127 - Tn; i >= 0; i--) {
-        L[i] = kryptos_rc2_PITABLE[L[i + 1] ^ L[i + Tn]]
+        L[i] = kryptos_rc2_PITABLE[L[i + 1] ^ L[i + Tn]];
     }
 
     for (i = 0, j = 0; i < 128; i += 2, j++) {
