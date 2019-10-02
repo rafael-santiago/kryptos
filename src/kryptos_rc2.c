@@ -290,19 +290,18 @@ static void kryptos_rc2_ld_user_key(kryptos_u16_t *key, const kryptos_u8_t *user
 
 static void kryptos_rc2_inflate_key(const kryptos_u8_t *key, const size_t key_size, struct kryptos_rc2_subkeys *sks) {
     ssize_t i;
-    size_t j, TM, Tn;
+    size_t j, TM, Tn, bit_nr;
     kryptos_u16_t K[64];
     kryptos_u8_t L[128];
     size_t T = key_size;
 
     kryptos_rc2_ld_user_key(K, key, key_size);
 
-    for (i = 0, j = 0; i < T; j++) {
+    for (i = 0, j = 0; j < 128; j++) {
         // INFO(Rafael): Dividing the L state into L_{words total x 2} bytes
-        L[j] = kryptos_rc2_get_byte(K[i], j % 2);
-        if(j % 2 == 1) {
-            i++;
-        }
+        bit_nr = j % 2;
+        L[j] = kryptos_rc2_get_byte(K[i], bit_nr);
+        i += bit_nr;
     }
 
     // INFO(Rafael): Evaluating TM.
@@ -326,7 +325,7 @@ static void kryptos_rc2_inflate_key(const kryptos_u8_t *key, const size_t key_si
         sks->K[j] = (kryptos_u16_t) L[i + 1] << 8 | (kryptos_u16_t) L[i];
     }
 
-    i = j = Tn = TM = T = 0;
+    i = j = Tn = TM = T = bit_nr = 0;
     memset(L, 0, sizeof(L));
     memset(K, 0, sizeof(K));
 }
