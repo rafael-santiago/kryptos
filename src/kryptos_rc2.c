@@ -312,16 +312,19 @@ static void kryptos_rc2_inflate_key(const kryptos_u8_t *key, const size_t key_si
 
     // INFO(Rafael): start of the expansion.
 
-    for (i = T; i < 128; L[i] = kryptos_rc2_PITABLE[(L[i - 1] + L[i - T]) % 256], i++)
-        ;
+    for (i = T; i < 128; i++) {
+        L[i] = kryptos_rc2_PITABLE[(L[i - 1] + L[i - T]) % 256];
+    }
 
     L[128 - Tn] = kryptos_rc2_PITABLE[L[128 - Tn] & TM];
 
-    for (i = 127 - Tn; i >= 0; L[i] = kryptos_rc2_PITABLE[L[i + 1] ^ L[i + Tn]], i--)
-        ;
+    for (i = 127 - Tn; i >= 0; i--) {
+        L[i] = kryptos_rc2_PITABLE[L[i + 1] ^ L[i + Tn]]
+    }
 
-    for (i = 0, j = 0; i < 128; sks->K[j] = (kryptos_u16_t) L[i + 1] << 8 | (kryptos_u16_t) L[i], i += 2, j++)
-        ;
+    for (i = 0, j = 0; i < 128; i += 2, j++) {
+        sks->K[j] = (kryptos_u16_t) L[i + 1] << 8 | (kryptos_u16_t) L[i];
+    }
 
     i = j = Tn = TM = T = 0;
     memset(L, 0, sizeof(L));
