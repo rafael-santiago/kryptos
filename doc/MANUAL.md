@@ -4225,6 +4225,10 @@ the function ``kryptos_allow_ram_swap()``.
 In Windows, the RAM swap avoidance is achieved by using VirtualLock from WINAPI function. The locked region will still locked
 until the related process exits.
 
+If you are using ``MINIX``, sorry, but until the current version (3.3.0) it does not implement mlock. The functions
+``kryptos_avoid_ram_swap()`` and ``kryptos_allow_ram_swap()`` are present just for compability issues. These functions
+do nothing in ``MINIX``.
+
 ## Key derivation functions
 
 Until now ``kryptos`` has three key derivation functions implemented: ``HKDF``, ``PBKDF2`` and ``Argon2`` (version 19). The
