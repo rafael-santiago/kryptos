@@ -37,7 +37,9 @@ kryptos-tests.prologue() {
 
     $cflags = hefesto.sys.get_option("cflags");
     $user_option = hefesto.sys.get_option("no-hmac-tests");
-    if ($user_option.count() > 0) {
+    if ($user_option.count() > 0 || hefesto.sys.os_name() == "minix") {
+        # INFO(Rafael): The compilation attempt of those tests in current clang's version in Minix (3.3.0)
+        #               causes segmentation fault in clang. Thus let's avoid it in Minix from now on.
         $cflags.add_item("-DKRYPTOS_NO_HMAC_TESTS");
     }
 

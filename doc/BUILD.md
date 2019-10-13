@@ -303,6 +303,14 @@ Sherlock@221B:~/src/kryptos/src# hefesto --kernel-mode-tests --no-hmac-tests
 
 It depends on your location in the project's source tree.
 
+## Clang is exiting due some fault and not properly compiling libkryptos tests in MINIX
+
+If it is happening with you try to compile ``libkryptos`` with the following option:
+
+```
+Sherlock@221B:~/src/kryptos/src/tests/kernel# hefesto --no-hmac-tests
+```
+
 ## Are you searching for some build information not detailed here?
 
 Please let me know more by opening an [issue](https://github.com/rafael-santiago/kryptos/issues). Thank you!
