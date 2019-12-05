@@ -173,8 +173,8 @@ void *kryptos_realloc(void *addr, const size_t ssize) {
             kryptos_freeseg(new_area, ssize);
             new_area = NULL;
         }
-    }
 #  endif
+    }
     return new_area;
 # endif
 #elif defined(KRYPTOS_KERNEL_MODE) && (defined(__FreeBSD__) || defined(__NetBSD__))
