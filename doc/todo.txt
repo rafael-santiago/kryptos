@@ -1,0 +1,3 @@
+(A) Implement a build task that looks for forbidden functions usage. Such as libc functions. +Build,+Improvement,+SecWorries
+(A) Fix any ocurrence of forbidden functions. +Improvement,+SecWorries
+
