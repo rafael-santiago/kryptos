@@ -32,6 +32,93 @@ function check_compiler_language() : result type none {
     }
 }
 
+function has_bad_funcs(func_signatures type list, srcs type list, incs type list, cflags type list) : result type int {
+    var option type list;
+    $option = hefesto.sys.get_option("allow-bad-funcs");
+
+    if ($option.count() > 0) {
+        hefesto.sys.echo("\nWARN: Bad functions are being allowed.\n");
+        result 0;
+    }
+
+    var cmdline type string;
+    $cmdline = get_toolset_option_data();
+
+    var i type int;
+    $i = 0;
+    while ($i < $incs.count()) {
+        $cmdline = $cmdline + " -I\"" + $incs.item($i) + "\"";
+        $i = $i + 1;
+    }
+
+    var c type int;
+    $c = 0;
+    while ($c < $cflags.count()) {
+        $cmdline = $cmdline + " " + $cflags.item($c);
+        $c = $c + 1;
+    }
+
+    $cmdline = $cmdline + " -S -o .asm-out.s";
+
+    hefesto.sys.echo("\nBUILD INFO: Searching for direct references to bad functions...\n");
+
+    var founds type list;
+
+    var s type int;
+    $s = 0;
+    while ($s < $srcs.count() && $founds.count() == 0) {
+        hefesto.sys.echo("\t*** " + $srcs.item($s) + ": ");
+
+        if (hefesto.sys.run($cmdline + " \"" + $srcs.item($s) + "\"") != 0) {
+            hefesto.sys.echo("\nERROR: Unable to generate assembly file.\n");
+            result 1;
+        }
+
+        var f type int;
+        $f = 0;
+        while ($f < $func_signatures.count()) {
+            var regex type string;
+            $regex = "(call|mov).*[ \t]" + $func_signatures.item($f);
+            var bad_lines type list;
+            $bad_lines = hefesto.sys.lines_from_file(".asm-out.s", $regex);
+            if ($bad_lines.count() > 0 && $founds.index_of($func_signatures.item($f)) == -1) {
+                $founds.add_item($func_signatures.item($f));
+            }
+            $f = $f + 1;
+        }
+
+        if ($founds.count() > 0) {
+            hefesto.sys.echo("dirty.\n*** error.\n\n");
+            hefesto.sys.echo("ERROR: Calls to bad functions found in '" + $srcs.item($s) + "'\n" +
+                             "       Bad functions referenced:");
+
+            $f = 0;
+            while ($f < $founds.count()) {
+                if ($f > 0) {
+                    hefesto.sys.echo(", " + $founds.item($f));
+                } else {
+                    hefesto.sys.echo(" " + $founds.item($f));
+                }
+
+                $f = $f + 1;
+            }
+
+            hefesto.sys.echo("\n       Take a look at '" + hefesto.sys.pwd() + "/.asm-out.s'.\n\n");
+        } else {
+            hefesto.sys.rm(".asm-out.s");
+            hefesto.sys.echo("clean.\n");
+        }
+
+        $s = $s + 1;
+    }
+
+    if ($founds.count() == 0) {
+        hefesto.sys.echo("*** all clean.\n");
+    }
+
+    result ($founds.count() > 0);
+}
+
 local function get_language_option_data() : result type string {
     var language_option type list;
 

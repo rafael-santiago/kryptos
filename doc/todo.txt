@@ -1,3 +1,4 @@
-(A) Implement a build task that looks for forbidden functions usage. Such as libc functions. +Build,+Improvement,+SecWorries
+(A) Use by default kryptos_memset, kryptos_memcmp and kryptos_memcpy instead of memset,
+    memcmp and memcpy. +Improvement,+SecWorries
 (A) Fix any ocurrence of forbidden functions. +Improvement,+SecWorries
-
+x (A) Implement a build task that looks for forbidden functions usages. Such as libc functions. +Build,+Improvement,+SecWorries

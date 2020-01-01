@@ -52,6 +52,10 @@ kryptos.epilogue() {
         var oldcwd type string;
         var option type list;
 
+        if (has_bad_funcs(hefesto.sys.lines_from_file("BAD_FUNCS", ".*"), $sources, $includes, $cflags) != 0) {
+            hefesto.project.abort(1);
+        }
+
         $option = hefesto.sys.get_option("no-tests");
         if ($option.count() > 0) {
             hefesto.project.abort(0);

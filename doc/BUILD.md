@@ -180,6 +180,7 @@ additional options. The **Table 3** gathers the options related with the kernel 
 | ``--toolset=<gcc or clang>``             | Defines the C compiler (the default is ``GCC``).                             |
 | ``--language=<c or cc>``                 | Defines the compiler's language (samples only). Obviously the default is ``c``. |
 | ``--no-tests``                           | Do not run any test.                                                         |
+| ``--allow-bad-funcs``                    | Do not look for bad functions usagees in library's implementation files.     |
 
 **Table 3**: The build options for the kernel mode unit tests.
 
