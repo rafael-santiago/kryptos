@@ -15,27 +15,20 @@
   kryptos_u8_t toupper(const kryptos_u8_t c);
 #endif
 
-#if defined(KRYPTOS_MITIGATE_TIMING_ATTACKS)
-  // INFO(Rafael): Since the linker uses the nearest symbol definition, we can easily overwrite the
-  //               memcmp calls without replacing the previous references.
-  int memcmp(const void *s1, const void *s2, size_t n);
-#else
+# if memcmp != kryptos_memcmp
 # warning Timing attacks are not being mitigated.
 #endif
 
-#if defined(KRYPTOS_ENSURE_MEMSET_CLEANUPS)
-  // INFO(Rafael): Depending on the compiler flag (as instance -O) the compiler will
-  //               strip off memset calls at the end of the function. In this case, the
-  //               memset call is for cleanup issues and must be done. Using the following
-  //               scheme (define a macro called 'memset' that is replaced to 'kryptos_memset'
-  //                       a.k.a. the libraries' local memset implementation) is possible to
-  //               keep the 'cleanup memset' even with the -O optimizing flag. If you have
-  //               doubts, try to inspect the final assembly on your own, it also would be
-  //               prudent since the compiler heuristics can change.
-# undef memset
-# define memset kryptos_memset
-  void *kryptos_memset(void *s, int c, size_t n);
-#else
+// INFO(Rafael): Depending on the compiler flag (as instance -O) the compiler will
+//               strip off memset calls at the end of the function. In this case, the
+//               memset call is for cleanup issues and must be done. Using the following
+//               scheme (define a macro called 'memset' that is replaced to 'kryptos_memset'
+//                       a.k.a. the libraries' local memset implementation) is possible to
+//               keep the 'cleanup memset' even with the -O optimizing flag. If you have
+//               doubts, try to inspect the final assembly on your own, it also would be
+//               prudent since the compiler heuristics can change. Anyway, the build is doing
+//               it for you by default and it will break if some memset is found.
+# if memset != kryptos_memset
 # warning Memset calls used in cleanups are not being ensured.
 #endif
 

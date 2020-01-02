@@ -22,9 +22,7 @@ kryptos_u8_t toupper(const kryptos_u8_t c) {
 
 #endif
 
-#if defined(KRYPTOS_MITIGATE_TIMING_ATTACKS)
-
-int memcmp(const void *s1, const void *s2, size_t n) {
+int kryptos_memcmp(const void *s1, const void *s2, size_t n) {
     int result = 0;
     const kryptos_u8_t *b1 = (const kryptos_u8_t *)s1, *b2 = (const kryptos_u8_t *)s2;
 
@@ -35,12 +33,21 @@ int memcmp(const void *s1, const void *s2, size_t n) {
     return result;
 }
 
+void *kryptos_memset(void *s, int c, size_t n) {
+#if !defined(__i386__)
+    kryptos_u8_t *bp, *bp_end, b;
 #endif
 
-#if defined(KRYPTOS_ENSURE_MEMSET_CLEANUPS)
-void *kryptos_memset(void *s, int c, size_t n) {
-    kryptos_u8_t *bp, *bp_end, b;
+    if (s == NULL) {
+        goto kryptos_memset_epilogue;
+    }
 
+#if defined(__i386__)
+    __asm__ __volatile__ ("pusha\n\t"
+                          "cld\n\t"
+                          "rep stosb\n\t"
+                          "popa" : : "a"(c), "c"(n), "D"(s));
+#else
     bp = (kryptos_u8_t *)s;
     bp_end = bp + n;
     b = (kryptos_u8_t)c;
@@ -49,7 +56,39 @@ void *kryptos_memset(void *s, int c, size_t n) {
         *bp = b;
         bp++;
     }
+#endif
+
+kryptos_memset_epilogue:
 
     return s;
 }
+
+void *kryptos_memcpy(void *dest, void *src, size_t n) {
+#if !defined(__i386__)
+    void *dest_p, *src_p;
 #endif
+
+    if (dest == NULL) {
+        goto kryptos_memcpy_epilogue;
+    }
+
+#if defined(__i386__)
+    __asm__ __volatile__("pusha\n\t"
+                         "cld\n\t"
+                         "rep movsb\n\t"
+                         "popa" : : "c"(n), "D"(dest), "S"(src));
+#else
+    dest_p = dest;
+    src_p = src;
+
+    while (n-- > 0) {
+        *dest_p = *src_p;
+        dest_p++;
+        src_p++;
+    }
+#endif
+
+kryptos_memcpy_epilogue:
+
+    return dest;
+}

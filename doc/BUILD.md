@@ -204,12 +204,19 @@ If you are paranoid enough maybe the following C macros listed in **Table 4** co
 
 |               **C Macro**                |           **Description**                                                    |
 |:----------------------------------------:|:----------------------------------------------------------------------------:|
-|  ``KRYPTOS_MITIGATE_TIMING_ATTACKS``     |       Makes the ``memcmp`` function processing time constant.                |
-|  ``KRYPTOS_ENSURE_MEMSET_CLEANUPS``      |       Makes sure that ``memset`` called at function epilogues always will be called (disable the compiler optimization). |
 |  ``KRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY`` | Applies some data wiping when freeing allocated memory.                  |
 | ``KRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY_FREAK_PARANOID_PERSON`` | Applies a slower data wiping when freeing allocated memory. |
 
-The first three macros are defined by default. All those macros in **Table 4** are defined through ``--cflags`` option.
+The first macro is defined by default. All those macros in **Table 4** are defined through ``--cflags`` option.
+
+Memcmp timing attacks are avoided by design through kryptos' local ``memcmp`` implementation. Data leakage through dropped out
+``memset`` by compiler optimizer are avoided by design with kryptos' local ``memset`` implementation.
+
+Even so I would advise you to link statically any critical part of your software, not only the crypto stuff (``libkryptos``).
+
+Here, after compiling the implementation files a build task will look for any direct reference to a considered bad function
+listed in the file ``src/BAD_FUNCS``. The build breaks when found some reference. You can skip this verification step by
+passing the build option ``--allow-bad-funcs``, but I strongly advise you to not skip it in final/release builds.
 
 ### How the kernel mode tests are executed
 
