@@ -339,7 +339,7 @@ kryptos_mp_value_t *kryptos_hex_value_as_mp(const char *value, const size_t valu
         return NULL;
     }
 
-    vp = (kryptos_u8_t *)value + (*value == '-');
+    vp = (const kryptos_u8_t *)value + (*value == '-');
     vp_end = vp + effective_value_size;
 
     d = mp->data_size - 1;
@@ -842,7 +842,7 @@ kryptos_mp_value_t *kryptos_assign_hex_value_to_mp(kryptos_mp_value_t **dest,
         return (*dest);
     }
 
-    vp = (kryptos_u8_t *)value;
+    vp = (const kryptos_u8_t *)value;
     vp_end = vp + value_size;
 
     memset((*dest)->data, 0, (*dest)->data_size);
@@ -1987,7 +1987,7 @@ kryptos_mp_mod_epilogue:
 kryptos_mp_value_t *kryptos_mp_barrett_reduction(kryptos_mp_value_t *x,
                                                  kryptos_mp_value_t **factor,
                                                  size_t *sh,
-                                                 const kryptos_mp_value_t *mod) {
+                                                 kryptos_mp_value_t *mod) {
 
     kryptos_mp_value_t *temp = NULL, *m = NULL, *r = NULL;
     size_t bitmap_size;
@@ -2042,7 +2042,7 @@ kryptos_mp_value_t *kryptos_mp_barrett_reduction(kryptos_mp_value_t *x,
         m = NULL;
         r = temp;
         temp = NULL;
-        kryptos_mp_mod(&r, (kryptos_mp_value_t *)mod);
+        kryptos_mp_mod(&r, mod);
         goto kryptos_mp_barret_reduction_epilogue;
     }
 
@@ -2051,12 +2051,12 @@ kryptos_mp_value_t *kryptos_mp_barrett_reduction(kryptos_mp_value_t *x,
 
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_mul(&temp, *factor), kryptos_mp_barret_reduction_epilogue);
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_rsh(&temp, *sh), kryptos_mp_barret_reduction_epilogue);
-    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_mul(&temp, (kryptos_mp_value_t *)mod), kryptos_mp_barret_reduction_epilogue);
+    KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_mul(&temp, mod), kryptos_mp_barret_reduction_epilogue);
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_assign_mp_value(&r, x), kryptos_mp_barret_reduction_epilogue);
     KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub(&r, temp), kryptos_mp_barret_reduction_epilogue);
 
     if (kryptos_mp_ge(r, mod)) {
-        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub(&r, (kryptos_mp_value_t *)mod), kryptos_mp_barret_reduction_epilogue);
+        KRYPTOS_MP_ABORT_WHEN_NULL(kryptos_mp_sub(&r, mod), kryptos_mp_barret_reduction_epilogue);
     }
 
 kryptos_mp_barret_reduction_epilogue:
@@ -3639,7 +3639,7 @@ kryptos_mp_modinv_epilogue:
 
 #else
 
-kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *u, const kryptos_mp_value_t *v) {
+kryptos_mp_value_t *kryptos_mp_modinv(kryptos_mp_value_t *u, kryptos_mp_value_t *v) {
     kryptos_mp_value_t *inv = NULL, *u1 = NULL, *u3 = NULL, *v1 = NULL, *v3 = NULL, *t1 = NULL, *t3 = NULL, *q = NULL;
     kryptos_mp_value_t *_1 = NULL, *_0 = NULL;
     char iter = 1;
@@ -3647,7 +3647,7 @@ kryptos_mp_value_t *kryptos_mp_modinv(const kryptos_mp_value_t *u, const kryptos
     // TODO(Rafael): If the v is prime use the Fermat's little theorem instead of the Extended Euclidean.
 
     if ((v->data[0] & 0x1)) {
-        return kryptos_mp_modinv_rs((kryptos_mp_value_t *)u, (kryptos_mp_value_t *)v);
+        return kryptos_mp_modinv_rs(u, v);
     }
 
     KRYPTOS_MP_ABORT_WHEN_NULL(_1 = kryptos_hex_value_as_mp("1", 1), kryptos_mp_modinv_epilogue);
