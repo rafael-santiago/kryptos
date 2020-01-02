@@ -56,6 +56,18 @@ kryptos-tests.prologue() {
     $libraries = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
 
+    if ($cflags.index_of("-Dmemcmp=kryptos_memcmp") == -1) {
+        $cflags.add_item("-Dmemcmp=kryptos_memcmp");
+    }
+
+    if ($cflags.index_of("-Dmemcpy=kryptos_memcpy") == -1) {
+        $cflags.add_item("-Dmemcpy=kryptos_memcpy");
+    }
+
+    if ($cflags.index_of("-Dmemset=kryptos_memset") == -1) {
+        $cflags.add_item("-Dmemset=kryptos_memset");
+    }
+
     if (hefesto.sys.os_name() == "freebsd") {
         $ldflags.add_item("-lexecinfo");
         $ldflags.add_item("-lpthread");

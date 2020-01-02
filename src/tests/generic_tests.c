@@ -1372,19 +1372,14 @@ CUTE_TEST_CASE(kryptos_csprng_context_change_tests)
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_memset_tests)
-#if defined(KRYPTOS_ENSURE_MEMSET_CLEANUPS)
     char buf[10];
     void *(*curr_libmemset)(void *, int, size_t) = memset;
     CUTE_ASSERT(curr_libmemset == kryptos_memset);
     CUTE_ASSERT(kryptos_memset(buf, '.', sizeof(buf)) == &buf[0]);
     CUTE_ASSERT(memcmp(buf, "..........", sizeof(buf)) == 0);
-#else
-    printf("WARN: KRYPTOS_ENSURE_MEMSET_CLEANUPS is undefined, this test was skipped.\n");
-#endif
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_memcmp_tests)
-#if defined(KRYPTOS_MITIGATE_TIMING_ATTACKS)
     // INFO(Rafael): If this test has passed the memcmp will be tested in the test case 'kryptos_memset_tests'.
 # if !defined(_WIN32)
     void *libc_so = (void *)RTLD_NEXT;
@@ -1421,9 +1416,6 @@ CUTE_TEST_CASE(kryptos_memcmp_tests)
 
     CUTE_ASSERT((libc_memcmp = (void *)GetProcAddress(libc_handle, "memcmp")) != NULL);
     CUTE_ASSERT(libc_memcmp != memcmp);
-#endif
-#else
-    printf("WARN: KRYPTOS_MITIGATE_TIMING_ATTACKS is undefined, this test was skipped.\n");
 #endif
 CUTE_TEST_CASE_END
 
