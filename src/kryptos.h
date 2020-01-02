@@ -80,6 +80,15 @@
 # include <string.h>
 #endif
 
+#if defined(KRYPTOS_KERNEL_MODE)
+# undef memset
+# define memset kryptos_memset
+# undef memcpy
+# define memcpy kryptos_memcpy
+# undef memcmp
+# define memcmp kryptos_memcmp
+#endif
+
 #define kryptos_task_set_ecb_mode(ktask) ( (ktask)->mode = kKryptosECB )
 
 #define kryptos_task_set_cbc_mode(ktask) ( (ktask)->mode = kKryptosCBC )

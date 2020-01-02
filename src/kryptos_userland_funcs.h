@@ -15,8 +15,15 @@
   kryptos_u8_t toupper(const kryptos_u8_t c);
 #endif
 
+#if defined(KRYPTOS_KERNEL_MODE)
+  void *kryptos_memcpy(void *dest, const void *src, size_t n);
+  int kryptos_memcmp(const void *s1, const void *s2, size_t n);
+# undef memcmp
+# define memcmp kryptos_memcmp
+#else
 # if memcmp != kryptos_memcmp
-# warning Timing attacks are not being mitigated.
+#  warning Timing attacks are not being mitigated.
+# endif
 #endif
 
 // INFO(Rafael): Depending on the compiler flag (as instance -O) the compiler will
@@ -28,8 +35,14 @@
 //               doubts, try to inspect the final assembly on your own, it also would be
 //               prudent since the compiler heuristics can change. Anyway, the build is doing
 //               it for you by default and it will break if some memset is found.
+#if defined(KRYPTOS_KERNEL_MODE)
+  void *kryptos_memset(void *s, int c, size_t n);
+# undef memset
+# define memset kryptos_memset
+#else
 # if memset != kryptos_memset
-# warning Memset calls used in cleanups are not being ensured.
+#  warning Memset calls used in cleanups are not being ensured.
+# endif
 #endif
 
 #endif

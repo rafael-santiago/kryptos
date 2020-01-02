@@ -34,7 +34,7 @@ int kryptos_memcmp(const void *s1, const void *s2, size_t n) {
 }
 
 void *kryptos_memset(void *s, int c, size_t n) {
-#if !defined(__i386__)
+#if !defined(__i386__) || defined(KRYPTOS_KERNEL_MODE)
     kryptos_u8_t *bp, *bp_end, b;
 #endif
 
@@ -42,7 +42,7 @@ void *kryptos_memset(void *s, int c, size_t n) {
         goto kryptos_memset_epilogue;
     }
 
-#if defined(__i386__)
+#if defined(__i386__) && !defined(KRYPTOS_KERNEL_MODE)
     __asm__ __volatile__ ("pusha\n\t"
                           "cld\n\t"
                           "rep stosb\n\t"
@@ -63,23 +63,25 @@ kryptos_memset_epilogue:
     return s;
 }
 
-void *kryptos_memcpy(void *dest, void *src, size_t n) {
-#if !defined(__i386__)
-    void *dest_p, *src_p;
+void *kryptos_memcpy(void *dest, const void *src, size_t n) {
+#if !defined(__i386__) || defined(KRYPTOS_KERNEL_MODE)
+    //void *dest_p, *src_p;
+    kryptos_u8_t *dest_p;
+    const kryptos_u8_t *src_p;
 #endif
 
     if (dest == NULL) {
         goto kryptos_memcpy_epilogue;
     }
 
-#if defined(__i386__)
+#if defined(__i386__) && !defined(KRYPTOS_KERNEL_MODE)
     __asm__ __volatile__("pusha\n\t"
                          "cld\n\t"
                          "rep movsb\n\t"
                          "popa" : : "c"(n), "D"(dest), "S"(src));
 #else
-    dest_p = dest;
-    src_p = src;
+    dest_p = (kryptos_u8_t *)dest;
+    src_p = (const kryptos_u8_t *)src;
 
     while (n-- > 0) {
         *dest_p = *src_p;
