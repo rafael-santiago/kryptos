@@ -160,7 +160,7 @@ void *kryptos_realloc(void *addr, const size_t ssize) {
 #if defined(KRYPTOS_USER_MODE)
 # if defined(_WIN32)
     return realloc(addr, ssize);
-# elif defined(__sunos__)
+# elif defined(__sun__)
     return realloc(addr, ssize);
 # else
     void *new_area = realloc(addr, ssize);
