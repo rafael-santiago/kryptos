@@ -45,6 +45,15 @@ kryptos.prologue() {
         # INFO(Rafael): Let's enable c99 capabilities by default.
         $cflags.add_item("-std=c99");
     }
+
+    var option type list;
+
+    $option = hefesto.sys.get_option("check-bad-funcs");
+
+    if ($option.count() > 0) {
+        check_bad_funcs();
+        hefesto.project.abort(0);
+    }
 }
 
 kryptos.epilogue() {
@@ -52,9 +61,7 @@ kryptos.epilogue() {
         var oldcwd type string;
         var option type list;
 
-        if (has_bad_funcs(hefesto.sys.lines_from_file("BAD_FUNCS", ".*"), $sources, $includes, $cflags) != 0) {
-            hefesto.project.abort(1);
-        }
+        check_bad_funcs();
 
         $option = hefesto.sys.get_option("no-tests");
         if ($option.count() > 0) {
@@ -122,5 +129,11 @@ kryptos.epilogue() {
                 hefesto.sys.exit(1);
             }
         }
+    }
+}
+
+local function check_bad_funcs() : result type none {
+    if (has_bad_funcs(hefesto.sys.lines_from_file("BAD_FUNCS", ".*"), $sources, $includes, $cflags) != 0) {
+        hefesto.project.abort(1);
     }
 }

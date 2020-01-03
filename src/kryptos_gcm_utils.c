@@ -234,8 +234,11 @@ static int kryptos_gcm_ghash(const kryptos_u8_t *h,
         struct gcm_ghash_block_ctx *block;
     } ublocks[3], *ubp, *ubp_end;
     kryptos_u8_t *temp = NULL;
-    size_t temp_size[2] = { 0, 0 }, A_size = 0, C_size = 0;
+    size_t temp_size[2], A_size = 0, C_size = 0;
     int no_error = 0;
+
+    // TIP(Rafael): Avoiding suggest to compiler to use memset (... = { .. }).
+    temp_size[0] = temp_size[1] = 0;
 
     H[0] = kryptos_get_u32_as_big_endian(h, 16);
     H[1] = kryptos_get_u32_as_big_endian(h +  4, 12);

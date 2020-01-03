@@ -322,11 +322,13 @@ static void kryptos_rabbit_key_setup(const kryptos_u8_t *key, const size_t key_s
 }
 
 static void kryptos_rabbit_ctr_system(struct kryptos_rabbit_keystream *sks) {
-    kryptos_u32_t A[8] = {
-        KRYPTOS_RABBIT_A0, KRYPTOS_RABBIT_A1, KRYPTOS_RABBIT_A2, KRYPTOS_RABBIT_A3,
-        KRYPTOS_RABBIT_A4, KRYPTOS_RABBIT_A5, KRYPTOS_RABBIT_A6, KRYPTOS_RABBIT_A7
-    };
+    kryptos_u32_t A[8];
     kryptos_u32_t temp;
+
+    // TIP(Rafael): Avoiding suggest to compiler to use memcpy (... = { .. }).
+    A[0] = KRYPTOS_RABBIT_A0; A[1] = KRYPTOS_RABBIT_A1; A[2] = KRYPTOS_RABBIT_A2;
+    A[3] = KRYPTOS_RABBIT_A3; A[4] = KRYPTOS_RABBIT_A4; A[5] = KRYPTOS_RABBIT_A5;
+    A[6] = KRYPTOS_RABBIT_A6; A[7] = KRYPTOS_RABBIT_A7;
 
 #define kryptos_rabbit_ctr_system_update_round(sks, A, j, temp) {\
     (temp) = (sks)->C[(j)] + (A)[(j)] + (sks)->b;\

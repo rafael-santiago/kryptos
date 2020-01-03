@@ -498,15 +498,19 @@ kryptos_u8_t *kryptos_bcrypt(const int cost,
                              const kryptos_u8_t *salt, const size_t salt_size,
                              const kryptos_u8_t *password, const size_t password_size, size_t *hash_size) {
     struct kryptos_blowfish_subkeys sks;
-    kryptos_u8_t ctext[24] = {
-        'O', 'r', 'p', 'h', 'e', 'a', 'n', 'B',
-        'e', 'h', 'o', 'l', 'd', 'e', 'r', 'S',
-        'c', 'r', 'y', 'D', 'o', 'u', 'b', 't'
-    };
+    kryptos_u8_t ctext[24];
     kryptos_u8_t *hash = NULL, pfx[32];
     size_t pfx_size, salt64_size, ctext64_size;
     kryptos_u8_t *salt64 = NULL, *ctext64 = NULL;
     kryptos_u8_t *null_term_password = NULL;
+
+    // TIP(Rafael): Avoiding suggest to compiler to use memcpy (... = { .. }).
+    ctext[ 0] = 'O'; ctext[ 1] = 'r'; ctext[ 2] = 'p'; ctext[ 3] = 'h';
+    ctext[ 4] = 'e'; ctext[ 5] = 'a'; ctext[ 6] = 'n'; ctext[ 7] = 'B';
+    ctext[ 8] = 'e'; ctext[ 9] = 'h'; ctext[10] = 'o'; ctext[11] = 'l';
+    ctext[12] = 'd'; ctext[13] = 'e'; ctext[14] = 'r'; ctext[15] = 'S';
+    ctext[16] = 'c'; ctext[17] = 'r'; ctext[18] = 'y'; ctext[19] = 'D';
+    ctext[20] = 'o'; ctext[21] = 'u'; ctext[22] = 'b'; ctext[23] = 't';
 
     if (cost < 4 || cost > 31 || salt_size != 16 || password == NULL || password_size > 72 || hash_size == NULL) {
         return NULL;
@@ -676,7 +680,13 @@ static void kryptos_eks_blowfish_setup(const int cost, const kryptos_u8_t *salt,
                                        struct kryptos_blowfish_subkeys *sks) {
     size_t r_nr = 1 << cost;
     size_t r;
-    kryptos_u8_t all_zeros[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    kryptos_u8_t all_zeros[16];
+
+    // TIP(Rafael): Avoiding suggest to compiler to use memset (... = { .. }).
+    all_zeros[ 0] = all_zeros[ 1] = all_zeros[ 2] = all_zeros[ 3] =
+    all_zeros[ 4] = all_zeros[ 5] = all_zeros[ 6] = all_zeros[ 7] =
+    all_zeros[ 8] = all_zeros[ 9] = all_zeros[10] = all_zeros[11] =
+    all_zeros[12] = all_zeros[13] = all_zeros[14] = all_zeros[15] = 0;
 
     // WARN(Rafael): In the original implementation the algorithm considers the NULL at the end of the string as part of
     //               this string, and yes: the user password is always expected to be null terminated. So you know, at

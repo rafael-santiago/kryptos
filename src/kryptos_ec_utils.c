@@ -74,11 +74,18 @@ int kryptos_ec_set_curve(kryptos_ec_t **c, kryptos_mp_value_t *a, kryptos_mp_val
 }
 
 void kryptos_ec_add(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_ec_pt_t *q, kryptos_ec_t *curve) {
-    kryptos_ec_pt_t p_mod = { NULL, NULL }, q_mod = { NULL, NULL };
+    kryptos_ec_pt_t p_mod, q_mod;
     kryptos_mp_value_t *temp1 = NULL, *_0 = NULL, *temp2 = NULL, *slope = NULL, *dq = NULL;
     kryptos_mp_value_t *factor = NULL, *md = NULL;
     size_t sh;
     int done = 0;
+
+    // TIP(Rafael): Initializing p_mod = { NULL, NULL} would suggest compiler to use memset (at least Clang 3.8.0).
+    //              We do not want it due to library hooking avoidance issues.
+    p_mod.x = NULL;
+    p_mod.y = NULL;
+    q_mod.x = NULL;
+    q_mod.y = NULL;
 
     *r = NULL;
 
@@ -363,11 +370,16 @@ kryptos_ec_dbl_epilogue:
 }
 
 void kryptos_ec_mul(kryptos_ec_pt_t **r, kryptos_ec_pt_t *p, kryptos_mp_value_t *d, kryptos_ec_t *curve) {
-    kryptos_ec_pt_t q = { NULL, NULL }, *t = NULL;
+    kryptos_ec_pt_t q, *t = NULL;
     kryptos_mp_value_t *_0 = NULL;
     int done = 0;
     kryptos_u8_t *bitmap = NULL, *bp = NULL, *bp_end = NULL;
     size_t bitmap_size = 0;
+
+    // TIP(Rafael): q = { NULL, NULL } would suggest compiler to use memset (at least Clang 3.8.0).
+    //              We do not want it due to library hooking avoidance issues.
+    q.x = NULL;
+    q.y = NULL;
 
     *r = NULL;
 

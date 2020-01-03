@@ -347,10 +347,13 @@ static void kryptos_camellia_ld_256_user_key(kryptos_u32_t *key, const kryptos_u
 }
 
 static void kryptos_camellia_keyexp_128(const kryptos_u8_t *key, const size_t key_size, struct kryptos_camellia_subkeys *sks) {
-    kryptos_u32_t KL[4], KR[4] = {0x00, 0x00, 0x00, 0x00};
+    kryptos_u32_t KL[4], KR[4];
     kryptos_u32_t D1[2], D2[2];
     kryptos_u32_t T[4], fout[2];
     kryptos_u32_t KA[4];
+
+    // TIP(Rafael): Avoiding suggest to compiler to use memset (... = { .. }).
+    KR[0] = KR[1] = KR[2] = KR[3] = 0x00;
 
     kryptos_camellia_ld_128_user_key(KL, key, key_size);
 
