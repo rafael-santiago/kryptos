@@ -154,6 +154,8 @@ static kryptos_u8_t *kryptos_uuencode_decode_buffer(const kryptos_u8_t *buffer, 
     if (bp_end > (bp + 3) && bp_end[-3] == '\n' && bp_end[-2] == '`' && bp_end[-1] == '\n') {
         // INFO(Rafael): Reducing the stopping criterion !(bp[0] == '`' && bp[1] == '\n' && &bp[2] == bp_end) to (bp < bp_end).
         bp_end -= 3;
+    } else if (bp_end > (bp + 4) && bp_end[-4] == '`' && bp_end[-3] == '\n' && bp_end[-2] == '\r' && bp_end[-1] == '\n') {
+        bp_end -= 3;
     }
 
     if (*out_size < *bp - 32) {
@@ -192,6 +194,11 @@ static kryptos_u8_t *kryptos_uuencode_decode_buffer(const kryptos_u8_t *buffer, 
         }
 
         bp++;
+        if (bp + 2 < bp_end && (*bp == '\r' || *(bp + 1) == '\n')) {
+            // INFO(Rafael): Being resilient against line ending differences between Windows/DOS and
+            //               Unix-like systems.
+            bp += 2;
+        }
     }
 
     *out_size = out_p - out;
