@@ -402,6 +402,38 @@ CUTE_TEST_CASE(kryptos_uuencode_tests)
     CUTE_ASSERT(memcmp(t.out, expected, expected_size) == 0);
 
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Simulating Windows/DOS line endings.
+    in = "M04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#\r\n"
+         "/04)#04)#04)#04)#04)#\r\n"
+         "`\n";
+    in_size = 88;
+
+    t.in = in;
+    t.in_size = in_size;
+    kryptos_task_set_decode_action(ktask);
+    kryptos_uuencode_processor(&ktask);
+    CUTE_ASSERT(t.out != NULL);
+    CUTE_ASSERT(t.out_size == expected_size);
+    CUTE_ASSERT(memcmp(t.out, expected, expected_size) == 0);
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Simulating Windows/DOS line endings.
+    in = "M04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#\r\n"
+         "/04)#04)#04)#04)#04)#\r\n"
+         "`\r\n";
+    in_size = 89;
+
+    t.in = in;
+    t.in_size = in_size;
+    kryptos_task_set_decode_action(ktask);
+    kryptos_uuencode_processor(&ktask);
+    CUTE_ASSERT(t.out != NULL);
+    CUTE_ASSERT(t.out_size == expected_size);
+    CUTE_ASSERT(memcmp(t.out, expected, expected_size) == 0);
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_uuencode_dsl_tests)
@@ -692,6 +724,34 @@ CUTE_TEST_CASE(kryptos_uuencode_dsl_tests)
          "/04)#04)#04)#04)#04)#\n\r\n"
          "`\n";
     in_size = 90;
+    kryptos_task_set_decode_action(ktask);
+    kryptos_run_encoder(uuencode, ktask, in, in_size);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    CUTE_ASSERT(t.out != NULL);
+    CUTE_ASSERT(t.out_size == expected_size);
+    CUTE_ASSERT(memcmp(t.out, expected, expected_size) == 0);
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Simulating Windows/DOS line endings.
+    in = "M04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#\r\n"
+         "/04)#04)#04)#04)#04)#\r\n"
+         "`\n";
+    in_size = 88;
+    kryptos_task_set_decode_action(ktask);
+    kryptos_run_encoder(uuencode, ktask, in, in_size);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    CUTE_ASSERT(t.out != NULL);
+    CUTE_ASSERT(t.out_size == expected_size);
+    CUTE_ASSERT(memcmp(t.out, expected, expected_size) == 0);
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Simulating Windows/DOS line endings.
+    in = "M04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#\r\n"
+         "/04)#04)#04)#04)#04)#\r\n"
+         "`\r\n";
+    in_size = 89;
     kryptos_task_set_decode_action(ktask);
     kryptos_run_encoder(uuencode, ktask, in, in_size);
     CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
