@@ -52,16 +52,16 @@
 #  include <unistd.h>
 // TODO(Rafael): Find a better way of detecting c99 capabilities in FreeBSD.
 #   if __ISO_C_VISIBLE >= 1999L && !defined(__STDC_VERSION__)
-#    define __STDC_VERSION__ 19901L
+#    define __STDC_VERSION__ 199901L
 #   endif
 # endif
 #endif
 
 #ifndef NO_KRYPTOS_C99_SUPPORT
 # ifdef __STDC_VERSION__
-#  if __STDC_VERSION__ >= 19901L
+#  if __STDC_VERSION__ >= 199901L
 #   define KRYPTOS_C99     1
-#  endif // __STDC_VERSION__ >= 19901L
+#  endif // __STDC_VERSION__ >= 199901L
 # else
 #  ifdef __cplusplus
 #   define KRYPTOS_C99     1
