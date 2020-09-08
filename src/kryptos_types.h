@@ -27,7 +27,6 @@
 #     include <sys/cprng.h>
 #    endif
 #  elif defined(__linux__)
-#   include <bits/wordsize.h>
 #   include <linux/init.h>
 #   include <linux/module.h>
 #   include <linux/slab.h>
