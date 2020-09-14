@@ -23,6 +23,14 @@ void *kryptos_sys_get_random_block(const size_t size_in_bytes);
 
 int kryptos_set_csprng(kryptos_csprng_t csprng);
 
+kryptos_u8_t kryptos_unbiased_rand_mod_u8(const size_t n);
+
+kryptos_u16_t kryptos_unbiased_rand_mod_u16(const size_t n);
+
+kryptos_u32_t kryptos_unbiased_rand_mod_u32(const size_t n);
+
+kryptos_u64_t kryptos_unbiased_rand_mod_u64(const size_t n);
+
 #ifdef __cplusplus
 }
 #endif

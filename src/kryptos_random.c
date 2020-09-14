@@ -21,6 +21,60 @@ void *kryptos_sys_get_random_block(const size_t size_in_bytes);
 
 static void kryptos_release_curr_csprng(void);
 
+kryptos_u8_t kryptos_unbiased_rand_mod_u8(const size_t n) {
+    kryptos_u8_t r = 0;
+
+    do {
+        r = kryptos_get_random_byte();
+    } while (r >= 0xFF - (0xFF % n));
+    r = r % n;
+
+    return r;
+}
+
+kryptos_u16_t kryptos_unbiased_rand_mod_u16(const size_t n) {
+    kryptos_u16_t r = 0;
+
+    do {
+        r = (((kryptos_u16_t)kryptos_get_random_byte()) << 8) | kryptos_get_random_byte();
+    } while (r >= 0xFFFF - (0xFFFF % n));
+
+    r = r % n;
+
+    return r;
+}
+
+kryptos_u32_t kryptos_unbiased_rand_mod_u32(const size_t n) {
+    kryptos_u32_t r = 0;
+
+    do {
+        r = (((kryptos_u32_t)kryptos_get_random_byte()) << 24) |
+            (((kryptos_u32_t)kryptos_get_random_byte()) << 16) |
+            (((kryptos_u32_t)kryptos_get_random_byte()) <<  8) | kryptos_get_random_byte();
+    } while (r >= 0xFFFFFFFF - (0xFFFFFFFF % n));
+    r = r % n;
+
+    return r;
+
+}
+
+kryptos_u64_t kryptos_unbiased_rand_mod_u64(const size_t n) {
+    kryptos_u64_t r = 0;
+
+    do {
+        r = (((kryptos_u64_t)kryptos_get_random_byte()) << 56) |
+            (((kryptos_u64_t)kryptos_get_random_byte()) << 48) |
+            (((kryptos_u64_t)kryptos_get_random_byte()) << 40) |
+            (((kryptos_u64_t)kryptos_get_random_byte()) << 32) |
+            (((kryptos_u64_t)kryptos_get_random_byte()) << 24) |
+            (((kryptos_u64_t)kryptos_get_random_byte()) << 16) |
+            (((kryptos_u64_t)kryptos_get_random_byte()) <<  8) | kryptos_get_random_byte();
+    } while (r >= 0xFFFFFFFFFFFFFFFF - (0xFFFFFFFFFFFFFFFF % n));
+    r = r % n;
+
+    return r;
+}
+
 int kryptos_set_csprng(kryptos_csprng_t csprng) {
     int set_glvar = 0;
     kryptos_u8_t *seed = NULL;

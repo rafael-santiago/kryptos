@@ -113,6 +113,22 @@ CUTE_TEST_CASE(kryptos_get_random_block_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_unbiased_rand_mod_u8_tests)
+    kryptos_unbiased_rand_mod_u8(0xAB);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_unbiased_rand_mod_u16_tests)
+    kryptos_unbiased_rand_mod_u16(0xABCD);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_unbiased_rand_mod_u32_tests)
+    kryptos_unbiased_rand_mod_u32(0xABCDEF00);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_unbiased_rand_mode_u64_tests)
+    kryptos_unbiased_rand_mod_u64(17237128);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_block_parser_tests)
     kryptos_u8_t *in = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f", *in_p;
     kryptos_u8_t *in_end = NULL;

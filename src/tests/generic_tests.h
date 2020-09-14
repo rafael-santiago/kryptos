@@ -16,6 +16,14 @@ CUTE_DECLARE_TEST_CASE(kryptos_sys_get_random_block_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_get_random_block_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_unbiased_rand_mod_u8_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_unbiased_rand_mod_u16_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_unbiased_rand_mod_u32_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_unbiased_rand_mod_u64_tests);
+
 CUTE_DECLARE_TEST_CASE(kryptos_block_parser_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_endianness_utils_tests);
