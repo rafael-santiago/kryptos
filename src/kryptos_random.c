@@ -60,7 +60,25 @@ kryptos_u32_t kryptos_unbiased_rand_mod_u32(const size_t n) {
 
 kryptos_u64_t kryptos_unbiased_rand_mod_u64(const size_t n) {
     kryptos_u64_t r = 0;
-
+#if defined(KRYPTOS_KERNEL_MODE) && defined(__linux__)
+    kryptos_u32_t rem = 0;
+    kryptos_u64_t lim = 0;
+    div_u64_rem(0xFFFFFFFFFFFFFFFF, n, &rem);
+    lim = 0xFFFFFFFFFFFFFFFF - rem;
+    do {
+        r = (((kryptos_u64_t)kryptos_get_random_byte()) << 56) |
+            (((kryptos_u64_t)kryptos_get_random_byte()) << 48) |
+            (((kryptos_u64_t)kryptos_get_random_byte()) << 40) |
+            (((kryptos_u64_t)kryptos_get_random_byte()) << 32) |
+            (((kryptos_u64_t)kryptos_get_random_byte()) << 24) |
+            (((kryptos_u64_t)kryptos_get_random_byte()) << 16) |
+            (((kryptos_u64_t)kryptos_get_random_byte()) <<  8) | kryptos_get_random_byte();
+    } while (r >= lim);
+    lim = r;
+    div_u64_rem(lim, (u64)n, (u32 *)&r);
+    rem = 0;
+    lim = 0;
+#else
     do {
         r = (((kryptos_u64_t)kryptos_get_random_byte()) << 56) |
             (((kryptos_u64_t)kryptos_get_random_byte()) << 48) |
@@ -71,7 +89,7 @@ kryptos_u64_t kryptos_unbiased_rand_mod_u64(const size_t n) {
             (((kryptos_u64_t)kryptos_get_random_byte()) <<  8) | kryptos_get_random_byte();
     } while (r >= 0xFFFFFFFFFFFFFFFF - (0xFFFFFFFFFFFFFFFF % n));
     r = r % n;
-
+#endif
     return r;
 }
 
