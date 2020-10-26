@@ -200,12 +200,7 @@ void kryptos_ecdh_process_xchg(struct kryptos_ecdh_xchg_ctx **data) {
                 goto kryptos_ecdh_process_xchg_epilogue;
             }
 
-#if !defined(__OpenBSD__)
-            snprintf(temp, sizeof(temp) - 1, "%d", (*data)->curve->bits);
-#else
-            // INFO(Rafael): Zzzz.
             snprintf(temp, sizeof(temp) - 1, "%d", (unsigned int)(*data)->curve->bits);
-#endif
 
             (*data)->result = kryptos_pem_put_data(&(*data)->out, &(*data)->out_size,
                                                    KRYPTOS_ECDH_PEM_HDR_PARAM_EC_BITS,

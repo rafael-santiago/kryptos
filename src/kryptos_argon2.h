@@ -22,13 +22,13 @@ typedef enum kryptos_argon2_hash_type {
     kArgon2id
 }kryptos_argon2_hash_type_t;
 
-kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const size_t password_size,
+kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const kryptos_u32_t password_size,
                                 kryptos_u8_t *salt, const kryptos_u32_t salt_size,
                                 const kryptos_u32_t parallelism,
                                 const kryptos_u32_t tag_size,
                                 const kryptos_u32_t memory_size_kb, const kryptos_u32_t iterations,
-                                kryptos_u8_t *key, const size_t key_size,
-                                kryptos_u8_t *associated_data, const size_t associated_data_size,
+                                kryptos_u8_t *key, const kryptos_u32_t key_size,
+                                kryptos_u8_t *associated_data, const kryptos_u32_t associated_data_size,
                                 const kryptos_argon2_hash_type_t htype);
 
 #define kryptos_argon2d(p, p_size, s, s_size, pl, t_size, m, i, k, k_size, a, a_size)\

@@ -16,15 +16,15 @@ CUTE_TEST_CASE(kryptos_do_argon2_tests)
         kryptos_u32_t parallelism;
         kryptos_u32_t tag_size;
         kryptos_u8_t *password;
-        size_t password_size;
+        kryptos_u32_t password_size;
         kryptos_u8_t *salt;
-        size_t salt_size;
+        kryptos_u32_t salt_size;
         kryptos_u8_t *key;
-        size_t key_size;
+        kryptos_u32_t key_size;
         kryptos_u8_t *associated_data;
-        size_t associated_data_size;
+        kryptos_u32_t associated_data_size;
         kryptos_u8_t *expected;
-        size_t expected_size;
+        kryptos_u32_t expected_size;
     };
 #define add_argon2_test_case(t, m, i, pl, ts, p, ps, s, s_sz, k, ks, a, as, e, es)\
     { t, m, i, pl, ts, p, ps, s, s_sz, k, ks, a, as, e, es }
