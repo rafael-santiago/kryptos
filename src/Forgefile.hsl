@@ -36,6 +36,10 @@ kryptos.prologue() {
     $deps = get_c_cpp_deps();
     $sources.ls(".*\\.c$");
 
+    if (hefesto.sys.os_name() != "windows" && is_x64()) {
+        $cflags.add_item("-fPIC");
+    }
+
     if ($toolset_name.match("^clang") == 1) {
         $cflags.add_item("-Wno-pointer-sign");
         $cflags.add_item("-Wno-invalid-source-encoding");

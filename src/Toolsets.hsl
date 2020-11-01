@@ -12,6 +12,18 @@ include ~/toolsets/clang/clang-lib.hsl
 include ~/toolsets/gcc/gcc-app.hsl
 include ~/toolsets/clang/clang-app.hsl
 
+function is_x64() : result type int {
+    var is type int;
+    $is = 0;
+    if (hefesto.sys.run(get_toolset_option_data() + " -dumpmachine > .dumpmachine") == 0) {
+        var x64 type list;
+        $x64 = hefesto.sys.lines_from_file(".dumpmachine", "^x86_64");
+        $is = ($x64.count() > 0);
+        hefesto.sys.rm(".dumpmachine");
+    }
+    result $is;
+}
+
 function get_app_toolset() : result type string {
     result (get_toolset_option_data() + "-" + get_language_option_data() + "-app");
 }
