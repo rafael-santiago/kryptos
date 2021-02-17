@@ -265,7 +265,7 @@
 
 KUTE_TEST_CASE(kryptos_bad_decryption_tests)
     kryptos_task_ctx t, *ktask = &t;
-    size_t feal_rounds = 19;
+    int feal_rounds = 19;
     int rc2_t1 = 128;
     int saferk64_n = 6;
     kryptos_u8_t *tdes_k2 = "abc", *tdes_k3 = "def";

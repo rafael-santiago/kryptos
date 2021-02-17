@@ -308,14 +308,14 @@ typedef struct kryptos_curve {
 }kryptos_curve_ctx;
 
 #ifndef __cplusplus
-#define KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(cipher_name)\
+#define KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(cipher_name, ...)\
 void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
                                        kryptos_u8_t *key,\
                                        const size_t key_size,\
                                        const kryptos_cipher_mode_t mode);
 
 #else
-#define KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(cipher_name)\
+#define KRYPTOS_DECL_STANDARD_BLOCK_CIPHER_SETUP(cipher_name, ...)\
 extern "C" void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
                                                   kryptos_u8_t *key,\
                                                   const size_t key_size,\
@@ -348,17 +348,17 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
 }
 
 #ifndef __cplusplus
-#define KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_SETUP(cipher_name, ktask, additional_args...)\
+#define KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_SETUP(cipher_name, ktask, ...)\
 void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
                                        kryptos_u8_t *key,\
                                        const size_t key_size,\
-                                       const kryptos_cipher_mode_t mode, additional_args);
+                                       const kryptos_cipher_mode_t mode, __VA_ARGS__);
 #else
-#define KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_SETUP(cipher_name, ktask, additional_args...)\
+#define KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_SETUP(cipher_name, ktask, ...)\
 extern "C" void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
                                                   kryptos_u8_t *key,\
                                                   const size_t key_size,\
-                                                  const kryptos_cipher_mode_t mode, additional_args);
+                                                  const kryptos_cipher_mode_t mode, __VA_ARGS__);
 
 #endif
 

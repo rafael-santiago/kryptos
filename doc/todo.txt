@@ -1,4 +1,5 @@
-x (A) Build in FreeBSD, NetBSD, Windows, Minix, Solaris and fix and forbidden function usage
+x (A) Fix wrong variadic macro uses (C99). +Improvement
+x (A) Build in FreeBSD, NetBSD, Windows, Minix, Solaris and fix forbidden function usage
       when found. +Build,+Improvement,+SecWorries
 x (A) Run the Kernel mode build and fix any inconsistence introduced by bad functions scanning stuff. +Build
 x (A) Use by default kryptos_memset, kryptos_memcmp and kryptos_memcpy instead of memset,

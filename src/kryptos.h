@@ -547,16 +547,16 @@ kryptos_ ## label_name:\
 
 #ifdef KRYPTOS_C99
 
-#define kryptos_run_cipher(cname, ktask, cipher_args...) {\
-    kryptos_ ## cname ## _setup((ktask), cipher_args);\
+#define kryptos_run_cipher(cname, ktask, ...) {\
+    kryptos_ ## cname ## _setup((ktask), __VA_ARGS__);\
     (ktask)->mirror_p = (ktask);\
     kryptos_ ## cname ## _cipher(&(ktask)->mirror_p);\
     (ktask)->mirror_p = NULL;\
 }
 
-#define kryptos_run_cipher_hmac(cname, hname, ktask, cipher_args...) {\
+#define kryptos_run_cipher_hmac(cname, hname, ktask, ...) {\
     if ((ktask)->action == kKryptosEncrypt) {\
-        kryptos_run_cipher(cname, ktask, cipher_args);\
+        kryptos_run_cipher(cname, ktask, __VA_ARGS__);\
         if (kryptos_last_task_succeed(ktask)) {\
             (ktask)->mirror_p = (ktask);\
             kryptos_hmac(&(ktask)->mirror_p,\
@@ -567,13 +567,13 @@ kryptos_ ## label_name:\
         }\
     } else if ((ktask)->action == kKryptosDecrypt) {\
             (ktask)->mirror_p = (ktask);\
-            kryptos_ ## cname ## _setup((ktask), cipher_args);\
+            kryptos_ ## cname ## _setup((ktask), __VA_ARGS__);\
             kryptos_hmac(&(ktask)->mirror_p,\
                          kryptos_ ## hname ## _hash,\
                          kryptos_ ## hname ## _hash_input_size,\
                          kryptos_ ## hname ## _hash_size);\
             if (kryptos_last_task_succeed(ktask)) {\
-                kryptos_run_cipher(cname, ktask, cipher_args);\
+                kryptos_run_cipher(cname, ktask, __VA_ARGS__);\
             }\
             (ktask)->mirror_p = NULL;\
     }\
@@ -581,19 +581,19 @@ kryptos_ ## label_name:\
 
 // TIP(Rafael): Pretty weird name in order to nobody never ever call it directly. :)
 
-#define kryptos_perform_digsig_proto_action(cname, proto_level, ktask, cipher_args...) {\
-    kryptos_ ## cname ## _digital_signature_setup((ktask), cipher_args);\
+#define kryptos_perform_digsig_proto_action(cname, proto_level, ktask, ...) {\
+    kryptos_ ## cname ## _digital_signature_setup((ktask), __VA_ARGS__);\
     (ktask)->mirror_p = (ktask);\
     kryptos_ ## cname ## _## proto_level(&(ktask)->mirror_p);\
     (ktask)->mirror_p = NULL;\
 }
 
-#define kryptos_sign(cname, ktask, cipher_args...) {\
-    kryptos_perform_digsig_proto_action(cname, sign, ktask, cipher_args);\
+#define kryptos_sign(cname, ktask, ...) {\
+    kryptos_perform_digsig_proto_action(cname, sign, ktask, __VA_ARGS__);\
 }
 
-#define kryptos_verify(cname, ktask, cipher_args...) {\
-    kryptos_perform_digsig_proto_action(cname, verify, ktask, cipher_args);\
+#define kryptos_verify(cname, ktask, ...) {\
+    kryptos_perform_digsig_proto_action(cname, verify, ktask, __VA_ARGS__);\
 }
 
 #endif // KRYPTOS_C99

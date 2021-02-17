@@ -590,7 +590,7 @@ static kryptos_u8_t *hmac_test_data[] = {
 
 #ifdef KRYPTOS_C99
 
-#define kryptos_run_hmac_tests(t, tv, tv_nr, data_size, cname, hname, cipher_args...) {\
+#define kryptos_run_hmac_tests(t, tv, tv_nr, data_size, cname, hname, ...) {\
     tv_nr = sizeof(hmac_test_data) / sizeof(hmac_test_data[0]);\
     for (tv = 0; tv < tv_nr; tv++) {\
         kryptos_task_init_as_null(&t);\
@@ -598,12 +598,12 @@ static kryptos_u8_t *hmac_test_data[] = {
         t.iv = NULL;\
         kryptos_task_set_in(&t, hmac_test_data[tv], data_size);\
         kryptos_task_set_encrypt_action(&t);\
-        kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
+        kryptos_run_cipher_hmac(cname, hname, &t, __VA_ARGS__);\
         CUTE_ASSERT(t.in != NULL);\
         CUTE_ASSERT(t.out != NULL);\
         kryptos_task_set_in(&t, t.out, t.out_size);\
         kryptos_task_set_decrypt_action(&t);\
-        kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
+        kryptos_run_cipher_hmac(cname, hname, &t, __VA_ARGS__);\
         CUTE_ASSERT(t.in != NULL);\
         CUTE_ASSERT(t.out != NULL);\
         CUTE_ASSERT(t.out_size == data_size);\
@@ -617,13 +617,13 @@ static kryptos_u8_t *hmac_test_data[] = {
         t.iv = NULL;\
         kryptos_task_set_in(&t, hmac_test_data[tv], data_size);\
         kryptos_task_set_encrypt_action(&t);\
-        kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
+        kryptos_run_cipher_hmac(cname, hname, &t, __VA_ARGS__);\
         CUTE_ASSERT(t.in != NULL);\
         CUTE_ASSERT(t.out != NULL);\
         kryptos_task_set_in(&t, t.out, t.out_size);\
         t.in[t.in_size >> 1] = ~t.in[t.in_size >> 1];\
         kryptos_task_set_decrypt_action(&t);\
-        kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
+        kryptos_run_cipher_hmac(cname, hname, &t, __VA_ARGS__);\
         CUTE_ASSERT(kryptos_last_task_succeed(&t) == 0);\
         CUTE_ASSERT(t.result == kKryptosHMACError);\
         if (t.mode == kKryptosECB) {\
@@ -635,13 +635,13 @@ static kryptos_u8_t *hmac_test_data[] = {
         t.iv = NULL;\
         kryptos_task_set_in(&t, hmac_test_data[tv], data_size);\
         kryptos_task_set_encrypt_action(&t);\
-        kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
+        kryptos_run_cipher_hmac(cname, hname, &t, __VA_ARGS__);\
         CUTE_ASSERT(t.in != NULL);\
         CUTE_ASSERT(t.out != NULL);\
         kryptos_task_set_in(&t, t.out, t.out_size);\
         t.in_size = kryptos_ ## hname ## _hash_size();\
         kryptos_task_set_decrypt_action(&t);\
-        kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
+        kryptos_run_cipher_hmac(cname, hname, &t, __VA_ARGS__);\
         CUTE_ASSERT(kryptos_last_task_succeed(&t) == 0);\
         CUTE_ASSERT(t.result == kKryptosHMACError);\
         if (t.mode == kKryptosECB) {\
@@ -652,12 +652,12 @@ static kryptos_u8_t *hmac_test_data[] = {
     }\
 }
 
-#define kryptos_bad_buf_run_hmac(cname, hname, ktask, cipher_args...) {\
+#define kryptos_bad_buf_run_hmac(cname, hname, ktask, ...) {\
     kryptos_task_init_as_null(ktask);\
     ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
     ktask->in_size = 39;\
     kryptos_task_set_decrypt_action(ktask);\
-    kryptos_run_cipher_hmac(cname, hname, ktask, cipher_args);\
+    kryptos_run_cipher_hmac(cname, hname, ktask, __VA_ARGS__);\
     CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
     CUTE_ASSERT(ktask->result == kKryptosHMACError);\
     if (ktask->mode != kKryptosECB) {\
@@ -666,7 +666,7 @@ static kryptos_u8_t *hmac_test_data[] = {
     ktask->in = "abc";\
     ktask->in_size = 3;\
     kryptos_task_set_decrypt_action(ktask);\
-    kryptos_run_cipher_hmac(cname, hname, ktask, cipher_args);\
+    kryptos_run_cipher_hmac(cname, hname, ktask, __VA_ARGS__);\
     CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
     CUTE_ASSERT(ktask->result == kKryptosHMACError);\
     if (ktask->mode != kKryptosECB) {\
@@ -676,7 +676,7 @@ static kryptos_u8_t *hmac_test_data[] = {
     CUTE_ASSERT(ktask->in != NULL);\
     ktask->in_size = 1024;\
     kryptos_task_set_decrypt_action(ktask);\
-    kryptos_run_cipher_hmac(cname, hname, ktask, cipher_args);\
+    kryptos_run_cipher_hmac(cname, hname, ktask, __VA_ARGS__);\
     CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
     CUTE_ASSERT(ktask->result == kKryptosHMACError);\
     if (ktask->mode != kKryptosECB) {\
