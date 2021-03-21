@@ -51,10 +51,15 @@ CUTE_TEST_CASE(kryptos_mp_hex_value_as_mp_tests)
     CUTE_ASSERT(mp->data[14] == 0xEE);
     CUTE_ASSERT(mp->data[15] == 0xFF);
 #else
+# if !defined(KRYPTOS_MP_EXTENDED_RADIX)
     CUTE_ASSERT(mp->data[0] == 0x66778899);
     CUTE_ASSERT(mp->data[1] == 0x22334455);
     CUTE_ASSERT(mp->data[2] == 0xBBAA0011);
     CUTE_ASSERT(mp->data[3] == 0xFFEEDDCC);
+#else
+    CUTE_ASSERT(mp->data[0] == 0x2233445566778899);
+    CUTE_ASSERT(mp->data[1] == 0xFFEEDDCCBBAA0011);
+#endif
 #endif
     kryptos_del_mp_value(mp);
 
@@ -80,10 +85,74 @@ CUTE_TEST_CASE(kryptos_mp_hex_value_as_mp_tests)
     CUTE_ASSERT(mp->data[14] == 0xEE);
     CUTE_ASSERT(mp->data[15] == 0xFF);
 #else
+# if !defined(KRYPTOS_MP_EXTENDED_RADIX)
     CUTE_ASSERT(mp->data[0] == 0x66778899);
     CUTE_ASSERT(mp->data[1] == 0x22334455);
     CUTE_ASSERT(mp->data[2] == 0xBBAA0011);
     CUTE_ASSERT(mp->data[3] == 0xFFEEDDCC);
+    kryptos_del_mp_value(mp);
+    mp = kryptos_hex_value_as_mp("1FFFF"
+                                 "FFFFFFFF"
+                                 "FFFFFFFF"
+                                 "FFFFFFFF"
+                                 "FFFFFFFF"
+                                 "FFFFFFFF"
+                                 "FFFFFFFF"
+                                 "FFFFFFFF"
+                                 "FFFFFFFF"
+                                 "FFFFFFFF"
+                                 "FFFFFFFF"
+                                 "FFFFFFFF"
+                                 "FFFFFFFF"
+                                 "FFFFFFFF"
+                                 "FFFEE600", 117);
+    CUTE_ASSERT(mp->data[ 0] == 0xFFFEE600);
+    CUTE_ASSERT(mp->data[ 1] == 0xFFFFFFFF);
+    CUTE_ASSERT(mp->data[ 2] == 0xFFFFFFFF);
+    CUTE_ASSERT(mp->data[ 3] == 0xFFFFFFFF);
+    CUTE_ASSERT(mp->data[ 4] == 0xFFFFFFFF);
+    CUTE_ASSERT(mp->data[ 5] == 0xFFFFFFFF);
+    CUTE_ASSERT(mp->data[ 6] == 0xFFFFFFFF);
+    CUTE_ASSERT(mp->data[ 7] == 0xFFFFFFFF);
+    CUTE_ASSERT(mp->data[ 8] == 0xFFFFFFFF);
+    CUTE_ASSERT(mp->data[ 9] == 0xFFFFFFFF);
+    CUTE_ASSERT(mp->data[10] == 0xFFFFFFFF);
+    CUTE_ASSERT(mp->data[11] == 0xFFFFFFFF);
+    CUTE_ASSERT(mp->data[12] == 0xFFFFFFFF);
+    CUTE_ASSERT(mp->data[13] == 0xFFFFFFFF);
+    CUTE_ASSERT(mp->data[14] == 0x0001FFFF);
+# else
+    CUTE_ASSERT(mp->data[0] == 0x2233445566778899);
+    CUTE_ASSERT(mp->data[1] == 0xFFEEDDCCBBAA0011);
+    kryptos_del_mp_value(mp);
+    mp = kryptos_hex_value_as_mp("1FFFF"
+                                 "FFFFFFFFFFFFFFFF"
+                                 "FFFFFFFFFFFFFFFF"
+                                 "FFFFFFFFFFFFFFFF"
+                                 "FFFFFFFFFFFFFFFF"
+                                 "FFFFFFFFFFFFFFFF"
+                                 "FFFFFFFFFFFFFFFF"
+                                 "FFFFFFFFFFFEE600", 117);
+    CUTE_ASSERT(mp->data[0] == 0xFFFFFFFFFFFEE600);
+    CUTE_ASSERT(mp->data[1] == 0xFFFFFFFFFFFFFFFF);
+    CUTE_ASSERT(mp->data[2] == 0xFFFFFFFFFFFFFFFF);
+    CUTE_ASSERT(mp->data[3] == 0xFFFFFFFFFFFFFFFF);
+    CUTE_ASSERT(mp->data[4] == 0xFFFFFFFFFFFFFFFF);
+    CUTE_ASSERT(mp->data[5] == 0xFFFFFFFFFFFFFFFF);
+    CUTE_ASSERT(mp->data[6] == 0xFFFFFFFFFFFFFFFF);
+    CUTE_ASSERT(mp->data[7] == 0x000000000001FFFF);
+    kryptos_del_mp_value(mp);
+
+    mp = kryptos_hex_value_as_mp("0000000000000000DEADBEEF", 24);
+    CUTE_ASSERT(mp->data[0] == 0x00000000DEADBEEF);
+    CUTE_ASSERT(mp->data[1] == 0x0000000000000000);
+    kryptos_del_mp_value(mp);
+
+    mp = kryptos_hex_value_as_mp("00000000DEADBEEFDEADBEEF", 24);
+    CUTE_ASSERT(mp->data[0] == 0xDEADBEEFDEADBEEF);
+    CUTE_ASSERT(mp->data[1] == 0x0000000000000000);
+
+# endif
 #endif
     kryptos_del_mp_value(mp);
 CUTE_TEST_CASE_END
@@ -141,6 +210,7 @@ CUTE_TEST_CASE(kryptos_assign_mp_value_tests)
     b = kryptos_hex_value_as_mp("FFEEDDCCBBAA00112233445566778899", 32);
     CUTE_ASSERT(b != NULL);
 
+#if !defined(KRYPTOS_MP_EXTENDED_RADIX)
     a = kryptos_new_mp_value(160);
     CUTE_ASSERT(a != NULL);
 
@@ -149,6 +219,16 @@ CUTE_TEST_CASE(kryptos_assign_mp_value_tests)
     CUTE_ASSERT(a != NULL);
 
     CUTE_ASSERT(kryptos_mp_byte2bit(a->data_size) == 160);
+#else
+    a = kryptos_new_mp_value(256);
+    CUTE_ASSERT(a != NULL);
+
+    memset(a->data, 0xf, a->data_size);
+    a = kryptos_assign_mp_value(&a, b);
+    CUTE_ASSERT(a != NULL);
+
+    CUTE_ASSERT(kryptos_mp_byte2bit(a->data_size) == 256);
+#endif
 
     CUTE_ASSERT(memcmp(a->data, b->data, b->data_size) == 0);
     for (d = b->data_size; d < a->data_size; d++) {
@@ -164,7 +244,11 @@ CUTE_TEST_CASE(kryptos_assign_hex_value_to_mp_tests)
     // INFO(Rafael): mp == NULL.
     mp = kryptos_assign_hex_value_to_mp(&mp, "DEADBEEF", 8);
     CUTE_ASSERT(mp != NULL);
+# if !defined(KRYPTOS_MP_EXTENDED_RADIX)
     CUTE_ASSERT(kryptos_mp_byte2bit(mp->data_size) == 32);
+# else
+    CUTE_ASSERT(kryptos_mp_byte2bit(mp->data_size) == 64);
+# endif
 #ifndef KRYPTOS_MP_U32_DIGIT
     CUTE_ASSERT(mp->data[0] == 0xEF);
     CUTE_ASSERT(mp->data[1] == 0xBE);
@@ -182,7 +266,11 @@ CUTE_TEST_CASE(kryptos_assign_hex_value_to_mp_tests)
 #ifndef KRYPTOS_MP_U32_DIGIT
     CUTE_ASSERT(kryptos_mp_byte2bit(mp->data_size) == 16);
 #else
+# if !defined(KRYPTOS_MP_EXTENDED_RADIX)
     CUTE_ASSERT(kryptos_mp_byte2bit(mp->data_size) == 32);
+# else
+    CUTE_ASSERT(kryptos_mp_byte2bit(mp->data_size) == 64);
+# endif
 #endif
 #ifndef KRYPTOS_MP_U32_DIGIT
     mp = kryptos_assign_hex_value_to_mp(&mp, "DEADBEEF", 8);
@@ -209,8 +297,19 @@ CUTE_TEST_CASE(kryptos_assign_hex_value_to_mp_tests)
     CUTE_ASSERT(mp->data[6] == 0x00);
     CUTE_ASSERT(mp->data[7] == 0x00);
 #else
+#if !defined(KRYPTOS_MP_EXTENDED_RADIX)
     CUTE_ASSERT(mp->data[1] == 0xDEADBEEF);
     CUTE_ASSERT(mp->data[0] == 0x0);
+# else
+    CUTE_ASSERT(mp->data[0] == 0xDEADBEEF);
+    kryptos_del_mp_value(mp);
+
+    mp = kryptos_new_mp_value(128);
+    CUTE_ASSERT(mp != NULL);
+    mp = kryptos_assign_hex_value_to_mp(&mp, "DEADBEEFDEADBEEF", 16);
+    CUTE_ASSERT(mp->data[1] == 0xDEADBEEFDEADBEEF);
+    CUTE_ASSERT(mp->data[0] == 0x0);
+# endif
 #endif
     kryptos_del_mp_value(mp);
 CUTE_TEST_CASE_END
@@ -639,7 +738,9 @@ CUTE_TEST_CASE(kryptos_mp_lt_tests)
         "0000000000000000018",
         "0000000000000000029",
         "0000000000000000039",
-        "0000001000001000010"
+        "0000001000001000010",
+        "0000000000000000DEADBEEF",
+        "00000000DEADBEEFDEADBEEF"
     };
     struct lt_tests_ctx {
         kryptos_u8_t *a, *b;
@@ -661,7 +762,9 @@ CUTE_TEST_CASE(kryptos_mp_lt_tests)
         {values[3], values[0], 0},
         {values[3], values[1], 0},
         {values[3], values[2], 0},
-        {values[3], values[3], 0}
+        {values[3], values[3], 0},
+        {values[4], values[5], 1},
+        {values[5], values[4], 0}
     };
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     kryptos_mp_value_t *a, *b;
@@ -682,7 +785,9 @@ CUTE_TEST_CASE(kryptos_mp_ge_tests)
         "0000000000000000018",
         "0000000000000000029",
         "0000000000000000039",
-        "0000001000001000010"
+        "0000001000001000010",
+        "0000000000000000DEADBEEF",
+        "00000000DEADBEEFDEADBEEF"
     };
     struct ge_tests_ctx {
         kryptos_u8_t *a, *b;
@@ -704,7 +809,11 @@ CUTE_TEST_CASE(kryptos_mp_ge_tests)
         {values[3], values[0], 1},
         {values[3], values[1], 1},
         {values[3], values[2], 1},
-        {values[3], values[3], 1}
+        {values[3], values[3], 1},
+        {values[4], values[5], 0},
+        {values[4], values[4], 1},
+        {values[5], values[4], 1},
+        {values[5], values[5], 1}
     };
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     kryptos_mp_value_t *a, *b;
@@ -725,7 +834,9 @@ CUTE_TEST_CASE(kryptos_mp_le_tests)
         "0000000000000000018",
         "0000000000000000029",
         "0000000000000000039",
-        "0000001000001000010"
+        "0000001000001000010",
+        "0000000000000000DEADBEEF",
+        "00000000DEADBEEFDEADBEEF"
     };
     struct le_tests_ctx {
         kryptos_u8_t *a, *b;
@@ -747,7 +858,11 @@ CUTE_TEST_CASE(kryptos_mp_le_tests)
         {values[3], values[0], 0},
         {values[3], values[1], 0},
         {values[3], values[2], 0},
-        {values[3], values[3], 1}
+        {values[3], values[3], 1},
+        {values[4], values[5], 1},
+        {values[4], values[4], 1},
+        {values[5], values[4], 0},
+        {values[5], values[5], 1}
     };
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     kryptos_mp_value_t *a, *b;
@@ -885,7 +1000,6 @@ CUTE_TEST_CASE(kryptos_mp_add_tests)
         a = kryptos_mp_add(&a, b);
 
         CUTE_ASSERT(a != NULL);
-
         CUTE_ASSERT(kryptos_mp_eq(a, e) == 1);
 
         kryptos_del_mp_value(a);
@@ -1190,6 +1304,7 @@ CUTE_TEST_CASE(kryptos_mp_not_tests)
     };
 #else
     struct not_tests_ctx test_vector[] = {
+# if !defined(KRYPTOS_MP_EXTENDED_RADIX)
         {               "FE",         "FFFFFF01" },
         {                "1",         "FFFFFFFE" },
         {             "FFFE",         "FFFF0001" },
@@ -1198,6 +1313,16 @@ CUTE_TEST_CASE(kryptos_mp_not_tests)
         {         "00000001",         "FFFFFFFE" },
         { "FFFFFFFFFFFFFFFE", "0000000000000001" },
         { "0000000000000001", "FFFFFFFFFFFFFFFE" }
+# else
+        {               "FE", "FFFFFFFFFFFFFF01" },
+        {                "1", "FFFFFFFFFFFFFFFE" },
+        {             "FFFE", "FFFFFFFFFFFF0001" },
+        {             "0001", "FFFFFFFFFFFFFFFE" },
+        { "FFFFFFFFFFFFFFFE", "0000000000000001" },
+        {         "00000001", "FFFFFFFFFFFFFFFE" },
+        { "FFFFFFFFFFFFFFFE", "0000000000000001" },
+        { "0000000000000001", "FFFFFFFFFFFFFFFE" }
+# endif
     };
 #endif
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
@@ -2456,12 +2581,25 @@ CUTE_TEST_CASE(kryptos_mp_get_bitmap_tests)
         size_t expected_size;
     };
     struct test_ctx test_vector[] = {
+#if !defined(KRYPTOS_MP_EXTENDED_RADIX)
         { "DEADBEEF",         "\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
                               "\x1\x0\x1\x1\x1\x1\x1\x0\x1\x1\x1\x0\x1\x1\x1\x1", 32 },
         { "DEADBEEFDEADBEEF", "\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
                               "\x1\x0\x1\x1\x1\x1\x1\x0\x1\x1\x1\x0\x1\x1\x1\x1"
                               "\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
                               "\x1\x0\x1\x1\x1\x1\x1\x0\x1\x1\x1\x0\x1\x1\x1\x1", 64 }
+#elif defined(KRYPTOS_MP_EXTENDED_RADIX)
+        { "DEADBEEF",         "\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0"
+                              "\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0"
+                              "\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
+                              "\x1\x0\x1\x1\x1\x1\x1\x0\x1\x1\x1\x0\x1\x1\x1\x1", 64 },
+        { "DEADBEEFDEADBEEF", "\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
+                              "\x1\x0\x1\x1\x1\x1\x1\x0\x1\x1\x1\x0\x1\x1\x1\x1"
+                              "\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
+                              "\x1\x0\x1\x1\x1\x1\x1\x0\x1\x1\x1\x0\x1\x1\x1\x1", 64 }
+#else
+# error Some code wanted.
+#endif
     };
     size_t tv_nr = sizeof(test_vector) / sizeof(test_vector[0]), tv;
     kryptos_mp_value_t *value = NULL;

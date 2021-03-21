@@ -811,10 +811,17 @@ kryptos_task_result_t kryptos_dh_get_random_s(kryptos_mp_value_t **s, const kryp
 #ifndef KRYPTOS_MP_U32_DIGIT
     mask = 0xFF;
 #else
+# if !defined(KRYPTOS_MP_EXTENDED_RADIX)
     mask = 0xFFFFFFFF;
     if (s_bits < 32) {
         mask = mask >> (32 - s_bits);
     }
+# else
+    mask = 0xFFFFFFFFFFFFFFFF;
+    if (s_bits < 64) {
+        mask = mask >> (64 - s_bits);
+    }
+# endif
 #endif
 
     do {
@@ -822,10 +829,21 @@ kryptos_task_result_t kryptos_dh_get_random_s(kryptos_mp_value_t **s, const kryp
 #ifndef KRYPTOS_MP_U32_DIGIT
             (*s)->data[d] = kryptos_get_random_byte();
 #else
+# if !defined(KRYPTOS_MP_EXTENDED_RADIX)
             (*s)->data[d] = (((kryptos_u32_t)kryptos_get_random_byte()) << 24 |
                              ((kryptos_u32_t)kryptos_get_random_byte()) << 16 |
                              ((kryptos_u32_t)kryptos_get_random_byte()) <<  8 |
                              ((kryptos_u32_t)kryptos_get_random_byte())) & mask;
+# else
+            (*s)->data[d] = (((kryptos_u64_t)kryptos_get_random_byte()) << 56 |
+                             ((kryptos_u64_t)kryptos_get_random_byte()) << 48 |
+                             ((kryptos_u64_t)kryptos_get_random_byte()) << 40 |
+                             ((kryptos_u64_t)kryptos_get_random_byte()) << 32 |
+                             ((kryptos_u64_t)kryptos_get_random_byte()) << 24 |
+                             ((kryptos_u64_t)kryptos_get_random_byte()) << 16 |
+                             ((kryptos_u64_t)kryptos_get_random_byte()) <<  8 |
+                             ((kryptos_u64_t)kryptos_get_random_byte())) & mask;
+# endif
 #endif
         }
     } while (kryptos_mp_gt(*s, p_2) || kryptos_mp_lt(*s, _2));

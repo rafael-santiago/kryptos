@@ -149,9 +149,17 @@ kryptos_u8_t *kryptos_mp_get_bitmap(const kryptos_mp_value_t *src, size_t *bitma
 
 #else
 
-# define kryptos_mp_bit2byte(b) ( (b) >> 5 )
+# if !defined(KRYPTOS_MP_EXTENDED_RADIX)
+#  define kryptos_mp_bit2byte(b) ( (b) >> 5 )
 
-# define kryptos_mp_byte2bit(b) ( (b) << 5 )
+#  define kryptos_mp_byte2bit(b) ( (b) << 5 )
+# else
+#  define kryptos_mp_bit2byte(b) ( (b) >> 6 )
+
+#  define kryptos_mp_byte2bit(b) ( (b) << 6 )
+# endif
+
+# if !defined(KRYPTOS_MP_EXTENDED_RADIX)
 
 # define kryptos_mp_as_task_out(ktask, m, o, o_size, xd, epilogue) {\
     (*(ktask))->out_size = (m)->data_size * sizeof(kryptos_mp_digit_t);\
@@ -170,6 +178,30 @@ kryptos_u8_t *kryptos_mp_get_bitmap(const kryptos_mp_value_t *src, size_t *bitma
     (o) = NULL;\
     (o_size) = (xd) = 0;\
 }
+
+# elif defined(KRYPTOS_MP_EXTENDED_RADIX)
+
+# define kryptos_mp_as_task_out(ktask, m, o, o_size, xd, epilogue) {\
+    (*(ktask))->out_size = (m)->data_size * sizeof(kryptos_mp_digit_t);\
+    (*(ktask))->out = (kryptos_u8_t *) kryptos_newseg((*(ktask))->out_size);\
+    if ((*(ktask))->out == NULL) {\
+        (*(ktask))->result = kKryptosProcessError;\
+        (*(ktask))->result_verbose = "No memory to produce the output.";\
+        goto epilogue;\
+    }\
+    memset((*(ktask))->out, 0, (*(ktask))->out_size);\
+    (o) = (*(ktask))->out;\
+    (o_size) = (*(ktask))->out_size;\
+    for ((xd) = (m)->data_size - 1; (xd) >= 0; (xd)--, (o) += sizeof(kryptos_mp_digit_t), (o_size) -= sizeof(kryptos_mp_digit_t)) {\
+        kryptos_cpy_u64_as_big_endian((o), (o_size), (m)->data[xd]);\
+    }\
+    (o) = NULL;\
+    (o_size) = (xd) = 0;\
+}
+
+# else
+#  error Some code wanted.
+# endif
 
 #endif
 

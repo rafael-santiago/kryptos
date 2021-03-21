@@ -344,6 +344,14 @@ static kryptos_mp_value_t *kryptos_elgamal_get_random_mp(kryptos_mp_value_t **mp
                                                          const kryptos_mp_value_t *q) {
     kryptos_mp_value_t *_2 = NULL, *q_2 = NULL;
     size_t bits;
+#if defined(KRYPTOS_MP_U32_DIGIT)
+# if defined(KRYPTOS_MP_EXTENDED_RADIX)
+    kryptos_mp_digit_t mask = 0xFFFFFFFFFFFFFFFF;
+# else
+    kryptos_mp_digit_t mask = 0xFFFFFFFF;
+# endif
+    size_t b;
+#endif
 
     if (mp == NULL || q == NULL) {
         return NULL;
@@ -369,13 +377,25 @@ static kryptos_mp_value_t *kryptos_elgamal_get_random_mp(kryptos_mp_value_t **mp
         goto kryptos_elgamal_get_random_mp_epilogue;
     }
 
-    bits = kryptos_mp_byte2bit(q->data_size);
+#if defined(KRYPTOS_MP_U32_DIGIT)
+    b = (sizeof(kryptos_mp_digit_t) << 3) - 1;
+    while (((q_2->data[q_2->data_size - 1] >> b) & 1) == 0) {
+        mask >>= 1;
+        b--;
+    }
+#endif
 
+    bits = kryptos_mp_byte2bit(q->data_size);
     do {
         if (*mp != NULL) {
             kryptos_del_mp_value(*mp);
         }
         (*mp) = kryptos_mp_rand(bits);
+#if defined(KRYPTOS_MP_U32_DIGIT)
+        if (mp != NULL) {
+            (*mp)->data[(*mp)->data_size - 1] &= mask;
+        }
+#endif
     } while (*mp == NULL || kryptos_mp_lt(*mp, _2) || kryptos_mp_gt(*mp, q_2));
 
 kryptos_elgamal_get_random_mp_epilogue:

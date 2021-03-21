@@ -258,9 +258,23 @@ typedef kryptos_task_result_t (*kryptos_gcm_e_func)(kryptos_u8_t **h, size_t *h_
 #define KRYPTOS_MP_U32_DIGIT 1
 
 #ifndef KRYPTOS_MP_U32_DIGIT
-typedef kryptos_u8_t kryptos_mp_digit_t;
+  typedef kryptos_u8_t kryptos_mp_digit_t;
 #else
-typedef kryptos_u32_t kryptos_mp_digit_t;
+# if __WORDSIZE == 32 || !defined(__SIZEOF_INT128__) || defined(KRYPTOS_KERNEL_MODE)
+  typedef kryptos_u32_t kryptos_mp_digit_t;
+  typedef kryptos_u64_t kryptos_urdx_overflow_t;
+  typedef long long kryptos_rdx_overflow_t;
+# define KRYPTOS_MAX_MP_DIGIT 0xFFFFFFFF
+#elif __WORDSIZE == 64 && defined(__SIZEOF_INT128__)
+# define KRYPTOS_MP_EXTENDED_RADIX      1
+# include <inttypes.h>
+  typedef kryptos_u64_t kryptos_mp_digit_t;
+  typedef unsigned __int128 kryptos_urdx_overflow_t;
+  typedef __int128 kryptos_rdx_overflow_t;
+# define KRYPTOS_MAX_MP_DIGIT 0xFFFFFFFFFFFFFFFF
+#else
+# error Unable to define a suitable MP radix.
+#endif
 #endif
 
 typedef struct kryptos_mp_value {

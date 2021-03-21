@@ -530,6 +530,8 @@ void kryptos_rsa_sign(kryptos_task_ctx **ktask) {
     kryptos_mp_value_t *d = NULL, *n = NULL, *x = NULL, *s = NULL;
     kryptos_u8_t *old_in = NULL;
     size_t old_in_size = 0;
+    kryptos_u8_t *unpadded_in = NULL;
+    size_t unpadded_in_size = 0;
 
     if (ktask == NULL) {
         return;
@@ -558,8 +560,28 @@ void kryptos_rsa_sign(kryptos_task_ctx **ktask) {
     }
 
     if ((*ktask)->cipher == kKryptosCipherRSAEMSAPSS) {
-        old_in = (*ktask)->in;
-        old_in_size = (*ktask)->in_size;
+        if (((*ktask)->in_size % sizeof(kryptos_mp_digit_t)) == 0) {
+            old_in = (*ktask)->in;
+            old_in_size = (*ktask)->in_size;
+        } else {
+            // INFO(Rafael): We need to pad the buffer message until it has a capacity multiple of sizeof(kryptos_mp_digit_t).
+            //               Otherwise it will fail during kryptos_pss_verify() due to aligment issues.
+            unpadded_in = (*ktask)->in;
+            unpadded_in_size = (*ktask)->in_size;
+
+            old_in_size = (*ktask)->in_size;
+            while (old_in_size % sizeof(kryptos_mp_digit_t)) {
+                old_in_size += 1;
+            }
+            old_in = (kryptos_u8_t *) kryptos_newseg(old_in_size);
+            if (old_in == NULL) {
+                (*ktask)->result_verbose = "No memory.";
+                goto kryptos_rsa_sign_epilogue;
+            }
+            memset(old_in, 0, old_in_size);
+            memcpy(old_in, (*ktask)->in, (*ktask)->in_size);
+            (*ktask)->in_size = old_in_size;
+        }
         (*ktask)->in = kryptos_pss_encode(old_in, &(*ktask)->in_size,
                                           kryptos_mp_byte2bit(n->data_size), *(size_t *)(*ktask)->arg[0],
                                           (kryptos_hash_func)(*ktask)->arg[1], (kryptos_hash_size_func)(*ktask)->arg[2]);
@@ -600,15 +622,26 @@ void kryptos_rsa_sign(kryptos_task_ctx **ktask) {
     if ((*ktask)->cipher == kKryptosCipherRSAEMSAPSS) {
         kryptos_freeseg((*ktask)->in, (*ktask)->in_size);
 
-        (*ktask)->in = old_in;
-        (*ktask)->in_size = old_in_size;
-
-        old_in = NULL;
-        old_in_size = 0;
+        if (unpadded_in == NULL) {
+            (*ktask)->in = old_in;
+            (*ktask)->in_size = old_in_size;
+        } else {
+            (*ktask)->in = unpadded_in;
+            (*ktask)->in_size = unpadded_in_size;
+        }
 
         kryptos_del_mp_value(x);
 
-        x = kryptos_raw_buffer_as_mp((*ktask)->in, (*ktask)->in_size);
+        x = kryptos_raw_buffer_as_mp(old_in, old_in_size);
+
+        if (unpadded_in != NULL) {
+            kryptos_freeseg(old_in, old_in_size);
+            unpadded_in = NULL;
+            unpadded_in_size = 0;
+        }
+
+        old_in = NULL;
+        old_in_size = 0;
     }
 
     (*ktask)->out = NULL;
@@ -657,9 +690,16 @@ kryptos_rsa_sign_epilogue:
         if ((*ktask)->in != NULL) {
             kryptos_freeseg((*ktask)->in, (*ktask)->in_size);
         }
-
-        (*ktask)->in = old_in;
-        (*ktask)->in_size = old_in_size;
+        if (unpadded_in == NULL) {
+            (*ktask)->in = old_in;
+            (*ktask)->in_size = old_in_size;
+        } else {
+            (*ktask)->in = unpadded_in;
+            (*ktask)->in_size = unpadded_in_size;
+            unpadded_in = NULL;
+            unpadded_in_size = 0;
+            kryptos_freeseg(old_in, old_in_size);
+        }
         old_in = NULL;
         old_in_size = 0;
     }

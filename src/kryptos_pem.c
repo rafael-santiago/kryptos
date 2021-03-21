@@ -190,6 +190,9 @@ kryptos_task_result_t kryptos_pem_get_mp_data(const char *hdr,
                                               kryptos_mp_value_t **number) {
     kryptos_u8_t *pem_data;
     size_t pem_data_size;
+    int smaller_radix = 0;
+    size_t mp_data_size = 0;
+    //size_t offset = 0;
 
     pem_data = kryptos_pem_get_data(hdr, in, in_size, &pem_data_size);
 
@@ -197,15 +200,30 @@ kryptos_task_result_t kryptos_pem_get_mp_data(const char *hdr,
         return kKryptosProcessError;
     }
 
-    (*number) = kryptos_new_mp_value(kryptos_mp_byte2bit(pem_data_size));
+    if ((smaller_radix = (pem_data_size < sizeof(kryptos_mp_digit_t)))) {
+        // INFO(Rafael): This trick makes exchangeable data from machines that are using a mp radix lesser than the
+        //               current one in this implementation.
+        //offset = pem_data_size / sizeof(kryptos_mp_digit_t);
+        mp_data_size = sizeof(kryptos_mp_digit_t);
+    } else {
+        mp_data_size = pem_data_size;
+    }
+
+    while (mp_data_size % sizeof(kryptos_mp_digit_t)) {
+        mp_data_size += 1;
+    }
+
+    (*number) = kryptos_new_mp_value(kryptos_mp_byte2bit(mp_data_size));
     if ((*number) == NULL) {
         return kKryptosProcessError;
     }
 
+    //memcpy(&(*number)->data[offset], pem_data, pem_data_size);
     memcpy((*number)->data, pem_data, pem_data_size);
-    (*number)->data_size = pem_data_size / sizeof(kryptos_mp_digit_t);
+    (*number)->data_size = mp_data_size / sizeof(kryptos_mp_digit_t);
     kryptos_freeseg(pem_data, pem_data_size);
-    pem_data_size = 0;
+    pem_data_size = mp_data_size = /*offset =*/ 0;
+    smaller_radix = 0;
 
     return kKryptosSuccess;
 }

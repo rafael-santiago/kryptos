@@ -157,6 +157,14 @@ kryptos_dsa_mk_key_pair_epilogue:
 static kryptos_mp_value_t *kryptos_dsa_get_random(const kryptos_mp_value_t *n) {
     kryptos_mp_value_t *_1 = NULL, *n_1 = NULL;
     kryptos_mp_value_t *r = NULL;
+#if defined(KRYPTOS_MP_U32_DIGIT)
+# if defined(KRYPTOS_MP_EXTENDED_RADIX)
+    kryptos_mp_digit_t mask = 0xFFFFFFFFFFFFFFFF;
+# else
+    kryptos_mp_digit_t mask = 0xFFFFFFFF;
+# endif
+    size_t b;
+#endif
 
     if (n == NULL) {
         return NULL;
@@ -180,6 +188,13 @@ static kryptos_mp_value_t *kryptos_dsa_get_random(const kryptos_mp_value_t *n) {
         goto kryptos_dsa_get_random_d_epilogue;
     }
 
+#if defined(KRYPTOS_MP_U32_DIGIT)
+    b = (sizeof(kryptos_mp_digit_t) << 3) - 1;
+    while (((n_1->data[n_1->data_size - 1] >> b) & 1) == 0) {
+        mask >>= 1;
+        b--;
+    }
+#endif
 
     do {
         if (r != NULL) {
@@ -191,6 +206,10 @@ static kryptos_mp_value_t *kryptos_dsa_get_random(const kryptos_mp_value_t *n) {
         if (r == NULL) {
             goto kryptos_dsa_get_random_d_epilogue;
         }
+
+#if defined(KRYPTOS_MP_U32_DIGIT)
+        r->data[r->data_size - 1] &= mask;
+#endif
 
     } while (kryptos_mp_lt(r, _1) || kryptos_mp_gt(r, n_1));
 

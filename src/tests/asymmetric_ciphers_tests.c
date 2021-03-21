@@ -391,6 +391,7 @@ CUTE_TEST_CASE(kryptos_dh_eval_t_tests)
             // INFO(Rafael): Unrealistic bit size. However, faster for tests.
             bit_size = 8;
         }
+
         CUTE_ASSERT(kryptos_dh_get_random_s(&s, p, bit_size) == kKryptosSuccess);
         CUTE_ASSERT(kryptos_dh_eval_t(&t, g, s, p) == kKryptosSuccess);
         kryptos_del_mp_value(p);
@@ -1730,7 +1731,6 @@ CUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
                                  "-----BEGIN ELGAMAL PARAM D-----\n"
                                  "8KUZ47r90x0=\n"
                                  "-----END ELGAMAL PARAM D-----\n";
-
     kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
     kryptos_u8_t *m = "yo no creo en brujas, pero que las hay, las hay.\x00\x00\x00\x00\x00\x00\x00\x00";
     size_t m_size = 56;
@@ -2534,6 +2534,7 @@ CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     size_t salt_size = 4;
     kryptos_u8_t *signature = NULL;
     size_t signature_size = 0;
+    size_t temp_m_size = 0;
 
     // INFO(Rafael): Valid signature case.
 
@@ -2575,8 +2576,12 @@ CUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     CUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
 
     CUTE_ASSERT(bob->out != NULL);
-    CUTE_ASSERT(bob->out_size == m_size);
-    CUTE_ASSERT(memcmp(bob->out, m, bob->out_size) == 0);
+    temp_m_size = m_size;
+    while (temp_m_size % sizeof(kryptos_mp_digit_t)) {
+        temp_m_size += 1;
+    }
+    CUTE_ASSERT(bob->out_size == temp_m_size);
+    CUTE_ASSERT(memcmp(bob->out, m, m_size) == 0);
 
     printf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
 
