@@ -1,5 +1,5 @@
-(A) Adapt KRYPTOS_MP_EXTENDED_RADIX for kernel mode if possible. +Improvement
 (A) Try to give support to GMP on multiprecision stuff when asked by the user. +Improvement
+x (A) Adapt KRYPTOS_MP_EXTENDED_RADIX for kernel mode if possible. +Improvement
 x (A) Give radix 2^64 a try on 64-bit processors on multiprecision stuff. +Improvement
 x (A) Fix wrong variadic macro uses (C99). +Improvement
 x (A) Build in FreeBSD, NetBSD, Windows, Minix, Solaris and fix forbidden function usage

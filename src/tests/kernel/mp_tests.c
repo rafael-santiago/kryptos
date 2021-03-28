@@ -62,7 +62,6 @@ KUTE_TEST_CASE(kryptos_mp_hex_value_as_mp_tests)
     KUTE_ASSERT(mp->data[1] == 0xFFEEDDCCBBAA0011);
 # endif
 #endif
-#endif
     kryptos_del_mp_value(mp);
 
     mp = kryptos_hex_value_as_mp("-FFEEDDCCBBAA00112233445566778899", 33);
