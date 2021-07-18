@@ -16,7 +16,9 @@
 # include <string.h>
 # include <ctype.h>
 # include <stdio.h>
-# include <inttypes.h>
+# if defined(_WIN32)
+#  include <inttypes.h>
+# endif
 #else
 # include <kryptos_userland_funcs.h>
 #endif
@@ -1357,7 +1359,14 @@ void kryptos_print_mp(const kryptos_mp_value_t *v) {
 #  if !defined(KRYPTOS_MP_EXTENDED_RADIX)
     for (d = v->data_size - 1; d >= 0; d--) printf("%.8X", v->data[d]);
 #  else
-    for (d = v->data_size - 1; d >= 0; d--) printf("%"PRIx64, v->data[d]);//printf("%.16llX", v->data[d]);
+#   if !defined(_WIN32)
+    for (d = v->data_size - 1; d >= 0; d--) printf("%.16llX", v->data[d]);
+#   else
+    // WARN(Rafael): MinGW (8.1.0) does not give support for llx. Since this is about a cryptographic library
+    //               the purpose of this function is more for debugging issues than user necessities due to
+    //               it by now I will not waste energy on trying to patch it.
+    for (d = v->data_size - 1; d >= 0; d--) printf("%"PRIX64, v->data[d]);
+#   endif
 #  endif
 # endif
     printf("\n");
