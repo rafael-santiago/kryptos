@@ -31,6 +31,10 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_u32_rev_tests);
     CUTE_RUN_TEST(kryptos_u64_rev_tests);
     CUTE_RUN_TEST(kryptos_padding_tests);
+    CUTE_RUN_TEST(kryptos_unbiased_rand_mod_u8_tests);
+    CUTE_RUN_TEST(kryptos_unbiased_rand_mod_u16_tests);
+    CUTE_RUN_TEST(kryptos_unbiased_rand_mod_u32_tests);
+    CUTE_RUN_TEST(kryptos_unbiased_rand_mod_u64_tests);
     CUTE_RUN_TEST(kryptos_sys_get_random_block_tests);
     CUTE_RUN_TEST(kryptos_get_random_block_tests);
     CUTE_RUN_TEST(kryptos_fortuna_general_tests);

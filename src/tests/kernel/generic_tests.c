@@ -111,7 +111,7 @@ KUTE_TEST_CASE(kryptos_unbiased_rand_mod_u32_tests)
     kryptos_unbiased_rand_mod_u32(0xABCDEF00);
 KUTE_TEST_CASE_END
 
-KUTE_TEST_CASE(kryptos_unbiased_rand_mode_u64_tests)
+KUTE_TEST_CASE(kryptos_unbiased_rand_mod_u64_tests)
     kryptos_unbiased_rand_mod_u64(17237128);
 KUTE_TEST_CASE_END
 
