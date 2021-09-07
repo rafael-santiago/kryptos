@@ -83,7 +83,10 @@ local function has_bad_funcs_msvc(func_signatures type list, srcs type list, inc
     var c type int;
     $c = 0;
     while ($c < $cflags.count()) {
-        $cmdline = $cmdline + " " + $cflags.item($c);
+        var cflag type string;
+        $cflag = $cflags.item($c);
+        $cflag.replace("-", "/");
+        $cmdline = $cmdline + " " + $cflag;
         $c = $c + 1;
     }
 
@@ -96,12 +99,9 @@ local function has_bad_funcs_msvc(func_signatures type list, srcs type list, inc
         result 1;
     }
     var badfuncs_data type string;
-    $badfuncs_data = "@" + $vcvarsall + "\n" +
-                     "@" + $cmdline + " \"%1\"\n" +
-                     "@if ErrorLevel 1 (\n" +
-                     "\t@exit /b 1\n" +
-                     ")\n" +
-                     "\t@exit /b 0\n";
+    $badfuncs_data = "@call \"" + $vcvarsall + "\" " + get_msvc_platform() + " >nul 2>&1\n" +
+                     "@cd \"" + hefesto.sys.pwd() + "\" >nul 2>&1\n" +
+                     "@" + $cmdline + " \"%1\" >nul 2>&1\n";
     hefesto.sys.fwrite($badfuncs_data, $badfuncs_data.len(), $fp);
     hefesto.sys.fclose($fp);
     
@@ -114,7 +114,8 @@ local function has_bad_funcs_msvc(func_signatures type list, srcs type list, inc
     while ($s < $srcs.count() && $founds.count() == 0) {
         hefesto.sys.echo("\t*** " + $srcs.item($s) + ": ");
 
-        if (hefesto.sys.run("cmd.exe /c .badfuncs.cmd \"" + $srcs.item($s) + "\"") != 0) {
+        hefesto.sys.run("cmd.exe /c .badfuncs.cmd \"" + $srcs.item($s) + "\"");
+        if (isfile(".asm-out.s") == 0) {
             hefesto.sys.echo("\nERROR: Unable to generate assembly file.\n");
             result 1;
         }
