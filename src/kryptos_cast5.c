@@ -732,7 +732,7 @@ static void kryptos_cast5_expand_key(const kryptos_u8_t *key, const size_t key_s
 
 static void kryptos_cast5_block_encrypt(kryptos_u8_t *block, const struct kryptos_cast5_subkeys *sks) {
     kryptos_u32_t L[18], R[18];
-    size_t r;
+    unsigned int r;
 
     // INFO(Rafael): Initial split.
 
@@ -754,7 +754,7 @@ static void kryptos_cast5_block_encrypt(kryptos_u8_t *block, const struct krypto
 
 static void kryptos_cast5_block_decrypt(kryptos_u8_t *block, const struct kryptos_cast5_subkeys *sks) {
     kryptos_u32_t L[17],R[17];
-    size_t r;
+    unsigned int r;
 
     // INFO(Rafael): Initial split.
 

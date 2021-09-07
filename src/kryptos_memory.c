@@ -29,7 +29,9 @@
 
 #if defined(KRYPTOS_USER_MODE)
 # include <stdio.h>
-# include <unistd.h>
+# if !defined(_MSC_VER)
+#  include <unistd.h>
+# endif
 # include <string.h>
 #elif defined(KRYPTOS_KERNEL_MODE) && (defined(__FreeBSD__) || defined(__NetBSD__))
   MALLOC_DECLARE(M_KRYPTOS);

@@ -167,7 +167,8 @@ static void kryptos_seal_ld_userkey(kryptos_u32_t *state, const size_t state_siz
 
 static void kryptos_seal_keystream(const kryptos_u8_t *userkey, const size_t userkey_size,
                                    struct kryptos_seal_keystream_ctx *kstream) {
-    int i, l, p;
+    int i, l;
+    kryptos_u32_t p;
     int until;
 #ifdef KRYPTOS_KERNEL_MODE
     static kryptos_u32_t T[512], S[256], R[ 4 * ((KRYPTOS_SEALMAXL - 1) / 8192) - 1];
@@ -395,7 +396,7 @@ void kryptos_seal_cipher(kryptos_task_ctx **ktask) {
         kstream.n = 0;
     }
 
-    kstream.L = wordsize << 5; // INFO(Rafael): I mean "wordsize * 32".
+    kstream.L = (kryptos_u32_t)wordsize << 5; // INFO(Rafael): I mean "wordsize * 32".
     kstream.version = *(kryptos_seal_version_t *)(*ktask)->arg[0];
 
     in_p = (*ktask)->in;

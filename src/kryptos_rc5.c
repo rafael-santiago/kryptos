@@ -205,7 +205,8 @@ static void kryptos_rc5_ksched(const kryptos_u8_t *user_key, const size_t user_k
         sks->K[i] = sks->K[i-1] + kryptos_rc5_QW;
     }
 
-    A = B = i = j = 0;
+    A = B = 0;
+    i = j = 0;
 
     t = (t < c) ? c : t;
 

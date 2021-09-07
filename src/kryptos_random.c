@@ -9,7 +9,9 @@
 #include <kryptos_memory.h>
 #ifndef KRYPTOS_KERNEL_MODE
 # include <fcntl.h>
-# include <unistd.h>
+# if !defined(_MSC_VER)
+#  include <unistd.h>
+# endif
 # include <string.h>
 #endif
 

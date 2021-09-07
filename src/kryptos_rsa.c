@@ -171,7 +171,7 @@ kryptos_rsa_mk_key_pair_epilogue:
 
 static kryptos_mp_value_t *kryptos_rsa_eval_e(const kryptos_mp_value_t *euler_phi_f) {
     kryptos_mp_value_t *_1 = NULL, *gcd = NULL, *e = NULL;
-    ssize_t d;
+    size_t d;
 
     if ((_1 = kryptos_hex_value_as_mp("1", 1)) == NULL) {
         goto kryptos_rsa_eval_e_epilogue;

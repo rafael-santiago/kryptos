@@ -307,7 +307,7 @@ static void kryptos_rc2_inflate_key(const kryptos_u8_t *key, const size_t key_si
     // INFO(Rafael): Evaluating TM.
 
     Tn = (sks->T1 + 7) / 8;
-    TM = 255 % kryptos_pw2((8 + sks->T1) - (Tn << 3));
+    TM = 255 % kryptos_pw2((8 + sks->T1) - ((unsigned int)Tn << 3));
 
     // INFO(Rafael): start of the expansion.
 

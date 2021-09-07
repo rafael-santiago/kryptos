@@ -106,7 +106,7 @@ kryptos_u8_t *kryptos_do_hkdf(kryptos_u8_t *ikm,
             goto kryptos_hkdf_epilogue;
         }
 
-        T_size = ((okm_t - okm_h) >= prk_size) ? prk_size : (okm_t - okm_h);
+        T_size = ((size_t)(okm_t - okm_h) >= prk_size) ? prk_size : (okm_t - okm_h);
 
         memcpy(okm_h, ktask->out, T_size);
 

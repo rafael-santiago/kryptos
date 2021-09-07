@@ -487,7 +487,7 @@ static size_t kryptos_huffman_eval_deflated_out_size(size_t *raw_freq, struct kr
 
 static kryptos_u8_t *kryptos_huffman_dump_tree(kryptos_u8_t *out, const kryptos_u8_t *out_end,
                                                struct kryptos_huffman_code_ctx *hcodes) {
-    size_t c;
+    unsigned int c;
     for (c = 0; c < 256; c++) {
         if (hcodes[c].data_size != 0) {
             if ((out + hcodes[c].data_size) > out_end) {

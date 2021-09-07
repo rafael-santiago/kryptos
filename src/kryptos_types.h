@@ -79,6 +79,11 @@
 #define KRYPTOS_TASK_AUX_BUF0  0x10
 #define KRYPTOS_TASK_AUX_BUF1  0x20
 
+#if defined(_MSC_VER)
+# include <basetsd.h>
+typedef SSIZE_T ssize_t;
+#endif
+
 typedef unsigned char kryptos_u8_t;
 
 typedef unsigned short kryptos_u16_t;
@@ -464,13 +469,13 @@ kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_si
 }
 
 #ifndef __cplusplus
-#define KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_GCM_E(cipher_name, additional_args...)\
+#define KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_GCM_E(cipher_name, ...)\
     kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_size,\
-                                                      kryptos_u8_t *key, size_t key_size, additional_args);
+                                                      kryptos_u8_t *key, size_t key_size, __VA_ARGS__);
 #else
-#define KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_GCM_E(cipher_name, additional_args...)\
+#define KRYPTOS_DECL_CUSTOM_BLOCK_CIPHER_GCM_E(cipher_name, ...)\
     extern "C" kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_size,\
-                                                                 kryptos_u8_t *key, size_t key_size, additional_args);
+                                                                 kryptos_u8_t *key, size_t key_size, __VA_ARGS__);
 #endif
 
 #define KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_GCM_E(cipher_name, key, key_size, additional_arg, ktask, setup_stmt)\
@@ -854,7 +859,7 @@ static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct
                 buffer[ctx->curr_len++] = ctx->message[i];\
             } else {\
                 kryptos_hash_ld_u8buf_as_u ## bits_per_block  ## _blocks(buffer, ctx->curr_len,\
-                                                    ctx->input.block, input_block_size,\
+                                                    ctx->input.block, (size_t)input_block_size,\
                                                     block_index_decision_table);\
                 hash_do_block_stmt;\
                 ctx->curr_len = 0;\
@@ -867,7 +872,7 @@ static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct
         i = l = 0;\
     } else {\
         kryptos_hash_ld_u8buf_as_u ## bits_per_block ## _blocks((kryptos_u8_t *)"", 0,\
-                                            ctx->input.block, input_block_size,\
+                                            ctx->input.block, (size_t)input_block_size,\
                                             block_index_decision_table);\
         hash_do_block_stmt;\
     }\

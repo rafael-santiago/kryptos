@@ -31,23 +31,29 @@ kryptos.prologue() {
     check_compiler_language();
     $includes = hefesto.sys.get_option("includes");
     $cflags = hefesto.sys.get_option("cflags");
-    $cflags.add_item("-Wall");
-    $cflags.add_item("-Werror");
-    $deps = get_c_cpp_deps();
-    $sources.ls(".*\\.c$");
+    if ($toolset_name.match("^msvc") == 0) {
+        $cflags.add_item("-Wall");
+        $cflags.add_item("-Werror");
+        $deps = get_c_cpp_deps();
+        $sources.ls(".*\\.c$");
 
-    if (hefesto.sys.os_name() != "windows" && is_x64()) {
-        $cflags.add_item("-fPIC");
-    }
+        if (hefesto.sys.os_name() != "windows" && is_x64()) {
+            $cflags.add_item("-fPIC");
+        }
 
-    if ($toolset_name.match("^clang") == 1) {
-        $cflags.add_item("-Wno-pointer-sign");
-        $cflags.add_item("-Wno-invalid-source-encoding");
-    }
+        if ($toolset_name.match("^clang") == 1) {
+            $cflags.add_item("-Wno-pointer-sign");
+            $cflags.add_item("-Wno-invalid-source-encoding");
+        }
 
-    if ($cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT") == -1) {
-        # INFO(Rafael): Let's enable c99 capabilities by default.
-        $cflags.add_item("-std=c99");
+        if ($cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT") == -1) {
+            # INFO(Rafael): Let's enable c99 capabilities by default.
+            $cflags.add_item("-std=c99");
+        }
+    } else {
+        $cflags.add_item("/Wall");
+        $cflags.add_item("/WX");
+        $cflags.add_item("-D_CRT_SECURE_NO_WARNINGS");
     }
 
     var option type list;

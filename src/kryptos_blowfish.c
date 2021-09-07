@@ -433,7 +433,7 @@ static void kryptos_blowfish_ld_user_key(kryptos_u32_t *key,
 }
 
 static void kryptos_blowfish_puff_up(const kryptos_u8_t *key, size_t key_size, struct kryptos_blowfish_subkeys *sks) {
-    kryptos_u32_t w_key[KRYPTOS_BLOWFISH_MAX_KEY_NR], *xl, *xr;
+    kryptos_u32_t w_key[KRYPTOS_BLOWFISH_MAX_KEY_NR], *xl = NULL, *xr = NULL;
     size_t i, j , w_size = 0;
     kryptos_u8_t pl[8];
 
@@ -678,7 +678,7 @@ kryptos_bcrypt_verify_epilogue:
 static void kryptos_eks_blowfish_setup(const int cost, const kryptos_u8_t *salt,
                                        const kryptos_u8_t *password, const size_t password_size,
                                        struct kryptos_blowfish_subkeys *sks) {
-    size_t r_nr = 1 << cost;
+    size_t r_nr = (size_t)1 << cost;
     size_t r;
     kryptos_u8_t all_zeros[16];
 
@@ -705,7 +705,7 @@ static void kryptos_eks_blowfish_setup(const int cost, const kryptos_u8_t *salt,
 
 static void kryptos_bcrypt_puff_up(const kryptos_u8_t *password, size_t password_size,
                                    const kryptos_u8_t *salt, struct kryptos_blowfish_subkeys *sks, const int init) {
-    kryptos_u32_t *xl, *xr, w_key;
+    kryptos_u32_t *xl = NULL, *xr = NULL, w_key;
     size_t i, j , w_size = 0;
     kryptos_u8_t pl[8], *pl_c, *pl_end;
     const kryptos_u8_t *s_c, *s_end;

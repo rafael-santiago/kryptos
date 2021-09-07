@@ -92,7 +92,7 @@ kryptos_u8_t *kryptos_uuencode_encode_buffer(const kryptos_u8_t *buffer, const s
         cp += 4;
 
         if (cp == cp_end || bp == bp_end) {
-            *out_p = 32 + enc_total;
+            *out_p = 32 + (kryptos_u8_t)enc_total;
             memcpy(out_p + 1, curr_line, (cp - &curr_line[0]));
             if (cp == cp_end) {
                 out_p += KRYPTOS_UUENCODE_BYTES_PER_LINE + 1;

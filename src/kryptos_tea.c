@@ -14,7 +14,11 @@
 
 #define KRYPTOS_TEA_DELTA 0x9E3779B9
 
-struct kryptos_tea_into_the_void { };
+#if !defined(_MSC_VER)
+    struct kryptos_tea_into_the_void { };
+#else
+    struct kryptos_tea_into_the_void { int dummy; };
+#endif
 
 typedef void (*kryptos_tea_block_processor)(kryptos_u8_t *block, kryptos_u8_t *key);
 
@@ -54,7 +58,8 @@ KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(tea)
 
 static void kryptos_tea_block_encryption(kryptos_u8_t *block, kryptos_u8_t *key) {
     kryptos_u32_t y, z, k[4];
-    size_t sum = 0, r;
+    kryptos_u32_t sum = 0;
+    size_t r;
 
     k[0] = kryptos_get_u32_as_big_endian(key, 4);
     k[1] = kryptos_get_u32_as_big_endian(key + 4, 4);
@@ -74,13 +79,14 @@ static void kryptos_tea_block_encryption(kryptos_u8_t *block, kryptos_u8_t *key)
     kryptos_cpy_u32_as_big_endian(block + 4, 4, z);
 
     memset(k, 0, sizeof(k));
-    y = z = 0;
-    sum = r = 0;
+    y = z = sum = 0;
+    r = 0;
 }
 
 static void kryptos_tea_block_decryption(kryptos_u8_t *block, kryptos_u8_t *key) {
     kryptos_u32_t y, z, k[4];
-    size_t sum = KRYPTOS_TEA_DELTA << 5, r;
+    kryptos_u32_t sum = KRYPTOS_TEA_DELTA << 5;
+    size_t r;
 
     k[0] = kryptos_get_u32_as_big_endian(key, 4);
     k[1] = kryptos_get_u32_as_big_endian(key + 4, 4);
@@ -100,8 +106,8 @@ static void kryptos_tea_block_decryption(kryptos_u8_t *block, kryptos_u8_t *key)
     kryptos_cpy_u32_as_big_endian(block + 4, 4, z);
 
     memset(k, 0, sizeof(k));
-    y = z = 0;
-    sum = r = 0;
+    y = z = sum = 0;
+    r = 0;
 }
 
 #undef KRYPTOS_TEA_DELTA

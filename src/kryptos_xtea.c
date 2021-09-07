@@ -12,7 +12,11 @@
 #include <kryptos_task_check.h>
 #include <kryptos.h>
 
+#if !defined(_MSC_VER)
 struct kryptos_xtea_nullkeys { };
+#else
+struct kryptos_xtea_nullkeys { int dummy; };
+#endif
 
 #define KRYPTOS_XTEA_DELTA 0x9E3779B9
 
