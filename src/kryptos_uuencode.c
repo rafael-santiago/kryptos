@@ -160,7 +160,7 @@ static kryptos_u8_t *kryptos_uuencode_decode_buffer(const kryptos_u8_t *buffer, 
         bp_end -= 3;
     }
 
-    if (*out_size < *bp - 32) {
+    if (*out_size < (size_t)(*bp - 32)) {
         // CLUE(Rafael): Rather tiny buffers case.
         *out_size = *bp - 32;
     }

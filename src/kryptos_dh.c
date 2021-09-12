@@ -866,7 +866,7 @@ kryptos_task_result_t kryptos_dh_get_modp(const kryptos_dh_modp_group_bits_t bit
                                           kryptos_mp_value_t **p, kryptos_mp_value_t **g) {
     kryptos_task_result_t result = kKryptosSuccess;
 
-    if (bits > kKryptosDHGroupNr || p == NULL || g == NULL) {
+    if (bits > kKryptosDHGroupNr || (int)bits <= -1 || p == NULL || g == NULL) {
         result = kKryptosInvalidParams;
         goto kryptos_dh_get_modp_epilogue;
     }

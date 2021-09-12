@@ -40,7 +40,7 @@
 
 struct kryptos_rc5_subkeys {
     kryptos_u32_t K[kryptos_rc5_K_NR];
-    int rounds;
+    size_t rounds;
 };
 
 typedef void (*kryptos_rc5_block_processor)(kryptos_u8_t *block, const struct kryptos_rc5_subkeys *sks);

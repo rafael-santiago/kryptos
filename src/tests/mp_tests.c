@@ -2393,7 +2393,7 @@ CUTE_TEST_CASE(kryptos_mp_barrett_reduction_tests)
         {       "-2", 2,  "02", 2,  "00", 2 }
     };
     size_t t, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
-    kryptos_mp_value_t *x, *factor = NULL, *mod, *e, *r;
+    kryptos_mp_value_t *x, *factor = NULL, *mod = NULL, *e, *r;
     size_t sh;
 
     CUTE_ASSERT(kryptos_mp_barrett_reduction(NULL, &factor, &sh, mod) == NULL);

@@ -49,7 +49,7 @@ typedef enum {
 
 struct kryptos_rc6_subkeys {
     kryptos_u32_t K[kryptos_rc6_K_NR];
-    int rounds;
+    size_t rounds;
     kryptos_rc6_ksize_t ksize;
 };
 

@@ -9,3 +9,12 @@ src/tests/o
 *.mod.c
 src/tests/kernel/*.ko
 samples/*
+*.obj
+src/.vs/*
+src/release/*
+src/debug/*
+src/x64/*
+src/tests/.vs/*
+src/tests/release/*
+src/tests/debug/*
+src/tests/x64/*

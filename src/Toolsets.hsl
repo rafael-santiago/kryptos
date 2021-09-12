@@ -99,7 +99,12 @@ local function has_bad_funcs_msvc(func_signatures type list, srcs type list, inc
         result 1;
     }
     var badfuncs_data type string;
-    $badfuncs_data = "@call \"" + $vcvarsall + "\" " + get_msvc_platform() + " >nul 2>&1\n" +
+    var platform type string;
+    $platform = get_msvc_platform();
+    if ($platform == "Win32") {
+        $platform = "x86";
+    }
+    $badfuncs_data = "@call \"" + $vcvarsall + "\" " + $platform + " >nul 2>&1\n" +
                      "@cd \"" + hefesto.sys.pwd() + "\" >nul 2>&1\n" +
                      "@" + $cmdline + " \"%1\" >nul 2>&1\n";
     hefesto.sys.fwrite($badfuncs_data, $badfuncs_data.len(), $fp);
