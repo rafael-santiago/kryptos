@@ -62,7 +62,7 @@
 #   define KRYPTOS_C99     1
 #  endif // __STDC_VERSION__ >= 199901L
 # else
-#  ifdef __cplusplus
+#  if defined(__cplusplus) || defined(_MSC_VER)
 #   define KRYPTOS_C99     1
 #  endif
 # endif // __STDC_VERSION__
@@ -858,7 +858,7 @@ static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct
             if (ctx->curr_len < buffer_size && i != l) {\
                 buffer[ctx->curr_len++] = ctx->message[i];\
             } else {\
-                kryptos_hash_ld_u8buf_as_u ## bits_per_block  ## _blocks(buffer, ctx->curr_len,\
+                kryptos_hash_ld_u8buf_as_u ## bits_per_block  ## _blocks(buffer, (size_t)ctx->curr_len,\
                                                     ctx->input.block, (size_t)input_block_size,\
                                                     block_index_decision_table);\
                 hash_do_block_stmt;\

@@ -112,7 +112,7 @@ struct kryptos_saferk64_32bit_pair {
 
 struct kryptos_saferk64_subkeys {
     struct kryptos_saferk64_32bit_pair K[KRYPTOS_SAFERK64_MAX_ROUND << 1];
-    int rounds;
+    size_t rounds;
 };
 
 typedef void (*kryptos_saferk64_block_processor)(kryptos_u8_t *block, const struct kryptos_saferk64_subkeys *sks);
