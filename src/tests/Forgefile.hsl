@@ -205,6 +205,7 @@ local function forge_cutest() : result type none {
         var compile_model type string;
         var link_model type string;
         var cpu_arch type string;
+
         var option type list;
         $option = hefesto.sys.get_option("compile-model");
         if ($option.count() > 0) {
@@ -214,6 +215,7 @@ local function forge_cutest() : result type none {
         if ($option.count() > 0) {
             $link_model = " --link-model=" + $option.item(0);
         }
+
         $option = hefesto.sys.get_option("cpu-arch");
         if ($option.count() > 0) {
             $cpu_arch = " --cpu-arch=" + $option.item(0);
@@ -222,6 +224,7 @@ local function forge_cutest() : result type none {
                           "Forgefile.hsl", "--forgefiles=Forgefile.hsl --Forgefile-projects=cutest " +
                                             "--obj-output-dir=obj --bin-output-dir=lib " +
                                             "--toolset=" + get_lib_toolset() + $compile_model + $link_model + $cpu_arch);
+
         if (hefesto.sys.last_forge_result() != 0) {
             hefesto.sys.echo("~~~ UNABLE TO BUILD LIBCUTEST.\n");
             hefesto.project.abort(1);
