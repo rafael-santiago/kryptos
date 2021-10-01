@@ -156,7 +156,7 @@ static kryptos_task_result_t kryptos_gcm_tag(kryptos_u8_t *c, const size_t c_siz
                                              kryptos_gcm_e_func E, void *E_arg, kryptos_u8_t *tag) {
     kryptos_u8_t *H = NULL, *Y0 = NULL, *tp, *tp_end, *hp, *hp_end;
     kryptos_task_result_t result = kKryptosProcessError;
-    size_t H_size, Y_size;
+    size_t H_size = 0, Y_size;
 
     // INFO(Rafael): By design, the iv is embedded in the ciphertext (as its first block).
 

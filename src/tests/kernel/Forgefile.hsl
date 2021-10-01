@@ -9,6 +9,7 @@
 include on freebsd ~/toolsets/freebsd/freebsd-module.hsl
 include on netbsd ~/toolsets/netbsd/netbsd-module.hsl
 include on linux ~/toolsets/linux/linux-module.hsl
+include on windows ~/toolsets/null/null.hsl
 include mkclean.hsl
 include krun.hsl
 
@@ -20,7 +21,6 @@ local var modname type string;
 
 local var LKMTOOL type string;
 
-
 project kryptos-test-mod : toolset $LKMTOOL : "main.c", $includes, $cflags, $libraries, $ldflags, $modname;
 
 kryptos-test-mod.preloading() {
@@ -30,6 +30,11 @@ kryptos-test-mod.preloading() {
         $LKMTOOL = "netbsd-module";
     } else if (hefesto.sys.os_name() == "linux") {
         $LKMTOOL = "linux-lkm";
+    } else if (hefesto.sys.os_name() == "windows") {
+        $LKMTOOL = "no-tool-any-set";
+        var exit_code type int;
+        $exit_code = hefesto.sys.forge("win-kryptos-test-sys", "WinForgefile.hsl", hefesto.project.cmdline());
+        hefesto.project.abort($exit_code);
     }
 }
 
@@ -105,9 +110,9 @@ kryptos-test-mod.epilogue() {
     if (hefesto.sys.last_forge_result() == 0) {
         hefesto.sys.echo("*** Test module successfully compiled.\n");
 
-        if (hefesto.sys.os_name() != "netbsd") {
+        if (hefesto.sys.os_name() == "linux" || hefesto.sys.os_name() == "freebsd") {
             $modname = $modname + ".ko";
-        } else {
+        } else if (hefesto.sys.os_name() == "netbsd") {
             $modname = $modname + ".kmod";
         }
 

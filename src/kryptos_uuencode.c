@@ -84,9 +84,9 @@ kryptos_u8_t *kryptos_uuencode_encode_buffer(const kryptos_u8_t *buffer, const s
             block = block << 8 | 0x01;
         }
 
-           *cp    = 32 + ((block & 0x00FC0000) >> 18);
-        *(cp + 1) = 32 + ((block & 0x0003F000) >> 12);
-        *(cp + 2) = 32 + ((block & 0x00000FC0) >>  6);
+           *cp    = 32 + (((block & 0x00FC0000) >> 18) & 0xFF);
+        *(cp + 1) = 32 + (((block & 0x0003F000) >> 12) & 0xFF);
+        *(cp + 2) = 32 + (((block & 0x00000FC0) >>  6) & 0xFF);
         *(cp + 3) = 32 + (block & 0x0000003F);
 
         cp += 4;

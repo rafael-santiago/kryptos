@@ -66,7 +66,11 @@
 struct kryptos_rabbit_keystream {
     kryptos_u32_t X[8];
     kryptos_u32_t C[8];
+#if defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+    kryptos_u8_t b;
+#else
     kryptos_u8_t b:1;
+#endif
 };
 
 static void kryptos_rabbit_key_setup(const kryptos_u8_t *key, const size_t key_size, const kryptos_u8_t *iv64,
@@ -168,7 +172,7 @@ static void kryptos_rabbit_ld_user_key(kryptos_u16_t *K, const kryptos_u8_t *key
     //               are just for silenting the warning.
     size_t w = 0, b = 0;
 #else
-    size_t w, b;
+    size_t w = 0, b = 0;
 #endif
     ssize_t k;
     kryptos_u8_t *ktemp;
@@ -228,6 +232,10 @@ static void kryptos_rabbit_ld_user_key(kryptos_u16_t *K, const kryptos_u8_t *key
 
 static void kryptos_rabbit_key_setup(const kryptos_u8_t *key, const size_t key_size, const kryptos_u8_t *iv64,
                                      struct kryptos_rabbit_keystream *sks) {
+#if defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+# pragma warning(push)
+# pragma warning(disable: 4127)
+#endif
     kryptos_u16_t K[8];
     kryptos_u64_t iv;
     kryptos_u32_t IV[4];
@@ -319,6 +327,10 @@ static void kryptos_rabbit_key_setup(const kryptos_u8_t *key, const size_t key_s
 #undef kryptos_rabbit_reinit_ctr_regs
 
 #undef kryptos_rabbit_init_state_round
+
+#if defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+# pragma warning(pop)
+#endif
 }
 
 static void kryptos_rabbit_ctr_system(struct kryptos_rabbit_keystream *sks) {

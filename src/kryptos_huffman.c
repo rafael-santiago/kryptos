@@ -461,6 +461,8 @@ static void kryptos_huffman_scan_codes(struct kryptos_huffman_code_ctx *hcodes,
 
 static size_t kryptos_huffman_eval_deflated_out_size(size_t *raw_freq, struct kryptos_huffman_code_ctx *hcodes,
                                                      const kryptos_u8_t *in, const size_t in_size) {
+    KRYPTOS_UNUSED(in);
+    KRYPTOS_UNUSED(in_size);
     size_t total_size = 2 + sizeof(size_t);
     size_t n;
 
@@ -496,7 +498,7 @@ static kryptos_u8_t *kryptos_huffman_dump_tree(kryptos_u8_t *out, const kryptos_
             }
             memcpy(out, hcodes[c].data, hcodes[c].data_size);
             out += hcodes[c].data_size;
-            *out = c;
+            *out = (kryptos_u8_t)c;
             out++;
         }
     }

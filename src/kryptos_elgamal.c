@@ -250,8 +250,8 @@ void kryptos_elgamal_oaep_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, size
 
     ktask->arg[0] = label;
     ktask->arg[1] = label_size;
-    ktask->arg[2] = hash;
-    ktask->arg[3] = hash_size;
+    ktask->arg[2] = (void *)hash;
+    ktask->arg[3] = (void *)hash_size;
 }
 
 void kryptos_elgamal_oaep_cipher(kryptos_task_ctx **ktask) {

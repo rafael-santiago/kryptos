@@ -16,13 +16,17 @@
 # include <string.h>
 # include <stdio.h>
 # include <stdlib.h>
+#else
+# if defined(_WIN32)
+#  include <kryptos_types.h>
+# endif
 #endif
 
 kryptos_task_result_t kryptos_ecdh_get_curve_from_params_buf(const kryptos_u8_t *params, const size_t params_size,
                                                              kryptos_curve_ctx **curve) {
     kryptos_task_result_t result = kKryptosProcessError;
     kryptos_u8_t *temp = NULL;
-    size_t temp_size;
+    size_t temp_size = 0;
 
     if (params == NULL || params_size == 0 || curve == NULL) {
         return kKryptosInvalidParams;
@@ -199,9 +203,11 @@ void kryptos_ecdh_process_xchg(struct kryptos_ecdh_xchg_ctx **data) {
                 (*data)->result_verbose = "Error on computing KPUB.";
                 goto kryptos_ecdh_process_xchg_epilogue;
             }
-
+#if defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+            RtlStringCbPrintfA(temp, sizeof(temp) - 1, "%d", (unsigned int)(*data)->curve->bits);
+#else
             snprintf(temp, sizeof(temp) - 1, "%d", (unsigned int)(*data)->curve->bits);
-
+#endif
             (*data)->result = kryptos_pem_put_data(&(*data)->out, &(*data)->out_size,
                                                    KRYPTOS_ECDH_PEM_HDR_PARAM_EC_BITS,
                                                    (kryptos_u8_t *)temp, strlen(temp));

@@ -57,6 +57,7 @@ kryptos.prologue() {
         $libname = "libkryptos" + get_msvc_artifact_postfix() + ".lib";
         $cflags.add_item("/WX");
         $cflags.add_item("-D_CRT_SECURE_NO_WARNINGS");
+        $cflags.add_item("-DUMDF_USING_NTSTATUS");
     }
 
     var option type list;

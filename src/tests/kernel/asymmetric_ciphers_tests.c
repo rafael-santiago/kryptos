@@ -26,7 +26,7 @@ static int corrupt_pem_data(const kryptos_u8_t *hdr, kryptos_u8_t *pem_data, con
     dp = pem_data;
     dp_end = pem_data + pem_data_size;
 
-    hp_end = hdr + strlen(hdr);
+    hp_end = hdr + strlen((char *)hdr);
 
     while (dp != dp_end && !found) {
         found = 1;
@@ -212,8 +212,10 @@ KUTE_TEST_CASE(kryptos_dh_mk_domain_params_tests)
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** DH DOMAIN PARAMETERS:\n\n%s", params);
-#else
+#elif defined(__linux__)
     printk(KERN_ERR " *** DH DOMAIN PARAMETERS:\n\n%s", params);
+#elif defined(_WIN32)
+    KdPrint((" *** DH DOMAIN PARAMETERS:\n\n%s", params));
 #endif
 
     data = kryptos_pem_get_data(KRYPTOS_DH_PEM_HDR_PARAM_P, params, params_size, &data_size);
@@ -238,36 +240,36 @@ KUTE_TEST_CASE(kryptos_dh_mk_domain_params_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_dh_verify_domain_params_tests)
-    kryptos_u8_t *valid_params = "-----BEGIN DH PARAM P-----\n"
-                                 "r0JMxbGO+Cg=\n"
-                                 "-----END DH PARAM P-----\n"
-                                 "-----BEGIN DH PARAM Q-----\n"
-                                 "O/IVlg==\n"
-                                 "-----END DH PARAM Q-----\n"
-                                 "-----BEGIN DH PARAM G-----\n"
-                                 "gEAAVxKjmgI=\n"
-                                 "-----END DH PARAM G-----\n";
+    kryptos_u8_t *valid_params = (kryptos_u8_t *)"-----BEGIN DH PARAM P-----\n"
+                                                 "r0JMxbGO+Cg=\n"
+                                                 "-----END DH PARAM P-----\n"
+                                                 "-----BEGIN DH PARAM Q-----\n"
+                                                 "O/IVlg==\n"
+                                                 "-----END DH PARAM Q-----\n"
+                                                 "-----BEGIN DH PARAM G-----\n"
+                                                 "gEAAVxKjmgI=\n"
+                                                 "-----END DH PARAM G-----\n";
 
-    kryptos_u8_t *invalid_params = "-----BEGIN DH PARAM P-----\n"
-                                   "Ko87iBqGQEI=\n"
-                                   "-----END DH PARAM P-----\n"
-                                   "-----BEGIN DH PARAM Q-----\n"
-                                   "Y/hBcA==\n"
-                                   "-----END DH PARAM Q-----\n"
-                                   "-----BEGIN DH PARAM G-----\n"
-                                   "tOOCDE3FHCU=\n"
-                                   "-----END DH PARAM G-----\n";
+    kryptos_u8_t *invalid_params = (kryptos_u8_t *)"-----BEGIN DH PARAM P-----\n"
+                                                   "Ko87iBqGQEI=\n"
+                                                   "-----END DH PARAM P-----\n"
+                                                   "-----BEGIN DH PARAM Q-----\n"
+                                                   "Y/hBcA==\n"
+                                                   "-----END DH PARAM Q-----\n"
+                                                   "-----BEGIN DH PARAM G-----\n"
+                                                   "tOOCDE3FHCU=\n"
+                                                   "-----END DH PARAM G-----\n";
 
     KUTE_ASSERT(kryptos_dh_verify_domain_params(valid_params, 0) == kKryptosInvalidParams);
     KUTE_ASSERT(kryptos_dh_verify_domain_params(NULL, 1) == kKryptosInvalidParams);
 
-    KUTE_ASSERT(kryptos_dh_verify_domain_params(valid_params, strlen(valid_params)) == kKryptosSuccess);
+    KUTE_ASSERT(kryptos_dh_verify_domain_params(valid_params, strlen((char *)valid_params)) == kKryptosSuccess);
 
-    KUTE_ASSERT(kryptos_dh_verify_domain_params(invalid_params, strlen(invalid_params)) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_dh_verify_domain_params(invalid_params, strlen((char *)invalid_params)) == kKryptosInvalidParams);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_dh_get_modp_from_params_buf_tests)
-    kryptos_u8_t *valid_params = "-----BEGIN DH PARAM P-----\n"
+    kryptos_u8_t *valid_params = (kryptos_u8_t *)"-----BEGIN DH PARAM P-----\n"
                                  "r0JMxbGO+Cg=\n"
                                  "-----END DH PARAM P-----\n"
                                  "-----BEGIN DH PARAM Q-----\n"
@@ -277,14 +279,14 @@ KUTE_TEST_CASE(kryptos_dh_get_modp_from_params_buf_tests)
                                  "gEAAVxKjmgI=\n"
                                  "-----END DH PARAM G-----\n";
 
-    kryptos_u8_t *no_p_param = "-----BEGIN DH PARAM Q-----\n"
+    kryptos_u8_t *no_p_param = (kryptos_u8_t *)"-----BEGIN DH PARAM Q-----\n"
                                "O/IVlg==\n"
                                "-----END DH PARAM Q-----\n"
                                "-----BEGIN DH PARAM G-----\n"
                                "gEAAVxKjmgI=\n"
                                "-----END DH PARAM G-----\n";
 
-    kryptos_u8_t *no_g_param = "-----BEGIN DH PARAM P-----\n"
+    kryptos_u8_t *no_g_param = (kryptos_u8_t *)"-----BEGIN DH PARAM P-----\n"
                                "r0JMxbGO+Cg=\n"
                                "-----END DH PARAM P-----\n"
                                "-----BEGIN DH PARAM Q-----\n"
@@ -301,13 +303,13 @@ KUTE_TEST_CASE(kryptos_dh_get_modp_from_params_buf_tests)
     KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, 1, NULL, NULL, &g) == kKryptosInvalidParams);
     KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, 1, &p, &q, NULL) == kKryptosInvalidParams);
 
-    KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, strlen(no_p_param), &p, NULL, &g) != kKryptosSuccess);
+    KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_p_param, strlen((char *)no_p_param), &p, NULL, &g) != kKryptosSuccess);
     KUTE_ASSERT(p == NULL && g == NULL);
 
-    KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_g_param, strlen(no_g_param), &p, &q, &g) != kKryptosSuccess);
+    KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(no_g_param, strlen((char *)no_g_param), &p, &q, &g) != kKryptosSuccess);
     KUTE_ASSERT(p == NULL && g == NULL && q == NULL);
 
-    KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(valid_params, strlen(valid_params), &p, &q, &g) == kKryptosSuccess);
+    KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(valid_params, strlen((char *)valid_params), &p, &q, &g) == kKryptosSuccess);
     KUTE_ASSERT(p != NULL && g != NULL && q != NULL);
 
     kryptos_del_mp_value(p);
@@ -316,7 +318,7 @@ KUTE_TEST_CASE(kryptos_dh_get_modp_from_params_buf_tests)
 
     p = g = NULL;
 
-    KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(valid_params, strlen(valid_params), &p, NULL, &g) == kKryptosSuccess);
+    KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(valid_params, strlen((char *)valid_params), &p, NULL, &g) == kKryptosSuccess);
     KUTE_ASSERT(p != NULL && g != NULL);
 
     kryptos_del_mp_value(p);
@@ -412,7 +414,7 @@ KUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     kryptos_mp_value_t *s_alice = NULL, *s_bob = NULL;
     kryptos_mp_value_t *t_alice = NULL, *t_bob = NULL;
     kryptos_mp_value_t *kab_alice = NULL, *kab_bob = NULL;
-    kryptos_u8_t *domain_parameters = "-----BEGIN DH PARAM P-----\n"
+    kryptos_u8_t *domain_parameters = (kryptos_u8_t *)"-----BEGIN DH PARAM P-----\n"
                                       "VSsW7ufPMgFn+MceQyQHgBtpq/q/"
                                       "xLAZ00q/hRh8Of7Wvto1lsS6iBWs"
                                       "mz4mYiSiOiPZkv6asUoBF8JhxMs4"
@@ -534,7 +536,7 @@ KUTE_TEST_CASE(kryptos_dh_standard_key_exchange_bare_bone_tests)
     } while (kryptos_mp_lt(s_alice, _2) || kryptos_mp_gt(s_alice, q_2));
 #else
     KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
-                                                    strlen(domain_parameters), &p, NULL, &g) == kKryptosSuccess);
+                                                    strlen((char *)domain_parameters), &p, NULL, &g) == kKryptosSuccess);
 
     KUTE_ASSERT(p != NULL);
     KUTE_ASSERT(g != NULL);
@@ -605,7 +607,7 @@ KUTE_TEST_CASE_END
 KUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
     // INFO(Rafael): Here we will test the "oracle" mode of the exchange process.
     struct kryptos_dh_xchg_ctx alice_stuff, bob_stuff, *alice = &alice_stuff, *bob = &bob_stuff;
-    kryptos_u8_t *domain_parameters = "-----BEGIN DH PARAM P-----\n"
+    kryptos_u8_t *domain_parameters = (kryptos_u8_t *)"-----BEGIN DH PARAM P-----\n"
                                       "q/1geMTHBhklSLEP9NVV3Z3KH54E"
                                       "hi8L4/ImBDydLH+WtLacIcNy5bzW"
                                       "ZYyFbfIKgD+mzbTWYLMkv8MR54O4"
@@ -698,11 +700,11 @@ KUTE_TEST_CASE(kryptos_dh_process_stdxchg_tests)
     // INFO(Rafael): Alice will start the protocol. So she picks a pre-computed DH group.
 #ifndef DH_USE_Q_SIZE
     KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
-                                                    strlen(domain_parameters),
+                                                    strlen((char *)domain_parameters),
                                                     &alice->p, NULL, &alice->g) == kKryptosSuccess);
 #else
     KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
-                                                    strlen(domain_parameters),
+                                                    strlen((char *)domain_parameters),
                                                     &alice->p, &alice->q, &alice->g) == kKryptosSuccess);
 #endif
 
@@ -771,7 +773,7 @@ KUTE_TEST_CASE(kryptos_dh_mk_key_pair_tests)
     size_t k_pub_size, k_priv_size;
     kryptos_u8_t *pem_data;
     size_t pem_data_size;
-    kryptos_u8_t *domain_parameters = "-----BEGIN DH PARAM P-----\n"
+    kryptos_u8_t *domain_parameters = (kryptos_u8_t *)"-----BEGIN DH PARAM P-----\n"
                                       "VSsW7ufPMgFn+MceQyQHgBtpq/q/"
                                       "xLAZ00q/hRh8Of7Wvto1lsS6iBWs"
                                       "mz4mYiSiOiPZkv6asUoBF8JhxMs4"
@@ -863,12 +865,12 @@ KUTE_TEST_CASE(kryptos_dh_mk_key_pair_tests)
 
 #ifndef DH_USE_Q_SIZE
     KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
-                                                    strlen(domain_parameters),
+                                                    strlen((char *)domain_parameters),
                                                     &kp->p, NULL, &kp->g) == kKryptosSuccess);
     kp->s_bits = 8;
 #else
     KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
-                                                    strlen(domain_parameters),
+                                                    strlen((char *)domain_parameters),
                                                     &kp->p, &kp->q, &kp->g) == kKryptosSuccess);
 #endif
 
@@ -925,7 +927,7 @@ KUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
     struct kryptos_dh_xchg_ctx alice_ctx, *alice = &alice_ctx, bob_ctx, *bob = &bob_ctx;
     kryptos_u8_t *k_pub_bob = NULL, *k_priv_bob = NULL;
     size_t k_pub_bob_size, k_priv_bob_size;
-    kryptos_u8_t *domain_parameters = "-----BEGIN DH PARAM P-----\n"
+    kryptos_u8_t *domain_parameters = (kryptos_u8_t *)"-----BEGIN DH PARAM P-----\n"
                                       "q/1geMTHBhklSLEP9NVV3Z3KH54E"
                                       "hi8L4/ImBDydLH+WtLacIcNy5bzW"
                                       "ZYyFbfIKgD+mzbTWYLMkv8MR54O4"
@@ -1031,12 +1033,12 @@ KUTE_TEST_CASE(kryptos_dh_process_modxchg_tests)
 
 #ifndef DH_USE_Q_SIZE
     KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
-                                                    strlen(domain_parameters),
+                                                    strlen((char *)domain_parameters),
                                                     &bob->p, NULL, &bob->g) == kKryptosSuccess);
     bob->s_bits = 8;
 #else
     KUTE_ASSERT(kryptos_dh_get_modp_from_params_buf(domain_parameters,
-                                                    strlen(domain_parameters),
+                                                    strlen((char *)domain_parameters),
                                                     &bob->p, &bob->q, &bob->g) == kKryptosSuccess);
 #endif
 
@@ -1121,14 +1123,14 @@ KUTE_TEST_CASE(kryptos_rsa_mk_key_pair_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rsa_cipher_tests)
-    kryptos_u8_t *k_pub_bob = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *k_pub_bob = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                               "1fqzrUbRB0Y1e0/4Mhxk5RaD0EFJs8JpEY6cwh2RQguccjk9yxeT4vF353cMUQQ17/GWGpz8glbKdCBI1j1SGw==\n"
                               "-----END RSA PARAM N-----\n"
                               "-----BEGIN RSA PARAM E-----\n"
                               "vyc/zlnghHEj1seRh3gDaY6NMRvenL3STs7DGOVcOqUHUt9K27WV0mzX3D7/D0+4lDarkXCpFWBSUCVjiBD7Cw==\n"
                               "-----END RSA PARAM E-----\n";
 
-    kryptos_u8_t *k_priv_bob = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *k_priv_bob = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                                "1fqzrUbRB0Y1e0/4Mhxk5RaD0EFJs8JpEY6cwh2RQguccjk9yxeT4vF353cMUQQ17/GWGpz8glbKdCBI1j1SGw==\n"
                                "-----END RSA PARAM N-----\n"
                                "-----BEGIN RSA PARAM D-----\n"
@@ -1137,7 +1139,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_tests)
 
     kryptos_task_ctx a_kt, *a_ktask = &a_kt;
     kryptos_task_ctx b_kt, *b_ktask = &b_kt;
-    kryptos_u8_t *m = "Hello Bob!\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *m = (kryptos_u8_t *)"Hello Bob!\x00\x00\x00\x00\x00\x00";
     size_t m_size = 16;
 
     kryptos_task_init_as_null(a_ktask);
@@ -1146,7 +1148,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_tests)
     // INFO(Rafael): Alice sends a new message to Bob, so she picks Bob's public key.
 
     a_ktask->key = k_pub_bob;
-    a_ktask->key_size = kstrlen(k_pub_bob);
+    a_ktask->key_size = kstrlen((char *)k_pub_bob);
     a_ktask->in = m;
     a_ktask->in_size = m_size;
 
@@ -1176,7 +1178,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_tests)
     // INFO(Rafael): Bob uses his private key to get the original message.
 
     b_ktask->key = k_priv_bob;
-    b_ktask->key_size = kstrlen(k_priv_bob);
+    b_ktask->key_size = kstrlen((char *)k_priv_bob);
 
     b_ktask->cipher = kKryptosCipherRSA;
     kryptos_task_set_decrypt_action(b_ktask);
@@ -1201,14 +1203,14 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
 #ifdef KRYPTOS_C99
-    kryptos_u8_t *k_pub_alice = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *k_pub_alice = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                                 "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
                                 "-----END RSA PARAM N-----\n"
                                 "-----BEGIN RSA PARAM E-----\n"
                                 "Q9mxxs0+nosV5jzwUs1UmYEhXLrYAszE9q0S3hljhpXD9ANvkzCUC5nM8FZ3+44V1IrPhIYZYDwfSrGlhwG4Aw==\n"
                                 "-----END RSA PARAM E-----\n";
 
-    kryptos_u8_t *k_priv_alice = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *k_priv_alice = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                                  "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
                                  "-----END RSA PARAM N-----\n"
                                  "-----BEGIN RSA PARAM D-----\n"
@@ -1217,7 +1219,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
 
     kryptos_task_ctx a_kt, *a_ktask = &a_kt;
     kryptos_task_ctx b_kt, *b_ktask = &b_kt;
-    kryptos_u8_t *m = "Hello Alice!\x00\x00\x00\x00";
+    kryptos_u8_t *m = (kryptos_u8_t *)"Hello Alice!\x00\x00\x00\x00";
     size_t m_size = 16;
 
     kryptos_task_init_as_null(a_ktask);
@@ -1234,7 +1236,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #endif
 
-    kryptos_run_cipher(rsa, b_ktask, k_pub_alice, kstrlen(k_pub_alice));
+    kryptos_run_cipher(rsa, b_ktask, k_pub_alice, kstrlen((char *)k_pub_alice));
 
     KUTE_ASSERT(kryptos_last_task_succeed(b_ktask) == 1);
 
@@ -1251,7 +1253,7 @@ KUTE_TEST_CASE(kryptos_rsa_cipher_c99_tests)
     // INFO(Rafael): Alice uses her private key to get the original message.
 
     kryptos_task_set_decrypt_action(a_ktask);
-    kryptos_run_cipher(rsa, a_ktask, k_priv_alice, kstrlen(k_priv_alice));
+    kryptos_run_cipher(rsa, a_ktask, k_priv_alice, kstrlen((char *)k_priv_alice));
 
     KUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 1);
 
@@ -1287,10 +1289,10 @@ KUTE_TEST_CASE(kryptos_padding_mgf_tests)
         const kryptos_u8_t *expected_out;
     };
     struct oaep_mgf_tests test_vector[] = {
-        { "foo", 3,  3,   kryptos_sha1_hash, "\x1A\xC9\x07"          },
-        { "foo", 3,  5,   kryptos_sha1_hash, "\x1A\xC9\x07\x5C\xD4"  },
-        { "bar", 3,  5,   kryptos_sha1_hash, "\xBC\x0C\x65\x5E\x01"  },
-        { "bar", 3, 50,   kryptos_sha1_hash, "\xBC\x0C\x65\x5E\x01"
+        { (kryptos_u8_t *)"foo", 3,  3,   kryptos_sha1_hash, (kryptos_u8_t *)"\x1A\xC9\x07"          },
+        { (kryptos_u8_t *)"foo", 3,  5,   kryptos_sha1_hash, (kryptos_u8_t *)"\x1A\xC9\x07\x5C\xD4"  },
+        { (kryptos_u8_t *)"bar", 3,  5,   kryptos_sha1_hash, (kryptos_u8_t *)"\xBC\x0C\x65\x5E\x01"  },
+        { (kryptos_u8_t *)"bar", 3, 50,   kryptos_sha1_hash, (kryptos_u8_t *)"\xBC\x0C\x65\x5E\x01"
                                              "\x6B\xC2\x93\x1D\x85"
                                              "\xA2\xE6\x75\x18\x1A"
                                              "\xDC\xEF\x7F\x58\x1F"
@@ -1300,7 +1302,7 @@ KUTE_TEST_CASE(kryptos_padding_mgf_tests)
                                              "\xC8\x9E\x98\x3F\xD0"
                                              "\xCE\x80\xCE\xD9\x87"
                                              "\x86\x41\xCB\x48\x76" },
-        { "bar", 3, 50, kryptos_sha256_hash, "\x38\x25\x76\xA7\x84"
+        { (kryptos_u8_t *)"bar", 3, 50, kryptos_sha256_hash, (kryptos_u8_t *)"\x38\x25\x76\xA7\x84"
                                              "\x10\x21\xCC\x28\xFC"
                                              "\x4C\x09\x48\x75\x3F"
                                              "\xB8\x31\x20\x90\xCE"
@@ -1339,28 +1341,28 @@ KUTE_TEST_CASE(kryptos_oaep_padding_tests)
         int corrupt_it;
     };
     struct oaep_padding_tests test_vector[] = {
-        { "(null)", 6, 128, NULL, 0, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
-        { "(null)", 6, 128, NULL, 0, NULL, NULL, 0 },
-        { "foobar", 6, 128, "", 0, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
-        { "alabaster", 9,  96, "L", 1, kryptos_sha224_hash, kryptos_sha224_hash_size, 0 },
-        { "you got a killer scene there, man...", 36, 256, "QoTSA", 5, kryptos_sha256_hash, kryptos_sha256_hash_size, 0 },
-        { "Givin'Up Food For Funk", 22, 512, "TheJ.B.'s", 9, kryptos_sha384_hash, kryptos_sha384_hash_size, 0 },
-        { "stray Cat strut", 15, 1024, "meow!", 5, kryptos_sha512_hash, kryptos_sha512_hash_size, 0 },
-        { "stones in my passway", 20, 128, "RJ", 2, kryptos_md4_hash, kryptos_md4_hash_size, 0 },
-        { "Get Back", 8, 512, "jojo", 4, kryptos_md5_hash, kryptos_md5_hash_size, 0 },
-        { "I Put A Spell On You", 20, 80, "Nina", 4, kryptos_ripemd128_hash, kryptos_ripemd128_hash_size, 0 },
-        { "Space Cadet", 11, 1024, "TheCoyoteWhoSpokeInTongues", 26, kryptos_ripemd160_hash, kryptos_ripemd160_hash_size, 0 },
-        { "Funky President (People It's Bad)", 33, 128, "Mr.Dynamite", 11, kryptos_sha1_hash, kryptos_sha1_hash_size, 1 },
-        { "Boom Boom", 9, 256, "HowHowHowHow", 12, kryptos_sha224_hash, kryptos_sha224_hash_size, 1 },
-        { "First Day Of My Life", 20, 96, "", 0, kryptos_sha256_hash, kryptos_sha256_hash_size, 1 },
-        { "Come On, Let's Go", 17, 1024, "LittleDarling", 13, kryptos_sha384_hash, kryptos_sha384_hash_size, 1 },
-        { "Sexual Healing", 14, 512, "Babe", 4, kryptos_sha512_hash, kryptos_sha512_hash_size, 1 },
-        { "First It Giveth", 15, 128, "...ThanITakeItAway", 18, kryptos_md4_hash, kryptos_md4_hash_size, 1 },
-        { "Easy as It Seems", 16, 2048, "Mavericks", 9, kryptos_md5_hash, kryptos_md5_hash_size, 1 },
-        { "Have You Ever Seen The Rain", 27, 128, "", 0, kryptos_ripemd128_hash, kryptos_ripemd128_hash_size, 1 },
-        { "I Know You Got Soul", 19, 256, "L", 1, kryptos_ripemd160_hash, kryptos_ripemd160_hash_size, 1 },
-        { "(null)", 6, 128, NULL, 0, kryptos_sha1_hash, kryptos_sha1_hash_size, 1 },
-        { "(null)", 6, 128, NULL, 0, NULL, NULL, 1 }
+        { (kryptos_u8_t *)"(null)", 6, 128, NULL, 0, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
+        { (kryptos_u8_t *)"(null)", 6, 128, NULL, 0, NULL, NULL, 0 },
+        { (kryptos_u8_t *)"foobar", 6, 128, (kryptos_u8_t *)"", 0, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
+        { (kryptos_u8_t *)"alabaster", 9,  96, (kryptos_u8_t *)"L", 1, kryptos_sha224_hash, kryptos_sha224_hash_size, 0 },
+        { (kryptos_u8_t *)"you got a killer scene there, man...", 36, 256, (kryptos_u8_t *)"QoTSA", 5, kryptos_sha256_hash, kryptos_sha256_hash_size, 0 },
+        { (kryptos_u8_t *)"Givin'Up Food For Funk", 22, 512, (kryptos_u8_t *)"TheJ.B.'s", 9, kryptos_sha384_hash, kryptos_sha384_hash_size, 0 },
+        { (kryptos_u8_t *)"stray Cat strut", 15, 1024, (kryptos_u8_t *)"meow!", 5, kryptos_sha512_hash, kryptos_sha512_hash_size, 0 },
+        { (kryptos_u8_t *)"stones in my passway", 20, 128, (kryptos_u8_t *)"RJ", 2, kryptos_md4_hash, kryptos_md4_hash_size, 0 },
+        { (kryptos_u8_t *)"Get Back", 8, 512, (kryptos_u8_t *)"jojo", 4, kryptos_md5_hash, kryptos_md5_hash_size, 0 },
+        { (kryptos_u8_t *)"I Put A Spell On You", 20, 80, (kryptos_u8_t *)"Nina", 4, kryptos_ripemd128_hash, kryptos_ripemd128_hash_size, 0 },
+        { (kryptos_u8_t *)"Space Cadet", 11, 1024, (kryptos_u8_t *)"TheCoyoteWhoSpokeInTongues", 26, kryptos_ripemd160_hash, kryptos_ripemd160_hash_size, 0 },
+        { (kryptos_u8_t *)"Funky President (People It's Bad)", 33, 128, (kryptos_u8_t *)"Mr.Dynamite", 11, kryptos_sha1_hash, kryptos_sha1_hash_size, 1 },
+        { (kryptos_u8_t *)"Boom Boom", 9, 256, (kryptos_u8_t *)"HowHowHowHow", 12, kryptos_sha224_hash, kryptos_sha224_hash_size, 1 },
+        { (kryptos_u8_t *)"First Day Of My Life", 20, 96, (kryptos_u8_t *)"", 0, kryptos_sha256_hash, kryptos_sha256_hash_size, 1 },
+        { (kryptos_u8_t *)"Come On, Let's Go", 17, 1024, (kryptos_u8_t *)"LittleDarling", 13, kryptos_sha384_hash, kryptos_sha384_hash_size, 1 },
+        { (kryptos_u8_t *)"Sexual Healing", 14, 512, (kryptos_u8_t *)"Babe", 4, kryptos_sha512_hash, kryptos_sha512_hash_size, 1 },
+        { (kryptos_u8_t *)"First It Giveth", 15, 128, (kryptos_u8_t *)"...ThanITakeItAway", 18, kryptos_md4_hash, kryptos_md4_hash_size, 1 },
+        { (kryptos_u8_t *)"Easy as It Seems", 16, 2048, (kryptos_u8_t *)"Mavericks", 9, kryptos_md5_hash, kryptos_md5_hash_size, 1 },
+        { (kryptos_u8_t *)"Have You Ever Seen The Rain", 27, 128, (kryptos_u8_t *)"", 0, kryptos_ripemd128_hash, kryptos_ripemd128_hash_size, 1 },
+        { (kryptos_u8_t *)"I Know You Got Soul", 19, 256, (kryptos_u8_t *)"L", 1, kryptos_ripemd160_hash, kryptos_ripemd160_hash_size, 1 },
+        { (kryptos_u8_t *)"(null)", 6, 128, NULL, 0, kryptos_sha1_hash, kryptos_sha1_hash_size, 1 },
+        { (kryptos_u8_t *)"(null)", 6, 128, NULL, 0, NULL, NULL, 1 }
     };
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;
     kryptos_u8_t *padded_message = NULL, *message = NULL;
@@ -1403,7 +1405,7 @@ KUTE_TEST_CASE(kryptos_oaep_padding_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
-    kryptos_u8_t *k_pub_bob = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *k_pub_bob = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                               "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNoVg"
                               "7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
                               "-----END RSA PARAM N-----\n"
@@ -1412,7 +1414,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
                               "5ESDnBQFoRSoeQ3p3QVqDzfgViMeHIinMzFxx/OYpSgxpuQq4em4CwrBkqn1DxlRCzNCrdAqiwo=\n"
                               "-----END RSA PARAM E-----\n";
 
-    kryptos_u8_t *k_priv_bob = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *k_priv_bob = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                                "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNoV"
                                "g7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
                                "-----END RSA PARAM N-----\n"
@@ -1423,9 +1425,9 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
 
     kryptos_task_ctx a_kt, *a_ktask = &a_kt;
     kryptos_task_ctx b_kt, *b_ktask = &b_kt;
-    kryptos_u8_t *m = "Hello Bob!";
+    kryptos_u8_t *m = (kryptos_u8_t *)"Hello Bob!";
     size_t m_size = 10;
-    kryptos_u8_t *l = "L";
+    kryptos_u8_t *l = (kryptos_u8_t *)"L";
     size_t l_size = 1;
 
     // INFO(Rafael): Case without corrupting data.
@@ -1436,11 +1438,11 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
     // INFO(Rafael): Alice sends a new message to Bob, so she picks Bob's public key.
 
     a_ktask->key = k_pub_bob;
-    a_ktask->key_size = strlen(k_pub_bob);
+    a_ktask->key_size = strlen((char *)k_pub_bob);
     a_ktask->arg[0] = l;
     a_ktask->arg[1] = &l_size;
-    a_ktask->arg[2] = kryptos_sha1_hash;
-    a_ktask->arg[3] = kryptos_sha1_hash_size;
+    a_ktask->arg[2] = (void *)kryptos_sha1_hash;
+    a_ktask->arg[3] = (void *)kryptos_sha1_hash_size;
     a_ktask->in = m;
     a_ktask->in_size = m_size;
 
@@ -1470,11 +1472,11 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
     // INFO(Rafael): Bob uses his private key to get the original message.
 
     b_ktask->key = k_priv_bob;
-    b_ktask->key_size = strlen(k_priv_bob);
+    b_ktask->key_size = strlen((char *)k_priv_bob);
     b_ktask->arg[0] = l;
     b_ktask->arg[1] = &l_size;
-    b_ktask->arg[2] = kryptos_sha1_hash;
-    b_ktask->arg[3] = kryptos_sha1_hash_size;
+    b_ktask->arg[2] = (void *)kryptos_sha1_hash;
+    b_ktask->arg[3] = (void *)kryptos_sha1_hash_size;
 
     b_ktask->cipher = kKryptosCipherRSAOAEP;
     kryptos_task_set_decrypt_action(b_ktask);
@@ -1504,11 +1506,11 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
     // INFO(Rafael): Alice sends a new message to Bob, so she picks Bob's public key.
 
     a_ktask->key = k_pub_bob;
-    a_ktask->key_size = strlen(k_pub_bob);
+    a_ktask->key_size = strlen((char *)k_pub_bob);
     a_ktask->arg[0] = l;
     a_ktask->arg[1] = &l_size;
-    a_ktask->arg[2] = kryptos_sha1_hash;
-    a_ktask->arg[3] = kryptos_sha1_hash_size;
+    a_ktask->arg[2] = (void *)kryptos_sha1_hash;
+    a_ktask->arg[3] = (void *)kryptos_sha1_hash_size;
     a_ktask->in = m;
     a_ktask->in_size = m_size;
 
@@ -1532,7 +1534,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
 
     // INFO(Rafael): For some reason during the transfer the cryptogram becomes corrupted.
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_C, a_ktask->out, a_ktask->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_C, a_ktask->out, a_ktask->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" ( the cryptogram was intentionally corrupted )\n\n");
@@ -1548,11 +1550,11 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_tests)
     // INFO(Rafael): Bob uses his private key to get the original message.
 
     b_ktask->key = k_priv_bob;
-    b_ktask->key_size = strlen(k_priv_bob);
+    b_ktask->key_size = strlen((char *)k_priv_bob);
     b_ktask->arg[0] = l;
     b_ktask->arg[1] = &l_size;
-    b_ktask->arg[2] = kryptos_sha1_hash;
-    b_ktask->arg[3] = kryptos_sha1_hash_size;
+    b_ktask->arg[2] = (void *)kryptos_sha1_hash;
+    b_ktask->arg[3] = (void *)kryptos_sha1_hash_size;
 
     b_ktask->cipher = kKryptosCipherRSAOAEP;
     kryptos_task_set_decrypt_action(b_ktask);
@@ -1580,7 +1582,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
 #ifdef KRYPTOS_C99
-    kryptos_u8_t *k_pub_alice = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *k_pub_alice = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                                 "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNo"
                                 "Vg7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
                                 "-----END RSA PARAM N-----\n"
@@ -1589,7 +1591,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
                                 "o45ESDnBQFoRSoeQ3p3QVqDzfgViMeHIinMzFxx/OYpSgxpuQq4em4CwrBkqn1DxlRCzNCrdAqiwo=\n"
                                 "-----END RSA PARAM E-----\n";
 
-    kryptos_u8_t *k_priv_alice = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *k_priv_alice = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                                  "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjN"
                                  "oVg7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
                                  "-----END RSA PARAM N-----\n"
@@ -1600,9 +1602,9 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
 
     kryptos_task_ctx a_kt, *a_ktask = &a_kt;
     kryptos_task_ctx b_kt, *b_ktask = &b_kt;
-    kryptos_u8_t *m = "Hello Alice!";
+    kryptos_u8_t *m = (kryptos_u8_t *)"Hello Alice!";
     size_t m_size = 12;
-    kryptos_u8_t *l = "L";
+    kryptos_u8_t *l = (kryptos_u8_t *)"L";
     size_t l_size = 1;
 
     // INFO(Rafael): Case without corrupting data.
@@ -1621,7 +1623,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #endif
 
-    kryptos_run_cipher(rsa_oaep, b_ktask, k_pub_alice, strlen(k_pub_alice), l, &l_size,
+    kryptos_run_cipher(rsa_oaep, b_ktask, k_pub_alice, strlen((char *)k_pub_alice), l, &l_size,
                        kryptos_oaep_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(b_ktask) == 1);
@@ -1639,7 +1641,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
     // INFO(Rafael): Alice uses her private key to get the original message.
 
     kryptos_task_set_decrypt_action(a_ktask);
-    kryptos_run_cipher(rsa_oaep, a_ktask, k_priv_alice, strlen(k_priv_alice), l, &l_size,
+    kryptos_run_cipher(rsa_oaep, a_ktask, k_priv_alice, strlen((char *)k_priv_alice), l, &l_size,
                        kryptos_oaep_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 1);
@@ -1674,7 +1676,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #endif
 
-    kryptos_run_cipher(rsa_oaep, b_ktask, k_pub_alice, strlen(k_pub_alice), l, &l_size,
+    kryptos_run_cipher(rsa_oaep, b_ktask, k_pub_alice, strlen((char *)k_pub_alice), l, &l_size,
                        kryptos_oaep_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(b_ktask) == 1);
@@ -1687,12 +1689,14 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
 
     // INFO(Rafael): For some reason during the transfer the cryptogram becomes corrupted.
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_C, b_ktask->out, b_ktask->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_C, b_ktask->out, b_ktask->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" ( the cryptogram was intentionally corrupted )\n\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR " ( the cryptogram was intentionally corrupted )\n\n");
+#elif defined(_WIN32)
+    KdPrint((" ( the cryptogram was intentionally corrupted )\n\n"));
 #endif
 
     // INFO(Rafael): Now Bob sends the encrypted buffer to Alice.
@@ -1702,7 +1706,7 @@ KUTE_TEST_CASE(kryptos_rsa_oaep_cipher_c99_tests)
     // INFO(Rafael): Alice uses her private key to get the original message.
 
     kryptos_task_set_decrypt_action(a_ktask);
-    kryptos_run_cipher(rsa_oaep, a_ktask, k_priv_alice, strlen(k_priv_alice), l, &l_size,
+    kryptos_run_cipher(rsa_oaep, a_ktask, k_priv_alice, strlen((char *)k_priv_alice), l, &l_size,
                        kryptos_oaep_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(a_ktask) == 0);
@@ -1795,7 +1799,7 @@ KUTE_TEST_CASE(kryptos_elgamal_mk_key_pair_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_elgamal_verify_public_key_tests)
-    kryptos_u8_t *valid_k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
+    kryptos_u8_t *valid_k_pub = (kryptos_u8_t *)"-----BEGIN ELGAMAL PARAM P-----\n"
                                 "q5jud0t7MBc=\n"
                                 "-----END ELGAMAL PARAM P-----\n"
                                 "-----BEGIN ELGAMAL PARAM Q-----\n"
@@ -1808,7 +1812,7 @@ KUTE_TEST_CASE(kryptos_elgamal_verify_public_key_tests)
                                 "i525HXApOwc=\n"
                                 "-----END ELGAMAL PARAM B-----\n";
 
-    kryptos_u8_t *weak_k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
+    kryptos_u8_t *weak_k_pub = (kryptos_u8_t *)"-----BEGIN ELGAMAL PARAM P-----\n"
                                 "kW+7WMY/t+ksDA8wN05Xik1hnRv7lLrV19fFLPfguqAM0em5kJsEP4Y57byre/U0dMt8fSqzAI+PtScC\n"
                                 "-----END ELGAMAL PARAM P-----\n"
                                 "-----BEGIN ELGAMAL PARAM G-----\n"
@@ -1818,7 +1822,7 @@ KUTE_TEST_CASE(kryptos_elgamal_verify_public_key_tests)
                                 "qAE80AtRrkkiL98tqV40En1FsSb2D8AFi68Ng8jwgBWLnlTrAoxliMK747CVBef4lExUSyv3CpeJ4MEB\n"
                                 "-----END ELGAMAL PARAM B-----\n";
 
-    kryptos_u8_t *no_beta_k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
+    kryptos_u8_t *no_beta_k_pub = (kryptos_u8_t *)"-----BEGIN ELGAMAL PARAM P-----\n"
                                   "kW+7WMY/t+ksDA8wN05Xik1hnRv7lLrV19fFLPfguqAM0em5kJsEP4Y57byre/U0dMt8fSqzAI+PtScC\n"
                                   "-----END ELGAMAL PARAM P-----\n"
                                   "-----BEGIN ELGAMAL PARAM Q-----\n"
@@ -1828,7 +1832,7 @@ KUTE_TEST_CASE(kryptos_elgamal_verify_public_key_tests)
                                   "2K1E/hpeAd4igi3RwZnibVM5ZUyNeAJtkfqLp0L+wG0MlOT04lnC/JAeJUXY97wgw/IQpJNmY+4++tcA\n"
                                   "-----END ELGAMAL PARAM G-----\n";
 
-    kryptos_u8_t *invalid_q_k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
+    kryptos_u8_t *invalid_q_k_pub = (kryptos_u8_t *)"-----BEGIN ELGAMAL PARAM P-----\n"
                                     "kW+7WMY/t+ksDA8wN05Xik1hnRv7lLrV19fFLPfguqAM0em5kJsEP4Y57byre/U0dMt8fSqzAI+PtScC\n"
                                     "-----END ELGAMAL PARAM P-----\n"
                                     "-----BEGIN ELGAMAL PARAM Q-----\n"
@@ -1848,20 +1852,20 @@ KUTE_TEST_CASE(kryptos_elgamal_verify_public_key_tests)
     KUTE_ASSERT(kryptos_elgamal_verify_public_key(valid_k_pub, 0) == kKryptosInvalidParams);
 
     // INFO(Rafael): Key buffer size with no Q parameter.
-    KUTE_ASSERT(kryptos_elgamal_verify_public_key(weak_k_pub, strlen(weak_k_pub)) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_elgamal_verify_public_key(weak_k_pub, strlen((char *)weak_k_pub)) == kKryptosInvalidParams);
 
     // INFO(Rafael): Useless key buffer without the B parameter.
-    KUTE_ASSERT(kryptos_elgamal_verify_public_key(no_beta_k_pub, strlen(no_beta_k_pub)) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_elgamal_verify_public_key(no_beta_k_pub, strlen((char *)no_beta_k_pub)) == kKryptosInvalidParams);
 
     // INFO(Rafael): Key buffer with an invalid Q.
-    KUTE_ASSERT(kryptos_elgamal_verify_public_key(invalid_q_k_pub, strlen(invalid_q_k_pub)) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_elgamal_verify_public_key(invalid_q_k_pub, strlen((char *)invalid_q_k_pub)) == kKryptosInvalidParams);
 
     // INFO(Rafael): Guess what?
-    KUTE_ASSERT(kryptos_elgamal_verify_public_key(valid_k_pub, strlen(valid_k_pub)) == kKryptosSuccess);
+    KUTE_ASSERT(kryptos_elgamal_verify_public_key(valid_k_pub, strlen((char *)valid_k_pub)) == kKryptosSuccess);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
-    kryptos_u8_t *k_pub_alice = "-----BEGIN ELGAMAL PARAM P-----\n"
+    kryptos_u8_t *k_pub_alice = (kryptos_u8_t *)"-----BEGIN ELGAMAL PARAM P-----\n"
                                 "kW+7WMY/t+ksDA8wN05Xik1hnRv7lLrV19fFLPfguqAM0em5kJsEP4Y57byre/U0dMt8fSqzAI+PtScC\n"
                                 "-----END ELGAMAL PARAM P-----\n"
                                 "-----BEGIN ELGAMAL PARAM Q-----\n"
@@ -1874,7 +1878,7 @@ KUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
                                 "qAE80AtRrkkiL98tqV40En1FsSb2D8AFi68Ng8jwgBWLnlTrAoxliMK747CVBef4lExUSyv3CpeJ4MEB\n"
                                 "-----END ELGAMAL PARAM B-----\n";
 
-    kryptos_u8_t *k_priv_alice = "-----BEGIN ELGAMAL PARAM P-----\n"
+    kryptos_u8_t *k_priv_alice = (kryptos_u8_t *)"-----BEGIN ELGAMAL PARAM P-----\n"
                                  "kW+7WMY/t+ksDA8wN05Xik1hnRv7lLrV19fFLPfguqAM0em5kJsEP4Y57byre/U0dMt8fSqzAI+PtScC\n"
                                  "-----END ELGAMAL PARAM P-----\n"
                                  "-----BEGIN ELGAMAL PARAM D-----\n"
@@ -1882,7 +1886,7 @@ KUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
                                  "-----END ELGAMAL PARAM D-----\n";
 
     kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
-    kryptos_u8_t *m = "yo no creo en brujas, pero que las hay, las hay.\x00\x00\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *m = (kryptos_u8_t *)"yo no creo en brujas, pero que las hay, las hay.\x00\x00\x00\x00\x00\x00\x00\x00";
     size_t m_size = 56;
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
@@ -1897,7 +1901,7 @@ KUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
     // INFO(Rafael): Bob wants to send a message to Alice.
 
     bob->key = k_pub_alice;
-    bob->key_size = strlen(k_pub_alice);
+    bob->key_size = strlen((char *)k_pub_alice);
     bob->in = m;
     bob->in_size = m_size;
 
@@ -1919,7 +1923,7 @@ KUTE_TEST_CASE(kryptos_elgamal_cipher_tests)
     alice->in_size = bob->out_size;
 
     alice->key = k_priv_alice;
-    alice->key_size = strlen(k_priv_alice);
+    alice->key_size = strlen((char *)k_priv_alice);
     alice->cipher = kKryptosCipherELGAMAL;
     kryptos_task_set_decrypt_action(alice);
     kryptos_elgamal_cipher(&alice);
@@ -1943,7 +1947,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_elgamal_cipher_c99_tests)
 #ifdef KRYPTOS_C99
-    kryptos_u8_t *k_pub_bob = "-----BEGIN ELGAMAL PARAM P-----\n"
+    kryptos_u8_t *k_pub_bob = (kryptos_u8_t *)"-----BEGIN ELGAMAL PARAM P-----\n"
                               "cxCr4JOOvFjrdQ/JvbFfwtZJOxOjKTgmYRwU0/x8s+vh1BCj2bnhqAY8iDwjssZOjZSFI3WfMat80ngB\n"
                               "-----END ELGAMAL PARAM P-----\n"
                               "-----BEGIN ELGAMAL PARAM Q-----\n"
@@ -1956,14 +1960,14 @@ KUTE_TEST_CASE(kryptos_elgamal_cipher_c99_tests)
                               "64Uee8Q42Vj8cxt9zwyrxd5jnQBXsTMIwgLmmQW7SYUblkiZUFbf2EoMbJPdt1BIUGle+z8nZpEyd2kB\n"
                               "-----END ELGAMAL PARAM B-----\n";
 
-    kryptos_u8_t *k_priv_bob = "-----BEGIN ELGAMAL PARAM P-----\n"
+    kryptos_u8_t *k_priv_bob = (kryptos_u8_t *)"-----BEGIN ELGAMAL PARAM P-----\n"
                                "cxCr4JOOvFjrdQ/JvbFfwtZJOxOjKTgmYRwU0/x8s+vh1BCj2bnhqAY8iDwjssZOjZSFI3WfMat80ngB\n"
                                "-----END ELGAMAL PARAM P-----\n"
                                "-----BEGIN ELGAMAL PARAM D-----\n"
                                "6cAd5Y8akwE=\n"
                                "-----END ELGAMAL PARAM D-----\n";
 
-    kryptos_u8_t *m = "This Machine Kills Fascists\x00\x00\x00\x00\x00";
+    kryptos_u8_t *m = (kryptos_u8_t *)"This Machine Kills Fascists\x00\x00\x00\x00\x00";
     size_t m_size = 32;
     kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
 
@@ -1981,7 +1985,7 @@ KUTE_TEST_CASE(kryptos_elgamal_cipher_c99_tests)
     kryptos_task_set_in(alice, m, m_size);
     kryptos_task_set_encrypt_action(alice);
 
-    kryptos_run_cipher(elgamal, alice, k_pub_bob, strlen(k_pub_bob));
+    kryptos_run_cipher(elgamal, alice, k_pub_bob, strlen((char *)k_pub_bob));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
 
@@ -1999,7 +2003,7 @@ KUTE_TEST_CASE(kryptos_elgamal_cipher_c99_tests)
     // INFO(Rafael): Asks the library for a decryption task and call Elgamal passing his private key.
     kryptos_task_set_decrypt_action(bob);
 
-    kryptos_run_cipher(elgamal, bob, k_priv_bob, strlen(k_priv_bob));
+    kryptos_run_cipher(elgamal, bob, k_priv_bob, strlen((char *)k_priv_bob));
 
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
 
@@ -2026,7 +2030,7 @@ KUTE_TEST_CASE(kryptos_elgamal_cipher_c99_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
-    kryptos_u8_t *k_pub_bob = "-----BEGIN ELGAMAL PARAM P-----\n"
+    kryptos_u8_t *k_pub_bob = (kryptos_u8_t *)"-----BEGIN ELGAMAL PARAM P-----\n"
                               "ub1yArM/5LO8iGWyQoTnXo7eq3kT9JYnO"
                               "YF1e328owL/2OsFwEzvzEPgvQf3iAjYbh"
                               "QiTxZsHsUJ0w6NQqAPB2+v+jt7JVqOAt3"
@@ -2054,7 +2058,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
                               "IkkY2o=\n"
                               "-----END ELGAMAL PARAM B-----\n";
 
-    kryptos_u8_t *k_priv_bob = "-----BEGIN ELGAMAL PARAM P-----\n"
+    kryptos_u8_t *k_priv_bob = (kryptos_u8_t *)"-----BEGIN ELGAMAL PARAM P-----\n"
                                "ub1yArM/5LO8iGWyQoTnXo7eq3kT9JYnO"
                                "YF1e328owL/2OsFwEzvzEPgvQf3iAjYbh"
                                "QiTxZsHsUJ0w6NQqAPB2+v+jt7JVqOAt3"
@@ -2066,10 +2070,10 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
                                "9Nz8YxvIEqdfeaAoJcNgey2kDWo=\n"
                                "-----END ELGAMAL PARAM D-----\n";
 
-    kryptos_u8_t *m = "I don't need no make up, I got real scars\x00\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *m = (kryptos_u8_t *)"I don't need no make up, I got real scars\x00\x00\x00\x00\x00\x00\x00";
     size_t m_size = 48;
     kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
-    kryptos_u8_t *label = "ChocalateJesus";
+    kryptos_u8_t *label = (kryptos_u8_t *)"ChocalateJesus";
     size_t label_size = 14;
 
     kryptos_task_init_as_null(alice);
@@ -2084,14 +2088,14 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
     alice->in = m;
     alice->in_size = m_size;
     alice->key = k_pub_bob;
-    alice->key_size = strlen(k_pub_bob);
+    alice->key_size = strlen((char *)k_pub_bob);
     alice->action = kKryptosEncrypt;
 
     alice->cipher = kKryptosCipherELGAMALOAEP;
     alice->arg[0] = label;
     alice->arg[1] = &label_size;
-    alice->arg[2] = kryptos_sha1_hash;
-    alice->arg[3] = kryptos_sha1_hash_size;
+    alice->arg[2] = (void *)kryptos_sha1_hash;
+    alice->arg[3] = (void *)kryptos_sha1_hash_size;
 
     kryptos_elgamal_oaep_cipher(&alice);
 
@@ -2107,14 +2111,14 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
     bob->in = alice->out;
     bob->in_size = alice->out_size;
     bob->key = k_priv_bob;
-    bob->key_size = strlen(k_priv_bob);
+    bob->key_size = strlen((char *)k_priv_bob);
     bob->action = kKryptosDecrypt;
 
     bob->cipher = kKryptosCipherELGAMALOAEP;
     bob->arg[0] = label;
     bob->arg[1] = &label_size;
-    bob->arg[2] = kryptos_sha1_hash;
-    bob->arg[3] = kryptos_sha1_hash_size;
+    bob->arg[2] = (void *)kryptos_sha1_hash;
+    bob->arg[3] = (void *)kryptos_sha1_hash_size;
 
     kryptos_elgamal_oaep_cipher(&bob);
 
@@ -2144,14 +2148,14 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
     alice->in = m;
     alice->in_size = m_size;
     alice->key = k_pub_bob;
-    alice->key_size = strlen(k_pub_bob);
+    alice->key_size = strlen((char *)k_pub_bob);
     alice->action = kKryptosEncrypt;
 
     alice->cipher = kKryptosCipherELGAMALOAEP;
     alice->arg[0] = label;
     alice->arg[1] = &label_size;
-    alice->arg[2] = kryptos_sha1_hash;
-    alice->arg[3] = kryptos_sha1_hash_size;
+    alice->arg[2] = (void *)kryptos_sha1_hash;
+    alice->arg[3] = (void *)kryptos_sha1_hash_size;
 
     kryptos_elgamal_oaep_cipher(&alice);
 
@@ -2167,10 +2171,10 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
     bob->in = alice->out;
     bob->in_size = alice->out_size;
     bob->key = k_priv_bob;
-    bob->key_size = strlen(k_priv_bob);
+    bob->key_size = strlen((char *)k_priv_bob);
     bob->action = kKryptosDecrypt;
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Y, bob->in, bob->in_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Y, bob->in, bob->in_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" ( the cryptogram was intentionally corrupted )\n\n");
@@ -2181,8 +2185,8 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_tests)
     bob->cipher = kKryptosCipherELGAMALOAEP;
     bob->arg[0] = label;
     bob->arg[1] = &label_size;
-    bob->arg[2] = kryptos_sha1_hash;
-    bob->arg[3] = kryptos_sha1_hash_size;
+    bob->arg[2] = (void *)kryptos_sha1_hash;
+    bob->arg[3] = (void *)kryptos_sha1_hash_size;
 
     kryptos_elgamal_oaep_cipher(&bob);
 
@@ -2206,7 +2210,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
 #ifdef KRYPTOS_C99
-    kryptos_u8_t *k_pub_alice = "-----BEGIN ELGAMAL PARAM P-----\n"
+    kryptos_u8_t *k_pub_alice = (kryptos_u8_t *)"-----BEGIN ELGAMAL PARAM P-----\n"
                                 "I+oUuRaQpiwFa0Saa5pJFGDro22vya7hh"
                                 "9mkyC5bQADl5BuqXT862/mOX5VWz+UNjR"
                                 "XU2tx380GzWp6UQnbhxM0ptehr+VRJvIL"
@@ -2234,7 +2238,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
                                 "GyLFCI=\n"
                                 "-----END ELGAMAL PARAM B-----\n";
 
-    kryptos_u8_t *k_priv_alice = "-----BEGIN ELGAMAL PARAM P-----\n"
+    kryptos_u8_t *k_priv_alice = (kryptos_u8_t *)"-----BEGIN ELGAMAL PARAM P-----\n"
                                  "I+oUuRaQpiwFa0Saa5pJFGDro22vya7hh"
                                  "9mkyC5bQADl5BuqXT862/mOX5VWz+UNjR"
                                  "XU2tx380GzWp6UQnbhxM0ptehr+VRJvIL"
@@ -2246,9 +2250,9 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
                                  "0VDQAgkcbyRksu/NskgCkva8rn0=\n"
                                  "-----END ELGAMAL PARAM D-----\n";
 
-    kryptos_u8_t *m = "a right is not what someone gives you; it's what no one can take from you.\x00\x00";
+    kryptos_u8_t *m = (kryptos_u8_t *)"a right is not what someone gives you; it's what no one can take from you.\x00\x00";
     size_t m_size = 76;
-    kryptos_u8_t *label = "Elcabong";
+    kryptos_u8_t *label = (kryptos_u8_t *)"Elcabong";
     size_t label_size = 8;
     kryptos_task_ctx at, bt, *bob = &bt, *alice = &at;
 
@@ -2264,7 +2268,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
     kryptos_task_set_in(bob, m, m_size);
     kryptos_task_set_encrypt_action(bob);
     kryptos_run_cipher(elgamal_oaep, bob,
-                       k_pub_alice, strlen(k_pub_alice),
+                       k_pub_alice, strlen((char *)k_pub_alice),
                        label, &label_size, kryptos_oaep_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
@@ -2279,7 +2283,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
     kryptos_task_set_in(alice, bob->out, bob->out_size);
     kryptos_task_set_decrypt_action(alice);
     kryptos_run_cipher(elgamal_oaep, alice,
-                       k_priv_alice, strlen(k_priv_alice),
+                       k_priv_alice, strlen((char *)k_priv_alice),
                        label, &label_size, kryptos_oaep_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
@@ -2310,7 +2314,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
     kryptos_task_set_in(bob, m, m_size);
     kryptos_task_set_encrypt_action(bob);
     kryptos_run_cipher(elgamal_oaep, bob,
-                       k_pub_alice, strlen(k_pub_alice),
+                       k_pub_alice, strlen((char *)k_pub_alice),
                        label, &label_size, kryptos_oaep_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
@@ -2324,7 +2328,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
 
     kryptos_task_set_in(alice, bob->out, bob->out_size);
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Y, alice->in, alice->in_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_ELGAMAL_PEM_HDR_PARAM_Y, alice->in, alice->in_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" ( the cryptogram was intentionally corrupted )\n\n");
@@ -2334,7 +2338,7 @@ KUTE_TEST_CASE(kryptos_elgamal_oaep_cipher_c99_tests)
 
     kryptos_task_set_decrypt_action(alice);
     kryptos_run_cipher(elgamal_oaep, alice,
-                       k_priv_alice, strlen(k_priv_alice),
+                       k_priv_alice, strlen((char *)k_priv_alice),
                        label, &label_size, kryptos_oaep_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
@@ -2374,20 +2378,20 @@ KUTE_TEST_CASE(kryptos_pss_encoding_tests)
     };
 
     struct pss_encoding_tests test_vector[] = {
-        { "...tears from the sky, in pools of pain...", 1024, 20, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
-        { "...well baby tonite, I'm gonna go & dance in the rain!!", 1024, 30, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
-        { "...tears from the sky, in pools of pain...", 1024, 0, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
-        { "...well baby tonite, I'm gonna go & dance in the rain!!", 1024, 0, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
-        { "brazil................................................."
+        { (kryptos_u8_t *)"...tears from the sky, in pools of pain...", 1024, 20, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
+        { (kryptos_u8_t *)"...well baby tonite, I'm gonna go & dance in the rain!!", 1024, 30, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
+        { (kryptos_u8_t *)"...tears from the sky, in pools of pain...", 1024, 0, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
+        { (kryptos_u8_t *)"...well baby tonite, I'm gonna go & dance in the rain!!", 1024, 0, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
+        { (kryptos_u8_t *)"brazil................................................."
           "......................................................."
           "....", 1024, 90, kryptos_sha1_hash, kryptos_sha1_hash_size, 1 },
-        { "compliance============================================="
+        { (kryptos_u8_t *)"compliance============================================="
           "======================================================="
           "====", 1024, 8, kryptos_sha1_hash, kryptos_sha1_hash_size, 1 },
-        { "true ethics, from home!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        { (kryptos_u8_t *)"true ethics, from home!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
           "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
           "!!!!", 1024, 7, kryptos_sha1_hash, kryptos_sha1_hash_size, 0 },
-        { "We've built a Great Wall around our power\n"
+        { (kryptos_u8_t *)"We've built a Great Wall around our power\n"
           "Economic Great Wall around our power\n"
           "Worldwide Great Wall around our power\n"
           "Give us your poor,\n"
@@ -2401,7 +2405,7 @@ KUTE_TEST_CASE(kryptos_pss_encoding_tests)
     size_t em_size = 0, m_size = 0;
 
     for (tv = 0; tv < tv_size; tv++) {
-        m_size = em_size = strlen(test_vector[tv].m);
+        m_size = em_size = strlen((char *)test_vector[tv].m);
 
         em = kryptos_pss_encode(test_vector[tv].m, &em_size,
                                 test_vector[tv].k, test_vector[tv].salt_size,
@@ -2428,7 +2432,7 @@ KUTE_TEST_CASE(kryptos_pss_encoding_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
-    kryptos_u8_t *k_pub_alice = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *k_pub_alice = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                                 "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNo"
                                 "Vg7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
                                 "-----END RSA PARAM N-----\n"
@@ -2437,7 +2441,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
                                 "o45ESDnBQFoRSoeQ3p3QVqDzfgViMeHIinMzFxx/OYpSgxpuQq4em4CwrBkqn1DxlRCzNCrdAqiwo=\n"
                                 "-----END RSA PARAM E-----\n";
 
-    kryptos_u8_t *k_priv_alice = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *k_priv_alice = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                                  "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjN"
                                  "oVg7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
                                  "-----END RSA PARAM N-----\n"
@@ -2447,7 +2451,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
                                  "-----END RSA PARAM D-----\n";
 
     kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
-    kryptos_u8_t *m = "The Bad In Each Other\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *m = (kryptos_u8_t *)"The Bad In Each Other\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
     size_t m_size = 32;
     kryptos_u8_t *signature = NULL;
     size_t signature_size = 0;
@@ -2468,7 +2472,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     alice->in = m;
     alice->in_size = m_size;
     alice->key = k_priv_alice;
-    alice->key_size = strlen(k_priv_alice);
+    alice->key_size = strlen((char *)k_priv_alice);
 
     kryptos_rsa_sign(&alice);
 
@@ -2489,7 +2493,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     bob->in = alice->out;
     bob->in_size = alice->out_size;
     bob->key = k_pub_alice;
-    bob->key_size = strlen(k_pub_alice);
+    bob->key_size = strlen((char *)k_pub_alice);
 
     kryptos_rsa_verify(&bob);
 
@@ -2527,7 +2531,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     alice->out_size = signature_size;
     KUTE_ASSERT(memcpy(alice->out, signature, signature_size) == alice->out);
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH X PARAMETER CORRUPTED:\n\n%s\n", alice->out);
@@ -2542,7 +2546,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     bob->in = alice->out;
     bob->in_size = alice->out_size;
     bob->key = k_pub_alice;
-    bob->key_size = strlen(k_pub_alice);
+    bob->key_size = strlen((char *)k_pub_alice);
 
     kryptos_rsa_verify(&bob);
 
@@ -2572,7 +2576,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     alice->out_size = signature_size;
     KUTE_ASSERT(memcpy(alice->out, signature, signature_size) == alice->out);
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH S PARAMETER CORRUPTED:\n\n%s\n", alice->out);
@@ -2587,7 +2591,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     bob->in = alice->out;
     bob->in_size = alice->out_size;
     bob->key = k_pub_alice;
-    bob->key_size = strlen(k_pub_alice);
+    bob->key_size = strlen((char *)k_pub_alice);
 
     kryptos_rsa_verify(&bob);
 
@@ -2618,8 +2622,8 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     alice->out_size = signature_size;
     KUTE_ASSERT(memcpy(alice->out, signature, signature_size) == alice->out);
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH BOTH X AND S PARAMETERS CORRUPTED:\n\n%s\n", alice->out);
@@ -2634,7 +2638,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_tests)
     bob->in = alice->out;
     bob->in_size = alice->out_size;
     bob->key = k_pub_alice;
-    bob->key_size = strlen(k_pub_alice);
+    bob->key_size = strlen((char *)k_pub_alice);
 
     kryptos_rsa_verify(&bob);
 
@@ -2655,7 +2659,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
 #ifdef KRYPTOS_C99
-    kryptos_u8_t *k_pub_bob = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *k_pub_bob = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                               "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNoVg"
                               "7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
                               "-----END RSA PARAM N-----\n"
@@ -2664,7 +2668,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
                               "5ESDnBQFoRSoeQ3p3QVqDzfgViMeHIinMzFxx/OYpSgxpuQq4em4CwrBkqn1DxlRCzNCrdAqiwo=\n"
                               "-----END RSA PARAM E-----\n";
 
-    kryptos_u8_t *k_priv_bob = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *k_priv_bob = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                                "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNoV"
                                "g7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
                                "-----END RSA PARAM N-----\n"
@@ -2674,7 +2678,7 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
                                "-----END RSA PARAM D-----\n";
 
     kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
-    kryptos_u8_t *m = "We're gonna steal your mail, on a Friday night... "
+    kryptos_u8_t *m = (kryptos_u8_t *)"We're gonna steal your mail, on a Friday night... "
                       "We're gonna steal your mail, by the pale moonlight\x00\x00\x00\x00";
     size_t m_size = 104;
     kryptos_u8_t *signature = NULL;
@@ -2687,11 +2691,13 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     // INFO(Rafael): Bob sign the message.
 
-    kryptos_sign(rsa, bob, m, m_size, k_priv_bob, strlen(k_priv_bob));
+    kryptos_sign(rsa, bob, m, m_size, k_priv_bob, strlen((char *)k_priv_bob));
 
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
     KUTE_ASSERT(bob->out != NULL);
@@ -2700,11 +2706,13 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     uprintf(" *** SIGNED OUTPUT:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT:\n\n%s\n", bob->out);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT:\n\r\n\r%s\n\r", bob->out));
 #endif
 
     // INFO(Rafael): Now Alice simply verify.
 
-    kryptos_verify(rsa, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob));
+    kryptos_verify(rsa, alice, bob->out, bob->out_size, k_pub_bob, strlen((char *)k_pub_bob));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     KUTE_ASSERT(alice->out != NULL);
@@ -2713,6 +2721,8 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     uprintf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
+#elif defined(_WIN32)
+    KdPrint((" *** AUTHENTICATED OUTPUT:\n\r\n\r'%s'\n\r\n\r", alice->out));
 #endif
 
     signature = bob->out;
@@ -2729,6 +2739,8 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     bob->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
@@ -2737,15 +2749,17 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     bob->out_size = signature_size;
     KUTE_ASSERT(memcpy(bob->out, signature, signature_size) == bob->out);
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", bob->out);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH X CORRUPTED:\n\r\n\r%s\n\r", bob->out));
 #endif
 
-    kryptos_verify(rsa, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob));
+    kryptos_verify(rsa, alice, bob->out, bob->out_size, k_pub_bob, strlen((char *)k_pub_bob));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     KUTE_ASSERT(alice->result == kKryptosInvalidSignature);
@@ -2758,6 +2772,8 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n",
                                                                                     alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\r\n\r", alice->result_verbose));
 #endif
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
@@ -2770,6 +2786,8 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     bob->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
@@ -2778,15 +2796,17 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     bob->out_size = signature_size;
     KUTE_ASSERT(memcpy(bob->out, signature, signature_size) == bob->out);
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->out);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH S CORRUPTED:\n\r\n\r%s\n\r", bob->out));
 #endif
 
-    kryptos_verify(rsa, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob));
+    kryptos_verify(rsa, alice, bob->out, bob->out_size, k_pub_bob, strlen((char *)k_pub_bob));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     KUTE_ASSERT(alice->result == kKryptosInvalidSignature);
@@ -2799,6 +2819,8 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n",
                                                                                      alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\r\n\r", alice->result_verbose));
 #endif
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
@@ -2811,6 +2833,8 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     bob->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
@@ -2819,16 +2843,18 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     bob->out_size = signature_size;
     KUTE_ASSERT(memcpy(bob->out, signature, signature_size) == bob->out);
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH BOTH X AND S CORRUPTED:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH BOTH X AND S CORRUPTED:\n\n%s\n", bob->out);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH BOTH X AND S CORRUPTED:\n\r\n\r%s\n\r", bob->out));
 #endif
 
-    kryptos_verify(rsa, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob));
+    kryptos_verify(rsa, alice, bob->out, bob->out_size, k_pub_bob, strlen((char *)k_pub_bob));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     KUTE_ASSERT(alice->result == kKryptosInvalidSignature);
@@ -2841,6 +2867,8 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n",
                                                                                         alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n\r", alice->result_verbose));
 #endif
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
@@ -2851,12 +2879,14 @@ KUTE_TEST_CASE(kryptos_rsa_digital_signature_basic_scheme_c99_tests)
     uprintf("WARN: No c99 support, this test was skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: No c99 support, this test was skipped.\n");
+# elif defined(_WIN32)
+    KdPrint(("WARN: No c99 support, this test was skipped.\n\r"));
 # endif
 #endif
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
-    kryptos_u8_t *k_pub_alice = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *k_pub_alice = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                                 "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNo"
                                 "Vg7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
                                 "-----END RSA PARAM N-----\n"
@@ -2865,7 +2895,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
                                 "o45ESDnBQFoRSoeQ3p3QVqDzfgViMeHIinMzFxx/OYpSgxpuQq4em4CwrBkqn1DxlRCzNCrdAqiwo=\n"
                                 "-----END RSA PARAM E-----\n";
 
-    kryptos_u8_t *k_priv_alice = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *k_priv_alice = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                                  "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjN"
                                  "oVg7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
                                  "-----END RSA PARAM N-----\n"
@@ -2875,7 +2905,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
                                  "-----END RSA PARAM D-----\n";
 
     kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
-    kryptos_u8_t *m = "Every fortress falls.\x00\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *m = (kryptos_u8_t *)"Every fortress falls.\x00\x00\x00\x00\x00\x00\x00";
     size_t m_size = 28;
     size_t salt_size = 4;
     kryptos_u8_t *signature = NULL;
@@ -2887,6 +2917,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     kryptos_task_init_as_null(alice);
@@ -2897,7 +2929,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     alice->in = m;
     alice->in_size = m_size;
     alice->key = k_priv_alice;
-    alice->key_size = strlen(k_priv_alice);
+    alice->key_size = strlen((char *)k_priv_alice);
     alice->arg[0] = &salt_size;
     alice->arg[1] = alice->arg[2] = NULL;
 
@@ -2911,6 +2943,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     uprintf(" *** SIGNED OUTPUT:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT:\n\n%s\n", alice->out);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT:\n\r\n\r%s\n\r", alice->out));
 #endif
 
     // INFO(Rafael): Once upon a time, Alice sent a signed message to bob.... blah, blah, blah.
@@ -2920,7 +2954,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     bob->in = alice->out;
     bob->in_size = alice->out_size;
     bob->key = k_pub_alice;
-    bob->key_size = strlen(k_pub_alice);
+    bob->key_size = strlen((char *)k_pub_alice);
     bob->arg[0] = &salt_size;
     bob->arg[1] = bob->arg[2] = NULL;
 
@@ -2936,6 +2970,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     uprintf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
+#elif defined(_WIN32)
+    KdPrint((" *** AUTHENTICATED OUTPUT:\n\r\n\r'%s'\n\r\n\r", bob->out));
 #endif
 
     signature = alice->out;
@@ -2949,6 +2985,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     kryptos_task_init_as_null(alice);
@@ -2959,7 +2997,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     alice->in = m;
     alice->in_size = m_size;
     alice->key = k_priv_alice;
-    alice->key_size = strlen(k_priv_alice);
+    alice->key_size = strlen((char *)k_priv_alice);
     alice->arg[0] = &salt_size;
     alice->arg[1] = alice->arg[2] = NULL;
 
@@ -2969,12 +3007,14 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     KUTE_ASSERT(memcpy(alice->out, signature, signature_size) == alice->out);
     alice->out_size = signature_size;
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH X PARAMETER CORRUPTED:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH X PARAMETER CORRUPTED:\n\n%s\n", alice->out);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH X PARAMETER CORRUPTED:\n\r\n\r%s\n\r", alice->out));
 #endif
 
     // INFO(Rafael): Once upon a time, Bob received a signed message by Alice with X corrupted.
@@ -2984,7 +3024,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     bob->in = alice->out;
     bob->in_size = alice->out_size;
     bob->key = k_pub_alice;
-    bob->key_size = strlen(k_pub_alice);
+    bob->key_size = strlen((char *)k_pub_alice);
     bob->arg[0] = &salt_size;
     bob->arg[1] = bob->arg[2] = NULL;
 
@@ -2999,6 +3039,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     uprintf(" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\r\n\r", bob->result_verbose));
 #endif
 
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
@@ -3008,6 +3050,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     kryptos_task_init_as_null(alice);
@@ -3019,12 +3063,14 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     KUTE_ASSERT(memcpy(alice->out, signature, signature_size) == alice->out);
     alice->out_size = signature_size;
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH S PARAMETER CORRUPTED:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH S PARAMETER CORRUPTED:\n\n%s\n", alice->out);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH S PARAMETER CORRUPTED:\n\r\n\r%s\n\r", alice->out));
 #endif
 
     // INFO(Rafael): Once upon a time, Bob received a signed message by Alice with S corrupted.
@@ -3034,7 +3080,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     bob->in = alice->out;
     bob->in_size = alice->out_size;
     bob->key = k_pub_alice;
-    bob->key_size = strlen(k_pub_alice);
+    bob->key_size = strlen((char *)k_pub_alice);
     bob->arg[0] = &salt_size;
     bob->arg[1] = bob->arg[2] = NULL;
 
@@ -3047,6 +3093,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     uprintf(" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\r\n\r", bob->result_verbose));
 #endif
 
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
@@ -3056,6 +3104,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     kryptos_task_init_as_null(alice);
@@ -3067,13 +3117,15 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     KUTE_ASSERT(memcpy(alice->out, signature, signature_size) == alice->out);
     alice->out_size = signature_size;
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_X, alice->out, alice->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_S, alice->out, alice->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH BOTH X AND S PARAMETERS CORRUPTED:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH BOTH X AND S PARAMETERS CORRUPTED:\n\n%s\n", alice->out);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH BOTH X AND S PARAMETERS CORRUPTED:\n\r\n\r%s\n\r", alice->out));
 #endif
 
     // INFO(Rafael): Once upon a time, Bob received a signed message by Alice, totally corrupted.
@@ -3083,7 +3135,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
     bob->in = alice->out;
     bob->in_size = alice->out_size;
     bob->key = k_pub_alice;
-    bob->key_size = strlen(k_pub_alice);
+    bob->key_size = strlen((char *)k_pub_alice);
     bob->arg[0] = &salt_size;
     bob->arg[1] = bob->arg[2] = NULL;
 
@@ -3097,6 +3149,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_tests)
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n",
                                                                                           bob->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n\r", bob->result_verbose));
 #endif
 
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
@@ -3106,7 +3160,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
 #ifdef KRYPTOS_C99
-    kryptos_u8_t *k_pub_bob = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *k_pub_bob = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                               "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNoVg"
                               "7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
                               "-----END RSA PARAM N-----\n"
@@ -3115,7 +3169,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
                               "5ESDnBQFoRSoeQ3p3QVqDzfgViMeHIinMzFxx/OYpSgxpuQq4em4CwrBkqn1DxlRCzNCrdAqiwo=\n"
                               "-----END RSA PARAM E-----\n";
 
-    kryptos_u8_t *k_priv_bob = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *k_priv_bob = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                                "NVI5j80KqEf1P7rxVnVSHVs0OJCvXigDIQpLnaujZae01zTqDMTT92+/i1ft4rpRqaJYat/DzQn+kJLPtxBESlJV84xjNoV"
                                "g7EqHRKl+6isyC/UbyAF1ioQr6LnoQ5fxFRtDbKEvKU8AUPPndYBuY3UcdJU+p2ezf4s5u3sMOhs=\n"
                                "-----END RSA PARAM N-----\n"
@@ -3125,7 +3179,7 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
                                "-----END RSA PARAM D-----\n";
 
     kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
-    kryptos_u8_t *m = "We live in a political world, wisdom is thrown in jail\x00\x00";
+    kryptos_u8_t *m = (kryptos_u8_t *)"We live in a political world, wisdom is thrown in jail\x00\x00";
     size_t m_size = 56;
     size_t salt_size = 8;
     kryptos_u8_t *signature = NULL;
@@ -3138,11 +3192,13 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     // INFO(Rafael): Bob sign the message.
 
-    kryptos_sign(rsa_emsa_pss, bob, m, m_size, k_priv_bob, strlen(k_priv_bob), &salt_size, kryptos_pss_hash(sha1));
+    kryptos_sign(rsa_emsa_pss, bob, m, m_size, k_priv_bob, strlen((char *)k_priv_bob), &salt_size, kryptos_pss_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
     KUTE_ASSERT(bob->out != NULL);
@@ -3151,11 +3207,13 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     uprintf(" *** SIGNED OUTPUT:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT:\n\n%s\n", bob->out);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT:\n\r\n\r%s\n\r", bob->out));
 #endif
 
     // INFO(Rafael): Now Alice simply verify.
 
-    kryptos_verify(rsa_emsa_pss, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob), &salt_size,
+    kryptos_verify(rsa_emsa_pss, alice, bob->out, bob->out_size, k_pub_bob, strlen((char *)k_pub_bob), &salt_size,
                    kryptos_pss_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
@@ -3165,6 +3223,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     uprintf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
+#elif defined(_WIN32)
+    KdPrint((" *** AUTHENTICATED OUTPUT:\n\r\n\r'%s'\n\r\n\r", alice->out));
 #endif
 
 
@@ -3182,6 +3242,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     bob->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
@@ -3190,15 +3252,17 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     KUTE_ASSERT(memcpy(bob->out, signature, signature_size) == bob->out);
     bob->out_size = signature_size;
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", bob->out);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH X CORRUPTED:\n\r\n\r%s\n\r", bob->out));
 #endif
 
-    kryptos_verify(rsa_emsa_pss, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob), &salt_size,
+    kryptos_verify(rsa_emsa_pss, alice, bob->out, bob->out_size, k_pub_bob, strlen((char *)k_pub_bob), &salt_size,
                    kryptos_pss_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
@@ -3212,6 +3276,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n",
                                                                                      alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\r\n\r", alice->result_verbose));
 #endif
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
@@ -3224,6 +3290,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     bob->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
@@ -3232,15 +3300,17 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     KUTE_ASSERT(memcpy(bob->out, signature, signature_size) == bob->out);
     bob->out_size = signature_size;
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     printf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->out);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH S CORRUPTED:\n\r\n\r%s\n\r", bob->out));
 #endif
 
-    kryptos_verify(rsa_emsa_pss, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob), &salt_size,
+    kryptos_verify(rsa_emsa_pss, alice, bob->out, bob->out_size, k_pub_bob, strlen((char *)k_pub_bob), &salt_size,
                    kryptos_pss_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
@@ -3254,6 +3324,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n",
                                                                                     alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\r\n\r", alice->result_verbose));
 #endif
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
@@ -3266,6 +3338,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     bob->out = (kryptos_u8_t *) kryptos_newseg(signature_size + 1);
@@ -3274,16 +3348,18 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     KUTE_ASSERT(memcpy(bob->out, signature, signature_size) == bob->out);
     bob->out_size = signature_size;
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_X, bob->out, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_RSA_PEM_HDR_PARAM_S, bob->out, bob->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH BOTH X AND S CORRUPTED:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH BOTH X AND S CORRUPTED:\n\n%s\n", bob->out);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH BOTH X AND S CORRUPTED:\n\r\n\r%s\n\r", bob->out));
 #endif
 
-    kryptos_verify(rsa_emsa_pss, alice, bob->out, bob->out_size, k_pub_bob, strlen(k_pub_bob), &salt_size,
+    kryptos_verify(rsa_emsa_pss, alice, bob->out, bob->out_size, k_pub_bob, strlen((char *)k_pub_bob), &salt_size,
                    kryptos_pss_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
@@ -3297,6 +3373,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n",
                                                                                         alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with x and s corrupted was successfully detected => '%s'\n\r", alice->result_verbose));
 #endif
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
@@ -3307,6 +3385,8 @@ KUTE_TEST_CASE(kryptos_rsa_emsa_pss_digital_signature_scheme_c99_tests)
     uprintf("WARN: No c99 support, this test was skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: No c99 support, this test was skipped.\n");
+# elif defined(_WIN32)
+    KdPrint(("WARN: No c99 support, this test was skipped.\n\r"));
 # endif
 #endif
 KUTE_TEST_CASE_END
@@ -3338,6 +3418,12 @@ KUTE_TEST_CASE(kryptos_dsa_mk_key_pair_tests)
 
     printk(KERN_ERR "\n *** DSA PRIVATE KEY:\n\n");
     printk(KERN_ERR "%s", k_priv);
+#elif defined(_WIN32)
+    KdPrint((" *** DSA PUBLIC KEY:\n\r\n\r"));
+    KdPrint(("%s", k_pub));
+
+    KdPrint(("\n\r *** DSA PRIVATE KEY:\n\r\n\r"));
+    KdPrint(("%s", k_priv));
 #endif
 
     // INFO(Rafael): Verifying the public exported parameters.
@@ -3391,7 +3477,7 @@ KUTE_TEST_CASE(kryptos_dsa_mk_key_pair_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
-    kryptos_u8_t *k_pub = "-----BEGIN DSA P-----\n"
+    kryptos_u8_t *k_pub = (kryptos_u8_t *)"-----BEGIN DSA P-----\n"
                           "76+T2iexCO+8DyRunM+C/s2"
                           "ZnFkMkjMc//9s73K5/amsrt"
                           "OkdSV7lk7pzJ42F+r6ADDUi"
@@ -3426,7 +3512,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
                           "Q35lzdxSgE=\n"
                           "-----END DSA E-----\n";
 
-    kryptos_u8_t *k_priv = "-----BEGIN DSA P-----\n"
+    kryptos_u8_t *k_priv = (kryptos_u8_t *)"-----BEGIN DSA P-----\n"
                            "76+T2iexCO+8DyRunM+C/s2"
                            "ZnFkMkjMc//9s73K5/amsrt"
                            "OkdSV7lk7pzJ42F+r6ADDUi"
@@ -3456,7 +3542,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
                            "-----END DSA D-----\n";
 
     kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
-    kryptos_u8_t *m = "Provisoriamente nao cantaremos o amor,\n"
+    kryptos_u8_t *m = (kryptos_u8_t *)"Provisoriamente nao cantaremos o amor,\n"
                       "que se refugiou mais abaixo dos subterraneos.\n"
                       "Cantaremos o medo, que estereliza os abracos.\n\n"
                       "nao cantaremos o odio, porque este nao existe,\n"
@@ -3473,8 +3559,10 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
-    m_size = strlen(m);
+    m_size = strlen((char *)m);
 
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
@@ -3482,7 +3570,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     alice->in = m;
     alice->in_size = m_size;
     alice->key = k_priv;
-    alice->key_size = strlen(k_priv);
+    alice->key_size = strlen((char *)k_priv);
     alice->cipher = kKryptosCipherDSA;
 
     kryptos_dsa_sign(&alice);
@@ -3494,12 +3582,14 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     uprintf(" *** SIGNED OUTPUT:\n\n%s\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT:\n\n%s\n", alice->out);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT:\n\r\n\r%s\n\r", alice->out));
 #endif
 
     bob->in = alice->out;
     bob->in_size = alice->out_size;
     bob->key = k_pub;
-    bob->key_size = strlen(k_pub);
+    bob->key_size = strlen((char *)k_pub);
     bob->cipher = kKryptosCipherDSA;
 
     kryptos_dsa_verify(&bob);
@@ -3513,6 +3603,8 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     uprintf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", bob->out);
+#elif defined(_WIN32)
+    KdPrint((" *** AUTHENTICATED OUTPUT:\n\r\n\r'%s'\n\r\n\r", bob->out));
 #endif
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
@@ -3521,6 +3613,8 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     bob->in = (kryptos_u8_t *) kryptos_newseg(alice->out_size + 1);
@@ -3529,15 +3623,17 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     memcpy(bob->in, alice->out, alice->out_size);
     bob->in_size = alice->out_size;
     bob->key = k_pub;
-    bob->key_size = strlen(bob->key);
+    bob->key_size = strlen((char *)bob->key);
     bob->cipher = kKryptosCipherDSA;
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_R, bob->in, bob->in_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_DSA_PEM_HDR_PARAM_R, bob->in, bob->in_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", bob->in);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", bob->in);
+#elif defined(_WIN32)
+    KdPrint(( " *** SIGNED OUTPUT WITH R CORRUPTED:\n\r\n\r%s\n\r", bob->in));
 #endif
 
     kryptos_dsa_verify(&bob);
@@ -3552,6 +3648,8 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with r corrupted was successfully detected => '%s'\n\n",
                                                                                        bob->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with r corrupted was successfully detected => '%s'\n\r\n\r", bob->result_verbose));
 #endif
 
     kryptos_task_free(bob, KRYPTOS_TASK_IN);
@@ -3560,6 +3658,8 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     bob->in = (kryptos_u8_t *) kryptos_newseg(alice->out_size + 1);
@@ -3568,15 +3668,17 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     memcpy(bob->in, alice->out, alice->out_size);
     bob->in_size = alice->out_size;
     bob->key = k_pub;
-    bob->key_size = strlen(bob->key);
+    bob->key_size = strlen((char *)bob->key);
     bob->cipher = kKryptosCipherDSA;
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_S, bob->in, bob->in_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_DSA_PEM_HDR_PARAM_S, bob->in, bob->in_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->in);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", bob->in);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH S CORRUPTED:\n\r\n\r%s\n\r", bob->in));
 #endif
 
     kryptos_dsa_verify(&bob);
@@ -3590,6 +3692,8 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     uprintf(" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", bob->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\r\n\r", bob->result_verbose));
 #endif
 
     kryptos_task_free(bob, KRYPTOS_TASK_IN);
@@ -3598,6 +3702,8 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     bob->in = (kryptos_u8_t *) kryptos_newseg(alice->out_size + 1);
@@ -3606,16 +3712,18 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
     memcpy(bob->in, alice->out, alice->out_size);
     bob->in_size = alice->out_size;
     bob->key = k_pub;
-    bob->key_size = strlen(bob->key);
+    bob->key_size = strlen((char *)bob->key);
     bob->cipher = kKryptosCipherDSA;
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_R, bob->in, bob->in_size) == 1);
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_S, bob->in, bob->in_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_DSA_PEM_HDR_PARAM_R, bob->in, bob->in_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_DSA_PEM_HDR_PARAM_S, bob->in, bob->in_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH BOTH R AND S CORRUPTED:\n\n%s\n", bob->in);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH BOTH R AND S CORRUPTED:\n\n%s\n", bob->in);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH BOTH R AND S CORRUPTED:\n\r\n\r%s\n\r", bob->in));
 #endif
 
     kryptos_dsa_verify(&bob);
@@ -3630,6 +3738,8 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_tests)
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with r and s corrupted was successfully detected => '%s'\n\n",
                                                                                              bob->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with r and s corrupted was successfully detected => '%s'\n\r\n\r", bob->result_verbose));
 #endif
 
     kryptos_task_free(bob, KRYPTOS_TASK_IN);
@@ -3638,7 +3748,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
 #ifdef KRYPTOS_C99
-    kryptos_u8_t *k_pub = "-----BEGIN DSA P-----\n"
+    kryptos_u8_t *k_pub = (kryptos_u8_t *)"-----BEGIN DSA P-----\n"
                           "76+T2iexCO+8DyRunM+C/s2"
                           "ZnFkMkjMc//9s73K5/amsrt"
                           "OkdSV7lk7pzJ42F+r6ADDUi"
@@ -3673,7 +3783,7 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
                           "Q35lzdxSgE=\n"
                           "-----END DSA E-----\n";
 
-    kryptos_u8_t *k_priv = "-----BEGIN DSA P-----\n"
+    kryptos_u8_t *k_priv = (kryptos_u8_t *)"-----BEGIN DSA P-----\n"
                            "76+T2iexCO+8DyRunM+C/s2"
                            "ZnFkMkjMc//9s73K5/amsrt"
                            "OkdSV7lk7pzJ42F+r6ADDUi"
@@ -3703,14 +3813,14 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
                            "-----END DSA D-----\n";
 
     kryptos_task_ctx at, bt, *alice = &at, *bob = &bt;
-    kryptos_u8_t *m = "Esse e tempo de partido,\n"
+    kryptos_u8_t *m = (kryptos_u8_t *)"Esse e tempo de partido,\n"
                       "tempo de homens partidos.\n\n"
                       "E tempo de meio silencio,\n"
                       "de boca gelada e murmurio,\n"
                       "palavra indireta, aviso\n"
                       "na esquina. Tempo de cinco sentidos\n"
                       "num so. O espiao janta conosco.";
-    size_t m_size = strlen(m);
+    size_t m_size = strlen((char *)m);
     kryptos_u8_t *signature = NULL;
 
     kryptos_task_init_as_null(alice);
@@ -3720,9 +3830,11 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
-    kryptos_sign(dsa, bob, m, m_size, k_priv, strlen(k_priv), kryptos_dsa_hash(sha1));
+    kryptos_sign(dsa, bob, m, m_size, k_priv, strlen((char *)k_priv), kryptos_dsa_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
     KUTE_ASSERT(bob->out != NULL);
@@ -3731,9 +3843,11 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     uprintf(" *** SIGNED OUTPUT:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT:\n\n%s\n", bob->out);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT:\n\r\n\r%s\n\r", bob->out));
 #endif
 
-    kryptos_verify(dsa, alice, bob->out, bob->out_size, k_pub, strlen(k_pub), kryptos_dsa_hash(sha1));
+    kryptos_verify(dsa, alice, bob->out, bob->out_size, k_pub, strlen((char *)k_pub), kryptos_dsa_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
     KUTE_ASSERT(alice->out != NULL);
@@ -3744,6 +3858,8 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     uprintf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
+#elif defined(_WIN32)
+    KdPrint((" *** AUTHENTICATED OUTPUT:\n\r\n\r'%s'\n\r\n\r", alice->out));
 #endif
 
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
@@ -3752,6 +3868,8 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     signature = (kryptos_u8_t *) kryptos_newseg(bob->out_size + 1);
@@ -3759,15 +3877,17 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     memset(signature, 0, bob->out_size + 1);
     memcpy(signature, bob->out, bob->out_size);
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_R, signature, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_DSA_PEM_HDR_PARAM_R, signature, bob->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", signature);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", signature);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH R CORRUPTED:\n\r\n\r%s\n\r", signature));
 #endif
 
-    kryptos_verify(dsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), kryptos_dsa_hash(sha1));
+    kryptos_verify(dsa, alice, signature, bob->out_size, k_pub, strlen((char *)k_pub), kryptos_dsa_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     KUTE_ASSERT(alice->result == kKryptosInvalidSignature);
@@ -3779,6 +3899,8 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with r corrupted was successfully detected => '%s'\n\n",
                                                                                      alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with r corrupted was successfully detected => '%s'\n\r\n\r", alice->result_verbose));
 #endif
 
     kryptos_freeseg(signature, bob->out_size + 1);
@@ -3787,6 +3909,8 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     signature = (kryptos_u8_t *) kryptos_newseg(bob->out_size + 1);
@@ -3794,15 +3918,17 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     memset(signature, 0, bob->out_size + 1);
     memcpy(signature, bob->out, bob->out_size);
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_S, signature, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_DSA_PEM_HDR_PARAM_S, signature, bob->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", signature);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", signature);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH S CORRUPTED:\n\r\n\r%s\n\r", signature));
 #endif
 
-    kryptos_verify(dsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), kryptos_dsa_hash(sha1));
+    kryptos_verify(dsa, alice, signature, bob->out_size, k_pub, strlen((char *)k_pub), kryptos_dsa_hash(sha1));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     KUTE_ASSERT(alice->result == kKryptosInvalidSignature);
@@ -3814,6 +3940,8 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n",
                                                                                      alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\r\n\r", alice->result_verbose));
 #endif
 
     kryptos_freeseg(signature, bob->out_size + 1);
@@ -3822,6 +3950,8 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", m);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", m));
 #endif
 
     signature = (kryptos_u8_t *) kryptos_newseg(bob->out_size + 1);
@@ -3829,16 +3959,18 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     memset(signature, 0, bob->out_size + 1);
     memcpy(signature, bob->out, bob->out_size);
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_R, signature, bob->out_size) == 1);
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_DSA_PEM_HDR_PARAM_S, signature, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_DSA_PEM_HDR_PARAM_R, signature, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_DSA_PEM_HDR_PARAM_S, signature, bob->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH BOTH R AND S CORRUPTED:\n\n%s\n", signature);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH BOTH R AND S CORRUPTED:\n\n%s\n", signature);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH BOTH R AND S CORRUPTED:\n\r\n\r%s\n\r", signature));
 #endif
 
-    kryptos_verify(dsa, alice, signature, bob->out_size, k_pub, strlen(k_pub), NULL);
+    kryptos_verify(dsa, alice, signature, bob->out_size, k_pub, strlen((char *)k_pub), NULL);
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     KUTE_ASSERT(alice->result == kKryptosInvalidSignature);
@@ -3850,6 +3982,8 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with r and s corrupted was successfully detected => '%s'\n\n",
                                                                                            alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with r and s corrupted was successfully detected => '%s'\n\r\n\r", alice->result_verbose));
 #endif
 
     kryptos_freeseg(signature, bob->out_size + 1);
@@ -3860,12 +3994,14 @@ KUTE_TEST_CASE(kryptos_dsa_digital_signature_scheme_c99_tests)
     uprintf("WARN: No c99 support, this test was skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: No c99 support, this test was skipped.\n");
+# elif defined(_WIN32)
+    KdPrint(("WARN: No c99 support, this test was skipped.\n\r"));
 # endif
 #endif
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_ecdh_get_curve_from_params_buf_tests)
-    kryptos_u8_t *params = "-----BEGIN ECDH PARAM EC BITS-----\n"
+    kryptos_u8_t *params = (kryptos_u8_t *)"-----BEGIN ECDH PARAM EC BITS-----\n"
                            "OA==\n"
                            "-----END ECDH PARAM EC BITS-----\n"
                            "-----BEGIN ECDH PARAM EC P-----\n"
@@ -3907,7 +4043,7 @@ KUTE_TEST_CASE(kryptos_ecdh_get_curve_from_params_buf_tests)
     q = kryptos_hex_value_as_mp("13", 2);
     KUTE_ASSERT(q != NULL);
 
-    KUTE_ASSERT(kryptos_ecdh_get_curve_from_params_buf(params, kstrlen(params), &curve) == kKryptosSuccess);
+    KUTE_ASSERT(kryptos_ecdh_get_curve_from_params_buf(params, kstrlen((char *)params), &curve) == kKryptosSuccess);
 
     KUTE_ASSERT(kryptos_mp_eq(curve->ec->p, p) == 1);
     KUTE_ASSERT(kryptos_mp_eq(curve->ec->a, a) == 1);
@@ -3929,7 +4065,7 @@ KUTE_TEST_CASE_END
 KUTE_TEST_CASE(kryptos_ecdh_get_random_k_tests)
     kryptos_mp_value_t *k = NULL;
     kryptos_mp_value_t *q = NULL;
-    kryptos_u8_t *qx = "E95E4A5F737059DC60DF5991D45029409E60FC09";
+    char *qx = "E95E4A5F737059DC60DF5991D45029409E60FC09";
     kryptos_mp_value_t *_2 = NULL;
 
     q = kryptos_hex_value_as_mp(qx, kstrlen(qx));
@@ -4120,6 +4256,12 @@ KUTE_TEST_CASE(kryptos_ecdsa_mk_key_pair_tests)
 
     printk(KERN_ERR "\n *** ECDSA PRIVATE KEY:\n\n");
     printk(KERN_ERR "%s", k_priv);
+#elif defined(_WIN32)
+    KdPrint((" *** ECDSA PUBLIC KEY:\n\r\n\r"));
+    KdPrint(("%s", k_pub));
+
+    KdPrint(("\n\r *** ECDSA PRIVATE KEY:\n\r\n\r"));
+    KdPrint(("%s", k_priv));
 #endif
 
     temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_P, k_pub, k_pub_size, &temp_size);
@@ -4196,7 +4338,7 @@ KUTE_TEST_CASE(kryptos_ecdsa_mk_key_pair_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
-    kryptos_u8_t *k_pub =  "-----BEGIN ECDSA P-----\n"
+    kryptos_u8_t *k_pub =  (kryptos_u8_t *)"-----BEGIN ECDSA P-----\n"
                            "D2IVlRPYs5Wtx99g3Flwc19KXuk=\n"
                            "-----END ECDSA P-----\n"
                            "-----BEGIN ECDSA A-----\n"
@@ -4220,7 +4362,7 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
                            "-----BEGIN ECDSA B Y-----\n"
                            "Lyv51/HVjMULdIKWv33Np7TEaZo=\n"
                            "-----END ECDSA B Y-----\n";
-    kryptos_u8_t *k_priv = "-----BEGIN ECDSA D-----\n"
+    kryptos_u8_t *k_priv = (kryptos_u8_t *)"-----BEGIN ECDSA D-----\n"
                            "sPJxcQ9mORQv2iJ76Y0g0zmMfFU=\n"
                            "-----END ECDSA D-----\n"
                            "-----BEGIN ECDSA P-----\n"
@@ -4242,7 +4384,7 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
                            "IWPaFmOXnGZBR/k4w44aekfLZxY=\n"
                            "-----END ECDSA A Y-----\n";
     kryptos_task_ctx bob_task, alice_task, *bob = &bob_task, *alice = &alice_task;
-    kryptos_u8_t *message = "Ain't it hard to stumble\n"
+    kryptos_u8_t *message = (kryptos_u8_t *)"Ain't it hard to stumble\n"
                             "And land in some funny lagoon?\n"
                             "Ain't it hard to stumble\n"
                             "And land in some muddy lagoon?\n"
@@ -4258,14 +4400,16 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", message));
 #endif
 
-    bob->in_size = kstrlen(message);
+    bob->in_size = kstrlen((char *)message);
     bob->in = message;
     bob->key = k_priv;
-    bob->key_size = kstrlen(k_priv);
-    bob->arg[0] = kryptos_sha256_hash;
-    bob->arg[1] = kryptos_sha256_hash_size;
+    bob->key_size = kstrlen((char *)k_priv);
+    bob->arg[0] = (void *)kryptos_sha256_hash;
+    bob->arg[1] = (void *)kryptos_sha256_hash_size;
     bob->cipher = kKryptosCipherECDSA;
 
     kryptos_ecdsa_sign(&bob);
@@ -4275,6 +4419,8 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
     uprintf(" *** SIGNED OUTPUT:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT:\n\n%s\n", bob->out);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT:\n\r\n\r%s\n\r", bob->out));
 #endif
 
     temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_X, bob->out, bob->out_size, &temp_size);
@@ -4294,9 +4440,9 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
     alice->in_size = bob->out_size;
     alice->in = bob->out;
     alice->key = k_pub;
-    alice->key_size = kstrlen(k_pub);
-    alice->arg[0] = kryptos_sha256_hash;
-    alice->arg[1] = kryptos_sha256_hash_size;
+    alice->key_size = kstrlen((char *)k_pub);
+    alice->arg[0] = (void *)kryptos_sha256_hash;
+    alice->arg[1] = (void *)kryptos_sha256_hash_size;
     alice->cipher = kKryptosCipherECDSA;
 
     kryptos_ecdsa_verify(&alice);
@@ -4309,6 +4455,8 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
     uprintf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
+#elif defined(_WIN32)
+    KdPrint((" *** AUTHENTICATED OUTPUT:\n\r\n\r'%s'\n\r\n\r", alice->out));
 #endif
 
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
@@ -4317,23 +4465,27 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
     alice->in = (kryptos_u8_t *) kryptos_newseg(alice->in_size + 1);
     memcpy(alice->in, bob->out, alice->in_size);
     alice->key = k_pub;
-    alice->key_size = kstrlen(k_pub);
-    alice->arg[0] = kryptos_sha256_hash;
-    alice->arg[1] = kryptos_sha256_hash_size;
+    alice->key_size = kstrlen((char *)k_pub);
+    alice->arg[0] = (void *)kryptos_sha256_hash;
+    alice->arg[1] = (void *)kryptos_sha256_hash_size;
     alice->cipher = kKryptosCipherECDSA;
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", message));
 #endif
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_X, alice->in, alice->in_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_ECDSA_PEM_HDR_PARAM_X, alice->in, alice->in_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", alice->in);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", alice->in);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH X CORRUPTED:\n\r\n\r%s\n\r", alice->in));
 #endif
 
     kryptos_ecdsa_verify(&alice);
@@ -4348,6 +4500,8 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
     uprintf(" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
 #elif defined(__linux__)
     printk(KERN_ERR " *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\r\n\r", alice->result_verbose));
 #endif
 
     alice->in_size = bob->out_size;
@@ -4355,23 +4509,27 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
     memset(alice->in, 0, alice->in_size + 1);
     memcpy(alice->in, bob->out, alice->in_size);
     alice->key = k_pub;
-    alice->key_size = kstrlen(k_pub);
-    alice->arg[0] = kryptos_sha256_hash;
-    alice->arg[1] = kryptos_sha256_hash_size;
+    alice->key_size = kstrlen((char *)k_pub);
+    alice->arg[0] = (void *)kryptos_sha256_hash;
+    alice->arg[1] = (void *)kryptos_sha256_hash_size;
     alice->cipher = kKryptosCipherECDSA;
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", message));
 #endif
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_R, alice->in, alice->in_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_ECDSA_PEM_HDR_PARAM_R, alice->in, alice->in_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", alice->in);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", alice->in);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH R CORRUPTED:\n\r\n\r%s\n\r", alice->in));
 #endif
 
     kryptos_ecdsa_verify(&alice);
@@ -4387,29 +4545,35 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
 #elif defined(__linux__)
     printk(KERN_ERR
            " *** Nice, the signed output with r corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with r corrupted was successfully detected => '%s'\n\r\n\r", alice->result_verbose));
 #endif
 
     alice->in_size = bob->out_size;
     alice->in = (kryptos_u8_t *) kryptos_newseg(alice->in_size + 1);
     memcpy(alice->in, bob->out, alice->in_size);
     alice->key = k_pub;
-    alice->key_size = kstrlen(k_pub);
-    alice->arg[0] = kryptos_sha256_hash;
-    alice->arg[1] = kryptos_sha256_hash_size;
+    alice->key_size = kstrlen((char *)k_pub);
+    alice->arg[0] = (void *)kryptos_sha256_hash;
+    alice->arg[1] = (void *)kryptos_sha256_hash_size;
     alice->cipher = kKryptosCipherECDSA;
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", message));
 #endif
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_S, alice->in, alice->in_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_ECDSA_PEM_HDR_PARAM_S, alice->in, alice->in_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", alice->in);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", alice->in);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH S CORRUPTED:\n\r\n\r%s\n\r", alice->in));
 #endif
 
     kryptos_ecdsa_verify(&alice);
@@ -4425,6 +4589,8 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
 #elif defined(__linux__)
     printk(KERN_ERR
            " *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\r\n\r", alice->result_verbose));
 #endif
 
     alice->in_size = bob->out_size;
@@ -4432,25 +4598,29 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
     memset(alice->in, 0, alice->in_size + 1);
     memcpy(alice->in, bob->out, alice->in_size);
     alice->key = k_pub;
-    alice->key_size = kstrlen(k_pub);
-    alice->arg[0] = kryptos_sha256_hash;
-    alice->arg[1] = kryptos_sha256_hash_size;
+    alice->key_size = kstrlen((char *)k_pub);
+    alice->arg[0] = (void *)kryptos_sha256_hash;
+    alice->arg[1] = (void *)kryptos_sha256_hash_size;
     alice->cipher = kKryptosCipherECDSA;
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", message));
 #endif
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_X, alice->in, alice->in_size) == 1);
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_R, alice->in, alice->in_size) == 1);
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_S, alice->in, alice->in_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_ECDSA_PEM_HDR_PARAM_X, alice->in, alice->in_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_ECDSA_PEM_HDR_PARAM_R, alice->in, alice->in_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_ECDSA_PEM_HDR_PARAM_S, alice->in, alice->in_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH ALL DATA CORRUPTED:\n\n%s\n", alice->in);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH ALL DATA CORRUPTED:\n\n%s\n", alice->in);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH ALL DATA CORRUPTED:\n\r\n\r%s\n\r", alice->in));
 #endif
 
     kryptos_ecdsa_verify(&alice);
@@ -4466,6 +4636,9 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
 #elif defined(__linux__)
     printk(KERN_ERR
            " *** Nice, the signed output with all data corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with all data corrupted was successfully detected => '%s'\n\r\n\r",
+             alice->result_verbose));
 #endif
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);
@@ -4473,7 +4646,7 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
-    kryptos_u8_t *k_pub =  "-----BEGIN ECDSA P-----\n"
+    kryptos_u8_t *k_pub =  (kryptos_u8_t *)"-----BEGIN ECDSA P-----\n"
                            "D2IVlRPYs5Wtx99g3Flwc19KXuk=\n"
                            "-----END ECDSA P-----\n"
                            "-----BEGIN ECDSA A-----\n"
@@ -4497,7 +4670,7 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
                            "-----BEGIN ECDSA B Y-----\n"
                            "4uOswC9GoazmV6zopR0OqX77Nm0=\n"
                            "-----END ECDSA B Y-----\n";
-    kryptos_u8_t *k_priv = "-----BEGIN ECDSA D-----\n"
+    kryptos_u8_t *k_priv = (kryptos_u8_t *)"-----BEGIN ECDSA D-----\n"
                            "Lulg0pwcb42v8FiMaUc1B2PMntk=\n"
                            "-----END ECDSA D-----\n"
                            "-----BEGIN ECDSA P-----\n"
@@ -4519,7 +4692,7 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
                            "IWPaFmOXnGZBR/k4w44aekfLZxY=\n"
                            "-----END ECDSA A Y-----\n";
     kryptos_task_ctx bob_task, alice_task, *bob = &bob_task, *alice = &alice_task;
-    kryptos_u8_t *message = "Ain't gonna hang no picture\n"
+    kryptos_u8_t *message = (kryptos_u8_t *)"Ain't gonna hang no picture\n"
                             "Ain't gonna hang no picture frame\n"
                             "Ain't gonna hang no picture\n"
                             "Or hang no picture frame\n"
@@ -4535,9 +4708,11 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", message));
 #endif
 
-    kryptos_sign(ecdsa, bob, message, kstrlen(message), k_priv, kstrlen(k_priv), kryptos_ecdsa_hash(sha256));
+    kryptos_sign(ecdsa, bob, message, kstrlen((char *)message), k_priv, kstrlen((char *)k_priv), kryptos_ecdsa_hash(sha256));
 
     KUTE_ASSERT(kryptos_last_task_succeed(bob) == 1);
 
@@ -4545,6 +4720,8 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
     uprintf(" *** SIGNED OUTPUT:\n\n%s\n", bob->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT:\n\n%s\n", bob->out);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT:\n\r\n\r%s\n\r", bob->out));
 #endif
 
     temp = kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_X, bob->out, bob->out_size, &temp_size);
@@ -4561,7 +4738,7 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
 
     KUTE_ASSERT(kryptos_pem_get_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_D, bob->out, bob->out_size, &temp_size) == NULL);
 
-    kryptos_verify(ecdsa, alice, bob->out, bob->out_size, k_pub, kstrlen(k_pub), kryptos_ecdsa_hash(sha256));
+    kryptos_verify(ecdsa, alice, bob->out, bob->out_size, k_pub, kstrlen((char *)k_pub), kryptos_ecdsa_hash(sha256));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 1);
 
@@ -4572,6 +4749,8 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
     uprintf(" *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
 #elif defined(__linux__)
     printk(KERN_ERR " *** AUTHENTICATED OUTPUT:\n\n'%s'\n\n", alice->out);
+#elif defined(_WIN32)
+    KdPrint((" *** AUTHENTICATED OUTPUT:\n\r\n\r'%s'\n\r\n\r", alice->out));
 #endif
 
     kryptos_task_free(alice, KRYPTOS_TASK_OUT);
@@ -4583,17 +4762,21 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", message));
 #endif
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_X, signature, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_ECDSA_PEM_HDR_PARAM_X, signature, bob->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", signature);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH X CORRUPTED:\n\n%s\n", signature);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH X CORRUPTED:\n\r\n\r%s\n\r", signature));
 #endif
 
-    kryptos_verify(ecdsa, alice, signature, bob->out_size, k_pub, kstrlen(k_pub), kryptos_ecdsa_hash(sha256));
+    kryptos_verify(ecdsa, alice, signature, bob->out_size, k_pub, kstrlen((char *)k_pub), kryptos_ecdsa_hash(sha256));
     kryptos_freeseg(signature, bob->out_size);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
@@ -4601,6 +4784,8 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
 #elif defined(__linux__)
     printk(KERN_ERR
            " *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with x corrupted was successfully detected => '%s'\n\r\n\r", alice->result_verbose));
 #endif
 
     signature = (kryptos_u8_t *) kryptos_newseg(bob->out_size + 1);
@@ -4611,17 +4796,21 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", message));
 #endif
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_R, signature, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_ECDSA_PEM_HDR_PARAM_R, signature, bob->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", signature);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH R CORRUPTED:\n\n%s\n", signature);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH R CORRUPTED:\n\r\n\r%s\n\r", signature));
 #endif
 
-    kryptos_verify(ecdsa, alice, signature, bob->out_size, k_pub, kstrlen(k_pub), kryptos_ecdsa_hash(sha256));
+    kryptos_verify(ecdsa, alice, signature, bob->out_size, k_pub, kstrlen((char *)k_pub), kryptos_ecdsa_hash(sha256));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     KUTE_ASSERT(alice->result == kKryptosInvalidSignature);
@@ -4635,6 +4824,8 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
 #elif defined(__linux__)
     printk(KERN_ERR
            " *** Nice, the signed output with r corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with r corrupted was successfully detected => '%s'\n\r\n\r", alice->result_verbose));
 #endif
 
     signature = (kryptos_u8_t *) kryptos_newseg(bob->out_size + 1);
@@ -4645,17 +4836,21 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", message));
 #endif
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_S, signature, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_ECDSA_PEM_HDR_PARAM_S, signature, bob->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", signature);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH S CORRUPTED:\n\n%s\n", signature);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH S CORRUPTED:\n\r\n\r%s\n\r", signature));
 #endif
 
-    kryptos_verify(ecdsa, alice, signature, bob->out_size, k_pub, kstrlen(k_pub), kryptos_ecdsa_hash(sha256));
+    kryptos_verify(ecdsa, alice, signature, bob->out_size, k_pub, kstrlen((char *)k_pub), kryptos_ecdsa_hash(sha256));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     KUTE_ASSERT(alice->result == kKryptosInvalidSignature);
@@ -4669,6 +4864,8 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
 #elif defined(__linux__)
     printk(KERN_ERR
            " *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with s corrupted was successfully detected => '%s'\n\r\n\r", alice->result_verbose));
 #endif
 
     signature = (kryptos_u8_t *) kryptos_newseg(bob->out_size + 1);
@@ -4679,19 +4876,23 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
     uprintf(" *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
 #elif defined(__linux__)
     printk(KERN_ERR " *** ORIGINAL MESSAGE:\n\n'%s'\n\n", message);
+#elif defined(_WIN32)
+    KdPrint((" *** ORIGINAL MESSAGE:\n\r\n\r'%s'\n\r\n\r", message));
 #endif
 
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_X, signature, bob->out_size) == 1);
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_R, signature, bob->out_size) == 1);
-    KUTE_ASSERT(corrupt_pem_data(KRYPTOS_ECDSA_PEM_HDR_PARAM_S, signature, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_ECDSA_PEM_HDR_PARAM_X, signature, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_ECDSA_PEM_HDR_PARAM_R, signature, bob->out_size) == 1);
+    KUTE_ASSERT(corrupt_pem_data((kryptos_u8_t *)KRYPTOS_ECDSA_PEM_HDR_PARAM_S, signature, bob->out_size) == 1);
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf(" *** SIGNED OUTPUT WITH ALL DATA CORRUPTED:\n\n%s\n", signature);
 #elif defined(__linux__)
     printk(KERN_ERR " *** SIGNED OUTPUT WITH ALL DATA CORRUPTED:\n\n%s\n", signature);
+#elif defined(_WIN32)
+    KdPrint((" *** SIGNED OUTPUT WITH ALL DATA CORRUPTED:\n\r\n\r%s\n\r", signature));
 #endif
 
-    kryptos_verify(ecdsa, alice, signature, bob->out_size, k_pub, kstrlen(k_pub), kryptos_ecdsa_hash(sha256));
+    kryptos_verify(ecdsa, alice, signature, bob->out_size, k_pub, kstrlen((char *)k_pub), kryptos_ecdsa_hash(sha256));
 
     KUTE_ASSERT(kryptos_last_task_succeed(alice) == 0);
     KUTE_ASSERT(alice->result == kKryptosInvalidSignature);
@@ -4705,6 +4906,9 @@ KUTE_TEST_CASE(kryptos_ecdsa_digital_signature_scheme_c99_tests)
 #elif defined(__linux__)
     printk(KERN_ERR
            " *** Nice, the signed output with all data corrupted was successfully detected => '%s'\n\n", alice->result_verbose);
+#elif defined(_WIN32)
+    KdPrint((" *** Nice, the signed output with all data corrupted was successfully detected => '%s'\n\r\n\r",
+             alice->result_verbose));
 #endif
 
     kryptos_task_free(bob, KRYPTOS_TASK_OUT);

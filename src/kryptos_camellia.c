@@ -694,7 +694,8 @@ static void kryptos_camellia_F(kryptos_u32_t *data, kryptos_u32_t kl, kryptos_u3
     y8 = t1 ^ t4 ^ t5 ^ t6 ^ t7;
     out[0] = (kryptos_u32_t) y1 << 24 | (kryptos_u32_t) y2 << 16 | (kryptos_u32_t) y3 << 8 | (kryptos_u32_t) y4;
     out[1] = (kryptos_u32_t) y5 << 24 | (kryptos_u32_t) y6 << 16 | (kryptos_u32_t) y7 << 8 | (kryptos_u32_t) y8;
-    t1 = t2 = t3 = t4 = t5 = t6 = t7 = t8 = y1 = y2 = y3 = y4 = y5 = y6 = y7 = y8 = x[0] = x[1] = 0;
+    t1 = t2 = t3 = t4 = t5 = t6 = t7 = t8 = y1 = y2 = y3 = y4 = y5 = y6 = y7 = y8 = 0;
+    x[0] = x[1] = 0;
 }
 
 static void kryptos_camellia_block_encrypt_128(kryptos_u8_t *block, const struct kryptos_camellia_subkeys *sks) {

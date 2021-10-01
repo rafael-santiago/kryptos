@@ -49,8 +49,8 @@ void kryptos_iv_inc_u32(kryptos_u8_t *iv, const size_t iv_size) {
 
     u32_ctr += 1;
 
-    iv[iv_size - 4] = u32_ctr >> 24;
-    iv[iv_size - 3] = (u32_ctr & 0xFF0000) >> 16;
-    iv[iv_size - 2] = (u32_ctr & 0xFF00) >> 8;
+    iv[iv_size - 4] = (u32_ctr >> 24) & 0xFF;
+    iv[iv_size - 3] = ((u32_ctr & 0xFF0000) >> 16) & 0xFF;
+    iv[iv_size - 2] = ((u32_ctr & 0xFF00) >> 8) & 0xFF;
     iv[iv_size - 1] = u32_ctr & 0xFF;
 }

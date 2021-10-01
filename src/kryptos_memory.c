@@ -12,8 +12,11 @@
 #  include <unistd.h>
 # endif
 #endif
-#if defined(_WIN32)
+#if defined(_WIN32) && !defined(KRYPTOS_KERNEL_MODE)
 # include <windows.h>
+#else
+# include <kryptos_types.h>
+# define KRYPTOS_MEMORY_TAG 'LKos'
 #endif
 
 #if defined(KRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY_FREAK_PARANOID_PERSON)
@@ -68,6 +71,8 @@ void *kryptos_newseg(const size_t ssize) {
     segment = malloc(ssize, M_KRYPTOS, M_NOWAIT);
 #elif defined(__linux__)
     segment = kmalloc(ssize, GFP_ATOMIC);
+#elif defined(_WIN32)
+    segment = ExAllocatePoolWithTag(NonPagedPoolNx, ssize, KRYPTOS_MEMORY_TAG);
 #else
     segment = NULL;
 #endif
@@ -154,6 +159,8 @@ void kryptos_freeseg(void *seg, const size_t ssize) {
         free(seg, M_KRYPTOS);
 #elif defined(KRYPTOS_KERNEL_MODE) && defined(__linux__)
         kfree(seg);
+#elif defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+        ExFreePoolWithTag(seg, KRYPTOS_MEMORY_TAG);
 #endif
     }
 }
@@ -185,6 +192,10 @@ void *kryptos_realloc(void *addr, const size_t ssize) {
     return realloc(addr, ssize, M_KRYPTOS, M_NOWAIT);
 #elif defined(KRYPTOS_KERNEL_MODE) && defined(__linux__)
     return krealloc(addr, ssize, GFP_ATOMIC);
+#elif defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+    (addr);
+    (ssize);
+    return NULL;
 #else
     return NULL;
 #endif

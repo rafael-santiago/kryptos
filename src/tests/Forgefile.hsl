@@ -53,6 +53,7 @@ kryptos-tests.prologue() {
         $cflags.add_item("-Wno-invalid-source-encoding");
     } else if ($toolset_name.match("^msvc") == 1) {
         $cflags.add_item("-D_CRT_SECURE_NO_WARNINGS");
+        $cflags.add_item("-DUMDF_USING_NTSTATUS");
     }
 
     $libraries = hefesto.sys.get_option("libraries");
@@ -64,6 +65,9 @@ kryptos-tests.prologue() {
         $ldflags.add_item("libkryptos" + get_msvc_artifact_postfix() + ".lib");
         $ldflags.add_item("libcutest" + get_msvc_artifact_postfix() + ".lib");
         $ldflags.add_item("/NODEFAULTLIB:MSVCRT,MSVCRTD");
+        $ldflags.add_item("bcrypt.lib");
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
     }
 
     if ($cflags.index_of("-Dmemcmp=kryptos_memcmp") == -1) {

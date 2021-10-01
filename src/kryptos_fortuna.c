@@ -168,7 +168,7 @@ static void *kryptos_fortuna_generate_blocks(struct kryptos_fortuna_ctx *fortuna
     kryptos_u8_t *r, *rp, *seed = NULL;
     struct kryptos_fortuna_ctx *fp;
     kryptos_task_ctx t, *ktask = &t;
-    size_t i, r_size, seed_size;
+    size_t i, r_size, seed_size = 0;
 
     fortuna->call_nr += 1;
 
@@ -221,9 +221,9 @@ static void *kryptos_fortuna_generate_blocks(struct kryptos_fortuna_ctx *fortuna
         ktask->action = kKryptosEncryptWithoutRandomPad;
 
         ktask->in[0] = fp->C & 0xFF;
-        ktask->in[1] = (fp->C & 0xFF00) >> 8;
-        ktask->in[2] = (fp->C & 0xFF0000) >> 16;
-        ktask->in[3] = fp->C >> 24;
+        ktask->in[1] = ((fp->C & 0xFF00) >> 8) & 0xFF;
+        ktask->in[2] = ((fp->C & 0xFF0000) >> 16) & 0xFF;
+        ktask->in[3] = (fp->C >> 24) & 0xFF;
 
         kryptos_aes128_cipher(&ktask);
 

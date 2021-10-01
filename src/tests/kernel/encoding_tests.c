@@ -25,12 +25,12 @@ KUTE_TEST_CASE(kryptos_base64_tests)
     };
 
     struct base64_test test_vector[] = {
-        {      "f", 1,     "Zg==", 4 },
-        {     "fo", 2,     "Zm8=", 4 },
-        {    "foo", 3,     "Zm9v", 4 },
-        {   "foob", 4, "Zm9vYg==", 8 },
-        {  "fooba", 5, "Zm9vYmE=", 8 },
-        { "foobar", 6, "Zm9vYmFy", 8 }
+        {      (kryptos_u8_t *)"f", 1,     (kryptos_u8_t *)"Zg==", 4 },
+        {     (kryptos_u8_t *)"fo", 2,     (kryptos_u8_t *)"Zm8=", 4 },
+        {    (kryptos_u8_t *)"foo", 3,     (kryptos_u8_t *)"Zm9v", 4 },
+        {   (kryptos_u8_t *)"foob", 4, (kryptos_u8_t *)"Zm9vYg==", 8 },
+        {  (kryptos_u8_t *)"fooba", 5, (kryptos_u8_t *)"Zm9vYmE=", 8 },
+        { (kryptos_u8_t *)"foobar", 6, (kryptos_u8_t *)"Zm9vYmFy", 8 }
     }; // INFO(Rafael): Test data from RFC-4648.
 
     size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
@@ -68,12 +68,12 @@ KUTE_TEST_CASE(kryptos_base64_dsl_tests)
     };
 
     struct base64_test test_vector[] = {
-        {      "f", 1,     "Zg==", 4 },
-        {     "fo", 2,     "Zm8=", 4 },
-        {    "foo", 3,     "Zm9v", 4 },
-        {   "foob", 4, "Zm9vYg==", 8 },
-        {  "fooba", 5, "Zm9vYmE=", 8 },
-        { "foobar", 6, "Zm9vYmFy", 8 }
+        {      (kryptos_u8_t *)"f", 1,     (kryptos_u8_t *)"Zg==", 4 },
+        {     (kryptos_u8_t *)"fo", 2,     (kryptos_u8_t *)"Zm8=", 4 },
+        {    (kryptos_u8_t *)"foo", 3,     (kryptos_u8_t *)"Zm9v", 4 },
+        {   (kryptos_u8_t *)"foob", 4, (kryptos_u8_t *)"Zm9vYg==", 8 },
+        {  (kryptos_u8_t *)"fooba", 5, (kryptos_u8_t *)"Zm9vYmE=", 8 },
+        { (kryptos_u8_t *)"foobar", 6, (kryptos_u8_t *)"Zm9vYmFy", 8 }
     }; // INFO(Rafael): Test data from RFC-4648.
 
     size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
@@ -106,6 +106,7 @@ KUTE_TEST_CASE(kryptos_uuencode_tests)
         kryptos_u8_t *out;
         size_t out_size;
     };
+#if !defined(_WIN32)
     kryptos_u8_t data[] = {
         0xbd, 0x50, 0xf7, 0xbc, 0x5c, 0x5c, 0xdb, 0xea, 0x7a, 0xc1, 0x71, 0x56,
         0x43, 0x53, 0xd8, 0xdc, 0x3b, 0x3b, 0x21, 0x53, 0x3e, 0xc6, 0x13, 0x46,
@@ -335,13 +336,15 @@ KUTE_TEST_CASE(kryptos_uuencode_tests)
         0x5b, 0x48, 0x48, 0x2e, 0x2a, 0x38, 0x40, 0x24, 0x21, 0x0a, 0x60, 0x0a
     };
     size_t exp_out_size = 1548;
-
+#endif
     struct uuencode_test test_vector[] = {
-        { "ABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABC", 60,
-          "M04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#\n"
+        { (kryptos_u8_t *)"ABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABC", 60,
+          (kryptos_u8_t *)"M04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#\n"
           "/04)#04)#04)#04)#04)#\n"
           "`\n", 86 },
+#if !defined(_WIN32)
         { data, data_size, exp_out, exp_out_size }
+#endif
     };
 
     size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
@@ -378,6 +381,7 @@ KUTE_TEST_CASE(kryptos_uuencode_dsl_tests)
         kryptos_u8_t *out;
         size_t out_size;
     };
+#if !defined(_WIN32)
     kryptos_u8_t data[] = {
         0xbd, 0x50, 0xf7, 0xbc, 0x5c, 0x5c, 0xdb, 0xea, 0x7a, 0xc1, 0x71, 0x56,
         0x43, 0x53, 0xd8, 0xdc, 0x3b, 0x3b, 0x21, 0x53, 0x3e, 0xc6, 0x13, 0x46,
@@ -607,13 +611,15 @@ KUTE_TEST_CASE(kryptos_uuencode_dsl_tests)
         0x5b, 0x48, 0x48, 0x2e, 0x2a, 0x38, 0x40, 0x24, 0x21, 0x0a, 0x60, 0x0a
     };
     size_t exp_out_size = 1548;
-
+#endif
     struct uuencode_test test_vector[] = {
-        { "ABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABC", 60,
-          "M04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#\n"
+        { (kryptos_u8_t *)"ABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABC", 60,
+          (kryptos_u8_t *)"M04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#04)#\n"
           "/04)#04)#04)#04)#04)#\n"
           "`\n", 86 },
+#if !defined(_WIN32)
         { data, data_size, exp_out, exp_out_size }
+#endif
     };
 
     size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
@@ -640,9 +646,9 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_huffman_tests)
     kryptos_u8_t *test_vector[] = {
-        "AAAAAAAAAABBBBBCCDEEEEEFFFGGGGZZZZYYXXXXXXXX",
+        (kryptos_u8_t *)"AAAAAAAAAABBBBBCCDEEEEEFFFGGGGZZZZYYXXXXXXXX",
 
-        "ACAAGATGCCATTGTCCCCCGGCCTCCTGCTGCTGCTGCTCTCCGGGGCCACGGCCACCGCTGCCCTGCC"
+        (kryptos_u8_t *)"ACAAGATGCCATTGTCCCCCGGCCTCCTGCTGCTGCTGCTCTCCGGGGCCACGGCCACCGCTGCCCTGCC"
         "CCTGGAGGGTGGCCCCACCGGCCGAGACAGCGAGCATATGCAGGAAGCGGCAGGAATAAGGAAAAGCAGC"
         "CTCCTGACTTTCCTCGCTTGGTGGTTTGAGTGGACCTCCCAGGCCAGTGCCGGGCCCCTCATAGGAGAGG"
         "AAGCTCGGGAGGTGGCCAGGCGGCAGGAAGGCGCACCCCCCCAGCAATCCGCGCGCCGGGACAGAATGCC"
@@ -654,7 +660,7 @@ KUTE_TEST_CASE(kryptos_huffman_tests)
     kryptos_u8_t *deflated_buffer = NULL, *inflated_buffer = NULL;
 
     for (tv = 0; tv < tv_nr; tv++) {
-        in_size = kstrlen(test_vector[tv]);
+        in_size = kstrlen((char *)test_vector[tv]);
         deflated_buffer = kryptos_huffman_deflate(test_vector[tv], in_size, &deflated_buffer_size);
         KUTE_ASSERT(deflated_buffer != NULL);
         inflated_buffer = kryptos_huffman_inflate(deflated_buffer, deflated_buffer_size, &inflated_buffer_size);
@@ -667,7 +673,7 @@ KUTE_TEST_CASE(kryptos_huffman_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_pem_get_data_tests)
-    kryptos_u8_t *buf = "-----BEGIN FOOBAR (1)-----\n"
+    kryptos_u8_t *buf = (kryptos_u8_t *)"-----BEGIN FOOBAR (1)-----\n"
                         "Rm9vYmFyMQ==\n"
                         "-----END FOOBAR (1)-----\n"
                         "-----BEGIN FOOBAR (0)-----\n"
@@ -676,47 +682,47 @@ KUTE_TEST_CASE(kryptos_pem_get_data_tests)
     size_t data_size = 0;
     kryptos_u8_t *data = NULL;
 
-    data = kryptos_pem_get_data("THE-DROIDS-WE-ARE-LOOKING-FOR", buf, kstrlen(buf), &data_size);
+    data = kryptos_pem_get_data("THE-DROIDS-WE-ARE-LOOKING-FOR", buf, kstrlen((char *)buf), &data_size);
 
     KUTE_ASSERT(data == NULL);
 
-    data = kryptos_pem_get_data("FOOBAR (0)", buf, kstrlen(buf), &data_size);
+    data = kryptos_pem_get_data("FOOBAR (0)", buf, kstrlen((char *)buf), &data_size);
 
     KUTE_ASSERT(data != NULL);
     KUTE_ASSERT(data_size == 7);
-    KUTE_ASSERT(kstrcmp(data, "Foobar0") == 0);
+    KUTE_ASSERT(kstrcmp((char *)data, "Foobar0") == 0);
 
     kryptos_freeseg(data, data_size);
 
     data_size = 0;
-    data = kryptos_pem_get_data("FOOBAR (1)", buf, kstrlen(buf), &data_size);
+    data = kryptos_pem_get_data("FOOBAR (1)", buf, kstrlen((char *)buf), &data_size);
 
     KUTE_ASSERT(data != NULL);
     KUTE_ASSERT(data_size == 7);
-    KUTE_ASSERT(kstrcmp(data, "Foobar1") == 0);
+    KUTE_ASSERT(kstrcmp((char *)data, "Foobar1") == 0);
 
     kryptos_freeseg(data, data_size);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_pem_put_data_tests)
-    kryptos_u8_t *foobar1 = "Foobar1", *foobar0 = "Foobar0";
+    kryptos_u8_t *foobar1 = (kryptos_u8_t *)"Foobar1", *foobar0 = (kryptos_u8_t *)"Foobar0";
     kryptos_u8_t *pem_buf = NULL;
     size_t pem_buf_size = 0;
-    kryptos_u8_t *expected_buffer = "-----BEGIN FOOBAR (1)-----\n"
+    kryptos_u8_t *expected_buffer = (kryptos_u8_t *)"-----BEGIN FOOBAR (1)-----\n"
                                     "Rm9vYmFyMQ==\n"
                                     "-----END FOOBAR (1)-----\n"
                                     "-----BEGIN FOOBAR (0)-----\n"
                                     "Rm9vYmFyMA==\n"
                                     "-----END FOOBAR (0)-----\n";
 
-    KUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (1)", foobar1, kstrlen(foobar1)) == kKryptosSuccess);
+    KUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (1)", foobar1, kstrlen((char *)foobar1)) == kKryptosSuccess);
     KUTE_ASSERT(pem_buf != NULL);
-    KUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (1)", foobar0, kstrlen(foobar0)) == kKryptosInvalidParams);
+    KUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (1)", foobar0, kstrlen((char *)foobar0)) == kKryptosInvalidParams);
     KUTE_ASSERT(pem_buf != NULL);
-    KUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (0)", foobar0, kstrlen(foobar0)) == kKryptosSuccess);
+    KUTE_ASSERT(kryptos_pem_put_data(&pem_buf, &pem_buf_size, "FOOBAR (0)", foobar0, kstrlen((char *)foobar0)) == kKryptosSuccess);
     KUTE_ASSERT(pem_buf != NULL);
-    KUTE_ASSERT(pem_buf_size == kstrlen(expected_buffer));
-    KUTE_ASSERT(kstrcmp(pem_buf, expected_buffer) == 0);
+    KUTE_ASSERT(pem_buf_size == kstrlen((char *)expected_buffer));
+    KUTE_ASSERT(kstrcmp((char *)pem_buf, (char *)expected_buffer) == 0);
     kryptos_freeseg(pem_buf, pem_buf_size);
 KUTE_TEST_CASE_END
 

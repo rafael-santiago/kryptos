@@ -1419,7 +1419,8 @@ CUTE_TEST_CASE(kryptos_memcmp_tests)
         "MSVCR110.dll",
         "MSVCR110d.dll",
         "MSVCR120.dll",
-        "MSCVR120d.dll"
+        "MSCVR120d.dll",
+        "ucrtbase.dll",
     };
     size_t libc_dll_nr = sizeof(libc_dll) / sizeof(libc_dll[0]), l;
     int (*libc_memcmp)(const void *, const void *, size_t);

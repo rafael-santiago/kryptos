@@ -33,7 +33,7 @@ KUTE_DECLARE_TEST_CASE(ktest_monkey);
 
 KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_memset_tests);
-    KUTE_RUN_TEST(kryptos_padding_tests);
+    /*KUTE_RUN_TEST(kryptos_padding_tests);
     KUTE_RUN_TEST(kryptos_unbiased_rand_mod_u8_tests);
     KUTE_RUN_TEST(kryptos_unbiased_rand_mod_u16_tests);
     KUTE_RUN_TEST(kryptos_unbiased_rand_mod_u32_tests);
@@ -288,7 +288,7 @@ KUTE_TEST_CASE(ktest_monkey)
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: The ECDSA signature tests were skipped.\n");
 # endif
-#endif
+#endif*/
 
     //KUTE_RUN_TEST(kryptos_new_standard_curve_tests);
 KUTE_TEST_CASE_END

@@ -48,10 +48,10 @@ kryptos_u8_t *kryptos_cpy_u32_as_big_endian(kryptos_u8_t *dest, const size_t des
     }
 
     if (kryptos_little_endian_cpu()) {
-        *(dest) = value >> 24;
-        *(dest + 1) = (value >> 16);
-        *(dest + 2) = (value >> 8);
-        *(dest + 3) = value;
+        *(dest) = (value >> 24) & 0xFF;
+        *(dest + 1) = (value >> 16) & 0xFF;
+        *(dest + 2) = (value >> 8) & 0xFF;
+        *(dest + 3) = value & 0xFF;
     } else {
         memcpy(dest, &value, sizeof(kryptos_u32_t));
     }

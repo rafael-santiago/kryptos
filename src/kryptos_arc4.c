@@ -36,7 +36,7 @@ static void kryptos_arc4_key_setup(const kryptos_u8_t *userkey, const size_t use
     kryptos_u8_t temp;
 
     for (sk->i = 0; sk->i < 256; sk->i++) {
-        sk->S[sk->i] = sk->i;
+        sk->S[sk->i] = (kryptos_u8_t)sk->i;
         S2[sk->i] = userkey[sk->i % userkey_size];
     }
 

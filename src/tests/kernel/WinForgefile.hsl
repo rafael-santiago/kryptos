@@ -1,0 +1,86 @@
+include on windows ~/toolsets/windows/driver/windows-driver.hsl
+
+local var srcs type list;
+local var includes type list;
+local var cflags type list;
+local var libraries type list;
+local var ldflags type list;
+local var modname type string;
+
+project win-kryptos-test-sys : toolset "windows-driver" : $srcs, $includes, $cflags, $libraries, $ldflags, $modname;
+
+win-kryptos-test-sys.prologue() {
+    var option type list;
+    $option = hefesto.sys.get_option("clean");
+
+#    if ($option.count() > 0) {
+#        mkclean($includes);
+#        hefesto.sys.echo("*** All clean!\n");
+#        hefesto.project.abort(0);
+#    }
+
+    $option = hefesto.sys.get_option("no-hmac-tests");
+    if ($option.count() > 0) {
+        $cflags.add_item("-DKRYPTOS_NO_HMAC_TESTS=1");
+    }
+
+    $option = hefesto.sys.get_option("skip-dh-xchg-tests");
+    if ($option.count() > 0) {
+        $cflags.add_item("-DSKIP_DH_XCHG_TESTS=1");
+    }
+
+    $option = hefesto.sys.get_option("skip-rsa-oaep-tests");
+    if ($option.count() > 0) {
+        $cflags.add_item("-DSKIP_RSA_OAEP_TESTS=1");
+    }
+
+    $option = hefesto.sys.get_option("skip-elgamal-oaep-tests");
+    if ($option.count() > 0) {
+        $cflags.add_item("-DSKIP_ELGAMAL_OAEP_TESTS=1");
+    }
+
+    $option = hefesto.sys.get_option("skip-rsa-signature-tests");
+    if ($option.count() > 0) {
+        $cflags.add_item("-DSKIP_RSA_SIGNATURE_TESTS=1");
+    }
+
+    $option = hefesto.sys.get_option("skip-dsa-signature-tests");
+    if ($option.count() > 0) {
+        $cflags.add_item("-DSKIP_DSA_SIGNATURE_TESTS=1");
+    }
+
+    $option = hefesto.sys.get_option("skip-ecdsa-signature-tests");
+    if ($option.count() > 0) {
+        $cflags.add_item("-DSKIP_ECDSA_SIGNATURE_TESTS=1");
+    }
+
+    $option = hefesto.sys.get_option("dh-use-q-size");
+    if ($option.count() > 0) {
+        $cflags.add_item("-DDH_USE_Q_SIZE=1");
+    }
+
+    # INFO(Rafael): Only define KRYPTOS_KERNEL_MODE will guide the compiler across the build of the kryptos kernel mode version.
+    #               Notice that no .ar file is generated. When adding the path "../.." to the includes list the object files from
+    #               kryptos are automatically linked together.
+    $cflags.add_item("-DKRYPTOS_KERNEL_MODE=1");
+    $cflags.add_item("-DKRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY=1");
+
+    $cflags.add_item("-DUSE_LIBCNTPR=1");
+
+    $ldflags.add_item("cng.lib");
+    $ldflags.add_item("libcntpr.lib");
+
+    $srcs.ls(".*\\.c$");
+    hefesto.sys.cd("..\\..");
+    $srcs.ls(".*\\.c$");
+    $includes.add_item(hefesto.sys.pwd());
+    hefesto.sys.cd("tests\\kernel");
+    $includes.add_item(hefesto.sys.pwd());
+    $modname = "kryptos-test.sys";
+}
+
+win-kryptos-test-sys.epilogue() {
+    if (hefesto.sys.last_forge_result() == 0) {
+        hefesto.sys.echo("*** Test module successfully compiled.\n");
+    }
+}

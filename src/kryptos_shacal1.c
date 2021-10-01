@@ -159,8 +159,12 @@ static void kryptos_shacal1_key_sched(const kryptos_u8_t *key, const size_t key_
 }
 
 static void kryptos_shacal1_block_encrypt(kryptos_u8_t *block, const struct kryptos_shacal1_subkeys *sks) {
+#if defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+# pragma warning(push)
+# pragma warning(disable: 4296)
+#endif
     kryptos_u32_t A, B, C, D, E, TEMP;
-    kryptos_u32_t Fx, Kx;
+    kryptos_u32_t Fx = 0, Kx = 0;
     size_t t;
 
     A = kryptos_get_u32_as_big_endian(block     , 4);
@@ -187,11 +191,15 @@ static void kryptos_shacal1_block_encrypt(kryptos_u8_t *block, const struct kryp
     kryptos_cpy_u32_as_big_endian(block + 16,  4, E);
 
     A = B = C = D = E = Fx = Kx = TEMP = 0;
+
+#if defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+# pragma warning(pop)
+#endif
 }
 
 static void kryptos_shacal1_block_decrypt(kryptos_u8_t *block, const struct kryptos_shacal1_subkeys *sks) {
     kryptos_u32_t A, B, C, D, E, TEMP;
-    kryptos_u32_t Fx, Kx;
+    kryptos_u32_t Fx = 0, Kx = 0;
     ssize_t t;
 
     A = kryptos_get_u32_as_big_endian(block     , 4);

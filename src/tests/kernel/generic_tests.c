@@ -34,10 +34,10 @@ KUTE_TEST_CASE(kryptos_padding_tests)
         const kryptos_u8_t *pad;
     };
     struct padding_tests_ctx tests[] = {
-        { "XXXXXXXXXXXXXXXXXXXXXXXXXXXX", 28, 8, 32, "XXXXXXXXXXXXXXXXXXXXXXXXXXXX\x0\x0\x0\x4" },
-        { "ABC",                           3, 4,  4, "ABC\x1"                                   },
-        { "ABCD",                          4, 4,  8, "ABCD\x0\x0\x0\x4"                         },
-        { "A",                             1, 8,  8, "A\x0\x0\x0\x0\x0\x0\x7"                   }
+        { (kryptos_u8_t *)"XXXXXXXXXXXXXXXXXXXXXXXXXXXX", 28, 8, 32, (kryptos_u8_t *)"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\x0\x0\x0\x4" },
+        { (kryptos_u8_t *)"ABC",                           3, 4,  4, (kryptos_u8_t *)"ABC\x1"                                   },
+        { (kryptos_u8_t *)"ABCD",                          4, 4,  8, (kryptos_u8_t *)"ABCD\x0\x0\x0\x4"                         },
+        { (kryptos_u8_t *)"A",                             1, 8,  8, (kryptos_u8_t *)"A\x0\x0\x0\x0\x0\x0\x7"                   }
     };
     size_t tests_nr = sizeof(tests) / sizeof(tests[0]), t = 0;
     kryptos_u8_t *pad = NULL;
@@ -116,7 +116,7 @@ KUTE_TEST_CASE(kryptos_unbiased_rand_mod_u64_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_block_parser_tests)
-    kryptos_u8_t *in = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f", *in_p;
+    kryptos_u8_t *in = (kryptos_u8_t *)"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f", *in_p;
     kryptos_u8_t *in_end = NULL;
     kryptos_u8_t *out = NULL;
 
@@ -263,7 +263,7 @@ KUTE_TEST_CASE(kryptos_apply_iv_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_iv_data_flush_tests)
-    kryptos_u8_t *y = "hellyeah!";
+    kryptos_u8_t *y = (kryptos_u8_t *)"hellyeah!";
     kryptos_u8_t *iv = kryptos_newseg(9);
     size_t s = 9;
     KUTE_ASSERT(iv != NULL);
@@ -273,27 +273,27 @@ KUTE_TEST_CASE(kryptos_iv_data_flush_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_task_check_tests)
-    kryptos_u8_t *key = "blah";
-    kryptos_u8_t *in = "bleh";
-    kryptos_u8_t *iv = "bluh";
+    kryptos_u8_t *key = (kryptos_u8_t *)"blah";
+    kryptos_u8_t *in = (kryptos_u8_t *)"bleh";
+    kryptos_u8_t *iv = (kryptos_u8_t *)"bluh";
     kryptos_task_ctx t;
     kryptos_task_ctx *ktask = &t;
-    kryptos_u8_t *rsa_k_pub = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *rsa_k_pub = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                               "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
                               "-----END RSA PARAM N-----\n"
                               "-----BEGIN RSA PARAM E-----\n"
                               "Q9mxxs0+nosV5jzwUs1UmYEhXLrYAszE9q0S3hljhpXD9ANvkzCUC5nM8FZ3+44V1IrPhIYZYDwfSrGlhwG4Aw==\n"
                               "-----END RSA PARAM E-----\n";
 
-    kryptos_u8_t *rsa_k_priv = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *rsa_k_priv = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                                "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
                                "-----END RSA PARAM N-----\n"
                                "-----BEGIN RSA PARAM D-----\n"
                                "K04+KEU3GyG2ABjJu+sTqV5yH8mgO8aIPdygWvBq9GzJfTmLt18cck2pc7y6lmYLsl+NxgFo7KTliwXAjU3eGg==\n"
                                "-----END RSA PARAM D-----\n";
-    kryptos_u8_t *label = "L";
+    kryptos_u8_t *label = (kryptos_u8_t *)"L";
     size_t label_size = 1;
-    kryptos_u8_t *elgamal_k_pub = "-----BEGIN ELGAMAL PARAM P-----\n"
+    kryptos_u8_t *elgamal_k_pub = (kryptos_u8_t *)"-----BEGIN ELGAMAL PARAM P-----\n"
                                   "LWy0fB4Y6Bc=\n"
                                   "-----END ELGAMAL PARAM P-----\n"
                                   "-----BEGIN ELGAMAL PARAM Q-----\n"
@@ -306,7 +306,7 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
                                   "zVTveNNhyhc=\n"
                                   "-----END ELGAMAL PARAM B-----\n";
 
-    kryptos_u8_t *elgamal_k_priv = "-----BEGIN ELGAMAL PARAM P-----\n"
+    kryptos_u8_t *elgamal_k_priv = (kryptos_u8_t *)"-----BEGIN ELGAMAL PARAM P-----\n"
                                    "LWy0fB4Y6Bc=\n"
                                    "-----END ELGAMAL PARAM P-----\n"
                                    "-----BEGIN ELGAMAL PARAM D-----\n"
@@ -415,7 +415,7 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
     KUTE_ASSERT(t.result_verbose == NULL);
 
     t.cipher = kKryptosCipherRABBIT;
-    t.iv = "\x00\x00\x00\x00\x00\x00\x00\x00";
+    t.iv = (kryptos_u8_t *)"\x00\x00\x00\x00\x00\x00\x00\x00";
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
     KUTE_ASSERT(t.result_verbose != NULL);
@@ -441,12 +441,12 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
 
     t.action = kKryptosEncrypt;
     t.key = rsa_k_priv;
-    t.key_size = strlen(rsa_k_priv);
+    t.key_size = strlen((char *)rsa_k_priv);
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosKeyError);
 
     t.key = rsa_k_pub;
-    t.key_size = strlen(rsa_k_pub);
+    t.key_size = strlen((char *)rsa_k_pub);
     KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
     KUTE_ASSERT(t.result == kKryptosSuccess);
 
@@ -455,7 +455,7 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
     KUTE_ASSERT(t.result == kKryptosKeyError);
 
     t.key = rsa_k_priv;
-    t.key_size = strlen(rsa_k_priv);
+    t.key_size = strlen((char *)rsa_k_priv);
     KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
     KUTE_ASSERT(t.result == kKryptosSuccess);
 
@@ -468,12 +468,12 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
 
     t.action = kKryptosEncrypt;
     t.key = rsa_k_priv;
-    t.key_size = strlen(rsa_k_priv);
+    t.key_size = strlen((char *)rsa_k_priv);
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosKeyError);
 
     t.key = rsa_k_pub;
-    t.key_size = strlen(rsa_k_pub);
+    t.key_size = strlen((char *)rsa_k_pub);
     KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
     KUTE_ASSERT(t.result == kKryptosSuccess);
 
@@ -482,7 +482,7 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
     KUTE_ASSERT(t.result == kKryptosKeyError);
 
     t.key = rsa_k_priv;
-    t.key_size = strlen(rsa_k_priv);
+    t.key_size = strlen((char *)rsa_k_priv);
     t.arg[0] = label;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
@@ -493,12 +493,12 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
 
     t.arg[1] = NULL;
-    t.arg[2] = (kryptos_hash_func) label;
+    t.arg[2] = (void *)label;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
 
     t.arg[2] = NULL;
-    t.arg[3] = (kryptos_hash_size_func) label;
+    t.arg[3] = (void *)label;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
 
@@ -508,8 +508,8 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
 
     t.arg[0] = label;
     t.arg[1] = &label_size;
-    t.arg[2] = (kryptos_hash_func) label;
-    t.arg[3] = (kryptos_hash_size_func) label;
+    t.arg[2] = (void *)label;
+    t.arg[3] = (void *)label;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
     KUTE_ASSERT(t.result == kKryptosSuccess);
 
@@ -521,12 +521,12 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
 
     t.action = kKryptosEncrypt;
     t.key = elgamal_k_priv;
-    t.key_size = strlen(elgamal_k_priv);
+    t.key_size = strlen((char *)elgamal_k_priv);
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosKeyError);
 
     t.key = elgamal_k_pub;
-    t.key_size = strlen(elgamal_k_pub);
+    t.key_size = strlen((char *)elgamal_k_pub);
     KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
     KUTE_ASSERT(t.result == kKryptosSuccess);
 
@@ -535,7 +535,7 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
     KUTE_ASSERT(t.result == kKryptosKeyError);
 
     t.key = elgamal_k_priv;
-    t.key_size = strlen(elgamal_k_priv);
+    t.key_size = strlen((char *)elgamal_k_priv);
     KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
     KUTE_ASSERT(t.result == kKryptosSuccess);
 
@@ -548,12 +548,12 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
 
     t.action = kKryptosEncrypt;
     t.key = elgamal_k_priv;
-    t.key_size = strlen(elgamal_k_priv);
+    t.key_size = strlen((char *)elgamal_k_priv);
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosKeyError);
 
     t.key = elgamal_k_pub;
-    t.key_size = strlen(elgamal_k_pub);
+    t.key_size = strlen((char *)elgamal_k_pub);
     KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
     KUTE_ASSERT(t.result == kKryptosSuccess);
 
@@ -562,7 +562,7 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
     KUTE_ASSERT(t.result == kKryptosKeyError);
 
     t.key = elgamal_k_priv;
-    t.key_size = strlen(elgamal_k_priv);
+    t.key_size = strlen((char *)elgamal_k_priv);
     t.arg[0] = label;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
@@ -573,12 +573,12 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
 
     t.arg[1] = NULL;
-    t.arg[2] = (kryptos_hash_func) label;
+    t.arg[2] = (void *)label;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
 
     t.arg[2] = NULL;
-    t.arg[3] = (kryptos_hash_size_func) label;
+    t.arg[3] = (void *)label;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
 
@@ -588,22 +588,22 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
 
     t.arg[0] = label;
     t.arg[1] = &label_size;
-    t.arg[2] = (kryptos_hash_func) label;
-    t.arg[3] = (kryptos_hash_size_func) label;
+    t.arg[2] = (void *)label;
+    t.arg[3] = (void *)label;
     KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
     KUTE_ASSERT(t.result == kKryptosSuccess);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_task_check_sign_tests)
     kryptos_task_ctx t, *ktask = &t;
-    kryptos_u8_t *rsa_k_pub = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *rsa_k_pub = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                               "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
                               "-----END RSA PARAM N-----\n"
                               "-----BEGIN RSA PARAM E-----\n"
                               "Q9mxxs0+nosV5jzwUs1UmYEhXLrYAszE9q0S3hljhpXD9ANvkzCUC5nM8FZ3+44V1IrPhIYZYDwfSrGlhwG4Aw==\n"
                               "-----END RSA PARAM E-----\n";
 
-    kryptos_u8_t *rsa_k_priv = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *rsa_k_priv = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                                "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
                                "-----END RSA PARAM N-----\n"
                                "-----BEGIN RSA PARAM D-----\n"
@@ -611,7 +611,7 @@ KUTE_TEST_CASE(kryptos_task_check_sign_tests)
                                "-----END RSA PARAM D-----\n";
     size_t k;
 
-    kryptos_u8_t *dsa_k_pub = "-----BEGIN DSA P-----\n"
+    kryptos_u8_t *dsa_k_pub = (kryptos_u8_t *)"-----BEGIN DSA P-----\n"
                               "12Ga65Y5bQ4=\n"
                               "-----END DSA P-----\n"
                               "-----BEGIN DSA Q-----\n"
@@ -624,7 +624,7 @@ KUTE_TEST_CASE(kryptos_task_check_sign_tests)
                               "bfVPLj3soAc=\n"
                               "-----END DSA E-----\n";
 
-    kryptos_u8_t *dsa_k_priv = "-----BEGIN DSA P-----\n"
+    kryptos_u8_t *dsa_k_priv = (kryptos_u8_t *)"-----BEGIN DSA P-----\n"
                                "12Ga65Y5bQ4=\n"
                                "-----END DSA P-----\n"
                                "-----BEGIN DSA Q-----\n"
@@ -654,7 +654,7 @@ KUTE_TEST_CASE(kryptos_task_check_sign_tests)
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
 
-    ktask->in = "rsa";
+    ktask->in = (kryptos_u8_t *)"rsa";
 
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
@@ -669,13 +669,13 @@ KUTE_TEST_CASE(kryptos_task_check_sign_tests)
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosKeyError);
 
-    ktask->key_size = strlen(ktask->key);
+    ktask->key_size = strlen((char *)ktask->key);
 
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosKeyError);
 
     ktask->key = rsa_k_priv;
-    ktask->key_size = strlen(ktask->key);
+    ktask->key_size = strlen((char *)ktask->key);
 
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 1);
     KUTE_ASSERT(ktask->result == kKryptosSuccess);
@@ -697,7 +697,7 @@ KUTE_TEST_CASE(kryptos_task_check_sign_tests)
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
 
-    ktask->in = "rsa";
+    ktask->in = (kryptos_u8_t *)"rsa";
 
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
@@ -712,13 +712,13 @@ KUTE_TEST_CASE(kryptos_task_check_sign_tests)
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosKeyError);
 
-    ktask->key_size = strlen(ktask->key);
+    ktask->key_size = strlen((char *)ktask->key);
 
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosKeyError);
 
     ktask->key = rsa_k_priv;
-    ktask->key_size = strlen(ktask->key);
+    ktask->key_size = strlen((char *)ktask->key);
 
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
@@ -728,19 +728,19 @@ KUTE_TEST_CASE(kryptos_task_check_sign_tests)
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 1);
     KUTE_ASSERT(ktask->result == kKryptosSuccess);
 
-    ktask->arg[2] = kryptos_sha1_hash_size;
+    ktask->arg[2] = (void *)kryptos_sha1_hash_size;
 
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
 
-    ktask->arg[1] = kryptos_sha1_hash;
+    ktask->arg[1] = (void *)kryptos_sha1_hash;
     ktask->arg[2] = NULL;
 
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
 
-    ktask->arg[1] = kryptos_sha1_hash;
-    ktask->arg[2] = kryptos_sha1_hash_size;
+    ktask->arg[1] = (void *)kryptos_sha1_hash;
+    ktask->arg[2] = (void *)kryptos_sha1_hash_size;
 
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 1);
     KUTE_ASSERT(ktask->result == kKryptosSuccess);
@@ -757,7 +757,7 @@ KUTE_TEST_CASE(kryptos_task_check_sign_tests)
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
 
-    ktask->in = "dsa";
+    ktask->in = (kryptos_u8_t *)"dsa";
 
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
@@ -772,13 +772,13 @@ KUTE_TEST_CASE(kryptos_task_check_sign_tests)
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosKeyError);
 
-    ktask->key_size = strlen(ktask->key);
+    ktask->key_size = strlen((char *)ktask->key);
 
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosKeyError);
 
     ktask->key = dsa_k_priv;
-    ktask->key_size = strlen(ktask->key);
+    ktask->key_size = strlen((char *)ktask->key);
 
     KUTE_ASSERT(kryptos_task_check_sign(&ktask) == 1);
     KUTE_ASSERT(ktask->result == kKryptosSuccess);
@@ -786,14 +786,14 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_task_check_verify_tests)
     kryptos_task_ctx t, *ktask = &t;
-    kryptos_u8_t *rsa_k_pub = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *rsa_k_pub = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                               "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
                               "-----END RSA PARAM N-----\n"
                               "-----BEGIN RSA PARAM E-----\n"
                               "Q9mxxs0+nosV5jzwUs1UmYEhXLrYAszE9q0S3hljhpXD9ANvkzCUC5nM8FZ3+44V1IrPhIYZYDwfSrGlhwG4Aw==\n"
                               "-----END RSA PARAM E-----\n";
 
-    kryptos_u8_t *rsa_k_priv = "-----BEGIN RSA PARAM N-----\n"
+    kryptos_u8_t *rsa_k_priv = (kryptos_u8_t *)"-----BEGIN RSA PARAM N-----\n"
                                "q/agiHElaTH+B056kexqvlrlHcbr4c8lF2lvFdH6VnrdyZCRYxYVJS1wixnxrUeMpJ7l2g+hEHYlgRxM3xrGaA==\n"
                                "-----END RSA PARAM N-----\n"
                                "-----BEGIN RSA PARAM D-----\n"
@@ -801,7 +801,7 @@ KUTE_TEST_CASE(kryptos_task_check_verify_tests)
                                "-----END RSA PARAM D-----\n";
     size_t k;
 
-    kryptos_u8_t *dsa_k_pub = "-----BEGIN DSA P-----\n"
+    kryptos_u8_t *dsa_k_pub = (kryptos_u8_t *)"-----BEGIN DSA P-----\n"
                               "12Ga65Y5bQ4=\n"
                               "-----END DSA P-----\n"
                               "-----BEGIN DSA Q-----\n"
@@ -814,7 +814,7 @@ KUTE_TEST_CASE(kryptos_task_check_verify_tests)
                               "bfVPLj3soAc=\n"
                               "-----END DSA E-----\n";
 
-    kryptos_u8_t *dsa_k_priv = "-----BEGIN DSA P-----\n"
+    kryptos_u8_t *dsa_k_priv = (kryptos_u8_t *)"-----BEGIN DSA P-----\n"
                                "12Ga65Y5bQ4=\n"
                                "-----END DSA P-----\n"
                                "-----BEGIN DSA Q-----\n"
@@ -845,7 +845,7 @@ KUTE_TEST_CASE(kryptos_task_check_verify_tests)
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
 
-    ktask->in = "rsa";
+    ktask->in = (kryptos_u8_t *)"rsa";
 
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
@@ -860,13 +860,13 @@ KUTE_TEST_CASE(kryptos_task_check_verify_tests)
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosKeyError);
 
-    ktask->key_size = strlen(ktask->key);
+    ktask->key_size = strlen((char *)ktask->key);
 
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosKeyError);
 
     ktask->key = rsa_k_pub;
-    ktask->key_size = strlen(ktask->key);
+    ktask->key_size = strlen((char *)ktask->key);
 
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 1);
     KUTE_ASSERT(ktask->result == kKryptosSuccess);
@@ -889,7 +889,7 @@ KUTE_TEST_CASE(kryptos_task_check_verify_tests)
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
 
-    ktask->in = "rsa";
+    ktask->in = (kryptos_u8_t *)"rsa";
 
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
@@ -904,13 +904,13 @@ KUTE_TEST_CASE(kryptos_task_check_verify_tests)
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosKeyError);
 
-    ktask->key_size = strlen(ktask->key);
+    ktask->key_size = strlen((char *)ktask->key);
 
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosKeyError);
 
     ktask->key = rsa_k_pub;
-    ktask->key_size = strlen(ktask->key);
+    ktask->key_size = strlen((char *)ktask->key);
 
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
@@ -920,19 +920,19 @@ KUTE_TEST_CASE(kryptos_task_check_verify_tests)
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 1);
     KUTE_ASSERT(ktask->result == kKryptosSuccess);
 
-    ktask->arg[1] = kryptos_sha1_hash;
+    ktask->arg[1] = (void *)kryptos_sha1_hash;
 
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
 
     ktask->arg[1] = NULL;
-    ktask->arg[2] = kryptos_sha1_hash_size;
+    ktask->arg[2] = (void *)kryptos_sha1_hash_size;
 
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
 
-    ktask->arg[1] = kryptos_sha1_hash;
-    ktask->arg[2] = kryptos_sha1_hash_size;
+    ktask->arg[1] = (void *)kryptos_sha1_hash;
+    ktask->arg[2] = (void *)kryptos_sha1_hash_size;
 
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 1);
     KUTE_ASSERT(ktask->result == kKryptosSuccess);
@@ -949,7 +949,7 @@ KUTE_TEST_CASE(kryptos_task_check_verify_tests)
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
 
-    ktask->in = "dsa";
+    ktask->in = (kryptos_u8_t *)"dsa";
 
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosInvalidParams);
@@ -964,13 +964,13 @@ KUTE_TEST_CASE(kryptos_task_check_verify_tests)
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosKeyError);
 
-    ktask->key_size = strlen(ktask->key);
+    ktask->key_size = strlen((char *)ktask->key);
 
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 0);
     KUTE_ASSERT(ktask->result == kKryptosKeyError);
 
     ktask->key = dsa_k_pub;
-    ktask->key_size = strlen(ktask->key);
+    ktask->key_size = strlen((char *)ktask->key);
 
     KUTE_ASSERT(kryptos_task_check_verify(&ktask) == 1);
     KUTE_ASSERT(ktask->result == kKryptosSuccess);
@@ -979,9 +979,9 @@ KUTE_TEST_CASE_END
 KUTE_TEST_CASE(kryptos_hex_tests)
     struct test_ctx {
         kryptos_u32_t u32;
-        kryptos_u8_t *u32_expected;
+        char *u32_expected;
         kryptos_u64_t u64;
-        kryptos_u8_t *u64_expected;
+        char *u64_expected;
     };
     struct test_ctx tv[] = {
         { 0x00000000, "00000000", 0x0000000000000000, "0000000000000000" },
@@ -1128,9 +1128,9 @@ KUTE_TEST_CASE(kryptos_hex_tests)
     kryptos_u8_t buf[20];
     for (t = 0; t < tv_nr; t++) {
         kryptos_u32_to_hex(buf, sizeof(buf), tv[t].u32);
-        KUTE_ASSERT(kstrcmp(buf, tv[t].u32_expected) == 0);
+        KUTE_ASSERT(kstrcmp((char *)buf, (char *)tv[t].u32_expected) == 0);
         kryptos_u64_to_hex(buf, sizeof(buf), tv[t].u64);
-        KUTE_ASSERT(kstrcmp(buf, tv[t].u64_expected) == 0);
+        KUTE_ASSERT(kstrcmp((char *)buf, (char *)tv[t].u64_expected) == 0);
     }
 KUTE_TEST_CASE_END
 
@@ -1176,7 +1176,7 @@ KUTE_TEST_CASE(kryptos_hash_common_tests)
     kryptos_u64_t curr_len, total_len;
     int paddin2times = 0;
 
-    kryptos_hash_ld_u8buf_as_u32_blocks("abc", 3,
+    kryptos_hash_ld_u8buf_as_u32_blocks((kryptos_u8_t *)"abc", 3,
                                         u32_input, 16,
                                         index_decision_table32);
 
@@ -1235,7 +1235,7 @@ KUTE_TEST_CASE(kryptos_hash_common_tests)
 
     paddin2times = 0;
 
-    kryptos_hash_ld_u8buf_as_u64_blocks("abc", 3,
+    kryptos_hash_ld_u8buf_as_u64_blocks((kryptos_u8_t *)"abc", 3,
                                         u64_input, 16,
                                         index_decision_table64);
 
@@ -1317,7 +1317,7 @@ KUTE_TEST_CASE(kryptos_fortuna_general_tests)
         fortuna = kryptos_fortuna_init(i);
         KUTE_ASSERT(fortuna != NULL);
 
-        KUTE_ASSERT(kryptos_fortuna_reseed(fortuna, "fortes fortuna adiuvat", 22) == 1);
+        KUTE_ASSERT(kryptos_fortuna_reseed(fortuna, (kryptos_u8_t *)"fortes fortuna adiuvat", 22) == 1);
 
         for (t = 0; t < 10; t++) {
             block = kryptos_fortuna_get_random_block(fortuna, t + 1);
@@ -1398,6 +1398,11 @@ KUTE_TEST_CASE(kryptos_gcm_gf_mul_tests)
 KUTE_TEST_CASE_END
 
 static kryptos_task_result_t E_stub(kryptos_u8_t **h, size_t *h_size, kryptos_u8_t *key, size_t key_size, void *arg) {
+    (h);
+    (h_size);
+    (key);
+    (key_size);
+    (arg);
     kryptos_u8_t *hp;
     hp = (kryptos_u8_t *)kryptos_newseg(16);
     if (*h == NULL) {
@@ -1442,6 +1447,11 @@ static kryptos_task_result_t E_stub(kryptos_u8_t **h, size_t *h_size, kryptos_u8
 }
 
 static kryptos_task_result_t E_bad_stub(kryptos_u8_t **h, size_t *h_size, kryptos_u8_t *key, size_t key_size, void *arg) {
+    (h);
+    (h_size);
+    (key);
+    (key_size);
+    (arg);
     kryptos_u8_t *hp;
     hp = (kryptos_u8_t *)kryptos_newseg(16);
     if (*h == NULL) {
@@ -1489,9 +1499,9 @@ KUTE_TEST_CASE(kryptos_gcm_tests)
     // INFO(Rafael): This test data was picked from Nist spec 'The Galois/Counter Mode of Operation' (revised) [Test case 2].
     kryptos_u8_t *c;
     size_t c_size;
-    kryptos_u8_t *key = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
-    kryptos_u8_t *etag = "\xAB\x6E\x47\xD4\x2C\xEC\x13\xBD\xF5\x3A\x67\xB2\x12\x57\xBD\xDF";
-    kryptos_u8_t *ec = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"                  // INFO(Rafael): IV.
+    kryptos_u8_t *key = (kryptos_u8_t *)"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *etag = (kryptos_u8_t *)"\xAB\x6E\x47\xD4\x2C\xEC\x13\xBD\xF5\x3A\x67\xB2\x12\x57\xBD\xDF";
+    kryptos_u8_t *ec = (kryptos_u8_t *)"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"                  // INFO(Rafael): IV.
                        "\x03\x88\xDA\xCE\x60\xB6\xA3\x92\xF3\x28\xC2\xB9\x71\xB2\xFE\x78"; // INFO(Rafael): Cryptogram.
     size_t ec_size = 28;
 
@@ -1551,7 +1561,7 @@ KUTE_TEST_CASE_END
 KUTE_TEST_CASE(kryptos_u8_ptr_to_hex_tests)
     kryptos_u8_t *result;
     size_t result_size;
-    kryptos_u8_t *u8 = "\xDE\xAD\xBe\xeF\xba\xBA\xCA\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0b\x0C\x0D\x0E\x0F";
+    kryptos_u8_t *u8 = (kryptos_u8_t *)"\xDE\xAD\xBe\xeF\xba\xBA\xCA\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0b\x0C\x0D\x0E\x0F";
     size_t u8_size = 23;
 
     KUTE_ASSERT(kryptos_u8_ptr_to_hex(NULL, u8_size, &result_size) == NULL);

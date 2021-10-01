@@ -32,11 +32,17 @@
 #   include <linux/slab.h>
 #   include <linux/random.h>
     typedef long intptr_t;
+#  elif defined(_WIN32)
+#  include <wdm.h>
+#  include <ntstrsafe.h>
+#  include <bcrypt.h>
+#  include <stdlib.h>
 #  endif
 # endif
 
-#if defined(_WIN32)
+#if defined(_WIN32) && !defined(KRYPTOS_KERNEL_MODE)
 # include <windows.h>
+# include <ntstatus.h>
 # include <sdkddkver.h>
 # include <sys/types.h>
 # if (_WIN32_WINNT >= 0x0600)
@@ -359,9 +365,9 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
         ktask->iv_size = cipher_block_size;\
     }\
     if (ktask->mode == kKryptosCTR && ktask->ctr != NULL) {\
-        ktask->iv[cipher_block_size - 4] = (*ktask->ctr) >> 24;\
-        ktask->iv[cipher_block_size - 3] = ((*ktask->ctr) & 0xFF0000) >> 16;\
-        ktask->iv[cipher_block_size - 2] = ((*ktask->ctr) & 0xFF00) >> 8;\
+        ktask->iv[cipher_block_size - 4] = ((*ktask->ctr) >> 24) & 0xFF;\
+        ktask->iv[cipher_block_size - 3] = (((*ktask->ctr) & 0xFF0000) >> 16) & 0xFF;\
+        ktask->iv[cipher_block_size - 2] = (((*ktask->ctr) & 0xFF00) >> 8) & 0xFF;\
         ktask->iv[cipher_block_size - 1] = (*ktask->ctr) & 0xFF;\
     }\
 }
@@ -401,9 +407,9 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
         ktask->iv_size = cipher_block_size;\
     }\
     if (ktask->mode == kKryptosCTR && ktask->ctr != NULL) {\
-        ktask->iv[cipher_block_size - 4] = (*ktask->ctr) >> 24;\
-        ktask->iv[cipher_block_size - 3] = ((*ktask->ctr) & 0xFF0000) >> 16;\
-        ktask->iv[cipher_block_size - 2] = ((*ktask->ctr) & 0xFF00) >> 8;\
+        ktask->iv[cipher_block_size - 4] = ((*ktask->ctr) >> 24) & 0xFF;\
+        ktask->iv[cipher_block_size - 3] = (((*ktask->ctr) & 0xFF0000) >> 16) & 0xFF;\
+        ktask->iv[cipher_block_size - 2] = (((*ktask->ctr) & 0xFF00) >> 8) & 0xFF;\
         ktask->iv[cipher_block_size - 1] = (*ktask->ctr) & 0xFF;\
     }\
     additional_setup_stmt;\
@@ -428,9 +434,16 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
 
 #endif
 
+#if defined(_MSC_VER)
+# define KRYPTOS_UNUSED(p) (p)
+#else
+# define KRYPTOS_UNUSED(p)
+#endif
+
 #define KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(cipher_name)\
 kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_size,\
                                                   kryptos_u8_t *key, size_t key_size, void *additional_arg) {\
+    KRYPTOS_UNUSED(additional_arg);\
     kryptos_task_ctx t, *ktask = &t;\
     kryptos_task_result_t result = kKryptosProcessError;\
     kryptos_task_init_as_null(ktask);\
@@ -465,6 +478,11 @@ kryptos_## cipher_name ##_e_epilogue:\
 #define KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E_NO_SUPPORT(cipher_name)\
 kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_size,\
                                                   kryptos_u8_t *key, size_t key_size, void *additional_arg) {\
+    KRYPTOS_UNUSED(h);\
+    KRYPTOS_UNUSED(h_size);\
+    KRYPTOS_UNUSED(key);\
+    KRYPTOS_UNUSED(key_size);\
+    KRYPTOS_UNUSED(additional_arg);\
     return kKryptosNoSupport;\
 }
 
@@ -512,9 +530,14 @@ kryptos_## cipher_name ##_e_epilogue:\
     return result;\
 }
 
-#define KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_GCM_E_NO_SUPPORT(cipher_name, additional_arg)\
+#define KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_GCM_E_NO_SUPPORT(cipher_name, additional_arg, additional_stmt)\
 kryptos_task_result_t kryptos_## cipher_name ##_e(kryptos_u8_t **h, size_t *h_size,\
                                                   kryptos_u8_t *key, size_t key_size, additional_arg) {\
+    KRYPTOS_UNUSED(h);\
+    KRYPTOS_UNUSED(h_size);\
+    KRYPTOS_UNUSED(key);\
+    KRYPTOS_UNUSED(key_size);\
+    KRYPTOS_UNUSED(additional_stmt);\
     return kKryptosNoSupport;\
 }
 
@@ -895,8 +918,8 @@ static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct
             if (ctx->curr_len < buffer_size && i != l) {\
                 buffer[ctx->curr_len++] = ctx->message[i];\
             } else {\
-                kryptos_hash_ld_u8buf_as_u ## bits_per_block  ## _blocks(buffer, ctx->curr_len,\
-                                                    ctx->input.block, input_block_size,\
+                kryptos_hash_ld_u8buf_as_u ## bits_per_block  ## _blocks(buffer, (size_t)ctx->curr_len,\
+                                                    ctx->input.block, (size_t)input_block_size,\
                                                     block_index_decision_table);\
                 hash_do_block_stmt;\
                 ctx->curr_len = 0;\
@@ -909,7 +932,7 @@ static void kryptos_ ## hash_name ## _process_message(struct struct_name *struct
         i = l = 0;\
     } else {\
         kryptos_hash_ld_u8buf_as_u ## bits_per_block ## _blocks((kryptos_u8_t *)"", 0,\
-                                            ctx->input.block, input_block_size,\
+                                            ctx->input.block, (kryptos_u64_t)input_block_size,\
                                             block_index_decision_table);\
         hash_do_block_stmt;\
     }\

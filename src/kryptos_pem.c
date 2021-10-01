@@ -189,7 +189,7 @@ kryptos_task_result_t kryptos_pem_get_mp_data(const char *hdr,
                                               const kryptos_u8_t *in, const size_t in_size,
                                               kryptos_mp_value_t **number) {
     kryptos_u8_t *pem_data;
-    size_t pem_data_size;
+    size_t pem_data_size = 0;
     int smaller_radix = 0;
     size_t mp_data_size = 0;
     //size_t offset = 0;
@@ -200,7 +200,9 @@ kryptos_task_result_t kryptos_pem_get_mp_data(const char *hdr,
         return kKryptosProcessError;
     }
 
-    if ((smaller_radix = (pem_data_size < sizeof(kryptos_mp_digit_t)))) {
+    smaller_radix = (pem_data_size < sizeof(kryptos_mp_digit_t));
+
+    if (smaller_radix) {
         // INFO(Rafael): This trick makes exchangeable data from machines that are using a mp radix lesser than the
         //               current one in this implementation.
         //offset = pem_data_size / sizeof(kryptos_mp_digit_t);

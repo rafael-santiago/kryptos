@@ -196,8 +196,8 @@ static void kryptos_idea_get_inv_multiplier(kryptos_u16_t *inv, kryptos_u16_t va
         return;
     }
 
-    t1 = 0x10001 / value;
-    y = 0x10001 % value;
+    t1 = (kryptos_u16_t)(0x10001 / value);
+    y = (kryptos_u16_t)(0x10001 % value);
     if (y == 1) {
         *inv = ((1 - t1) & 0xffff);
         goto kryptos_idea_get_inv_mul_epilogue;

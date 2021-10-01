@@ -21,6 +21,13 @@
 # endif
 #else
 # include <kryptos_userland_funcs.h>
+#if defined(_WIN32)
+# pragma warning(push)
+# pragma warning(disable: 4244)
+# pragma warning(push)
+# pragma warning(disable: 4706)
+#endif
+
 #endif
 
 #define kryptos_mp_xnb(n) ( isdigit((n)) ? ( (n) - 48 ) : ( toupper((n)) - 55 )  )
@@ -2115,7 +2122,7 @@ kryptos_mp_value_t *kryptos_mp_barrett_reduction(kryptos_mp_value_t *x,
                                                  kryptos_mp_value_t *mod) {
 
     kryptos_mp_value_t *temp = NULL, *m = NULL, *r = NULL;
-    size_t bitmap_size;
+    size_t bitmap_size = 0;
     kryptos_u8_t *bitmap = NULL, *bp, *bp_end;
 
     if (x == NULL || mod == NULL || sh == NULL || factor == NULL) {
@@ -2204,7 +2211,7 @@ kryptos_mp_barret_reduction_epilogue:
 kryptos_mp_value_t *kryptos_mp_add_s(kryptos_mp_value_t **dest, kryptos_mp_value_t *src) {
     // INFO(Rafael): This function takes into consideration signal when adding ("_s"...).
     kryptos_mp_value_t *dc = NULL, *sc = NULL, *result = NULL;
-    int dc_neg, sc_neg, dc_is_greater;
+    int dc_neg, sc_neg, dc_is_greater = 1;
     kryptos_mp_value_t *(*kmp_op)(kryptos_mp_value_t **, const kryptos_mp_value_t *) = NULL;
 
     if (dest == NULL || src == NULL) {
@@ -4257,3 +4264,8 @@ int kryptos_mp_is_zero(const kryptos_mp_value_t *value) {
 #undef kryptos_mp_put_u32_into_mp
 
 #undef KRYPTOS_MP_ABORT_WHEN_NULL
+
+#if defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+# pragma warning(pop)
+# pragma warning(pop)
+#endif

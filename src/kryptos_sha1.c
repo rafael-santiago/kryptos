@@ -140,7 +140,11 @@ static void kryptos_sha1_init(struct kryptos_sha1_ctx *ctx) {
 }
 
 static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx) {
-    kryptos_u32_t A, B, C, D, E, TEMP, Fx, Kx;
+#if defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+# pragma warning(push)
+# pragma warning(disable: 4296)
+#endif
+    kryptos_u32_t A, B, C, D, E, TEMP, Fx = 0, Kx = 0;
     kryptos_u32_t W[80];
     size_t t;
 
@@ -204,6 +208,10 @@ static void kryptos_sha1_do_block(struct kryptos_sha1_ctx *ctx) {
                                             kryptos_sha1_block_index_decision_table);
         kryptos_sha1_do_block(ctx);
     }
+
+#if defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+# pragma warning(pop)
+#endif
 }
 
 #undef kryptos_sha1_Sn

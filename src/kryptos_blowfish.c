@@ -500,7 +500,7 @@ kryptos_u8_t *kryptos_bcrypt(const int cost,
     struct kryptos_blowfish_subkeys sks;
     kryptos_u8_t ctext[24];
     kryptos_u8_t *hash = NULL, pfx[32];
-    size_t pfx_size, salt64_size, ctext64_size;
+    size_t pfx_size = 0, salt64_size = 0, ctext64_size = 0;
     kryptos_u8_t *salt64 = NULL, *ctext64 = NULL;
     kryptos_u8_t *null_term_password = NULL;
 
@@ -590,7 +590,11 @@ kryptos_u8_t *kryptos_bcrypt(const int cost,
 #if defined(KRYPTOS_KERNEL_MODE) && defined(__NetBSD__)
         snprintf((char *)pfx, sizeof(pfx), "$2a$%.2d$", cost);
 #else
+# if !defined(_WIN32) || (defined(_WIN32) && !defined(KRYPTOS_KERNEL_MODE))
         sprintf((char *)pfx, "$2a$%.2d$", cost);
+# else
+        RtlStringCbPrintfA((char *)pfx, sizeof(pfx) - 1, "$2a$%.2d$", cost);
+# endif
 #endif
         pfx_size = strlen((char *)pfx);
         *hash_size = pfx_size + salt64_size + ctext64_size;
@@ -625,7 +629,7 @@ int kryptos_bcrypt_verify(const kryptos_u8_t *password, const size_t password_si
                           const kryptos_u8_t *hash, const size_t hash_size) {
     int cost;
     kryptos_u8_t *salt = NULL, *temp_hash = NULL;
-    size_t salt_size, temp_hash_size;
+    size_t salt_size = 0, temp_hash_size = 0;
     int is_ok = 0;
 
     if (password == NULL || hash == NULL || hash_size <= 22) {
@@ -879,14 +883,14 @@ static kryptos_u8_t *kryptos_bcrypt_decode_buffer(const kryptos_u8_t *buffer, co
                 (kryptos_u32_t) kryptos_messy_base64_state_1[kryptos_base64_get_encoded_byte(*(bp + 2))] <<  6 |
                 (kryptos_u32_t) kryptos_messy_base64_state_1[kryptos_base64_get_encoded_byte(*(bp + 3))];
 
-        *out_p = (block & 0x00FF0000) >> 16;
+        *out_p = ((block & 0x00FF0000) >> 16) & 0xFF;
         out_p++;
 
         if (out_p == out_end) {
             continue;
         }
 
-        *out_p = (block & 0x0000FF00) >>  8;
+        *out_p = ((block & 0x0000FF00) >>  8) & 0xFF;
         out_p++;
 
         if (out_p == out_end) {

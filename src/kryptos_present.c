@@ -251,7 +251,7 @@ static void kryptos_present_rotl_u128(struct kryptos_present_kbuf *key, const si
 
 static void kryptos_present_key_sched(const kryptos_u8_t *key, const size_t key_size, const size_t key_bit_size,
                                       struct kryptos_present_subkeys *sks) {
-    struct kryptos_present_kbuf K;
+    struct kryptos_present_kbuf K = { 0 };
     kryptos_u8_t key_buf[128];
     void (*kryptos_present_rotl)(struct kryptos_present_kbuf *, const size_t);
     kryptos_u64_t temp;

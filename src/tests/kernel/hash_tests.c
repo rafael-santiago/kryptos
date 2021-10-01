@@ -17,16 +17,16 @@
 //               But here we will use just one plaintext for each <hash;cipher> pair.
 //
 
-#define kryptos_run_hmac_tests(t, plaintext, plaintext_size, cname, hname, cipher_args...) {\
+#define kryptos_run_hmac_tests(t, plaintext, plaintext_size, cname, hname, ...) {\
     kryptos_task_init_as_null(&t);\
     kryptos_task_set_in(&t, plaintext, plaintext_size);\
     kryptos_task_set_encrypt_action(&t);\
-    kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
+    kryptos_run_cipher_hmac(cname, hname, &t, __VA_ARGS__);\
     KUTE_ASSERT(t.in != NULL);\
     KUTE_ASSERT(t.out != NULL);\
     kryptos_task_set_in(&t, t.out, t.out_size);\
     kryptos_task_set_decrypt_action(&t);\
-    kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
+    kryptos_run_cipher_hmac(cname, hname, &t, __VA_ARGS__);\
     KUTE_ASSERT(t.in != NULL);\
     KUTE_ASSERT(t.out != NULL);\
     KUTE_ASSERT(t.out_size == plaintext_size);\
@@ -39,13 +39,13 @@
     t.iv = NULL;\
     kryptos_task_set_in(&t, plaintext, plaintext_size);\
     kryptos_task_set_encrypt_action(&t);\
-    kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
+    kryptos_run_cipher_hmac(cname, hname, &t, __VA_ARGS__);\
     KUTE_ASSERT(t.in != NULL);\
     KUTE_ASSERT(t.out != NULL);\
     kryptos_task_set_in(&t, t.out, t.out_size);\
     t.in[t.in_size >> 1] = ~t.in[t.in_size >> 1];\
     kryptos_task_set_decrypt_action(&t);\
-    kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
+    kryptos_run_cipher_hmac(cname, hname, &t, __VA_ARGS__);\
     KUTE_ASSERT(kryptos_last_task_succeed(&t) == 0);\
     KUTE_ASSERT(t.result == kKryptosHMACError);\
     if (t.mode == kKryptosECB) {\
@@ -56,13 +56,13 @@
     t.iv = NULL;\
     kryptos_task_set_in(&t, plaintext, plaintext_size);\
     kryptos_task_set_encrypt_action(&t);\
-    kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
+    kryptos_run_cipher_hmac(cname, hname, &t, __VA_ARGS__);\
     KUTE_ASSERT(t.in != NULL);\
     KUTE_ASSERT(t.out != NULL);\
     kryptos_task_set_in(&t, t.out, t.out_size);\
     t.in_size = kryptos_## hname ##_hash_size();\
     kryptos_task_set_decrypt_action(&t);\
-    kryptos_run_cipher_hmac(cname, hname, &t, cipher_args);\
+    kryptos_run_cipher_hmac(cname, hname, &t, __VA_ARGS__);\
     KUTE_ASSERT(kryptos_last_task_succeed(&t) == 0);\
     KUTE_ASSERT(t.result == kKryptosHMACError);\
     if (t.mode == kKryptosECB) {\
@@ -167,7 +167,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_task_ctx t, *ktask = &t;
-    kryptos_u8_t *message = "abc";
+    kryptos_u8_t *message = (kryptos_u8_t *)"abc";
     size_t message_size = 3;
     kryptos_u8_t *raw_hash = NULL;
 
@@ -183,7 +183,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_sha1_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_sha1_hash_size());
-    raw_hash = "\xA9\x99\x3E\x36\x47\x06\x81\x6A\xBA\x3E\x25\x71\x78\x50\xC2\x6C\x9C\xD0\xD8\x9D";
+    raw_hash = (kryptos_u8_t *)"\xA9\x99\x3E\x36\x47\x06\x81\x6A\xBA\x3E\x25\x71\x78\x50\xC2\x6C\x9C\xD0\xD8\x9D";
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
@@ -198,7 +198,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_sha224_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_sha224_hash_size());
-    raw_hash = "\x23\x09\x7D\x22\x34\x05\xD8\x22\x86\x42\xA4\x77\xBD\xA2"
+    raw_hash = (kryptos_u8_t *)"\x23\x09\x7D\x22\x34\x05\xD8\x22\x86\x42\xA4\x77\xBD\xA2"
                "\x55\xB3\x2A\xAD\xBC\xE4\xBD\xA0\xB3\xF7\xE3\x6C\x9D\xA7";
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
@@ -214,7 +214,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_sha256_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_sha256_hash_size());
-    raw_hash = "\xBA\x78\x16\xBF\x8F\x01\xCF\xEA\x41\x41\x40\xDE\x5D\xAE\x22\x23"
+    raw_hash = (kryptos_u8_t *)"\xBA\x78\x16\xBF\x8F\x01\xCF\xEA\x41\x41\x40\xDE\x5D\xAE\x22\x23"
                "\xB0\x03\x61\xA3\x96\x17\x7A\x9C\xB4\x10\xFF\x61\xF2\x00\x15\xAD";
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
@@ -230,7 +230,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_sha384_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_sha384_hash_size());
-    raw_hash = "\xCB\x00\x75\x3F\x45\xA3\x5E\x8B\xB5\xA0\x3D\x69\x9A\xC6\x50\x07"
+    raw_hash = (kryptos_u8_t *)"\xCB\x00\x75\x3F\x45\xA3\x5E\x8B\xB5\xA0\x3D\x69\x9A\xC6\x50\x07"
                "\x27\x2C\x32\xAB\x0E\xDE\xD1\x63\x1A\x8B\x60\x5A\x43\xFF\x5B\xED"
                "\x80\x86\x07\x2B\xA1\xE7\xCC\x23\x58\xBA\xEC\xA1\x34\xC8\x25\xA7";
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
@@ -247,7 +247,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_sha512_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_sha512_hash_size());
-    raw_hash = "\xDD\xAF\x35\xA1\x93\x61\x7A\xBA\xCC\x41\x73\x49\xAE\x20\x41\x31"
+    raw_hash = (kryptos_u8_t *)"\xDD\xAF\x35\xA1\x93\x61\x7A\xBA\xCC\x41\x73\x49\xAE\x20\x41\x31"
                "\x12\xE6\xFA\x4E\x89\xA9\x7E\xA2\x0A\x9E\xEE\xE6\x4B\x55\xD3\x9A"
                "\x21\x92\x99\x2A\x27\x4F\xC1\xA8\x36\xBA\x3C\x23\xA3\xFE\xEB\xBD"
                "\x45\x4D\x44\x23\x64\x3C\xE8\x0E\x2A\x9A\xC9\x4F\xA5\x4C\xA4\x9F";
@@ -265,7 +265,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_sha3_224_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_sha3_224_hash_size());
-    raw_hash = "\xE6\x42\x82\x4C\x3F\x8C\xF2\x4A\xD0\x92\x34\xEE\x7D\x3C"
+    raw_hash = (kryptos_u8_t *)"\xE6\x42\x82\x4C\x3F\x8C\xF2\x4A\xD0\x92\x34\xEE\x7D\x3C"
                "\x76\x6F\xC9\xA3\xA5\x16\x8D\x0C\x94\xAD\x73\xB4\x6F\xDF";
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
@@ -281,7 +281,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_sha3_256_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_sha3_256_hash_size());
-    raw_hash = "\x3A\x98\x5D\xA7\x4F\xE2\x25\xB2\x04\x5C\x17\x2D\x6B\xD3\x90\xBD"
+    raw_hash = (kryptos_u8_t *)"\x3A\x98\x5D\xA7\x4F\xE2\x25\xB2\x04\x5C\x17\x2D\x6B\xD3\x90\xBD"
                "\x85\x5F\x08\x6E\x3E\x9D\x52\x5B\x46\xBF\xE2\x45\x11\x43\x15\x32";
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
@@ -297,7 +297,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_sha3_384_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_sha3_384_hash_size());
-    raw_hash = "\xEC\x01\x49\x82\x88\x51\x6F\xC9\x26\x45\x9F\x58\xE2\xC6\xAD\x8D"
+    raw_hash = (kryptos_u8_t *)"\xEC\x01\x49\x82\x88\x51\x6F\xC9\x26\x45\x9F\x58\xE2\xC6\xAD\x8D"
                "\xF9\xB4\x73\xCB\x0F\xC0\x8C\x25\x96\xDA\x7C\xF0\xE4\x9B\xE4\xB2"
                "\x98\xD8\x8C\xEA\x92\x7A\xC7\xF5\x39\xF1\xED\xF2\x28\x37\x6D\x25";
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
@@ -314,7 +314,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_sha3_512_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_sha3_512_hash_size());
-    raw_hash = "\xB7\x51\x85\x0B\x1A\x57\x16\x8A\x56\x93\xCD\x92\x4B\x6B\x09\x6E\x08"
+    raw_hash = (kryptos_u8_t *)"\xB7\x51\x85\x0B\x1A\x57\x16\x8A\x56\x93\xCD\x92\x4B\x6B\x09\x6E\x08"
                "\xF6\x21\x82\x74\x44\xF7\x0D\x88\x4F\x5D\x02\x40\xD2\x71\x2E\x10\xE1"
                "\x16\xE9\x19\x2A\xF3\xC9\x1A\x7E\xC5\x76\x47\xE3\x93\x40\x57\x34\x0B"
                "\x4C\xF4\x08\xD5\xA5\x65\x92\xF8\x27\x4E\xEC\x53\xF0";
@@ -328,7 +328,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_keccak224_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_keccak224_hash_size());
-    raw_hash = "\xC3\x04\x11\x76\x85\x06\xEB\xE1\xC2\x87\x1B\x1E\xE2\xE8"
+    raw_hash = (kryptos_u8_t *)"\xC3\x04\x11\x76\x85\x06\xEB\xE1\xC2\x87\x1B\x1E\xE2\xE8"
                "\x7D\x38\xDF\x34\x23\x17\x30\x0A\x9B\x97\xA9\x5E\xC6\xA8";
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
@@ -344,7 +344,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_keccak256_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_keccak256_hash_size());
-    raw_hash = "\x4E\x03\x65\x7A\xEA\x45\xA9\x4F\xC7\xD4\x7B\xA8\x26\xC8\xD6\x67"
+    raw_hash = (kryptos_u8_t *)"\x4E\x03\x65\x7A\xEA\x45\xA9\x4F\xC7\xD4\x7B\xA8\x26\xC8\xD6\x67"
                "\xC0\xD1\xE6\xE3\x3A\x64\xA0\x36\xEC\x44\xF5\x8F\xA1\x2D\x6C\x45";
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
@@ -360,7 +360,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_keccak384_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_keccak384_hash_size());
-    raw_hash = "\xF7\xDF\x11\x65\xF0\x33\x33\x7B\xE0\x98\xE7\xD2\x88\xAD\x6A\x2F"
+    raw_hash = (kryptos_u8_t *)"\xF7\xDF\x11\x65\xF0\x33\x33\x7B\xE0\x98\xE7\xD2\x88\xAD\x6A\x2F"
                "\x74\x40\x9D\x7A\x60\xB4\x9C\x36\x64\x22\x18\xDE\x16\x1B\x1F\x99"
                "\xF8\xC6\x81\xE4\xAF\xAF\x31\xA3\x4D\xB2\x9F\xB7\x63\xE3\xC2\x8E";
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
@@ -377,7 +377,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_keccak512_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_keccak512_hash_size());
-    raw_hash = "\x18\x58\x7D\xC2\xEA\x10\x6B\x9A\x15\x63\xE3\x2B\x33\x12\x42\x1C\xA1"
+    raw_hash = (kryptos_u8_t *)"\x18\x58\x7D\xC2\xEA\x10\x6B\x9A\x15\x63\xE3\x2B\x33\x12\x42\x1C\xA1"
                "\x64\xC7\xF1\xF0\x7B\xC9\x22\xA9\xC8\x3D\x77\xCE\xA3\xA1\xE5\xD0\xC6"
                "\x99\x10\x73\x90\x25\x37\x2D\xC1\x4A\xC9\x64\x26\x29\x37\x95\x40\xC1"
                "\x7E\x2A\x65\xB1\x9D\x77\xAA\x51\x1A\x9D\x00\xBB\x96";
@@ -395,7 +395,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_md4_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_md4_hash_size());
-    raw_hash = "\xA4\x48\x01\x7A\xAF\x21\xD8\x52\x5F\xC1\x0A\xE8\x7A\xA6\x72\x9D";
+    raw_hash = (kryptos_u8_t *)"\xA4\x48\x01\x7A\xAF\x21\xD8\x52\x5F\xC1\x0A\xE8\x7A\xA6\x72\x9D";
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
@@ -410,7 +410,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_md5_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_md5_hash_size());
-    raw_hash = "\x90\x01\x50\x98\x3C\xD2\x4F\xB0\xD6\x96\x3F\x7D\x28\xE1\x7F\x72";
+    raw_hash = (kryptos_u8_t *)"\x90\x01\x50\x98\x3C\xD2\x4F\xB0\xD6\x96\x3F\x7D\x28\xE1\x7F\x72";
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
@@ -425,7 +425,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_ripemd128_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_ripemd128_hash_size());
-    raw_hash = "\xC1\x4A\x12\x19\x9C\x66\xE4\xBA\x84\x63\x6B\x0F\x69\x14\x4C\x77";
+    raw_hash = (kryptos_u8_t *)"\xC1\x4A\x12\x19\x9C\x66\xE4\xBA\x84\x63\x6B\x0F\x69\x14\x4C\x77";
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
@@ -440,7 +440,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_ripemd160_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_ripemd160_hash_size());
-    raw_hash = "\x8E\xB2\x08\xF7\xE0\x5D\x98\x7A\x9B\x04\x4A\x8E\x98\xC6\xB0\x87\xF1\x5A\x0B\xFC";
+    raw_hash = (kryptos_u8_t *)"\x8E\xB2\x08\xF7\xE0\x5D\x98\x7A\x9B\x04\x4A\x8E\x98\xC6\xB0\x87\xF1\x5A\x0B\xFC";
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
@@ -455,7 +455,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_tiger_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_tiger_hash_size());
-    raw_hash = "\x2A\xAB\x14\x84\xE8\xC1\x58\xF2\xBF\xB8\xC5\xFF\x41\xB5\x7A\x52\x51\x29\x13\x1C\x95\x7B\x5F\x93";
+    raw_hash = (kryptos_u8_t *)"\x2A\xAB\x14\x84\xE8\xC1\x58\xF2\xBF\xB8\xC5\xFF\x41\xB5\x7A\x52\x51\x29\x13\x1C\x95\x7B\x5F\x93";
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
@@ -470,7 +470,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_blake2s256_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_blake2s256_hash_size());
-    raw_hash = "\x50\x8C\x5E\x8C\x32\x7C\x14\xE2\xE1\xA7\x2B\xA3\x4E\xEB\x45\x2F"
+    raw_hash = (kryptos_u8_t *)"\x50\x8C\x5E\x8C\x32\x7C\x14\xE2\xE1\xA7\x2B\xA3\x4E\xEB\x45\x2F"
                "\x37\x45\x8B\x20\x9E\xD6\x3A\x29\x4D\x99\x9B\x4C\x86\x67\x59\x82";
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
@@ -486,7 +486,7 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_blake2b512_hash(&ktask, 0);
     KUTE_ASSERT(t.out != NULL);
     KUTE_ASSERT(t.out_size == kryptos_blake2b512_hash_size());
-    raw_hash = "\xBA\x80\xA5\x3F\x98\x1C\x4D\x0D\x6A\x27\x97\xB6\x9F\x12\xF6\xE9"
+    raw_hash = (kryptos_u8_t *)"\xBA\x80\xA5\x3F\x98\x1C\x4D\x0D\x6A\x27\x97\xB6\x9F\x12\xF6\xE9"
                "\x4C\x21\x2F\x14\x68\x5A\xC4\xB7\x4B\x12\xBB\x6F\xDB\xFF\xA2\xD1"
                "\x7D\x87\xC5\x39\x2A\xAB\x79\x2D\xC2\x52\xD5\xDE\x45\x33\xCC\x95"
                "\x18\xD3\x8A\xA8\xDB\xF1\x92\x5A\xB9\x23\x86\xED\xD4\x00\x99\x23";
@@ -506,7 +506,7 @@ KUTE_TEST_CASE(kryptos_blake2sN_tests)
 
     kryptos_task_init_as_null(ktask);
 
-    ktask->in = "abc";
+    ktask->in = (kryptos_u8_t *)"abc";
     ktask->in_size = 3;
 
     ktask->out_size = 33; // INFO(Rafael): Greater than Blake2s hash size limit.
@@ -533,7 +533,7 @@ KUTE_TEST_CASE(kryptos_blake2bN_tests)
 
     kryptos_task_init_as_null(ktask);
 
-    ktask->in = "abc";
+    ktask->in = (kryptos_u8_t *)"abc";
     ktask->in_size = 3;
 
     ktask->out_size = 65; // INFO(Rafael): Greater than Blake2b hash size limit.
@@ -564,7 +564,7 @@ KUTE_TEST_CASE(kryptos_hmac_basic_tests)
         size_t expected_size;
     };
 #define add_hmac_test_step(h, k, ks, d, ds, e, es)\
- { kryptos_ ## h ## _hash, kryptos_ ## h ## _hash_input_size, kryptos_ ## h ## _hash_size, k, ks, d, ds, e, es }
+ { kryptos_ ## h ## _hash, kryptos_ ## h ## _hash_input_size, kryptos_ ## h ## _hash_size, (kryptos_u8_t *)k, ks, (kryptos_u8_t *)d, ds, (kryptos_u8_t *)e, es }
     // INFO(Rafael): Test vector from RFC-4231.
     struct test_step test_vector[] = {
         // INFO(Rafael): Test case 1.
@@ -791,15 +791,15 @@ KUTE_TEST_CASE_END
 #if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)
 
 KUTE_TEST_CASE(kryptos_des_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): DES/ECB.
 
@@ -851,15 +851,15 @@ KUTE_TEST_CASE(kryptos_des_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_idea_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): IDEA/ECB.
 
@@ -911,15 +911,15 @@ KUTE_TEST_CASE(kryptos_idea_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_blowfish_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): BLOWFISH/ECB.
 
@@ -971,16 +971,16 @@ KUTE_TEST_CASE(kryptos_blowfish_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_feal_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
     int feal_rounds = 8;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): FEAL/ECB.
 
@@ -1032,16 +1032,16 @@ KUTE_TEST_CASE(kryptos_feal_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc2_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
     int rc2_T1 = 64;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): RC2/ECB.
 
@@ -1093,16 +1093,16 @@ KUTE_TEST_CASE(kryptos_rc2_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc5_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
     int rc5_rounds = 20;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): RC5/ECB.
 
@@ -1154,16 +1154,16 @@ KUTE_TEST_CASE(kryptos_rc5_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc6_128_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
     int rc6_rounds = 40;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): RC6-128/ECB.
 
@@ -1215,16 +1215,16 @@ KUTE_TEST_CASE(kryptos_rc6_128_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc6_192_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
     int rc6_rounds = 40;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): RC6-192/ECB.
 
@@ -1276,16 +1276,16 @@ KUTE_TEST_CASE(kryptos_rc6_192_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc6_256_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
     int rc6_rounds = 40;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): RC6-256/ECB.
 
@@ -1337,15 +1337,15 @@ KUTE_TEST_CASE(kryptos_rc6_256_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_camellia128_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): CAMELLIA-128/ECB.
 
@@ -1397,15 +1397,15 @@ KUTE_TEST_CASE(kryptos_camellia128_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_camellia192_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): CAMELLIA-192/ECB.
 
@@ -1457,15 +1457,15 @@ KUTE_TEST_CASE(kryptos_camellia192_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_camellia256_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): CAMELLIA-256/ECB.
 
@@ -1517,15 +1517,15 @@ KUTE_TEST_CASE(kryptos_camellia256_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_cast5_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): CAST5/ECB.
 
@@ -1577,16 +1577,16 @@ KUTE_TEST_CASE(kryptos_cast5_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_saferk64_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
     int saferk64_rounds = 6;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): SAFER-K64/ECB.
 
@@ -1638,15 +1638,15 @@ KUTE_TEST_CASE(kryptos_saferk64_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_aes128_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): AES-128/ECB.
 
@@ -1698,15 +1698,15 @@ KUTE_TEST_CASE(kryptos_aes128_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_aes192_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): AES-192/ECB.
 
@@ -1758,15 +1758,15 @@ KUTE_TEST_CASE(kryptos_aes192_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_aes256_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): AES-256/ECB.
 
@@ -1818,15 +1818,15 @@ KUTE_TEST_CASE(kryptos_aes256_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_serpent_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): SERPENT/ECB.
 
@@ -1874,23 +1874,23 @@ KUTE_TEST_CASE(kryptos_serpent_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_triple_des_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
     kryptos_u8_t *triple_des_key2, *triple_des_key3;
     size_t triple_des_key2_size, triple_des_key3_size;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): TRIPLE-DES/ECB.
 
-    triple_des_key2 = "riverintheroad";
+    triple_des_key2 = (kryptos_u8_t *)"riverintheroad";
     triple_des_key2_size = 14;
-    triple_des_key3 = "thewayyouusedtodo";
+    triple_des_key3 = (kryptos_u8_t *)"thewayyouusedtodo";
     triple_des_key3_size = 17;
 
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des, sha1, key, key_size, kKryptosECB,
@@ -1958,9 +1958,9 @@ KUTE_TEST_CASE(kryptos_triple_des_hmac_tests)
 
     // INFO(Rafael): TRIPLE-DES/CBC.
 
-    triple_des_key2 = "riverintheroad";
+    triple_des_key2 = (kryptos_u8_t *)"riverintheroad";
     triple_des_key2_size = 14;
-    triple_des_key3 = "thewayyouusedtodo";
+    triple_des_key3 = (kryptos_u8_t *)"thewayyouusedtodo";
     triple_des_key3_size = 17;
 
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des, sha1, key, key_size, kKryptosCBC,
@@ -2028,23 +2028,23 @@ KUTE_TEST_CASE(kryptos_triple_des_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_triple_des_ede_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
     kryptos_u8_t *triple_des_key2, *triple_des_key3;
     size_t triple_des_key2_size, triple_des_key3_size;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): TRIPLE-DES-EDE/ECB.
 
-    triple_des_key2 = "riverintheroad";
+    triple_des_key2 = (kryptos_u8_t *)"riverintheroad";
     triple_des_key2_size = 14;
-    triple_des_key3 = "thewayyouusedtodo";
+    triple_des_key3 = (kryptos_u8_t *)"thewayyouusedtodo";
     triple_des_key3_size = 17;
 
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des_ede, sha1, key, key_size, kKryptosECB,
@@ -2112,9 +2112,9 @@ KUTE_TEST_CASE(kryptos_triple_des_ede_hmac_tests)
 
     // INFO(Rafael): TRIPLE-DES-EDE/CBC.
 
-    triple_des_key2 = "riverintheroad";
+    triple_des_key2 = (kryptos_u8_t *)"riverintheroad";
     triple_des_key2_size = 14;
-    triple_des_key3 = "thewayyouusedtodo";
+    triple_des_key3 = (kryptos_u8_t *)"thewayyouusedtodo";
     triple_des_key3_size = 17;
 
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des_ede, sha1, key, key_size, kKryptosCBC,
@@ -2182,15 +2182,15 @@ KUTE_TEST_CASE(kryptos_triple_des_ede_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_tea_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): TEA/ECB.
 
@@ -2242,16 +2242,16 @@ KUTE_TEST_CASE(kryptos_tea_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_xtea_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
     int xtea_rounds = 64;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): XTEA/ECB.
 
@@ -2303,15 +2303,15 @@ KUTE_TEST_CASE(kryptos_xtea_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_misty1_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): MISTY1/ECB.
 
@@ -2363,15 +2363,15 @@ KUTE_TEST_CASE(kryptos_misty1_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mars128_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): MARS-128/ECB.
 
@@ -2423,15 +2423,15 @@ KUTE_TEST_CASE(kryptos_mars128_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mars192_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): MARS-192/ECB.
 
@@ -2483,15 +2483,15 @@ KUTE_TEST_CASE(kryptos_mars192_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mars256_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): MARS-256/ECB.
 
@@ -2543,15 +2543,15 @@ KUTE_TEST_CASE(kryptos_mars256_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_present80_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): PRESENT-80/ECB.
 
@@ -2603,15 +2603,15 @@ KUTE_TEST_CASE(kryptos_present80_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_present128_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): PRESENT-128/ECB.
 
@@ -2663,15 +2663,15 @@ KUTE_TEST_CASE(kryptos_present128_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_shacal1_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): SHACAL-1/ECB.
 
@@ -2723,15 +2723,15 @@ KUTE_TEST_CASE(kryptos_shacal1_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_shacal2_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): SHACAL-2/ECB.
 
@@ -2783,15 +2783,15 @@ KUTE_TEST_CASE(kryptos_shacal2_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_noekeon_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): NOEKEON/ECB.
 
@@ -2843,15 +2843,15 @@ KUTE_TEST_CASE(kryptos_noekeon_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_noekeon_d_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): NOEKEON/DIRECT/ECB.
 
@@ -2903,15 +2903,15 @@ KUTE_TEST_CASE(kryptos_noekeon_d_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_gost_ds_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): GOST-DS/ECB.
 
@@ -2963,7 +2963,7 @@ KUTE_TEST_CASE(kryptos_gost_ds_hmac_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_gost_hmac_tests)
-    kryptos_u8_t *key = "nooneknows\x00\x00\x00\x00\x00\x00";
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
     size_t key_size = 16;
     kryptos_task_ctx t;
     kryptos_u8_t s1[16] = {
@@ -2990,12 +2990,12 @@ KUTE_TEST_CASE(kryptos_gost_hmac_tests)
     kryptos_u8_t s8[16] = {
          1, 15, 13,  0,  5,  7, 10,  4,  9,  2,  3, 14,  6, 11,  8, 12
     };
-    kryptos_u8_t *plaintext = "When I find my code in tons of trouble,\n"
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
                               "Friends and colleagues come to me,\n"
                               "Speaking words of wisdom:\n"
                               "Write in C.\n\n"
                               " -- Write in C(\"Let it Be\")\n";
-    size_t plaintext_size = kstrlen(plaintext);
+    size_t plaintext_size = kstrlen((char *)plaintext);
 
     // INFO(Rafael): GOST/ECB.
 

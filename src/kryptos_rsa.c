@@ -258,7 +258,7 @@ void kryptos_rsa_cipher(kryptos_task_ctx **ktask) {
 
 void kryptos_rsa_oaep_cipher(kryptos_task_ctx **ktask) {
     kryptos_u8_t *temp = NULL, *old_in = NULL;
-    size_t old_in_size;
+    size_t old_in_size = 0;
     kryptos_mp_value_t *n = NULL;
 
     if (ktask == NULL) {
@@ -479,8 +479,8 @@ void kryptos_rsa_oaep_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, size_t k
 
     ktask->arg[0] = label;
     ktask->arg[1] = label_size;
-    ktask->arg[2] = hash;
-    ktask->arg[3] = hash_size;
+    ktask->arg[2] = (void *)hash;
+    ktask->arg[3] = (void *)hash_size;
 }
 
 void kryptos_rsa_digital_signature_setup(kryptos_task_ctx *ktask, kryptos_u8_t *in, size_t in_size,
@@ -514,8 +514,8 @@ void kryptos_rsa_emsa_pss_digital_signature_setup(kryptos_task_ctx *ktask, krypt
     ktask->in_size = in_size;
 
     ktask->arg[0] = salt_size;
-    ktask->arg[1] = hash;
-    ktask->arg[2] = hash_size;
+    ktask->arg[1] = (void *)hash;
+    ktask->arg[2] = (void *)hash_size;
 }
 
 void kryptos_rsa_emsa_pss_sign(kryptos_task_ctx **ktask) {
