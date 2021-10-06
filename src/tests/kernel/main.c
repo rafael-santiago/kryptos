@@ -33,8 +33,8 @@ KUTE_DECLARE_TEST_CASE(ktest_monkey);
 
 KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_memset_tests);
-    /*KUTE_RUN_TEST(kryptos_padding_tests);
-    KUTE_RUN_TEST(kryptos_unbiased_rand_mod_u8_tests);
+    KUTE_RUN_TEST(kryptos_padding_tests);
+    /*KUTE_RUN_TEST(kryptos_unbiased_rand_mod_u8_tests);
     KUTE_RUN_TEST(kryptos_unbiased_rand_mod_u16_tests);
     KUTE_RUN_TEST(kryptos_unbiased_rand_mod_u32_tests);
     KUTE_RUN_TEST(kryptos_unbiased_rand_mod_u64_tests);
