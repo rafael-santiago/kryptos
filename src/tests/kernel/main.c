@@ -34,7 +34,7 @@ KUTE_DECLARE_TEST_CASE(ktest_monkey);
 KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_memset_tests);
     KUTE_RUN_TEST(kryptos_padding_tests);
-    /*KUTE_RUN_TEST(kryptos_unbiased_rand_mod_u8_tests);
+    KUTE_RUN_TEST(kryptos_unbiased_rand_mod_u8_tests);
     KUTE_RUN_TEST(kryptos_unbiased_rand_mod_u16_tests);
     KUTE_RUN_TEST(kryptos_unbiased_rand_mod_u32_tests);
     KUTE_RUN_TEST(kryptos_unbiased_rand_mod_u64_tests);
@@ -63,7 +63,7 @@ KUTE_TEST_CASE(ktest_monkey)
 
     // INFO(Rafael): Operation modes (complementary tests).
 
-    KUTE_RUN_TEST(kryptos_ctr_mode_sequencing_tests);
+    /*KUTE_RUN_TEST(kryptos_ctr_mode_sequencing_tests);
 
     // INFO(Rafael): We only test the GCM mode after ensuring that everything is fine with CTR.
 

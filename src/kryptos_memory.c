@@ -193,9 +193,27 @@ void *kryptos_realloc(void *addr, const size_t ssize) {
 #elif defined(KRYPTOS_KERNEL_MODE) && defined(__linux__)
     return krealloc(addr, ssize, GFP_ATOMIC);
 #elif defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
-    (addr);
-    (ssize);
-    return NULL;
+    kryptos_u8_t *newseg = kryptos_newseg(ssize);
+    kryptos_u8_t *ap = NULL;
+    kryptos_u8_t *ap_end = NULL;
+    kryptos_u8_t *np = NULL;
+    if (newseg == NULL) {
+        goto kryptos_realloc_epilogue;
+    }
+    RtlZeroMemory(newseg, ssize);
+    try {
+        ap = addr;
+        ap_end = ap + ssize;
+        np = newseg;
+        while (ap != ap_end) {
+            *np = *ap;
+            np++;
+            ap++;
+        }
+    } except(EXCEPTION_EXECUTE_HANDLER) {
+    }
+kryptos_realloc_epilogue:
+    return newseg;
 #else
     return NULL;
 #endif
