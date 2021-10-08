@@ -197,6 +197,7 @@ void *kryptos_realloc(void *addr, const size_t ssize) {
     kryptos_u8_t *ap = NULL;
     kryptos_u8_t *ap_end = NULL;
     kryptos_u8_t *np = NULL;
+    size_t old_size = 0;
     if (newseg == NULL) {
         goto kryptos_realloc_epilogue;
     }
@@ -209,10 +210,14 @@ void *kryptos_realloc(void *addr, const size_t ssize) {
             *np = *ap;
             np++;
             ap++;
+            old_size++;
         }
     } except(EXCEPTION_EXECUTE_HANDLER) {
     }
 kryptos_realloc_epilogue:
+    if (newseg != NULL) {
+        kryptos_freeseg(addr, old_size);
+    }
     return newseg;
 #else
     return NULL;

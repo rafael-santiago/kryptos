@@ -63,7 +63,7 @@ KUTE_TEST_CASE(ktest_monkey)
 
     // INFO(Rafael): Operation modes (complementary tests).
 
-    /*KUTE_RUN_TEST(kryptos_ctr_mode_sequencing_tests);
+    KUTE_RUN_TEST(kryptos_ctr_mode_sequencing_tests);
 
     // INFO(Rafael): We only test the GCM mode after ensuring that everything is fine with CTR.
 
@@ -130,7 +130,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_argon2_macro_bounds_tests);
 #endif
 
-    KUTE_RUN_TEST(kryptos_mp_new_value_tests);
+    /*KUTE_RUN_TEST(kryptos_mp_new_value_tests);
     KUTE_RUN_TEST(kryptos_mp_hex_value_as_mp_tests);
     KUTE_RUN_TEST(kryptos_mp_value_as_hex_tests);
     KUTE_RUN_TEST(kryptos_assign_mp_value_tests);
