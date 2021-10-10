@@ -251,6 +251,7 @@ local function forge_kernel_mode_tests(build_mode type string) : result type int
     $supported_platforms.add_item("linux");
     $supported_platforms.add_item("freebsd");
     $supported_platforms.add_item("netbsd");
+    $supported_platforms.add_item("windows");
 
     if ($supported_platforms.index_of(hefesto.sys.os_name()) == -1) {
         hefesto.sys.echo("ERROR: Kryptos kernel mode stuff not supported " +
@@ -269,9 +270,13 @@ local function forge_kernel_mode_tests(build_mode type string) : result type int
                 result 1;
             }
         }
-        $exit_code = hefesto.sys.forge("kryptos-test-mod",
-                                       "Forgefile.hsl", "--forgefiles=Forgefile.hsl --Forgefile-projects=kryptos-test-mod " +
-                                       hefesto.project.cmdline());
+        if (hefesto.sys.os_name() != "windows") {
+            $exit_code = hefesto.sys.forge("kryptos-test-mod",
+                                           "Forgefile.hsl", "--forgefiles=Forgefile.hsl --Forgefile-projects=kryptos-test-mod " +
+                                           hefesto.project.cmdline());
+        } else {
+            $exit_code = hefesto.sys.forge("win-kryptos-test-sys", "WinForgefile.hsl", hefesto.project.cmdline());
+        }
         hefesto.sys.cd($oldcwd);
     }
 
