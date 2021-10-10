@@ -26,7 +26,7 @@ static int corrupt_pem_data(const kryptos_u8_t *hdr, kryptos_u8_t *pem_data, con
     dp = pem_data;
     dp_end = pem_data + pem_data_size;
 
-    hp_end = hdr + strlen((char *)hdr);
+    hp_end = hdr + strlen((const char *)hdr);
 
     while (dp != dp_end && !found) {
         found = 1;

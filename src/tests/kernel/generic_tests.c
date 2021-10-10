@@ -1398,11 +1398,13 @@ KUTE_TEST_CASE(kryptos_gcm_gf_mul_tests)
 KUTE_TEST_CASE_END
 
 static kryptos_task_result_t E_stub(kryptos_u8_t **h, size_t *h_size, kryptos_u8_t *key, size_t key_size, void *arg) {
+#if defined(_MSC_VER)
     (h);
     (h_size);
     (key);
     (key_size);
     (arg);
+#endif
     kryptos_u8_t *hp;
     hp = (kryptos_u8_t *)kryptos_newseg(16);
     if (*h == NULL) {
@@ -1447,11 +1449,13 @@ static kryptos_task_result_t E_stub(kryptos_u8_t **h, size_t *h_size, kryptos_u8
 }
 
 static kryptos_task_result_t E_bad_stub(kryptos_u8_t **h, size_t *h_size, kryptos_u8_t *key, size_t key_size, void *arg) {
+#if defined(_MSC_VER)
     (h);
     (h_size);
     (key);
     (key_size);
     (arg);
+#endif
     kryptos_u8_t *hp;
     hp = (kryptos_u8_t *)kryptos_newseg(16);
     if (*h == NULL) {
