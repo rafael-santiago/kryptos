@@ -102,9 +102,9 @@ win-kryptos-test-sys.epilogue() {
             $compile_model = $option.item(0);
         }
         if (get_msvc_platform() == "x64") {
-            $driver_filepath = hefesto.sys.make_path("x64\\" + $compile_model + "\\kryptos-test\\kryptos-test.sys"); 
+            $driver_filepath = hefesto.sys.make_path(hefesto.sys.pwd(), "x64\\" + $compile_model + "\\kryptos-test\\" + $modname);
         } else {
-            $driver_filepath = hefesto.sys.make_path($compile_model + "\\kryptos-test\\kryptos-test.sys"); 
+            $driver_filepath = hefesto.sys.make_path(hefesto.sys.pwd(), $compile_model + "\\kryptos-test\\" + $modname);
         }
         var exit_code type int;
         $exit_code = insmod($driver_filepath);
