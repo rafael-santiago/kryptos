@@ -99,7 +99,7 @@ int kryptos_set_csprng(kryptos_csprng_t csprng) {
     int set_glvar = 0;
     kryptos_u8_t *seed = NULL;
     kryptos_u32_t seed_size = 0;
-    
+
     switch (csprng) {
         case kKryptosCSPRNGSystem:
             kryptos_release_curr_csprng();

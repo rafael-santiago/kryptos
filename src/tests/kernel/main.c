@@ -183,12 +183,6 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_ec_dbl_tests);
     KUTE_RUN_TEST(kryptos_ec_mul_tests);
 
-    /*KUTE_RUN_TEST(kryptos_ec_set_point_tests);
-    KUTE_RUN_TEST(kryptos_ec_set_curve_tests);
-    KUTE_RUN_TEST(kryptos_ec_add_tests);
-    KUTE_RUN_TEST(kryptos_ec_dbl_tests);
-    KUTE_RUN_TEST(kryptos_ec_mul_tests);*/
-
     KUTE_RUN_TEST(kryptos_verify_dl_params_tests);
     KUTE_RUN_TEST(kryptos_generate_dl_params_tests);
 
@@ -232,7 +226,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KdPrint(("WARN: The RSA-OAEP tests were skipped.\n"));
 # endif
 #endif
-    
+
     KUTE_RUN_TEST(kryptos_elgamal_mk_key_pair_tests);
     KUTE_RUN_TEST(kryptos_elgamal_verify_public_key_tests);
     KUTE_RUN_TEST(kryptos_elgamal_cipher_tests);
