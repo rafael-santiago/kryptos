@@ -102,6 +102,7 @@ kryptos-test-mod.prologue() {
     #               kryptos are automatically linked together.
     $cflags.add_item("-DKRYPTOS_KERNEL_MODE=1");
     $cflags.add_item("-DKRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY=1");
+    $cflags.add_item("-DKRYPTOS_ENSURE_MEMSET_CLEANUPS=1");
 
     $modname = "kryptos_test";
 }
