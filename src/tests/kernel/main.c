@@ -130,7 +130,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_argon2_macro_bounds_tests);
 #endif
 
-    /*KUTE_RUN_TEST(kryptos_mp_new_value_tests);
+    KUTE_RUN_TEST(kryptos_mp_new_value_tests);
     KUTE_RUN_TEST(kryptos_mp_hex_value_as_mp_tests);
     KUTE_RUN_TEST(kryptos_mp_value_as_hex_tests);
     KUTE_RUN_TEST(kryptos_assign_mp_value_tests);
@@ -183,11 +183,11 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_ec_dbl_tests);
     KUTE_RUN_TEST(kryptos_ec_mul_tests);
 
-    KUTE_RUN_TEST(kryptos_ec_set_point_tests);
+    /*KUTE_RUN_TEST(kryptos_ec_set_point_tests);
     KUTE_RUN_TEST(kryptos_ec_set_curve_tests);
     KUTE_RUN_TEST(kryptos_ec_add_tests);
     KUTE_RUN_TEST(kryptos_ec_dbl_tests);
-    KUTE_RUN_TEST(kryptos_ec_mul_tests);
+    KUTE_RUN_TEST(kryptos_ec_mul_tests);*/
 
     KUTE_RUN_TEST(kryptos_verify_dl_params_tests);
     KUTE_RUN_TEST(kryptos_generate_dl_params_tests);
@@ -209,6 +209,8 @@ KUTE_TEST_CASE(ktest_monkey)
     uprintf("WARN: The Diffie-Hellman-Merkle exchange tests were skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: The Diffie-Hellman-Merkle exchange tests were skipped.\n");
+# elif defined(_WIN32)
+    KdPrint(("WARN: The Diffie-Hellman-Merkle exchange tests were skipped.\n"));
 # endif
 #endif
 
@@ -226,9 +228,11 @@ KUTE_TEST_CASE(ktest_monkey)
     uprintf("WARN: The RSA-OAEP tests were skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: The RSA-OAEP tests were skipped.\n");
+# elif defined(_WIN32)
+    KdPrint(("WARN: The RSA-OAEP tests were skipped.\n"));
 # endif
 #endif
-
+    
     KUTE_RUN_TEST(kryptos_elgamal_mk_key_pair_tests);
     KUTE_RUN_TEST(kryptos_elgamal_verify_public_key_tests);
     KUTE_RUN_TEST(kryptos_elgamal_cipher_tests);
@@ -242,6 +246,8 @@ KUTE_TEST_CASE(ktest_monkey)
     uprintf("WARN: The Elgamal-OAEP tests were skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: The Elgamal-OAEP tests were skipped.\n");
+# elif defined(_WIN32)
+    KdPrint(("WARN: The Elgamal-OAEP tests were skipped.\n"));
 # endif
 #endif
 
@@ -257,6 +263,8 @@ KUTE_TEST_CASE(ktest_monkey)
     uprintf("WARN: The RSA signature tests were skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: The RSA signature tests were skipped.\n");
+# elif defined(_WIN32)
+    KdPrint(("WARN: The RSA signature tests were skipped.\n"));
 # endif
 #endif
 
@@ -269,6 +277,8 @@ KUTE_TEST_CASE(ktest_monkey)
     uprintf("WARN: The DSA signature tests were skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: The DSA signature tests were skipped.\n");
+# elif defined(_WIN32)
+    KdPrint(("WARN: The DSA signature tests were skipped.\n"));
 # endif
 #endif
 
@@ -287,8 +297,10 @@ KUTE_TEST_CASE(ktest_monkey)
     uprintf("WARN: The ECDSA signature tests were skipped.\n");
 # elif defined(__linux__)
     printk(KERN_ERR "WARN: The ECDSA signature tests were skipped.\n");
+# elif defined(_WIN32)
+    KdPrint(("WARN: The ECDSA signature tests were skipped.\n"));
 # endif
-#endif*/
+#endif
 
     //KUTE_RUN_TEST(kryptos_new_standard_curve_tests);
 KUTE_TEST_CASE_END

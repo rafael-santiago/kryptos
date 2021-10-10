@@ -1,4 +1,14 @@
+#
+#                                Copyright (C) 2021 by Rafael Santiago
+#
+# This is a free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+#
+
 include on windows ~/toolsets/windows/driver/windows-driver.hsl
+include on windows ~/toolsets/windows/driver/util/mod_utils.hsl
+include ../../Toolsets.hsl
 
 local var srcs type list;
 local var includes type list;
@@ -64,6 +74,7 @@ win-kryptos-test-sys.prologue() {
     #               kryptos are automatically linked together.
     $cflags.add_item("-DKRYPTOS_KERNEL_MODE=1");
     $cflags.add_item("-DKRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY=1");
+    $cflags.add_item("-DKRYPTOS_ENSURE_MEMSET_CLEANUPS=1");
 
     $cflags.add_item("-DUSE_LIBCNTPR=1");
 
@@ -82,5 +93,26 @@ win-kryptos-test-sys.prologue() {
 win-kryptos-test-sys.epilogue() {
     if (hefesto.sys.last_forge_result() == 0) {
         hefesto.sys.echo("*** Test module successfully compiled.\n");
+        var driver_filepath type string;
+        var compile_model type string;
+        $compile_model = "debug";
+        var option type list;
+        $option = hefesto.sys.get_option("compile-model");
+        if ($option.count() > 0) {
+            $compile_model = $option.item(0);
+        }
+        if (get_msvc_platform() == "x64") {
+            $driver_filepath = hefesto.sys.make_path("x64\\" + $compile_model + "\\kryptos-test\\kryptos-test.sys"); 
+        } else {
+            $driver_filepath = hefesto.sys.make_path($compile_model + "\\kryptos-test\\kryptos-test.sys"); 
+        }
+        var exit_code type int;
+        $exit_code = insmod($driver_filepath);
+        if ($exit_code != 0) {
+            hefesto.sys.echo("ERROR: Some issues were found during kernel-mode tests.\n");
+            hefesto.project.abort(1);
+        } else {
+            hefesto.sys.echo("INFO: Kernel-mode tests passed.\n");
+        }
     }
 }
