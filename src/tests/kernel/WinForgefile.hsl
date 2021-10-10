@@ -113,6 +113,9 @@ win-kryptos-test-sys.epilogue() {
             hefesto.project.abort(1);
         } else {
             hefesto.sys.echo("INFO: Kernel-mode tests passed.\n");
+            if (rmmod($driver_filepath) != 0) {
+                hefesto.sys.echo("WARN: Unable to unload test device driver.\n");
+            }
         }
     }
 }
