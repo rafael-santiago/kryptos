@@ -9,6 +9,7 @@
 include on windows ~/toolsets/windows/driver/windows-driver.hsl
 include on windows ~/toolsets/windows/driver/util/mod_utils.hsl
 include ../../Toolsets.hsl
+include mkclean.hsl
 
 local var srcs type list;
 local var includes type list;
@@ -23,11 +24,18 @@ win-kryptos-test-sys.prologue() {
     var option type list;
     $option = hefesto.sys.get_option("clean");
 
-#    if ($option.count() > 0) {
-#        mkclean($includes);
-#        hefesto.sys.echo("*** All clean!\n");
-#        hefesto.project.abort(0);
-#    }
+    if ($option.count() > 0) {
+        var dirlist type list;
+        $dirlist.add_item(hefesto.sys.pwd());
+        $dirlist.add_item(hefesto.sys.make_path(hefesto.sys.pwd(), "debug\x64"));
+        $dirlist.add_item(hefesto.sys.make_path(hefesto.sys.pwd(), "release\x64"));
+        $dirlist.add_item(hefesto.sys.make_path(hefesto.sys.pwd(), "debug"));
+        $dirlist.add_item(hefesto.sys.make_path(hefesto.sys.pwd(), "release"));
+        $dirlist.add_item(hefesto.sys.make_path(hefesto.sys.pwd(), "..\\.."));
+        mkclean($dirlist);
+        hefesto.sys.echo("*** All clean!\n");
+        hefesto.project.abort(0);
+    }
 
     $option = hefesto.sys.get_option("no-hmac-tests");
     if ($option.count() > 0) {
