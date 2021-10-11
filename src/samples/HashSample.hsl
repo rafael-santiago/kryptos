@@ -43,6 +43,9 @@ bare-bone-hash-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_ldflags($ldflags);
+    }
 }
 
 bare-bone-hash-sample.epilogue() {
@@ -78,6 +81,9 @@ hash-macro-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_ldflags($ldflags);
+    }
 }
 
 hash-macro-sample.epilogue() {
@@ -113,6 +119,9 @@ hmac-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_ldflags($ldflags);
+    }
 }
 
 hmac-sample.epilogue() {
@@ -148,6 +157,9 @@ blake2b-keyed-hash-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_ldflags($ldflags);
+    }
 }
 
 blake2b-keyed-hash-sample.epilogue() {
@@ -183,6 +195,9 @@ blake2n-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_ldflags($ldflags);
+    }
 }
 
 blake2n-sample.epilogue() {

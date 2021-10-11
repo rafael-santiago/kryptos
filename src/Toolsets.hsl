@@ -366,6 +366,13 @@ local function get_vcvarsall_path() : result type string {
     result "";
 }
 
+function setup_sample_msvc_ldflags(ldflags type list) : result type none {
+    $ldflags.del_item("-lkryptos");
+    $ldflags.add_item("libkryptos" + get_msvc_artifact_postfix() + ".lib");
+    $ldflags.add_item("bcrypt.lib");
+    hefesto.sys.byref($ldflags);
+}
+
 function get_msvc_artifact_postfix() : result type string {
     var cfg_postfix type string;
     $cfg_postfix = "mt";

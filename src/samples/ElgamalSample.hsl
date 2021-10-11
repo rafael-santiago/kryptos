@@ -43,6 +43,9 @@ elgamal-mk-key-pair-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_ldflags($ldflags);
+    }
 }
 
 elgamal-mk-key-pair-sample.epilogue() {
@@ -78,6 +81,9 @@ elgamal-schoolbook-c99-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_ldflags($ldflags);
+    }
 }
 
 elgamal-schoolbook-c99-sample.epilogue() {
@@ -113,6 +119,9 @@ elgamal-oaep-c99-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_ldflags($ldflags);
+    }
 }
 
 elgamal-oaep-c99-sample.epilogue() {

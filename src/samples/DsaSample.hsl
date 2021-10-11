@@ -43,6 +43,9 @@ dsa-mk-key-pair-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_ldflags($ldflags);
+    }
 }
 
 dsa-mk-key-pair-sample.epilogue() {
@@ -78,6 +81,9 @@ dsa-sign-c99-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_ldflags($ldflags);
+    }
 }
 
 dsa-sign-c99-sample.epilogue() {
@@ -113,6 +119,9 @@ ecdsa-mk-key-pair-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_ldflags($ldflags);
+    }
 }
 
 ecdsa-mk-key-pair-sample.epilogue() {
@@ -148,6 +157,9 @@ ecdsa-sign-c99-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_ldflags($ldflags);
+    }
 }
 
 ecdsa-sign-c99-sample.epilogue() {

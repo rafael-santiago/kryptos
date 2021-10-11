@@ -43,6 +43,9 @@ bcrypt-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_ldflags($ldflags);
+    }
 }
 
 bcrypt-sample.epilogue() {
