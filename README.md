@@ -16,3 +16,5 @@ Until now these are the supported platforms:
 |![Windows](https://github.com/rafael-santiago/kryptos/blob/master/etc/small-windows-logo.png "Windows")|:heavy_check_mark:|:heavy_check_mark:|
 
 In order to know more you should start [here](https://github.com/rafael-santiago/kryptos/blob/master/doc/README.md).
+
+This library is ``GPLv2`` if for some reason it does not fit into your stuff you can contact me and let's talk about.
