@@ -44,7 +44,7 @@ pem-buffer-put-data-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -82,7 +82,7 @@ pem-buffer-get-data-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -120,7 +120,7 @@ pem-buffer-get-mp-data-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 

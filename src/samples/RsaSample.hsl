@@ -44,7 +44,7 @@ rsa-mk-key-pair-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -82,7 +82,7 @@ rsa-schoolbook-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -120,7 +120,7 @@ rsa-schoolbook-c99-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -158,7 +158,7 @@ rsa-oaep-c99-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -196,7 +196,7 @@ rsa-sign-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -234,7 +234,7 @@ rsa-sign-c99-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -272,7 +272,7 @@ rsa-emsa-pss-sign-c99-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 

@@ -366,10 +366,12 @@ local function get_vcvarsall_path() : result type string {
     result "";
 }
 
-function setup_sample_msvc_ldflags(ldflags type list) : result type none {
+function setup_sample_msvc_flags(cflags type list, ldflags type list) : result type none {
+    $cflags.add_item("-DUMDF_USING_NTSTATUS");
     $ldflags.del_item("-lkryptos");
     $ldflags.add_item("libkryptos" + get_msvc_artifact_postfix() + ".lib");
     $ldflags.add_item("bcrypt.lib");
+    hefesto.sys.byref($cflags);
     hefesto.sys.byref($ldflags);
 }
 

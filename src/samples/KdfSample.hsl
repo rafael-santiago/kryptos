@@ -44,7 +44,7 @@ hkdf-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -82,7 +82,7 @@ pbkdf2-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -120,7 +120,7 @@ argon2-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 

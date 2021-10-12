@@ -44,7 +44,7 @@ base64-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -82,7 +82,7 @@ base64-dsl-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -120,7 +120,7 @@ uuencode-dsl-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -158,7 +158,7 @@ huffman-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 

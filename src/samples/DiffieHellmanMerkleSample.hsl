@@ -44,7 +44,7 @@ std-dh-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -82,7 +82,7 @@ mod-dh-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -120,7 +120,7 @@ dh-domain-params-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -158,7 +158,7 @@ dh-domain-params-verify-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -196,7 +196,7 @@ dh-domain-params-load-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
@@ -234,7 +234,7 @@ ecdh-sample.prologue() {
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
-        setup_sample_msvc_ldflags($ldflags);
+        setup_sample_msvc_flags($cflags, $ldflags);
     }
 }
 
