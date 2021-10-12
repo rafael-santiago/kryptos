@@ -45,6 +45,8 @@ pem-buffer-put-data-sample.prologue() {
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
         setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
     }
 }
 
@@ -83,6 +85,8 @@ pem-buffer-get-data-sample.prologue() {
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
         setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
     }
 }
 
@@ -121,6 +125,8 @@ pem-buffer-get-mp-data-sample.prologue() {
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
         setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
     }
 }
 

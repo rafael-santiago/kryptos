@@ -45,6 +45,8 @@ rsa-mk-key-pair-sample.prologue() {
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
         setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
     }
 }
 
@@ -83,6 +85,8 @@ rsa-schoolbook-sample.prologue() {
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
         setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
     }
 }
 
@@ -121,6 +125,8 @@ rsa-schoolbook-c99-sample.prologue() {
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
         setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
     }
 }
 
@@ -159,6 +165,8 @@ rsa-oaep-c99-sample.prologue() {
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
         setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
     }
 }
 
@@ -197,6 +205,8 @@ rsa-sign-sample.prologue() {
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
         setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
     }
 }
 
@@ -235,6 +245,8 @@ rsa-sign-c99-sample.prologue() {
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
         setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
     }
 }
 
@@ -273,6 +285,8 @@ rsa-emsa-pss-sign-c99-sample.prologue() {
     $ldflags = hefesto.sys.get_option("ldflags");
     if ($toolset_name.match("^msvc")) {
         setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
     }
 }
 
