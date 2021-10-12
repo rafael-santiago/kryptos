@@ -1,7 +1,7 @@
 # Kryptos
 
-This project is an attempt of building a tiny and straightforward crypto library that can be used in user mode and also
-kernel mode stuff.
+I started the core of this project on about 2004 and since them it was being an attempt of building a tiny and straightforward
+crypto library which can be easily integrated with user and also kernel mode code.
 
 Until now these are the supported platforms:
 
@@ -17,4 +17,5 @@ Until now these are the supported platforms:
 
 In order to know more you should start [here](https://github.com/rafael-santiago/kryptos/blob/main/doc/README.md).
 
-This library is ``GPLv2`` if for some reason it does not fit into your stuff you can contact me and let's talk about.
+This library is licensed under ``GPLv2`` if for some reason it does not fit into your stuff you can contact me and let's
+talk about.
