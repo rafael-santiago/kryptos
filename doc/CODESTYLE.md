@@ -8,7 +8,7 @@ This is not an absolute truth (a.k.a. unicorn) but this is the truth that I have
 ## Comments
 
 It is necessary when is necessary. Try do not think like a blasé "bodisatva coder" who likes to repeat "uh! the code must speak by itself".
-You are dealing with cryptography, so things tend to become tricky and complicated. A good comment can save time and avoid misunderstanding
+You are dealing with cryptography, so things tend to become tricky. A good comment can save time and avoid misunderstanding
 and improper improvements by other people.
 
 A good way of commenting is by identifying yourself using meaningful short labels. The general idea is: *LABEL(YourNameOrNickname): blah, blah, blah.*.
