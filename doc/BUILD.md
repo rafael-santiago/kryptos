@@ -327,6 +327,8 @@ All you should do is to pass your usage intention by using the build option ``to
 > hefesto --toolset=msvc
 ```
 
+I have been building ``libkryptos`` on ``Microsoft Visual Studio 2019``.
+
 ### Running libkryptos kernel mode tests on Windows
 
 You need to have ``WDK`` well-installed on your system once it done, if you invoke ``Hefesto`` by using
