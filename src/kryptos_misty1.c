@@ -188,7 +188,8 @@ static void kryptos_misty1_sched_skeys(const kryptos_u8_t *key, const size_t key
 
 #undef kryptos_misty1_sched_sk_chunk
 
-    d7 = d9 = 0;
+    d7 = 0;
+    d9 = 0;
 }
 
 static void kryptos_misty1_block_encrypt(kryptos_u8_t *block, const struct kryptos_misty1_subkeys *sks) {
@@ -238,8 +239,8 @@ static void kryptos_misty1_block_encrypt(kryptos_u8_t *block, const struct krypt
     kryptos_cpy_u32_as_big_endian(block, 8, D1);
     kryptos_cpy_u32_as_big_endian(block + 4, 4, D0);
 
-    d7 = d9 = 0;
-    t0 = t1 = d0 = d1 = 0;
+    d7 = 0;
+    t0 = t1 = d0 = d1 = d9 = 0;
 }
 
 static void kryptos_misty1_block_decrypt(kryptos_u8_t *block, const struct kryptos_misty1_subkeys *sks) {
@@ -289,8 +290,8 @@ static void kryptos_misty1_block_decrypt(kryptos_u8_t *block, const struct krypt
     kryptos_cpy_u32_as_big_endian(block, 8, D0);
     kryptos_cpy_u32_as_big_endian(block + 4, 4, D1);
 
-    d7 = d9 = 0;
-    t0 = t1 = d0 = d1 = 0;
+    d7 = 0;
+    t0 = t1 = d0 = d1 = d9 = 0;
 }
 
 #undef KRYPTOS_MISTY1_SKEYS_NR

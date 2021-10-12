@@ -24,7 +24,7 @@
 #define kryptos_feal_get_byte_from_u16(w, n) ( ( (w) >> (8 - ((n) << 3)) ) & 0xff )
 
 struct kryptos_feal_subkeys {
- int rounds;
+ size_t rounds;
  kryptos_u16_t K[KRYPTOS_FEAL_MAX];
 };
 
@@ -89,7 +89,7 @@ KRYPTOS_IMPL_BLOCK_CIPHER_PROCESSOR(feal,
                                     feal_block_processor(outblock, &sks),
                                     NULL /* GCM E function arg (No GCM) */)
 
-KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_GCM_E_NO_SUPPORT(feal, void *rounds)
+KRYPTOS_IMPL_CUSTOM_BLOCK_CIPHER_GCM_E_NO_SUPPORT(feal, void *rounds, (rounds))
 
 static kryptos_u8_t kryptos_feal_Sd(kryptos_u8_t T, kryptos_u8_t U, int d) {
     T = (T + U + d) % 256;

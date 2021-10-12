@@ -9,7 +9,7 @@
 #include <kryptos.h>
 #include <kstring.h>
 
-static kryptos_u8_t *dsl_tests_data = "IDIOT, n. A member of a large and powerful tribe whose influence in "
+static kryptos_u8_t *dsl_tests_data = (kryptos_u8_t *)"IDIOT, n. A member of a large and powerful tribe whose influence in "
                             "human affairs has always been dominant and controlling. The Idiot's "
                             "activity is not confined to any special field of throught or action, but "
                             "'pervades and regulates the whole'. He has the last word in everything; his "
@@ -160,10 +160,10 @@ KUTE_TEST_CASE(kryptos_arc4_dsl_tests)
     kryptos_task_ctx t, *ktask = &t;
     kryptos_task_init_as_null(ktask);
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
-    kryptos_run_cipher(arc4, ktask, "arc4", 4);
+    kryptos_run_cipher(arc4, ktask, (kryptos_u8_t *)"arc4", 4);
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
     kryptos_task_set_in(ktask, kryptos_task_get_out(ktask), kryptos_task_get_out_size(ktask));
-    kryptos_run_cipher(arc4, ktask, "arc4", 4);
+    kryptos_run_cipher(arc4, ktask, (kryptos_u8_t *)"arc4", 4);
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(ktask->out != NULL);
@@ -184,12 +184,12 @@ KUTE_TEST_CASE(kryptos_seal_dsl_tests)
     seal_version = kKryptosSEAL20;
     seal_l = 1024;
     seal_n = 0;
-    kryptos_run_cipher(seal, ktask, "seal", 4, &seal_version, &seal_l, &seal_n);
+    kryptos_run_cipher(seal, ktask, (kryptos_u8_t *)"seal", 4, &seal_version, &seal_l, &seal_n);
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
 
     kryptos_task_set_in(ktask, kryptos_task_get_out(ktask), kryptos_task_get_out_size(ktask));
 
-    kryptos_run_cipher(seal, ktask, "seal", 4, &seal_version, &seal_l, &seal_n);
+    kryptos_run_cipher(seal, ktask, (kryptos_u8_t *)"seal", 4, &seal_version, &seal_l, &seal_n);
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
@@ -203,12 +203,12 @@ KUTE_TEST_CASE(kryptos_seal_dsl_tests)
     seal_version = kKryptosSEAL30;
     seal_l = 2048;
     seal_n = 0;
-    kryptos_run_cipher(seal, ktask, "seal", 4, &seal_version, &seal_l, &seal_n);
+    kryptos_run_cipher(seal, ktask, (kryptos_u8_t *)"seal", 4, &seal_version, &seal_l, &seal_n);
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
 
     kryptos_task_set_in(ktask, kryptos_task_get_out(ktask), kryptos_task_get_out_size(ktask));
 
-    kryptos_run_cipher(seal, ktask, "seal", 4, &seal_version, &seal_l, &seal_n);
+    kryptos_run_cipher(seal, ktask, (kryptos_u8_t *)"seal", 4, &seal_version, &seal_l, &seal_n);
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
@@ -223,12 +223,12 @@ KUTE_TEST_CASE(kryptos_rabbit_dsl_tests)
     // RABBIT
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
 
-    kryptos_run_cipher(rabbit, ktask, "rabbit", 6, NULL);
+    kryptos_run_cipher(rabbit, ktask, (kryptos_u8_t *)"rabbit", 6, NULL);
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
 
     kryptos_task_set_in(ktask, kryptos_task_get_out(ktask), kryptos_task_get_out_size(ktask));
 
-    kryptos_run_cipher(rabbit, ktask, "rabbit", 6, NULL);
+    kryptos_run_cipher(rabbit, ktask, (kryptos_u8_t *)"rabbit", 6, NULL);
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
@@ -247,14 +247,14 @@ KUTE_TEST_CASE(kryptos_des_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(des, ktask, "des", 3, kKryptosECB);
+    kryptos_run_cipher(des, ktask, (kryptos_u8_t *)"des", 3, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(des, ktask, "des", 3, kKryptosECB);
+    kryptos_run_cipher(des, ktask, (kryptos_u8_t *)"des", 3, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -265,14 +265,14 @@ KUTE_TEST_CASE(kryptos_des_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(des, ktask, "des", 3, kKryptosCBC);
+    kryptos_run_cipher(des, ktask, (kryptos_u8_t *)"des", 3, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(des, ktask, "des", 3, kKryptosCBC);
+    kryptos_run_cipher(des, ktask, (kryptos_u8_t *)"des", 3, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -283,14 +283,14 @@ KUTE_TEST_CASE(kryptos_des_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(des, ktask, "des", 3, kKryptosOFB);
+    kryptos_run_cipher(des, ktask, (kryptos_u8_t *)"des", 3, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(des, ktask, "des", 3, kKryptosOFB);
+    kryptos_run_cipher(des, ktask, (kryptos_u8_t *)"des", 3, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -301,14 +301,14 @@ KUTE_TEST_CASE(kryptos_des_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(des, ktask, "des", 3, kKryptosCTR);
+    kryptos_run_cipher(des, ktask, (kryptos_u8_t *)"des", 3, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(des, ktask, "des", 3, kKryptosCTR);
+    kryptos_run_cipher(des, ktask, (kryptos_u8_t *)"des", 3, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -319,7 +319,7 @@ KUTE_TEST_CASE(kryptos_des_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(des, ktask, "des", 3, kKryptosGCM);
+    kryptos_run_cipher(des, ktask, (kryptos_u8_t *)"des", 3, kKryptosGCM);
 
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);
     KUTE_ASSERT(ktask->out == NULL);
@@ -337,14 +337,14 @@ KUTE_TEST_CASE(kryptos_idea_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(idea, ktask, "idea", 4, kKryptosECB);
+    kryptos_run_cipher(idea, ktask, (kryptos_u8_t *)"idea", 4, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(idea, ktask, "idea", 4, kKryptosECB);
+    kryptos_run_cipher(idea, ktask, (kryptos_u8_t *)"idea", 4, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -355,14 +355,14 @@ KUTE_TEST_CASE(kryptos_idea_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(idea, ktask, "idea", 4, kKryptosCBC);
+    kryptos_run_cipher(idea, ktask, (kryptos_u8_t *)"idea", 4, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(idea, ktask, "idea", 4, kKryptosCBC);
+    kryptos_run_cipher(idea, ktask, (kryptos_u8_t *)"idea", 4, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -373,14 +373,14 @@ KUTE_TEST_CASE(kryptos_idea_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(idea, ktask, "idea", 4, kKryptosOFB);
+    kryptos_run_cipher(idea, ktask, (kryptos_u8_t *)"idea", 4, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(idea, ktask, "idea", 4, kKryptosOFB);
+    kryptos_run_cipher(idea, ktask, (kryptos_u8_t *)"idea", 4, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -391,14 +391,14 @@ KUTE_TEST_CASE(kryptos_idea_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(idea, ktask, "idea", 4, kKryptosCTR);
+    kryptos_run_cipher(idea, ktask, (kryptos_u8_t *)"idea", 4, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(idea, ktask, "idea", 4, kKryptosCTR);
+    kryptos_run_cipher(idea, ktask, (kryptos_u8_t *)"idea", 4, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -409,7 +409,7 @@ KUTE_TEST_CASE(kryptos_idea_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(idea, ktask, "idea", 4, kKryptosGCM);
+    kryptos_run_cipher(idea, ktask, (kryptos_u8_t *)"idea", 4, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out == NULL);
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);
@@ -427,14 +427,14 @@ KUTE_TEST_CASE(kryptos_blowfish_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(blowfish, ktask, "blowfish", 8, kKryptosECB);
+    kryptos_run_cipher(blowfish, ktask, (kryptos_u8_t *)"blowfish", 8, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(blowfish, ktask, "blowfish", 8, kKryptosECB);
+    kryptos_run_cipher(blowfish, ktask, (kryptos_u8_t *)"blowfish", 8, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -445,14 +445,14 @@ KUTE_TEST_CASE(kryptos_blowfish_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(blowfish, ktask, "blowfish", 8, kKryptosCBC);
+    kryptos_run_cipher(blowfish, ktask, (kryptos_u8_t *)"blowfish", 8, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(blowfish, ktask, "blowfish", 8, kKryptosCBC);
+    kryptos_run_cipher(blowfish, ktask, (kryptos_u8_t *)"blowfish", 8, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -463,14 +463,14 @@ KUTE_TEST_CASE(kryptos_blowfish_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(blowfish, ktask, "blowfish", 8, kKryptosOFB);
+    kryptos_run_cipher(blowfish, ktask, (kryptos_u8_t *)"blowfish", 8, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(blowfish, ktask, "blowfish", 8, kKryptosOFB);
+    kryptos_run_cipher(blowfish, ktask, (kryptos_u8_t *)"blowfish", 8, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -481,14 +481,14 @@ KUTE_TEST_CASE(kryptos_blowfish_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(blowfish, ktask, "blowfish", 8, kKryptosCTR);
+    kryptos_run_cipher(blowfish, ktask, (kryptos_u8_t *)"blowfish", 8, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(blowfish, ktask, "blowfish", 8, kKryptosCTR);
+    kryptos_run_cipher(blowfish, ktask, (kryptos_u8_t *)"blowfish", 8, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -499,7 +499,7 @@ KUTE_TEST_CASE(kryptos_blowfish_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(blowfish, ktask, "blowfish", 8, kKryptosGCM);
+    kryptos_run_cipher(blowfish, ktask, (kryptos_u8_t *)"blowfish", 8, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out == NULL);
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);
@@ -518,14 +518,14 @@ KUTE_TEST_CASE(kryptos_feal_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(feal, ktask, "feal", 4, kKryptosECB, &feal_rounds);
+    kryptos_run_cipher(feal, ktask, (kryptos_u8_t *)"feal", 4, kKryptosECB, &feal_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(feal, ktask, "feal", 4, kKryptosECB, &feal_rounds);
+    kryptos_run_cipher(feal, ktask, (kryptos_u8_t *)"feal", 4, kKryptosECB, &feal_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -536,14 +536,14 @@ KUTE_TEST_CASE(kryptos_feal_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(feal, ktask, "feal", 4, kKryptosCBC, &feal_rounds);
+    kryptos_run_cipher(feal, ktask, (kryptos_u8_t *)"feal", 4, kKryptosCBC, &feal_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(feal, ktask, "feal", 4, kKryptosCBC, &feal_rounds);
+    kryptos_run_cipher(feal, ktask, (kryptos_u8_t *)"feal", 4, kKryptosCBC, &feal_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -554,14 +554,14 @@ KUTE_TEST_CASE(kryptos_feal_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(feal, ktask, "feal", 4, kKryptosOFB, &feal_rounds);
+    kryptos_run_cipher(feal, ktask, (kryptos_u8_t *)"feal", 4, kKryptosOFB, &feal_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(feal, ktask, "feal", 4, kKryptosOFB, &feal_rounds);
+    kryptos_run_cipher(feal, ktask, (kryptos_u8_t *)"feal", 4, kKryptosOFB, &feal_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -572,14 +572,14 @@ KUTE_TEST_CASE(kryptos_feal_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(feal, ktask, "feal", 4, kKryptosCTR, &feal_rounds);
+    kryptos_run_cipher(feal, ktask, (kryptos_u8_t *)"feal", 4, kKryptosCTR, &feal_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(feal, ktask, "feal", 4, kKryptosCTR, &feal_rounds);
+    kryptos_run_cipher(feal, ktask, (kryptos_u8_t *)"feal", 4, kKryptosCTR, &feal_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -590,7 +590,7 @@ KUTE_TEST_CASE(kryptos_feal_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(feal, ktask, "feal", 4, kKryptosGCM, &feal_rounds);
+    kryptos_run_cipher(feal, ktask, (kryptos_u8_t *)"feal", 4, kKryptosGCM, &feal_rounds);
 
     KUTE_ASSERT(ktask->out == NULL);
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);
@@ -608,14 +608,14 @@ KUTE_TEST_CASE(kryptos_camellia_128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(camellia128, ktask, "camellia", 8, kKryptosECB);
+    kryptos_run_cipher(camellia128, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(camellia128, ktask, "camellia", 8, kKryptosECB);
+    kryptos_run_cipher(camellia128, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -626,14 +626,14 @@ KUTE_TEST_CASE(kryptos_camellia_128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(camellia128, ktask, "camellia", 8, kKryptosCBC);
+    kryptos_run_cipher(camellia128, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(camellia128, ktask, "camellia", 8, kKryptosCBC);
+    kryptos_run_cipher(camellia128, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -644,14 +644,14 @@ KUTE_TEST_CASE(kryptos_camellia_128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(camellia128, ktask, "camellia", 8, kKryptosOFB);
+    kryptos_run_cipher(camellia128, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(camellia128, ktask, "camellia", 8, kKryptosOFB);
+    kryptos_run_cipher(camellia128, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -662,14 +662,14 @@ KUTE_TEST_CASE(kryptos_camellia_128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(camellia128, ktask, "camellia", 8, kKryptosCTR);
+    kryptos_run_cipher(camellia128, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(camellia128, ktask, "camellia", 8, kKryptosCTR);
+    kryptos_run_cipher(camellia128, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -680,14 +680,14 @@ KUTE_TEST_CASE(kryptos_camellia_128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(camellia128, ktask, "camellia", 8, kKryptosGCM);
+    kryptos_run_cipher(camellia128, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(camellia128, ktask, "camellia", 8, kKryptosGCM);
+    kryptos_run_cipher(camellia128, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -704,14 +704,14 @@ KUTE_TEST_CASE(kryptos_camellia_192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(camellia192, ktask, "camellia", 8, kKryptosECB);
+    kryptos_run_cipher(camellia192, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(camellia192, ktask, "camellia", 8, kKryptosECB);
+    kryptos_run_cipher(camellia192, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -722,14 +722,14 @@ KUTE_TEST_CASE(kryptos_camellia_192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(camellia192, ktask, "camellia", 8, kKryptosCBC);
+    kryptos_run_cipher(camellia192, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(camellia192, ktask, "camellia", 8, kKryptosCBC);
+    kryptos_run_cipher(camellia192, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -740,14 +740,14 @@ KUTE_TEST_CASE(kryptos_camellia_192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(camellia192, ktask, "camellia", 8, kKryptosOFB);
+    kryptos_run_cipher(camellia192, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(camellia192, ktask, "camellia", 8, kKryptosOFB);
+    kryptos_run_cipher(camellia192, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -758,14 +758,14 @@ KUTE_TEST_CASE(kryptos_camellia_192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(camellia192, ktask, "camellia", 8, kKryptosCTR);
+    kryptos_run_cipher(camellia192, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(camellia192, ktask, "camellia", 8, kKryptosCTR);
+    kryptos_run_cipher(camellia192, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -776,14 +776,14 @@ KUTE_TEST_CASE(kryptos_camellia_192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(camellia192, ktask, "camellia", 8, kKryptosGCM);
+    kryptos_run_cipher(camellia192, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(camellia192, ktask, "camellia", 8, kKryptosGCM);
+    kryptos_run_cipher(camellia192, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -800,14 +800,14 @@ KUTE_TEST_CASE(kryptos_camellia_256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(camellia256, ktask, "camellia", 8, kKryptosECB);
+    kryptos_run_cipher(camellia256, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(camellia256, ktask, "camellia", 8, kKryptosECB);
+    kryptos_run_cipher(camellia256, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -818,14 +818,14 @@ KUTE_TEST_CASE(kryptos_camellia_256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(camellia256, ktask, "camellia", 8, kKryptosCBC);
+    kryptos_run_cipher(camellia256, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(camellia256, ktask, "camellia", 8, kKryptosCBC);
+    kryptos_run_cipher(camellia256, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -836,14 +836,14 @@ KUTE_TEST_CASE(kryptos_camellia_256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(camellia256, ktask, "camellia", 8, kKryptosOFB);
+    kryptos_run_cipher(camellia256, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(camellia256, ktask, "camellia", 8, kKryptosOFB);
+    kryptos_run_cipher(camellia256, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -854,14 +854,14 @@ KUTE_TEST_CASE(kryptos_camellia_256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(camellia256, ktask, "camellia", 8, kKryptosCTR);
+    kryptos_run_cipher(camellia256, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(camellia256, ktask, "camellia", 8, kKryptosCTR);
+    kryptos_run_cipher(camellia256, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -872,14 +872,14 @@ KUTE_TEST_CASE(kryptos_camellia_256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(camellia256, ktask, "camellia", 8, kKryptosGCM);
+    kryptos_run_cipher(camellia256, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(camellia256, ktask, "camellia", 8, kKryptosGCM);
+    kryptos_run_cipher(camellia256, ktask, (kryptos_u8_t *)"camellia", 8, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -896,14 +896,14 @@ KUTE_TEST_CASE(kryptos_cast5_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(cast5, ktask, "cast5", 5, kKryptosECB);
+    kryptos_run_cipher(cast5, ktask, (kryptos_u8_t *)"cast5", 5, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(cast5, ktask, "cast5", 5, kKryptosECB);
+    kryptos_run_cipher(cast5, ktask, (kryptos_u8_t *)"cast5", 5, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -914,14 +914,14 @@ KUTE_TEST_CASE(kryptos_cast5_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(cast5, ktask, "cast5", 5, kKryptosCBC);
+    kryptos_run_cipher(cast5, ktask, (kryptos_u8_t *)"cast5", 5, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(cast5, ktask, "cast5", 5, kKryptosCBC);
+    kryptos_run_cipher(cast5, ktask, (kryptos_u8_t *)"cast5", 5, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -932,14 +932,14 @@ KUTE_TEST_CASE(kryptos_cast5_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(cast5, ktask, "cast5", 5, kKryptosOFB);
+    kryptos_run_cipher(cast5, ktask, (kryptos_u8_t *)"cast5", 5, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(cast5, ktask, "cast5", 5, kKryptosOFB);
+    kryptos_run_cipher(cast5, ktask, (kryptos_u8_t *)"cast5", 5, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -950,14 +950,14 @@ KUTE_TEST_CASE(kryptos_cast5_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(cast5, ktask, "cast5", 5, kKryptosCTR);
+    kryptos_run_cipher(cast5, ktask, (kryptos_u8_t *)"cast5", 5, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(cast5, ktask, "cast5", 5, kKryptosCTR);
+    kryptos_run_cipher(cast5, ktask, (kryptos_u8_t *)"cast5", 5, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -968,7 +968,7 @@ KUTE_TEST_CASE(kryptos_cast5_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(cast5, ktask, "cast5", 5, kKryptosGCM);
+    kryptos_run_cipher(cast5, ktask, (kryptos_u8_t *)"cast5", 5, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out == NULL);
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);
@@ -986,14 +986,14 @@ KUTE_TEST_CASE(kryptos_rc2_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc2, ktask, "rc2", 3, kKryptosECB, &rc2_t1);
+    kryptos_run_cipher(rc2, ktask, (kryptos_u8_t *)"rc2", 3, kKryptosECB, &rc2_t1);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc2, ktask, "rc2", 3, kKryptosECB, &rc2_t1);
+    kryptos_run_cipher(rc2, ktask, (kryptos_u8_t *)"rc2", 3, kKryptosECB, &rc2_t1);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1004,14 +1004,14 @@ KUTE_TEST_CASE(kryptos_rc2_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc2, ktask, "rc2", 3, kKryptosCBC, &rc2_t1);
+    kryptos_run_cipher(rc2, ktask, (kryptos_u8_t *)"rc2", 3, kKryptosCBC, &rc2_t1);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc2, ktask, "rc2", 3, kKryptosCBC, &rc2_t1);
+    kryptos_run_cipher(rc2, ktask, (kryptos_u8_t *)"rc2", 3, kKryptosCBC, &rc2_t1);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1022,14 +1022,14 @@ KUTE_TEST_CASE(kryptos_rc2_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc2, ktask, "rc2", 3, kKryptosOFB, &rc2_t1);
+    kryptos_run_cipher(rc2, ktask, (kryptos_u8_t *)"rc2", 3, kKryptosOFB, &rc2_t1);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc2, ktask, "rc2", 3, kKryptosOFB, &rc2_t1);
+    kryptos_run_cipher(rc2, ktask, (kryptos_u8_t *)"rc2", 3, kKryptosOFB, &rc2_t1);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1040,14 +1040,14 @@ KUTE_TEST_CASE(kryptos_rc2_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc2, ktask, "rc2", 3, kKryptosCTR, &rc2_t1);
+    kryptos_run_cipher(rc2, ktask, (kryptos_u8_t *)"rc2", 3, kKryptosCTR, &rc2_t1);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc2, ktask, "rc2", 3, kKryptosCTR, &rc2_t1);
+    kryptos_run_cipher(rc2, ktask, (kryptos_u8_t *)"rc2", 3, kKryptosCTR, &rc2_t1);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1058,7 +1058,7 @@ KUTE_TEST_CASE(kryptos_rc2_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc2, ktask, "rc2", 3, kKryptosGCM, &rc2_t1);
+    kryptos_run_cipher(rc2, ktask, (kryptos_u8_t *)"rc2", 3, kKryptosGCM, &rc2_t1);
 
     KUTE_ASSERT(ktask->out == NULL);
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);
@@ -1077,14 +1077,14 @@ KUTE_TEST_CASE(kryptos_rc5_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc5, ktask, "rc5", 3, kKryptosECB, &rc5_rounds);
+    kryptos_run_cipher(rc5, ktask, (kryptos_u8_t *)"rc5", 3, kKryptosECB, &rc5_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc5, ktask, "rc5", 3, kKryptosECB, &rc5_rounds);
+    kryptos_run_cipher(rc5, ktask, (kryptos_u8_t *)"rc5", 3, kKryptosECB, &rc5_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1095,14 +1095,14 @@ KUTE_TEST_CASE(kryptos_rc5_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc5, ktask, "rc5", 3, kKryptosCBC, &rc5_rounds);
+    kryptos_run_cipher(rc5, ktask, (kryptos_u8_t *)"rc5", 3, kKryptosCBC, &rc5_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc5, ktask, "rc5", 3, kKryptosCBC, &rc5_rounds);
+    kryptos_run_cipher(rc5, ktask, (kryptos_u8_t *)"rc5", 3, kKryptosCBC, &rc5_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1113,14 +1113,14 @@ KUTE_TEST_CASE(kryptos_rc5_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc5, ktask, "rc5", 3, kKryptosOFB, &rc5_rounds);
+    kryptos_run_cipher(rc5, ktask, (kryptos_u8_t *)"rc5", 3, kKryptosOFB, &rc5_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc5, ktask, "rc5", 3, kKryptosOFB, &rc5_rounds);
+    kryptos_run_cipher(rc5, ktask, (kryptos_u8_t *)"rc5", 3, kKryptosOFB, &rc5_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1131,14 +1131,14 @@ KUTE_TEST_CASE(kryptos_rc5_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc5, ktask, "rc5", 3, kKryptosCTR, &rc5_rounds);
+    kryptos_run_cipher(rc5, ktask, (kryptos_u8_t *)"rc5", 3, kKryptosCTR, &rc5_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc5, ktask, "rc5", 3, kKryptosCTR, &rc5_rounds);
+    kryptos_run_cipher(rc5, ktask, (kryptos_u8_t *)"rc5", 3, kKryptosCTR, &rc5_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1149,7 +1149,7 @@ KUTE_TEST_CASE(kryptos_rc5_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc5, ktask, "rc5", 3, kKryptosGCM, &rc5_rounds);
+    kryptos_run_cipher(rc5, ktask, (kryptos_u8_t *)"rc5", 3, kKryptosGCM, &rc5_rounds);
 
     KUTE_ASSERT(ktask->out == NULL);
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);
@@ -1168,14 +1168,14 @@ KUTE_TEST_CASE(kryptos_rc6_128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_128, ktask, "rc6", 3, kKryptosECB, &rc6_rounds);
+    kryptos_run_cipher(rc6_128, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosECB, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_128, ktask, "rc6", 3, kKryptosECB, &rc6_rounds);
+    kryptos_run_cipher(rc6_128, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosECB, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1186,14 +1186,14 @@ KUTE_TEST_CASE(kryptos_rc6_128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_128, ktask, "rc6", 3, kKryptosCBC, &rc6_rounds);
+    kryptos_run_cipher(rc6_128, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosCBC, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_128, ktask, "rc6", 3, kKryptosCBC, &rc6_rounds);
+    kryptos_run_cipher(rc6_128, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosCBC, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1204,14 +1204,14 @@ KUTE_TEST_CASE(kryptos_rc6_128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_128, ktask, "rc6", 3, kKryptosOFB, &rc6_rounds);
+    kryptos_run_cipher(rc6_128, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosOFB, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_128, ktask, "rc6", 3, kKryptosOFB, &rc6_rounds);
+    kryptos_run_cipher(rc6_128, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosOFB, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1222,14 +1222,14 @@ KUTE_TEST_CASE(kryptos_rc6_128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_128, ktask, "rc6", 3, kKryptosCTR, &rc6_rounds);
+    kryptos_run_cipher(rc6_128, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosCTR, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_128, ktask, "rc6", 3, kKryptosCTR, &rc6_rounds);
+    kryptos_run_cipher(rc6_128, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosCTR, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1240,14 +1240,14 @@ KUTE_TEST_CASE(kryptos_rc6_128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_128, ktask, "rc6", 3, kKryptosGCM, &rc6_rounds);
+    kryptos_run_cipher(rc6_128, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosGCM, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_128, ktask, "rc6", 3, kKryptosGCM, &rc6_rounds);
+    kryptos_run_cipher(rc6_128, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosGCM, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1265,14 +1265,14 @@ KUTE_TEST_CASE(kryptos_rc6_192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_192, ktask, "rc6", 3, kKryptosECB, &rc6_rounds);
+    kryptos_run_cipher(rc6_192, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosECB, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_192, ktask, "rc6", 3, kKryptosECB, &rc6_rounds);
+    kryptos_run_cipher(rc6_192, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosECB, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1283,14 +1283,14 @@ KUTE_TEST_CASE(kryptos_rc6_192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_192, ktask, "rc6", 3, kKryptosCBC, &rc6_rounds);
+    kryptos_run_cipher(rc6_192, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosCBC, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_192, ktask, "rc6", 3, kKryptosCBC, &rc6_rounds);
+    kryptos_run_cipher(rc6_192, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosCBC, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1301,14 +1301,14 @@ KUTE_TEST_CASE(kryptos_rc6_192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_192, ktask, "rc6", 3, kKryptosOFB, &rc6_rounds);
+    kryptos_run_cipher(rc6_192, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosOFB, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_192, ktask, "rc6", 3, kKryptosOFB, &rc6_rounds);
+    kryptos_run_cipher(rc6_192, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosOFB, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1319,14 +1319,14 @@ KUTE_TEST_CASE(kryptos_rc6_192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_192, ktask, "rc6", 3, kKryptosCTR, &rc6_rounds);
+    kryptos_run_cipher(rc6_192, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosCTR, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_192, ktask, "rc6", 3, kKryptosCTR, &rc6_rounds);
+    kryptos_run_cipher(rc6_192, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosCTR, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1337,14 +1337,14 @@ KUTE_TEST_CASE(kryptos_rc6_192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_192, ktask, "rc6", 3, kKryptosGCM, &rc6_rounds);
+    kryptos_run_cipher(rc6_192, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosGCM, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_192, ktask, "rc6", 3, kKryptosGCM, &rc6_rounds);
+    kryptos_run_cipher(rc6_192, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosGCM, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1362,14 +1362,14 @@ KUTE_TEST_CASE(kryptos_rc6_256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_256, ktask, "rc6", 3, kKryptosECB, &rc6_rounds);
+    kryptos_run_cipher(rc6_256, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosECB, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_256, ktask, "rc6", 3, kKryptosECB, &rc6_rounds);
+    kryptos_run_cipher(rc6_256, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosECB, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1380,14 +1380,14 @@ KUTE_TEST_CASE(kryptos_rc6_256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_256, ktask, "rc6", 3, kKryptosCBC, &rc6_rounds);
+    kryptos_run_cipher(rc6_256, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosCBC, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_256, ktask, "rc6", 3, kKryptosCBC, &rc6_rounds);
+    kryptos_run_cipher(rc6_256, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosCBC, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1398,14 +1398,14 @@ KUTE_TEST_CASE(kryptos_rc6_256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_256, ktask, "rc6", 3, kKryptosOFB, &rc6_rounds);
+    kryptos_run_cipher(rc6_256, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosOFB, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_256, ktask, "rc6", 3, kKryptosOFB, &rc6_rounds);
+    kryptos_run_cipher(rc6_256, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosOFB, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1416,14 +1416,14 @@ KUTE_TEST_CASE(kryptos_rc6_256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_256, ktask, "rc6", 3, kKryptosCTR, &rc6_rounds);
+    kryptos_run_cipher(rc6_256, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosCTR, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_256, ktask, "rc6", 3, kKryptosCTR, &rc6_rounds);
+    kryptos_run_cipher(rc6_256, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosCTR, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1434,14 +1434,14 @@ KUTE_TEST_CASE(kryptos_rc6_256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_256, ktask, "rc6", 3, kKryptosGCM, &rc6_rounds);
+    kryptos_run_cipher(rc6_256, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosGCM, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(rc6_256, ktask, "rc6", 3, kKryptosGCM, &rc6_rounds);
+    kryptos_run_cipher(rc6_256, ktask, (kryptos_u8_t *)"rc6", 3, kKryptosGCM, &rc6_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1459,14 +1459,14 @@ KUTE_TEST_CASE(kryptos_saferk64_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(saferk64, ktask, "saferk64", 8, kKryptosECB, &saferk64_rounds);
+    kryptos_run_cipher(saferk64, ktask, (kryptos_u8_t *)"saferk64", 8, kKryptosECB, &saferk64_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(saferk64, ktask, "saferk64", 8, kKryptosECB, &saferk64_rounds);
+    kryptos_run_cipher(saferk64, ktask, (kryptos_u8_t *)"saferk64", 8, kKryptosECB, &saferk64_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1477,14 +1477,14 @@ KUTE_TEST_CASE(kryptos_saferk64_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(saferk64, ktask, "saferk64", 8, kKryptosCBC, &saferk64_rounds);
+    kryptos_run_cipher(saferk64, ktask, (kryptos_u8_t *)"saferk64", 8, kKryptosCBC, &saferk64_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(saferk64, ktask, "saferk64", 8, kKryptosCBC, &saferk64_rounds);
+    kryptos_run_cipher(saferk64, ktask, (kryptos_u8_t *)"saferk64", 8, kKryptosCBC, &saferk64_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1495,14 +1495,14 @@ KUTE_TEST_CASE(kryptos_saferk64_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(saferk64, ktask, "saferk64", 8, kKryptosOFB, &saferk64_rounds);
+    kryptos_run_cipher(saferk64, ktask, (kryptos_u8_t *)"saferk64", 8, kKryptosOFB, &saferk64_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(saferk64, ktask, "saferk64", 8, kKryptosOFB, &saferk64_rounds);
+    kryptos_run_cipher(saferk64, ktask, (kryptos_u8_t *)"saferk64", 8, kKryptosOFB, &saferk64_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1513,14 +1513,14 @@ KUTE_TEST_CASE(kryptos_saferk64_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(saferk64, ktask, "saferk64", 8, kKryptosCTR, &saferk64_rounds);
+    kryptos_run_cipher(saferk64, ktask, (kryptos_u8_t *)"saferk64", 8, kKryptosCTR, &saferk64_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(saferk64, ktask, "saferk64", 8, kKryptosCTR, &saferk64_rounds);
+    kryptos_run_cipher(saferk64, ktask, (kryptos_u8_t *)"saferk64", 8, kKryptosCTR, &saferk64_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1531,7 +1531,7 @@ KUTE_TEST_CASE(kryptos_saferk64_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(saferk64, ktask, "saferk64", 8, kKryptosGCM, &saferk64_rounds);
+    kryptos_run_cipher(saferk64, ktask, (kryptos_u8_t *)"saferk64", 8, kKryptosGCM, &saferk64_rounds);
 
     KUTE_ASSERT(ktask->out == NULL);
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);
@@ -1549,14 +1549,14 @@ KUTE_TEST_CASE(kryptos_aes128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(aes128, ktask, "aes128", 6, kKryptosECB);
+    kryptos_run_cipher(aes128, ktask, (kryptos_u8_t *)"aes128", 6, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(aes128, ktask, "aes128", 6, kKryptosECB);
+    kryptos_run_cipher(aes128, ktask, (kryptos_u8_t *)"aes128", 6, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1567,14 +1567,14 @@ KUTE_TEST_CASE(kryptos_aes128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(aes128, ktask, "aes128", 6, kKryptosCBC);
+    kryptos_run_cipher(aes128, ktask, (kryptos_u8_t *)"aes128", 6, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(aes128, ktask, "aes128", 6, kKryptosCBC);
+    kryptos_run_cipher(aes128, ktask, (kryptos_u8_t *)"aes128", 6, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1585,14 +1585,14 @@ KUTE_TEST_CASE(kryptos_aes128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(aes128, ktask, "aes128", 6, kKryptosOFB);
+    kryptos_run_cipher(aes128, ktask, (kryptos_u8_t *)"aes128", 6, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(aes128, ktask, "aes128", 6, kKryptosOFB);
+    kryptos_run_cipher(aes128, ktask, (kryptos_u8_t *)"aes128", 6, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1603,14 +1603,14 @@ KUTE_TEST_CASE(kryptos_aes128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(aes128, ktask, "aes128", 6, kKryptosCTR);
+    kryptos_run_cipher(aes128, ktask, (kryptos_u8_t *)"aes128", 6, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(aes128, ktask, "aes128", 6, kKryptosCTR);
+    kryptos_run_cipher(aes128, ktask, (kryptos_u8_t *)"aes128", 6, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1621,14 +1621,14 @@ KUTE_TEST_CASE(kryptos_aes128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(aes128, ktask, "aes128", 6, kKryptosGCM);
+    kryptos_run_cipher(aes128, ktask, (kryptos_u8_t *)"aes128", 6, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(aes128, ktask, "aes128", 6, kKryptosGCM);
+    kryptos_run_cipher(aes128, ktask, (kryptos_u8_t *)"aes128", 6, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1645,14 +1645,14 @@ KUTE_TEST_CASE(kryptos_aes192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(aes192, ktask, "aes192", 6, kKryptosECB);
+    kryptos_run_cipher(aes192, ktask, (kryptos_u8_t *)"aes192", 6, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(aes192, ktask, "aes192", 6, kKryptosECB);
+    kryptos_run_cipher(aes192, ktask, (kryptos_u8_t *)"aes192", 6, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1663,14 +1663,14 @@ KUTE_TEST_CASE(kryptos_aes192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(aes192, ktask, "aes192", 6, kKryptosCBC);
+    kryptos_run_cipher(aes192, ktask, (kryptos_u8_t *)"aes192", 6, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(aes192, ktask, "aes192", 6, kKryptosCBC);
+    kryptos_run_cipher(aes192, ktask, (kryptos_u8_t *)"aes192", 6, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1681,14 +1681,14 @@ KUTE_TEST_CASE(kryptos_aes192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(aes192, ktask, "aes192", 6, kKryptosOFB);
+    kryptos_run_cipher(aes192, ktask, (kryptos_u8_t *)"aes192", 6, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(aes192, ktask, "aes192", 6, kKryptosOFB);
+    kryptos_run_cipher(aes192, ktask, (kryptos_u8_t *)"aes192", 6, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1699,14 +1699,14 @@ KUTE_TEST_CASE(kryptos_aes192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(aes192, ktask, "aes192", 6, kKryptosCTR);
+    kryptos_run_cipher(aes192, ktask, (kryptos_u8_t *)"aes192", 6, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(aes192, ktask, "aes192", 6, kKryptosCTR);
+    kryptos_run_cipher(aes192, ktask, (kryptos_u8_t *)"aes192", 6, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1717,14 +1717,14 @@ KUTE_TEST_CASE(kryptos_aes192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(aes192, ktask, "aes192", 6, kKryptosGCM);
+    kryptos_run_cipher(aes192, ktask, (kryptos_u8_t *)"aes192", 6, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(aes192, ktask, "aes192", 6, kKryptosGCM);
+    kryptos_run_cipher(aes192, ktask, (kryptos_u8_t*)"aes192", 6, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1741,14 +1741,14 @@ KUTE_TEST_CASE(kryptos_aes256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(aes256, ktask, "aes256", 6, kKryptosECB);
+    kryptos_run_cipher(aes256, ktask, (kryptos_u8_t *)"aes256", 6, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(aes256, ktask, "aes256", 6, kKryptosECB);
+    kryptos_run_cipher(aes256, ktask, (kryptos_u8_t *)"aes256", 6, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1759,14 +1759,14 @@ KUTE_TEST_CASE(kryptos_aes256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(aes256, ktask, "aes256", 6, kKryptosCBC);
+    kryptos_run_cipher(aes256, ktask, (kryptos_u8_t *)"aes256", 6, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(aes256, ktask, "aes256", 6, kKryptosCBC);
+    kryptos_run_cipher(aes256, ktask, (kryptos_u8_t *)"aes256", 6, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1777,14 +1777,14 @@ KUTE_TEST_CASE(kryptos_aes256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(aes256, ktask, "aes256", 6, kKryptosOFB);
+    kryptos_run_cipher(aes256, ktask, (kryptos_u8_t *)"aes256", 6, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(aes256, ktask, "aes256", 6, kKryptosOFB);
+    kryptos_run_cipher(aes256, ktask, (kryptos_u8_t *)"aes256", 6, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1795,14 +1795,14 @@ KUTE_TEST_CASE(kryptos_aes256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(aes256, ktask, "aes256", 6, kKryptosCTR);
+    kryptos_run_cipher(aes256, ktask, (kryptos_u8_t *)"aes256", 6, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(aes256, ktask, "aes256", 6, kKryptosCTR);
+    kryptos_run_cipher(aes256, ktask, (kryptos_u8_t *)"aes256", 6, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1813,14 +1813,14 @@ KUTE_TEST_CASE(kryptos_aes256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(aes256, ktask, "aes256", 6, kKryptosGCM);
+    kryptos_run_cipher(aes256, ktask, (kryptos_u8_t *)"aes256", 6, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(aes256, ktask, "aes256", 6, kKryptosGCM);
+    kryptos_run_cipher(aes256, ktask, (kryptos_u8_t *)"aes256", 6, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1837,14 +1837,14 @@ KUTE_TEST_CASE(kryptos_serpent_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(serpent, ktask, "serpent", 7, kKryptosECB);
+    kryptos_run_cipher(serpent, ktask, (kryptos_u8_t *)"serpent", 7, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(serpent, ktask, "serpent", 7, kKryptosECB);
+    kryptos_run_cipher(serpent, ktask, (kryptos_u8_t *)"serpent", 7, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1855,14 +1855,14 @@ KUTE_TEST_CASE(kryptos_serpent_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(serpent, ktask, "serpent", 7, kKryptosCBC);
+    kryptos_run_cipher(serpent, ktask, (kryptos_u8_t *)"serpent", 7, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(serpent, ktask, "serpent", 7, kKryptosCBC);
+    kryptos_run_cipher(serpent, ktask, (kryptos_u8_t *)"serpent", 7, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1873,14 +1873,14 @@ KUTE_TEST_CASE(kryptos_serpent_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(serpent, ktask, "serpent", 7, kKryptosOFB);
+    kryptos_run_cipher(serpent, ktask, (kryptos_u8_t *)"serpent", 7, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(serpent, ktask, "serpent", 7, kKryptosOFB);
+    kryptos_run_cipher(serpent, ktask, (kryptos_u8_t *)"serpent", 7, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1891,14 +1891,14 @@ KUTE_TEST_CASE(kryptos_serpent_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(serpent, ktask, "serpent", 7, kKryptosCTR);
+    kryptos_run_cipher(serpent, ktask, (kryptos_u8_t *)"serpent", 7, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(serpent, ktask, "serpent", 7, kKryptosCTR);
+    kryptos_run_cipher(serpent, ktask, (kryptos_u8_t *)"serpent", 7, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1909,14 +1909,14 @@ KUTE_TEST_CASE(kryptos_serpent_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(serpent, ktask, "serpent", 7, kKryptosGCM);
+    kryptos_run_cipher(serpent, ktask, (kryptos_u8_t *)"serpent", 7, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(serpent, ktask, "serpent", 7, kKryptosGCM);
+    kryptos_run_cipher(serpent, ktask, (kryptos_u8_t *)"serpent", 7, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -1935,11 +1935,11 @@ KUTE_TEST_CASE(kryptos_triple_des_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    triple_des_key2 = "noel";
+    triple_des_key2 = (kryptos_u8_t *)"noel";
     triple_des_key2_size = 4;
-    triple_des_key3 = "mitch";
+    triple_des_key3 = (kryptos_u8_t *)"mitch";
     triple_des_key3_size = 5;
-    kryptos_run_cipher(triple_des, ktask, "jimi", 4, kKryptosECB,
+    kryptos_run_cipher(triple_des, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosECB,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out != NULL);
@@ -1947,7 +1947,7 @@ KUTE_TEST_CASE(kryptos_triple_des_dsl_tests)
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(triple_des, ktask, "jimi", 4, kKryptosECB,
+    kryptos_run_cipher(triple_des, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosECB,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
@@ -1959,11 +1959,11 @@ KUTE_TEST_CASE(kryptos_triple_des_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    triple_des_key2 = "buddy";
+    triple_des_key2 = (kryptos_u8_t *)"buddy";
     triple_des_key2_size = 5;
-    triple_des_key3 = "billy";
+    triple_des_key3 = (kryptos_u8_t *)"billy";
     triple_des_key3_size = 5;
-    kryptos_run_cipher(triple_des, ktask, "jimi", 4, kKryptosCBC,
+    kryptos_run_cipher(triple_des, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosCBC,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out != NULL);
@@ -1971,7 +1971,7 @@ KUTE_TEST_CASE(kryptos_triple_des_dsl_tests)
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(triple_des, ktask, "jimi", 4, kKryptosCBC,
+    kryptos_run_cipher(triple_des, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosCBC,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
@@ -1983,11 +1983,11 @@ KUTE_TEST_CASE(kryptos_triple_des_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    triple_des_key2 = "buddy";
+    triple_des_key2 = (kryptos_u8_t *)"buddy";
     triple_des_key2_size = 5;
-    triple_des_key3 = "billy";
+    triple_des_key3 = (kryptos_u8_t *)"billy";
     triple_des_key3_size = 5;
-    kryptos_run_cipher(triple_des, ktask, "jimi", 4, kKryptosOFB,
+    kryptos_run_cipher(triple_des, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosOFB,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out != NULL);
@@ -1995,7 +1995,7 @@ KUTE_TEST_CASE(kryptos_triple_des_dsl_tests)
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(triple_des, ktask, "jimi", 4, kKryptosOFB,
+    kryptos_run_cipher(triple_des, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosOFB,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
@@ -2007,11 +2007,11 @@ KUTE_TEST_CASE(kryptos_triple_des_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    triple_des_key2 = "buddy";
+    triple_des_key2 = (kryptos_u8_t *)"buddy";
     triple_des_key2_size = 5;
-    triple_des_key3 = "billy";
+    triple_des_key3 = (kryptos_u8_t *)"billy";
     triple_des_key3_size = 5;
-    kryptos_run_cipher(triple_des, ktask, "jimi", 4, kKryptosCTR,
+    kryptos_run_cipher(triple_des, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosCTR,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out != NULL);
@@ -2019,7 +2019,7 @@ KUTE_TEST_CASE(kryptos_triple_des_dsl_tests)
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(triple_des, ktask, "jimi", 4, kKryptosCTR,
+    kryptos_run_cipher(triple_des, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosCTR,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
@@ -2031,11 +2031,11 @@ KUTE_TEST_CASE(kryptos_triple_des_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    triple_des_key2 = "buddy";
+    triple_des_key2 = (kryptos_u8_t *)"buddy";
     triple_des_key2_size = 5;
-    triple_des_key3 = "billy";
+    triple_des_key3 = (kryptos_u8_t *)"billy";
     triple_des_key3_size = 5;
-    kryptos_run_cipher(triple_des, ktask, "jimi", 4, kKryptosGCM,
+    kryptos_run_cipher(triple_des, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosGCM,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out == NULL);
@@ -2056,11 +2056,11 @@ KUTE_TEST_CASE(kryptos_triple_des_ede_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    triple_des_key2 = "noel";
+    triple_des_key2 = (kryptos_u8_t *)"noel";
     triple_des_key2_size = 4;
-    triple_des_key3 = "mitch";
+    triple_des_key3 = (kryptos_u8_t *)"mitch";
     triple_des_key3_size = 5;
-    kryptos_run_cipher(triple_des_ede, ktask, "jimi", 4, kKryptosECB,
+    kryptos_run_cipher(triple_des_ede, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosECB,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out != NULL);
@@ -2068,7 +2068,7 @@ KUTE_TEST_CASE(kryptos_triple_des_ede_dsl_tests)
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(triple_des_ede, ktask, "jimi", 4, kKryptosECB,
+    kryptos_run_cipher(triple_des_ede, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosECB,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
@@ -2080,11 +2080,11 @@ KUTE_TEST_CASE(kryptos_triple_des_ede_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    triple_des_key2 = "buddy";
+    triple_des_key2 = (kryptos_u8_t *)"buddy";
     triple_des_key2_size = 5;
-    triple_des_key3 = "billy";
+    triple_des_key3 = (kryptos_u8_t *)"billy";
     triple_des_key3_size = 5;
-    kryptos_run_cipher(triple_des_ede, ktask, "jimi", 4, kKryptosCBC,
+    kryptos_run_cipher(triple_des_ede, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosCBC,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out != NULL);
@@ -2092,7 +2092,7 @@ KUTE_TEST_CASE(kryptos_triple_des_ede_dsl_tests)
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(triple_des_ede, ktask, "jimi", 4, kKryptosCBC,
+    kryptos_run_cipher(triple_des_ede, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosCBC,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
@@ -2104,11 +2104,11 @@ KUTE_TEST_CASE(kryptos_triple_des_ede_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    triple_des_key2 = "buddy";
+    triple_des_key2 = (kryptos_u8_t *)"buddy";
     triple_des_key2_size = 5;
-    triple_des_key3 = "billy";
+    triple_des_key3 = (kryptos_u8_t *)"billy";
     triple_des_key3_size = 5;
-    kryptos_run_cipher(triple_des_ede, ktask, "jimi", 4, kKryptosOFB,
+    kryptos_run_cipher(triple_des_ede, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosOFB,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out != NULL);
@@ -2116,7 +2116,7 @@ KUTE_TEST_CASE(kryptos_triple_des_ede_dsl_tests)
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(triple_des_ede, ktask, "jimi", 4, kKryptosOFB,
+    kryptos_run_cipher(triple_des_ede, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosOFB,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
@@ -2128,11 +2128,11 @@ KUTE_TEST_CASE(kryptos_triple_des_ede_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    triple_des_key2 = "buddy";
+    triple_des_key2 = (kryptos_u8_t *)"buddy";
     triple_des_key2_size = 5;
-    triple_des_key3 = "billy";
+    triple_des_key3 = (kryptos_u8_t *)"billy";
     triple_des_key3_size = 5;
-    kryptos_run_cipher(triple_des_ede, ktask, "jimi", 4, kKryptosCTR,
+    kryptos_run_cipher(triple_des_ede, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosCTR,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out != NULL);
@@ -2140,7 +2140,7 @@ KUTE_TEST_CASE(kryptos_triple_des_ede_dsl_tests)
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(triple_des_ede, ktask, "jimi", 4, kKryptosCTR,
+    kryptos_run_cipher(triple_des_ede, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosCTR,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
@@ -2152,11 +2152,11 @@ KUTE_TEST_CASE(kryptos_triple_des_ede_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    triple_des_key2 = "buddy";
+    triple_des_key2 = (kryptos_u8_t *)"buddy";
     triple_des_key2_size = 5;
-    triple_des_key3 = "billy";
+    triple_des_key3 = (kryptos_u8_t *)"billy";
     triple_des_key3_size = 5;
-    kryptos_run_cipher(triple_des_ede, ktask, "jimi", 4, kKryptosGCM,
+    kryptos_run_cipher(triple_des_ede, ktask, (kryptos_u8_t *)"jimi", 4, kKryptosGCM,
                        triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     KUTE_ASSERT(ktask->out == NULL);
@@ -2175,14 +2175,14 @@ KUTE_TEST_CASE(kryptos_tea_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(tea, ktask, "tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosECB);
+    kryptos_run_cipher(tea, ktask, (kryptos_u8_t *)"tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(tea, ktask, "tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosECB);
+    kryptos_run_cipher(tea, ktask, (kryptos_u8_t *)"tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2193,14 +2193,14 @@ KUTE_TEST_CASE(kryptos_tea_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(tea, ktask, "tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCBC);
+    kryptos_run_cipher(tea, ktask, (kryptos_u8_t *)"tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(tea, ktask, "tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCBC);
+    kryptos_run_cipher(tea, ktask, (kryptos_u8_t *)"tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2211,14 +2211,14 @@ KUTE_TEST_CASE(kryptos_tea_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(tea, ktask, "tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosOFB);
+    kryptos_run_cipher(tea, ktask, (kryptos_u8_t *)"tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(tea, ktask, "tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosOFB);
+    kryptos_run_cipher(tea, ktask, (kryptos_u8_t *)"tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2229,14 +2229,14 @@ KUTE_TEST_CASE(kryptos_tea_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(tea, ktask, "tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCTR);
+    kryptos_run_cipher(tea, ktask, (kryptos_u8_t *)"tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(tea, ktask, "tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCTR);
+    kryptos_run_cipher(tea, ktask, (kryptos_u8_t *)"tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2247,7 +2247,7 @@ KUTE_TEST_CASE(kryptos_tea_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(tea, ktask, "tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosGCM);
+    kryptos_run_cipher(tea, ktask, (kryptos_u8_t *)"tea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out == NULL);
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);
@@ -2266,14 +2266,14 @@ KUTE_TEST_CASE(kryptos_xtea_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(xtea, ktask, "xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosECB, &xtea_rounds);
+    kryptos_run_cipher(xtea, ktask, (kryptos_u8_t *)"xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosECB, &xtea_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(xtea, ktask, "xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosECB, &xtea_rounds);
+    kryptos_run_cipher(xtea, ktask, (kryptos_u8_t *)"xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosECB, &xtea_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2284,14 +2284,14 @@ KUTE_TEST_CASE(kryptos_xtea_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(xtea, ktask, "xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCBC, &xtea_rounds);
+    kryptos_run_cipher(xtea, ktask, (kryptos_u8_t *)"xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCBC, &xtea_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(xtea, ktask, "xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCBC, &xtea_rounds);
+    kryptos_run_cipher(xtea, ktask, (kryptos_u8_t *)"xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCBC, &xtea_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2302,14 +2302,14 @@ KUTE_TEST_CASE(kryptos_xtea_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(xtea, ktask, "xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosOFB, &xtea_rounds);
+    kryptos_run_cipher(xtea, ktask, (kryptos_u8_t *)"xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosOFB, &xtea_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(xtea, ktask, "xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosOFB, &xtea_rounds);
+    kryptos_run_cipher(xtea, ktask, (kryptos_u8_t *)"xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosOFB, &xtea_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2320,14 +2320,14 @@ KUTE_TEST_CASE(kryptos_xtea_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(xtea, ktask, "xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCTR, &xtea_rounds);
+    kryptos_run_cipher(xtea, ktask, (kryptos_u8_t *)"xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCTR, &xtea_rounds);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(xtea, ktask, "xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCTR, &xtea_rounds);
+    kryptos_run_cipher(xtea, ktask, (kryptos_u8_t *)"xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosCTR, &xtea_rounds);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2338,7 +2338,7 @@ KUTE_TEST_CASE(kryptos_xtea_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(xtea, ktask, "xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosGCM, &xtea_rounds);
+    kryptos_run_cipher(xtea, ktask, (kryptos_u8_t *)"xtea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16, kKryptosGCM, &xtea_rounds);
 
     KUTE_ASSERT(ktask->out == NULL);
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);
@@ -2356,14 +2356,14 @@ KUTE_TEST_CASE(kryptos_misty1_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(misty1, ktask, "misty1", 6, kKryptosECB);
+    kryptos_run_cipher(misty1, ktask, (kryptos_u8_t *)"misty1", 6, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(misty1, ktask, "misty1", 6, kKryptosECB);
+    kryptos_run_cipher(misty1, ktask, (kryptos_u8_t *)"misty1", 6, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2374,14 +2374,14 @@ KUTE_TEST_CASE(kryptos_misty1_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(misty1, ktask, "misty1", 6, kKryptosCBC);
+    kryptos_run_cipher(misty1, ktask, (kryptos_u8_t *)"misty1", 6, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(misty1, ktask, "misty1", 6, kKryptosCBC);
+    kryptos_run_cipher(misty1, ktask, (kryptos_u8_t *)"misty1", 6, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2392,14 +2392,14 @@ KUTE_TEST_CASE(kryptos_misty1_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(misty1, ktask, "misty1", 6, kKryptosOFB);
+    kryptos_run_cipher(misty1, ktask, (kryptos_u8_t *)"misty1", 6, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(misty1, ktask, "misty1", 6, kKryptosOFB);
+    kryptos_run_cipher(misty1, ktask, (kryptos_u8_t *)"misty1", 6, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2410,14 +2410,14 @@ KUTE_TEST_CASE(kryptos_misty1_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(misty1, ktask, "misty1", 6, kKryptosCTR);
+    kryptos_run_cipher(misty1, ktask, (kryptos_u8_t *)"misty1", 6, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(misty1, ktask, "misty1", 6, kKryptosCTR);
+    kryptos_run_cipher(misty1, ktask, (kryptos_u8_t *)"misty1", 6, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2428,7 +2428,7 @@ KUTE_TEST_CASE(kryptos_misty1_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(misty1, ktask, "misty1", 6, kKryptosGCM);
+    kryptos_run_cipher(misty1, ktask, (kryptos_u8_t *)"misty1", 6, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out == NULL);
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);
@@ -2446,14 +2446,14 @@ KUTE_TEST_CASE(kryptos_mars128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(mars128, ktask, "mars128", 7, kKryptosECB);
+    kryptos_run_cipher(mars128, ktask, (kryptos_u8_t *)"mars128", 7, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(mars128, ktask, "mars128", 7, kKryptosECB);
+    kryptos_run_cipher(mars128, ktask, (kryptos_u8_t *)"mars128", 7, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2464,14 +2464,14 @@ KUTE_TEST_CASE(kryptos_mars128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(mars128, ktask, "mars128", 7, kKryptosCBC);
+    kryptos_run_cipher(mars128, ktask, (kryptos_u8_t *)"mars128", 7, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(mars128, ktask, "mars128", 7, kKryptosCBC);
+    kryptos_run_cipher(mars128, ktask, (kryptos_u8_t *)"mars128", 7, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2482,14 +2482,14 @@ KUTE_TEST_CASE(kryptos_mars128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(mars128, ktask, "mars128", 7, kKryptosOFB);
+    kryptos_run_cipher(mars128, ktask, (kryptos_u8_t *)"mars128", 7, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(mars128, ktask, "mars128", 7, kKryptosOFB);
+    kryptos_run_cipher(mars128, ktask, (kryptos_u8_t *)"mars128", 7, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2500,14 +2500,14 @@ KUTE_TEST_CASE(kryptos_mars128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(mars128, ktask, "mars128", 7, kKryptosCTR);
+    kryptos_run_cipher(mars128, ktask, (kryptos_u8_t *)"mars128", 7, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(mars128, ktask, "mars128", 7, kKryptosCTR);
+    kryptos_run_cipher(mars128, ktask, (kryptos_u8_t *)"mars128", 7, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2518,14 +2518,14 @@ KUTE_TEST_CASE(kryptos_mars128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(mars128, ktask, "mars128", 7, kKryptosGCM);
+    kryptos_run_cipher(mars128, ktask, (kryptos_u8_t *)"mars128", 7, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(mars128, ktask, "mars128", 7, kKryptosGCM);
+    kryptos_run_cipher(mars128, ktask, (kryptos_u8_t *)"mars128", 7, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2542,14 +2542,14 @@ KUTE_TEST_CASE(kryptos_mars192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(mars192, ktask, "mars192", 7, kKryptosECB);
+    kryptos_run_cipher(mars192, ktask, (kryptos_u8_t *)"mars192", 7, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(mars192, ktask, "mars192", 7, kKryptosECB);
+    kryptos_run_cipher(mars192, ktask, (kryptos_u8_t *)"mars192", 7, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2560,14 +2560,14 @@ KUTE_TEST_CASE(kryptos_mars192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(mars192, ktask, "mars192", 7, kKryptosCBC);
+    kryptos_run_cipher(mars192, ktask, (kryptos_u8_t *)"mars192", 7, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(mars192, ktask, "mars192", 7, kKryptosCBC);
+    kryptos_run_cipher(mars192, ktask, (kryptos_u8_t *)"mars192", 7, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2578,14 +2578,14 @@ KUTE_TEST_CASE(kryptos_mars192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(mars192, ktask, "mars192", 7, kKryptosOFB);
+    kryptos_run_cipher(mars192, ktask, (kryptos_u8_t *)"mars192", 7, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(mars192, ktask, "mars192", 7, kKryptosOFB);
+    kryptos_run_cipher(mars192, ktask, (kryptos_u8_t *)"mars192", 7, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2596,14 +2596,14 @@ KUTE_TEST_CASE(kryptos_mars192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(mars192, ktask, "mars192", 7, kKryptosCTR);
+    kryptos_run_cipher(mars192, ktask, (kryptos_u8_t *)"mars192", 7, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(mars192, ktask, "mars192", 7, kKryptosCTR);
+    kryptos_run_cipher(mars192, ktask, (kryptos_u8_t *)"mars192", 7, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2614,14 +2614,14 @@ KUTE_TEST_CASE(kryptos_mars192_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(mars192, ktask, "mars192", 7, kKryptosGCM);
+    kryptos_run_cipher(mars192, ktask, (kryptos_u8_t *)"mars192", 7, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(mars192, ktask, "mars192", 7, kKryptosGCM);
+    kryptos_run_cipher(mars192, ktask, (kryptos_u8_t *)"mars192", 7, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2638,14 +2638,14 @@ KUTE_TEST_CASE(kryptos_mars256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(mars256, ktask, "mars256", 7, kKryptosECB);
+    kryptos_run_cipher(mars256, ktask, (kryptos_u8_t *)"mars256", 7, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(mars256, ktask, "mars256", 7, kKryptosECB);
+    kryptos_run_cipher(mars256, ktask, (kryptos_u8_t *)"mars256", 7, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2656,14 +2656,14 @@ KUTE_TEST_CASE(kryptos_mars256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(mars256, ktask, "mars256", 7, kKryptosCBC);
+    kryptos_run_cipher(mars256, ktask, (kryptos_u8_t *)"mars256", 7, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(mars256, ktask, "mars256", 7, kKryptosCBC);
+    kryptos_run_cipher(mars256, ktask, (kryptos_u8_t *)"mars256", 7, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2674,14 +2674,14 @@ KUTE_TEST_CASE(kryptos_mars256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(mars256, ktask, "mars256", 7, kKryptosOFB);
+    kryptos_run_cipher(mars256, ktask, (kryptos_u8_t *)"mars256", 7, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(mars256, ktask, "mars256", 7, kKryptosOFB);
+    kryptos_run_cipher(mars256, ktask, (kryptos_u8_t *)"mars256", 7, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2692,14 +2692,14 @@ KUTE_TEST_CASE(kryptos_mars256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(mars256, ktask, "mars256", 7, kKryptosCTR);
+    kryptos_run_cipher(mars256, ktask, (kryptos_u8_t *)"mars256", 7, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(mars256, ktask, "mars256", 7, kKryptosCTR);
+    kryptos_run_cipher(mars256, ktask, (kryptos_u8_t *)"mars256", 7, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2710,14 +2710,14 @@ KUTE_TEST_CASE(kryptos_mars256_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(mars256, ktask, "mars256", 7, kKryptosGCM);
+    kryptos_run_cipher(mars256, ktask, (kryptos_u8_t *)"mars256", 7, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(mars256, ktask, "mars256", 7, kKryptosGCM);
+    kryptos_run_cipher(mars256, ktask, (kryptos_u8_t *)"mars256", 7, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2734,14 +2734,14 @@ KUTE_TEST_CASE(kryptos_present80_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(present80, ktask, "present80", 9, kKryptosECB);
+    kryptos_run_cipher(present80, ktask, (kryptos_u8_t *)"present80", 9, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(present80, ktask, "present80", 9, kKryptosECB);
+    kryptos_run_cipher(present80, ktask, (kryptos_u8_t *)"present80", 9, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2752,14 +2752,14 @@ KUTE_TEST_CASE(kryptos_present80_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(present80, ktask, "present80", 9, kKryptosCBC);
+    kryptos_run_cipher(present80, ktask, (kryptos_u8_t *)"present80", 9, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(present80, ktask, "present80", 9, kKryptosCBC);
+    kryptos_run_cipher(present80, ktask, (kryptos_u8_t *)"present80", 9, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2770,14 +2770,14 @@ KUTE_TEST_CASE(kryptos_present80_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(present80, ktask, "present80", 9, kKryptosOFB);
+    kryptos_run_cipher(present80, ktask, (kryptos_u8_t *)"present80", 9, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(present80, ktask, "present80", 9, kKryptosOFB);
+    kryptos_run_cipher(present80, ktask, (kryptos_u8_t *)"present80", 9, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2788,14 +2788,14 @@ KUTE_TEST_CASE(kryptos_present80_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(present80, ktask, "present80", 9, kKryptosCTR);
+    kryptos_run_cipher(present80, ktask, (kryptos_u8_t *)"present80", 9, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(present80, ktask, "present80", 9, kKryptosCTR);
+    kryptos_run_cipher(present80, ktask, (kryptos_u8_t *)"present80", 9, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2806,7 +2806,7 @@ KUTE_TEST_CASE(kryptos_present80_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(present80, ktask, "present80", 9, kKryptosGCM);
+    kryptos_run_cipher(present80, ktask, (kryptos_u8_t *)"present80", 9, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out == NULL);
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);
@@ -2824,14 +2824,14 @@ KUTE_TEST_CASE(kryptos_present128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(present128, ktask, "present128", 10, kKryptosECB);
+    kryptos_run_cipher(present128, ktask, (kryptos_u8_t *)"present128", 10, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(present128, ktask, "present128", 10, kKryptosECB);
+    kryptos_run_cipher(present128, ktask, (kryptos_u8_t *)"present128", 10, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2842,14 +2842,14 @@ KUTE_TEST_CASE(kryptos_present128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(present128, ktask, "present128", 10, kKryptosCBC);
+    kryptos_run_cipher(present128, ktask, (kryptos_u8_t *)"present128", 10, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(present128, ktask, "present128", 10, kKryptosCBC);
+    kryptos_run_cipher(present128, ktask, (kryptos_u8_t *)"present128", 10, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2860,14 +2860,14 @@ KUTE_TEST_CASE(kryptos_present128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(present128, ktask, "present128", 10, kKryptosOFB);
+    kryptos_run_cipher(present128, ktask, (kryptos_u8_t *)"present128", 10, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(present128, ktask, "present128", 10, kKryptosOFB);
+    kryptos_run_cipher(present128, ktask, (kryptos_u8_t *)"present128", 10, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2878,14 +2878,14 @@ KUTE_TEST_CASE(kryptos_present128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(present128, ktask, "present128", 10, kKryptosCTR);
+    kryptos_run_cipher(present128, ktask, (kryptos_u8_t *)"present128", 10, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(present128, ktask, "present128", 10, kKryptosCTR);
+    kryptos_run_cipher(present128, ktask, (kryptos_u8_t *)"present128", 10, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2896,7 +2896,7 @@ KUTE_TEST_CASE(kryptos_present128_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(present128, ktask, "present128", 10, kKryptosGCM);
+    kryptos_run_cipher(present128, ktask, (kryptos_u8_t *)"present128", 10, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out == NULL);
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);
@@ -2914,14 +2914,14 @@ KUTE_TEST_CASE(kryptos_shacal1_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(shacal1, ktask, "shacal1", 7, kKryptosECB);
+    kryptos_run_cipher(shacal1, ktask, (kryptos_u8_t *)"shacal1", 7, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(shacal1, ktask, "shacal1", 7, kKryptosECB);
+    kryptos_run_cipher(shacal1, ktask, (kryptos_u8_t *)"shacal1", 7, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2932,14 +2932,14 @@ KUTE_TEST_CASE(kryptos_shacal1_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(shacal1, ktask, "shacal1", 7, kKryptosCBC);
+    kryptos_run_cipher(shacal1, ktask, (kryptos_u8_t *)"shacal1", 7, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(shacal1, ktask, "shacal1", 7, kKryptosCBC);
+    kryptos_run_cipher(shacal1, ktask, (kryptos_u8_t *)"shacal1", 7, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2950,14 +2950,14 @@ KUTE_TEST_CASE(kryptos_shacal1_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(shacal1, ktask, "shacal1", 7, kKryptosOFB);
+    kryptos_run_cipher(shacal1, ktask, (kryptos_u8_t *)"shacal1", 7, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(shacal1, ktask, "shacal1", 7, kKryptosOFB);
+    kryptos_run_cipher(shacal1, ktask, (kryptos_u8_t *)"shacal1", 7, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2968,14 +2968,14 @@ KUTE_TEST_CASE(kryptos_shacal1_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(shacal1, ktask, "shacal1", 7, kKryptosCTR);
+    kryptos_run_cipher(shacal1, ktask, (kryptos_u8_t *)"shacal1", 7, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(shacal1, ktask, "shacal1", 7, kKryptosCTR);
+    kryptos_run_cipher(shacal1, ktask, (kryptos_u8_t *)"shacal1", 7, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -2986,7 +2986,7 @@ KUTE_TEST_CASE(kryptos_shacal1_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(shacal1, ktask, "shacal1", 7, kKryptosGCM);
+    kryptos_run_cipher(shacal1, ktask, (kryptos_u8_t *)"shacal1", 7, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out == NULL);
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);
@@ -3004,14 +3004,14 @@ KUTE_TEST_CASE(kryptos_shacal2_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(shacal2, ktask, "shacal2", 7, kKryptosECB);
+    kryptos_run_cipher(shacal2, ktask, (kryptos_u8_t *)"shacal2", 7, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(shacal2, ktask, "shacal2", 7, kKryptosECB);
+    kryptos_run_cipher(shacal2, ktask, (kryptos_u8_t *)"shacal2", 7, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3022,14 +3022,14 @@ KUTE_TEST_CASE(kryptos_shacal2_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(shacal2, ktask, "shacal2", 7, kKryptosCBC);
+    kryptos_run_cipher(shacal2, ktask, (kryptos_u8_t *)"shacal2", 7, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(shacal2, ktask, "shacal2", 7, kKryptosCBC);
+    kryptos_run_cipher(shacal2, ktask, (kryptos_u8_t *)"shacal2", 7, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3040,14 +3040,14 @@ KUTE_TEST_CASE(kryptos_shacal2_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(shacal2, ktask, "shacal2", 7, kKryptosOFB);
+    kryptos_run_cipher(shacal2, ktask, (kryptos_u8_t *)"shacal2", 7, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(shacal2, ktask, "shacal2", 7, kKryptosOFB);
+    kryptos_run_cipher(shacal2, ktask, (kryptos_u8_t *)"shacal2", 7, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3058,14 +3058,14 @@ KUTE_TEST_CASE(kryptos_shacal2_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(shacal2, ktask, "shacal2", 7, kKryptosCTR);
+    kryptos_run_cipher(shacal2, ktask, (kryptos_u8_t *)"shacal2", 7, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(shacal2, ktask, "shacal2", 7, kKryptosCTR);
+    kryptos_run_cipher(shacal2, ktask, (kryptos_u8_t *)"shacal2", 7, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3076,7 +3076,7 @@ KUTE_TEST_CASE(kryptos_shacal2_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(shacal2, ktask, "shacal2", 7, kKryptosGCM);
+    kryptos_run_cipher(shacal2, ktask, (kryptos_u8_t *)"shacal2", 7, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out == NULL);
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);
@@ -3094,14 +3094,14 @@ KUTE_TEST_CASE(kryptos_noekeon_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon, ktask, "noekeon", 7, kKryptosECB);
+    kryptos_run_cipher(noekeon, ktask, (kryptos_u8_t *)"noekeon", 7, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon, ktask, "noekeon", 7, kKryptosECB);
+    kryptos_run_cipher(noekeon, ktask, (kryptos_u8_t *)"noekeon", 7, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3112,14 +3112,14 @@ KUTE_TEST_CASE(kryptos_noekeon_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon, ktask, "noekeon", 7, kKryptosCBC);
+    kryptos_run_cipher(noekeon, ktask, (kryptos_u8_t *)"noekeon", 7, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon, ktask, "noekeon", 7, kKryptosCBC);
+    kryptos_run_cipher(noekeon, ktask, (kryptos_u8_t *)"noekeon", 7, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3130,14 +3130,14 @@ KUTE_TEST_CASE(kryptos_noekeon_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon, ktask, "noekeon", 7, kKryptosOFB);
+    kryptos_run_cipher(noekeon, ktask, (kryptos_u8_t *)"noekeon", 7, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon, ktask, "noekeon", 7, kKryptosOFB);
+    kryptos_run_cipher(noekeon, ktask, (kryptos_u8_t *)"noekeon", 7, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3148,14 +3148,14 @@ KUTE_TEST_CASE(kryptos_noekeon_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon, ktask, "noekeon", 7, kKryptosCTR);
+    kryptos_run_cipher(noekeon, ktask, (kryptos_u8_t *)"noekeon", 7, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon, ktask, "noekeon", 7, kKryptosCTR);
+    kryptos_run_cipher(noekeon, ktask, (kryptos_u8_t *)"noekeon", 7, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3166,14 +3166,14 @@ KUTE_TEST_CASE(kryptos_noekeon_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon, ktask, "noekeon", 7, kKryptosGCM);
+    kryptos_run_cipher(noekeon, ktask, (kryptos_u8_t *)"noekeon", 7, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon, ktask, "noekeon", 7, kKryptosGCM);
+    kryptos_run_cipher(noekeon, ktask, (kryptos_u8_t *)"noekeon", 7, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3190,14 +3190,14 @@ KUTE_TEST_CASE(kryptos_noekeon_d_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon_d, ktask, "noekeon_d", 9, kKryptosECB);
+    kryptos_run_cipher(noekeon_d, ktask, (kryptos_u8_t *)"noekeon_d", 9, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon_d, ktask, "noekeon_d", 9, kKryptosECB);
+    kryptos_run_cipher(noekeon_d, ktask, (kryptos_u8_t *)"noekeon_d", 9, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3208,14 +3208,14 @@ KUTE_TEST_CASE(kryptos_noekeon_d_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon_d, ktask, "noekeon_d", 9, kKryptosCBC);
+    kryptos_run_cipher(noekeon_d, ktask, (kryptos_u8_t *)"noekeon_d", 9, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon_d, ktask, "noekeon_d", 9, kKryptosCBC);
+    kryptos_run_cipher(noekeon_d, ktask, (kryptos_u8_t *)"noekeon_d", 9, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3226,14 +3226,14 @@ KUTE_TEST_CASE(kryptos_noekeon_d_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon_d, ktask, "noekeon_d", 9, kKryptosOFB);
+    kryptos_run_cipher(noekeon_d, ktask, (kryptos_u8_t *)"noekeon_d", 9, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon_d, ktask, "noekeon_d", 9, kKryptosOFB);
+    kryptos_run_cipher(noekeon_d, ktask, (kryptos_u8_t *)"noekeon_d", 9, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3244,14 +3244,14 @@ KUTE_TEST_CASE(kryptos_noekeon_d_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon_d, ktask, "noekeon_d", 9, kKryptosCTR);
+    kryptos_run_cipher(noekeon_d, ktask, (kryptos_u8_t *)"noekeon_d", 9, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon_d, ktask, "noekeon_d", 9, kKryptosCTR);
+    kryptos_run_cipher(noekeon_d, ktask, (kryptos_u8_t *)"noekeon_d", 9, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3262,14 +3262,14 @@ KUTE_TEST_CASE(kryptos_noekeon_d_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon_d, ktask, "noekeon_d", 9, kKryptosGCM);
+    kryptos_run_cipher(noekeon_d, ktask, (kryptos_u8_t *)"noekeon_d", 9, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(noekeon_d, ktask, "noekeon_d", 9, kKryptosGCM);
+    kryptos_run_cipher(noekeon_d, ktask, (kryptos_u8_t *)"noekeon_d", 9, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3286,14 +3286,14 @@ KUTE_TEST_CASE(kryptos_gost_ds_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(gost_ds, ktask, "gost-ds", 7, kKryptosECB);
+    kryptos_run_cipher(gost_ds, ktask, (kryptos_u8_t *)"gost-ds", 7, kKryptosECB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(gost_ds, ktask, "gost-ds", 7, kKryptosECB);
+    kryptos_run_cipher(gost_ds, ktask, (kryptos_u8_t *)"gost-ds", 7, kKryptosECB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3304,14 +3304,14 @@ KUTE_TEST_CASE(kryptos_gost_ds_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(gost_ds, ktask, "gost-ds", 7, kKryptosCBC);
+    kryptos_run_cipher(gost_ds, ktask, (kryptos_u8_t *)"gost-ds", 7, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(gost_ds, ktask, "gost-ds", 7, kKryptosCBC);
+    kryptos_run_cipher(gost_ds, ktask, (kryptos_u8_t *)"gost-ds", 7, kKryptosCBC);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3322,14 +3322,14 @@ KUTE_TEST_CASE(kryptos_gost_ds_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(gost_ds, ktask, "gost-ds", 7, kKryptosOFB);
+    kryptos_run_cipher(gost_ds, ktask, (kryptos_u8_t *)"gost-ds", 7, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(gost_ds, ktask, "gost-ds", 7, kKryptosOFB);
+    kryptos_run_cipher(gost_ds, ktask, (kryptos_u8_t *)"gost-ds", 7, kKryptosOFB);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3340,14 +3340,14 @@ KUTE_TEST_CASE(kryptos_gost_ds_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(gost_ds, ktask, "gost-ds", 7, kKryptosCTR);
+    kryptos_run_cipher(gost_ds, ktask, (kryptos_u8_t *)"gost-ds", 7, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(gost_ds, ktask, "gost-ds", 7, kKryptosCTR);
+    kryptos_run_cipher(gost_ds, ktask, (kryptos_u8_t *)"gost-ds", 7, kKryptosCTR);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3358,7 +3358,7 @@ KUTE_TEST_CASE(kryptos_gost_ds_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(gost_ds, ktask, "gost-ds", 7, kKryptosGCM);
+    kryptos_run_cipher(gost_ds, ktask, (kryptos_u8_t *)"gost-ds", 7, kKryptosGCM);
 
     KUTE_ASSERT(ktask->out == NULL);
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);
@@ -3400,14 +3400,14 @@ KUTE_TEST_CASE(kryptos_gost_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(gost, ktask, "gost", 4, kKryptosECB, s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_cipher(gost, ktask, (kryptos_u8_t *)"gost", 4, kKryptosECB, s1, s2, s3, s4, s5, s6, s7, s8);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(gost, ktask, "gost", 4, kKryptosECB, s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_cipher(gost, ktask, (kryptos_u8_t *)"gost", 4, kKryptosECB, s1, s2, s3, s4, s5, s6, s7, s8);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3418,14 +3418,14 @@ KUTE_TEST_CASE(kryptos_gost_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(gost, ktask, "gost", 4, kKryptosCBC, s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_cipher(gost, ktask, (kryptos_u8_t *)"gost", 4, kKryptosCBC, s1, s2, s3, s4, s5, s6, s7, s8);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(gost, ktask, "gost", 4, kKryptosCBC, s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_cipher(gost, ktask, (kryptos_u8_t *)"gost", 4, kKryptosCBC, s1, s2, s3, s4, s5, s6, s7, s8);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3436,14 +3436,14 @@ KUTE_TEST_CASE(kryptos_gost_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(gost, ktask, "gost", 4, kKryptosOFB, s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_cipher(gost, ktask, (kryptos_u8_t *)"gost", 4, kKryptosOFB, s1, s2, s3, s4, s5, s6, s7, s8);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(gost, ktask, "gost", 4, kKryptosOFB, s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_cipher(gost, ktask, (kryptos_u8_t *)"gost", 4, kKryptosOFB, s1, s2, s3, s4, s5, s6, s7, s8);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3454,14 +3454,14 @@ KUTE_TEST_CASE(kryptos_gost_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(gost, ktask, "gost", 4, kKryptosCTR, s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_cipher(gost, ktask, (kryptos_u8_t *)"gost", 4, kKryptosCTR, s1, s2, s3, s4, s5, s6, s7, s8);
 
     KUTE_ASSERT(ktask->out != NULL);
 
     kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_run_cipher(gost, ktask, "gost", 4, kKryptosCTR, s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_cipher(gost, ktask, (kryptos_u8_t *)"gost", 4, kKryptosCTR, s1, s2, s3, s4, s5, s6, s7, s8);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
     KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
@@ -3472,7 +3472,7 @@ KUTE_TEST_CASE(kryptos_gost_dsl_tests)
     kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
     kryptos_task_set_encrypt_action(ktask);
 
-    kryptos_run_cipher(gost, ktask, "gost", 4, kKryptosGCM, s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_cipher(gost, ktask, (kryptos_u8_t *)"gost", 4, kKryptosGCM, s1, s2, s3, s4, s5, s6, s7, s8);
 
     KUTE_ASSERT(ktask->out == NULL);
     KUTE_ASSERT(ktask->result == kKryptosNoSupport);

@@ -17,7 +17,7 @@ kryptos_u8_t *kryptos_do_hkdf(kryptos_u8_t *ikm,
                               const kryptos_u8_t *info, const size_t info_size,
                               const size_t intended_osize) {
     kryptos_u8_t *prk = NULL;
-    size_t prk_size;
+    size_t prk_size = 0;
     kryptos_u8_t *lsalt = (salt == NULL) ? (kryptos_u8_t *)"" : salt;
     size_t lsalt_size = (salt == NULL) ? 0 : salt_size;
     kryptos_hash_func lh = (h == NULL) ? kryptos_sha256_hash : h;
@@ -25,7 +25,7 @@ kryptos_u8_t *kryptos_do_hkdf(kryptos_u8_t *ikm,
     kryptos_hash_size_func lh_size = (h_size == NULL) ? kryptos_sha256_hash_size : h_size;
     kryptos_u8_t sfx, *T = NULL;
     kryptos_u8_t *okm = NULL, *okm_h, *okm_t;
-    size_t T_size;
+    size_t T_size = 0;
     kryptos_task_ctx t, *ktask = &t;
 
     kryptos_task_init_as_null(ktask);
@@ -106,7 +106,7 @@ kryptos_u8_t *kryptos_do_hkdf(kryptos_u8_t *ikm,
             goto kryptos_hkdf_epilogue;
         }
 
-        T_size = ((okm_t - okm_h) >= prk_size) ? prk_size : (okm_t - okm_h);
+        T_size = ((size_t)(okm_t - okm_h) >= prk_size) ? prk_size : (okm_t - okm_h);
 
         memcpy(okm_h, ktask->out, T_size);
 

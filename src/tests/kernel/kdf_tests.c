@@ -18,18 +18,18 @@ KUTE_TEST_CASE(kryptos_do_argon2_tests)
         kryptos_u32_t parallelism;
         kryptos_u32_t tag_size;
         kryptos_u8_t *password;
-        size_t password_size;
+        kryptos_u32_t password_size;
         kryptos_u8_t *salt;
-        size_t salt_size;
+        kryptos_u32_t salt_size;
         kryptos_u8_t *key;
-        size_t key_size;
+        kryptos_u32_t key_size;
         kryptos_u8_t *associated_data;
-        size_t associated_data_size;
+        kryptos_u32_t associated_data_size;
         kryptos_u8_t *expected;
         size_t expected_size;
     };
 #define add_argon2_test_case(t, m, i, pl, ts, p, ps, s, s_sz, k, ks, a, as, e, es)\
-    { t, m, i, pl, ts, p, ps, s, s_sz, k, ks, a, as, e, es }
+    { t, m, i, pl, ts, (kryptos_u8_t *)p, ps, (kryptos_u8_t *)s, s_sz, (kryptos_u8_t *)k, ks, (kryptos_u8_t *)a, as, (kryptos_u8_t *)e, es }
     // INFO(Rafael): This following test vector is picked from the Argon2's reference implementation.
     struct test_step test_vector[] = {
         add_argon2_test_case(kArgon2d, 32, 3, 4, 32,
@@ -79,220 +79,274 @@ KUTE_TEST_CASE(kryptos_argon2_macro_tests)
     // WARN(Rafael): Keep the prints. It is trying to access n expected bytes.
     //               If n bytes were not returned this test will explode and we will know that something went wrong here.
     kryptos_u8_t *okm, *op, *op_end;
-    okm = kryptos_argon2d("Gardenia", 8, "", 0, 5, 128, 64, 20, "slow", 4, "", 0);
+    okm = kryptos_argon2d((kryptos_u8_t *)"Gardenia", 8, (kryptos_u8_t *)"", 0, 5, 128, 64, 20, (kryptos_u8_t *)"slow", 4, (kryptos_u8_t *)"", 0);
     KUTE_ASSERT(okm != NULL);
     op = okm;
     op_end = op + 128;
 
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t OKM = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t DK = ");
+#elif defined(_WIN32)
+    KdPrint(("\t DK = "));
 #endif
     while (op != op_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
         op++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(okm, 128);
 
-    okm = kryptos_argon2i("Gardenia", 8, "", 0, 5, 128, 64, 20, "slow", 4, "", 0);
+    okm = kryptos_argon2i((kryptos_u8_t *)"Gardenia", 8, (kryptos_u8_t *)"", 0, 5, 128, 64, 20, (kryptos_u8_t *)"slow", 4, (kryptos_u8_t *)"", 0);
     KUTE_ASSERT(okm != NULL);
     op = okm;
     op_end = op + 128;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t OKM = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t DK = ");
+#elif defined(_WIN32)
+    KdPrint(("\t DK = "));
 #endif
     while (op != op_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
         op++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(okm, 128);
 
-    okm = kryptos_argon2id("Gardenia", 8, "", 0, 5, 128, 64, 20, "slow", 4, "", 0);
+    okm = kryptos_argon2id((kryptos_u8_t *)"Gardenia", 8, (kryptos_u8_t *)"", 0, 5, 128, 64, 20, (kryptos_u8_t *)"slow", 4, (kryptos_u8_t *)"", 0);
     KUTE_ASSERT(okm != NULL);
     op = okm;
     op_end = op + 128;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t OKM = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t DK = ");
+#elif defined(_WIN32)
+    KdPrint(("\t DK = "));
 #endif
     while (op != op_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
         op++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(okm, 128);
 
-    okm = kryptos_argon2d("Ash Gray Sunday", 15, "Revelator", 9, 5, 16, 64, 20, "Black Rose Way", 14, "Anita Grey", 10);
+    okm = kryptos_argon2d((kryptos_u8_t *)"Ash Gray Sunday", 15, (kryptos_u8_t *)"Revelator", 9, 5, 16, 64, 20, (kryptos_u8_t *)"Black Rose Way", 14, (kryptos_u8_t *)"Anita Grey", 10);
     KUTE_ASSERT(okm != NULL);
     op = okm;
     op_end = op + 16;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t OKM = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t DK = ");
+#elif defined(_WIN32)
+    KdPrint(("\t DK = "));
 #endif
     while (op != op_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
         op++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(okm, 16);
 
-    okm = kryptos_argon2i("Ash Gray Sunday", 15, "Revelator", 9, 5, 16, 64, 20, "Black Rose Way", 14, "Anita Grey", 10);
+    okm = kryptos_argon2i((kryptos_u8_t *)"Ash Gray Sunday", 15, (kryptos_u8_t *)"Revelator", 9, 5, 16, 64, 20, (kryptos_u8_t *)"Black Rose Way", 14, (kryptos_u8_t *)"Anita Grey", 10);
     KUTE_ASSERT(okm != NULL);
     op = okm;
     op_end = op + 16;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t OKM = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t DK = ");
+#elif defined(_WIN32)
+    KdPrint(("\t DK = "));
 #endif
     while (op != op_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
         op++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(okm, 16);
 
-    okm = kryptos_argon2id("Ash Gray Sunday", 15, "Revelator", 9, 5, 16, 64, 20, "Black Rose Way", 14, "Anita Grey", 10);
+    okm = kryptos_argon2id((kryptos_u8_t *)"Ash Gray Sunday", 15, (kryptos_u8_t *)"Revelator", 9, 5, 16, 64, 20, (kryptos_u8_t *)"Black Rose Way", 14, (kryptos_u8_t *)"Anita Grey", 10);
     KUTE_ASSERT(okm != NULL);
     op = okm;
     op_end = op + 16;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t OKM = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t DK = ");
+#elif defined(_WIN32)
+    KdPrint(("\t DK = "));
 #endif
     while (op != op_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
         op++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(okm, 16);
 
-    okm = kryptos_argon2d("Ash Gray Sunday", 15, "Revelator", 9, 5, 1024, 64, 20, "Black Rose Way", 14, "Anita Grey", 10);
+    okm = kryptos_argon2d((kryptos_u8_t *)"Ash Gray Sunday", 15, (kryptos_u8_t *)"Revelator", 9, 5, 1024, 64, 20, (kryptos_u8_t *)"Black Rose Way", 14, (kryptos_u8_t *)"Anita Grey", 10);
     KUTE_ASSERT(okm != NULL);
     op = okm;
     op_end = op + 1024;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t OKM = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t DK = ");
+#elif defined(_WIN32)
+    KdPrint(("\t DK = "));
 #endif
     while (op != op_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
         op++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(okm, 1024);
 
-    okm = kryptos_argon2i("Ash Gray Sunday", 15, "Revelator", 9, 5, 1024, 64, 20, "Black Rose Way", 14, "Anita Grey", 10);
+    okm = kryptos_argon2i((kryptos_u8_t *)"Ash Gray Sunday", 15, (kryptos_u8_t *)"Revelator", 9, 5, 1024, 64, 20, (kryptos_u8_t *)"Black Rose Way", 14, (kryptos_u8_t *)"Anita Grey", 10);
     KUTE_ASSERT(okm != NULL);
     op = okm;
     op_end = op + 1024;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t OKM = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t DK = ");
+#elif defined(_WIN32)
+    KdPrint(("\t DK = "));
 #endif
     while (op != op_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
         op++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(okm, 1024);
 
-    okm = kryptos_argon2id("Ash Gray Sunday", 15, "Revelator", 9, 5, 1024, 64, 20, "Black Rose Way", 14, "Anita Grey", 10);
+    okm = kryptos_argon2id((kryptos_u8_t *)"Ash Gray Sunday", 15, (kryptos_u8_t *)"Revelator", 9, 5, 1024, 64, 20, (kryptos_u8_t *)"Black Rose Way", 14, (kryptos_u8_t *)"Anita Grey", 10);
     KUTE_ASSERT(okm != NULL);
     op = okm;
     op_end = op + 1024;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t OKM = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t DK = ");
+#elif defined(_WIN32)
+    KdPrint(("\t DK = "));
 #endif
     while (op != op_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
         op++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(okm, 1024);
 KUTE_TEST_CASE_END
@@ -302,10 +356,10 @@ KUTE_TEST_CASE(kryptos_do_argon2_bounds_tests)
     kryptos_u32_t iterations = (0xFFFFFFFF >> 3) + 1;
     kryptos_u32_t parallelism = 0x00FFFFFF + 1;
     kryptos_u32_t tag_size = (0xFFFFFFFF >> 3) + 1;
-    size_t password_size = (0xFFFFFFFF >> 3) + 1;
-    size_t salt_size = (0xFFFFFFFF >> 3) + 1;
-    size_t key_size = (0xFFFFFFFF >> 3) + 1;
-    size_t associated_data_size = (0xFFFFFFFF >> 3) + 1;
+    kryptos_u32_t password_size = (0xFFFFFFFF >> 3) + 1;
+    kryptos_u32_t salt_size = (0xFFFFFFFF >> 3) + 1;
+    kryptos_u32_t key_size = (0xFFFFFFFF >> 3) + 1;
+    kryptos_u32_t associated_data_size = (0xFFFFFFFF >> 3) + 1;
     kryptos_u8_t *tag;
 
     KUTE_ASSERT(kryptos_do_argon2(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
@@ -359,10 +413,10 @@ KUTE_TEST_CASE(kryptos_argon2_macro_bounds_tests)
     kryptos_u32_t iterations = (0xFFFFFFFF >> 3) + 1;
     kryptos_u32_t parallelism = 0x00FFFFFF + 1;
     kryptos_u32_t tag_size = (0xFFFFFFFF >> 3) + 1;
-    size_t password_size = (0xFFFFFFFF >> 3) + 1;
-    size_t salt_size = (0xFFFFFFFF >> 3) + 1;
-    size_t key_size = (0xFFFFFFFF >> 3) + 1;
-    size_t associated_data_size = (0xFFFFFFFF >> 3) + 1;
+    kryptos_u32_t password_size = (0xFFFFFFFF >> 3) + 1;
+    kryptos_u32_t salt_size = (0xFFFFFFFF >> 3) + 1;
+    kryptos_u32_t key_size = (0xFFFFFFFF >> 3) + 1;
+    kryptos_u32_t associated_data_size = (0xFFFFFFFF >> 3) + 1;
     kryptos_u8_t *tag;
 
     KUTE_ASSERT(kryptos_argon2d(NULL, password_size, NULL, salt_size, parallelism, tag_size, memory_size_kb,
@@ -520,7 +574,7 @@ KUTE_TEST_CASE(kryptos_do_pbkdf2_tests)
         kryptos_u8_t *expected;
     };
 #define add_pbkdf2_test_case(h, p, p_size, s, s_size, c, d, e)\
-    { kryptos_ ## h ## _hash, kryptos_ ## h ## _hash_input_size, kryptos_ ## h ## _hash_size, p, p_size, s, s_size, c, d, e }
+    { kryptos_ ## h ## _hash, kryptos_ ## h ## _hash_input_size, kryptos_ ## h ## _hash_size, (kryptos_u8_t *)p, p_size, (kryptos_u8_t *)s, s_size, c, d, (kryptos_u8_t *)e }
     // INFO(Rafael): Test vectors from RFC-6070.
     struct test_step test_vector[] = {
         add_pbkdf2_test_case(sha1,
@@ -533,9 +587,9 @@ KUTE_TEST_CASE(kryptos_do_pbkdf2_tests)
                              "\x0C\x60\xC8\x0F\x96\x1F\x0E\x71\xF3\xA9"
                              "\xB5\x24\xAF\x60\x12\x06\x2F\xE0\x37\xA6"),
         add_pbkdf2_test_case(sha1,
-                             "password",
+                             (kryptos_u8_t *)"password",
                              8,
-                             "salt",
+                             (kryptos_u8_t *)"salt",
                              4,
                              2,
                              20,
@@ -596,171 +650,213 @@ KUTE_TEST_CASE(kryptos_pbkdf2_macro_tests)
     // WARN(Rafael): Keep the prints. It is trying to access n expected bytes.
     //               If n bytes were not returned this test will explode and we will know that something went wrong here.
     kryptos_u8_t *dk, *dk_p, *dk_p_end;
-    dk = kryptos_pbkdf2("Gardenia", 8, sha3_512, "", 0, 188, 18);
+    dk = kryptos_pbkdf2((kryptos_u8_t *)"Gardenia", 8, sha3_512, (kryptos_u8_t *)"", 0, 188, 18);
     KUTE_ASSERT(dk != NULL);
     dk_p = dk;
     dk_p_end = dk_p + 18;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t DK = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t DK = ");
+#elif defined(_WIN32)
+    KdPrint(("\t DK = "));
 #endif
     while (dk_p != dk_p_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *dk_p);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *dk_p);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *dk_p));
 #endif
         dk_p++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(dk, 18);
 
-    dk = kryptos_pbkdf2("Slow Cheetah", 12, whirlpool, "RHCP", 4, 16, 22);
+    dk = kryptos_pbkdf2((kryptos_u8_t *)"Slow Cheetah", 12, whirlpool, (kryptos_u8_t *)"RHCP", 4, 16, 22);
     KUTE_ASSERT(dk != NULL);
     dk_p = dk;
     dk_p_end = dk_p + 22;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t DK = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t DK = ");
+#elif defined(_WIN32)
+    KdPrint(("\t DK = "));
 #endif
     while (dk_p != dk_p_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *dk_p);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *dk_p);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *dk_p));
 #endif
         dk_p++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(dk, 22);
 
-    dk = kryptos_pbkdf2("Joe Cool", 8, tiger, "", 0, 27, 113);
+    dk = kryptos_pbkdf2((kryptos_u8_t *)"Joe Cool", 8, tiger, (kryptos_u8_t *)"", 0, 27, 113);
     KUTE_ASSERT(dk != NULL);
     dk_p = dk;
     dk_p_end = dk_p + 113;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t DK = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t DK = ");
+#elif defined(_WIN32)
+    KdPrint(("\t DK = "));
 #endif
     while (dk_p != dk_p_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *dk_p);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *dk_p);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *dk_p));
 #endif
         dk_p++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(dk, 113);
 
-    dk = kryptos_pbkdf2("PBKDF2", 6, tiger, "2FDKBP", 6, 5, 256);
+    dk = kryptos_pbkdf2((kryptos_u8_t *)"PBKDF2", 6, tiger, (kryptos_u8_t *)"2FDKBP", 6, 5, 256);
     KUTE_ASSERT(dk != NULL);
     dk_p = dk;
     dk_p_end = dk_p + 256;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t DK = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t DK = ");
+#elif defined(_WIN32)
+    KdPrint(("\t DK = "));
 #endif
     while (dk_p != dk_p_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *dk_p);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *dk_p);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *dk_p));
 #endif
         dk_p++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(dk, 256);
 
-    dk = kryptos_pbkdf2("Dulcimer Stomp", 14, md5, "Pump", 4, 14, 1024);
+    dk = kryptos_pbkdf2((kryptos_u8_t *)"Dulcimer Stomp", 14, md5, (kryptos_u8_t *)"Pump", 4, 14, 1024);
     KUTE_ASSERT(dk != NULL);
     dk_p = dk;
     dk_p_end = dk_p + 1024;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t DK = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t DK = ");
+#elif defined(_WIN32)
+    KdPrint(("\t DK = "));
 #endif
     while (dk_p != dk_p_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *dk_p);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *dk_p);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *dk_p));
 #endif
         dk_p++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(dk, 1024);
 
-    dk = kryptos_pbkdf2("Ahhhhh", 6, md4, "", 0, 32, 2048);
+    dk = kryptos_pbkdf2((kryptos_u8_t *)"Ahhhhh", 6, md4, (kryptos_u8_t *)"", 0, 32, 2048);
     KUTE_ASSERT(dk != NULL);
     dk_p = dk;
     dk_p_end = dk_p + 2048;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t DK = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t DK = ");
+#elif defined(_WIN32)
+    KdPrint(("\t DK = "));
 #endif
     while (dk_p != dk_p_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *dk_p);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *dk_p);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *dk_p));
 #endif
         dk_p++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(dk, 2048);
 
-    dk = kryptos_pbkdf2("boo!", 4, sha3_256, "ahh!", 4, 4, 8);
+    dk = kryptos_pbkdf2((kryptos_u8_t *)"boo!", 4, sha3_256, (kryptos_u8_t *)"ahh!", 4, 4, 8);
     KUTE_ASSERT(dk != NULL);
     dk_p = dk;
     dk_p_end = dk_p + 8;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t DK = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t DK = ");
+#elif defined(_WIN32)
+    KdPrint(("\t DK = "));
 #endif
     while (dk_p != dk_p_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *dk_p);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *dk_p);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *dk_p));
 #endif
         dk_p++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(dk, 8);
 KUTE_TEST_CASE_END
@@ -781,7 +877,7 @@ KUTE_TEST_CASE(kryptos_do_hkdf_tests)
     };
 #define add_hkdf_test_case(h, ikm, ikm_size, salt, salt_size, info, info_size, L, okm)\
     { kryptos_ ## h ## _hash, kryptos_ ## h ## _hash_input_size, kryptos_ ## h ## _hash_size,\
-      ikm, ikm_size, salt, salt_size, info, info_size, L, okm }
+      (kryptos_u8_t *)ikm, ikm_size, (kryptos_u8_t *)salt, salt_size, (kryptos_u8_t *)info, info_size, L, (kryptos_u8_t *)okm }
     // INFO(Rafael): Test cases from RFC-5869.
     struct test_step test_vector[] = {
         // INFO(Rafael): Test case 1.
@@ -914,173 +1010,215 @@ KUTE_TEST_CASE(kryptos_hkdf_macro_tests)
     // WARN(Rafael): Keep the prints. It is trying to access n expected bytes.
     //               If n bytes were not returned this test will explode and we will know that something went wrong here.
     kryptos_u8_t *okm, *op, *op_end;
-    okm = kryptos_hkdf("Gardenia", 8, sha3_512, "", 0, "", 0, 18);
+    okm = kryptos_hkdf((kryptos_u8_t *)"Gardenia", 8, sha3_512, (kryptos_u8_t *)"", 0, (kryptos_u8_t *)"", 0, 18);
     KUTE_ASSERT(okm != NULL);
     op = okm;
     op_end = op + 18;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t OKM = ");
-#else
+#elif defined(__linux__)
     printk("\t OKM = ");
+#elif defined(_WIN32)
+    KdPrint(("\t OKM = "));
 #endif
     while (op != op_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
         op++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(okm, 18);
 
-    okm = kryptos_hkdf("Slow Cheetah", 12, whirlpool, "RHCP", 4, "Stadium Arcadium", 16, 22);
+    okm = kryptos_hkdf((kryptos_u8_t *)"Slow Cheetah", 12, whirlpool, (kryptos_u8_t *)"RHCP", 4, (kryptos_u8_t *)"Stadium Arcadium", 16, 22);
     KUTE_ASSERT(okm != NULL);
     op = okm;
     op_end = op + 22;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t OKM = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t OKM = ");
+#elif defined(_WIN32)
+    KdPrint(("\t OKM = "));
 #endif
     while (op != op_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
         op++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(okm, 22);
 
-    okm = kryptos_hkdf("Joe Cool", 8, tiger, "", 0, "", 0, 113);
+    okm = kryptos_hkdf((kryptos_u8_t *)"Joe Cool", 8, tiger, (kryptos_u8_t *)"", 0, (kryptos_u8_t *)"", 0, 113);
     KUTE_ASSERT(okm != NULL);
     op = okm;
     op_end = op + 113;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t OKM = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t OKM = ");
+#elif defined(_WIN32)
+    KdPrint(("\t OKM = "));
 #endif
     while (op != op_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
         op++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(okm, 113);
 
-    okm = kryptos_hkdf("HKDF", 4, tiger, "FDKH", 4, "", 0, 256);
+    okm = kryptos_hkdf((kryptos_u8_t *)"HKDF", 4, tiger, (kryptos_u8_t *)"FDKH", 4, (kryptos_u8_t *)"", 0, 256);
     KUTE_ASSERT(okm != NULL);
     op = okm;
     op_end = op + 256;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t OKM = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t OKM = ");
+#elif defined(_WIN32)
+    KdPrint(("\t OKM = "));
 #endif
     while (op != op_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
         op++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
     kryptos_freeseg(okm, 256);
 
-    okm = kryptos_hkdf("Dulcimer Stomp", 14, md5, "Pump", 4, "The Other Side", 14, 1024);
+    okm = kryptos_hkdf((kryptos_u8_t *)"Dulcimer Stomp", 14, md5, (kryptos_u8_t *)"Pump", 4, (kryptos_u8_t *)"The Other Side", 14, 1024);
     KUTE_ASSERT(okm != NULL);
     op = okm;
     op_end = op + 1024;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t OKM = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t OKM = ");
+#elif defined(_WIN32)
+    KdPrint(("\t OKM = "));
 #endif
     while (op != op_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
         op++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
 
     kryptos_freeseg(okm, 1024);
 
-    okm = kryptos_hkdf("Ahhhhh", 6, md4, "", 0, "", 0, 2048);
+    okm = kryptos_hkdf((kryptos_u8_t *)"Ahhhhh", 6, md4, (kryptos_u8_t *)"", 0, (kryptos_u8_t *)"", 0, 2048);
     KUTE_ASSERT(okm != NULL);
     op = okm;
     op_end = op + 2048;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t OKM = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t OKM = ");
+#elif defined(_WIN32)
+    KdPrint(("\t OKM = "));
 #endif
     while (op != op_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
         op++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\n");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\n");
+#elif defined(_WIN32)
+    KdPrint(("\n\r"));
 #endif
 
     kryptos_freeseg(okm, 2048);
 
-    okm = kryptos_hkdf("boo!", 4, sha3_256, "ahh!", 4, "duh!", 4, 8);
+    okm = kryptos_hkdf((kryptos_u8_t *)"boo!", 4, sha3_256, (kryptos_u8_t *)"ahh!", 4, (kryptos_u8_t *)"duh!", 4, 8);
     KUTE_ASSERT(okm != NULL);
     op = okm;
     op_end = op + 8;
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
     uprintf("\t OKM = ");
-#else
+#elif defined(__linux__)
     printk(KERN_ERR "\t OKM = ");
+#elif defined(_WIN32)
+    KdPrint(("\t OKM = "));
 #endif
     while (op != op_end) {
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
         op++;
     }
-#if !defined(__linux__)
+#if defined(__FreeBSD__) || defined(__NetBSD__)
         uprintf("%.2X", *op);
-#else
+#elif defined(__linux__)
         printk(KERN_ERR "%.2X", *op);
+#elif defined(_WIN32)
+        KdPrint(("%.2X", *op));
 #endif
     kryptos_freeseg(okm, 8);
 KUTE_TEST_CASE_END

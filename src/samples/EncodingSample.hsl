@@ -43,6 +43,11 @@ base64-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 base64-sample.epilogue() {
@@ -78,6 +83,11 @@ base64-dsl-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 base64-dsl-sample.epilogue() {
@@ -113,6 +123,11 @@ uuencode-dsl-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 uuencode-dsl-sample.epilogue() {
@@ -148,6 +163,11 @@ huffman-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 huffman-sample.epilogue() {

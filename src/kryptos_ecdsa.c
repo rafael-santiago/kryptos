@@ -753,8 +753,8 @@ void kryptos_ecdsa_digital_signature_setup(kryptos_task_ctx *ktask, kryptos_u8_t
     ktask->key = key;
     ktask->key_size = key_size;
 
-    ktask->arg[0] = hash;
-    ktask->arg[1] = hash_size;
+    ktask->arg[0] = (void *)hash;
+    ktask->arg[1] = (void *)hash_size;
 }
 
 static kryptos_task_result_t kryptos_ecdsa_get_random_d(kryptos_mp_value_t **d, const kryptos_mp_value_t *q,

@@ -9,7 +9,9 @@
 #include <kryptos_memory.h>
 #ifndef KRYPTOS_KERNEL_MODE
 # include <fcntl.h>
-# include <unistd.h>
+# if !defined(_MSC_VER)
+#  include <unistd.h>
+# endif
 # include <string.h>
 #endif
 
@@ -261,7 +263,7 @@ kryptos_get_random_block_epilogue:
 
 void *kryptos_sys_get_random_block(const size_t size_in_bytes) {
     void *block = NULL;
-#if 1 // TODO(Rafael): Use 'bcrypt.h' in vista or newer.
+#if 0 // TODO(Rafael): Use 'bcrypt.h' in vista or newer.
     static HCRYPTPROV crypto_ctx = 0;
 
     if (size_in_bytes == 0) {
@@ -286,13 +288,16 @@ void *kryptos_sys_get_random_block(const size_t size_in_bytes) {
         goto kryptos_get_random_block_epilogue;
     }
 #else
+    if (size_in_bytes == 0) {
+        return NULL;
+    }
     block = kryptos_newseg(size_in_bytes);
 
     if (block == NULL) {
         goto kryptos_get_random_block_epilogue;
     }
 
-    if (BCryptGenRandom(NULL, block, size_in_bytes,
+    if (BCryptGenRandom(NULL, block, (ULONG)size_in_bytes,
                         BCRYPT_USE_SYSTEM_PREFERRED_RNG) != STATUS_SUCCESS) {
         kryptos_freeseg(block, size_in_bytes);
         block = NULL;

@@ -9,9 +9,9 @@
 #include <kryptos.h>
 
 static kryptos_u8_t *gcm_test_data[] = {
-    "PEACE, n.In international affairs, a period of cheating "
+    (kryptos_u8_t *)"PEACE, n.In international affairs, a period of cheating "
         "between two periods of fighting. -- Ambrose Pierce, The Devil's Dictionary",
-    "PAST, n.That part of Eternity with some small fraction of which we "
+    (kryptos_u8_t *)"PAST, n.That part of Eternity with some small fraction of which we "
         "have a slight and regrettable acquaintance. A moving line called the "
         "Present parts it from an imaginary period known as the Future. These "
         "two grand divisions of Eternity, of which the one is continually "
@@ -22,40 +22,40 @@ static kryptos_u8_t *gcm_test_data[] = {
         "in the sunshine of the other Hope flies with a free wing, beckoning to temples "
         "of success and bowers of ease. Yet the Past is the Future of yesterday, the Future "
         "is the Past of tomorrow. They are one -- the knowledge and the dream. -- Ambrose Pierce, The Devil's Dictionary",
-    "PAGAN, n.A benighted person who prefers home-made deities and indigenous religious "
+    (kryptos_u8_t *)"PAGAN, n.A benighted person who prefers home-made deities and indigenous religious "
         "rites. -- Ambrose Pierce, The Devil's Dictionary",
-    "PASSPORT, n.A document treacherously inflicted upon a citizen "
+    (kryptos_u8_t *)"PASSPORT, n.A document treacherously inflicted upon a citizen "
         "going abroad, exposing him as an alien and pointing him out for "
         "special reprobation and outrage. -- Ambrose Pierce, The Devil's Dictionary",
-    "PARDON, v.To remit a penalty and restore to a life of crime. To add to the lure "
+    (kryptos_u8_t *)"PARDON, v.To remit a penalty and restore to a life of crime. To add to the lure "
         "of crime the temptation of ingratitude. -- Ambrose Pierce, The Devil's Dictionary",
-    "PLEASE, v.To lay the foundation for a superstructure of imposition. "
+    (kryptos_u8_t *)"PLEASE, v.To lay the foundation for a superstructure of imposition. "
         "-- Ambrose Pierce, The Devil's Dictionary",
-    "PAINTING, n.The art of protecting flat surfaces from the weather and exposing "
+    (kryptos_u8_t *)"PAINTING, n.The art of protecting flat surfaces from the weather and exposing "
         "them to the critic. -- Ambrose Pierce, The Devil's Dictionary",
-    "QUOTIENT, n.A number showing how many times a sum of money "
+    (kryptos_u8_t *)"QUOTIENT, n.A number showing how many times a sum of money "
         "belonging to one person is contained in the pocket of another -- "
         "usually about as many times as it can got there. -- Ambrose Pierce, The Devil's Dictionary",
-    "VIRTUES, n.pl.Certain abstentions. -- Ambrose Pierce, The Devil's Dictionary",
-    "BED, n.A rack for the torture of the wicked; a citadel unfortified against remorse. "
+    (kryptos_u8_t *)"VIRTUES, n.pl.Certain abstentions. -- Ambrose Pierce, The Devil's Dictionary",
+    (kryptos_u8_t *)"BED, n.A rack for the torture of the wicked; a citadel unfortified against remorse. "
         " -- Ambrose Pierce, The Devil's Dictionary",
-    "BAYONET, n.An instrument for pricking the bubble of a nation's conceit. "
+    (kryptos_u8_t *)"BAYONET, n.An instrument for pricking the bubble of a nation's conceit. "
         " -- Ambrose Pierce, The Devil's Dictionary",
-    "BELLADONNA, n.In Italian a beautiful lady; In English a deadly poison. "
+    (kryptos_u8_t *)"BELLADONNA, n.In Italian a beautiful lady; In English a deadly poison. "
         "A striking example of the essential identity of the two tongues."
         " -- Ambrose Pierce, The Devil's Dictionary",
-    "BORE, n.A person who talks when you wish him to listen. -- Ambrose Pierce, The Devil's Dictionary",
-    "BRIDE, n.A Woman with a fine prospect of happiness behind her. -- Ambrose Pierce, The Devil's Dictionary",
-    "BRUTE, n.See HUSBAND. -- Ambrose Pierce, The Devil's Dictionary",
-    "HUSBAND, n.One who, having dined, is charged with the care of the plate. -- Ambrose Pierce, The Devil's Dictionary",
-    "WEDDING, n.A ceremony at which two persons undertake to become one, one undertakes to become nothing, "
+    (kryptos_u8_t *)"BORE, n.A person who talks when you wish him to listen. -- Ambrose Pierce, The Devil's Dictionary",
+    (kryptos_u8_t *)"BRIDE, n.A Woman with a fine prospect of happiness behind her. -- Ambrose Pierce, The Devil's Dictionary",
+    (kryptos_u8_t *)"BRUTE, n.See HUSBAND. -- Ambrose Pierce, The Devil's Dictionary",
+    (kryptos_u8_t *)"HUSBAND, n.One who, having dined, is charged with the care of the plate. -- Ambrose Pierce, The Devil's Dictionary",
+    (kryptos_u8_t *)"WEDDING, n.A ceremony at which two persons undertake to become one, one undertakes to become nothing, "
         "and nothing undertakes to become supportable. -- Ambrose Pierce, The Devil's Dictionary",
-    "WITCH, n.[1.] An ugly and repulsive old woman, in a wicked league with the devil. "
+    (kryptos_u8_t *)"WITCH, n.[1.] An ugly and repulsive old woman, in a wicked league with the devil. "
         "[2] A beautiful and attractive young woman, in wickedness a league beyond the devil."
         " -- Ambrose Pierce, The Devil's Dictionary",
-    "\"When you have learned to snatch the error code from the trap frame, it will be time for you to leave.\"\n\n"
+    (kryptos_u8_t *)"\"When you have learned to snatch the error code from the trap frame, it will be time for you to leave.\"\n\n"
         "-- The Tao of Programming BOOK 1.",
-    "A program should be light and agile, its subroutines connected like a string of pearls. "
+    (kryptos_u8_t *)"A program should be light and agile, its subroutines connected like a string of pearls. "
         "The spirit and intent of the program should be retained throughout. There should be neither too "
         "little nor too much. Neither needless loops nor useless variables; neither lack of structure nor "
         "overwhelming rigidity.\n"
@@ -72,10 +72,10 @@ static kryptos_u8_t *gcm_test_data[] = {
 
 #define kryptos_run_gcm_tests_no_support(cipher_name) {\
     kryptos_task_ctx t, *ktask = &t;\
-    kryptos_u8_t *key = "GCMTest";\
+    kryptos_u8_t *key = (kryptos_u8_t *)"GCMTest";\
     size_t key_size = 7;\
     kryptos_task_init_as_null(ktask);\
-    ktask->in = "nosupp";\
+    ktask->in = (kryptos_u8_t *)"nosupp";\
     ktask->in_size = 6;\
     kryptos_ ## cipher_name ## _setup(ktask, key, key_size, kKryptosGCM);\
     kryptos_task_set_encrypt_action(ktask);\
@@ -89,7 +89,7 @@ static kryptos_u8_t *gcm_test_data[] = {
 #define kryptos_run_gcm_tests_no_support_with_custom_setup(cipher_name, ktask, setup_stmt) {\
     kryptos_task_ctx t, *ktask = &t;\
     kryptos_task_init_as_null(ktask);\
-    ktask->in = "nosupp";\
+    ktask->in = (kryptos_u8_t *)"nosupp";\
     ktask->in_size = 6;\
     setup_stmt;\
     kryptos_task_set_encrypt_action(ktask);\
@@ -103,13 +103,13 @@ static kryptos_u8_t *gcm_test_data[] = {
 #define kryptos_run_gcm_tests(cipher_name) {\
     size_t tv, tv_nr = sizeof(gcm_test_data) / sizeof(gcm_test_data[0]);\
     kryptos_task_ctx t, *ktask = &t;\
-    kryptos_u8_t *key = "GCMTest";\
+    kryptos_u8_t *key = (kryptos_u8_t *)"GCMTest";\
     size_t key_size = 7, data_size;\
     for (tv = 0; tv < tv_nr; tv++) {\
         /*INFO(Rafael): Authentication success without aad.*/\
         kryptos_task_init_as_null(ktask);\
         ktask->in = gcm_test_data[tv];\
-        data_size = strlen(ktask->in);\
+        data_size = strlen((char *)ktask->in);\
         ktask->in_size = data_size;\
         kryptos_ ## cipher_name ## _setup(ktask, key, key_size, kKryptosGCM);\
         kryptos_task_set_encrypt_action(ktask);\
@@ -128,7 +128,7 @@ static kryptos_u8_t *gcm_test_data[] = {
         /*INFO(Rafael): Authentication failure without add.*/\
         kryptos_task_init_as_null(ktask);\
         ktask->in = gcm_test_data[tv];\
-        data_size = strlen(ktask->in);\
+        data_size = strlen((char *)ktask->in);\
         ktask->in_size = data_size;\
         kryptos_ ## cipher_name ## _setup(ktask, key, key_size, kKryptosGCM);\
         kryptos_task_set_encrypt_action(ktask);\
@@ -148,9 +148,9 @@ static kryptos_u8_t *gcm_test_data[] = {
         kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
         /*INFO(Rafael): Authentication success with aad.*/\
         kryptos_task_init_as_null(ktask);\
-        kryptos_task_set_gcm_aad(ktask, "boo", 3);\
+        kryptos_task_set_gcm_aad(ktask, (kryptos_u8_t *)"boo", 3);\
         ktask->in = gcm_test_data[tv];\
-        data_size = strlen(ktask->in);\
+        data_size = strlen((char *)ktask->in);\
         ktask->in_size = data_size;\
         kryptos_ ## cipher_name ## _setup(ktask, key, key_size, kKryptosGCM);\
         kryptos_task_set_encrypt_action(ktask);\
@@ -168,9 +168,9 @@ static kryptos_u8_t *gcm_test_data[] = {
         kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
         /*INFO(Rafael): Authentication failure with add.*/\
         kryptos_task_init_as_null(ktask);\
-        kryptos_task_set_gcm_aad(ktask, "boo", 3);\
+        kryptos_task_set_gcm_aad(ktask, (kryptos_u8_t *)"boo", 3);\
         ktask->in = gcm_test_data[tv];\
-        data_size = strlen(ktask->in);\
+        data_size = strlen((char *)ktask->in);\
         ktask->in_size = data_size;\
         kryptos_ ## cipher_name ## _setup(ktask, key, key_size, kKryptosGCM);\
         kryptos_task_set_encrypt_action(ktask);\
@@ -181,7 +181,7 @@ static kryptos_u8_t *gcm_test_data[] = {
         ktask->in_size = ktask->out_size;\
         ktask->out = NULL;\
         ktask->out_size = 0;\
-        kryptos_task_set_gcm_aad(ktask, "bo", 2);\
+        kryptos_task_set_gcm_aad(ktask, (kryptos_u8_t *)"bo", 2);\
         kryptos_task_set_decrypt_action(ktask);\
         kryptos_ ## cipher_name ## _cipher(&ktask);\
         KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
@@ -199,7 +199,7 @@ static kryptos_u8_t *gcm_test_data[] = {
         /*INFO(Rafael): Authentication success without aad.*/\
         kryptos_task_init_as_null(ktask);\
         ktask->in = gcm_test_data[tv];\
-        data_size = strlen(ktask->in);\
+        data_size = strlen((char *)ktask->in);\
         ktask->in_size = data_size;\
         setup_stmt;\
         kryptos_task_set_encrypt_action(ktask);\
@@ -218,7 +218,7 @@ static kryptos_u8_t *gcm_test_data[] = {
         /*INFO(Rafael): Authentication failure without add.*/\
         kryptos_task_init_as_null(ktask);\
         ktask->in = gcm_test_data[tv];\
-        data_size = strlen(ktask->in);\
+        data_size = strlen((char *)ktask->in);\
         ktask->in_size = data_size;\
         setup_stmt;\
         kryptos_task_set_encrypt_action(ktask);\
@@ -238,9 +238,9 @@ static kryptos_u8_t *gcm_test_data[] = {
         kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
         /*INFO(Rafael): Authentication success with aad.*/\
         kryptos_task_init_as_null(ktask);\
-        kryptos_task_set_gcm_aad(ktask, "boo", 3);\
+        kryptos_task_set_gcm_aad(ktask, (kryptos_u8_t *)"boo", 3);\
         ktask->in = gcm_test_data[tv];\
-        data_size = strlen(ktask->in);\
+        data_size = strlen((char *)ktask->in);\
         ktask->in_size = data_size;\
         setup_stmt;\
         kryptos_task_set_encrypt_action(ktask);\
@@ -258,9 +258,9 @@ static kryptos_u8_t *gcm_test_data[] = {
         kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
         /*INFO(Rafael): Authentication failure with add.*/\
         kryptos_task_init_as_null(ktask);\
-        kryptos_task_set_gcm_aad(ktask, "boo", 3);\
+        kryptos_task_set_gcm_aad(ktask, (kryptos_u8_t *)"boo", 3);\
         ktask->in = gcm_test_data[tv];\
-        data_size = strlen(ktask->in);\
+        data_size = strlen((char *)ktask->in);\
         ktask->in_size = data_size;\
         setup_stmt;\
         kryptos_task_set_encrypt_action(ktask);\
@@ -271,7 +271,7 @@ static kryptos_u8_t *gcm_test_data[] = {
         ktask->in_size = ktask->out_size;\
         ktask->out = NULL;\
         ktask->out_size = 0;\
-        kryptos_task_set_gcm_aad(ktask, "bo", 2);\
+        kryptos_task_set_gcm_aad(ktask, (kryptos_u8_t *)"bo", 2);\
         kryptos_task_set_decrypt_action(ktask);\
         kryptos_ ## cipher_name ## _cipher(&ktask);\
         KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
@@ -284,7 +284,7 @@ static kryptos_u8_t *gcm_test_data[] = {
 KUTE_TEST_CASE(kryptos_ctr_mode_sequencing_tests)
     kryptos_task_ctx t, *ktask = &t;
     kryptos_u32_t ctr = 10;
-    kryptos_u8_t *data = "ISLEEPTHROUGHTHEWAR";
+    kryptos_u8_t *data = (kryptos_u8_t *)"ISLEEPTHROUGHTHEWAR";
     size_t data_size = 19;
 
     kryptos_task_init_as_null(ktask);
@@ -294,7 +294,7 @@ KUTE_TEST_CASE(kryptos_ctr_mode_sequencing_tests)
     kryptos_task_set_encrypt_action(ktask);
 
     kryptos_task_set_ctr_mode(ktask, &ctr);
-    kryptos_misty1_setup(ktask, "bulls", 5, kKryptosCTR);
+    kryptos_misty1_setup(ktask, (kryptos_u8_t *)"bulls", 5, kKryptosCTR);
     kryptos_misty1_cipher(&ktask);
 
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
@@ -306,7 +306,7 @@ KUTE_TEST_CASE(kryptos_ctr_mode_sequencing_tests)
 
     kryptos_task_set_decrypt_action(ktask);
 
-    kryptos_misty1_setup(ktask, "bulls", 5, kKryptosCTR);
+    kryptos_misty1_setup(ktask, (kryptos_u8_t *)"bulls", 5, kKryptosCTR);
     kryptos_misty1_cipher(&ktask);
 
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
@@ -319,7 +319,7 @@ KUTE_TEST_CASE(kryptos_ctr_mode_sequencing_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_des_weak_keys_detection_tests)
-#define REGISTER_DES_WEAK_KEY(k) (k)
+#define REGISTER_DES_WEAK_KEY(k) (kryptos_u8_t *)(k)
     static kryptos_u8_t *wkey[] = {
         // WARN(Rafael): DES' weak keys.
         REGISTER_DES_WEAK_KEY("\x01\x01\x01\x01\x01\x01\x01\x01"), REGISTER_DES_WEAK_KEY("\x1F\x1F\x1F\x1F\x0E\x0E\x0E\x0E"),
@@ -360,12 +360,12 @@ KUTE_TEST_CASE(kryptos_des_weak_keys_detection_tests)
 #undef REGISTER_DES_WEAK_KEY
     size_t wkey_nr = sizeof(wkey) / sizeof(wkey[0]), w, wkeys_size = 8;
     kryptos_task_ctx t, *ktask = &t;
-    kryptos_u8_t *k1 = "101", *k2 = "255";
+    kryptos_u8_t *k1 = (kryptos_u8_t *)"101", *k2 = (kryptos_u8_t *)"255";
     size_t k1_size = 3, k2_size = 3;
 
     for (w = 0; w < wkey_nr; w++) {
         kryptos_task_init_as_null(ktask);
-        kryptos_task_set_in(ktask, "Skeletons", 9);
+        kryptos_task_set_in(ktask, (kryptos_u8_t *)"Skeletons", 9);
         kryptos_task_set_encrypt_action(ktask);
         kryptos_des_setup(ktask, wkey[w], wkeys_size, kKryptosECB);
         kryptos_des_cipher(&ktask);
@@ -374,7 +374,7 @@ KUTE_TEST_CASE(kryptos_des_weak_keys_detection_tests)
 
     for (w = 0; w < wkey_nr; w++) {
         kryptos_task_init_as_null(ktask);
-        kryptos_task_set_in(ktask, "Skeletons", 9);
+        kryptos_task_set_in(ktask, (kryptos_u8_t *)"Skeletons", 9);
         kryptos_task_set_encrypt_action(ktask);
         kryptos_triple_des_setup(ktask, wkey[w], wkeys_size, kKryptosECB, k1, &k1_size, k2, &k2_size);
         kryptos_triple_des_cipher(&ktask);
@@ -389,7 +389,7 @@ KUTE_TEST_CASE(kryptos_des_weak_keys_detection_tests)
 
     for (w = 0; w < wkey_nr; w++) {
         kryptos_task_init_as_null(ktask);
-        kryptos_task_set_in(ktask, "Skeletons", 9);
+        kryptos_task_set_in(ktask, (kryptos_u8_t *)"Skeletons", 9);
         kryptos_task_set_encrypt_action(ktask);
         kryptos_triple_des_ede_setup(ktask, wkey[w], wkeys_size, kKryptosECB, k1, &k1_size, k2, &k2_size);
         kryptos_triple_des_ede_cipher(&ktask);
@@ -413,7 +413,7 @@ KUTE_TEST_CASE(kryptos_bcrypt_tests)
         const kryptos_u8_t *hash;
         const size_t hash_size;
     };
-#define add_test_step(p, p_sz, c, s, s_sz, h, h_sz) { p, p_sz, c, s, s_sz, h, h_sz }
+#define add_test_step(p, p_sz, c, s, s_sz, h, h_sz) { (kryptos_u8_t *)p, p_sz, c, (kryptos_u8_t *)s, s_sz, (kryptos_u8_t *)h, h_sz }
     struct bcrypt_test test_vector[] = {
         add_test_step("", 0,
                        4, "\xD5\x72\x68\x31\x2B\xC8\x21\x2A\x9D\x01\xD0\x4F\x7B\xD9\xFF\x3D", 16,
@@ -452,49 +452,50 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_bcrypt_verify_tests)
     kryptos_u8_t *password[] = {
-        "messycrypt", "No Good, Mr. Holden", "Bad idea.", "Nothing Ventured"
+        (kryptos_u8_t *)"messycrypt", (kryptos_u8_t*)"No Good, Mr. Holden", (kryptos_u8_t*)"Bad idea.", (kryptos_u8_t*)"Nothing Ventured"
     };
-    size_t password_nr = sizeof(password) / sizeof(password[0]), p;
+    size_t password_nr = sizeof(password) / sizeof(password[0]);
+    int p;
     kryptos_u8_t *hash;
     size_t hash_size;
     kryptos_u8_t *salt;
 
     // INFO(Rafael): Malformed or unsupported hashes.
 
-    hash = "$3a$04$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
-    KUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+    hash = (kryptos_u8_t *)"$3a$04$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
+    KUTE_ASSERT(kryptos_bcrypt_verify((kryptos_u8_t *)"Wrong", 5, hash, strlen((char *)hash)) == 0);
 
-    hash = "$2x$04$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
-    KUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+    hash = (kryptos_u8_t *)"$2x$04$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
+    KUTE_ASSERT(kryptos_bcrypt_verify((kryptos_u8_t *)"Wrong", 5, hash, strlen((char *)hash)) == 0);
 
-    hash = "2x$04$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
-    KUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+    hash = (kryptos_u8_t *)"2x$04$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
+    KUTE_ASSERT(kryptos_bcrypt_verify((kryptos_u8_t *)"Wrong", 5, hash, strlen((char *)hash)) == 0);
 
-    hash = "$2a04$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
-    KUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+    hash = (kryptos_u8_t *)"$2a04$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
+    KUTE_ASSERT(kryptos_bcrypt_verify((kryptos_u8_t *)"Wrong", 5, hash, strlen((char *)hash)) == 0);
 
-    hash = "$2x$0a$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
-    KUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+    hash = (kryptos_u8_t *)"$2x$0a$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
+    KUTE_ASSERT(kryptos_bcrypt_verify((kryptos_u8_t *)"Wrong", 5, hash, strlen((char *)hash)) == 0);
 
-    hash = "$2x$a4$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
-    KUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+    hash = (kryptos_u8_t *)"$2x$a4$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
+    KUTE_ASSERT(kryptos_bcrypt_verify((kryptos_u8_t *)"Wrong", 5, hash, strlen((char *)hash)) == 0);
 
-    hash = "$2x$32$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
-    KUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+    hash = (kryptos_u8_t *)"$2x$32$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
+    KUTE_ASSERT(kryptos_bcrypt_verify((kryptos_u8_t *)"Wrong", 5, hash, strlen((char *)hash)) == 0);
 
-    hash = "$2x$00$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
-    KUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+    hash = (kryptos_u8_t *)"$2x$00$zVHmKQtGGQob.b/Nc7l9NOW2pAwmViS9PCMB6D5D0ehLM6L7H3OGC";
+    KUTE_ASSERT(kryptos_bcrypt_verify((kryptos_u8_t *)"Wrong", 5, hash, strlen((char *)hash)) == 0);
 
-    hash = "$2x$04$zVHmKQtGGQo";
-    KUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, strlen(hash)) == 0);
+    hash = (kryptos_u8_t *)"$2x$04$zVHmKQtGGQo";
+    KUTE_ASSERT(kryptos_bcrypt_verify((kryptos_u8_t *)"Wrong", 5, hash, strlen((char *)hash)) == 0);
 
     for (p = 0; p < password_nr; p++) {
         salt = kryptos_get_random_block(16);
         KUTE_ASSERT(salt != NULL);
-        hash = kryptos_bcrypt(4 + p, salt, 16, password[p], strlen(password[p]), &hash_size);
+        hash = kryptos_bcrypt(4 + p, salt, 16, password[p], strlen((char *)password[p]), &hash_size);
         KUTE_ASSERT(hash != NULL);
-        KUTE_ASSERT(kryptos_bcrypt_verify("Wrong", 5, hash, hash_size) == 0);
-        KUTE_ASSERT(kryptos_bcrypt_verify(password[p], strlen(password[p]), hash, hash_size) == 1);
+        KUTE_ASSERT(kryptos_bcrypt_verify((kryptos_u8_t *)"Wrong", 5, hash, hash_size) == 0);
+        KUTE_ASSERT(kryptos_bcrypt_verify(password[p], strlen((char *)password[p]), hash, hash_size) == 1);
         kryptos_freeseg(hash, hash_size);
         kryptos_freeseg(salt, 16);
     }
@@ -514,13 +515,13 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_feal_gcm_tests)
     int rounds = 1;
-    kryptos_run_gcm_tests_no_support_with_custom_setup(feal, ktask, kryptos_feal_setup(ktask, "feal", 4,
+    kryptos_run_gcm_tests_no_support_with_custom_setup(feal, ktask, kryptos_feal_setup(ktask, (kryptos_u8_t *)"feal", 4,
                                                                                        kKryptosGCM, &rounds));
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc2_gcm_tests)
     int T1 = 32;
-    kryptos_run_gcm_tests_no_support_with_custom_setup(rc2, ktask, kryptos_rc2_setup(ktask, "rc2", 3, kKryptosGCM,
+    kryptos_run_gcm_tests_no_support_with_custom_setup(rc2, ktask, kryptos_rc2_setup(ktask, (kryptos_u8_t *)"rc2", 3, kKryptosGCM,
                                                                                      &T1));
 KUTE_TEST_CASE_END
 
@@ -542,7 +543,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_saferk64_gcm_tests)
     int rounds = 67;
-    kryptos_run_gcm_tests_no_support_with_custom_setup(saferk64, ktask, kryptos_saferk64_setup(ktask, "saferk64", 8,
+    kryptos_run_gcm_tests_no_support_with_custom_setup(saferk64, ktask, kryptos_saferk64_setup(ktask, (kryptos_u8_t *)"saferk64", 8,
                                                                                                kKryptosGCM, &rounds));
 KUTE_TEST_CASE_END
 
@@ -563,18 +564,18 @@ KUTE_TEST_CASE(kryptos_serpent_gcm_tests)
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_triple_des_gcm_tests)
-    kryptos_u8_t *k2 = "3des'", *k3 = "3des''";
+    kryptos_u8_t *k2 = (kryptos_u8_t *)"3des'", *k3 = (kryptos_u8_t *)"3des''";
     size_t k2_size = 5, k3_size = 6;
-    kryptos_run_gcm_tests_no_support_with_custom_setup(triple_des, ktask, kryptos_triple_des_setup(ktask, "3des", 4,
+    kryptos_run_gcm_tests_no_support_with_custom_setup(triple_des, ktask, kryptos_triple_des_setup(ktask, (kryptos_u8_t *)"3des", 4,
                                                                                                    kKryptosGCM,
                                                                                                    k2, &k2_size,
                                                                                                    k3, &k3_size));
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_triple_des_ede_gcm_tests)
-    kryptos_u8_t *k2 = "3des'", *k3 = "3des''";
+    kryptos_u8_t *k2 = (kryptos_u8_t *)"3des'", *k3 = (kryptos_u8_t *)"3des''";
     size_t k2_size = 5, k3_size = 6;
-    kryptos_run_gcm_tests_no_support_with_custom_setup(triple_des_ede, ktask, kryptos_triple_des_ede_setup(ktask, "3des", 4,
+    kryptos_run_gcm_tests_no_support_with_custom_setup(triple_des_ede, ktask, kryptos_triple_des_ede_setup(ktask, (kryptos_u8_t *)"3des", 4,
                                                                                                            kKryptosGCM,
                                                                                                            k2, &k2_size,
                                                                                                            k3, &k3_size));
@@ -582,12 +583,12 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_tea_gcm_tests)
     kryptos_run_gcm_tests_no_support_with_custom_setup(tea, ktask, kryptos_tea_setup(ktask,
-                                                                                     "teateateateateat", 16, kKryptosGCM));
+                                                                                     (kryptos_u8_t *)"teateateateateat", 16, kKryptosGCM));
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_xtea_gcm_tests)
     int rounds = 17;
-    kryptos_run_gcm_tests_no_support_with_custom_setup(xtea, ktask, kryptos_xtea_setup(ktask, "teateateateateat", 16,
+    kryptos_run_gcm_tests_no_support_with_custom_setup(xtea, ktask, kryptos_xtea_setup(ktask, (kryptos_u8_t *)"teateateateateat", 16,
                                                                                        kKryptosGCM, &rounds));
 KUTE_TEST_CASE_END
 
@@ -597,22 +598,22 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc5_gcm_tests)
     int rounds = 60;
-    kryptos_run_gcm_tests_no_support_with_custom_setup(rc5, ktask, kryptos_rc5_setup(ktask, "rc5", 3, kKryptosGCM, &rounds));
+    kryptos_run_gcm_tests_no_support_with_custom_setup(rc5, ktask, kryptos_rc5_setup(ktask, (kryptos_u8_t *)"rc5", 3, kKryptosGCM, &rounds));
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc6_128_gcm_tests)
     int rounds = 48;
-    kryptos_run_gcm_tests_with_custom_setup(rc6_128, ktask, kryptos_rc6_128_setup(ktask, "rc6", 3, kKryptosGCM, &rounds));
+    kryptos_run_gcm_tests_with_custom_setup(rc6_128, ktask, kryptos_rc6_128_setup(ktask, (kryptos_u8_t *)"rc6", 3, kKryptosGCM, &rounds));
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc6_192_gcm_tests)
     int rounds = 48;
-    kryptos_run_gcm_tests_with_custom_setup(rc6_192, ktask, kryptos_rc6_192_setup(ktask, "rc6", 3, kKryptosGCM, &rounds));
+    kryptos_run_gcm_tests_with_custom_setup(rc6_192, ktask, kryptos_rc6_192_setup(ktask, (kryptos_u8_t *)"rc6", 3, kKryptosGCM, &rounds));
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc6_256_gcm_tests)
     int rounds = 48;
-    kryptos_run_gcm_tests_with_custom_setup(rc6_256, ktask, kryptos_rc6_256_setup(ktask, "rc6", 3, kKryptosGCM, &rounds));
+    kryptos_run_gcm_tests_with_custom_setup(rc6_256, ktask, kryptos_rc6_256_setup(ktask, (kryptos_u8_t *)"rc6", 3, kKryptosGCM, &rounds));
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mars128_gcm_tests)
@@ -683,6 +684,6 @@ KUTE_TEST_CASE(kryptos_gost_gcm_tests)
     kryptos_u8_t s8[16] = {
          1, 15, 13,  0,  5,  7, 10,  4,  9,  2,  3, 14,  6, 11,  8, 12
     };
-    kryptos_run_gcm_tests_no_support_with_custom_setup(gost, ktask, kryptos_gost_setup(ktask, "gost", 4, kKryptosGCM,
+    kryptos_run_gcm_tests_no_support_with_custom_setup(gost, ktask, kryptos_gost_setup(ktask, (kryptos_u8_t *)"gost", 4, kKryptosGCM,
                                                        s1, s2, s3, s4, s5, s6, s7, s8));
 KUTE_TEST_CASE_END

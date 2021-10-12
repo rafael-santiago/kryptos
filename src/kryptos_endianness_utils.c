@@ -48,10 +48,10 @@ kryptos_u8_t *kryptos_cpy_u32_as_big_endian(kryptos_u8_t *dest, const size_t des
     }
 
     if (kryptos_little_endian_cpu()) {
-        *(dest) = value >> 24;
-        *(dest + 1) = (value >> 16);
-        *(dest + 2) = (value >> 8);
-        *(dest + 3) = value;
+        *(dest) = (value >> 24) & 0xFF;
+        *(dest + 1) = (value >> 16) & 0xFF;
+        *(dest + 2) = (value >> 8) & 0xFF;
+        *(dest + 3) = value & 0xFF;
     } else {
         memcpy(dest, &value, sizeof(kryptos_u32_t));
     }
@@ -87,7 +87,7 @@ kryptos_u8_t *kryptos_cpy_u16_as_big_endian(kryptos_u8_t *dest, const size_t des
 
     if (kryptos_little_endian_cpu()) {
         *(dest) = (value >> 8);
-        *(dest + 1) = value;
+        *(dest + 1) = value & 0xFF;
     } else {
         memcpy(dest, &value, sizeof(kryptos_u16_t));
     }
@@ -101,14 +101,14 @@ kryptos_u8_t *kryptos_cpy_u64_as_big_endian(kryptos_u8_t *dest, const size_t des
     }
 
     if (kryptos_little_endian_cpu()) {
-        *(dest) = value >> 56;
-        *(dest + 1) = (value >> 48);
-        *(dest + 2) = (value >> 40);
-        *(dest + 3) = (value >> 32);
-        *(dest + 4) = (value >> 24);
-        *(dest + 5) = (value >> 16);
-        *(dest + 6) = (value >>  8);
-        *(dest + 7) = value;
+        *(dest) = (value >> 56) & 0xFF;
+        *(dest + 1) = (value >> 48) & 0xFF;
+        *(dest + 2) = (value >> 40) & 0xFF;
+        *(dest + 3) = (value >> 32) & 0xFF;
+        *(dest + 4) = (value >> 24) & 0xFF;
+        *(dest + 5) = (value >> 16) & 0xFF;
+        *(dest + 6) = (value >>  8) & 0xFF;
+        *(dest + 7) = value & 0xFF;
     } else {
         memcpy(dest, &value, sizeof(kryptos_u64_t));
     }

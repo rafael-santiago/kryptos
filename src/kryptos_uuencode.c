@@ -84,15 +84,15 @@ kryptos_u8_t *kryptos_uuencode_encode_buffer(const kryptos_u8_t *buffer, const s
             block = block << 8 | 0x01;
         }
 
-           *cp    = 32 + ((block & 0x00FC0000) >> 18);
-        *(cp + 1) = 32 + ((block & 0x0003F000) >> 12);
-        *(cp + 2) = 32 + ((block & 0x00000FC0) >>  6);
+           *cp    = 32 + (((block & 0x00FC0000) >> 18) & 0xFF);
+        *(cp + 1) = 32 + (((block & 0x0003F000) >> 12) & 0xFF);
+        *(cp + 2) = 32 + (((block & 0x00000FC0) >>  6) & 0xFF);
         *(cp + 3) = 32 + (block & 0x0000003F);
 
         cp += 4;
 
         if (cp == cp_end || bp == bp_end) {
-            *out_p = 32 + enc_total;
+            *out_p = 32 + (kryptos_u8_t)enc_total;
             memcpy(out_p + 1, curr_line, (cp - &curr_line[0]));
             if (cp == cp_end) {
                 out_p += KRYPTOS_UUENCODE_BYTES_PER_LINE + 1;
@@ -160,7 +160,7 @@ static kryptos_u8_t *kryptos_uuencode_decode_buffer(const kryptos_u8_t *buffer, 
         bp_end -= 3;
     }
 
-    if (*out_size < *bp - 32) {
+    if (*out_size < (size_t)(*bp - 32)) {
         // CLUE(Rafael): Rather tiny buffers case.
         *out_size = *bp - 32;
     }

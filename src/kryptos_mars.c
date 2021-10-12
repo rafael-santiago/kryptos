@@ -264,13 +264,13 @@ static void kryptos_mars_key_sched(const kryptos_u8_t *key, const size_t key_siz
 
     kryptos_mars_ld_user_key_bytes(T, wkey, effective_key_size);
 
-    for (i = 0; i < n; i++) {
+    for (i = 0; i < (ssize_t)n; i++) {
         // CLUE(Rafael): This implementation is suitable for little-endian machines,
         //               if you are tilting at big-endian windmills... simply use a 'mirror' as shield, Sancho! ;)
         T[i] = kryptos_mars_rev_u32(T[i]);
     }
 
-    T[n] = n;
+    T[n] = (kryptos_u32_t)n;
 
     for (i = n + 1; i < 15; i++) {
         T[i] = 0;
@@ -443,6 +443,11 @@ static void kryptos_mars_block_encrypt(kryptos_u8_t *block, const struct kryptos
 
     // INFO(Rafael): Eight rounds of forward mixing.
 
+#if defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+# pragma warning(push)
+# pragma warning(disable : 4127 )
+#endif
+
     kryptos_mars_forward_mixing_round(0, D);
     kryptos_mars_forward_mixing_round(1, D);
     kryptos_mars_forward_mixing_round(2, D);
@@ -481,6 +486,10 @@ static void kryptos_mars_block_encrypt(kryptos_u8_t *block, const struct kryptos
     kryptos_mars_backwards_mixing_round(5, D);
     kryptos_mars_backwards_mixing_round(6, D);
     kryptos_mars_backwards_mixing_round(7, D);
+
+#if defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+# pragma warning(pop)
+#endif
 
     // INFO(Rafael): Key whitening stuff.
 
@@ -564,6 +573,11 @@ static void kryptos_mars_block_decrypt(kryptos_u8_t *block, const struct kryptos
     D[2] += sks->K[38];
     D[3] += sks->K[39];
 
+#if defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+# pragma warning(push)
+# pragma warning(disable: 4127)
+#endif
+
     // INFO(Rafael): Forward mixing inverse.
 
     kryptos_mars_forward_mixing_round_1(7, D);
@@ -604,6 +618,10 @@ static void kryptos_mars_block_decrypt(kryptos_u8_t *block, const struct kryptos
     kryptos_mars_backwards_mixing_round_1(2, D);
     kryptos_mars_backwards_mixing_round_1(1, D);
     kryptos_mars_backwards_mixing_round_1(0, D);
+
+#if defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+# pragma warning(pop)
+#endif
 
     // INFO(Rafael): Key whitening.
 

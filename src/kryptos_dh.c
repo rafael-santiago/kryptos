@@ -783,7 +783,7 @@ kryptos_task_result_t kryptos_dh_eval_t(kryptos_mp_value_t **t,
 kryptos_task_result_t kryptos_dh_get_random_s(kryptos_mp_value_t **s, const kryptos_mp_value_t *p, const size_t s_bits) {
     kryptos_mp_value_t *p_2 = NULL, *_2 = NULL;
     kryptos_task_result_t result = kKryptosProcessError;
-    ssize_t d;
+    size_t d;
     kryptos_mp_digit_t mask = 0;
 
     if (p == NULL || s == NULL) {
@@ -866,7 +866,7 @@ kryptos_task_result_t kryptos_dh_get_modp(const kryptos_dh_modp_group_bits_t bit
                                           kryptos_mp_value_t **p, kryptos_mp_value_t **g) {
     kryptos_task_result_t result = kKryptosSuccess;
 
-    if (bits > kKryptosDHGroupNr || p == NULL || g == NULL) {
+    if (bits > kKryptosDHGroupNr || (int)bits <= -1 || p == NULL || g == NULL) {
         result = kKryptosInvalidParams;
         goto kryptos_dh_get_modp_epilogue;
     }

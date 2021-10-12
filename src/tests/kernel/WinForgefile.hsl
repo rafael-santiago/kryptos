@@ -1,58 +1,38 @@
 #
-#                                Copyright (C) 2017 by Rafael Santiago
+#                                Copyright (C) 2021 by Rafael Santiago
 #
 # This is a free software. You can redistribute it and/or modify under
 # the terms of the GNU General Public License version 2.
 #
 #
 
-include on freebsd ~/toolsets/freebsd/freebsd-module.hsl
-include on netbsd ~/toolsets/netbsd/netbsd-module.hsl
-include on linux ~/toolsets/linux/linux-module.hsl
-include on windows ~/toolsets/null/null.hsl
+include on windows ~/toolsets/windows/driver/windows-driver.hsl
+include on windows ~/toolsets/windows/driver/util/mod_utils.hsl
+include ../../Toolsets.hsl
 include mkclean.hsl
-include krun.hsl
 
+local var srcs type list;
 local var includes type list;
 local var cflags type list;
 local var libraries type list;
 local var ldflags type list;
 local var modname type string;
 
-local var LKMTOOL type string;
+project win-kryptos-test-sys : toolset "windows-driver" : $srcs, $includes, $cflags, $libraries, $ldflags, $modname;
 
-project kryptos-test-mod : toolset $LKMTOOL : "main.c", $includes, $cflags, $libraries, $ldflags, $modname;
-
-kryptos-test-mod.preloading() {
-    if (hefesto.sys.os_name() == "freebsd") {
-        $LKMTOOL = "freebsd-kld";
-    } else if (hefesto.sys.os_name() == "netbsd") {
-        $LKMTOOL = "netbsd-module";
-    } else if (hefesto.sys.os_name() == "linux") {
-        $LKMTOOL = "linux-lkm";
-    } else if (hefesto.sys.os_name() == "windows") {
-        $LKMTOOL = "no-tool-any-set";
-        var exit_code type int;
-        $exit_code = hefesto.sys.forge("win-kryptos-test-sys", "WinForgefile.hsl", hefesto.project.cmdline());
-        hefesto.project.abort($exit_code);
-    }
-}
-
-kryptos-test-mod.prologue() {
-    $includes.add_item(hefesto.sys.make_path(hefesto.sys.pwd(), "../../"));
-    $includes.add_item(hefesto.sys.pwd());
-
-    if (hefesto.sys.os_name() == "linux") {
-        $includes.add_item("/usr/include");
-        # INFO(Rafael): By now let's enable it by default in Linux, instead of detecting during compile-time as in FreeBSD.
-        $cflags.add_item("-std=gnu99");
-    }
-
+win-kryptos-test-sys.prologue() {
     var option type list;
     $option = hefesto.sys.get_option("clean");
 
     if ($option.count() > 0) {
-        mkclean($includes);
+        var dirlist type list;
+        $dirlist.add_item(hefesto.sys.pwd());
+        $dirlist.add_item(hefesto.sys.make_path(hefesto.sys.pwd(), "debug\x64"));
+        $dirlist.add_item(hefesto.sys.make_path(hefesto.sys.pwd(), "release\x64"));
+        $dirlist.add_item(hefesto.sys.make_path(hefesto.sys.pwd(), "debug"));
+        $dirlist.add_item(hefesto.sys.make_path(hefesto.sys.pwd(), "release"));
+        $dirlist.add_item(hefesto.sys.make_path(hefesto.sys.pwd(), "..\\.."));
+        mkclean($dirlist);
         hefesto.sys.echo("*** All clean!\n");
         hefesto.project.abort(0);
     }
@@ -104,28 +84,46 @@ kryptos-test-mod.prologue() {
     $cflags.add_item("-DKRYPTOS_DATA_WIPING_WHEN_FREEING_MEMORY=1");
     $cflags.add_item("-DKRYPTOS_ENSURE_MEMSET_CLEANUPS=1");
 
-    $modname = "kryptos_test";
+    $cflags.add_item("-DUSE_LIBCNTPR=1");
+
+    $ldflags.add_item("cng.lib");
+    $ldflags.add_item("libcntpr.lib");
+
+    $srcs.ls(".*\\.c$");
+    hefesto.sys.cd("..\\..");
+    $srcs.ls(".*\\.c$");
+    $includes.add_item(hefesto.sys.pwd());
+    hefesto.sys.cd("tests\\kernel");
+    $includes.add_item(hefesto.sys.pwd());
+    $modname = "kryptos-test.sys";
 }
 
-kryptos-test-mod.epilogue() {
+win-kryptos-test-sys.epilogue() {
     if (hefesto.sys.last_forge_result() == 0) {
         hefesto.sys.echo("*** Test module successfully compiled.\n");
-
-        if (hefesto.sys.os_name() == "linux" || hefesto.sys.os_name() == "freebsd") {
-            $modname = $modname + ".ko";
-        } else if (hefesto.sys.os_name() == "netbsd") {
-            $modname = $modname + ".kmod";
+        var driver_filepath type string;
+        var compile_model type string;
+        $compile_model = "debug";
+        var option type list;
+        $option = hefesto.sys.get_option("compile-model");
+        if ($option.count() > 0) {
+            $compile_model = $option.item(0);
         }
-
-        # WARN(Rafael): Buckle up!
-
+        if (get_msvc_platform() == "x64") {
+            $driver_filepath = hefesto.sys.make_path(hefesto.sys.pwd(), "x64\\" + $compile_model + "\\kryptos-test\\" + $modname);
+        } else {
+            $driver_filepath = hefesto.sys.make_path(hefesto.sys.pwd(), $compile_model + "\\kryptos-test\\" + $modname);
+        }
         var exit_code type int;
-        $exit_code = krun($modname);
-
+        $exit_code = insmod($driver_filepath);
         if ($exit_code != 0) {
-            hefesto.project.abort($exit_code);
+            hefesto.sys.echo("ERROR: Some issues were found during kernel-mode tests.\n");
+            hefesto.project.abort(1);
+        } else {
+            hefesto.sys.echo("INFO: Kernel-mode tests passed.\n");
+            if (rmmod($driver_filepath) != 0) {
+                hefesto.sys.echo("WARN: Unable to unload test device driver.\n");
+            }
         }
-    } else {
-        hefesto.sys.echo("~~~ Error during test module compilation.\n");
     }
 }

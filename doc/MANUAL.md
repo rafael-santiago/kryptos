@@ -24,13 +24,22 @@ Watson@221B:~/src/kryptos-test# gcc test.c -L/usr/well-known-place/ -lkryptos
 Of course, you should indicate where the ``kryptos`` headers are. In ``GCC``, ``Clang`` it can be done using the option
 ``-I<path>``.
 
+On Windows we also must link your code with ``bcrypt.(lib|a)`` due to the random generator system pool.
+
+Yes, ``Libkryptos`` also offers support for compilation on ``Microsoft Visual C``, take a look at ``doc/BUILD.md`` for
+more details.
+
 ### Linking kernel mode stuff
 
-For kernel mode, until now, kryptos can be used in ``FreeBSD``, ``NetBSD`` and ``Linux``. The main idea was create a tiny
-library easy to embed in any project. Thus all you need to do is define the C macro ``KRYPTOS_KERNEL_MODE`` during the
-compilation of your code.
+For kernel mode, until now, kryptos can be used on ``FreeBSD``, ``NetBSD``, ``Linux`` and ``Windows``. The main idea was
+create a tiny library easy to embed in any project. Thus all you need to do is define the C macro ``KRYPTOS_KERNEL_MODE``
+during the compilation of your code.
 
-In ``Linux`` if you want to use the c99 capabilities of ``kryptos`` you also need to pass the compiler flag ``-std=gnu99``.
+On ``Linux`` if you want to use the c99 capabilities of ``kryptos`` you also need to pass the compiler flag ``-std=gnu99``.
+
+On ``Windows`` c99 capabilities are on by default. In addition you must link your stuff with ``cng.lib`` (due to the random
+pool used from there) and ``libcntpr.lib`` due to some libc conveniences offered within Windows kernel and used by us. Since
+you are linking with ``libcntpr.lib`` define ``USE_LIBCNTPR=1``.
 
 ## The main idea behind this library
 

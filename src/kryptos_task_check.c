@@ -90,7 +90,7 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
         goto kryptos_task_check_error;
     }
 
-    if ((*ktask)->cipher >= kKryptosCipherNr) {
+    if ((*ktask)->cipher >= kKryptosCipherNr || (int)(*ktask)->cipher <= -1) {
         (*ktask)->result = kKryptosInvalidCipher;
         (*ktask)->result_verbose = "Invalid cipher.";
         goto kryptos_task_check_error;

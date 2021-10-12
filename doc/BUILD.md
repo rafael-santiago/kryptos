@@ -319,6 +319,29 @@ If it is happening with you try to compile ``libkryptos`` with the following opt
 Sherlock@221B:~/src/kryptos/src/tests/kernel# hefesto --no-hmac-tests
 ```
 
+### Building libkryptos on Microsoft Visual C
+
+All you should do is to pass your usage intention by using the build option ``toolset`` when invoking ``Hefesto``:
+
+```
+> hefesto --toolset=msvc
+```
+
+I have been building ``libkryptos`` on ``Microsoft Visual Studio 2019``.
+
+### Running libkryptos kernel mode tests on Windows
+
+You need to have ``WDK`` well-installed on your system once it done, if you invoke ``Hefesto`` by using
+``--kernel-mode-tests`` it will be built and tests will be ran.
+
+Notice that on ``Windows`` we have plenty of restrictions on device driver loading:
+
+- You must have Administrator privileges.
+- Since the generated device driver is not certified you must enable ``testsigning`` feature: ``bcdedit /set testsigning on``
+  (requires reboot).
+
+If you want to see the test verbose the best way is to use ``Sysinternals DebugView``.
+
 ## Are you searching for some build information not detailed here?
 
 Please let me know more by opening an [issue](https://github.com/rafael-santiago/kryptos/issues). Thank you!

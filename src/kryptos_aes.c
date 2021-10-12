@@ -43,7 +43,7 @@ struct kryptos_128bit_u8_matrix {
 
 struct kryptos_aes_subkeys {
     struct kryptos_128bit_u8_matrix round[16];
-    int rounds_nr;
+    size_t rounds_nr;
 };
 
 // INFO(Rafael): The AES pre-sets.

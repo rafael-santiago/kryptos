@@ -43,6 +43,11 @@ rsa-mk-key-pair-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 rsa-mk-key-pair-sample.epilogue() {
@@ -78,6 +83,11 @@ rsa-schoolbook-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 rsa-schoolbook-sample.epilogue() {
@@ -113,6 +123,11 @@ rsa-schoolbook-c99-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 rsa-schoolbook-c99-sample.epilogue() {
@@ -148,6 +163,11 @@ rsa-oaep-c99-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 rsa-oaep-c99-sample.epilogue() {
@@ -183,6 +203,11 @@ rsa-sign-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 rsa-sign-sample.epilogue() {
@@ -218,6 +243,11 @@ rsa-sign-c99-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 rsa-sign-c99-sample.epilogue() {
@@ -253,6 +283,11 @@ rsa-emsa-pss-sign-c99-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 rsa-emsa-pss-sign-c99-sample.epilogue() {

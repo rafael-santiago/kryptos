@@ -161,14 +161,14 @@ static kryptos_u8_t *kryptos_base64_decode_buffer(const kryptos_u8_t *buffer, co
                 (kryptos_u32_t) kryptos_base64_state_1[kryptos_base64_get_encoded_byte(*(bp + 2))] <<  6 |
                 (kryptos_u32_t) kryptos_base64_state_1[kryptos_base64_get_encoded_byte(*(bp + 3))];
 
-        *out_p = (block & 0x00FF0000) >> 16;
+        *out_p = ((block & 0x00FF0000) >> 16) & 0xFF;
         out_p++;
 
         if (out_p == out_end) {
             continue;
         }
 
-        *out_p = (block & 0x0000FF00) >>  8;
+        *out_p = ((block & 0x0000FF00) >>  8) & 0xFF;
         out_p++;
 
         if (out_p == out_end) {

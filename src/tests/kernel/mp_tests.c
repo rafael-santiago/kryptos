@@ -364,7 +364,7 @@ KUTE_TEST_CASE(kryptos_mp_eq_tests)
         "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000DEADBEEC"
     };
     struct eq_tests_ctx {
-        kryptos_u8_t *a, *b;
+        char *a, *b;
         int expected;
     };
     struct eq_tests_ctx test_vector[] = {
@@ -654,7 +654,7 @@ KUTE_TEST_CASE(kryptos_mp_ne_tests)
         "0000001000001000010"
     };
     struct ne_tests_ctx {
-        kryptos_u8_t *a, *b;
+        char *a, *b;
         int expected;
     };
     struct ne_tests_ctx test_vector[] = {
@@ -697,7 +697,7 @@ KUTE_TEST_CASE(kryptos_mp_gt_tests)
         "0000001000001000010"
     };
     struct gt_tests_ctx {
-        kryptos_u8_t *a, *b;
+        char *a, *b;
         int expected;
     };
     struct gt_tests_ctx test_vector[] = {
@@ -740,7 +740,7 @@ KUTE_TEST_CASE(kryptos_mp_lt_tests)
         "0000001000001000010"
     };
     struct lt_tests_ctx {
-        kryptos_u8_t *a, *b;
+        char *a, *b;
         int expected;
     };
     struct lt_tests_ctx test_vector[] = {
@@ -783,7 +783,7 @@ KUTE_TEST_CASE(kryptos_mp_ge_tests)
         "0000001000001000010"
     };
     struct ge_tests_ctx {
-        kryptos_u8_t *a, *b;
+        char *a, *b;
         int expected;
     };
     struct ge_tests_ctx test_vector[] = {
@@ -826,7 +826,7 @@ KUTE_TEST_CASE(kryptos_mp_le_tests)
         "0000001000001000010"
     };
     struct le_tests_ctx {
-        kryptos_u8_t *a, *b;
+        char *a, *b;
         int expected;
     };
     struct le_tests_ctx test_vector[] = {
@@ -863,7 +863,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_is_neg_tests)
     struct is_neg_tests_ctx {
-        kryptos_u8_t *v;
+        char *v;
         int is_neg;
     };
 #ifndef KRYPTOS_MP_U32_DIGIT
@@ -906,7 +906,7 @@ KUTE_TEST_CASE_END
 KUTE_TEST_CASE(kryptos_mp_add_tests)
     kryptos_mp_value_t *a, *b, *e;
     struct add_tests_ctx {
-        kryptos_u8_t *a, *b, *e;
+        char *a, *b, *e;
     };
 #ifndef KRYPTOS_MP_U32_DIGIT
     struct add_tests_ctx test_vector[] = {
@@ -997,7 +997,7 @@ KUTE_TEST_CASE_END
 KUTE_TEST_CASE(kryptos_mp_sub_tests)
     kryptos_mp_value_t *a, *b, *e;
     struct sub_tests_ctx {
-        kryptos_u8_t *a, *b, *e;
+        char *a, *b, *e;
     };
 #ifndef KRYPTOS_MP_U32_DIGIT
     struct sub_tests_ctx test_vector[] = {
@@ -1200,7 +1200,7 @@ KUTE_TEST_CASE_END
 KUTE_TEST_CASE(kryptos_mp_mul_tests)
     kryptos_mp_value_t *a, *b, *e;
     struct mul_tests_ctx {
-        kryptos_u8_t *a, *b, *e;
+        char *a, *b, *e;
     };
     struct mul_tests_ctx test_vector[] = {
         {                "2",        "4",                        "8" },
@@ -1249,9 +1249,9 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_mul_digit_tests)
     struct mul_digit_tests_ctx {
-        kryptos_u8_t *n;
+        char *n;
         kryptos_u8_t d;
-        kryptos_u8_t *e;
+        char *e;
     };
     struct mul_digit_tests_ctx test_vector[] = {
         { "0000000022", 0x02, "000000000044" },
@@ -1274,7 +1274,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_not_tests)
     struct not_tests_ctx {
-        kryptos_u8_t *n, *en;
+        char *n, *en;
     };
 #ifndef KRYPTOS_MP_U32_DIGIT
     struct not_tests_ctx test_vector[] = {
@@ -1327,7 +1327,7 @@ KUTE_TEST_CASE_END
 KUTE_TEST_CASE(kryptos_mp_div_tests)
     kryptos_mp_value_t *x, *y, *q, *r, *eq, *er;
     struct div_tests_ctx {
-        kryptos_u8_t *x, *y, *eq, *er;
+        char *x, *y, *eq, *er;
     };
     struct div_tests_ctx test_vector[] = {
         {                             "0002",                "1",                "2",                "0" },
@@ -1574,9 +1574,9 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_div_2p_tests)
     struct div_2p_tests_ctx {
-        kryptos_u8_t *x;
+        char *x;
         int p;
-        kryptos_u8_t *q, *r;
+        char *q, *r;
     };
     struct div_2p_tests_ctx test_vector[] = {
         { "1667", 1,  "B33", "1" },
@@ -1667,7 +1667,7 @@ KUTE_TEST_CASE_END
 KUTE_TEST_CASE(kryptos_mp_pow_tests)
     kryptos_mp_value_t *b, *e, *pe, *p;
     struct pow_tests_ctx {
-        kryptos_u8_t *b, *e, *pe;
+        char *b, *e, *pe;
     };
     struct pow_tests_ctx test_vector[] = {
         {  "2",  "0",                    "1" },
@@ -1702,8 +1702,8 @@ KUTE_TEST_CASE_END
 KUTE_TEST_CASE(kryptos_mp_is_odd_tests)
     kryptos_mp_value_t *a;
     struct odd_tests_ctx {
-        kryptos_u8_t *a;
-        int e;
+        char *a;
+        kryptos_u8_t e;
     };
     struct odd_tests_ctx test_vector[] = {
         { "0", 0 },
@@ -1736,7 +1736,7 @@ KUTE_TEST_CASE_END
 KUTE_TEST_CASE(kryptos_mp_is_even_tests)
     kryptos_mp_value_t *a;
     struct odd_tests_ctx {
-        kryptos_u8_t *a;
+        char *a;
         int e;
     };
     struct odd_tests_ctx test_vector[] = {
@@ -1769,7 +1769,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_me_mod_n_tests)
     struct mp_me_mod_n_tests_ctx {
-        kryptos_u8_t *m, *e, *n, *exp;
+        char *m, *e, *n, *exp;
     };
     struct mp_me_mod_n_tests_ctx test_vector[] = {
         {  "5", "2",   "D",   "C" },
@@ -1809,7 +1809,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_fermat_test_tests)
     struct fermat_test_ctx {
-        kryptos_u8_t *n;
+        char *n;
         int is_prime;
     };
     struct fermat_test_ctx test_vector[] = {
@@ -1829,9 +1829,9 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_lsh_tests)
     struct lsh_tests_ctx {
-        kryptos_u8_t *a;
+        char *a;
         int l;
-        kryptos_u8_t *e;
+        char *e;
     };
     struct lsh_tests_ctx test_vector[] = {
         {       "50",  7,          "2800" },
@@ -1864,9 +1864,9 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_rsh_tests)
     struct rsh_tests_ctx {
-        kryptos_u8_t *a;
+        char *a;
         int l;
-        kryptos_u8_t *e;
+        char *e;
     };
     struct rsh_tests_ctx test_vector[] = {
         {        "2",  1,             "1" },
@@ -1903,7 +1903,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_miller_rabin_test_tests)
     struct miller_rabin_test_ctx {
-        kryptos_u8_t *n;
+        char *n;
         int is_prime;
     };
     struct miller_rabin_test_ctx test_vector[] = {
@@ -1923,7 +1923,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_is_prime_tests)
     struct is_prime_test_ctx {
-        kryptos_u8_t *n;
+        char *n;
         int is_prime;
     };
     struct is_prime_test_ctx test_vector[] = {
@@ -1965,7 +1965,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_gcd_tests)
     struct gcd_tests_ctx {
-        kryptos_u8_t *x, *y, *gcd;
+        char *x, *y, *gcd;
     };
     struct gcd_tests_ctx test_vector[] = {
         {                              "6E4",                             "364",   "1C" },
@@ -2011,7 +2011,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_modinv_tests)
     struct egcd_tests_ctx {
-        kryptos_u8_t *a, *m, *v;
+        char *a, *m, *v;
     };
     struct egcd_tests_ctx test_vector[] = {
         {     "10F",       "17F",        "6A" },
@@ -2041,7 +2041,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_modinv_rs_tests)
     struct egcd_tests_ctx {
-        kryptos_u8_t *a, *m, *v;
+        char *a, *m, *v;
     };
     struct egcd_tests_ctx test_vector[] = {
         {     "10F",       "17F",        "6A" },
@@ -2073,7 +2073,7 @@ KUTE_TEST_CASE(kryptos_mp_montgomery_reduction_tests)
     kryptos_mp_value_t *y;
     kryptos_mp_value_t *e;
     struct montgomery_reduction_test_ctx {
-        kryptos_u8_t *x, *y, *e;
+        char *x, *y, *e;
     };
     struct montgomery_reduction_test_ctx test_vector[] = {
         {    "37",   "7",   "6" },
@@ -2112,7 +2112,7 @@ KUTE_TEST_CASE(kryptos_raw_buffer_as_mp_tests)
 
     KUTE_ASSERT(emp != NULL);
 
-    mp = kryptos_raw_buffer_as_mp("\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xAA\xBB\xCC\xDD\xEE\xFF", 16);
+    mp = kryptos_raw_buffer_as_mp((kryptos_u8_t *)"\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xAA\xBB\xCC\xDD\xEE\xFF", 16);
 
     KUTE_ASSERT(mp != NULL);
 
@@ -2127,7 +2127,7 @@ KUTE_TEST_CASE(kryptos_mp_as_task_out_tests)
     kryptos_mp_value_t *mp = NULL;
     kryptos_u8_t *o = NULL;
     ssize_t o_size = 0, d = 0;
-    kryptos_u8_t *expected_buffer = "\xDE\xAD\xBE\xEF\xBE\xEF\xDE\xAD";
+    kryptos_u8_t *expected_buffer = (kryptos_u8_t *)"\xDE\xAD\xBE\xEF\xBE\xEF\xDE\xAD";
     size_t expected_buffer_size = 8;
 
     mp = kryptos_raw_buffer_as_mp(expected_buffer, expected_buffer_size);
@@ -2145,18 +2145,20 @@ KUTE_TEST_CASE(kryptos_mp_as_task_out_tests)
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
     kryptos_del_mp_value(mp);
 
-    return 0;
+    goto kryptos_mp_as_raw_buffer_tests_end;
+
 kryptos_mp_as_raw_buffer_tests_epilogue:
     return 1;
+kryptos_mp_as_raw_buffer_tests_end:
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_mod_tests)
     struct test_ctx {
-        kryptos_u8_t *a;
+        char *a;
         size_t a_size;
-        kryptos_u8_t *b;
+        char *b;
         size_t b_size;
-        kryptos_u8_t *e;
+        char *e;
         size_t e_size;
     };
     struct test_ctx test_vector[] = {
@@ -2190,11 +2192,11 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_barrett_reduction_tests)
     struct test_ctx {
-        kryptos_u8_t *x;
+        char *x;
         size_t x_size;
-        kryptos_u8_t *m;
+        char *m;
         size_t m_size;
-        kryptos_u8_t *e;
+        char *e;
         size_t e_size;
     };
     struct test_ctx test_vector[] = {
@@ -2258,11 +2260,11 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_add_s_tests)
     struct test_ctx {
-        kryptos_u8_t *a;
+        char *a;
         size_t a_size;
-        kryptos_u8_t *b;
+        char *b;
         size_t b_size;
-        kryptos_u8_t *e;
+        char *e;
         size_t e_size;
     };
     struct test_ctx test_vector[] = {
@@ -2301,11 +2303,11 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_sub_s_tests)
     struct test_ctx {
-        kryptos_u8_t *a;
+        char *a;
         size_t a_size;
-        kryptos_u8_t *b;
+        char *b;
         size_t b_size;
-        kryptos_u8_t *e;
+        char *e;
         size_t e_size;
     };
     struct test_ctx test_vector[] = {
@@ -2348,11 +2350,11 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_mul_s_tests)
     struct test_ctx {
-        kryptos_u8_t *a;
+        char *a;
         size_t a_size;
-        kryptos_u8_t *b;
+        char *b;
         size_t b_size;
-        kryptos_u8_t *e;
+        char *e;
         size_t e_size;
     };
     struct test_ctx test_vector[] = {
@@ -2393,24 +2395,24 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_get_bitmap_tests)
     struct test_ctx {
-        kryptos_u8_t *value;
+        char *value;
         kryptos_u8_t *expected;
         size_t expected_size;
     };
     struct test_ctx test_vector[] = {
 #if !defined(KRYPTOS_MP_EXTENDED_RADIX)
-        { "DEADBEEF",         "\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
+        { "DEADBEEF",         (kryptos_u8_t *)"\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
                               "\x1\x0\x1\x1\x1\x1\x1\x0\x1\x1\x1\x0\x1\x1\x1\x1", 32 },
-        { "DEADBEEFDEADBEEF", "\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
+        { "DEADBEEFDEADBEEF", (kryptos_u8_t *)"\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
                               "\x1\x0\x1\x1\x1\x1\x1\x0\x1\x1\x1\x0\x1\x1\x1\x1"
                               "\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
                               "\x1\x0\x1\x1\x1\x1\x1\x0\x1\x1\x1\x0\x1\x1\x1\x1", 64 }
 #elif defined(KRYPTOS_MP_EXTENDED_RADIX)
-        { "DEADBEEF",         "\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0"
+        { "DEADBEEF",         (kryptos_u8_t *)"\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0"
                               "\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0"
                               "\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
                               "\x1\x0\x1\x1\x1\x1\x1\x0\x1\x1\x1\x0\x1\x1\x1\x1", 64 },
-        { "DEADBEEFDEADBEEF", "\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
+        { "DEADBEEFDEADBEEF", (kryptos_u8_t *)"\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
                               "\x1\x0\x1\x1\x1\x1\x1\x0\x1\x1\x1\x0\x1\x1\x1\x1"
                               "\x1\x1\x0\x1\x1\x1\x1\x0\x1\x0\x1\x0\x1\x1\x0\x1"
                               "\x1\x0\x1\x1\x1\x1\x1\x0\x1\x1\x1\x0\x1\x1\x1\x1", 64 }
@@ -2435,7 +2437,7 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mp_inv_tests)
     struct inv_signal_tests_ctx {
-        kryptos_u8_t *n, *en;
+        char *n, *en;
     };
 
     // INFO(Rafael): This is equivalent to the "signed char" range (-128 to 128).

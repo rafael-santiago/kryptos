@@ -741,10 +741,10 @@ static void kryptos_blake2s(struct kryptos_blake2_ctx *data) {
     p->f = 1;
 
     if (data->kk == 0) {
-        p->t[0] = data->ll;
+        p->t[0] = (kryptos_u32_t)data->ll;
         p->t[1] = 0;
     } else {
-        p->t[0] = data->ll + KRYPTOS_BLAKE2S_BYTES_PER_BLOCK;
+        p->t[0] = (kryptos_u32_t)(data->ll + KRYPTOS_BLAKE2S_BYTES_PER_BLOCK);
         p->t[1] = 0;
     }
 

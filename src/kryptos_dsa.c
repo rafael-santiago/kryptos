@@ -240,7 +240,7 @@ void kryptos_dsa_digital_signature_setup(kryptos_task_ctx *ktask, kryptos_u8_t *
     ktask->key = key;
     ktask->key_size = key_size;
 
-    ktask->arg[0] = hash;
+    ktask->arg[0] = (void *)hash;
 }
 
 void kryptos_dsa_sign(kryptos_task_ctx **ktask) {
@@ -566,7 +566,7 @@ void kryptos_dsa_verify(kryptos_task_ctx **ktask) {
     }
 
     if ((*ktask)->arg[0] != NULL) {
-        hash = (*ktask)->arg[0];
+        hash = (kryptos_hash_func)(*ktask)->arg[0];
     }
 
     s_inv = kryptos_mp_modinv(s, q);

@@ -16,6 +16,9 @@
 #include <kryptos.h>
 #ifndef KRYPTOS_KERNEL_MODE
 # include <string.h>
+#elif defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+# pragma warning(push)
+# pragma warning(disable: 4296)
 #endif
 
 // WARN(Rafael): Until now (2019) Argon2 algorithm counts with a specification that has some really bad and cruel
@@ -106,11 +109,11 @@ kryptos_u8_t *kryptos_do_argon2(kryptos_u8_t *password, const kryptos_u32_t pass
                                 const kryptos_argon2_hash_type_t htype) {
 
     kryptos_u8_t *tag = NULL, *buffer = NULL, *bp, *tp, *tp_end, *tt, *tt_end, *cp, *cp_end, C[KRYPTOS_ARGON2_DATA_SIZE];
-    size_t buffer_size;
+    size_t buffer_size = 0;
     kryptos_u32_t hash_type = htype;
     kryptos_task_ctx t, *ktask = &t;
     kryptos_u8_t *H0 = NULL;
-    size_t H0_size;
+    size_t H0_size = 0;
     struct kryptos_argon2_array_ctx **B = NULL;
     struct kryptos_argon2_params_ctx params;
     kryptos_u32_t i, j;
@@ -861,5 +864,9 @@ static void kryptos_argon2_P(kryptos_u8_t *s0, kryptos_u8_t *s1, kryptos_u8_t *s
 #undef kryptos_argon2_put_u32
 
 #undef KRYPTOS_ARGON2_DATA_SIZE
+
+#if defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
+# pragma warning(pop)
+#endif
 
 #endif

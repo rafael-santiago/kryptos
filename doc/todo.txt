@@ -1,3 +1,4 @@
+(A) Support kryptos kernel mode on Windows. +ScopeIncrease,+NewFeature,+Improvement,+Build
 (A) Try to give support to GMP on multiprecision stuff when asked by the user. +Improvement
 x (A) Adapt KRYPTOS_MP_EXTENDED_RADIX for kernel mode if possible. +Improvement
 x (A) Give radix 2^64 a try on 64-bit processors on multiprecision stuff. +Improvement

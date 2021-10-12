@@ -10,33 +10,33 @@
 
 #define kryptos_bad_buf_run_block_cipher(cipher_name, ktask) {\
     kryptos_task_init_as_null(ktask);\
-    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in = (kryptos_u8_t *)"Wabba labba dub dub Wabba labba dub dub";\
     ktask->in_size = 39;\
-    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosECB);\
+    kryptos_ ## cipher_name ## _setup(&t, (kryptos_u8_t *)"Boom!!!!!!!!!!!!", 16, kKryptosECB);\
     kryptos_task_set_encrypt_action(&t);\
     kryptos_ ## cipher_name  ## _cipher(&ktask);\
     KUTE_ASSERT(ktask->out != NULL);\
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
-    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in = (kryptos_u8_t *)"Wabba labba dub dub Wabba labba dub dub";\
     ktask->in_size = 39;\
-    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosCBC);\
+    kryptos_ ## cipher_name ## _setup(&t, (kryptos_u8_t *)"Boom!!!!!!!!!!!!", 16, kKryptosCBC);\
     kryptos_task_set_encrypt_action(&t);\
     kryptos_ ## cipher_name  ## _cipher(&ktask);\
     KUTE_ASSERT(ktask->out != NULL);\
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
-    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in = (kryptos_u8_t *)"Wabba labba dub dub Wabba labba dub dub";\
     ktask->in_size = 39;\
-    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosOFB);\
+    kryptos_ ## cipher_name ## _setup(&t, (kryptos_u8_t *)"Boom!!!!!!!!!!!!", 16, kKryptosOFB);\
     kryptos_task_set_encrypt_action(&t);\
     kryptos_ ## cipher_name  ## _cipher(&ktask);\
     KUTE_ASSERT(ktask->out != NULL);\
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
-    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in = (kryptos_u8_t *)"Wabba labba dub dub Wabba labba dub dub";\
     ktask->in_size = 39;\
-    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosCTR);\
+    kryptos_ ## cipher_name ## _setup(&t, (kryptos_u8_t *)"Boom!!!!!!!!!!!!", 16, kKryptosCTR);\
     kryptos_task_set_encrypt_action(&t);\
     kryptos_ ## cipher_name  ## _cipher(&ktask);\
     KUTE_ASSERT(ktask->out != NULL);\
@@ -46,7 +46,7 @@
     ktask->in = kryptos_get_random_block(1024);\
     KUTE_ASSERT(ktask->in != NULL);\
     ktask->in_size = 1024;\
-    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosECB);\
+    kryptos_ ## cipher_name ## _setup(&t, (kryptos_u8_t *)"Boom!!!!!!!!!!!!", 16, kKryptosECB);\
     kryptos_task_set_encrypt_action(&t);\
     kryptos_ ## cipher_name  ## _cipher(&ktask);\
     KUTE_ASSERT(ktask->out != NULL);\
@@ -55,7 +55,7 @@
     ktask->in = kryptos_get_random_block(1024);\
     KUTE_ASSERT(ktask->in != NULL);\
     ktask->in_size = 1024;\
-    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosCBC);\
+    kryptos_ ## cipher_name ## _setup(&t, (kryptos_u8_t *)"Boom!!!!!!!!!!!!", 16, kKryptosCBC);\
     kryptos_task_set_encrypt_action(&t);\
     kryptos_ ## cipher_name  ## _cipher(&ktask);\
     KUTE_ASSERT(ktask->out != NULL);\
@@ -64,7 +64,7 @@
     ktask->in = kryptos_get_random_block(1024);\
     KUTE_ASSERT(ktask->in != NULL);\
     ktask->in_size = 1024;\
-    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosOFB);\
+    kryptos_ ## cipher_name ## _setup(&t, (kryptos_u8_t *)"Boom!!!!!!!!!!!!", 16, kKryptosOFB);\
     kryptos_task_set_encrypt_action(&t);\
     kryptos_ ## cipher_name  ## _cipher(&ktask);\
     KUTE_ASSERT(ktask->out != NULL);\
@@ -73,7 +73,7 @@
     ktask->in = kryptos_get_random_block(1024);\
     KUTE_ASSERT(ktask->in != NULL);\
     ktask->in_size = 1024;\
-    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosCTR);\
+    kryptos_ ## cipher_name ## _setup(&t, (kryptos_u8_t *)"Boom!!!!!!!!!!!!", 16, kKryptosCTR);\
     kryptos_task_set_encrypt_action(&t);\
     kryptos_ ## cipher_name  ## _cipher(&ktask);\
     KUTE_ASSERT(ktask->out != NULL);\
@@ -82,7 +82,7 @@
     ktask->in = kryptos_get_random_block(3);\
     KUTE_ASSERT(ktask->in != NULL);\
     ktask->in_size = 3;\
-    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosECB);\
+    kryptos_ ## cipher_name ## _setup(&t, (kryptos_u8_t *)"Boom!!!!!!!!!!!!", 16, kKryptosECB);\
     kryptos_task_set_encrypt_action(&t);\
     kryptos_ ## cipher_name  ## _cipher(&ktask);\
     KUTE_ASSERT(ktask->out != NULL);\
@@ -91,7 +91,7 @@
     ktask->in = kryptos_get_random_block(3);\
     KUTE_ASSERT(ktask->in != NULL);\
     ktask->in_size = 3;\
-    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosCBC);\
+    kryptos_ ## cipher_name ## _setup(&t, (kryptos_u8_t *)"Boom!!!!!!!!!!!!", 16, kKryptosCBC);\
     kryptos_task_set_encrypt_action(&t);\
     kryptos_ ## cipher_name  ## _cipher(&ktask);\
     KUTE_ASSERT(ktask->out != NULL);\
@@ -100,7 +100,7 @@
     ktask->in = kryptos_get_random_block(3);\
     KUTE_ASSERT(ktask->in != NULL);\
     ktask->in_size = 3;\
-    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosOFB);\
+    kryptos_ ## cipher_name ## _setup(&t, (kryptos_u8_t *)"Boom!!!!!!!!!!!!", 16, kKryptosOFB);\
     kryptos_task_set_encrypt_action(&t);\
     kryptos_ ## cipher_name  ## _cipher(&ktask);\
     KUTE_ASSERT(ktask->out != NULL);\
@@ -109,7 +109,7 @@
     ktask->in = kryptos_get_random_block(3);\
     KUTE_ASSERT(ktask->in != NULL);\
     ktask->in_size = 3;\
-    kryptos_ ## cipher_name ## _setup(&t, "Boom!!!!!!!!!!!!", 16, kKryptosCTR);\
+    kryptos_ ## cipher_name ## _setup(&t, (kryptos_u8_t *)"Boom!!!!!!!!!!!!", 16, kKryptosCTR);\
     kryptos_task_set_encrypt_action(&t);\
     kryptos_ ## cipher_name  ## _cipher(&ktask);\
     KUTE_ASSERT(ktask->out != NULL);\
@@ -120,7 +120,7 @@
 #define kryptos_bad_buf_run_block_cipher_with_custom_setup(cipher_name,\
                                          setup_stmt_ecb, setup_stmt_cbc, setup_stmt_ofb, setup_stmt_ctr, ktask) {\
     kryptos_task_init_as_null(ktask);\
-    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in = (kryptos_u8_t *)"Wabba labba dub dub Wabba labba dub dub";\
     ktask->in_size = 39;\
     setup_stmt_ecb;\
     kryptos_task_set_encrypt_action(&t);\
@@ -128,7 +128,7 @@
     KUTE_ASSERT(ktask->out != NULL);\
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
-    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in = (kryptos_u8_t *)"Wabba labba dub dub Wabba labba dub dub";\
     ktask->in_size = 39;\
     setup_stmt_cbc;\
     kryptos_task_set_encrypt_action(&t);\
@@ -136,7 +136,7 @@
     KUTE_ASSERT(ktask->out != NULL);\
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
-    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in = (kryptos_u8_t *)"Wabba labba dub dub Wabba labba dub dub";\
     ktask->in_size = 39;\
     setup_stmt_ofb;\
     kryptos_task_set_encrypt_action(&t);\
@@ -144,7 +144,7 @@
     KUTE_ASSERT(ktask->out != NULL);\
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);\
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
-    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in = (kryptos_u8_t *)"Wabba labba dub dub Wabba labba dub dub";\
     ktask->in_size = 39;\
     setup_stmt_ctr;\
     kryptos_task_set_encrypt_action(&t);\
@@ -228,21 +228,21 @@
 }
 
 #if defined(KRYPTOS_C99)
-#define kryptos_bad_buf_run_hmac(cname, hname, ktask, cipher_args...) {\
+#define kryptos_bad_buf_run_hmac(cname, hname, ktask, ...) {\
     kryptos_task_init_as_null(ktask);\
-    ktask->in = "Wabba labba dub dub Wabba labba dub dub";\
+    ktask->in = (kryptos_u8_t *)"Wabba labba dub dub Wabba labba dub dub";\
     ktask->in_size = 39;\
     kryptos_task_set_decrypt_action(ktask);\
-    kryptos_run_cipher_hmac(cname, hname, ktask, cipher_args);\
+    kryptos_run_cipher_hmac(cname, hname, ktask, __VA_ARGS__);\
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
     KUTE_ASSERT(ktask->result == kKryptosHMACError);\
     if (ktask->mode != kKryptosECB) {\
         kryptos_task_free(ktask, KRYPTOS_TASK_IV);\
     }\
-    ktask->in = "abc";\
+    ktask->in = (kryptos_u8_t *)"abc";\
     ktask->in_size = 3;\
     kryptos_task_set_decrypt_action(ktask);\
-    kryptos_run_cipher_hmac(cname, hname, ktask, cipher_args);\
+    kryptos_run_cipher_hmac(cname, hname, ktask, __VA_ARGS__);\
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
     KUTE_ASSERT(ktask->result == kKryptosHMACError);\
     if (ktask->mode != kKryptosECB) {\
@@ -252,7 +252,7 @@
     KUTE_ASSERT(ktask->in != NULL);\
     ktask->in_size = 1024;\
     kryptos_task_set_decrypt_action(ktask);\
-    kryptos_run_cipher_hmac(cname, hname, ktask, cipher_args);\
+    kryptos_run_cipher_hmac(cname, hname, ktask, __VA_ARGS__);\
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 0);\
     KUTE_ASSERT(ktask->result == kKryptosHMACError);\
     if (ktask->mode != kKryptosECB) {\
@@ -268,12 +268,12 @@ KUTE_TEST_CASE(kryptos_bad_decryption_tests)
     int feal_rounds = 19;
     int rc2_t1 = 128;
     int saferk64_n = 6;
-    kryptos_u8_t *tdes_k2 = "abc", *tdes_k3 = "def";
+    kryptos_u8_t *tdes_k2 = (kryptos_u8_t*)"abc", *tdes_k3 = (kryptos_u8_t*)"def";
     size_t tdes_k2_size = 3, tdes_k3_size = 3;
     int xtea_rounds = 72;
     int rc5_rounds = 48;
     int rc6_rounds = 90;
-    kryptos_u8_t *rabbit_iv = "abcdefghijklmnopqrstuvwxyz"
+    kryptos_u8_t *rabbit_iv = (kryptos_u8_t*)"abcdefghijklmnopqrstuvwxyz"
                               "abcdefghijklmnopqrstuvwxyz"
                               "abcdefghijkl";
     kryptos_u8_t gost_s1[16] = {
@@ -326,92 +326,92 @@ KUTE_TEST_CASE(kryptos_bad_decryption_tests)
     kryptos_bad_buf_run_block_cipher(noekeon, ktask);
     kryptos_bad_buf_run_block_cipher(noekeon_d, ktask);
     kryptos_bad_buf_run_block_cipher_with_custom_setup(feal,
-                                                       kryptos_feal_setup(ktask, "Boom!", 5, kKryptosECB, &feal_rounds),
-                                                       kryptos_feal_setup(ktask, "Boom!", 5, kKryptosCBC, &feal_rounds),
-                                                       kryptos_feal_setup(ktask, "Boom!", 5, kKryptosOFB, &feal_rounds),
-                                                       kryptos_feal_setup(ktask, "Boom!", 5, kKryptosCTR, &feal_rounds),
+                                                       kryptos_feal_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosECB, &feal_rounds),
+                                                       kryptos_feal_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCBC, &feal_rounds),
+                                                       kryptos_feal_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosOFB, &feal_rounds),
+                                                       kryptos_feal_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCTR, &feal_rounds),
                                                        ktask);
     kryptos_bad_buf_run_block_cipher_with_custom_setup(rc2,
-                                                       kryptos_rc2_setup(ktask, "Boom!", 5, kKryptosECB, &rc2_t1),
-                                                       kryptos_rc2_setup(ktask, "Boom!", 5, kKryptosCBC, &rc2_t1),
-                                                       kryptos_rc2_setup(ktask, "Boom!", 5, kKryptosOFB, &rc2_t1),
-                                                       kryptos_rc2_setup(ktask, "Boom!", 5, kKryptosCTR, &rc2_t1),
+                                                       kryptos_rc2_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosECB, &rc2_t1),
+                                                       kryptos_rc2_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCBC, &rc2_t1),
+                                                       kryptos_rc2_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosOFB, &rc2_t1),
+                                                       kryptos_rc2_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCTR, &rc2_t1),
                                                        ktask);
     kryptos_bad_buf_run_block_cipher_with_custom_setup(saferk64,
-                                                       kryptos_saferk64_setup(ktask, "Boom!", 5, kKryptosECB, &saferk64_n),
-                                                       kryptos_saferk64_setup(ktask, "Boom!", 5, kKryptosCBC, &saferk64_n),
-                                                       kryptos_saferk64_setup(ktask, "Boom!", 5, kKryptosOFB, &saferk64_n),
-                                                       kryptos_saferk64_setup(ktask, "Boom!", 5, kKryptosCTR, &saferk64_n),
+                                                       kryptos_saferk64_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosECB, &saferk64_n),
+                                                       kryptos_saferk64_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCBC, &saferk64_n),
+                                                       kryptos_saferk64_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosOFB, &saferk64_n),
+                                                       kryptos_saferk64_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCTR, &saferk64_n),
                                                        ktask);
     kryptos_bad_buf_run_block_cipher_with_custom_setup(triple_des,
-                                                       kryptos_triple_des_setup(ktask, "Boom!", 5, kKryptosECB,
+                                                       kryptos_triple_des_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosECB,
                                                                                 tdes_k2, &tdes_k2_size, tdes_k3, &tdes_k3_size),
-                                                       kryptos_triple_des_setup(ktask, "Boom!", 5, kKryptosCBC,
+                                                       kryptos_triple_des_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCBC,
                                                                                 tdes_k2, &tdes_k2_size, tdes_k3, &tdes_k3_size),
-                                                       kryptos_triple_des_setup(ktask, "Boom!", 5, kKryptosOFB,
+                                                       kryptos_triple_des_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosOFB,
                                                                                 tdes_k2, &tdes_k2_size, tdes_k3, &tdes_k3_size),
-                                                       kryptos_triple_des_setup(ktask, "Boom!", 5, kKryptosCTR,
+                                                       kryptos_triple_des_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCTR,
                                                                                 tdes_k2, &tdes_k2_size, tdes_k3, &tdes_k3_size),
                                                        ktask);
     kryptos_bad_buf_run_block_cipher_with_custom_setup(triple_des_ede,
-                                                       kryptos_triple_des_ede_setup(ktask, "Boom!", 5, kKryptosECB,
+                                                       kryptos_triple_des_ede_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosECB,
                                                                                     tdes_k2, &tdes_k2_size,
                                                                                     tdes_k3, &tdes_k3_size),
-                                                       kryptos_triple_des_ede_setup(ktask, "Boom!", 5, kKryptosCBC,
+                                                       kryptos_triple_des_ede_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCBC,
                                                                                     tdes_k2, &tdes_k2_size,
                                                                                     tdes_k3, &tdes_k3_size),
-                                                       kryptos_triple_des_ede_setup(ktask, "Boom!", 5, kKryptosOFB,
+                                                       kryptos_triple_des_ede_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosOFB,
                                                                                     tdes_k2, &tdes_k2_size,
                                                                                     tdes_k3, &tdes_k3_size),
-                                                       kryptos_triple_des_ede_setup(ktask, "Boom!", 5, kKryptosCTR,
+                                                       kryptos_triple_des_ede_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCTR,
                                                                                     tdes_k2, &tdes_k2_size,
                                                                                     tdes_k3, &tdes_k3_size), ktask);
     kryptos_bad_buf_run_block_cipher_with_custom_setup(xtea,
-                                                       kryptos_xtea_setup(ktask, "Boom!!!!!!!!!!!!", 16, kKryptosECB,
+                                                       kryptos_xtea_setup(ktask, (kryptos_u8_t *)"Boom!!!!!!!!!!!!", 16, kKryptosECB,
                                                                           &xtea_rounds),
-                                                       kryptos_xtea_setup(ktask, "Boom!!!!!!!!!!!!", 16, kKryptosCBC,
+                                                       kryptos_xtea_setup(ktask, (kryptos_u8_t *)"Boom!!!!!!!!!!!!", 16, kKryptosCBC,
                                                                           &xtea_rounds),
-                                                       kryptos_xtea_setup(ktask, "Boom!!!!!!!!!!!!", 16, kKryptosOFB,
+                                                       kryptos_xtea_setup(ktask, (kryptos_u8_t *)"Boom!!!!!!!!!!!!", 16, kKryptosOFB,
                                                                           &xtea_rounds),
-                                                       kryptos_xtea_setup(ktask, "Boom!!!!!!!!!!!!", 16, kKryptosCTR,
+                                                       kryptos_xtea_setup(ktask, (kryptos_u8_t *)"Boom!!!!!!!!!!!!", 16, kKryptosCTR,
                                                                           &xtea_rounds), ktask);
     kryptos_bad_buf_run_block_cipher_with_custom_setup(rc5,
-                                                       kryptos_rc5_setup(ktask, "Boom!", 5, kKryptosECB, &rc5_rounds),
-                                                       kryptos_rc5_setup(ktask, "Boom!", 5, kKryptosCBC, &rc5_rounds),
-                                                       kryptos_rc5_setup(ktask, "Boom!", 5, kKryptosOFB, &rc5_rounds),
-                                                       kryptos_rc5_setup(ktask, "Boom!", 5, kKryptosCTR, &rc5_rounds), ktask);
+                                                       kryptos_rc5_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosECB, &rc5_rounds),
+                                                       kryptos_rc5_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCBC, &rc5_rounds),
+                                                       kryptos_rc5_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosOFB, &rc5_rounds),
+                                                       kryptos_rc5_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCTR, &rc5_rounds), ktask);
     kryptos_bad_buf_run_block_cipher_with_custom_setup(rc6_128,
-                                                       kryptos_rc6_128_setup(ktask, "Boom!", 5, kKryptosECB, &rc6_rounds),
-                                                       kryptos_rc6_128_setup(ktask, "Boom!", 5, kKryptosCBC, &rc6_rounds),
-                                                       kryptos_rc6_128_setup(ktask, "Boom!", 5, kKryptosOFB, &rc6_rounds),
-                                                       kryptos_rc6_128_setup(ktask, "Boom!", 5, kKryptosCTR, &rc6_rounds),
+                                                       kryptos_rc6_128_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosECB, &rc6_rounds),
+                                                       kryptos_rc6_128_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCBC, &rc6_rounds),
+                                                       kryptos_rc6_128_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosOFB, &rc6_rounds),
+                                                       kryptos_rc6_128_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCTR, &rc6_rounds),
                                                        ktask);
     kryptos_bad_buf_run_block_cipher_with_custom_setup(rc6_192,
-                                                       kryptos_rc6_192_setup(ktask, "Boom!", 5, kKryptosECB, &rc6_rounds),
-                                                       kryptos_rc6_192_setup(ktask, "Boom!", 5, kKryptosCBC, &rc6_rounds),
-                                                       kryptos_rc6_192_setup(ktask, "Boom!", 5, kKryptosOFB, &rc6_rounds),
-                                                       kryptos_rc6_192_setup(ktask, "Boom!", 5, kKryptosCTR, &rc6_rounds),
+                                                       kryptos_rc6_192_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosECB, &rc6_rounds),
+                                                       kryptos_rc6_192_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCBC, &rc6_rounds),
+                                                       kryptos_rc6_192_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosOFB, &rc6_rounds),
+                                                       kryptos_rc6_192_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCTR, &rc6_rounds),
                                                        ktask);
     kryptos_bad_buf_run_block_cipher_with_custom_setup(rc6_256,
-                                                       kryptos_rc6_256_setup(ktask, "Boom!", 5, kKryptosECB, &rc6_rounds),
-                                                       kryptos_rc6_256_setup(ktask, "Boom!", 5, kKryptosCBC, &rc6_rounds),
-                                                       kryptos_rc6_256_setup(ktask, "Boom!", 5, kKryptosOFB, &rc6_rounds),
-                                                       kryptos_rc6_256_setup(ktask, "Boom!", 5, kKryptosCTR, &rc6_rounds),
+                                                       kryptos_rc6_256_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosECB, &rc6_rounds),
+                                                       kryptos_rc6_256_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCBC, &rc6_rounds),
+                                                       kryptos_rc6_256_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosOFB, &rc6_rounds),
+                                                       kryptos_rc6_256_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCTR, &rc6_rounds),
                                                        ktask);
     kryptos_bad_buf_run_block_cipher_with_custom_setup(gost,
-                                                       kryptos_gost_setup(ktask, "Boom!", 5, kKryptosECB,
+                                                       kryptos_gost_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosECB,
                                                        gost_s1, gost_s2, gost_s3, gost_s4, gost_s5, gost_s6, gost_s7, gost_s8),
-                                                       kryptos_gost_setup(ktask, "Boom!", 5, kKryptosCBC,
+                                                       kryptos_gost_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCBC,
                                                        gost_s1, gost_s2, gost_s3, gost_s4, gost_s5, gost_s6, gost_s7, gost_s8),
-                                                       kryptos_gost_setup(ktask, "Boom!", 5, kKryptosOFB,
+                                                       kryptos_gost_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosOFB,
                                                        gost_s1, gost_s2, gost_s3, gost_s4, gost_s5, gost_s6, gost_s7, gost_s8),
-                                                       kryptos_gost_setup(ktask, "Boom!", 5, kKryptosCTR,
+                                                       kryptos_gost_setup(ktask, (kryptos_u8_t *)"Boom!", 5, kKryptosCTR,
                                                        gost_s1, gost_s2, gost_s3, gost_s4, gost_s5, gost_s6, gost_s7, gost_s8),
                                                        ktask);
 
     kryptos_task_init_as_null(ktask);
 
-    kryptos_rabbit_setup(ktask, "Boom!", 5, rabbit_iv);
+    kryptos_rabbit_setup(ktask, (kryptos_u8_t *)"Boom!", 5, rabbit_iv);
     ktask->in = kryptos_get_random_block(1024);
     KUTE_ASSERT(ktask->in != NULL);
     ktask->in_size = 1024;
@@ -420,7 +420,7 @@ KUTE_TEST_CASE(kryptos_bad_decryption_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
     kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT);
 
-    kryptos_seal_setup(ktask, "Boom!", 5, &seal_v, &seal_l, &seal_n);
+    kryptos_seal_setup(ktask, (kryptos_u8_t *)"Boom!", 5, &seal_v, &seal_l, &seal_n);
     ktask->in = kryptos_get_random_block(1024);
     KUTE_ASSERT(ktask->in != NULL);
     ktask->in_size = 1024;
@@ -429,7 +429,7 @@ KUTE_TEST_CASE(kryptos_bad_decryption_tests)
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
     kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT);
 
-    kryptos_arc4_setup(ktask, "Boom!", 5);
+    kryptos_arc4_setup(ktask, (kryptos_u8_t *)"Boom!", 5);
     ktask->in = kryptos_get_random_block(1024);
     KUTE_ASSERT(ktask->in != NULL);
     ktask->in_size = 1024;

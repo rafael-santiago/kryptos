@@ -51,10 +51,24 @@ kryptos-tests.prologue() {
     if ($toolset_name.match("^clang") == 1) {
         $cflags.add_item("-Wno-pointer-sign");
         $cflags.add_item("-Wno-invalid-source-encoding");
+    } else if ($toolset_name.match("^msvc") == 1) {
+        $cflags.add_item("-D_CRT_SECURE_NO_WARNINGS");
+        $cflags.add_item("-DUMDF_USING_NTSTATUS");
     }
 
     $libraries = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+
+    if ($toolset_name.match("^msvc") == 1) {
+        $ldflags.del_item("-lkryptos");
+        $ldflags.del_item("-lcutest");
+        $ldflags.add_item("libkryptos" + get_msvc_artifact_postfix() + ".lib");
+        $ldflags.add_item("libcutest" + get_msvc_artifact_postfix() + ".lib");
+        $ldflags.add_item("/NODEFAULTLIB:MSVCRT,MSVCRTD");
+        $ldflags.add_item("bcrypt.lib");
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 
     if ($cflags.index_of("-Dmemcmp=kryptos_memcmp") == -1) {
         $cflags.add_item("-Dmemcmp=kryptos_memcmp");
@@ -192,10 +206,29 @@ local function forge_cutest() : result type none {
     $oldcwd = hefesto.sys.pwd();
 
     if (hefesto.sys.cd("cutest/src")) {
+        var compile_model type string;
+        var link_model type string;
+        var cpu_arch type string;
+
+        var option type list;
+        $option = hefesto.sys.get_option("compile-model");
+        if ($option.count() > 0) {
+            $compile_model = " --compile-model=" + $option.item(0);
+        }
+        $option = hefesto.sys.get_option("link-model");
+        if ($option.count() > 0) {
+            $link_model = " --link-model=" + $option.item(0);
+        }
+
+        $option = hefesto.sys.get_option("cpu-arch");
+        if ($option.count() > 0) {
+            $cpu_arch = " --cpu-arch=" + $option.item(0);
+        }
         hefesto.sys.forge("cutest",
                           "Forgefile.hsl", "--forgefiles=Forgefile.hsl --Forgefile-projects=cutest " +
                                             "--obj-output-dir=obj --bin-output-dir=lib " +
-                                            "--toolset=" + get_lib_toolset());
+                                            "--toolset=" + get_lib_toolset() + $compile_model + $link_model + $cpu_arch);
+
         if (hefesto.sys.last_forge_result() != 0) {
             hefesto.sys.echo("~~~ UNABLE TO BUILD LIBCUTEST.\n");
             hefesto.project.abort(1);
@@ -218,6 +251,7 @@ local function forge_kernel_mode_tests(build_mode type string) : result type int
     $supported_platforms.add_item("linux");
     $supported_platforms.add_item("freebsd");
     $supported_platforms.add_item("netbsd");
+    $supported_platforms.add_item("windows");
 
     if ($supported_platforms.index_of(hefesto.sys.os_name()) == -1) {
         hefesto.sys.echo("ERROR: Kryptos kernel mode stuff not supported " +
@@ -236,9 +270,13 @@ local function forge_kernel_mode_tests(build_mode type string) : result type int
                 result 1;
             }
         }
-        $exit_code = hefesto.sys.forge("kryptos-test-mod",
-                                       "Forgefile.hsl", "--forgefiles=Forgefile.hsl --Forgefile-projects=kryptos-test-mod " +
-                                       hefesto.project.cmdline());
+        if (hefesto.sys.os_name() != "windows") {
+            $exit_code = hefesto.sys.forge("kryptos-test-mod",
+                                           "Forgefile.hsl", "--forgefiles=Forgefile.hsl --Forgefile-projects=kryptos-test-mod " +
+                                           hefesto.project.cmdline());
+        } else {
+            $exit_code = hefesto.sys.forge("win-kryptos-test-sys", "WinForgefile.hsl", hefesto.project.cmdline());
+        }
         hefesto.sys.cd($oldcwd);
     }
 

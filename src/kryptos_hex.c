@@ -11,7 +11,7 @@
 # include <ctype.h>
 #endif
 
-#define kryptos_hex_nibble2ascii(n) ( ( (n) >= 0 && (n) <= 9 ) ? 48 + (n) : 55 + (n) )
+#define kryptos_hex_nibble2ascii(n) ( ( (int)(n) >= 0 && (n) <= 9 ) ? 48 + (n) : 55 + (n) )
 
 kryptos_u8_t *kryptos_u8_ptr_to_hex(const kryptos_u8_t *u8, const size_t u8_size, size_t *o_size) {
     static kryptos_u8_t nibble_lt[16] = {

@@ -200,9 +200,9 @@ void kryptos_gost_setup(kryptos_task_ctx *ktask,
     }
 
     if (ktask->mode == kKryptosCTR && ktask->ctr != NULL) {
-        ktask->iv[KRYPTOS_GOST_BLOCKSIZE - 4] = (*ktask->ctr) >> 24;
-        ktask->iv[KRYPTOS_GOST_BLOCKSIZE - 3] = ((*ktask->ctr) & 0xFF0000) >> 16;
-        ktask->iv[KRYPTOS_GOST_BLOCKSIZE - 2] = ((*ktask->ctr) & 0xFF00) >> 8;
+        ktask->iv[KRYPTOS_GOST_BLOCKSIZE - 4] = ((*ktask->ctr) >> 24) & 0xFF;
+        ktask->iv[KRYPTOS_GOST_BLOCKSIZE - 3] = (((*ktask->ctr) & 0xFF0000) >> 16) & 0xFF;
+        ktask->iv[KRYPTOS_GOST_BLOCKSIZE - 2] = (((*ktask->ctr) & 0xFF00) >> 8) & 0xFF;
         ktask->iv[KRYPTOS_GOST_BLOCKSIZE - 1] = (*ktask->ctr) & 0xFF;
     }
 }

@@ -40,7 +40,7 @@
 
 struct kryptos_rc5_subkeys {
     kryptos_u32_t K[kryptos_rc5_K_NR];
-    int rounds;
+    size_t rounds;
 };
 
 typedef void (*kryptos_rc5_block_processor)(kryptos_u8_t *block, const struct kryptos_rc5_subkeys *sks);
@@ -205,7 +205,8 @@ static void kryptos_rc5_ksched(const kryptos_u8_t *user_key, const size_t user_k
         sks->K[i] = sks->K[i-1] + kryptos_rc5_QW;
     }
 
-    A = B = i = j = 0;
+    A = B = 0;
+    i = j = 0;
 
     t = (t < c) ? c : t;
 

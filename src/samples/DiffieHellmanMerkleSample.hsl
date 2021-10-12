@@ -43,6 +43,11 @@ std-dh-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 std-dh-sample.epilogue() {
@@ -78,6 +83,11 @@ mod-dh-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 mod-dh-sample.epilogue() {
@@ -113,6 +123,11 @@ dh-domain-params-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 dh-domain-params-sample.epilogue() {
@@ -148,6 +163,11 @@ dh-domain-params-verify-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 dh-domain-params-verify-sample.epilogue() {
@@ -183,6 +203,11 @@ dh-domain-params-load-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 dh-domain-params-load-sample.epilogue() {
@@ -218,6 +243,11 @@ ecdh-sample.prologue() {
     }
     $lib = hefesto.sys.get_option("libraries");
     $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
 }
 
 ecdh-sample.epilogue() {

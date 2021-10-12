@@ -513,7 +513,7 @@ kryptos_drop_oaep_padding_epilogue:
 kryptos_u8_t *kryptos_pss_encode(const kryptos_u8_t *buffer, size_t *buffer_size,
                                  const size_t k, const size_t salt_size,
                                  kryptos_hash_func hash_func, kryptos_hash_size_func hash_size_func) {
-
+    KRYPTOS_UNUSED(k);
     kryptos_u8_t *em = NULL, *mp = NULL, *dest = NULL, *salt = NULL, *ps = NULL, *db = NULL, *dbmask = NULL,
                  *p = NULL, *p_end = NULL;
     size_t h_size = 0, mp_size = 0, ps_size = 0, db_size = 0, dbmask_size = 0;

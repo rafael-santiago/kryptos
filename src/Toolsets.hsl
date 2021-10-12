@@ -12,6 +12,8 @@ include ~/toolsets/clang/clang-lib.hsl
 include ~/toolsets/gcc/gcc-app.hsl
 include ~/toolsets/clang/clang-app.hsl
 
+include on windows ~/toolsets/msvc/msvc.hsl
+
 function is_x64() : result type int {
     var is type int;
     $is = 0;
@@ -38,13 +40,139 @@ function check_compiler_language() : result type none {
                          "             But you can use the C compiled code with your C++ project.\n\n");
         hefesto.sys.echo("'?! Blah-blah': Run the standard build command and once it well succeeded, " +
                          "change to the samples directory and run the command:\n\t\t" +
-                         "-> 'hefesto [--toolset=gcc|clang] --language=cc --cflags=-fpermissive'. " +
+                         "-> 'hefesto [--toolset=gcc|clang|msvc] --language=cc --cflags=-fpermissive'. " +
                          "Please do not pee on pants!\n");
         hefesto.sys.exit(1);
     }
 }
 
 function has_bad_funcs(func_signatures type list, srcs type list, incs type list, cflags type list) : result type int {
+    if (get_toolset_option_data() != "msvc") {
+        result has_bad_funcs_gcc_clang($func_signatures, $srcs, $incs, $cflags);
+    }
+    result has_bad_funcs_msvc($func_signatures, $srcs, $incs, $cflags);
+}
+
+local function has_bad_funcs_msvc(func_signatures type list, srcs type list, incs type list, cflags type list) : result type int {
+    var option type list;
+    $option = hefesto.sys.get_option("allow-bad-funcs");
+
+    if ($option.count() > 0) {
+        hefesto.sys.echo("\nWARN: Bad functions are being allowed.\n");
+        result 0;
+    }
+    
+    var vcvarsall type string;
+    $vcvarsall = get_vcvarsall_path();
+    
+    if ($vcvarsall.len() == 0) {
+        hefesto.sys.echo("ERROR: Unable to set MSVC developer environment.\n");
+        result 1;
+    }
+
+    var cmdline type string;
+    $cmdline = "cl.exe";
+
+    var i type int;
+    $i = 0;
+    while ($i < $incs.count()) {
+        $cmdline = $cmdline + " /I\"" + $incs.item($i) + "\"";
+        $i = $i + 1;
+    }
+
+    var c type int;
+    $c = 0;
+    while ($c < $cflags.count()) {
+        var cflag type string;
+        $cflag = $cflags.item($c);
+        $cflag.replace("-", "/");
+        $cmdline = $cmdline + " " + $cflag;
+        $c = $c + 1;
+    }
+
+    $cmdline = $cmdline + " /Fa.asm-out.s";
+    
+    var fp type file;
+    $fp = hefesto.sys.fopen(".badfuncs.cmd", "wb");
+    if ($fp == 0) {
+        hefesto.sys.echo("ERROR: Unable to set .badfuncs.cmd batch.\n");
+        result 1;
+    }
+    var badfuncs_data type string;
+    var platform type string;
+    $platform = get_msvc_platform();
+    if ($platform == "Win32") {
+        $platform = "x86";
+    }
+    $badfuncs_data = "@call \"" + $vcvarsall + "\" " + $platform + " >nul 2>&1\n" +
+                     "@cd \"" + hefesto.sys.pwd() + "\" >nul 2>&1\n" +
+                     "@" + $cmdline + " \"%1\" >nul 2>&1\n";
+    hefesto.sys.fwrite($badfuncs_data, $badfuncs_data.len(), $fp);
+    hefesto.sys.fclose($fp);
+    
+    hefesto.sys.echo("\nBUILD INFO: Searching for direct references to bad functions...\n");
+
+    var founds type list;
+
+    var s type int;
+    $s = 0;
+    while ($s < $srcs.count() && $founds.count() == 0) {
+        hefesto.sys.echo("\t*** " + $srcs.item($s) + ": ");
+
+        hefesto.sys.run("cmd.exe /c .badfuncs.cmd \"" + $srcs.item($s) + "\"");
+        if (isfile(".asm-out.s") == 0) {
+            hefesto.sys.echo("\nERROR: Unable to generate assembly file.\n");
+            result 1;
+        }
+
+        var f type int;
+        $f = 0;
+        while ($f < $func_signatures.count()) {
+            var regex type string;
+            $regex = "(call|mov).*[ \t]" + $func_signatures.item($f);
+            var bad_lines type list;
+            $bad_lines = hefesto.sys.lines_from_file(".asm-out.s", $regex);
+            if ($bad_lines.count() > 0 && $founds.index_of($func_signatures.item($f)) == -1) {
+                $founds.add_item($func_signatures.item($f));
+            }
+            $f = $f + 1;
+        }
+
+        if ($founds.count() > 0) {
+            hefesto.sys.echo("dirty.\n*** error.\n\n");
+            hefesto.sys.echo("ERROR: Calls to bad functions found in '" + $srcs.item($s) + "'\n" +
+                             "       Bad functions referenced:");
+
+            $f = 0;
+            while ($f < $founds.count()) {
+                if ($f > 0) {
+                    hefesto.sys.echo(", " + $founds.item($f));
+                } else {
+                    hefesto.sys.echo(" " + $founds.item($f));
+                }
+
+                $f = $f + 1;
+            }
+
+            hefesto.sys.echo("\n       Take a look at '" + hefesto.sys.pwd() + "/.asm-out.s'.\n\n");
+        } else {
+            hefesto.sys.rm(".asm-out.s");
+            hefesto.sys.echo("clean.\n");
+        }
+
+        $s = $s + 1;
+    }
+
+    if ($founds.count() == 0) {
+        hefesto.sys.echo("*** all clean.\n");
+    }
+    
+    hefesto.sys.rm(".badfuncs.cmd");
+
+    result ($founds.count() > 0);
+}
+
+local function has_bad_funcs_gcc_clang(func_signatures type list, srcs type list, incs type list, cflags type list) : result type int {
     var option type list;
     $option = hefesto.sys.get_option("allow-bad-funcs");
 
@@ -71,7 +199,7 @@ function has_bad_funcs(func_signatures type list, srcs type list, incs type list
     }
 
     $cmdline = $cmdline + " -S -o .asm-out.s";
-
+    
     hefesto.sys.echo("\nBUILD INFO: Searching for direct references to bad functions...\n");
 
     var founds type list;
@@ -177,4 +305,112 @@ local function runbkcmd(cmd type string) : result type int {
         $cmd = $cmd + " > /dev/null 2>&1";
     }
     result hefesto.sys.run($cmd);
+}
+
+local function get_vcvarsall_path() : result type string {
+    var program_files type list;
+    $program_files.add_item("Program Files (x86)");
+    $program_files.add_item("Program Files");
+
+    var year type list;
+    $year.add_item("2022");
+    $year.add_item("2019");
+    $year.add_item("2017");
+    $year.add_item("2015");
+    $year.add_item("2013");
+    $year.add_item("2012");
+    $year.add_item("2010");
+    $year.add_item("2008");
+    $year.add_item("2005");
+
+    var vsinstall_type type list;
+    $vsinstall_type.add_item("Community");
+    $vsinstall_type.add_item("Professional");
+    $vsinstall_type.add_item("Enterprise");
+
+    var metapath type string;
+
+    $metapath = "C:\\{{PROGRAMFILES}}\\Microsoft Visual Studio\\{{YEAR}}\\{{VSINSTALLTYPE}}\\VC\\Auxiliary\\Build\\vcvarsall.bat";
+
+    var y type int;
+    var p type int;
+    var v type int;
+
+    $y = 0;
+    while ($y < $year.count()) {
+        var curr_year type string;
+        $curr_year = $year.item($y);
+        $p = 0;
+        while ($p < $program_files.count()) {
+            var curr_program_files type string;
+            $curr_program_files = $program_files.item($p);
+            $v = 0;
+            while ($v < $vsinstall_type.count()) {
+                var curr_vsinstall_type type string;
+                $curr_vsinstall_type = $vsinstall_type.item($v);
+                var vcvarsall_path type string;
+                $vcvarsall_path = $metapath;
+                $vcvarsall_path.replace("\\{\\{PROGRAMFILES\\}\\}", $curr_program_files);
+                $vcvarsall_path.replace("\\{\\{YEAR\\}\\}", $curr_year);
+                $vcvarsall_path.replace("\\{\\{VSINSTALLTYPE\\}\\}", $curr_vsinstall_type);
+                if (isfile($vcvarsall_path)) {
+                    result $vcvarsall_path;
+                }
+                $v = $v + 1;
+            }
+            $p = $p + 1;
+        }
+        $y = $y + 1;
+    }
+
+    result "";
+}
+
+function setup_sample_msvc_flags(cflags type list, ldflags type list) : result type none {
+    $cflags.add_item("-DUMDF_USING_NTSTATUS");
+    $ldflags.del_item("-lkryptos");
+    $ldflags.add_item("libkryptos" + get_msvc_artifact_postfix() + ".lib");
+    $ldflags.add_item("bcrypt.lib");
+    hefesto.sys.byref($cflags);
+    hefesto.sys.byref($ldflags);
+}
+
+function get_msvc_artifact_postfix() : result type string {
+    var cfg_postfix type string;
+    $cfg_postfix = "mt";
+
+    var option type list;
+    $option = hefesto.sys.get_option("compile-model");
+    if ($option.count() > 0) {
+        var compile_model type string;
+        $compile_model = $option.item(0);
+        if ($compile_model == "debug") {
+            $cfg_postfix = $cfg_postfix + "d";
+        }
+    }
+
+    result $cfg_postfix;
+}
+
+function get_msvc_platform() : result type string {
+    var option type list;
+    var arch type string;
+
+    $option = hefesto.sys.get_option("cpu-arch");
+    if ($option.count() == 0) {
+        var programfilesx86 type string;
+        $programfilesx86 = hefesto.sys.env("ProgramFiles(x86)");
+        if ($programfilesx86.len() > 0) {
+            result "x64";
+        }
+        result "Win32";
+    }
+
+    $arch = $option.item(0);
+
+    if($arch == "x86" || $arch == "X86") {
+        result "Win32";
+    }
+
+    result $arch;
 }

@@ -8,7 +8,7 @@ This is not an absolute truth (a.k.a. unicorn) but this is the truth that I have
 ## Comments
 
 It is necessary when is necessary. Try do not think like a blasé "bodisatva coder" who likes to repeat "uh! the code must speak by itself".
-You are dealing with cryptography, so things tend to become tricky and complicated. A good comment can save time and avoid misunderstanding
+You are dealing with cryptography, so things tend to become tricky. A good comment can save time and avoid misunderstanding
 and improper improvements by other people.
 
 A good way of commenting is by identifying yourself using meaningful short labels. The general idea is: *LABEL(YourNameOrNickname): blah, blah, blah.*.
@@ -180,3 +180,16 @@ Otherwise, if your code should not be executed in kernel mode, inform it explain
 The correctness of any cipher (symmetric) must be tested with official test vectors. When not possible, the custom test vector should be
 derived from key expansion samples present in the cipher spec written by the algorithm authors. These test vectors should not be
 tested in kernel mode since they were well-tested in user mode.
+
+### Use inclusive and neutral language
+
+Always try to use inclusive and neutral words/terms in your source codes and documentations. If you find something that
+for you seems to be not so correct, please let me know by opening an issue and suggesting improvements. Thank you in
+advance.
+
+In general avoid use colors to name what should be "good" or "bad". Outdated terms such as ``whitelist``/``blacklist``
+are deprecated/banned here. You should use ``allowlist/denylist`` or anything more related to what you really are doing. Terms
+like ``master/slave`` are out too. You could use ``main``, ``secondary``, ``next``, ``trunk``, ``current``, ``supervisor``,
+``worker`` in replacement.
+
+Do not use sexist and/or machist terms, too.

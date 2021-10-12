@@ -10,7 +10,7 @@
 
 #include <kryptos_types.h>
 
-#if defined(KRYPTOS_KERNEL_MODE) && !defined(__NetBSD__)
+#if defined(KRYPTOS_KERNEL_MODE) && !defined(__NetBSD__) && !defined(_WIN32)
 # define isdigit(d) ( (d) >= '0' && (d) <= '9' )
   kryptos_u8_t toupper(const kryptos_u8_t c);
 #endif

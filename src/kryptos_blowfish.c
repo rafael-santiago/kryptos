@@ -433,7 +433,7 @@ static void kryptos_blowfish_ld_user_key(kryptos_u32_t *key,
 }
 
 static void kryptos_blowfish_puff_up(const kryptos_u8_t *key, size_t key_size, struct kryptos_blowfish_subkeys *sks) {
-    kryptos_u32_t w_key[KRYPTOS_BLOWFISH_MAX_KEY_NR], *xl, *xr;
+    kryptos_u32_t w_key[KRYPTOS_BLOWFISH_MAX_KEY_NR], *xl = NULL, *xr = NULL;
     size_t i, j , w_size = 0;
     kryptos_u8_t pl[8];
 
@@ -500,7 +500,7 @@ kryptos_u8_t *kryptos_bcrypt(const int cost,
     struct kryptos_blowfish_subkeys sks;
     kryptos_u8_t ctext[24];
     kryptos_u8_t *hash = NULL, pfx[32];
-    size_t pfx_size, salt64_size, ctext64_size;
+    size_t pfx_size = 0, salt64_size = 0, ctext64_size = 0;
     kryptos_u8_t *salt64 = NULL, *ctext64 = NULL;
     kryptos_u8_t *null_term_password = NULL;
 
@@ -590,7 +590,11 @@ kryptos_u8_t *kryptos_bcrypt(const int cost,
 #if defined(KRYPTOS_KERNEL_MODE) && defined(__NetBSD__)
         snprintf((char *)pfx, sizeof(pfx), "$2a$%.2d$", cost);
 #else
+# if !defined(_WIN32) || (defined(_WIN32) && !defined(KRYPTOS_KERNEL_MODE))
         sprintf((char *)pfx, "$2a$%.2d$", cost);
+# else
+        RtlStringCbPrintfA((char *)pfx, sizeof(pfx) - 1, "$2a$%.2d$", cost);
+# endif
 #endif
         pfx_size = strlen((char *)pfx);
         *hash_size = pfx_size + salt64_size + ctext64_size;
@@ -625,7 +629,7 @@ int kryptos_bcrypt_verify(const kryptos_u8_t *password, const size_t password_si
                           const kryptos_u8_t *hash, const size_t hash_size) {
     int cost;
     kryptos_u8_t *salt = NULL, *temp_hash = NULL;
-    size_t salt_size, temp_hash_size;
+    size_t salt_size = 0, temp_hash_size = 0;
     int is_ok = 0;
 
     if (password == NULL || hash == NULL || hash_size <= 22) {
@@ -678,7 +682,7 @@ kryptos_bcrypt_verify_epilogue:
 static void kryptos_eks_blowfish_setup(const int cost, const kryptos_u8_t *salt,
                                        const kryptos_u8_t *password, const size_t password_size,
                                        struct kryptos_blowfish_subkeys *sks) {
-    size_t r_nr = 1 << cost;
+    size_t r_nr = (size_t)1 << cost;
     size_t r;
     kryptos_u8_t all_zeros[16];
 
@@ -705,7 +709,7 @@ static void kryptos_eks_blowfish_setup(const int cost, const kryptos_u8_t *salt,
 
 static void kryptos_bcrypt_puff_up(const kryptos_u8_t *password, size_t password_size,
                                    const kryptos_u8_t *salt, struct kryptos_blowfish_subkeys *sks, const int init) {
-    kryptos_u32_t *xl, *xr, w_key;
+    kryptos_u32_t *xl = NULL, *xr = NULL, w_key;
     size_t i, j , w_size = 0;
     kryptos_u8_t pl[8], *pl_c, *pl_end;
     const kryptos_u8_t *s_c, *s_end;
@@ -879,14 +883,14 @@ static kryptos_u8_t *kryptos_bcrypt_decode_buffer(const kryptos_u8_t *buffer, co
                 (kryptos_u32_t) kryptos_messy_base64_state_1[kryptos_base64_get_encoded_byte(*(bp + 2))] <<  6 |
                 (kryptos_u32_t) kryptos_messy_base64_state_1[kryptos_base64_get_encoded_byte(*(bp + 3))];
 
-        *out_p = (block & 0x00FF0000) >> 16;
+        *out_p = ((block & 0x00FF0000) >> 16) & 0xFF;
         out_p++;
 
         if (out_p == out_end) {
             continue;
         }
 
-        *out_p = (block & 0x0000FF00) >>  8;
+        *out_p = ((block & 0x0000FF00) >>  8) & 0xFF;
         out_p++;
 
         if (out_p == out_end) {
