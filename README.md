@@ -1,6 +1,6 @@
 # Kryptos
 
-I started the core of this project on about 2004 and since them it was being an attempt of building a tiny and straightforward
+I started the core of this project on about 2004 and since then it was being an attempt of building a tiny and straightforward
 crypto library which can be easily integrated with user and also kernel mode code.
 
 Until now these are the supported platforms:
