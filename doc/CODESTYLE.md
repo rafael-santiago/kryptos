@@ -5,6 +5,23 @@ read this document first. I personally like some points present in [pike's style
 
 This is not an absolute truth (a.k.a. unicorn) but this is the truth that I have been taking into consideration.
 
+## Contents
+
+- [Comments](#comments)
+- [Code constructions](#code-constructions)
+    - [If-statement](#if-statement)
+    - [While-statement](#while-statement)
+    - [Do/while-statement](#do-while-statement)
+    - [Switches](#switches)
+    - [Expressions](#expressions)
+    - [Functions](#functions)
+    - [Pointers](#pointers)
+    - ["String" terminator](#string-terminator)
+    - [Gotos](#gotos)
+    - [Macros](#macros)
+    - [Unit tests](#unit-tests)
+- [Use inclusive and neutral language](#use-inclusive-and-neutral-language)
+
 ## Comments
 
 It is necessary when is necessary. Try do not think like a blasé "bodisatva coder" who likes to repeat "uh! the code must speak by itself".
@@ -28,9 +45,11 @@ Take a look at the **Table 1** to know more about those labels and their proper 
 
 I prefer using ``// ...`` instead of ``/* ... */``. However, I find it is up to you, pick your prefered one.
 
+[Back](#contents)
+
 ## Code constructions
 
-Well, here goes...
+Well, here we go...
 
 ### If-statement
 
@@ -61,6 +80,8 @@ Always use braces.
     }
 ```
 
+[Back](#contents)
+
 ### While-statement
 
 ```c
@@ -69,6 +90,8 @@ Always use braces.
     }
 ```
 
+[Back](#contents)
+
 ### Do/while-statement
 
 ```c
@@ -76,6 +99,8 @@ Always use braces.
         ...
     } while (<expr>);
 ```
+
+[Back](#contents)
 
 ### Switches
 
@@ -98,12 +123,16 @@ Always use braces.
     }
 ```
 
+[Back](#contents)
+
 ### Expressions
 
 Do not trust in precedence. Try to make the stuff clearer. If you used to write crypto code you may know that everytime we see and write pretty "insane"
 and long expressions. I think that trust in precedence is evidence of naivety. Nothing should obfuscate correctness.
 
 You should use ``(...)`` when you want to communicate and make clearer your intentions about precedence.
+
+[Back](#contents)
 
 ### Functions
 
@@ -135,13 +164,19 @@ This isn't:
 - Also try not complicate the stuff with native incantations for process synchronization, remember that this is a cryptographic library.
   If you need syncronize something just **inside this library**, you should review your requirements. They are possibly pretty wrong.
 
+[Back](#contents)
+
 ### Pointers
 
 ``NULL`` <- This is a null pointer.
 
-### "Strings" terminator
+[Back](#contents)
+
+### "String" terminator
 
 ``0`` <- This is a "string" terminator. But try not to be dependent of it, if you can pass the amount of bytes, pass it!
+
+[Back](#contents)
 
 ### Gotos
 
@@ -149,6 +184,8 @@ Well, well, well, polemic is loaded... Some goto stuff is used here. But it is u
 rule of thumb is never perform a goto that goes backward, the goto always need to jump forward.
 
 If you have got reasons for a spaghetti code let's discuss the idea before.
+
+[Back](#contents)
 
 ### Macros
 
@@ -162,6 +199,8 @@ problem with that, we are all literate in C and you will be understood.
 Try always wrapping your macro parameters with (...) during the computations.
 
 Yes, global macros into a code module (``*.c``) should be undefined at the end of the module.
+
+[Back](#contents)
 
 ### Unit tests
 
@@ -181,7 +220,9 @@ The correctness of any cipher (symmetric) must be tested with official test vect
 derived from key expansion samples present in the cipher spec written by the algorithm authors. These test vectors should not be
 tested in kernel mode since they were well-tested in user mode.
 
-### Use inclusive and neutral language
+[Back](#contents)
+
+## Use inclusive and neutral language
 
 Always try to use inclusive and neutral words/terms in your source codes and documentations. If you find something that
 for you seems to be not so correct, please let me know by opening an issue and suggesting improvements. Thank you in
@@ -193,3 +234,5 @@ like ``master/slave`` are out too. You could use ``main``, ``secondary``, ``next
 ``worker`` in replacement.
 
 Do not use sexist and/or machist terms, too.
+
+[Back](#contents)
