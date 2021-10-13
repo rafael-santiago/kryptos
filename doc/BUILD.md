@@ -19,10 +19,10 @@ build commands intended for contributors.
     - [The default build options (library)](#the-default-build-options-library)
     - [The default build options (unit tests)](#the-default-build-options-unit-tests)
     - [Mitigating some side-channel attacks](#mitigating-some-side-channel-attacks)
-- [How the kernel mode tests are executed](#how-the-kernel-mode-tests-are-executed)
+- [How kernel mode tests are executed](#how-kernel-mode-tests-are-executed)
 - [Troubleshootings](#troubleshootings)
-    - [GCC is being killed during the build process](#gcc-is-being-killed-during-build-process)
-    - [Clang is exiting due some fault and not properly compiling libkryptos tests on MINIX](#clang-is-exiting-due-to-some-fault-and-not-properly-compiling-libkryptos-tests-on-MINIX]
+    - [GCC is being killed during build process](#gcc-is-being-killed-during-build-process)
+    - [Clang is exiting due to some fault and not properly compiling libkryptos tests on MINIX](#clang-is-exiting-due-to-some-fault-and-not-properly-compiling-libkryptos-tests-on-MINIX]
 - [Building libkryptos on Microsoft Visual C](#building-libkryptos-on-microsoft-visual-c)
 - [Running libkryptos kernel mode tests on Windows](#running-libkryptos-kernel-mode-tests-on-windows)
 - [Are you searching for some build information not detailed here?](#are-you-searching-for-some-build-information-not-detailed-here]
@@ -36,6 +36,8 @@ Mycroft@221B:~# git clone https://github.com/rafael-santiago/kryptos --recursive
 ```
 
 The ``--recursive`` option will handle the git-submodules "complications".
+
+[Back](#contents)
 
 ## The build system
 
@@ -268,7 +270,7 @@ passing the build option ``--allow-bad-funcs``, but I strongly advise you to not
 
 [Back](#contents)
 
-## How the kernel mode tests are executed
+## How kernel mode tests are executed
 
 The kernel mode tests are almost the same of the user mode tests. However, the correctness of the ciphers are not verified since
 it was already done in user mode. The execution is pretty straightforward: a loadable kernel module is generated and inserted into
@@ -346,7 +348,7 @@ the ``src/tests/kernel`` and invoke Hefesto from there.
 
 ## Troubleshootings
 
-### GCC is being killed during the build process
+### GCC is being killed during build process
 
 I only observed it when compiling kernel stuff (so, in Linux and NetBSD). I was experiencing the following run-time error
 message:
@@ -373,7 +375,7 @@ It depends on your location in the project's source tree.
 
 [Back](#contents)
 
-### Clang is exiting due some fault and not properly compiling libkryptos tests on MINIX
+### Clang is exiting due to some fault and not properly compiling libkryptos tests on MINIX
 
 If it is happening with you try to compile ``libkryptos`` with the following option:
 
