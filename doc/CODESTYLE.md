@@ -11,7 +11,7 @@ This is not an absolute truth (a.k.a. unicorn) but this is the truth that I have
 - [Code constructions](#code-constructions)
     - [If-statement](#if-statement)
     - [While-statement](#while-statement)
-    - [Do/while-statement](#do/while-statement)
+    - [Do/while-statement](#dowhile-statement)
     - [Switches](#switches)
     - [Expressions](#expressions)
     - [Functions](#functions)
