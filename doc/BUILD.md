@@ -3,6 +3,30 @@
 In this document you find basic information about how to build ``kryptos`` (a.k.a. libkryptos) besides advanced
 build commands intended for contributors.
 
+## Contents
+
+- [Cloning the kryptos repository](#cloning-the-kryptos-repository)
+- [The build system](#the-build-system)
+- [How to install the library and its headers](#how-to-install-the-library-and-its-headers)
+- [Building the kernel mode version](#building-the-kernel-mode-version)
+- [Advanced build commands for contributors](#advanced-build-commands-for-contributors)
+    - [Skipping the HMAC tests](#skipping-the-hmac-tests)
+    - [Skipping the Diffie-Hellman-Merkle exchange tests](#skipping-the-diffie-hellman-merkle-exchange-tests)
+    - [Speeding up the Diffie-Hellman-Merkle exchange tests](#speeding-up-the-diffie-hellman-merkle-exchange-tests)
+    - [Skipping the OAEP tests from some PK algorithms](#skipping-the-oaep-tests-from-some-pk-algorithms)
+    - [Skipping the digital signature tests](#skipping-the-digital-signature-tests)
+    - [Stressing the tests in order to see if you have introduced some undefined behavior](#stressing-the-tests-in-order-to-see-if-you-have-introduced-some-undefined-behavior)
+    - [The default build options (library)](#the-default-build-options-library)
+    - [The default build options (unit tests)](#the-default-build-options-unit-tests)
+    - [Mitigating some side-channel attacks](#mitigating-some-side-channel-attacks)
+- [How the kernel mode tests are executed](#how-the-kernel-mode-tests-are-executed)
+- [Troubleshootings](#troubleshootings)
+    - [GCC is being killed during the build process](#gcc-is-being-killed-during-build-process)
+    - [Clang is exiting due some fault and not properly compiling libkryptos tests on MINIX](#clang-is-exiting-due-to-some-fault-and-not-properly-compiling-libkryptos-tests-on-MINIX]
+- [Building libkryptos on Microsoft Visual C](#building-libkryptos-on-microsoft-visual-c)
+- [Running libkryptos kernel mode tests on Windows](#running-libkryptos-kernel-mode-tests-on-windows)
+- [Are you searching for some build information not detailed here?](#are-you-searching-for-some-build-information-not-detailed-here]
+
 ## Cloning the kryptos repository
 
 The simplest way of cloning the repository is as follows:
@@ -17,6 +41,8 @@ The ``--recursive`` option will handle the git-submodules "complications".
 
 The ``kryptos`` build is based on my build system called [``Hefesto``](https://github.com/rafael-santiago/hefesto).
 All instructions about how to install this build system can be found in its repository.
+
+[Back](#contents)
 
 ## How final users should build kryptos
 
@@ -38,6 +64,8 @@ libkryptos.a
 
 All done!
 
+[Back](#contents)
+
 ## How to install the library and its headers
 
 Pretty easy, being within the ``src`` sub-directory execute the following command:
@@ -52,7 +80,9 @@ To uninstall:
 MrsHudson@221B:~/src/kryptos/src# hefesto --uninstall
 ```
 
-### Building the kernel mode version
+[Back](#contents)
+
+## Building the kernel mode version
 
 ``Kryptos`` has some parts designed to be used in kernel mode. Until now it supports ``FreeBSD``, ``NetBSD`` and ``Linux``. However, there is no "kernel mode" build.
 The library was written taking into consideration that the users will compile ``kryptos`` together with their own stuff (as a monolithic project).
@@ -60,6 +90,8 @@ The only thing you should do is define the macro ``KRYPTOS_KERNEL_MODE`` and ``k
 
 You should use some features with care. Personally I find that execute some features in kernel mode is overkill. You should do only the
 most "straightforward" cryptographic stuff in kernel but you are free... But take my point into consideration. ;)
+
+[Back](#contents)
 
 ## Advanced build commands for contributors
 
@@ -76,6 +108,8 @@ compile-time and this can be done by calling ``Hefesto`` as follows:
 Sherlock@221B:~/src/kryptos/src# hefesto --no-hmac-tests
 ```
 
+[Back](#contents)
+
 ### Skipping the Diffie-Hellman-Merkle exchange tests
 
 The Diffie-Hellman-Merkle tests can be skipped as follows:
@@ -83,6 +117,8 @@ The Diffie-Hellman-Merkle tests can be skipped as follows:
 ```
 Sherlock@221B:~/src/kryptos/src# hefesto --skip-dh-xchg-tests
 ```
+
+[Back](#contents)
 
 ### Speeding up the Diffie-Hellman-Merkle exchange tests
 
@@ -97,6 +133,8 @@ The usage of this build option through command line is pretty straightforward:
 Sherlock@221B:~/src/kryptos/src# hefesto --quick-dh-tests
 ```
 
+[Back](#contents)
+
 ### Skipping the OAEP tests from some PK algorithms
 
 The OAEP tests not only test the data encryption and its correct data decryption. The test also simulates invalid data passing.
@@ -107,6 +145,8 @@ Sherlock@221B:~/src/kryptos/src# hefesto --skip-rsa-oaep-tests \
 > --skip-elgamal-oaep-tests
 ```
 
+[Back](#contents)
+
 ### Skipping the digital signature tests
 
 The digital signature tests also can be time consuming. The following command line skips them:
@@ -115,6 +155,8 @@ The digital signature tests also can be time consuming. The following command li
 Sherlock@221B:~/src/kryptos/src# hefesto --skip-rsa-signature-tests \
 > --skip-dsa-signature-tests
 ```
+
+[Back](#contents)
 
 ### Stressing the tests in order to see if you have introduced some undefined behavior
 
@@ -138,6 +180,8 @@ Sherlock@221B:~/src/kryptos/src# hefesto --no-hmac-tests --stress-tests \
 
 When you are dealing with random bugs this is a friendly way of trying to reproduce the bug.
 
+[Back](#contents)
+
 ### The default build options (library)
 
 The default build options are defined into the file ``src/.ivk``. The **Table 1** gathers these options.
@@ -152,6 +196,8 @@ The default build options are defined into the file ``src/.ivk``. The **Table 1*
 | ``--quick-dh-tests``        |   Speeding up the Diffie-Hellman-Merkle tests.                                 |
 | ``--quick-ecdh-tests``      |   Speeding up the Elliptic curve Diffie-Hellman-Merkle tests.                  |
 
+
+[Back](#contents)
 
 ### The default build options (unit tests)
 
@@ -196,6 +242,8 @@ additional options. The **Table 3** gathers the options related with the kernel 
 | ``--skip-dsa-signature-tests``           | Skips the DSA signature tests. The tests execution becomes faster.           |
 | ``--skip-ecdsa-signature-tests``         | Skips the ECDSA signature tests. The tests execution becomes faster.         |
 
+[Back](#contents)
+
 ### Mitigating some side-channel attacks
 
 If you are paranoid enough maybe the following C macros listed in **Table 4** could be useful to you.
@@ -218,7 +266,9 @@ Here, after compiling the implementation files a build task will look for any di
 listed in the file ``src/BAD_FUNCS``. The build breaks when found some reference. You can skip this verification step by
 passing the build option ``--allow-bad-funcs``, but I strongly advise you to not skip it in final/release builds.
 
-### How the kernel mode tests are executed
+[Back](#contents)
+
+## How the kernel mode tests are executed
 
 The kernel mode tests are almost the same of the user mode tests. However, the correctness of the ciphers are not verified since
 it was already done in user mode. The execution is pretty straightforward: a loadable kernel module is generated and inserted into
@@ -255,22 +305,28 @@ Sherlock@221B:~/src# cd helios
 Sherlock@221B:~/src/helios# _
 ```
 
-If you are in Linux:
+If you are on Linux:
 
 ```
 Sherlock@221B:~/src/helios# hefesto --install=lnx-module-toolset
 ```
 
-If you are in FreeBSD:
+If you are on FreeBSD:
 
 ```
 Sherlock@221B:~/src/helios# hefesto --install=freebsd-module-toolset
 ```
 
-If you are in NetBSD:
+If you are on NetBSD:
 
 ```
 Sherlock@221B:~/src/helios# hefesto --install=netbsd-module-toolset
+```
+
+If you are on Windows:
+
+```
+Sherlock@221B:~/src/helios# hefesto --install=windows-driver-toolset
 ```
 
 Done! Once the toolset well installed your Hefesto's copy is able to build the LKM and test the kernel mode version of Kryptos.
@@ -286,7 +342,11 @@ As you already should know just by running ``hefesto --kernel-mode-tests`` withi
 the kernel mode tests after a successful execution of the user mode tests. If you just want the kernel mode tests, move to
 the ``src/tests/kernel`` and invoke Hefesto from there.
 
-### The GCC is being killed during the build process
+[Back](#contents)
+
+## Troubleshootings
+
+### GCC is being killed during the build process
 
 I only observed it when compiling kernel stuff (so, in Linux and NetBSD). I was experiencing the following run-time error
 message:
@@ -311,7 +371,9 @@ Sherlock@221B:~/src/kryptos/src# hefesto --kernel-mode-tests --no-hmac-tests
 
 It depends on your location in the project's source tree.
 
-## Clang is exiting due some fault and not properly compiling libkryptos tests in MINIX
+[Back](#contents)
+
+### Clang is exiting due some fault and not properly compiling libkryptos tests on MINIX
 
 If it is happening with you try to compile ``libkryptos`` with the following option:
 
@@ -319,7 +381,9 @@ If it is happening with you try to compile ``libkryptos`` with the following opt
 Sherlock@221B:~/src/kryptos/src/tests/kernel# hefesto --no-hmac-tests
 ```
 
-### Building libkryptos on Microsoft Visual C
+[Back](#contents)
+
+## Building libkryptos on Microsoft Visual C
 
 All you should do is to pass your usage intention by using the build option ``toolset`` when invoking ``Hefesto``:
 
@@ -329,7 +393,9 @@ All you should do is to pass your usage intention by using the build option ``to
 
 I have been building ``libkryptos`` on ``Microsoft Visual Studio 2019``.
 
-### Running libkryptos kernel mode tests on Windows
+[Back](#contents)
+
+## Running libkryptos kernel mode tests on Windows
 
 You need to have ``WDK`` well-installed on your system once it done, if you invoke ``Hefesto`` by using
 ``--kernel-mode-tests`` it will be built and tests will be ran.
@@ -342,7 +408,10 @@ Notice that on ``Windows`` we have plenty of restrictions on device driver loadi
 
 If you want to see the test verbose the best way is to use ``Sysinternals DebugView``.
 
+[Back](#contents)
+
 ## Are you searching for some build information not detailed here?
 
 Please let me know more by opening an [issue](https://github.com/rafael-santiago/kryptos/issues). Thank you!
 
+[Back](#contents)
