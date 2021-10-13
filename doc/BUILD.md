@@ -22,10 +22,10 @@ build commands intended for contributors.
 - [How kernel mode tests are executed](#how-kernel-mode-tests-are-executed)
 - [Troubleshootings](#troubleshootings)
     - [GCC is being killed during build process](#gcc-is-being-killed-during-build-process)
-    - [Clang is exiting due to some fault and not properly compiling libkryptos tests on MINIX](#clang-is-exiting-due-to-some-fault-and-not-properly-compiling-libkryptos-tests-on-MINIX]
+    - [Clang is exiting due to some fault and not properly compiling libkryptos tests on MINIX](#clang-is-exiting-due-to-some-fault-and-not-properly-compiling-libkryptos-tests-on-MINIX)
 - [Building libkryptos on Microsoft Visual C](#building-libkryptos-on-microsoft-visual-c)
 - [Running libkryptos kernel mode tests on Windows](#running-libkryptos-kernel-mode-tests-on-windows)
-- [Are you searching for some build information not detailed here?](#are-you-searching-for-some-build-information-not-detailed-here]
+- [Are you searching for some build information not detailed here?](#are-you-searching-for-some-build-information-not-detailed-here)
 
 ## Cloning the kryptos repository
 
