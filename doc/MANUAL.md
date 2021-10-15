@@ -11,7 +11,7 @@ presented here can be built with the command ``hefesto --mk-samples``.
     - [Linking user mode applications](#linking-user-mode-applications)
     - [Linking kernel mode stuff](#linking-kernel-mode-stuff)
 - [The main idea behind this library](#the-main-idea-behind-this-library)
-    - [How it have been versioned](#how-it-have-been-versioned]
+    - [How it have been versioned](#how-it-have-been-versioned)
     - [The kryptos_task_ctx struct](#the-kryptos_task_ctx-struct)
 - [The symmetric stuff](#the-symmetric-stuff)
     - [Hashes](#hashes)
