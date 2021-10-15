@@ -4550,6 +4550,8 @@ int main(int argc, char **argv) {
 **Warning**: I am not intending to provide a huge support for ``bcrypt`` (including its bugs and necessary backward
 compatibility). Only "$2a$" is being considered here.
 
+[Back](#contents)
+
 ## So it is enough
 
 If you have understood every single sample code presented in here, I think that you are ready for some action
