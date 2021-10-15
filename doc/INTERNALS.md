@@ -1145,6 +1145,8 @@ The kernel tests for hash algorithms only verify the result for the "abc" hashin
 In kernel mode, still in the file ``src/tests/kernel/hash_tests.c``, you should edit the test case ``kryptos_hmac_tests``
 and add the verifying macros for your new hash algorithm. The same thing done in user mode tests.
 
+[Back](#contents)
+
 ## Adding a new stream cipher
 
 Stream ciphers do not have an internal dsl macro that abstracts the cipher entry points implementation. So if you want
