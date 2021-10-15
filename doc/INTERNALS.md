@@ -3,6 +3,23 @@
 **Abstract**: This document is intended for contributors. Here you will find information about how to code new stuff besides maintaining the current ones.
 Due to it the reader is assumed as a medium to advanced C programmer and also a "cryptoholic" ;)
 
+## Contents
+
+- [The libkryptos repo tree layout](#the-libkryptos-repo-tree-layout)
+- [Some meaningful header files](#some-meaningful-header-files)
+    - [src/kryptos_types.h](#srckryptos_typesh)
+    - [src/kryptos.h](#srckryptosh)
+    - [src/kryptos_mp.h](#srckryptos_mph)
+    - [src/kryptos_padding.h](#srckryptos_paddingh)
+    - [src/kryptos_pem.h](#srckryptos_pemh)
+    - [src/kryptos_task_check.h](#srckryptos_task_checkh)
+    - [src/kryptos_hash_common.h](#srckryptos_hash_commonh)
+- [Okay, let's add a new block cipher called "foofish" to libkryptos...](#okay-lets-add-a-new-block-cipher-called-foofish-to-libkryptos)
+- [Okay, let's write some tests for "foofish"...](#okay-lets-write-some-tests-for-foofish)
+- [Steps to add a new hash algorithm based on Merkle-Damgard construction](#steps-to-add-a-new-hash-algorithm-based-on-merkle-damgard-construction)
+- [Adding a new stream cipher](#adding-a-new-stream-cipher)
+- [Encoding algorithms](#encoding-algorithms)
+
 ## The libkryptos repo tree layout
 
 The repository tree has the following layout:
@@ -45,12 +62,16 @@ libkryptos/
 When you also request the kernel mode tests the native kernel's build system will create the object files directly within the source code's sub-directory
 (lib and tests source [tests/kernel/*]).
 
+[Back](#contents)
+
 ## Some meaningful header files
 
 Some of the detailed headers include their own implementation files. A header implementation file usually has the same name of
 the header file but the file extension is ``.c`` instead of ``.h``.
 
 For the library code never include using "..."  always use ``<...>``.
+
+[Back](#contents)
 
 ### src/kryptos_types.h
 
@@ -64,6 +85,8 @@ The two main types (structs) defined within this header files are: ``kryptos_tas
 The ``kryptos_types.h`` file also defines some macros that make up the developer's internal dsl. This internal dsl
 makes easier the addition of new features (more on later).
 
+[Back](#contents)
+
 ### src/kryptos.h
 
 This header file merges the whole library and exposes some final user's macros. In fact, this is the header file that
@@ -74,19 +97,27 @@ When you add some new cipher you must include the header of this new cipher in `
 
 Also when you extend the kryptos user's internal dsl, the new dsl stuff must be defined within this header file.
 
+[Back](#contents)
+
 ### src/kryptos_mp.h
 
 This header file contains all function prototypes/macros related with multi-precision arithmetic. This header exports important
 functions for PK crypto.
 
+[Back](#contents)
+
 ### src/kryptos_padding.h
 
 This header file contains all function prototypes related with padding tasks. Actually it is quite important for block ciphers.
+
+[Back](#contents)
 
 ### src/kryptos_pem.h
 
 This header file exposes some functions for PEM buffer reading and writing. This is very important for PK crypto, because all
 PK crypto algorithms implemented in kryptos expects and returns their data using the PEM format.
+
+[Back](#contents)
 
 ### src/kryptos_task_check.h
 
@@ -94,10 +125,14 @@ Any interaction by the users with the library is represented as a task, due to i
 the library must verify if the current task makes sense or not. The ``kryptos_task_check.h`` exports some important task
 check entry points. This also could be understood as a "task compiler".
 
+[Back](#contents)
+
 ### src/kryptos_hash_common.h
 
 If you will add a new hash algorithm and this algorithm uses Merkle-Damgard construction, the ``kryptos_hash_common.h``
 exports some useful functions that will make your implementation easier (more on later).
+
+[Back](#contents)
 
 ## Okay, let's add a new block cipher called "foofish" to libkryptos...
 
@@ -548,6 +583,8 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
 All done! Now the new cipher is actually added into kryptos. However, you should not add a new stuff without adding
 tests for it too.
 
+[Back](#contents)
+
 ## Okay, let's write some tests for "foofish"...
 
 The basic test to be added for a new block cipher is the encryption/decryption test following the standard test vector
@@ -807,6 +844,8 @@ enabling the kernel tests.
 
 Now, it is real, congrats! Your stuff is being really tested according to the project requirements. Your job is done!
 Let's celebrate coding a little more...
+
+[Back](#contents)
 
 ## Steps to add a new hash algorithm based on Merkle-Damgard construction
 
@@ -1145,6 +1184,8 @@ additional data according to the related algorithm. All received data must be re
 variable. This function also must set the ``cipher`` field from ``(kryptos_task_ctx *)`` to the expected internal
 algorithm constant.
 
+[Back](#contents)
+
 ## Encoding algorithms
 
 The addition of new encoding algorithms are automated by some internal dsl macros.
@@ -1227,3 +1268,5 @@ you need to add here in this library.
 
 New constants for encoding algorithms must be added into the ``kryptos_encoding_t`` typed enum defined in
 ``src/kryptos_types.h``.
+
+[Back](#contents)
