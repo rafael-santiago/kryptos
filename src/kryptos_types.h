@@ -8,6 +8,8 @@
 #ifndef KRYPTOS_KRYPTOS_TYPES_H
 #define KRYPTOS_KRYPTOS_TYPES_H 1
 
+#define KRYPTOS_VERSION 0x20210000 // INFO(Rafael): a hex value [16-bit-year-in-decimal][16-bit-release-increment]
+
 # ifndef KRYPTOS_KERNEL_MODE
 #  include <stdlib.h>
 #  include <stdint.h>

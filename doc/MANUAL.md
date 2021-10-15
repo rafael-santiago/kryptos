@@ -11,6 +11,7 @@ presented here can be built with the command ``hefesto --mk-samples``.
     - [Linking user mode applications](#linking-user-mode-applications)
     - [Linking kernel mode stuff](#linking-kernel-mode-stuff)
 - [The main idea behind this library](#the-main-idea-behind-this-library)
+    - [How it have been versioned](#how-it-have-been-versioned]
     - [The kryptos_task_ctx struct](#the-kryptos_task_ctx-struct)
 - [The symmetric stuff](#the-symmetric-stuff)
     - [Hashes](#hashes)
@@ -83,6 +84,22 @@ Almost all cryptographic operations done in kryptos are based on simple tasks. A
 
 You do not need to worry about where this struct is specifically defined in kryptos. For all user code, just including
 ``kryptos.h`` will give you access to every relevant feature.
+
+[Back](#contents)
+
+### How it have been versioned
+
+``Libkryptos`` expresses its version through ``KRYPTOS_VERSION`` defined into ``kryptos_types.h`` (but you should include
+``kryptos.h`` instead).
+
+The version number is expressed in a big-endian hexadecimal value. Being the most significant 16-bit value the current year in
+which the library was released (in decimal) and the least significant 16-bit is used to release increment (starting at zero):
+
+```c
+#define KRYPTOS_VERSION 0x20210000
+```
+
+**Remark**: More than 2^16 versions in a year is not an extremelly active project but a pretty bad bugged one! ;)
 
 [Back](#contents)
 
