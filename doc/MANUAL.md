@@ -5,6 +5,34 @@ sections will guide the readers through the main aspects of how to use ``kryptos
 considers that the readers have at least a minimal formal knowledge of modern cryptography. All complete sample code
 presented here can be built with the command ``hefesto --mk-samples``.
 
+## Contents
+
+- [Link101](#link101)
+    - [Linking user mode applications](#linking-user-mode-applications)
+    - [Linking kernel mode stuff](#linking-kernel-mode-stuff)
+- [The main idea behind this library](#the-main-idea-behind-this-library)
+    - [The kryptos_task_ctx struct](#the-kryptos_task_ctx-struct)
+- [The symmetric stuff](#the-symmetric-stuff)
+    - [Hashes](#hashes)
+    - [HMACs](#hmacs)
+- [Asymmetric stuff](#asymmetric-stuff)
+    - [The Diffie-Hellman-Merkle key exchange](#the-diffie-hellman-merkle-key-exchange)
+    - [RSA](#rsa)
+    - [Elgamal](#elgamal)
+    - [Digital signature](#digital-signature)
+        - [RSA](#rsa)
+        - [DSA](#dsa)
+        - [ECDSA](#ecdsa)
+- [Secondary stuff](#secondary-stuff)
+    - [Encoding algorithms](#encoding-algorithms)
+    - [Data compression](#data-compression)
+    - [Handling PEM buffers](#handling-pem-buffers)
+    - [CSPRNG](#csprng)
+    - [Avoiding RAM swap](#avoiding-ram-swap)
+    - [Key derivation functions](#key-derivation-functions)
+    - [Bcrypt](#bcrypt)
+- [So it is enough](#so-it-is-enough)
+
 ## Link101
 
 ### Linking user mode applications
@@ -29,6 +57,8 @@ On Windows we also must link your code with ``bcrypt.(lib|a)`` due to the random
 Yes, ``Libkryptos`` also offers support for compilation on ``Microsoft Visual C``, take a look at ``doc/BUILD.md`` for
 more details.
 
+[Back](#contents)
+
 ### Linking kernel mode stuff
 
 For kernel mode, until now, kryptos can be used on ``FreeBSD``, ``NetBSD``, ``Linux`` and ``Windows``. The main idea was
@@ -41,6 +71,8 @@ On ``Windows`` c99 capabilities are on by default. In addition you must link you
 pool used from there) and ``libcntpr.lib`` due to some libc conveniences offered within Windows kernel and used by us. Since
 you are linking with ``libcntpr.lib`` define ``USE_LIBCNTPR=1``.
 
+[Back](#contents)
+
 ## The main idea behind this library
 
 The main idea here is to provide a way of using some cryptographic primitives without the necessity of longer and confuse
@@ -51,6 +83,8 @@ Almost all cryptographic operations done in kryptos are based on simple tasks. A
 
 You do not need to worry about where this struct is specifically defined in kryptos. For all user code, just including
 ``kryptos.h`` will give you access to every relevant feature.
+
+[Back](#contents)
 
 ### The kryptos_task_ctx struct
 
@@ -101,6 +135,8 @@ new allocated pointer representing the result of the processed input. The ``out_
 
 All relevant ``kryptos_task_ctx`` fields can be handled by C macros but the remaining information of how manipulate the
 ``kryptos_task_ctx`` will be introduced together with the related crypto stuff.
+
+[Back](#contents)
 
 ## The symmetric stuff
 
@@ -821,6 +857,8 @@ The **Table 3** lists the other ciphers which use additional parameters during t
 |  3DES-EDE  |  Key2, Key2 size, Key3, Key3 size | ``unsigned char`` for keys and ``size_t`` for sizes | ``kryptos_run_cipher(triple_des_ede, &task, k1, &k1_size, kKryptosECB, k2, &k2_size, k3, &k3_size)`` |
 |    GOST    |  Eight custom s-boxes             |      ``unsigned char[16]``                          | ``kryptos_run_cipher(gost, &task, "gost", 4, kKryptosCBC, s1, s2, s3, s4, s5, s6, s7, s8)``          |
 
+[Back](#contents)
+
 ### Hashes
 
 Firstly I will show you how to generate hashes without using C macro conveniences, after we will generate hashes through
@@ -1096,6 +1134,7 @@ epilogue:
     return 0;
 }
 ```
+[Back](#contents)
 
 ### HMACs
 
@@ -1200,6 +1239,7 @@ As you may have noticed the general form of using the ``kryptos_run_cipher_hmac`
                             <block cipher mode>
                             [, <block cipher add. args, when the block cipher has some>)
 ```
+[Back](#contents)
 
 ## Asymmetric stuff
 
@@ -1208,6 +1248,8 @@ For digital signature the library includes ``RSA`` (basic scheme), ``RSA-EMSA-PS
 its elliptic curve version, ``ECDSA`` is available.
 
 Firstly let's discuss the ``DHKE`` and after the other stuff.
+
+[Back](#contents)
 
 ### The Diffie-Hellman-Merkle key exchange
 
@@ -1918,6 +1960,8 @@ epilogue:
 
 Well, I think that we have done with DHKE. For awhile let's forget a little about it and dive into RSA available stuff...
 
+[Back](#contents)
+
 ### RSA
 
 The best way of introducing the usage of ``RSA`` in kryptos is by showing you how to generate the key pair.
@@ -2423,6 +2467,8 @@ Then now with those tips I hope that the following code snippet becomes clearer 
                        kryptos_oaep_hash(sha1));
 ```
 
+[Back](#contents)
+
 ### Elgamal
 
 The Elgamal encryption is available in kryptos in two modes: the schoolbook mode and with OAEP padding.
@@ -2737,6 +2783,8 @@ If you pass the hash function and the hash function size as NULL pointers, inter
 
 Now is time to talk about digital signature.
 
+[Back](#contents)
+
 ### Digital signature
 
 Until now three digital signature algorithms are implemented: ``RSA``, ``DSA`` and ``ECDSA``. The three implementions are
@@ -2746,6 +2794,8 @@ if the input is authenticated or not. When the verification process fails the ou
 NULL and the task result will be equal to ``kKryptosInvalidSignature``. When the verification succeeds the output
 buffer will contain the authenticated data and so you can process this verified output as you intend. The output
 buffer when not NULL should be freed.
+
+[Back](#contents)
 
 #### RSA
 
@@ -3155,6 +3205,8 @@ of the function pointers are abstracted with the another macro ``kryptos_pss_has
 
 If you pass both function pointers as NULL the ``PSS`` stuff will use ``SHA-1`` to hash the data.
 
+[Back](#contents)
+
 #### DSA
 
 The ``DSA`` is one of the most popular signature algorithms. As you may know it involves a key pair calculation. The following
@@ -3439,6 +3491,8 @@ parameter, the ``SHA-1`` is chosen as the default hash function. In the sample a
 pass it without the macro you should use ``kryptos_sha256_hash`` since it is the function name that performs ``SHA-256``
 stuff in kryptos (a.k.a the ``SHA-256`` hash processor).
 
+[Back](#contents)
+
 ## ECDSA
 
 The algorithm ``ECDSA`` is the elliptic curve version of the standard ``DSA``. ``ECDSA`` also needs to a key pair calculation
@@ -3604,10 +3658,14 @@ epilogue:
 }
 ```
 
+[Back](#contents)
+
 ## Secondary stuff
 
 Besides the cryptographic tasks, ``kryptos`` also has some secondary stuff such as encoding, compression and data exporting
 functionalities. In the following section we will discuss them a little.
+
+[Back](#contents)
 
 ### Encoding algorithms
 
@@ -3796,6 +3854,8 @@ epilogue:
 }
 ```
 
+[Back](#contents)
+
 ### Data compression
 
 The data compression routine available here is only for entropy issues. However, as you may know not always is
@@ -3887,6 +3947,8 @@ epilogue:
     return exit_code;
 }
 ```
+
+[Back](#contents)
 
 ### Handling PEM buffers
 
@@ -4083,6 +4145,8 @@ More details about the multiprecision handling functions are not given because i
 topic for a final user manual. For more details try the technical documentation intended for contributors besides
 reading the library's code.
 
+[Back](#contents)
+
 ### CSPRNG
 
 By default kryptos uses the native CSPRNG but the library also features a Fortuna implementation.
@@ -4213,6 +4277,8 @@ int main(int argc, char **argv) {
 }
 ```
 
+[Back](#contents)
+
 ## Avoiding RAM swap
 
 Sometimes you need to hold (for short periods of time) sensible data into RAM. In this case, a swap would be harmful because
@@ -4237,6 +4303,8 @@ until the related process exits.
 If you are using ``MINIX``, sorry, but until the current version (3.3.0) it does not implement mlock. The functions
 ``kryptos_avoid_ram_swap()`` and ``kryptos_allow_ram_swap()`` are present just for compability issues. These functions
 do nothing in ``MINIX``.
+
+[Back](#contents)
 
 ## Key derivation functions
 
@@ -4429,6 +4497,8 @@ epilogue:
 Avoid passing the parameter parallelism with values greater than one, because ``kryptos`` does not implement argon2's multi-threading
 conveniences. Using parallelism greater than one with this implementation will allow timing attacks.
 
+[Back](#contents)
+
 ## Bcrypt
 
 If you like ``bcrypt`` you can generate and verify "hashed" passwords by using ``kryptos``. The usage is as follows:
@@ -4487,3 +4557,5 @@ with this library. I hope you enjoy! Happy coding! :)
 
 Do you think that something is still unclear? Please let me [know](https://github.com/rafael-santiago/kryptos/issues)
 and thank you!
+
+[Back](#contents)
