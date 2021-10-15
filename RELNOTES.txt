@@ -1,0 +1,41 @@
+1. Latest releases are on the top.
+2. The versions are cumulative, any feature drop is informed.
+3. Usually, I try to do my best in order to bring you 'RELNOTES' instead of notes from hell ;)
+
+    Rafael
+--
+
+vx20210000 [git-tag: 'vx20210000']
+
+    Well, this is my first formalization/gathering of codes that I have been implementing, maintaining
+    and using from 2004 to 2021.
+
+    Features:
+
+        - Symmetric ciphers: arc4, seal, rabbit, aes-128, aes-192, aes-256, des, 3des, 3des-ede,
+                             idea, rc2, rc5, rc6-128, rc6-192, rc6-256, feal, cast5, camellia-128,
+                             camellia-192, camellia-256, safer-k64, blowfish, serpent, tea, xtea,
+                             misty1, mars-128, mars-192, mars-256, present-80, present-128, shacal-1,
+                             shacal-2, noekeon, noekeon (direct key), gost (with DES s-boxes), gost.
+        - Supported block ciphers mode: ecb, cbc, ofb, ctr, gcm.
+        - Hashes: sha-1, sha-224, sha-256, sha-384, sha-512, sha3-224, sha3-256, sha3-384, sha3-512,
+                  keccak-224, keccak-256, keccak-384, keccak-512, md4, md5, ripemd-128, ripemd-160,
+                  tiger, whirlpool, blake2s256, blake2b512, blake2sN (variable output length),
+                  blake2bN (variable output length).
+        - HMAC: yes.
+        - PK: dh, ecdh, rsa, rsa/oaep, rsa/emsapss, elgamal, elgamal/oaep, dsa, ecdsa.
+        - Supported standard elliptic curves: BrainPoolP160R1, BrainPoolP160T1, BrainPoolP192R1,
+                                              BrainPoolP192T1, BrainPoolP224R1, BrainPoolP224T1,
+                                              BrainPoolP256R1, BrainPoolP256T1, BrainPoolP320R1,
+                                              BrainPoolP320T1, BrainPoolP384R1, BrainPoolP384T1,
+                                              BrainPoolP512R1, BrainPoolP512T1
+        - KDFs: hkdf, pbkdf2, argon2 (version 19).
+        - Bcrypt: yes.
+        - Extra features: base64 and uuencode, huffman compression, pem encoding conveniences,
+                          ram swap avoidance, libc memory functions hooking avoidance, data wiping
+                          on freeing memory, unbiased random values from ranges, fortuna prng besides
+                          the default use of the system's csprng.
+        - Able to be used from user or kernel mode (watch the current kernel support).
+        - Supported kernels: Linux, FreeBSD, NetBSD and Windows.
+        - Supported toolchains: gcc, clang and microsoft visual c (2019).
+        - License: GPLv2.
