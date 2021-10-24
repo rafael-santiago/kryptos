@@ -10,7 +10,7 @@ Until now these are the supported platforms:
 |![FreeBSD](https://github.com/rafael-santiago/kryptos/blob/main/etc/small-freebsd.png "FreeBSD")|:heavy_check_mark:|:heavy_check_mark:|
 |![Linux](https://github.com/rafael-santiago/kryptos/blob/main/etc/small-tux.png "Linux")|:heavy_check_mark:|:heavy_check_mark:|
 |![OpenBSD](https://github.com/rafael-santiago/kryptos/blob/main/etc/small-puffy.png "OpenBSD")|:heavy_check_mark:|:x:|
-|![NetBSD](https://github.com/rafael-santiago/kryptos/blob/main/etc/small-netbsd-flag.png "NetBSD")|:heavy_check_mark:|:x:|
+|![NetBSD](https://github.com/rafael-santiago/kryptos/blob/main/etc/small-netbsd-flag.png "NetBSD")|:heavy_check_mark:|:heavy_check_mark:|
 |![MINIX](https://github.com/rafael-santiago/kryptos/blob/main/etc/small-raccoon.png "MINIX")|:heavy_check_mark:|:x:|
 |![SOLARIS](https://github.com/rafael-santiago/kryptos/blob/main/etc/small-solaris-sun.png "Solaris")|:heavy_check_mark:|:x:|
 |![Windows](https://github.com/rafael-santiago/kryptos/blob/main/etc/small-windows-logo.png "Windows")|:heavy_check_mark:|:heavy_check_mark:|
