@@ -20,4 +20,6 @@ KUTE_DECLARE_TEST_CASE(kryptos_blake2sN_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_blake2bN_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_djb2_tests);
+
 #endif

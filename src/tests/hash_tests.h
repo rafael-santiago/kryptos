@@ -114,4 +114,6 @@ CUTE_DECLARE_TEST_CASE_SUITE(kryptos_hmac_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_hmac_basic_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_djb2_tests);
+
 #endif

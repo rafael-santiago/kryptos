@@ -53,6 +53,8 @@
 #include <kryptos_whirlpool.h>
 #include <kryptos_blake2.h>
 
+#include <kryptos_djb2.h>
+
 #include <kryptos_base64.h>
 #include <kryptos_uuencode.h>
 #include <kryptos_huffman.h>

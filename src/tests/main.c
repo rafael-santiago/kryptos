@@ -203,6 +203,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_blake2bN_tests);
     CUTE_RUN_TEST(kryptos_blake2bN_hash_macro_tests);
 
+    // INFO(Rafael): Non-cryptographic hashes.
+    CUTE_RUN_TEST(kryptos_djb2_tests);
+
     //  -=-=-=-=-=-=- New block ciphers/hash functions should be added to HMAC tests. -=-=-=-=-=-=-=-
 
     // INFO(Rafael): HMAC tests.

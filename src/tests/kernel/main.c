@@ -114,6 +114,8 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_blake2sN_tests);
     KUTE_RUN_TEST(kryptos_blake2bN_tests);
 
+    KUTE_RUN_TEST(kryptos_djb2_tests);
+
     KUTE_RUN_TEST(kryptos_hmac_basic_tests);
     KUTE_RUN_TEST(kryptos_hmac_tests);
 

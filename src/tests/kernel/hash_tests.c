@@ -3090,4 +3090,19 @@ KUTE_TEST_CASE_END
 
 #undef kryptos_run_hmac_tests
 
+KUTE_TEST_CASE(kryptos_djb2_tests)
+    struct test_vector_ctx {
+        kryptos_u8_t *input;
+        size_t input_size;
+        kryptos_u64_t expected;
+    } test_vector[] = {
+        { (kryptos_u8_t *)"Hello", 5, 0x000000310D4F2079 },
+    }, *test = &test_vector[0], *test_end = test + sizeof(test_vector) / sizeof(test_vector[0]);
+
+    while (test != test_end) {
+        CUTE_ASSERT(kryptos_djb2(test->input, test->input_size) == test->expected);
+        test++;
+    }
+KUTE_TEST_CASE_END
+
 #endif
