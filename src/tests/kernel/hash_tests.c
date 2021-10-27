@@ -3100,7 +3100,7 @@ KUTE_TEST_CASE(kryptos_djb2_tests)
     }, *test = &test_vector[0], *test_end = test + sizeof(test_vector) / sizeof(test_vector[0]);
 
     while (test != test_end) {
-        CUTE_ASSERT(kryptos_djb2(test->input, test->input_size) == test->expected);
+        KUTE_ASSERT(kryptos_djb2(test->input, test->input_size) == test->expected);
         test++;
     }
 KUTE_TEST_CASE_END
