@@ -447,6 +447,7 @@ static kryptos_u8_t *kryptos_argon2_H(kryptos_u8_t *h, const size_t h_size,
         if (!kryptos_last_task_succeed(ktask)) {
             kryptos_freeseg(a, digest_size);
             a = NULL;
+            in = NULL;
             goto kryptos_argon2_H_epilogue;
         }
     }
