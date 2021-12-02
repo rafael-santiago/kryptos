@@ -246,3 +246,10 @@ static void kryptos_salsa20_keystream_feed(const kryptos_u8_t *key, const size_t
 
     kryptos_salsa20_H(ks->K, sizeof(ks->K));
 }
+
+#undef kryptos_salsa20_getbyte
+
+#undef KRYPTOS_SALSA20_THETA0
+#undef KRYPTOS_SALSA20_THETA1
+#undef KRYPTOS_SALSA20_THETA2
+#undef KRYPTOS_SALSA20_THETA3
