@@ -8,6 +8,7 @@
 #include "hash_tests.h"
 #include "test_vectors.h"
 #include <kryptos.h>
+#include <kryptos_salsa20_core.h>
 
 #if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)
 
@@ -2656,5 +2657,186 @@ CUTE_TEST_CASE(kryptos_djb2_tests)
     while (test != test_end) {
         CUTE_ASSERT(kryptos_djb2(test->input, test->input_size) == test->expected);
         test++;
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_salsa20_H_tests)
+    struct salsa20_H_test_vector_ctx {
+        kryptos_u32_t in[16];
+        kryptos_u32_t out[16];
+    } test_vector[] = {
+        {
+            { 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+              0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 },
+            { 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+              0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }
+        },
+        {
+            { 0xD39F0D73, 0x4C3752B7, 0x0375DE25, 0xBFBBEA88, 0x31EDB330, 0x016AB2DB, 0xAFC7A630, 0x5610B3CF,
+              0x1FF0203F, 0x0F535DA1, 0x74933071, 0xEE37CC24, 0x4FC9EB4F, 0x03519C2F, 0xCB1AF4F3, 0x58766836 },
+            { 0x6D2AB2A8, 0x9CF0F8EE, 0xA8C4BECB, 0x1A6EAA9A, 0x1D1D961A, 0x961EEBF9, 0xBEA3FB30, 0x45903339,
+              0x7628989D, 0xB4391B5E, 0x6B2AEC23, 0x1B6F7272, 0xDBECE887, 0x6F9B6E12, 0x18E85F9E, 0xB31330CA }
+        },
+        {
+            { 0x58766836, 0x4FC9EB4F, 0x03519C2F, 0xCB1AF4F3, 0xBFBBEA88, 0xD39F0D73, 0x4C3752B7, 0x0375DE25,
+              0x5610B3CF, 0x31EDB330, 0x016AB2DB, 0xAFC7A630, 0xEE37CC24, 0x1FF0203F, 0x0F535DA1, 0x74933071 },
+            { 0xB31330CA, 0xDBECE887, 0x6F9B6E12, 0x18E85F9E, 0x1A6EAA9A, 0x6D2AB2A8, 0x9CF0F8EE, 0xA8C4BECB,
+              0x45903339, 0x1D1D961A, 0x961EEBF9, 0xBEA3FB30, 0x1B6F7272, 0x7628989D, 0xB4391B5E, 0x6B2AEC23 },
+        },
+    }, *tp = &test_vector[0], *tp_end = tp + sizeof(test_vector) / sizeof(test_vector[0]);
+    kryptos_u8_t x[64];
+    kryptos_u32_t xw[16];
+
+    while (tp != tp_end) {
+        x[ 0] = (tp->in[0] >> 24) & 0xFF;
+        x[ 1] = ((tp->in[0] & 0x00FF0000) >> 16) & 0xFF;
+        x[ 2] = ((tp->in[0] & 0x0000FF00) >>  8) & 0xFF;
+        x[ 3] = tp->in[0] & 0xFF;
+        x[ 4] = (tp->in[1] >> 24) & 0xFF;
+        x[ 5] = ((tp->in[1] & 0x00FF0000) >> 16) & 0xFF;
+        x[ 6] = ((tp->in[1] & 0x0000FF00) >>  8) & 0xFF;
+        x[ 7] = tp->in[1] & 0xFF;
+        x[ 8] = (tp->in[2] >> 24) & 0xFF;
+        x[ 9] = ((tp->in[2] & 0x00FF0000) >> 16) & 0xFF;
+        x[10] = ((tp->in[2] & 0x0000FF00) >>  8) & 0xFF;
+        x[11] = tp->in[2] & 0xFF;
+        x[12] = (tp->in[3] >> 24) & 0xFF;
+        x[13] = ((tp->in[3] & 0x00FF0000) >> 16) & 0xFF;
+        x[14] = ((tp->in[3] & 0x0000FF00) >>  8) & 0xFF;
+        x[15] = tp->in[3] & 0xFF;
+        x[16] = (tp->in[4] >> 24) & 0xFF;
+        x[17] = ((tp->in[4] & 0x00FF0000) >> 16) & 0xFF;
+        x[18] = ((tp->in[4] & 0x0000FF00) >>  8) & 0xFF;
+        x[19] = tp->in[4] & 0xFF;
+        x[20] = (tp->in[5] >> 24) & 0xFF;
+        x[21] = ((tp->in[5] & 0x00FF0000) >> 16) & 0xFF;
+        x[22] = ((tp->in[5] & 0x0000FF00) >>  8) & 0xFF;
+        x[23] = tp->in[5] & 0xFF;
+        x[24] = (tp->in[6] >> 24) & 0xFF;
+        x[25] = ((tp->in[6] & 0x00FF0000) >> 16) & 0xFF;
+        x[26] = ((tp->in[6] & 0x0000FF00) >>  8) & 0xFF;
+        x[27] = tp->in[6] & 0xFF;
+        x[28] = (tp->in[7] >> 24) & 0xFF;
+        x[29] = ((tp->in[7] & 0x00FF0000) >> 16) & 0xFF;
+        x[30] = ((tp->in[7] & 0x0000FF00) >>  8) & 0xFF;
+        x[31] = tp->in[7] & 0xFF;
+        x[32] = (tp->in[8] >> 24) & 0xFF;
+        x[33] = ((tp->in[8] & 0x00FF0000) >> 16) & 0xFF;
+        x[34] = ((tp->in[8] & 0x0000FF00) >>  8) & 0xFF;
+        x[35] = tp->in[8] & 0xFF;
+        x[36] = (tp->in[9] >> 24) & 0xFF;
+        x[37] = ((tp->in[9] & 0x00FF0000) >> 16) & 0xFF;
+        x[38] = ((tp->in[9] & 0x0000FF00) >>  8) & 0xFF;
+        x[39] = tp->in[9] & 0xFF;
+        x[40] = (tp->in[10] >> 24) & 0xFF;
+        x[41] = ((tp->in[10] & 0x00FF0000) >> 16) & 0xFF;
+        x[42] = ((tp->in[10] & 0x0000FF00) >>  8) & 0xFF;
+        x[43] = tp->in[10] & 0xFF;
+        x[44] = (tp->in[11] >> 24) & 0xFF;
+        x[45] = ((tp->in[11] & 0x00FF0000) >> 16) & 0xFF;
+        x[46] = ((tp->in[11] & 0x0000FF00) >>  8) & 0xFF;
+        x[47] = tp->in[11] & 0xFF;
+        x[48] = (tp->in[12] >> 24) & 0xFF;
+        x[49] = ((tp->in[12] & 0x00FF0000) >> 16) & 0xFF;
+        x[50] = ((tp->in[12] & 0x0000FF00) >>  8) & 0xFF;
+        x[51] = tp->in[12] & 0xFF;
+        x[52] = (tp->in[13] >> 24) & 0xFF;
+        x[53] = ((tp->in[13] & 0x00FF0000) >> 16) & 0xFF;
+        x[54] = ((tp->in[13] & 0x0000FF00) >>  8) & 0xFF;
+        x[55] = tp->in[13] & 0xFF;
+        x[56] = (tp->in[14] >> 24) & 0xFF;
+        x[57] = ((tp->in[14] & 0x00FF0000) >> 16) & 0xFF;
+        x[58] = ((tp->in[14] & 0x0000FF00) >>  8) & 0xFF;
+        x[59] = tp->in[14] & 0xFF;
+        x[60] = (tp->in[15] >> 24) & 0xFF;
+        x[61] = ((tp->in[15] & 0x00FF0000) >> 16) & 0xFF;
+        x[62] = ((tp->in[15] & 0x0000FF00) >>  8) & 0xFF;
+        x[63] = tp->in[15] & 0xFF;
+
+        CUTE_ASSERT(kryptos_salsa20_H(x, sizeof(x)) == 1);
+
+        xw[ 0] = ((kryptos_u32_t)x[ 0]) << 24 |
+                 ((kryptos_u32_t)x[ 1]) << 16 |
+                 ((kryptos_u32_t)x[ 2]) <<  8 |
+                 ((kryptos_u32_t)x[ 3]);
+        xw[ 1] = ((kryptos_u32_t)x[ 4]) << 24 |
+                 ((kryptos_u32_t)x[ 5]) << 16 |
+                 ((kryptos_u32_t)x[ 6]) <<  8 |
+                 ((kryptos_u32_t)x[ 7]);
+        xw[ 2] = ((kryptos_u32_t)x[ 8]) << 24 |
+                 ((kryptos_u32_t)x[ 9]) << 16 |
+                 ((kryptos_u32_t)x[10]) <<  8 |
+                 ((kryptos_u32_t)x[11]);
+        xw[ 3] = ((kryptos_u32_t)x[12]) << 24 |
+                 ((kryptos_u32_t)x[13]) << 16 |
+                 ((kryptos_u32_t)x[14]) <<  8 |
+                 ((kryptos_u32_t)x[15]);
+        xw[ 4] = ((kryptos_u32_t)x[16]) << 24 |
+                 ((kryptos_u32_t)x[17]) << 16 |
+                 ((kryptos_u32_t)x[18]) <<  8 |
+                 ((kryptos_u32_t)x[19]);
+        xw[ 5] = ((kryptos_u32_t)x[20]) << 24 |
+                 ((kryptos_u32_t)x[21]) << 16 |
+                 ((kryptos_u32_t)x[22]) <<  8 |
+                 ((kryptos_u32_t)x[23]);
+        xw[ 6] = ((kryptos_u32_t)x[24]) << 24 |
+                 ((kryptos_u32_t)x[25]) << 16 |
+                 ((kryptos_u32_t)x[26]) <<  8 |
+                 ((kryptos_u32_t)x[27]);
+        xw[ 7] = ((kryptos_u32_t)x[28]) << 24 |
+                 ((kryptos_u32_t)x[29]) << 16 |
+                 ((kryptos_u32_t)x[30]) <<  8 |
+                 ((kryptos_u32_t)x[31]);
+        xw[ 8] = ((kryptos_u32_t)x[32]) << 24 |
+                 ((kryptos_u32_t)x[33]) << 16 |
+                 ((kryptos_u32_t)x[34]) <<  8 |
+                 ((kryptos_u32_t)x[35]);
+        xw[ 9] = ((kryptos_u32_t)x[36]) << 24 |
+                 ((kryptos_u32_t)x[37]) << 16 |
+                 ((kryptos_u32_t)x[38]) <<  8 |
+                 ((kryptos_u32_t)x[39]);
+        xw[10] = ((kryptos_u32_t)x[40]) << 24 |
+                 ((kryptos_u32_t)x[41]) << 16 |
+                 ((kryptos_u32_t)x[42]) <<  8 |
+                 ((kryptos_u32_t)x[43]);
+        xw[11] = ((kryptos_u32_t)x[44]) << 24 |
+                 ((kryptos_u32_t)x[45]) << 16 |
+                 ((kryptos_u32_t)x[46]) <<  8 |
+                 ((kryptos_u32_t)x[47]);
+        xw[12] = ((kryptos_u32_t)x[48]) << 24 |
+                 ((kryptos_u32_t)x[49]) << 16 |
+                 ((kryptos_u32_t)x[50]) <<  8 |
+                 ((kryptos_u32_t)x[51]);
+        xw[13] = ((kryptos_u32_t)x[52]) << 24 |
+                 ((kryptos_u32_t)x[53]) << 16 |
+                 ((kryptos_u32_t)x[54]) <<  8 |
+                 ((kryptos_u32_t)x[55]);
+        xw[14] = ((kryptos_u32_t)x[56]) << 24 |
+                 ((kryptos_u32_t)x[57]) << 16 |
+                 ((kryptos_u32_t)x[58]) <<  8 |
+                 ((kryptos_u32_t)x[59]);
+        xw[15] = ((kryptos_u32_t)x[60]) << 24 |
+                 ((kryptos_u32_t)x[61]) << 16 |
+                 ((kryptos_u32_t)x[62]) <<  8 |
+                 ((kryptos_u32_t)x[63]);
+
+        CUTE_ASSERT(xw[ 0] == tp->out[ 0]);
+        CUTE_ASSERT(xw[ 1] == tp->out[ 1]);
+        CUTE_ASSERT(xw[ 2] == tp->out[ 2]);
+        CUTE_ASSERT(xw[ 3] == tp->out[ 3]);
+        CUTE_ASSERT(xw[ 4] == tp->out[ 4]);
+        CUTE_ASSERT(xw[ 5] == tp->out[ 5]);
+        CUTE_ASSERT(xw[ 6] == tp->out[ 6]);
+        CUTE_ASSERT(xw[ 7] == tp->out[ 7]);
+        CUTE_ASSERT(xw[ 8] == tp->out[ 8]);
+        CUTE_ASSERT(xw[ 9] == tp->out[ 9]);
+        CUTE_ASSERT(xw[10] == tp->out[10]);
+        CUTE_ASSERT(xw[11] == tp->out[11]);
+        CUTE_ASSERT(xw[12] == tp->out[12]);
+        CUTE_ASSERT(xw[13] == tp->out[13]);
+        CUTE_ASSERT(xw[14] == tp->out[14]);
+        CUTE_ASSERT(xw[15] == tp->out[15]);
+
+        tp++;
     }
 CUTE_TEST_CASE_END
