@@ -99,6 +99,7 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
     if (( (*ktask)->cipher != kKryptosCipherARC4        &&
           (*ktask)->cipher != kKryptosCipherSEAL        &&
           (*ktask)->cipher != kKryptosCipherRABBIT      &&
+          (*ktask)->cipher != kKryptosCipherSalsa20     &&
           (*ktask)->cipher != kKryptosCipherRSA         &&
           (*ktask)->cipher != kKryptosCipherRSAOAEP     &&
           (*ktask)->cipher != kKryptosCipherELGAMAL     &&
@@ -116,6 +117,7 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
 
     if (( (*ktask)->cipher != kKryptosCipherARC4    &&
           (*ktask)->cipher != kKryptosCipherSEAL    &&
+          (*ktask)->cipher != kKryptosCipherSalsa20 &&
           (*ktask)->cipher != kKryptosCipherRSA     &&
           (*ktask)->cipher != kKryptosCipherRSAOAEP &&
           (*ktask)->cipher != kKryptosCipherELGAMAL ) && ( (*ktask)->mode == kKryptosCBC ||
@@ -131,7 +133,8 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
 
     if (( (*ktask)->cipher != kKryptosCipherARC4   &&
           (*ktask)->cipher != kKryptosCipherSEAL   &&
-          (*ktask)->cipher != kKryptosCipherRABBIT   ) &&
+          (*ktask)->cipher != kKryptosCipherRABBIT &&
+          (*ktask)->cipher != kKryptosCipherSalsa20  ) &&
         (*ktask)->action != kKryptosEncrypt && (*ktask)->action != kKryptosDecrypt &&
         (*ktask)->action != kKryptosEncryptWithoutRandomPad) {
         (*ktask)->result = kKryptosInvalidParams;
