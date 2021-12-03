@@ -28,6 +28,7 @@
 #include <kryptos_noekeon.h>
 #include <kryptos_gost.h>
 #include <kryptos_rabbit.h>
+#include <kryptos_salsa20.h>
 #include <kryptos_rsa.h>
 #include <kryptos_elgamal.h>
 #include <kryptos_dsa.h>
@@ -117,14 +118,14 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
 
     if (( (*ktask)->cipher != kKryptosCipherARC4    &&
           (*ktask)->cipher != kKryptosCipherSEAL    &&
-          (*ktask)->cipher != kKryptosCipherSalsa20 &&
           (*ktask)->cipher != kKryptosCipherRSA     &&
           (*ktask)->cipher != kKryptosCipherRSAOAEP &&
           (*ktask)->cipher != kKryptosCipherELGAMAL ) && ( (*ktask)->mode == kKryptosCBC ||
                                                            (*ktask)->mode == kKryptosOFB ||
                                                            (*ktask)->mode == kKryptosCTR ||
                                                            (*ktask)->mode == kKryptosGCM ||
-                                                           (*ktask)->cipher == kKryptosCipherRABBIT) &&
+                                                           (*ktask)->cipher == kKryptosCipherRABBIT ||
+                                                           (*ktask)->cipher == kKryptosCipherSalsa20) &&
                                                               kryptos_task_check_iv_data(ktask) == 0) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Invalid iv data.";
@@ -347,100 +348,81 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
         case kKryptosCipher3DES:
         case kKryptosCipher3DESEDE:
             return ((*ktask)->iv_size == KRYPTOS_DES_BLOCKSIZE);
-            break;
 
         case kKryptosCipherIDEA:
             return ((*ktask)->iv_size == KRYPTOS_IDEA_BLOCKSIZE);
-            break;
 
         case kKryptosCipherBLOWFISH:
             return ((*ktask)->iv_size == KRYPTOS_BLOWFISH_BLOCKSIZE);
-            break;
 
         case kKryptosCipherFEAL:
             return ((*ktask)->iv_size == KRYPTOS_FEAL_BLOCKSIZE);
-            break;
 
         case kKryptosCipherCAMELLIA:
             return ((*ktask)->iv_size == KRYPTOS_CAMELLIA_BLOCKSIZE);
-            break;
 
         case kKryptosCipherCAST5:
             return ((*ktask)->iv_size == KRYPTOS_CAST5_BLOCKSIZE);
-            break;
 
         case kKryptosCipherRC2:
             return ((*ktask)->iv_size == KRYPTOS_RC2_BLOCKSIZE);
-            break;
 
         case kKryptosCipherRC5:
             return ((*ktask)->iv_size == KRYPTOS_RC5_BLOCKSIZE);
-            break;
 
         case kKryptosCipherRC6128:
         case kKryptosCipherRC6192:
         case kKryptosCipherRC6256:
             return ((*ktask)->iv_size == KRYPTOS_RC6_BLOCKSIZE);
-            break;
 
         case kKryptosCipherSAFERK64:
             return ((*ktask)->iv_size == KRYPTOS_SAFERK64_BLOCKSIZE);
-            break;
 
         case kKryptosCipherTEA:
             return ((*ktask)->iv_size == KRYPTOS_TEA_BLOCKSIZE);
-            break;
 
         case kKryptosCipherXTEA:
             return ((*ktask)->iv_size == KRYPTOS_XTEA_BLOCKSIZE);
-            break;
 
         case kKryptosCipherAES128:
         case kKryptosCipherAES192:
         case kKryptosCipherAES256:
             return ((*ktask)->iv_size == KRYPTOS_AES_BLOCKSIZE);
-            break;
 
         case kKryptosCipherSERPENT:
             return ((*ktask)->iv_size == KRYPTOS_SERPENT_BLOCKSIZE);
-            break;
 
         case kKryptosCipherMISTY1:
             return ((*ktask)->iv_size == KRYPTOS_MISTY1_BLOCKSIZE);
-            break;
 
         case kKryptosCipherMARS128:
         case kKryptosCipherMARS192:
         case kKryptosCipherMARS256:
             return ((*ktask)->iv_size == KRYPTOS_MARS_BLOCKSIZE);
-            break;
 
         case kKryptosCipherPRESENT:
             return ((*ktask)->iv_size == KRYPTOS_PRESENT_BLOCKSIZE);
-            break;
 
         case kKryptosCipherSHACAL1:
             return ((*ktask)->iv_size == KRYPTOS_SHACAL1_BLOCKSIZE);
-            break;
 
         case kKryptosCipherSHACAL2:
             return ((*ktask)->iv_size == KRYPTOS_SHACAL2_BLOCKSIZE);
-            break;
 
         case kKryptosCipherNOEKEON:
         case kKryptosCipherNOEKEOND:
             return ((*ktask)->iv_size == KRYPTOS_NOEKEON_BLOCKSIZE);
-            break;
 
         case kKryptosCipherGOSTDS:
         case kKryptosCipherGOST:
             return ((*ktask)->iv_size == KRYPTOS_GOST_BLOCKSIZE);
-            break;
 
         case kKryptosCipherRABBIT:
             return (((*ktask)->iv == NULL && (*ktask)->iv_size == 0) ||
                     (*ktask)->iv_size == (KRYPTOS_RABBIT_BLOCKSIZE >> 1));
-            break;
+
+        case kKryptosCipherSalsa20:
+            return ((*ktask)->iv_size == KRYPTOS_SALSA20_IVSIZE);
 
         default: // WARN(Rafael): Only to shut up the cumbersome compiler warning.
             break;

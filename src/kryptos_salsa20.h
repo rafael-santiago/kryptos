@@ -10,9 +10,11 @@
 
 #include <kryptos_types.h>
 
+#define KRYPTOS_SALSA20_IVSIZE sizeof(kryptos_u64_t)
+
 void kryptos_salsa20_cipher(kryptos_task_ctx **ktask);
 
 void kryptos_salsa20_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size,
-                           kryptos_u64_t *n);
+                           kryptos_u8_t *iv64);
 
 #endif

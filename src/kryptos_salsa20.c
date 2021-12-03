@@ -30,6 +30,7 @@ void kryptos_salsa20_cipher(kryptos_task_ctx **ktask) {
     kryptos_u8_t *ip = NULL, *ip_end = NULL;
     kryptos_u8_t *kp = NULL, *kp_end = NULL;
     kryptos_u8_t *op = NULL;
+    kryptos_u64_t nonce = 0;
 
     memset(&ks, 0, sizeof(ks));
 
@@ -37,10 +38,11 @@ void kryptos_salsa20_cipher(kryptos_task_ctx **ktask) {
         return;
     }
 
-    if ((*ktask)->arg[0] == NULL) {
-        (*ktask)->result = kKryptosInvalidParams;
-        (*ktask)->result_verbose = "Salsa20 n parameter not supplied.";
-        return;
+    if ((*ktask)->key_size != 32 &&
+        (*ktask)->key_size != 16) {
+        (*ktask)->result = kKryptosKeyError;
+        (*ktask)->result_verbose = "Key size for Salsa20 must be a 16 or 32-bit value.";
+        goto kryptos_salsa20_cipher_epilogue;
     }
 
     ks.l = 0;
@@ -58,8 +60,17 @@ void kryptos_salsa20_cipher(kryptos_task_ctx **ktask) {
 
     op = &(*ktask)->out[0];
 
+    nonce = (((kryptos_u64_t)(*ktask)->iv[0]) << 56) |
+            (((kryptos_u64_t)(*ktask)->iv[1]) << 48) |
+            (((kryptos_u64_t)(*ktask)->iv[2]) << 40) |
+            (((kryptos_u64_t)(*ktask)->iv[3]) << 32) |
+            (((kryptos_u64_t)(*ktask)->iv[4]) << 24) |
+            (((kryptos_u64_t)(*ktask)->iv[5]) << 16) |
+            (((kryptos_u64_t)(*ktask)->iv[6]) <<  8) |
+            ((kryptos_u64_t)(*ktask)->iv[7]);
+
     while (ip != ip_end) {
-        kryptos_salsa20_keystream_feed((*ktask)->key, (*ktask)->key_size, *(kryptos_u64_t *)(*ktask)->arg[0], &ks);
+        kryptos_salsa20_keystream_feed((*ktask)->key, (*ktask)->key_size, nonce, &ks);
         kp = &ks.K[0];
         kp_end = kp + sizeof(ks.K);
         while (ip != ip_end && kp != kp_end) {
@@ -72,12 +83,14 @@ void kryptos_salsa20_cipher(kryptos_task_ctx **ktask) {
 
 kryptos_salsa20_cipher_epilogue:
 
+    nonce = 0;
+
     ip = ip_end = kp = kp_end = op = NULL;
     memset(&ks, 0, sizeof(ks));
 }
 
 void kryptos_salsa20_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size,
-                           kryptos_u64_t *n) {
+                           kryptos_u8_t *iv64) {
     if (ktask == NULL) {
         return;
     }
@@ -85,7 +98,8 @@ void kryptos_salsa20_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const siz
     ktask->cipher = kKryptosCipherSalsa20;
     ktask->key = key;
     ktask->key_size = key_size;
-    ktask->arg[0] = n;
+    ktask->iv = iv64;
+    ktask->iv_size = sizeof(kryptos_u64_t);
 }
 
 static void kryptos_salsa20_keystream_feed(const kryptos_u8_t *key, const size_t key_size, const kryptos_u64_t n,

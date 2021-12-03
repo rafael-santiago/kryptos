@@ -2687,6 +2687,12 @@ CUTE_TEST_CASE(kryptos_salsa20_H_tests)
     kryptos_u8_t x[64];
     kryptos_u32_t xw[16];
 
+    CUTE_ASSERT(kryptos_salsa20_H(NULL, 16) == 0);
+    CUTE_ASSERT(kryptos_salsa20_H(x, 0) == 0);
+    CUTE_ASSERT(kryptos_salsa20_H(x, 15) == 0);
+    CUTE_ASSERT(kryptos_salsa20_H(x, 17) == 0);
+    CUTE_ASSERT(kryptos_salsa20_H(x, -1) == 0);
+
     while (tp != tp_end) {
         x[ 0] = (tp->in[0] >> 24) & 0xFF;
         x[ 1] = ((tp->in[0] & 0x00FF0000) >> 16) & 0xFF;

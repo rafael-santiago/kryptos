@@ -160,4 +160,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_gost_ds_gcm_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_gost_gcm_tests);
 
+//CUTE_DECLARE_TEST_CASE(kryptos_salsa20_tests);
+
 #endif
