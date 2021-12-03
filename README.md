@@ -19,3 +19,11 @@ In order to know more you should start [here](https://github.com/rafael-santiago
 
 This library is licensed under ``GPLv2`` if for some reason it does not fit into your stuff you can contact me and let's
 talk about.
+
+---
+
+**Bear in mind**: Use this software at your own risk. I am not responsible for any misuse of it, including some kind of damage,
+data loss etc. The software is provided with no warranty. Also watch the crypto regulations for your country and the licenses
+of the current available ciphers before using this library.
+
+**Remark**: I do not provide pre-builts, if you have found any pre-built of this library somewhere, I **do not** endorse it.
