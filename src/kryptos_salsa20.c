@@ -15,7 +15,7 @@ struct kryptos_salsa20_keystream {
     kryptos_u64_t l;
 };
 
-#define kryptos_salsa20_getbyte(b, n) (( (b) >> (24 - (sizeof((b)) * (n))) ) & 0xFF )
+#define kryptos_salsa20_getbyte(b, n) (( (b) >> (24 - (8 * (n))) ) & 0xFF)
 
 #define KRYPTOS_SALSA20_THETA0 0x65787061
 #define KRYPTOS_SALSA20_THETA1 0x6E642033
