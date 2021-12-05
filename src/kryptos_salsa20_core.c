@@ -7,7 +7,7 @@
  */
 #include <kryptos_salsa20_core.h>
 #include <kryptos.h>
-#if defined(KRYPTOS_KERNEL_MODE)
+#if defined(KRYPTOS_KERNEL_MODE) && defined(__linux__)
 # include <string.h>
 #endif
 
