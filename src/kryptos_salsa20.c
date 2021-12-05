@@ -17,6 +17,11 @@ struct kryptos_salsa20_keystream {
 
 #define kryptos_salsa20_getbyte(b, n) (( (b) >> (24 - (8 * (n))) ) & 0xFF)
 
+#define kryptos_salsa20_littleendian(w) ( (((kryptos_u32_t)(w)) << 24) |\
+                                          (((kryptos_u32_t)(w) & 0x0000FF00) << 8) |\
+                                          (((kryptos_u32_t)(w) & 0x00FF0000) >> 8) |\
+                                          (((kryptos_u32_t)(w)) >> 24) )
+
 #define KRYPTOS_SALSA20_THETA0 0x65787061
 #define KRYPTOS_SALSA20_THETA1 0x6E642033
 #define KRYPTOS_SALSA20_THETA2 0x322D6279
@@ -81,6 +86,8 @@ void kryptos_salsa20_cipher(kryptos_task_ctx **ktask) {
         }
     }
 
+    (*ktask)->result = kKryptosSuccess;
+
 kryptos_salsa20_cipher_epilogue:
 
     nonce = 0;
@@ -144,8 +151,10 @@ static void kryptos_salsa20_keystream_feed(const kryptos_u8_t *key, const size_t
             ks->K[29] = kryptos_salsa20_getbyte(n_u32[1], 1);
             ks->K[30] = kryptos_salsa20_getbyte(n_u32[1], 2);
             ks->K[31] = kryptos_salsa20_getbyte(n_u32[1], 3);
-            n_u32[0] = (kryptos_u32_t) (ks->l >> 32);
-            n_u32[1] = (kryptos_u32_t) (ks->l & 0xFFFFFFFF);
+            n_u32[1] = (kryptos_u32_t) (ks->l >> 32);
+            n_u32[0] = (kryptos_u32_t) (ks->l & 0xFFFFFFFF);
+            n_u32[0] = kryptos_salsa20_littleendian(n_u32[0]);
+            n_u32[1] = kryptos_salsa20_littleendian(n_u32[1]);
             ks->K[32] = kryptos_salsa20_getbyte(n_u32[0], 0);
             ks->K[33] = kryptos_salsa20_getbyte(n_u32[0], 1);
             ks->K[34] = kryptos_salsa20_getbyte(n_u32[0], 2);
@@ -214,8 +223,10 @@ static void kryptos_salsa20_keystream_feed(const kryptos_u8_t *key, const size_t
             ks->K[29] = kryptos_salsa20_getbyte(n_u32[1], 1);
             ks->K[30] = kryptos_salsa20_getbyte(n_u32[1], 2);
             ks->K[31] = kryptos_salsa20_getbyte(n_u32[1], 3);
-            n_u32[0] = (kryptos_u32_t) (ks->l >> 32);
-            n_u32[1] = (kryptos_u32_t) (ks->l & 0xFFFFFFFF);
+            n_u32[1] = (kryptos_u32_t) (ks->l >> 32);
+            n_u32[0] = (kryptos_u32_t) (ks->l & 0xFFFFFFFF);
+            n_u32[0] = kryptos_salsa20_littleendian(n_u32[0]);
+            n_u32[1] = kryptos_salsa20_littleendian(n_u32[1]);
             ks->K[32] = kryptos_salsa20_getbyte(n_u32[0], 0);
             ks->K[33] = kryptos_salsa20_getbyte(n_u32[0], 1);
             ks->K[34] = kryptos_salsa20_getbyte(n_u32[0], 2);
@@ -262,6 +273,7 @@ static void kryptos_salsa20_keystream_feed(const kryptos_u8_t *key, const size_t
 }
 
 #undef kryptos_salsa20_getbyte
+#undef kryptos_salsa20_littleendian
 
 #undef KRYPTOS_SALSA20_THETA0
 #undef KRYPTOS_SALSA20_THETA1
