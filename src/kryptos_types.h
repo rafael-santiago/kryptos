@@ -148,7 +148,7 @@ typedef enum {
     kKryptosCipherARC4 = 0,
     kKryptosCipherSEAL,
     kKryptosCipherRABBIT,
-    kKryptosCipherSalsa20,
+    kKryptosCipherSALSA20,
     // INFO(Rafael): Block ciphers.
     kKryptosCipherAES128,
     kKryptosCipherAES192,

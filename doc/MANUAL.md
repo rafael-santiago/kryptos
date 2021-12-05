@@ -166,6 +166,7 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 |   ``ARC4``                      | Stream |       ``kKryptosCipherARC4``     |      ``arc4``      |
 |   ``SEAL``                      | Stream |       ``kKryptosCipherSEAL``     |      ``seal``      |
 |  ``RABBIT``                     | Stream |       ``kKryptosCipherRABBIT``   |      ``rabbit``    |
+|  ``Salsa20``                    | Stream |       ``kKryptosCipherSALSA20``  |      ``salsa20``   |
 | ``AES-128``                     | Block  |       ``kKryptosCipherAES128``   |      ``aes128``    |
 | ``AES-192``                     | Block  |       ``kKryptosCipherAES192``   |      ``aes192``    |
 | ``AES-256``                     | Block  |       ``kKryptosCipherAES256``   |      ``aes256``    |

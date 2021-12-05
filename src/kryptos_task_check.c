@@ -100,7 +100,7 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
     if (( (*ktask)->cipher != kKryptosCipherARC4        &&
           (*ktask)->cipher != kKryptosCipherSEAL        &&
           (*ktask)->cipher != kKryptosCipherRABBIT      &&
-          (*ktask)->cipher != kKryptosCipherSalsa20     &&
+          (*ktask)->cipher != kKryptosCipherSALSA20     &&
           (*ktask)->cipher != kKryptosCipherRSA         &&
           (*ktask)->cipher != kKryptosCipherRSAOAEP     &&
           (*ktask)->cipher != kKryptosCipherELGAMAL     &&
@@ -125,7 +125,7 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
                                                            (*ktask)->mode == kKryptosCTR ||
                                                            (*ktask)->mode == kKryptosGCM ||
                                                            (*ktask)->cipher == kKryptosCipherRABBIT ||
-                                                           (*ktask)->cipher == kKryptosCipherSalsa20) &&
+                                                           (*ktask)->cipher == kKryptosCipherSALSA20) &&
                                                               kryptos_task_check_iv_data(ktask) == 0) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Invalid iv data.";
@@ -135,7 +135,7 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
     if (( (*ktask)->cipher != kKryptosCipherARC4   &&
           (*ktask)->cipher != kKryptosCipherSEAL   &&
           (*ktask)->cipher != kKryptosCipherRABBIT &&
-          (*ktask)->cipher != kKryptosCipherSalsa20  ) &&
+          (*ktask)->cipher != kKryptosCipherSALSA20  ) &&
         (*ktask)->action != kKryptosEncrypt && (*ktask)->action != kKryptosDecrypt &&
         (*ktask)->action != kKryptosEncryptWithoutRandomPad) {
         (*ktask)->result = kKryptosInvalidParams;
@@ -421,7 +421,7 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
             return (((*ktask)->iv == NULL && (*ktask)->iv_size == 0) ||
                     (*ktask)->iv_size == (KRYPTOS_RABBIT_BLOCKSIZE >> 1));
 
-        case kKryptosCipherSalsa20:
+        case kKryptosCipherSALSA20:
             return ((*ktask)->iv_size == KRYPTOS_SALSA20_IVSIZE);
 
         default: // WARN(Rafael): Only to shut up the cumbersome compiler warning.

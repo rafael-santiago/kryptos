@@ -102,7 +102,7 @@ void kryptos_salsa20_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const siz
         return;
     }
 
-    ktask->cipher = kKryptosCipherSalsa20;
+    ktask->cipher = kKryptosCipherSALSA20;
     ktask->key = key;
     ktask->key_size = key_size;
     ktask->iv = iv64;

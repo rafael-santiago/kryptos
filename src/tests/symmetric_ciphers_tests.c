@@ -1475,12 +1475,13 @@ CUTE_TEST_CASE(kryptos_salsa20_tests)
             "\x5E\x3B\x34\x45\x98\x9C\x76\xF6\x11\xE0\xFE\xC6\xD9\x1A\xCA\xCC",
             131008
         },
+        // TODO(Rafael): Add more NESSIE test vectors.
     }, *test = &test_vector[0], *test_end = test + sizeof(test_vector) / sizeof(test_vector[0]);
     kryptos_task_ctx t, *ktask = &t;
 
     memset(&t, 0, sizeof(t));
 
-    t.cipher = kKryptosCipherSalsa20;
+    t.cipher = kKryptosCipherSALSA20;
 
     while (test != test_end) {
         t.in_size = test->input_size;
