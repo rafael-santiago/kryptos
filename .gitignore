@@ -18,3 +18,5 @@ src/tests/.vs/*
 src/tests/release/*
 src/tests/debug/*
 src/tests/x64/*
+src/tests/kernel/kryptos-test.inf
+src/tests/kernel/x64/*
