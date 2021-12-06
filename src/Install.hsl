@@ -24,11 +24,39 @@ function kryptos_installer() : result type none {
 }
 
 local function install_kryptos() : result type none {
-    if (isfile(hefesto.sys.make_path("../lib", "libkryptos.a")) == 0) {
-        if ((hefesto.sys.run("hefesto") != 0) || (isfile(hefesto.sys.make_path("../lib", "libkryptos.a")) == 0)) {
-            hefesto.project.abort(1);
-        }
-    }
+	if (hefesto.sys.os_name() != "windows") {
+		if (isfile(hefesto.sys.make_path("../lib", "libkryptos.a")) == 0) {
+			if ((hefesto.sys.run("hefesto") != 0) || (isfile(hefesto.sys.make_path("../lib", "libkryptos.a")) == 0)) {
+				hefesto.project.abort(1);
+			}
+		}
+	} else {
+		if (isfile(hefesto.sys.make_path("../lib", "libkryptos.a")) == 0 &&
+			isfile(hefesto.sys.make_path("../lib", "libkryptosmt.lib")) == 0 && 
+			isfile(hefesto.sys.make_path("../lib", "libkryptosmtd.lib")) == 0) {
+			if ((hefesto.sys.run("hefesto") != 0) || (isfile(hefesto.sys.make_path("../lib", "libkryptos.a")) == 0)) {
+				hefesto.project.abort(1);
+			}
+		} else {
+			var has_mt type int;
+			$has_mt = isfile(hefesto.sys.make_path("../lib", "libkryptosmt.lib")) != 0;
+			var has_mtd type int;
+			$has_mtd = isfile(hefesto.sys.make_path("../lib", "libkryptosmtd.lib")) != 0;
+
+			var artifacts_done type int;
+			$artifacts_done = ($has_mt != 0 && $has_mtd != 0);
+
+			if ($has_mt != 0 && $has_mtd == 0) {
+				$artifacts_done = (hefesto.sys.run("hefesto --toolset=msvc --compile-model=debug") == 0);
+			} else if ($has_mt == 0 && $has_mtd != 0) {
+				$artifacts_done = (hefesto.sys.run("hefesto --toolset=msvc --compile-model=release") == 0);
+			}
+
+			if ($artifacts_done == 0) {
+				hefesto.project.abort(1);
+			}
+		}
+	}
 
     var include_directory type string;
     var library_directory type string;
@@ -210,11 +238,45 @@ local function cpfiles(inc_dir type string, lib_dir type string) : result type i
         rollback_kryptos_install($inc_dir, $lib_dir);
     }
 
-    if (hefesto.sys.cp(hefesto.sys.make_path("../lib/", "libkryptos.a"),
-                       hefesto.sys.make_path($lib_dir, "libkryptos.a")) != 1) {
-        hefesto.sys.echo("INSTALL ERROR: Error while copying the library file...\n");
-        rollback_kryptos_install($inc_dir, $lib_dir);
-    }
+	if (hefesto.sys.os_name() != "windows") {
+		if (hefesto.sys.cp(hefesto.sys.make_path("../lib/", "libkryptos.a"),
+						   hefesto.sys.make_path($lib_dir, "libkryptos.a")) != 1) {
+			hefesto.sys.echo("INSTALL ERROR: Error while copying the library file...\n");
+			rollback_kryptos_install($inc_dir, $lib_dir);
+		}
+	} else {
+		if (isfile(hefesto.sys.make_path("../lib/", "libkryptos.a"))) {
+			if (hefesto.sys.cp(hefesto.sys.make_path("../lib/", "libkryptos.a"),
+							   hefesto.sys.make_path($lib_dir, "libkryptos.a")) != 1) {
+				hefesto.sys.echo("INSTALL ERROR: Error while copying the library file...\n");
+				rollback_kryptos_install($inc_dir, $lib_dir);
+			}
+		}
+
+		if (isfile(hefesto.sys.make_path("../lib/", "libkryptosmt.lib"))) {
+			if (hefesto.sys.cp(hefesto.sys.make_path("../lib/", "libkryptosmt.lib"),
+							   hefesto.sys.make_path($lib_dir, "libkryptosmt.lib")) != 1) {
+				hefesto.sys.echo("INSTALL ERROR: Error while copying the library file...\n");
+				rollback_kryptos_install($inc_dir, $lib_dir);
+			}
+		}
+
+		if (isfile(hefesto.sys.make_path("../lib/", "libkryptosmtd.lib"))) {
+			if (hefesto.sys.cp(hefesto.sys.make_path("../lib/", "libkryptosmtd.lib"),
+							   hefesto.sys.make_path($lib_dir, "libkryptosmtd.lib")) != 1) {
+				hefesto.sys.echo("INSTALL ERROR: Error while copying the library file...\n");
+				rollback_kryptos_install($inc_dir, $lib_dir);
+			}
+		}
+
+		if (isfile(hefesto.sys.make_path("../lib/", "libkryptosmtd.pdb"))) {
+			if (hefesto.sys.cp(hefesto.sys.make_path("../lib/", "libkryptosmtd.pdb"),
+							   hefesto.sys.make_path($lib_dir, "libkryptosmtd.pdb")) != 1) {
+				hefesto.sys.echo("INSTALL ERROR: Error while copying the library file...\n");
+				rollback_kryptos_install($inc_dir, $lib_dir);
+			}
+		}
+	}
 
     result 1;
 }
@@ -248,6 +310,28 @@ local function rmfiles(inc_dir type string, lib_dir type string) : result type n
         } else {
             hefesto.sys.echo("UNINSTALL WARN: Unable to find the library file.\n");
         }
+		if (hefesto.sys.os_name() == "windows") {
+			$path = hefesto.sys.make_path($lib_dir, "libkryptosmt.lib");
+			if (isfile($path)) {
+				hefesto.sys.rm($path);
+			} else {
+				hefesto.sys.echo("UNINSTALL WARN: Unable to find the library file ´libkryptosmt.lib´.\n");
+			}
+
+			$path = hefesto.sys.make_path($lib_dir, "libkryptosmtd.lib");
+			if (isfile($path)) {
+				hefesto.sys.rm($path);
+			} else {
+				hefesto.sys.echo("UNINSTALL WARN: Unable to find the library file `libkryptosmtd.lib`.\n");
+			}
+
+			$path = hefesto.sys.make_path($lib_dir, "libkryptosmtd.pdb");
+			if (isfile($path)) {
+				hefesto.sys.rm($path);
+			} else {
+				hefesto.sys.echo("UNINSTALL WARN: Unable to find the library file `libkryptosmtd.pdb`.\n");
+			}
+		}
         rmtree($lib_dir);
     } else {
         hefesto.sys.echo("UNINSTALL WARN: Unable to find the directory library.\n");
