@@ -76,6 +76,12 @@ Pretty easy, being within the ``src`` sub-directory execute the following comman
 MrsHudson@221B:~/src/kryptos/src# hefesto --install
 ```
 
+If you are on ``Windows`` and wanting to install ``MSVC`` artifacts:
+
+```
+MrsHudson@221B:~/src/kryptos/src# hefesto --toolset=msvc --install
+```
+
 To uninstall:
 
 ```
