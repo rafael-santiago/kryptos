@@ -149,6 +149,7 @@ typedef enum {
     kKryptosCipherSEAL,
     kKryptosCipherRABBIT,
     kKryptosCipherSALSA20,
+    kKryptosCipherCHACHA20,
     // INFO(Rafael): Block ciphers.
     kKryptosCipherAES128,
     kKryptosCipherAES192,

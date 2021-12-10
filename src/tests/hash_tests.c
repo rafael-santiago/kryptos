@@ -2846,3 +2846,172 @@ CUTE_TEST_CASE(kryptos_salsa20_H_tests)
         tp++;
     }
 CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_chacha20_H_tests)
+    struct test_ctx {
+        kryptos_u8_t *key;
+        kryptos_u8_t *nonce;
+        kryptos_u32_t initial_ct;
+        kryptos_u8_t *expected_keystream;
+        size_t expected_keystream_size;
+        size_t ct_nr;
+    } test_vector[] = {
+        // INFO(Rafael): Test vectors picked from RFC-7539.
+        //
+        //           "- Hey Beavis, why every test vector related to ChaCha/Salsa sucks?"
+        //           "- Yeah! yeah! it stinks Butt..Head... hehehe!"
+        //           "- Huhuh!"
+        //           "- Did you write it?"
+        //           "- Ohhh... yeah... I meant... no! No until I can remember heheheheh..
+        //              What did you say? HehHehHeheheHe"
+        //           "- HuHuhu!"
+        //
+        //      Sad but true. Anyway, the draft was much more spooky. If suddenly
+        //      this draft come across you: it is not a rabbit but -> Go Awaaaaayyyy! <-
+        {
+            "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
+            "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F",
+            "\x00\x00\x00\x09\x00\x00\x00\x4a\x00\x00\x00\x00",
+            0x00000001,
+            "\x10\xF1\xE7\xE4\xD1\x3B\x59\x15\x50\x0F\xDD\x1F\xA3\x20\x71\xC4"
+            "\xC7\xD1\xF4\xC7\x33\xC0\x68\x03\x04\x22\xAA\x9A\xC3\xD4\x6C\x4E"
+            "\xD2\x82\x64\x46\x07\x9F\xAA\x09\x14\xC2\xD7\x05\xD9\x8B\x02\xA2"
+            "\xB5\x12\x9C\xD1\xDE\x16\x4E\xB9\xCB\xD0\x83\xE8\xA2\x50\x3C\x4E",
+            64,
+            1
+        },
+        {
+            "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
+            "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F",
+            "\x00\x00\x00\x00\x00\x00\x00\x4A\x00\x00\x00\x00",
+            0x00000001,
+            "\x22\x4F\x51\xF3\x40\x1B\xD9\xE1\x2F\xDE\x27\x6F\xB8\x63\x1D\xED"
+            "\x8C\x13\x1F\x82\x3D\x2C\x06\xE2\x7E\x4F\xCA\xEC\x9E\xF3\xCF\x78"
+            "\x8A\x3B\x0A\xA3\x72\x60\x0A\x92\xB5\x79\x74\xCD\xED\x2B\x93\x34"
+            "\x79\x4C\xBA\x40\xC6\x3E\x34\xCD\xEA\x21\x2C\x4C\xF0\x7D\x41\xB7"
+            "\x69\xA6\x74\x9F\x3F\x63\x0F\x41\x22\xCA\xFE\x28\xEC\x4D\xC4\x7E"
+            "\x26\xD4\x34\x6D\x70\xB9\x8C\x73\xF3\xE9\xC5\x3A\xC4\x0C\x59\x45"
+            "\x39\x8B\x6E\xDA\x1A\x83\x2C\x89\xC1\x67\xEA\xCD\x90\x1D\x7E\x2B"
+            "\xF3\x63",
+            114,
+            4
+        },
+    }, *test = &test_vector[0], *test_end = test + sizeof(test_vector) / sizeof(test_vector[0]);
+    kryptos_u8_t x[64];
+    kryptos_u32_t u32[2];
+    size_t e;
+    kryptos_u32_t ct;
+    kryptos_u8_t *kp, *kp_end;
+
+    while (test != test_end) {
+#define kryptos_chacha20_getbyte(b, n) (( (b) >> (24 - (8 * (n))) ) & 0xFF)
+
+#define kryptos_chacha20_littleendian(w) ( (((kryptos_u32_t)(w)) << 24) |\
+                                          (((kryptos_u32_t)(w) & 0x0000FF00) << 8) |\
+                                          (((kryptos_u32_t)(w) & 0x00FF0000) >> 8) |\
+                                          (((kryptos_u32_t)(w)) >> 24) )
+
+#define KRYPTOS_CHACHA20_THETA0 0x61707865
+#define KRYPTOS_CHACHA20_THETA1 0x3320646E
+#define KRYPTOS_CHACHA20_THETA2 0x79622D32
+#define KRYPTOS_CHACHA20_THETA3 0x6B206574
+
+        kp = &test->expected_keystream[0];
+        kp_end = kp + test->expected_keystream_size;
+        for (ct = test->initial_ct; ct <= test->ct_nr; ct++) {
+            x[ 0] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA0, 0);
+            x[ 1] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA0, 1);
+            x[ 2] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA0, 2);
+            x[ 3] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA0, 3);
+            x[ 4] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA1, 0);
+            x[ 5] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA1, 1);
+            x[ 6] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA1, 2);
+            x[ 7] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA1, 3);
+            x[ 8] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA2, 0);
+            x[ 9] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA2, 1);
+            x[10] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA2, 2);
+            x[11] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA2, 3);
+            x[12] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA3, 0);
+            x[13] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA3, 1);
+            x[14] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA3, 2);
+            x[15] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA3, 3);
+            x[16] = test->key[ 3];
+            x[17] = test->key[ 2];
+            x[18] = test->key[ 1];
+            x[19] = test->key[ 0];
+
+            x[20] = test->key[ 7];
+            x[21] = test->key[ 6];
+            x[22] = test->key[ 5];
+            x[23] = test->key[ 4];
+
+            x[24] = test->key[11];
+            x[25] = test->key[10];
+            x[26] = test->key[ 9];
+            x[27] = test->key[ 8];
+
+            x[28] = test->key[15];
+            x[29] = test->key[14];
+            x[30] = test->key[13];
+            x[31] = test->key[12];
+
+            x[32] = test->key[19];
+            x[33] = test->key[18];
+            x[34] = test->key[17];
+            x[35] = test->key[16];
+
+            x[36] = test->key[23];
+            x[37] = test->key[22];
+            x[38] = test->key[21];
+            x[39] = test->key[20];
+
+            x[40] = test->key[27];
+            x[41] = test->key[26];
+            x[42] = test->key[25];
+            x[43] = test->key[24];
+
+            x[44] = test->key[31];
+            x[45] = test->key[30];
+            x[46] = test->key[29];
+            x[47] = test->key[28];
+
+            x[48] = kryptos_chacha20_getbyte(ct, 0);
+            x[49] = kryptos_chacha20_getbyte(ct, 1);
+            x[50] = kryptos_chacha20_getbyte(ct, 2);
+            x[51] = kryptos_chacha20_getbyte(ct, 3);
+
+
+            x[52] = test->nonce[ 3];
+            x[53] = test->nonce[ 2];
+            x[54] = test->nonce[ 1];
+            x[55] = test->nonce[ 0];
+
+            x[56] = test->nonce[ 7];
+            x[57] = test->nonce[ 6];
+            x[58] = test->nonce[ 5];
+            x[59] = test->nonce[ 4];
+
+            x[60] = test->nonce[11];
+            x[61] = test->nonce[10];
+            x[62] = test->nonce[ 9];
+            x[63] = test->nonce[ 8];
+
+            CUTE_ASSERT(kryptos_chacha20_H(x, sizeof(x)) == 1);
+
+            for (e = 0; e < 64 && kp != kp_end; e++, kp++) {
+                CUTE_ASSERT(x[e] == *kp);
+            }
+        }
+
+#undef kryptos_chacha20_getbyte
+
+#undef kryptos_chacha20_littleendian
+
+#undef KRYPTOS_CHACHA20_THETA0
+#undef KRYPTOS_CHACHA20_THETA1
+#undef KRYPTOS_CHACHA20_THETA2
+#undef KRYPTOS_CHACHA20_THETA3
+
+        test++;
+    }
+CUTE_TEST_CASE_END

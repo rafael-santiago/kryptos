@@ -1881,3 +1881,5 @@ CUTE_TEST_CASE(kryptos_salsa20_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_chacha20_tests)
+CUTE_TEST_CASE_END

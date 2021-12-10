@@ -46,7 +46,7 @@ void kryptos_salsa20_cipher(kryptos_task_ctx **ktask) {
     if ((*ktask)->key_size != 32 &&
         (*ktask)->key_size != 16) {
         (*ktask)->result = kKryptosKeyError;
-        (*ktask)->result_verbose = "Key size for Salsa20 must be a 16 or 32-bit value.";
+        (*ktask)->result_verbose = "Key size for Salsa20 must be a 16 or 32-byte value.";
         goto kryptos_salsa20_cipher_epilogue;
     }
 

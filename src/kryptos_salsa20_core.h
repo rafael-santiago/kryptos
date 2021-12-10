@@ -12,4 +12,6 @@
 
 int kryptos_salsa20_H(kryptos_u8_t *x, const size_t x_size);
 
+int kryptos_chacha20_H(kryptos_u8_t *x, const size_t x_size);
+
 #endif

@@ -65,6 +65,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     // INFO(Rafael): Symmetric stuff.
 
     CUTE_RUN_TEST(kryptos_salsa20_H_tests);
+    CUTE_RUN_TEST(kryptos_chacha20_H_tests);
 
     // INFO(Rafael): Cipher validation using official test vectors.
     CUTE_RUN_TEST(kryptos_arc4_tests);
