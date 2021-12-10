@@ -101,7 +101,6 @@ void kryptos_chacha20_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const si
 
 static void kryptos_chacha20_keystream_feed(const kryptos_u8_t *key, const kryptos_u8_t *n,
                                            struct kryptos_chacha20_keystream *ks) {
-    kryptos_u32_t u32[2];
     // INFO(Rafael): ChaCha20 only supports 256-bit keys pass key_size here is pointless.
     ks->K[ 0] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA0, 0);
     ks->K[ 1] = kryptos_chacha20_getbyte(KRYPTOS_CHACHA20_THETA0, 1);
@@ -180,8 +179,6 @@ static void kryptos_chacha20_keystream_feed(const kryptos_u8_t *key, const krypt
     ks->K[63] = n[ 8];
 
     kryptos_chacha20_H(ks->K, sizeof(ks->K));
-
-    u32[0] = u32[1] = 0;
 
     ks->l += 1;
 }
