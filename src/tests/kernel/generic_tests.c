@@ -496,7 +496,7 @@ KUTE_TEST_CASE(kryptos_task_check_tests)
     KUTE_ASSERT(t.result == kKryptosInvalidParams);
     KUTE_ASSERT(strcmp(t.result_verbose, "Invalid iv data.") == 0);
 
-    t.iv = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+    t.iv = (kryptos_u8_t *)"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
     KUTE_ASSERT(kryptos_task_check(&ktask) == 1);
 
     t.cipher = kKryptosCipherRSA;
