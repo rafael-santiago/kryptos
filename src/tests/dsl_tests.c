@@ -289,6 +289,31 @@ CUTE_TEST_CASE(kryptos_salsa20_dsl_tests)
     CUTE_ASSERT(ktask->out != NULL);
     CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+
+    // SALSA20
+    // INFO(Rafael): Using random iv.
+    kryptos_task_set_encrypt_action(ktask);
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+
+    kryptos_run_cipher(salsa20, ktask, "salsa20\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00\x00\x00", 32, NULL);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+
+    kryptos_task_set_decrypt_action(ktask);
+    kryptos_task_set_in(ktask, kryptos_task_get_out(ktask), kryptos_task_get_out_size(ktask));
+
+    kryptos_run_cipher(salsa20, ktask, "salsa20\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00\x00\x00", 32, NULL);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(ktask->out != NULL);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_chacha20_dsl_tests)
@@ -309,6 +334,29 @@ CUTE_TEST_CASE(kryptos_chacha20_dsl_tests)
                                        "\x00\x00\x00\x00\x00\x00\x00\x00"
                                        "\x00\x00\x00\x00\x00\x00\x00\x00"
                                        "\x00\x00", 32, "chacha20\x00\x00\x00\x00", NULL);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(ktask->out != NULL);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+
+    // CHACHA20
+    // INFO(Rafael): Using random iv.
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+    kryptos_task_set_encrypt_action(ktask);
+    kryptos_run_cipher(chacha20, ktask, "chacha20\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00", 32, NULL, NULL);
+    CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+
+    kryptos_task_set_in(ktask, kryptos_task_get_out(ktask), kryptos_task_get_out_size(ktask));
+    kryptos_task_set_decrypt_action(ktask);
+    kryptos_run_cipher(chacha20, ktask, "chacha20\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00", 32, NULL, NULL);
     CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
 
     CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);

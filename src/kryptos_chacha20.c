@@ -7,6 +7,7 @@
  */
 #include <kryptos_chacha20.h>
 #include <kryptos_salsa20_core.h>
+#include <kryptos_random.h>
 #include <kryptos_task_check.h>
 #include <kryptos.h>
 
@@ -35,13 +36,13 @@ void kryptos_chacha20_cipher(kryptos_task_ctx **ktask) {
     kryptos_u8_t *ip = NULL, *ip_end = NULL;
     kryptos_u8_t *op = NULL;
     kryptos_u8_t *kp = NULL, *kp_end = NULL;
+    int do_iv_pre_proc = 0;
 
+    memset(&ks, 0, sizeof(ks));
 
     if (kryptos_task_check(ktask) == 0) {
         return;
     }
-
-    memset(&ks, 0, sizeof(ks));
 
     if ((*ktask)->key_size != 32) {
         (*ktask)->result = kKryptosKeyError;
@@ -53,8 +54,27 @@ void kryptos_chacha20_cipher(kryptos_task_ctx **ktask) {
     ip = (*ktask)->in;
     ip_end = ip + (*ktask)->in_size;
 
-    (*ktask)->out_size = (ip_end - ip);
-    (*ktask)->out = (kryptos_u8_t *)kryptos_newseg(ip_end - ip);
+    do_iv_pre_proc = ((*ktask)->iv == NULL && (*ktask)->iv_size == 0);
+
+    if (do_iv_pre_proc) {
+        if ((*ktask)->action == kKryptosEncrypt) {
+            (*ktask)->iv = kryptos_get_random_block(KRYPTOS_CHACHA20_IVSIZE);
+            (*ktask)->iv_size = KRYPTOS_CHACHA20_IVSIZE;
+            if ((*ktask)->iv == NULL) {
+                (*ktask)->result = kKryptosProcessError;
+                (*ktask)->result_verbose = "No memory to get a valid random nonce.";
+                do_iv_pre_proc = 0;
+                goto kryptos_chacha20_cipher_epilogue;
+            }
+        } else {
+            (*ktask)->iv = ip;
+            ip += KRYPTOS_CHACHA20_IVSIZE;
+        }
+    }
+
+    (*ktask)->out_size = (ip_end - ip) +
+                            ((do_iv_pre_proc && (*ktask)->action == kKryptosEncrypt) ? KRYPTOS_CHACHA20_IVSIZE : 0);
+    (*ktask)->out = (kryptos_u8_t *)kryptos_newseg((*ktask)->out_size);
 
     if ((*ktask)->out == NULL) {
         (*ktask)->out_size = 0;
@@ -64,6 +84,11 @@ void kryptos_chacha20_cipher(kryptos_task_ctx **ktask) {
     }
 
     op = (*ktask)->out;
+
+    if (do_iv_pre_proc && (*ktask)->action == kKryptosEncrypt) {
+        memcpy(op, (*ktask)->iv, (*ktask)->iv_size);
+        op += (*ktask)->iv_size;
+    }
 
     while (ip != ip_end) {
         kryptos_chacha20_keystream_feed((*ktask)->key, (*ktask)->iv, &ks);
@@ -77,17 +102,31 @@ void kryptos_chacha20_cipher(kryptos_task_ctx **ktask) {
         }
     }
 
+    if (do_iv_pre_proc && (*ktask)->action == kKryptosDecrypt) {
+        (*ktask)->iv = NULL;
+        (*ktask)->iv_size = 0;
+    }
+
     (*ktask)->result = kKryptosSuccess;
+
+    if ((*ktask)->arg[0] != NULL) {
+        *((kryptos_u32_t *)(*ktask)->arg[0]) = ks.l;
+    }
 
 kryptos_chacha20_cipher_epilogue:
 
     memset(&ks, 0, sizeof(ks));
 
+    if (do_iv_pre_proc && (*ktask)->iv != NULL) {
+        kryptos_freeseg((*ktask)->iv, (*ktask)->iv_size);
+        do_iv_pre_proc = 0;
+    }
+
     ip = ip_end = op = kp = kp_end = NULL;
 }
 
 void kryptos_chacha20_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size,
-                            kryptos_u8_t *iv64, const kryptos_u32_t *initial_counter) {
+                            kryptos_u8_t *iv64, kryptos_u32_t *initial_counter) {
     if (ktask == NULL) {
         return;
     }
@@ -96,15 +135,8 @@ void kryptos_chacha20_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const si
     ktask->key = key;
     ktask->key_size = key_size;
     ktask->iv = iv64;
-    ktask->iv_size = KRYPTOS_CHACHA20_IVSIZE;
-#if defined(__GNUC__) || defined(__clang__)
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wcast-qual"
-#endif
+    ktask->iv_size = (iv64 != NULL) ? KRYPTOS_CHACHA20_IVSIZE : 0;
     ktask->arg[0] = (void *)initial_counter;
-#if defined(__GNUC__) || defined(__clang__)
-# pragma GCC diagnostic pop
-#endif
 }
 
 static void kryptos_chacha20_keystream_feed(const kryptos_u8_t *key, const kryptos_u8_t *n,

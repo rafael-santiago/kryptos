@@ -7,6 +7,7 @@
  */
 #include <kryptos_salsa20.h>
 #include <kryptos_salsa20_core.h>
+#include <kryptos_random.h>
 #include <kryptos_task_check.h>
 #include <kryptos.h>
 
@@ -36,6 +37,7 @@ void kryptos_salsa20_cipher(kryptos_task_ctx **ktask) {
     kryptos_u8_t *kp = NULL, *kp_end = NULL;
     kryptos_u8_t *op = NULL;
     kryptos_u64_t nonce = 0;
+    int do_iv_pre_proc = 0;
 
     memset(&ks, 0, sizeof(ks));
 
@@ -54,7 +56,26 @@ void kryptos_salsa20_cipher(kryptos_task_ctx **ktask) {
     ip = (*ktask)->in;
     ip_end = ip + (*ktask)->in_size;
 
-    (*ktask)->out_size = ip_end - ip;
+    do_iv_pre_proc = ((*ktask)->iv == NULL && (*ktask)->iv_size == 0);
+
+    if (do_iv_pre_proc) {
+        if ((*ktask)->action == kKryptosEncrypt) {
+            (*ktask)->iv = kryptos_get_random_block(KRYPTOS_SALSA20_IVSIZE);
+            (*ktask)->iv_size = KRYPTOS_SALSA20_IVSIZE;
+            if ((*ktask)->iv == NULL) {
+                (*ktask)->result = kKryptosProcessError;
+                (*ktask)->result_verbose = "No memory to get a valid random nonce.";
+                do_iv_pre_proc = 0;
+                goto kryptos_salsa20_cipher_epilogue;
+            }
+        } else {
+            (*ktask)->iv = ip;
+            ip += KRYPTOS_SALSA20_IVSIZE;
+        }
+    }
+
+    (*ktask)->out_size = ip_end - ip +
+                            ((do_iv_pre_proc && (*ktask)->action == kKryptosEncrypt) ? KRYPTOS_SALSA20_IVSIZE : 0);
     (*ktask)->out = (kryptos_u8_t *)kryptos_newseg((*ktask)->out_size);
     if ((*ktask)->out == NULL) {
         (*ktask)->out_size = 0;
@@ -62,8 +83,6 @@ void kryptos_salsa20_cipher(kryptos_task_ctx **ktask) {
         (*ktask)->result_verbose = "No memory to get a valid output.";
         goto kryptos_salsa20_cipher_epilogue;
     }
-
-    op = &(*ktask)->out[0];
 
     nonce = (((kryptos_u64_t)(*ktask)->iv[0]) << 56) |
             (((kryptos_u64_t)(*ktask)->iv[1]) << 48) |
@@ -73,6 +92,15 @@ void kryptos_salsa20_cipher(kryptos_task_ctx **ktask) {
             (((kryptos_u64_t)(*ktask)->iv[5]) << 16) |
             (((kryptos_u64_t)(*ktask)->iv[6]) <<  8) |
             ((kryptos_u64_t)(*ktask)->iv[7]);
+
+    op = &(*ktask)->out[0];
+
+    if (do_iv_pre_proc && (*ktask)->action == kKryptosEncrypt) {
+        memcpy(op, (*ktask)->iv, (*ktask)->iv_size);
+        op += (*ktask)->iv_size;
+    } else if (do_iv_pre_proc) {
+        (*ktask)->iv = NULL;
+    }
 
     while (ip != ip_end) {
         kryptos_salsa20_keystream_feed((*ktask)->key, (*ktask)->key_size, nonce, &ks);
@@ -90,6 +118,11 @@ void kryptos_salsa20_cipher(kryptos_task_ctx **ktask) {
 
 kryptos_salsa20_cipher_epilogue:
 
+    if (do_iv_pre_proc && (*ktask)->iv != NULL) {
+        kryptos_freeseg((*ktask)->iv, (*ktask)->iv_size);
+        do_iv_pre_proc = 0;
+    }
+
     nonce = 0;
 
     ip = ip_end = kp = kp_end = op = NULL;
@@ -106,7 +139,7 @@ void kryptos_salsa20_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const siz
     ktask->key = key;
     ktask->key_size = key_size;
     ktask->iv = iv64;
-    ktask->iv_size = sizeof(kryptos_u64_t);
+    ktask->iv_size = (iv64 != NULL) ? KRYPTOS_SALSA20_IVSIZE : 0;
 }
 
 static void kryptos_salsa20_keystream_feed(const kryptos_u8_t *key, const size_t key_size, const kryptos_u64_t n,

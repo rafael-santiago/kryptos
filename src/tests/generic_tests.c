@@ -465,6 +465,7 @@ CUTE_TEST_CASE(kryptos_task_check_tests)
     CUTE_ASSERT(strcmp(t.result_verbose, "Invalid key data.") == 0);
 
     t.key_size = 32;
+    t.iv_size = 1;
     CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     CUTE_ASSERT(t.result == kKryptosInvalidParams);
     CUTE_ASSERT(strcmp(t.result_verbose, "Invalid iv data.") == 0);
@@ -498,6 +499,7 @@ CUTE_TEST_CASE(kryptos_task_check_tests)
     CUTE_ASSERT(strcmp(t.result_verbose, "Invalid key data.") == 0);
 
     t.key_size = 32;
+    t.iv_size = 1;
     CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
     CUTE_ASSERT(t.result == kKryptosInvalidParams);
     CUTE_ASSERT(strcmp(t.result_verbose, "Invalid iv data.") == 0);

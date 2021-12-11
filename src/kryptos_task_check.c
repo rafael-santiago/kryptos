@@ -343,7 +343,9 @@ kryptos_task_check_verify_rsa_error:
 }
 
 static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
-    if (((*ktask)->iv == NULL || (*ktask)->iv_size == 0) && (*ktask)->cipher != kKryptosCipherRABBIT) {
+    if (((*ktask)->iv == NULL || (*ktask)->iv_size == 0) && (*ktask)->cipher != kKryptosCipherRABBIT  &&
+                                                            (*ktask)->cipher != kKryptosCipherSALSA20 &&
+                                                            (*ktask)->cipher != kKryptosCipherCHACHA20) {
         return 0;
     }
 
@@ -426,10 +428,12 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
                     (*ktask)->iv_size == (KRYPTOS_RABBIT_BLOCKSIZE >> 1));
 
         case kKryptosCipherSALSA20:
-            return ((*ktask)->iv_size == KRYPTOS_SALSA20_IVSIZE);
+            return (((*ktask)->iv == NULL && (*ktask)->iv_size == 0) ||
+                    ((*ktask)->iv != NULL && (*ktask)->iv_size == KRYPTOS_SALSA20_IVSIZE));
 
         case kKryptosCipherCHACHA20:
-            return ((*ktask)->iv_size == KRYPTOS_CHACHA20_IVSIZE);
+            return (((*ktask)->iv == NULL && (*ktask)->iv_size == 0) ||
+                    ((*ktask)->iv != NULL && (*ktask)->iv_size == KRYPTOS_CHACHA20_IVSIZE));
 
         default: // WARN(Rafael): Only to shut up the cumbersome compiler warning.
             break;
