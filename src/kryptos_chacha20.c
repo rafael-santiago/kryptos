@@ -97,7 +97,14 @@ void kryptos_chacha20_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const si
     ktask->key_size = key_size;
     ktask->iv = iv64;
     ktask->iv_size = KRYPTOS_CHACHA20_IVSIZE;
+#if defined(__GNUC__) || defined(__clang__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wcast-qual"
+#endif
     ktask->arg[0] = (void *)initial_counter;
+#if defined(__GNUC__) || defined(__clang__)
+# pragma GCC diagnostic pop
+#endif
 }
 
 static void kryptos_chacha20_keystream_feed(const kryptos_u8_t *key, const kryptos_u8_t *n,
