@@ -482,6 +482,39 @@ CUTE_TEST_CASE(kryptos_task_check_tests)
     t.iv = "\x00\x00\x00\x00\x00\x00\x00\x00";
     CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
 
+    t.cipher = kKryptosCipherCHACHA20;
+    t.iv = NULL;
+    t.iv_size = 0;
+    t.key = NULL;
+    t.key_size = 0;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+    CUTE_ASSERT(strcmp(t.result_verbose, "Invalid key data.") == 0);
+
+    t.key = key;
+    t.key_size = 0;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+    CUTE_ASSERT(strcmp(t.result_verbose, "Invalid key data.") == 0);
+
+    t.key_size = 32;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+    CUTE_ASSERT(strcmp(t.result_verbose, "Invalid iv data.") == 0);
+
+    t.iv_size = 8;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+    CUTE_ASSERT(strcmp(t.result_verbose, "Invalid iv data.") == 0);
+
+    t.iv_size = 12;
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 0);
+    CUTE_ASSERT(t.result == kKryptosInvalidParams);
+    CUTE_ASSERT(strcmp(t.result_verbose, "Invalid iv data.") == 0);
+
+    t.iv = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+    CUTE_ASSERT(kryptos_task_check(&ktask) == 1);
+
     t.cipher = kKryptosCipherRSA;
     t.key = NULL;
     t.key_size = 0;

@@ -1,5 +1,5 @@
-(A) Implement ChaCha20. +CipherAddition,+NewFeature,+Improvement
 (A) Try to give support to GMP on multiprecision stuff when asked by the user. +Improvement
+x (A) Implement ChaCha20. +CipherAddition,+NewFeature,+Improvement
 x (A) Implement Salsa20 stream cipher. +NewFeature,+CipherSupport
 x (A) Support kryptos kernel mode on Windows. +ScopeIncrease,+NewFeature,+Improvement,+Build
 x (A) Adapt KRYPTOS_MP_EXTENDED_RADIX for kernel mode if possible. +Improvement

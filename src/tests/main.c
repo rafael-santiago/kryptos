@@ -72,6 +72,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_seal_tests);
     CUTE_RUN_TEST(kryptos_rabbit_tests);
     CUTE_RUN_TEST(kryptos_salsa20_tests);
+    CUTE_RUN_TEST(kryptos_chacha20_tests);
     CUTE_RUN_TEST(kryptos_des_weak_keys_detection_tests);
     CUTE_RUN_TEST(kryptos_des_tests);
     CUTE_RUN_TEST(kryptos_idea_tests);

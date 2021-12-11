@@ -1882,4 +1882,60 @@ CUTE_TEST_CASE(kryptos_salsa20_tests)
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_chacha20_tests)
+    struct test_ctx {
+        kryptos_u8_t *key;
+        size_t key_size;
+        kryptos_u8_t *nonce;
+        kryptos_u32_t initial_counter;
+        kryptos_u8_t *plaintext;
+        size_t plaintext_size;
+        kryptos_u8_t *ciphertext;
+        size_t ciphertext_size;
+    } test_vector[] = {
+        // INFO(Rafael): Test vector picked from RFC-7539.
+        {
+            "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
+            "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F",
+            32,
+            "\x00\x00\x00\x00\x00\x00\x00\x4A\x00\x00\x00\x00",
+            1,
+            "\x4C\x61\x64\x69\x65\x73\x20\x61\x6E\x64\x20\x47\x65\x6E\x74\x6C"
+            "\x65\x6D\x65\x6E\x20\x6F\x66\x20\x74\x68\x65\x20\x63\x6C\x61\x73"
+            "\x73\x20\x6F\x66\x20\x27\x39\x39\x3A\x20\x49\x66\x20\x49\x20\x63"
+            "\x6F\x75\x6C\x64\x20\x6F\x66\x66\x65\x72\x20\x79\x6F\x75\x20\x6F"
+            "\x6E\x6C\x79\x20\x6F\x6E\x65\x20\x74\x69\x70\x20\x66\x6F\x72\x20"
+            "\x74\x68\x65\x20\x66\x75\x74\x75\x72\x65\x2C\x20\x73\x75\x6E\x73"
+            "\x63\x72\x65\x65\x6E\x20\x77\x6F\x75\x6C\x64\x20\x62\x65\x20\x69"
+            "\x74\x2E",
+            114,
+            "\x6E\x2E\x35\x9A\x25\x68\xF9\x80\x41\xBA\x07\x28\xDD\x0D\x69\x81"
+            "\xE9\x7E\x7A\xEC\x1D\x43\x60\xC2\x0A\x27\xAF\xCC\xFD\x9F\xAE\x0B"
+            "\xF9\x1B\x65\xC5\x52\x47\x33\xAB\x8F\x59\x3D\xAB\xCD\x62\xB3\x57"
+            "\x16\x39\xD6\x24\xE6\x51\x52\xAB\x8F\x53\x0C\x35\x9F\x08\x61\xD8"
+            "\x07\xCA\x0D\xBF\x50\x0D\x6A\x61\x56\xA3\x8E\x08\x8A\x22\xB6\x5E"
+            "\x52\xBC\x51\x4D\x16\xCC\xF8\x06\x81\x8C\xE9\x1A\xB7\x79\x37\x36"
+            "\x5A\xF9\x0B\xBF\x74\xA3\x5B\xE6\xB4\x0B\x8E\xED\xF2\x78\x5E\x42"
+            "\x87\x4D",
+            114
+        },
+    }, *test = &test_vector[0], *test_end = test + sizeof(test_vector) / sizeof(test_vector[0]);
+    kryptos_task_ctx t, *ktask = &t;
+    size_t ct;
+
+    memset(ktask, 0, sizeof(kryptos_task_ctx));
+
+    while (test != test_end) {
+        ktask->cipher = kKryptosCipherCHACHA20;
+        kryptos_chacha20_setup(ktask, test->key, test->key_size, test->nonce, &test->initial_counter);
+        ktask->in = test->plaintext;
+        ktask->in_size = test->plaintext_size;
+        kryptos_chacha20_cipher(&ktask);
+        CUTE_ASSERT(ktask->out != NULL);
+        CUTE_ASSERT(ktask->out_size == test->ciphertext_size);
+        CUTE_ASSERT(memcmp(ktask->out, test->ciphertext, test->ciphertext_size) == 0);
+        kryptos_freeseg(ktask->out, ktask->out_size);
+        ktask->out = NULL;
+        ktask->out_size = 0;
+        test++;
+    }
 CUTE_TEST_CASE_END

@@ -15,6 +15,6 @@
 void kryptos_chacha20_cipher(kryptos_task_ctx **ktask);
 
 void kryptos_chacha20_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size,
-                            kryptos_u8_t *iv64);
+                            kryptos_u8_t *iv64, const kryptos_u32_t *initial_counter);
 
 #endif

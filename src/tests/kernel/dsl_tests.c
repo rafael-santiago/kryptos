@@ -59,6 +59,7 @@ KUTE_DECLARE_TEST_CASE(kryptos_noekeon_d_dsl_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_gost_ds_dsl_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_gost_dsl_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_salsa20_dsl_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_chacha20_dsl_tests);
 #endif
 
 KUTE_TEST_CASE(kryptos_dsl_tests)
@@ -73,6 +74,7 @@ KUTE_TEST_CASE(kryptos_dsl_tests)
     KUTE_RUN_TEST(kryptos_seal_dsl_tests);
     KUTE_RUN_TEST(kryptos_rabbit_dsl_tests);
     KUTE_RUN_TEST(kryptos_salsa20_dsl_tests);
+    KUTE_RUN_TEST(kryptos_chacha20_dsl_tests);
     KUTE_RUN_TEST(kryptos_des_dsl_tests);
     KUTE_RUN_TEST(kryptos_idea_dsl_tests);
     KUTE_RUN_TEST(kryptos_blowfish_dsl_tests);
@@ -257,6 +259,32 @@ KUTE_TEST_CASE(kryptos_salsa20_dsl_tests)
                                        "\x00\x00\x00\x00\x00\x00\x00\x00"
                                        "\x00\x00\x00\x00\x00\x00\x00\x00"
                                        "\x00\x00\x00\x00", 32, (kryptos_u8_t *)"salsa20\x00");
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+
+    KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    KUTE_ASSERT(ktask->out != NULL);
+    KUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_chacha20_dsl_tests)
+    kryptos_task_ctx t, *ktask = &t;
+
+    // CHACHA20
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+
+    kryptos_run_cipher(chacha20, ktask, (kryptos_u8_t *)"chacha20\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00", 32, (kryptos_u8_t *)"chacha20\x00\x00\x00\x00", NULL);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+
+    kryptos_task_set_in(ktask, kryptos_task_get_out(ktask), kryptos_task_get_out_size(ktask));
+
+    kryptos_run_cipher(chacha20, ktask, (kryptos_u8_t *)"chacha20\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00\x00\x00\x00\x00\x00\x00"
+                                       "\x00\x00", 32, (kryptos_u8_t *)"chacha20\x00\x00\x00\x00", NULL);
     KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
 
     KUTE_ASSERT(ktask->out_size == dsl_tests_data_size);

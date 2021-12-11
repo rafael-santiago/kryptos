@@ -49,7 +49,7 @@ void kryptos_chacha20_cipher(kryptos_task_ctx **ktask) {
         goto kryptos_chacha20_cipher_epilogue;
     }
 
-    ks.l = 0;
+    ks.l = ((*ktask)->arg[0] == NULL) ? 0 : *(kryptos_u32_t *)(*ktask)->arg[0];
     ip = (*ktask)->in;
     ip_end = ip + (*ktask)->in_size;
 
@@ -87,7 +87,7 @@ kryptos_chacha20_cipher_epilogue:
 }
 
 void kryptos_chacha20_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const size_t key_size,
-                            kryptos_u8_t *iv64) {
+                            kryptos_u8_t *iv64, const kryptos_u32_t *initial_counter) {
     if (ktask == NULL) {
         return;
     }
@@ -97,6 +97,7 @@ void kryptos_chacha20_setup(kryptos_task_ctx *ktask, kryptos_u8_t *key, const si
     ktask->key_size = key_size;
     ktask->iv = iv64;
     ktask->iv_size = KRYPTOS_CHACHA20_IVSIZE;
+    ktask->arg[0] = (void *)initial_counter;
 }
 
 static void kryptos_chacha20_keystream_feed(const kryptos_u8_t *key, const kryptos_u8_t *n,
@@ -182,3 +183,12 @@ static void kryptos_chacha20_keystream_feed(const kryptos_u8_t *key, const krypt
 
     ks->l += 1;
 }
+
+#undef kryptos_chacha20_getbyte
+
+#undef kryptos_chacha20_littleendian
+
+#undef KRYPTOS_CHACHA20_THETA0
+#undef KRYPTOS_CHACHA20_THETA1
+#undef KRYPTOS_CHACHA20_THETA2
+#undef KRYPTOS_CHACHA20_THETA3

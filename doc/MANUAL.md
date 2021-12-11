@@ -166,7 +166,8 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 |   ``ARC4``                      | Stream |       ``kKryptosCipherARC4``     |      ``arc4``      |
 |   ``SEAL``                      | Stream |       ``kKryptosCipherSEAL``     |      ``seal``      |
 |  ``RABBIT``                     | Stream |       ``kKryptosCipherRABBIT``   |      ``rabbit``    |
-|  ``Salsa20``                    | Stream |       ``kKryptosCipherSALSA20``  |      ``salsa20``   |
+|  ``SALSA20``                    | Stream |       ``kKryptosCipherSALSA20``  |      ``salsa20``   |
+|  ``CHACHA20``                   | Stream |       ``kKryptosCipherCHACHA20`` |      ``chacha20``  |
 | ``AES-128``                     | Block  |       ``kKryptosCipherAES128``   |      ``aes128``    |
 | ``AES-192``                     | Block  |       ``kKryptosCipherAES192``   |      ``aes192``    |
 | ``AES-256``                     | Block  |       ``kKryptosCipherAES256``   |      ``aes256``    |
@@ -203,7 +204,7 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 |  ``GOST``                       | Block  |       ``kKryptosCipherGOST``     |       ``gost``     |
 
 The available modes of operation for block ciphers are: ``ECB``, ``CBC``, ``CTR``, ``OFB`` and ``GCM``. So in practice,
-considering the ``OFB`` and ``CTR`` modes (also ``GCM`` indirectly), we have 37 stream ciphers instead of only three.
+considering the ``OFB`` and ``CTR`` modes (also ``GCM`` indirectly), we have much more stream ciphers.
 
 As you should know, originally, the GCM mode is only supported by block ciphers which work with 128-bit blocks. Currently
 these are the ciphers with support for GCM mode in kryptos: ``AES-128``, ``AES-192``, ``AES-256``, ``RC6-128``, ``RC6-192``,

@@ -21,6 +21,7 @@
 #include <kryptos_seal.h>
 #include <kryptos_rabbit.h>
 #include <kryptos_salsa20.h>
+#include <kryptos_chacha20.h>
 #include <kryptos_des.h>
 #include <kryptos_idea.h>
 #include <kryptos_blowfish.h>

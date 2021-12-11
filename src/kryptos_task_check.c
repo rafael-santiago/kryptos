@@ -29,6 +29,7 @@
 #include <kryptos_gost.h>
 #include <kryptos_rabbit.h>
 #include <kryptos_salsa20.h>
+#include <kryptos_chacha20.h>
 #include <kryptos_rsa.h>
 #include <kryptos_elgamal.h>
 #include <kryptos_dsa.h>
@@ -101,6 +102,7 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
           (*ktask)->cipher != kKryptosCipherSEAL        &&
           (*ktask)->cipher != kKryptosCipherRABBIT      &&
           (*ktask)->cipher != kKryptosCipherSALSA20     &&
+          (*ktask)->cipher != kKryptosCipherCHACHA20    &&
           (*ktask)->cipher != kKryptosCipherRSA         &&
           (*ktask)->cipher != kKryptosCipherRSAOAEP     &&
           (*ktask)->cipher != kKryptosCipherELGAMAL     &&
@@ -125,17 +127,19 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
                                                            (*ktask)->mode == kKryptosCTR ||
                                                            (*ktask)->mode == kKryptosGCM ||
                                                            (*ktask)->cipher == kKryptosCipherRABBIT ||
-                                                           (*ktask)->cipher == kKryptosCipherSALSA20) &&
+                                                           (*ktask)->cipher == kKryptosCipherSALSA20 ||
+                                                           (*ktask)->cipher == kKryptosCipherCHACHA20 ) &&
                                                               kryptos_task_check_iv_data(ktask) == 0) {
         (*ktask)->result = kKryptosInvalidParams;
         (*ktask)->result_verbose = "Invalid iv data.";
         goto kryptos_task_check_error;
     }
 
-    if (( (*ktask)->cipher != kKryptosCipherARC4   &&
-          (*ktask)->cipher != kKryptosCipherSEAL   &&
-          (*ktask)->cipher != kKryptosCipherRABBIT &&
-          (*ktask)->cipher != kKryptosCipherSALSA20  ) &&
+    if (( (*ktask)->cipher != kKryptosCipherARC4    &&
+          (*ktask)->cipher != kKryptosCipherSEAL    &&
+          (*ktask)->cipher != kKryptosCipherRABBIT  &&
+          (*ktask)->cipher != kKryptosCipherSALSA20 &&
+          (*ktask)->cipher != kKryptosCipherCHACHA20  ) &&
         (*ktask)->action != kKryptosEncrypt && (*ktask)->action != kKryptosDecrypt &&
         (*ktask)->action != kKryptosEncryptWithoutRandomPad) {
         (*ktask)->result = kKryptosInvalidParams;
@@ -423,6 +427,9 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
 
         case kKryptosCipherSALSA20:
             return ((*ktask)->iv_size == KRYPTOS_SALSA20_IVSIZE);
+
+        case kKryptosCipherCHACHA20:
+            return ((*ktask)->iv_size == KRYPTOS_CHACHA20_IVSIZE);
 
         default: // WARN(Rafael): Only to shut up the cumbersome compiler warning.
             break;
