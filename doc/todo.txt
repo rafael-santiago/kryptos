@@ -1,3 +1,4 @@
+(B) Implement some support for Poly1305. +NewFeature,+MACStuff
 (A) Try to give support to GMP on multiprecision stuff when asked by the user. +Improvement
 x (A) Implement ChaCha20. +CipherAddition,+NewFeature,+Improvement
 x (A) Implement Salsa20 stream cipher. +NewFeature,+CipherSupport

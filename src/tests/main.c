@@ -11,6 +11,7 @@
 #include "dsl_tests.h"
 #include "symmetric_ciphers_tests.h"
 #include "hash_tests.h"
+#include "poly1305_mp_tests.h"
 #include "kdf_tests.h"
 #include "encoding_tests.h"
 #include "mp_tests.h"
@@ -216,6 +217,12 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     // INFO(Rafael): HMAC tests.
     CUTE_RUN_TEST(kryptos_hmac_basic_tests);
     CUTE_RUN_TEST(kryptos_hmac_tests);
+
+    // INFO(Rafael): Poly1305 suff.
+
+    CUTE_RUN_TEST(kryptos_poly1305_le_bytes_to_num_tests);
+    CUTE_RUN_TEST(kryptos_poly1305_le_num_tests);
+    CUTE_RUN_TEST(kryptos_poly1305_ld_raw_bytes_tests);
 
     // INFO(Rafael): KDF stuff.
 
