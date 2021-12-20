@@ -70,7 +70,7 @@ void kryptos_poly1305_not(kryptos_poly1305_number_t x);
 
 #define kryptos_poly1305_lt(x, y) kryptos_poly1305_gt((y), (x))
 
-#define kryptos_poly1305_ge(x, y) ( kryptos_eq((x), (y)) || kryptos_poly1305_gt((x), (y)) )
+#define kryptos_poly1305_ge(x, y) ( kryptos_poly1305_eq((x), (y)) || kryptos_poly1305_gt((x), (y)) )
 
 #ifdef __cplusplus
 }

@@ -223,6 +223,15 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_poly1305_le_bytes_to_num_tests);
     CUTE_RUN_TEST(kryptos_poly1305_le_num_tests);
     CUTE_RUN_TEST(kryptos_poly1305_ld_raw_bytes_tests);
+    CUTE_RUN_TEST(kryptos_poly1305_eq_tests);
+    CUTE_RUN_TEST(kryptos_poly1305_get_gt_tests);
+    CUTE_RUN_TEST(kryptos_poly1305_ne_tests);
+    CUTE_RUN_TEST(kryptos_poly1305_gt_tests);
+    CUTE_RUN_TEST(kryptos_poly1305_lt_tests);
+    CUTE_RUN_TEST(kryptos_poly1305_ge_tests);
+    CUTE_RUN_TEST(kryptos_poly1305_not_tests);
+    CUTE_RUN_TEST(kryptos_poly1305_lsh_tests);
+    CUTE_RUN_TEST(kryptos_poly1305_rsh_tests);
 
     // INFO(Rafael): KDF stuff.
 
