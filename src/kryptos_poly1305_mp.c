@@ -24,17 +24,17 @@ void kryptos_poly1305_add(kryptos_poly1305_number_t x, const kryptos_poly1305_nu
     kryptos_poly1305_overflown_numfrac_t bsum = 0;
     kryptos_poly1305_numfrac_t *xp = &x[0];
     kryptos_poly1305_numfrac_t *xp_end = xp + kKryptosPoly1305_128bit_NumberSize;
-    kryptos_poly1305_numfrac_t *yp = &yp[0];
-    kryptos_poly1305_numfrac_t *yp_end = yp + kKryptosPoly1305_128bit_NumberSize;
+    const kryptos_poly1305_numfrac_t *yp = &y[0];
+    const kryptos_poly1305_numfrac_t *yp_end = yp + kKryptosPoly1305_128bit_NumberSize;
     kryptos_poly1305_number_t s;
     kryptos_poly1305_numfrac_t *sp = &s[0];
     kryptos_poly1305_numfrac_t *sp_end = sp + kKryptosPoly1305NumberSize;
     kryptos_u8_t c = 0;
 
-    memset(s, 0, sizeof(s));
+    memset(s, 0, sizeof(kryptos_poly1305_number_t));
 
     while (xp != xp_end) {
-        bsum = *xp + *yp + c;
+        bsum = ((kryptos_poly1305_overflown_numfrac_t)(*xp)) + ((kryptos_poly1305_overflown_numfrac_t)(*yp)) + c;
         c = (bsum > kKryptosPoly1305MaxMpDigit);
         *sp = (bsum & kKryptosPoly1305MaxMpDigit);
         xp++;
@@ -46,11 +46,12 @@ void kryptos_poly1305_add(kryptos_poly1305_number_t x, const kryptos_poly1305_nu
         *sp = c;
     }
 
-    memcpy(x, s, sizeof(s));
+    memcpy(x, s, sizeof(kryptos_poly1305_number_t));
 
-    memset(s, 0, sizeof(s));
+    memset(s, 0, sizeof(kryptos_poly1305_number_t));
     bsum = 0;
-    xp = xp_end = yp = yp_end = sp = sp_end = NULL;
+    xp = xp_end = sp = sp_end = NULL;
+    yp = yp_end = NULL;
     c = 0;
 }
 

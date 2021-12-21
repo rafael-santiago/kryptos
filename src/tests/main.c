@@ -232,6 +232,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_poly1305_not_tests);
     CUTE_RUN_TEST(kryptos_poly1305_lsh_tests);
     CUTE_RUN_TEST(kryptos_poly1305_rsh_tests);
+    CUTE_RUN_TEST(kryptos_poly1305_add_tests);
 
     // INFO(Rafael): KDF stuff.
 

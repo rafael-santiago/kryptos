@@ -36,4 +36,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_poly1305_lsh_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_poly1305_rsh_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_poly1305_add_tests);
+
 #endif
