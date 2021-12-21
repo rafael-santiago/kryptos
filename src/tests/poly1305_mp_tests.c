@@ -2145,13 +2145,13 @@ CUTE_TEST_CASE(kryptos_poly1305_add_tests)
 #if defined(KRYPTOS_MP_EXTENDED_RADIX)
         {
             {
-                0x0000000000000001,
+                0x0000000000000001, // TIP(Rafael): Less significant limb
                 0x0000000000000000,
                 0x0000000000000000,
+                0x0000000000000000,     // ((((((( For practical issues we store all mp numbers "upside-down" )))))))
                 0x0000000000000000,
                 0x0000000000000000,
-                0x0000000000000000,
-                0x0000000000000000
+                0x0000000000000000  // TIP(Rafael): Most significant limb
             },
             {
                 0x0000000000000001,
