@@ -136,25 +136,25 @@ void kryptos_poly1305_not(kryptos_poly1305_number_t x) {
 void kryptos_poly1305_mul(kryptos_poly1305_number_t x, const kryptos_poly1305_number_t y) {
     kryptos_poly1305_numfrac_t *xp = NULL;
     // INFO(Rafael): We are not using the entire mp size (this is always about a 128-bit value).
-    kryptos_poly1305_numfrac_t *xp_end = xp + kKryptosPoly1305_128bit_NumberSize;
-    kryptos_poly1305_numfrac_t *yp = &yp[0];
+    kryptos_poly1305_numfrac_t *xp_end = &x[0] + kKryptosPoly1305_128bit_NumberSize;
+    const kryptos_poly1305_numfrac_t *yp = &y[0];
     // INFO(Rafael): We are not using the entire mp size (this is always about a 128-bit value).
-    kryptos_poly1305_numfrac_t *yp_end = yp + kKryptosPoly1305_128bit_NumberSize;
+    const kryptos_poly1305_numfrac_t *yp_end = yp + kKryptosPoly1305_128bit_NumberSize;
     kryptos_poly1305_number_t p;
     kryptos_poly1305_numfrac_t *pp = &p[0];
     kryptos_poly1305_numfrac_t *pp_end = pp + kKryptosPoly1305NumberSize;
     kryptos_poly1305_overflown_numfrac_t bsum = 0;
     kryptos_u8_t ac = 0;
     kryptos_poly1305_overflown_numfrac_t bmul = 0;
-    kryptos_u8_t mc = 0;
+    kryptos_poly1305_numfrac_t mc = 0;
     size_t x_off = 0, y_off = 0;
 
-    memset(p, 0, sizeof(p));
+    memset(p, 0, sizeof(kryptos_poly1305_number_t));
 
     while (yp != yp_end) {
-        y_off = yp_end - yp;
-        for (xp = &x[0]; xp != xp_end; xp++) {
-            x_off = xp_end - xp;
+        mc = 0;
+        ac = 0;
+        for (xp = &x[0], x_off = 0; xp != xp_end; xp++, x_off++) {
             bmul = ((kryptos_poly1305_overflown_numfrac_t)(*yp)) *
                    ((kryptos_poly1305_overflown_numfrac_t)(*xp)) + (kryptos_poly1305_overflown_numfrac_t)mc;
             mc = (bmul >> (sizeof(kryptos_poly1305_numfrac_t) << 3));
@@ -163,21 +163,22 @@ void kryptos_poly1305_mul(kryptos_poly1305_number_t x, const kryptos_poly1305_nu
             pp[y_off + x_off] = (bsum & kKryptosPoly1305MaxMpDigit);
         }
 
-        x_off += 1;
         if ((x_off + y_off) < kKryptosPoly1305NumberSize) {
             pp[x_off + y_off] = (pp[x_off + y_off] + mc + ac) & kKryptosPoly1305MaxMpDigit;
         }
 
         yp++;
+        y_off++;
     }
 
-    memcpy(x, p, sizeof(p));
+    memcpy(x, p, sizeof(kryptos_poly1305_number_t));
 
     xp = xp_end =
-    yp = yp_end =
     pp = pp_end = NULL;
+    yp = yp_end = NULL;
     bsum = bmul = 0;
-    ac = mc = 0;
+    ac = 0;
+    mc = 0;
     x_off = y_off = 0;
 }
 

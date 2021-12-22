@@ -237,6 +237,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     //              so it is important to ensure that it is working before testing subtraction.
     CUTE_RUN_TEST(kryptos_poly1305_inv_cmplt_tests);
     CUTE_RUN_TEST(kryptos_poly1305_sub_tests);
+    CUTE_RUN_TEST(kryptos_poly1305_mul_tests);
 
     // INFO(Rafael): KDF stuff.
 
