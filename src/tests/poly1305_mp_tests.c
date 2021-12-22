@@ -3033,7 +3033,7 @@ CUTE_TEST_CASE(kryptos_poly1305_mul_tests)
                 0x0000000000000000
             },
             {
-                0x00000000A6144983, //INFO(Rafael): Does reality solid still? Multiplication idempotence is "working"? ;)
+                0x00000000A6144983, //INFO(Rafael): Does reality solid still? Does multiplication commutative still? ;)
                 0x0000000000000000,
                 0x0000000000000000,
                 0x0000000000000000,
