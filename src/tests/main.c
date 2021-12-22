@@ -233,6 +233,10 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_poly1305_lsh_tests);
     CUTE_RUN_TEST(kryptos_poly1305_rsh_tests);
     CUTE_RUN_TEST(kryptos_poly1305_add_tests);
+    // TIP(Rafael): Kryptos multi-precision stuff uses 2's complement to express negative numbers
+    //              so it is important to ensure that it is working before testing subtraction.
+    CUTE_RUN_TEST(kryptos_poly1305_inv_cmplt_tests);
+    CUTE_RUN_TEST(kryptos_poly1305_sub_tests);
 
     // INFO(Rafael): KDF stuff.
 
