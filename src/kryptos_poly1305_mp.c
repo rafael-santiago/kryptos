@@ -206,35 +206,32 @@ void kryptos_poly1305_mul_digit(kryptos_poly1305_number_t x, const kryptos_poly1
 
 void kryptos_poly1305_div(kryptos_poly1305_number_t x, const kryptos_poly1305_number_t y, kryptos_poly1305_number_t r) {
     kryptos_poly1305_number_t x_cp, y_cp, b, q, t;
-    kryptos_poly1305_numfrac_t *xp = &x_cp[0] + kKryptosPoly1305NumberSize - 1;
-    kryptos_poly1305_numfrac_t *xp_end = &x_cp[0] - 1;
-    kryptos_poly1305_numfrac_t *yp = &y_cp[0] + kKryptosPoly1305NumberSize - 1;
-    kryptos_poly1305_numfrac_t *yp_end = &y_cp[0] - 1;
-    int is_zero = 1, dec_nr = 0, is_less = 0;
+    int is_zero = 0, dec_nr = 0, is_less = 0;
     size_t shlv_nm = 0;
-    ssize_t m = 0, n, j, xi;
+    ssize_t m = 0, n = 0, j = 0, xi = 0;
     kryptos_poly1305_overflown_numfrac_t qtemp = 0;
 
     memcpy(x_cp, x, sizeof(kryptos_poly1305_number_t));
     memcpy(y_cp, y, sizeof(kryptos_poly1305_number_t));
 
-    while (yp != yp_end && is_zero) {
-        is_zero = (*yp == 0);
-        yp--;
+    for (n = kKryptosPoly1305NumberSize - 1, is_zero = 1; n >= 0; n--) {
+        is_zero = (y_cp[n] == 0);
     }
 
-    if (!is_zero) {
-        is_zero = 1;
-        while (xp != xp_end) {
-            is_zero = (*xp == 0);
-            xp--;
-        }
+    if (is_zero) {
+        memset(x, 0, sizeof(kryptos_poly1305_number_t));
+        memset(r, 0, sizeof(kryptos_poly1305_number_t));
+        goto kryptos_poly1305_div_epilogue_cleanup;
+    }
+
+    for (n = kKryptosPoly1305NumberSize - 1, is_zero = 1; n >= 0; n--) {
+        is_zero = (x_cp[n] == 0);
     }
 
     if (is_zero && kryptos_poly1305_lt(x, y)) {
         memset(x, 0, sizeof(kryptos_poly1305_number_t));
         memset(r, 0, sizeof(kryptos_poly1305_number_t));
-        return;
+        goto kryptos_poly1305_div_epilogue_cleanup;
     }
 
     n = kKryptosPoly1305NumberSize;
@@ -242,34 +239,47 @@ void kryptos_poly1305_div(kryptos_poly1305_number_t x, const kryptos_poly1305_nu
         n--;
     }
 
+    j = kKryptosPoly1305NumberSize;
+    while (x_cp[j - 1] == 0 && j >= 1) {
+        j--;
+    }
+
 #if !defined(KRYPTOS_MP_EXTENDED_RADIX)
-    while (yp != yp_end && *yp < 0x80000000) {
+    while (x_cp[j - 1] < 0x80000000 && y_cp[n - 1] < 0x80000000) {
         shlv_nm++;
         kryptos_poly1305_lsh(x_cp, 1);
         kryptos_poly1305_lsh(y_cp, 1);
-        while (*yp == 0 && yp != yp_end) {
-            yp--;
+        n = kKryptosPoly1305NumberSize;
+        while (y_cp[n - 1] == 0 && n >= 1) {
+            n--;
         }
     }
 #else
-    while (yp != yp_end && *yp < 0x8000000000000000) {
+    while (x_cp[j - 1] < 0x8000000000000000 && y_cp[n - 1] < 0x8000000000000000) {
         shlv_nm++;
         kryptos_poly1305_lsh(x_cp, 1);
         kryptos_poly1305_lsh(y_cp, 1);
-        while (*yp == 0 && yp != yp_end) {
-            yp--;
+        n = kKryptosPoly1305NumberSize;
+        while (y_cp[n - 1] == 0 && n >= 1) {
+            n--;
         }
     }
 #endif
 
+    m = (j - m);
+    if (m <= 0) {
+        m = 1;
+    }
+
     memcpy(b, y_cp, sizeof(kryptos_poly1305_number_t));
     memset(q, 0, sizeof(kryptos_poly1305_number_t));
 
+    kryptos_poly1305_lsh(b, (sizeof(kryptos_poly1305_numfrac_t) << 3) * (size_t)m);
     if (kryptos_poly1305_ge(x_cp, b)) {
         memcpy(t, x_cp, sizeof(kryptos_poly1305_number_t));
     }
 
-    while (kryptos_poly1305_ge(x_cp, b) && q[m] == 0xFF) {
+    while (kryptos_poly1305_ge(x_cp, b) && q[m] < 0xFF) {
         q[m]++;
         kryptos_poly1305_sub(x_cp, b);
     }
@@ -279,6 +289,10 @@ void kryptos_poly1305_div(kryptos_poly1305_number_t x, const kryptos_poly1305_nu
         memcpy(x_cp, t, sizeof(kryptos_poly1305_number_t));
         m++;
     }
+
+    /*printf("x = %llx %llx %llx %llx %llx %llx %llx\n", x_cp[0], x_cp[1], x_cp[2], x_cp[3], x_cp[4], x_cp[5], x_cp[6]);
+    printf("y = %llx %llx %llx %llx %llx %llx %llx\n", y_cp[0], y_cp[1], y_cp[2], y_cp[3], y_cp[4], y_cp[5], y_cp[6]);
+    printf("q = %llx %llx %llx %llx %llx %llx %llx\n", q[0], q[1], q[2], q[3], q[4], q[5], q[6]);*/
 
     if (kryptos_poly1305_lt(x_cp, y_cp)) {
         goto kryptos_poly1305_div_epilogue;
@@ -296,6 +310,8 @@ void kryptos_poly1305_div(kryptos_poly1305_number_t x, const kryptos_poly1305_nu
             xi--;
             qtemp = (qtemp << (sizeof(kryptos_poly1305_numfrac_t) << 3)) | x_cp[xi];
         }
+        /*printf("Q = %llx %llx (%llx / %llx)\n", (kryptos_u64_t)(qtemp >> 64),
+                                                  (kryptos_u64_t)qtemp & 0xFFFFFFFFFFFFFFFF, x_cp[xi], y_cp[n-1]);*/
 
 #if defined(__linux__) && defined(KRYPTOS_KERNEL_MODE)
         do_div(qtemp, (kryptos_poly1305_overflown_numfrac_t)y_cp[n - 1]);
@@ -318,6 +334,7 @@ void kryptos_poly1305_div(kryptos_poly1305_number_t x, const kryptos_poly1305_nu
             if (is_less) {
                 dec_nr++;
                 if (dec_nr == 0xFF) {
+                    q[j] = 0;
                     goto kryptos_poly1305_div_end_of_iteration;
                 }
                 qtemp--;
@@ -337,8 +354,19 @@ kryptos_poly1305_div_epilogue:
     }
 
     memcpy(r, x_cp, sizeof(kryptos_poly1305_number_t));
-
     memcpy(x, q, sizeof(kryptos_poly1305_number_t));
+
+kryptos_poly1305_div_epilogue_cleanup:
+
+    memset(x_cp, 0, sizeof(kryptos_poly1305_number_t));
+    memset(y_cp, 0, sizeof(kryptos_poly1305_number_t));
+    memset(b, 0, sizeof(kryptos_poly1305_number_t));
+    memset(q, 0, sizeof(kryptos_poly1305_number_t));
+    memset(t, 0, sizeof(kryptos_poly1305_number_t));
+    is_zero = dec_nr = is_less = 0;
+    shlv_nm = 0;
+    m = n = j = xi = 0;
+    qtemp = 0;
 }
 
 void kryptos_poly1305_lsh(kryptos_poly1305_number_t x, const size_t level) {

@@ -44,4 +44,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_poly1305_mul_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_poly1305_mul_digit_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_poly1305_div_tests);
+
 #endif
