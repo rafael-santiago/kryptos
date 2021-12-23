@@ -16,10 +16,6 @@
 //               well-contained "multi-precision" functions subset just for Poly.                                  /
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-+
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// WARN(Rafael): Work in progress pretty dumb stuff can be found. !!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 void kryptos_poly1305_add(kryptos_poly1305_number_t x, const kryptos_poly1305_number_t y) {
     kryptos_poly1305_overflown_numfrac_t bsum = 0;
     kryptos_poly1305_numfrac_t *xp = &x[0];
@@ -202,6 +198,10 @@ void kryptos_poly1305_mul_digit(kryptos_poly1305_number_t x, const kryptos_poly1
         kryptos_poly1305_rsh(x, (sizeof(kryptos_poly1305_numfrac_t) << 3));
         xp[-1] = mc;
     }
+
+    xp = xp_end = NULL;
+    mc = 0;
+    bmul = 0;
 }
 
 void kryptos_poly1305_div(kryptos_poly1305_number_t x, const kryptos_poly1305_number_t y, kryptos_poly1305_number_t r) {
