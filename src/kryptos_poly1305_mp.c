@@ -182,16 +182,38 @@ void kryptos_poly1305_mul(kryptos_poly1305_number_t x, const kryptos_poly1305_nu
     x_off = y_off = 0;
 }
 
+void kryptos_poly1305_mul_digit(kryptos_poly1305_number_t x, const kryptos_poly1305_numfrac_t digit) {
+    kryptos_poly1305_numfrac_t *xp = &x[0];
+    kryptos_poly1305_numfrac_t *xp_end = xp + kKryptosPoly1305NumberSize;
+    kryptos_poly1305_numfrac_t mc = 0;
+    kryptos_poly1305_overflown_numfrac_t bmul = 0;
+
+    while (xp != xp_end) {
+        bmul = (kryptos_poly1305_overflown_numfrac_t)(*xp) *
+               (kryptos_poly1305_overflown_numfrac_t)digit +
+               (kryptos_poly1305_overflown_numfrac_t)mc;
+        mc = (bmul >> (sizeof(kryptos_poly1305_numfrac_t) << 3));
+        *xp = (bmul & kKryptosPoly1305MaxMpDigit);
+        xp++;
+    }
+
+    if (mc > 0) {
+        kryptos_poly1305_lsh(x, (sizeof(kryptos_poly1305_numfrac_t) << 3));
+        kryptos_poly1305_rsh(x, (sizeof(kryptos_poly1305_numfrac_t) << 3));
+        xp[-1] = mc;
+    }
+}
+
 void kryptos_poly1305_div(kryptos_poly1305_number_t x, const kryptos_poly1305_number_t y, kryptos_poly1305_number_t r) {
-    kryptos_poly1305_number_t x_cp, y_cp, b;
+    kryptos_poly1305_number_t x_cp, y_cp, b, q, t;
     kryptos_poly1305_numfrac_t *xp = &x_cp[0] + kKryptosPoly1305NumberSize - 1;
     kryptos_poly1305_numfrac_t *xp_end = &x_cp[0] - 1;
     kryptos_poly1305_numfrac_t *yp = &y_cp[0] + kKryptosPoly1305NumberSize - 1;
     kryptos_poly1305_numfrac_t *yp_end = &y_cp[0] - 1;
-    //kryptos_poly1305_numfrac_t *bp = &b[0] + kKryptosPoly1305NumberSize - 1;
-    //kryptos_poly1305_numfrac_t *bp_end = &b[0] - 1;
-    int is_zero = 1;
+    int is_zero = 1, dec_nr = 0, is_less = 0;
     size_t shlv_nm = 0;
+    ssize_t m = 0, n, j, xi;
+    kryptos_poly1305_overflown_numfrac_t qtemp = 0;
 
     memcpy(x_cp, x, sizeof(kryptos_poly1305_number_t));
     memcpy(y_cp, y, sizeof(kryptos_poly1305_number_t));
@@ -215,6 +237,11 @@ void kryptos_poly1305_div(kryptos_poly1305_number_t x, const kryptos_poly1305_nu
         return;
     }
 
+    n = kKryptosPoly1305NumberSize;
+    while (y_cp[n - 1] == 0 && n >= 1) {
+        n--;
+    }
+
 #if !defined(KRYPTOS_MP_EXTENDED_RADIX)
     while (yp != yp_end && *yp < 0x80000000) {
         shlv_nm++;
@@ -236,8 +263,82 @@ void kryptos_poly1305_div(kryptos_poly1305_number_t x, const kryptos_poly1305_nu
 #endif
 
     memcpy(b, y_cp, sizeof(kryptos_poly1305_number_t));
+    memset(q, 0, sizeof(kryptos_poly1305_number_t));
 
-    
+    if (kryptos_poly1305_ge(x_cp, b)) {
+        memcpy(t, x_cp, sizeof(kryptos_poly1305_number_t));
+    }
+
+    while (kryptos_poly1305_ge(x_cp, b) && q[m] == 0xFF) {
+        q[m]++;
+        kryptos_poly1305_sub(x_cp, b);
+    }
+
+    if (q[m] == 0xFF && kryptos_poly1305_ge(x_cp, b)) {
+        q[m] = 0;
+        memcpy(x_cp, t, sizeof(kryptos_poly1305_number_t));
+        m++;
+    }
+
+    if (kryptos_poly1305_lt(x_cp, y_cp)) {
+        goto kryptos_poly1305_div_epilogue;
+    }
+
+    for (j = m - 1; j >= 0; j--) {
+        xi = n + j;
+        while ((size_t)xi >= kKryptosPoly1305NumberSize) {
+            xi--;
+        }
+
+        qtemp = x_cp[xi];
+
+        if ((xi - 1) >= 0) {
+            xi--;
+            qtemp = (qtemp << (sizeof(kryptos_poly1305_numfrac_t) << 3)) | x_cp[xi];
+        }
+
+#if defined(__linux__) && defined(KRYPTOS_KERNEL_MODE)
+        do_div(qtemp, (kryptos_poly1305_overflown_numfrac_t)y_cp[n - 1]);
+#else
+        qtemp = qtemp / (kryptos_poly1305_overflown_numfrac_t)y_cp[n - 1];
+#endif
+
+        if (qtemp > kKryptosPoly1305MaxMpDigit) {
+            qtemp = 0xFF;
+        }
+
+        dec_nr = 0;
+
+        do {
+            q[j] = qtemp & kKryptosPoly1305MaxMpDigit;
+            memcpy(b, y_cp, sizeof(kryptos_poly1305_number_t));
+            kryptos_poly1305_mul_digit(b, q[j]);
+            kryptos_poly1305_lsh(b, (sizeof(kryptos_poly1305_numfrac_t) << 3) * (size_t)j);
+            is_less = kryptos_poly1305_lt(x_cp, b);
+            if (is_less) {
+                dec_nr++;
+                if (dec_nr == 0xFF) {
+                    goto kryptos_poly1305_div_end_of_iteration;
+                }
+                qtemp--;
+            }
+        } while (is_less);
+
+        kryptos_poly1305_sub(x_cp, b);
+
+kryptos_poly1305_div_end_of_iteration:
+            ;
+    }
+
+kryptos_poly1305_div_epilogue:
+
+    if (shlv_nm > 0) {
+        kryptos_poly1305_rsh(x_cp, shlv_nm);
+    }
+
+    memcpy(r, x_cp, sizeof(kryptos_poly1305_number_t));
+
+    memcpy(x, q, sizeof(kryptos_poly1305_number_t));
 }
 
 void kryptos_poly1305_lsh(kryptos_poly1305_number_t x, const size_t level) {

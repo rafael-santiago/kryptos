@@ -43,6 +43,8 @@ void kryptos_poly1305_sub(kryptos_poly1305_number_t x, const kryptos_poly1305_nu
 
 void kryptos_poly1305_mul(kryptos_poly1305_number_t x, const kryptos_poly1305_number_t y);
 
+void kryptos_poly1305_mul_digit(kryptos_poly1305_number_t x, const kryptos_poly1305_numfrac_t digit);
+
 void kryptos_poly1305_div(kryptos_poly1305_number_t x, const kryptos_poly1305_number_t y, kryptos_poly1305_number_t r);
 
 void kryptos_poly1305_le_bytes_to_num(kryptos_poly1305_number_t n, const kryptos_u8_t *bytes, const size_t bytes_nr);
