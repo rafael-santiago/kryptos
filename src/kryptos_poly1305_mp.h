@@ -14,6 +14,45 @@
 extern "C" {
 #endif
 
+// TIP(Rafael): The idea behind kryptos_poly1305_number_t is providing a self-contained multiprecision structure for
+//              fitting up 128-bit math operations results without needing to allocate any memory, using only stack based
+//              limbs.
+//
+//              Important:
+//
+//                      - On environments with support for 128-bit native type, kryptos_poly1305_number_t has
+//                        seven 64-bit limbs. The macro KRYPTOS_MP_EXTENTED_RADIX is defined.
+//
+//                      - On enviroments without support for 128-bit native type, kryptos_poly1305_number_t has
+//                        eleven 32-bit limbs (Windows with VS2019, for example).
+//
+//               Limbs are always stored from *** the least significant to the most significant *** number fraction:
+//
+//               Thus, 0xAABBCCDDEEFF00112233445566778899 has the following memory storage layout:
+//
+//                      [ 0] = 0xAABBCCDDEEFF0011,
+//                      [ 1] = 0x2233445566778899,
+//                      [ 2] = 0x0000000000000000,
+//                      [ 3] = 0x0000000000000000,
+//                      [ 4] = 0x0000000000000000,
+//                      [ 5] = 0x0000000000000000,
+//                      [ 6] = 0x0000000000000000 with KRYPTOS_MP_EXTENDED_RADIX, or without:
+//
+//                      [ 0] = 0xEEFF0011,
+//                      [ 1] = 0xAABBCCDD,
+//                      [ 2] = 0x66778899,
+//                      [ 3] = 0x22334455,
+//                      [ 4] = 0x00000000
+//                      [ 5] = 0x00000000,
+//                      [ 6] = 0x00000000,
+//                      [ 7] = 0x00000000,
+//                      [ 8] = 0x00000000,
+//                      [ 9] = 0x00000000,
+//                      [10] = 0x00000000 (so when reading from 10 down to 0 we will got the same from the extended radix
+//                                         presented above, it seems up-side-down and clumsy but avoids a bunch of extra
+//                                         work when consuming, operating over the value).
+//
+
 # if defined(KRYPTOS_MP_EXTENDED_RADIX)
 #  include <inttypes.h>
     typedef kryptos_u64_t kryptos_poly1305_numfrac_t;
