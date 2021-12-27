@@ -22,18 +22,19 @@ extern "C" {
     //               results.
     typedef kryptos_poly1305_numfrac_t kryptos_poly1305_number_t[(3 << 1) + 1];
     typedef unsigned __int128 kryptos_poly1305_overflown_numfrac_t;
+# define kKryptosPoly1305_128bit_NumberSize 2
 # else
     typedef kryptos_u32_t kryptos_poly1305_numfrac_t;
     // INFO(Rafael): 128-bits + 128-bits + 1. Since this tiny mp module is implemented thinking about 128-bit values
     //               and does not use allocations we need to make it prepared to fit all additions and multiplications
     //               results.
-    typedef kryptos_poly1305_numfrac kryptos_poly1305_number_t[(5 << 1) + 1];
+    typedef kryptos_poly1305_numfrac_t kryptos_poly1305_number_t[(5 << 1) + 1];
     typedef kryptos_u64_t kryptos_poly1305_overflown_numfrac_t;
+
+# define kKryptosPoly1305_128bit_NumberSize 4
 # endif
 
 #define kKryptosPoly1305NumberSize sizeof(kryptos_poly1305_number_t) / sizeof(kryptos_poly1305_numfrac_t)
-
-#define kKryptosPoly1305_128bit_NumberSize 128 / sizeof(kryptos_poly1305_number_t)
 
 #define kKryptosPoly1305MaxMpDigit KRYPTOS_MAX_MP_DIGIT
 
