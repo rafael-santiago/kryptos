@@ -45,7 +45,7 @@ void kryptos_poly1305(kryptos_task_ctx **ktask) {
             }
 
             // INFO(Rafael): Key sizes less than 32-bits will be padded with a nonce.
-            //               Key size equals to 256-bits assumes that the s chunk is a external nonce.
+            //               Key size equals to 256-bits assumes that the s chunk is an external nonce.
             nonce_size = 32 - (*ktask)->key_size;
             if (nonce_size > 0) {
                 if ((nonce = kryptos_get_random_block(nonce_size)) == NULL) {
