@@ -14,11 +14,6 @@
 static kryptos_u8_t *kryptos_poly1305_tag(const kryptos_u8_t *message, const size_t message_size,
                                           const kryptos_u8_t *key, const size_t key_size);
 
-/*
-static kryptos_u8_t *kryptos_poly1305_verify(const kryptos_u8_t *tagged_message, const size_t tagged_message_size,
-                                             const kryptos_u8_t *key, const size_t key_size);
-*/
-
 static kryptos_u8_t *kryptos_poly1305_get_tag_from_num(const kryptos_poly1305_number_t a);
 
 void kryptos_poly1305(kryptos_task_ctx **ktask) {
@@ -42,6 +37,13 @@ void kryptos_poly1305(kryptos_task_ctx **ktask) {
                 (*ktask)->result_verbose = "No message to tag at output buffer.";
                 goto kryptos_poly1305_epilogue;
             }
+
+            if ((*ktask)->key == NULL || (*ktask)->key_size == 0) {
+                (*ktask)->result = kKryptosPOLY1305Error;
+                (*ktask)->result_verbose = "No key to authenticate.";
+                goto kryptos_poly1305_epilogue;
+            }
+
             // INFO(Rafael): Key sizes less than 32-bits will be padded with a nonce.
             //               Key size equals to 256-bits assumes that the s chunk is a external nonce.
             nonce_size = 32 - (*ktask)->key_size;
@@ -90,15 +92,91 @@ void kryptos_poly1305(kryptos_task_ctx **ktask) {
             (*ktask)->out_size = tagged_message_size;
             (*ktask)->out = tagged_message;
             tagged_message = NULL;
+
             break;
 
         case kKryptosDecrypt:
-            // TODO(Rafael): Guess what?
+            if ((*ktask)->in == NULL || (*ktask)->in_size == 0) {
+                (*ktask)->result = kKryptosPOLY1305Error;
+                (*ktask)->result_verbose = "No message to verify.";
+                goto kryptos_poly1305_epilogue;
+            }
+
+            if ((*ktask)->key == NULL || (*ktask)->key_size == 0) {
+                (*ktask)->result = kKryptosPOLY1305Error;
+                (*ktask)->result_verbose = "No key to authenticate.";
+                goto kryptos_poly1305_epilogue;
+            }
+
+            if ((*ktask)->key_size < 32) {
+                nonce_size = 32 - (*ktask)->key_size;
+            }
+
+            if ((*ktask)->in_size < nonce_size + 16) {
+                (*ktask)->result = kKryptosPOLY1305Error;
+                (*ktask)->result_verbose = "Message buffer seems to be incomplete.";
+                goto kryptos_poly1305_epilogue;
+            }
+
+            if (nonce_size > 0) {
+                if ((nonce = (kryptos_u8_t *)kryptos_newseg(nonce_size)) == NULL) {
+                    (*ktask)->result = kKryptosPOLY1305Error;
+                    (*ktask)->result_verbose = "No enough memory to parse nonce.";
+                    goto kryptos_poly1305_epilogue;
+                }
+
+                memcpy(nonce, (*ktask)->in + 16, nonce_size);
+
+                if ((key = (kryptos_u8_t *)kryptos_newseg(nonce_size + (*ktask)->key_size)) == NULL) {
+                    (*ktask)->result = kKryptosPOLY1305Error;
+                    (*ktask)->result_verbose = "No enough memory to make the session key.";
+                    goto kryptos_poly1305_epilogue;
+                }
+
+                memcpy(key, (*ktask)->key, (*ktask)->key_size);
+                memcpy(key + (*ktask)->key_size, nonce, nonce_size);
+
+            } else {
+                key = (*ktask)->key;
+            }
+
+            tag = kryptos_poly1305_tag((*ktask)->in + 16 + nonce_size, (*ktask)->in_size - 16 - nonce_size,
+                                       key, 32);
+            if (tag == NULL) {
+                (*ktask)->result = kKryptosPOLY1305Error;
+                (*ktask)->result_verbose = "Unable to generate message tag.";
+                goto kryptos_poly1305_epilogue;
+            }
+
+            if (memcmp(tag, (*ktask)->in, 16) != 0) {
+                (*ktask)->result = kKryptosPOLY1305Error;
+                (*ktask)->result_verbose = "Corrupted data.";
+                goto kryptos_poly1305_epilogue;
+            }
+
+            tagged_message = (*ktask)->in;
+            tagged_message_size = (*ktask)->in_size;
+
+            (*ktask)->in_size -= (16 + nonce_size);
+            (*ktask)->in = (kryptos_u8_t *)kryptos_newseg((*ktask)->in_size);
+            if ((*ktask)->in == NULL) {
+                (*ktask)->result = kKryptosPOLY1305Error;
+                (*ktask)->result_verbose = "No memory to extract original authenticated message.";
+                goto kryptos_poly1305_epilogue;
+            }
+
+            memcpy((*ktask)->in, tagged_message + 16 + nonce_size, (*ktask)->in_size);
+
             break;
 
         default:
+            (*ktask)->result = kKryptosPOLY1305Error;
+            (*ktask)->result_verbose = "Unknown action.";
             break;
     }
+
+    (*ktask)->result = kKryptosSuccess;
+    (*ktask)->result_verbose = NULL;
 
 kryptos_poly1305_epilogue:
 
@@ -108,6 +186,11 @@ kryptos_poly1305_epilogue:
 
     if (nonce != NULL) {
         kryptos_freeseg(nonce, nonce_size);
+    }
+
+    if (tag != NULL) {
+        kryptos_freeseg(tag, 16);
+        tag = NULL;
     }
 
     if (tagged_message != NULL) {
@@ -150,8 +233,29 @@ static kryptos_u8_t *kryptos_poly1305_tag(const kryptos_u8_t *message, const siz
 
     memset(a, 0, sizeof(kryptos_poly1305_number_t));
 
-    kryptos_poly1305_le_bytes_to_num(p, (kryptos_u8_t *)"\x03\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
-                                                        "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFB", 17);
+    // INFO(Rafael): Setting P to 2^130-5.
+
+#if defined(KRYPTOS_MP_EXTENDED_RADIX)
+    p[ 0] = 0xFFFFFFFFFFFFFFFB;
+    p[ 1] = 0xFFFFFFFFFFFFFFFF;
+    p[ 2] = 0x0000000000000003;
+    p[ 3] = 0x0000000000000000;
+    p[ 4] = 0x0000000000000000;
+    p[ 5] = 0x0000000000000000;
+    p[ 6] = 0x0000000000000000;
+#else
+    p[ 0] = 0xFFFFFFFB;
+    p[ 1] = 0xFFFFFFFF;
+    p[ 2] = 0xFFFFFFFF;
+    p[ 3] = 0xFFFFFFFF;
+    p[ 4] = 0x00000003;
+    p[ 5] = 0x00000000;
+    p[ 6] = 0x00000000;
+    p[ 7] = 0x00000000;
+    p[ 8] = 0x00000000;
+    p[ 9] = 0x00000000;
+    p[10] = 0x00000000;
+#endif
 
     m_pad = (message_size % 16);
 
@@ -163,7 +267,7 @@ static kryptos_u8_t *kryptos_poly1305_tag(const kryptos_u8_t *message, const siz
     memset(msg, 0, message_size + m_pad);
     memcpy(msg, message, message_size);
     if (m_pad > 0) {
-        msg[m_pad + message_size] = 0x80;
+        msg[m_pad + message_size] = 0x01;
     }
 
     mp = msg;
@@ -172,6 +276,7 @@ static kryptos_u8_t *kryptos_poly1305_tag(const kryptos_u8_t *message, const siz
     while(mp != mp_end) {
         kryptos_poly1305_le_bytes_to_num(n, mp, 16);
         kryptos_poly1305_add(a, n);
+        kryptos_poly1305_mul(a, r);
         kryptos_poly1305_div(a, p, a_mod);
         memcpy(a, a_mod, sizeof(kryptos_poly1305_number_t));
         mp += 16;
@@ -202,13 +307,6 @@ kryptos_poly1305_tag_epilogue:
     return tag;
 }
 
-/*
-static kryptos_u8_t *kryptos_poly1305_verify(const kryptos_u8_t *tagged_message, const size_t tagged_message_size,
-                                             const kryptos_u8_t *key, const size_t key_size) {
-    return NULL;
-}
-*/
-
 static kryptos_u8_t *kryptos_poly1305_get_tag_from_num(const kryptos_poly1305_number_t a) {
     kryptos_u8_t *t = (kryptos_u8_t *)kryptos_newseg(16);
     if (t == NULL) {
@@ -235,22 +333,22 @@ static kryptos_u8_t *kryptos_poly1305_get_tag_from_num(const kryptos_poly1305_nu
     t[14] = get_byte(a[ 1], 6);
     t[15] = get_byte(a[ 1], 7);
 #else
-    t[ 0] = get_byte(a[0], 0);
-    t[ 1] = get_byte(a[0], 1);
-    t[ 2] = get_byte(a[0], 2);
-    t[ 3] = get_byte(a[0], 3);
-    t[ 4] = get_byte(a[1], 0);
-    t[ 5] = get_byte(a[1], 1);
-    t[ 6] = get_byte(a[1], 2);
-    t[ 7] = get_byte(a[1], 3);
-    t[ 8] = get_byte(a[2], 0);
-    t[ 9] = get_byte(a[2], 1);
-    t[10] = get_byte(a[2], 2);
-    t[11] = get_byte(a[2], 3);
-    t[12] = get_byte(a[3], 0);
-    t[13] = get_byte(a[3], 1);
-    t[14] = get_byte(a[3], 2);
-    t[15] = get_byte(a[3], 3);
+    t[ 0] = get_byte(a[ 0], 0);
+    t[ 1] = get_byte(a[ 0], 1);
+    t[ 2] = get_byte(a[ 0], 2);
+    t[ 3] = get_byte(a[ 0], 3);
+    t[ 4] = get_byte(a[ 1], 0);
+    t[ 5] = get_byte(a[ 1], 1);
+    t[ 6] = get_byte(a[ 1], 2);
+    t[ 7] = get_byte(a[ 1], 3);
+    t[ 8] = get_byte(a[ 2], 0);
+    t[ 9] = get_byte(a[ 2], 1);
+    t[10] = get_byte(a[ 2], 2);
+    t[11] = get_byte(a[ 2], 3);
+    t[12] = get_byte(a[ 3], 0);
+    t[13] = get_byte(a[ 3], 1);
+    t[14] = get_byte(a[ 3], 2);
+    t[15] = get_byte(a[ 3], 3);
 #endif
 
 #undef get_byte
