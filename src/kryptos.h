@@ -62,6 +62,7 @@
 #include <kryptos_huffman.h>
 
 #include <kryptos_hmac.h>
+#include <kryptos_poly1305.h>
 
 #include <kryptos_hkdf.h>
 #include <kryptos_pbkdf2.h>

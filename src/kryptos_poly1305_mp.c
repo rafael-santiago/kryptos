@@ -31,9 +31,9 @@ static void kryptos_poly1305_to_hex(char *xn, const size_t xn_size, const krypto
 void kryptos_poly1305_add(kryptos_poly1305_number_t x, const kryptos_poly1305_number_t y) {
     kryptos_poly1305_overflown_numfrac_t bsum = 0;
     kryptos_poly1305_numfrac_t *xp = &x[0];
-    kryptos_poly1305_numfrac_t *xp_end = xp + kKryptosPoly1305_128bit_NumberSize;
+    kryptos_poly1305_numfrac_t *xp_end = xp + kKryptosPoly1305NumberSize;
     const kryptos_poly1305_numfrac_t *yp = &y[0];
-    const kryptos_poly1305_numfrac_t *yp_end = yp + kKryptosPoly1305_128bit_NumberSize;
+    const kryptos_poly1305_numfrac_t *yp_end = yp + kKryptosPoly1305NumberSize;
     kryptos_poly1305_number_t s;
     kryptos_poly1305_numfrac_t *sp = &s[0];
     kryptos_poly1305_numfrac_t *sp_end = sp + kKryptosPoly1305NumberSize;
@@ -65,15 +65,15 @@ void kryptos_poly1305_add(kryptos_poly1305_number_t x, const kryptos_poly1305_nu
 
 void kryptos_poly1305_sub(kryptos_poly1305_number_t x, const kryptos_poly1305_number_t y) {
     kryptos_poly1305_numfrac_t *xp = &x[0];
-    kryptos_poly1305_numfrac_t *xp_end = xp + kKryptosPoly1305_128bit_NumberSize;
+    kryptos_poly1305_numfrac_t *xp_end = xp + kKryptosPoly1305NumberSize;
     const kryptos_poly1305_numfrac_t *yp = &y[0];
-    const kryptos_poly1305_numfrac_t *yp_end = yp + kKryptosPoly1305_128bit_NumberSize;
+    const kryptos_poly1305_numfrac_t *yp_end = yp + kKryptosPoly1305NumberSize;
     int is_zero = 1;
     kryptos_poly1305_numfrac_t c = 0;
     kryptos_poly1305_overflown_numfrac_t bsub = 0;
     kryptos_poly1305_number_t d;
     kryptos_poly1305_numfrac_t *delta = &d[0];
-    kryptos_poly1305_numfrac_t *delta_end = delta + kKryptosPoly1305_128bit_NumberSize;
+    kryptos_poly1305_numfrac_t *delta_end = delta + kKryptosPoly1305NumberSize;
 
     memset(d, 0, sizeof(kryptos_poly1305_number_t));
 
@@ -144,10 +144,10 @@ void kryptos_poly1305_not(kryptos_poly1305_number_t x) {
 void kryptos_poly1305_mul(kryptos_poly1305_number_t x, const kryptos_poly1305_number_t y) {
     kryptos_poly1305_numfrac_t *xp = NULL;
     // INFO(Rafael): We are not using the entire mp size (this is always about a 128-bit value).
-    kryptos_poly1305_numfrac_t *xp_end = &x[0] + kKryptosPoly1305_128bit_NumberSize;
+    kryptos_poly1305_numfrac_t *xp_end = &x[0] + kKryptosPoly1305NumberSize;
     const kryptos_poly1305_numfrac_t *yp = &y[0];
     // INFO(Rafael): We are not using the entire mp size (this is always about a 128-bit value).
-    const kryptos_poly1305_numfrac_t *yp_end = yp + kKryptosPoly1305_128bit_NumberSize;
+    const kryptos_poly1305_numfrac_t *yp_end = yp + kKryptosPoly1305NumberSize;
     kryptos_poly1305_number_t p;
     kryptos_poly1305_numfrac_t *pp = &p[0];
     kryptos_poly1305_numfrac_t *pp_end = pp + kKryptosPoly1305NumberSize;
@@ -523,15 +523,15 @@ void kryptos_poly1305_rsh(kryptos_poly1305_number_t x, const size_t level) {
 
 void kryptos_poly1305_le_bytes_to_num(kryptos_poly1305_number_t n, const kryptos_u8_t *bytes, const size_t bytes_nr) {
     kryptos_poly1305_numfrac_t *np = &n[0];
-    kryptos_poly1305_numfrac_t *np_end = &n[0] + kKryptosPoly1305_128bit_NumberSize;
+    kryptos_poly1305_numfrac_t *np_end = &n[0] + kKryptosPoly1305NumberSize;
     size_t p = 0;
     const kryptos_u8_t *bp = bytes;
-    const kryptos_u8_t *bp_end = bp + bytes_nr;
+    const kryptos_u8_t *bp_end = bytes + bytes_nr;
 
     memset(n, 0, sizeof(kryptos_poly1305_number_t));
 
     while (np != np_end && bp != bp_end) {
-        *np = ((*np) << 8) | *bp;
+        *np = (*np) | ((kryptos_poly1305_numfrac_t)*bp << (p * 8));
         bp += 1;
         p = (p + 1) % sizeof(kryptos_poly1305_numfrac_t);
         np += (p == 0);

@@ -10,6 +10,7 @@
 #include <kryptos_memory.h>
 #include <kryptos_random.h>
 #include <kryptos.h>
+//#include <stdio.h>
 
 static kryptos_u8_t *kryptos_poly1305_tag(const kryptos_u8_t *message, const size_t message_size,
                                           const kryptos_u8_t *key, const size_t key_size);
@@ -204,11 +205,11 @@ kryptos_poly1305_epilogue:
 
 static kryptos_u8_t *kryptos_poly1305_tag(const kryptos_u8_t *message, const size_t message_size,
                                           const kryptos_u8_t *key, const size_t key_size) {
-    kryptos_u8_t working_key[32];
+    kryptos_u8_t working_key[32], poly_mbuf[17];
     kryptos_u8_t *tag = NULL;
     kryptos_poly1305_number_t p, r, s, a, n, a_mod;
-    size_t m_pad = 0;
-    kryptos_u8_t *msg = NULL, *mp = NULL, *mp_end = NULL;
+    const kryptos_u8_t *mp = NULL, *mp_end = NULL;
+    kryptos_u8_t *bp = NULL, *bp_end = NULL;
 
     memset(working_key, 0, sizeof(working_key));
 
@@ -217,19 +218,45 @@ static kryptos_u8_t *kryptos_poly1305_tag(const kryptos_u8_t *message, const siz
     }
 
     memcpy(working_key, key, key_size);
+    /*
+    printf("KEY: %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X\n"
+           "     %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X\n",
+            working_key[0], working_key[1], working_key[2], working_key[3], working_key[4], working_key[5],
+            working_key[6], working_key[7], working_key[8], working_key[9], working_key[10], working_key[11],
+            working_key[12], working_key[13], working_key[14], working_key[15], working_key[16], working_key[17],
+            working_key[18], working_key[19], working_key[20], working_key[21], working_key[22], working_key[23],
+            working_key[24], working_key[25], working_key[26], working_key[27], working_key[28], working_key[29],
+            working_key[30], working_key[31]);
+    */
 
     // INFO(Rafael): This is is the "Clamp(r)" and the mask to apply when it is still not loaded as number.
-    working_key[ 3] &= 0xFF;
-    working_key[ 7] &= 0xFF;
-    working_key[11] &= 0xFF;
-    working_key[15] &= 0xFF;
+    working_key[ 3] &= 0x0F;
+    working_key[ 7] &= 0x0F;
+    working_key[11] &= 0x0F;
+    working_key[15] &= 0x0F;
     working_key[ 4] &= 0xFC;
     working_key[ 8] &= 0xFC;
     working_key[12] &= 0xFC;
 
+    /*
+    printf("R:   %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X\n"
+           "     %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X\n",
+            working_key[0], working_key[1], working_key[2], working_key[3], working_key[4], working_key[5],
+            working_key[6], working_key[7], working_key[8], working_key[9], working_key[10], working_key[11],
+            working_key[12], working_key[13], working_key[14], working_key[15], working_key[16], working_key[17],
+            working_key[18], working_key[19], working_key[20], working_key[21], working_key[22], working_key[23],
+            working_key[24], working_key[25], working_key[26], working_key[27], working_key[28], working_key[29],
+            working_key[30], working_key[31]);
+    */
+
     kryptos_poly1305_le_bytes_to_num(r, working_key, 16);
 
     kryptos_poly1305_le_bytes_to_num(s, &working_key[16], 16);
+
+    /*
+    printf("S = %llx %llx %llx %llx %llx %llx %llx\n", s[0], s[1], s[2], s[3], s[4], s[5], s[6]);
+    printf("R = %llx %llx %llx %llx %llx %llx %llx\n", r[0], r[1], r[2], r[3], r[4], r[5], r[6]);
+    */
 
     memset(a, 0, sizeof(kryptos_poly1305_number_t));
 
@@ -257,32 +284,49 @@ static kryptos_u8_t *kryptos_poly1305_tag(const kryptos_u8_t *message, const siz
     p[10] = 0x00000000;
 #endif
 
-    m_pad = (message_size % 16);
+    mp = message;
+    mp_end = message + message_size;
 
-    msg = (kryptos_u8_t *) kryptos_newseg(message_size + m_pad);
-    if (msg == NULL) {
-        goto kryptos_poly1305_tag_epilogue;
-    }
-
-    memset(msg, 0, message_size + m_pad);
-    memcpy(msg, message, message_size);
-    if (m_pad > 0) {
-        msg[m_pad + message_size] = 0x01;
-    }
-
-    mp = msg;
-    mp_end = mp + message_size + m_pad;
+    memset(poly_mbuf, 0x01, sizeof(poly_mbuf));
+    bp = &poly_mbuf[0];
+    bp_end = bp + sizeof(poly_mbuf) - 1;
 
     while(mp != mp_end) {
-        kryptos_poly1305_le_bytes_to_num(n, mp, 16);
-        kryptos_poly1305_add(a, n);
-        kryptos_poly1305_mul(a, r);
-        kryptos_poly1305_div(a, p, a_mod);
-        memcpy(a, a_mod, sizeof(kryptos_poly1305_number_t));
-        mp += 16;
+        if (bp != bp_end && (mp + 1) != mp_end) {
+            *bp = *mp;
+            bp++;
+            mp++;
+        } else {
+            if ((mp + 1) == mp_end && bp != bp_end) {
+                *bp = *mp;
+                bp++;
+                mp++;
+            }
+            /*
+            printf("MBUF (size=%lu)= ", 17 - (bp_end - bp));
+            for (b = 0; b < 17 - (bp_end - bp); b++) {
+                printf("%.2X ", poly_mbuf[b]);
+            }
+            printf("\n");
+            */
+            kryptos_poly1305_le_bytes_to_num(n, poly_mbuf, 17 - (bp_end - bp));
+            //printf("Acc = %llx %llx %llx %llx %llx %llx %llx\n", a[0], a[1], a[2], a[3], a[4], a[5], a[6]);
+            //printf("Block with 0x01 = %llx %llx %llx %llx %llx %llx %llx\n", n[0], n[1], n[2], n[3], n[4], n[5], n[6]);
+            kryptos_poly1305_add(a, n);
+            //printf("Acc + Block = %llx %llx %llx %llx %llx %llx %llx\n", a[0], a[1], a[2], a[3], a[4], a[5], a[6]);
+            kryptos_poly1305_mul(a, r);
+            //printf("(Acc + Block) * r = %llx %llx %llx %llx %llx %llx %llx\n", a[0], a[1], a[2], a[3], a[4], a[5], a[6]);
+            kryptos_poly1305_div(a, p, a_mod);
+            memcpy(a, a_mod, sizeof(kryptos_poly1305_number_t));
+            //printf("(Acc + Block) * r) %% P = %llx %llx %llx %llx %llx %llx %llx\n--\n", a[0], a[1], a[2], a[3], a[4], a[5], a[6]);
+
+            memset(poly_mbuf, 0x01, sizeof(poly_mbuf));
+            bp = &poly_mbuf[0];
+        }
     }
 
     kryptos_poly1305_add(a, s);
+    //printf("Acc + s = %llx %llx %llx %llx %llx %llx %llx\n", a[0], a[1], a[2], a[3], a[4], a[5], a[6]);
 
     tag = kryptos_poly1305_get_tag_from_num(a);
 
@@ -296,13 +340,7 @@ kryptos_poly1305_tag_epilogue:
     memset(n, 0, sizeof(kryptos_poly1305_number_t));
     memset(a_mod, 0, sizeof(kryptos_poly1305_number_t));
 
-    if (msg != NULL) {
-        kryptos_freeseg(msg, message_size + m_pad);
-    }
-
-    m_pad = 0;
-
-    msg = mp = mp_end = NULL;
+    mp = mp_end = NULL;
 
     return tag;
 }
@@ -316,39 +354,39 @@ static kryptos_u8_t *kryptos_poly1305_get_tag_from_num(const kryptos_poly1305_nu
 #define get_byte(w, n) ( ( (w) >> (((sizeof(kryptos_poly1305_numfrac_t) << 3) - 8) - ((n) << 3)) ) & 0xFF )
 
 #if defined(KRYPTOS_MP_EXTENDED_RADIX)
-    t[ 0] = get_byte(a[ 0], 0);
-    t[ 1] = get_byte(a[ 0], 1);
-    t[ 2] = get_byte(a[ 0], 2);
-    t[ 3] = get_byte(a[ 0], 3);
-    t[ 4] = get_byte(a[ 0], 4);
-    t[ 5] = get_byte(a[ 0], 5);
-    t[ 6] = get_byte(a[ 0], 6);
-    t[ 7] = get_byte(a[ 0], 7);
-    t[ 8] = get_byte(a[ 1], 0);
-    t[ 9] = get_byte(a[ 1], 1);
-    t[10] = get_byte(a[ 1], 2);
-    t[11] = get_byte(a[ 1], 3);
-    t[12] = get_byte(a[ 1], 4);
-    t[13] = get_byte(a[ 1], 5);
-    t[14] = get_byte(a[ 1], 6);
-    t[15] = get_byte(a[ 1], 7);
+    t[ 0] = get_byte(a[ 0], 7);
+    t[ 1] = get_byte(a[ 0], 6);
+    t[ 2] = get_byte(a[ 0], 5);
+    t[ 3] = get_byte(a[ 0], 4);
+    t[ 4] = get_byte(a[ 0], 3);
+    t[ 5] = get_byte(a[ 0], 2);
+    t[ 6] = get_byte(a[ 0], 1);
+    t[ 7] = get_byte(a[ 0], 0);
+    t[ 8] = get_byte(a[ 1], 7);
+    t[ 9] = get_byte(a[ 1], 6);
+    t[10] = get_byte(a[ 1], 5);
+    t[11] = get_byte(a[ 1], 4);
+    t[12] = get_byte(a[ 1], 3);
+    t[13] = get_byte(a[ 1], 2);
+    t[14] = get_byte(a[ 1], 1);
+    t[15] = get_byte(a[ 1], 0);
 #else
-    t[ 0] = get_byte(a[ 0], 0);
-    t[ 1] = get_byte(a[ 0], 1);
-    t[ 2] = get_byte(a[ 0], 2);
-    t[ 3] = get_byte(a[ 0], 3);
-    t[ 4] = get_byte(a[ 1], 0);
-    t[ 5] = get_byte(a[ 1], 1);
-    t[ 6] = get_byte(a[ 1], 2);
-    t[ 7] = get_byte(a[ 1], 3);
-    t[ 8] = get_byte(a[ 2], 0);
-    t[ 9] = get_byte(a[ 2], 1);
-    t[10] = get_byte(a[ 2], 2);
-    t[11] = get_byte(a[ 2], 3);
-    t[12] = get_byte(a[ 3], 0);
-    t[13] = get_byte(a[ 3], 1);
-    t[14] = get_byte(a[ 3], 2);
-    t[15] = get_byte(a[ 3], 3);
+    t[ 0] = get_byte(a[ 0], 3);
+    t[ 1] = get_byte(a[ 0], 2);
+    t[ 2] = get_byte(a[ 0], 1);
+    t[ 3] = get_byte(a[ 0], 0);
+    t[ 4] = get_byte(a[ 1], 3);
+    t[ 5] = get_byte(a[ 1], 2);
+    t[ 6] = get_byte(a[ 1], 1);
+    t[ 7] = get_byte(a[ 1], 0);
+    t[ 8] = get_byte(a[ 2], 3);
+    t[ 9] = get_byte(a[ 2], 2);
+    t[10] = get_byte(a[ 2], 1);
+    t[11] = get_byte(a[ 2], 0);
+    t[12] = get_byte(a[ 3], 3);
+    t[13] = get_byte(a[ 3], 2);
+    t[14] = get_byte(a[ 3], 1);
+    t[15] = get_byte(a[ 3], 0);
 #endif
 
 #undef get_byte
