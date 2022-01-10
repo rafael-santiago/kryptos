@@ -221,7 +221,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     // INFO(Rafael): Poly1305 suff.
 
-    //CUTE_RUN_TEST(kryptos_poly1305_le_bytes_to_num_tests);
+    CUTE_RUN_TEST(kryptos_poly1305_le_bytes_to_num_tests);
     CUTE_RUN_TEST(kryptos_poly1305_le_num_tests);
     CUTE_RUN_TEST(kryptos_poly1305_ld_raw_bytes_tests);
     CUTE_RUN_TEST(kryptos_poly1305_eq_tests);
@@ -236,7 +236,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_poly1305_add_tests);
     // TIP(Rafael): Kryptos multi-precision stuff uses 2's complement to express negative numbers
     //              so it is important to ensure that it is working before testing subtraction.
-    //CUTE_RUN_TEST(kryptos_poly1305_inv_cmplt_tests);
+    CUTE_RUN_TEST(kryptos_poly1305_inv_cmplt_tests);
     CUTE_RUN_TEST(kryptos_poly1305_sub_tests);
     CUTE_RUN_TEST(kryptos_poly1305_mul_tests);
     CUTE_RUN_TEST(kryptos_poly1305_mul_digit_tests);
