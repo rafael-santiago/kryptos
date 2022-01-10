@@ -601,6 +601,25 @@ kryptos_ ## label_name:\
     kryptos_perform_digsig_proto_action(cname, verify, ktask, __VA_ARGS__);\
 }
 
+#define kryptos_run_cipher_poly1305(cname, ktask, ...) {\
+    if ((ktask)->action == kKryptosEncrypt) {\
+        kryptos_run_cipher(cname, ktask, __VA_ARGS__);\
+        if (kryptos_last_task_succeed(ktask)) {\
+            (ktask)->mirror_p = (ktask);\
+            kryptos_do_poly1305(&(ktask)->mirror_p);\
+            (ktask)->mirror_p = NULL;\
+        }\
+    } else if ((ktask)->action == kKryptosDecrypt) {\
+        (ktask)->mirror_p = (ktask);\
+        kryptos_ ## cname ## _setup((ktask), __VA_ARGS__);\
+        kryptos_hmac(&(ktask)->mirror_p);\
+        if (kryptos_last_task_succeed(ktask)) {\
+            kryptos_run_cipher(cname, ktask, __VA_ARGS__);\
+        }\
+        (ktask)->mirror_p = NULL;\
+    }\
+}
+
 #endif // KRYPTOS_C99
 
 #define kryptos_run_encoder(ename, ktask, data, data_size) {\

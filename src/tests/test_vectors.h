@@ -146,6 +146,131 @@ static kryptos_u8_t *hmac_test_data[] = {
     "'Without the wind, the grass does not move. Without software hardware is useless.'"
 };
 
+static kryptos_u8_t *poly1305_test_data[] = {
+    "Ao redor da vida do homem"
+    "ha certas caixas de vidro,"
+    "dentro das quais, como em jaula,"
+    "se ouve palpitar um bicho.",
+
+    "Se sao jaulas nao e certo;"
+    "mais perto estao das gaiolas"
+    "ao menos, pelo tamanho"
+    "e quadradico de forma.",
+
+    "Uma vezes, tais gaiolas"
+    "vao penduradas nos muros;"
+    "outras vezes, mais privadas,"
+    "vao num bolso, num dos pulsos.",
+
+    "Mas onde esteja: a gaiola"
+    "sera de passaro ou passara:"
+    "e alada a palpitacao,",
+
+    "a saltacao que ela guarda;",
+
+    "e de passaro cantor,"
+    "nao passaro de plumagem:"
+    "pois delas se emite um canto"
+    "de uma tal continuidade",
+
+    "que continua cantando"
+    "se deixa de ouvi-lo a gente:"
+    "como a gente às vezes canta"
+    "para sentir-se existente.",
+
+    "O que eles cantam, se passaros,"
+    "e diferente de todos:"
+    "cantam numa linha baixa,"
+    "com voz de passaro rouco;",
+
+    "desconhecem as variantes"
+    "e o estilo numeroso"
+    "dos pasaros que sabemos,"
+    "estejam presos ou soltos;",
+
+    "tem sempre o mesmo compasso"
+    "horizontal e monotono,"
+    "e nunca, em nenhum momento,"
+    "variam de repertorio:",
+
+    "dir-se-ia que nao importa"
+    "a nenhum ser escutado."
+    "Assim, que nao sao artistas"
+    "nem artesaos, mas operarios",
+
+    "para quem tudo o que cantam"
+    "e simplesmente trabalho,"
+    "trabalho rotina, em serie,"
+    "impessoal, nao assinado,",
+
+    "de operario que executa"
+    "seu martelo regular"
+    "proibido (ou sem querer)"
+    "do minimo variar.",
+
+    "A mao daquele martelo"
+    "nunca muda de compasso."
+    "Mas tao igual sem fadiga,"
+    "mal deve ser de operario;",
+
+    "ela e por demais precisa"
+    "para nao ser mao de maquina,"
+    "a maquina independente"
+    "de operacao operaria.",
+
+    "De maquina, mas movida"
+    "por uma forca qualquer"
+    "que a move passando nela,"
+    "regular, sem decrescer:",
+
+    "quem sabe se algum monjolo"
+    "ou antiga roda de agua"
+    "que vai rodando, passiva,"
+    "gracar a um fluido que a passa;",
+
+    "que fluido e ninguem ve:"
+    "da agua nao mostra os senoes:"
+    "alem de igual, e continuo,"
+    "sem mares, sem estacoes.",
+
+    "E porque tampouco cabe,"
+    "por isso, pensar que e o vento,"
+    "ha de ser um outro fluido"
+    "que a move: quem sabe, o tempo.",
+
+    "Quando por algum motivo"
+    "a roda de agua se rompe,"
+    "outra maquina se escuta:"
+    "agora, de dentro do homem;",
+
+    "outra maquina de dentro,"
+    "imediata, a reveza,"
+    "soando nas veias, no fundo"
+    "de poca no corpo, imersa.",
+
+    "Entao se sente que o som"
+    "da maquina, ora interior,"
+    "nada possui de passivo,"
+    "de roda de agua: e motor;",
+
+    "se descobre nele o afogo"
+    "de quem, ao fazer, se esforca,"
+    "e que ele, dentro, afinal,"
+    "revela vontade propria,",
+
+    "incapaz, agora, dentro,"
+    "de ainda disfarcar que nasce"
+    "daquela bomba motor"
+    "(coracao, noutra linguagem)",
+
+    "que, sem nenhum coracao,"
+    "vive a esgotar, gota a gota,"
+    "o que o homem, de reserva,"
+    "possa ter na intima poca.",
+
+    "O Relogio / Joao Cabral de Melo Neto"
+};
+
 #define kryptos_run_block_cipher_tests(cipher_name, blocksize) {\
     kryptos_task_ctx t, *ktask = &t;\
     size_t cbc_test_data_nr = sizeof(cbc_test_data) / sizeof(cbc_test_data[0]);\

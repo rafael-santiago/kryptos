@@ -8,7 +8,95 @@
 #include "poly1305_tests.h"
 #include <kryptos.h>
 
-CUTE_TEST_CASE(kryptos_poly1305_tests)
+#if defined(KRYPTOS_C99)
+CUTE_DECLARE_TEST_CASE(kryptos_arc4_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_seal_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_rabbit_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_salsa20_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_chacha20_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_des_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_idea_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_blowfish_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_feal_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_rc2_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_rc5_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_rc6_128_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_rc6_192_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_rc6_256_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_camellia128_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_camellia192_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_camellia256_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_cast5_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_saferk64_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_aes128_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_aes192_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_aes256_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_serpent_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_triple_des_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_triple_des_ede_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_tea_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_xtea_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_misty1_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_mars128_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_mars192_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_mars256_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_present80_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_present128_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_shacal1_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_shacal2_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_noekeon_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_noekeon_d_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_gost_ds_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_gost_poly1305_tests);
+#endif // defined(KRYPTOS_C99)
+
+CUTE_TEST_CASE_SUITE(kryptos_poly1305_tests)
+#if defined(KRYPTOS_C99)
+    CUTE_RUN_TEST(kryptos_arc4_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_seal_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_rabbit_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_salsa20_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_chacha20_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_des_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_idea_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_blowfish_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_feal_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_rc2_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_rc5_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_rc6_128_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_rc6_192_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_rc6_256_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_camellia128_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_camellia192_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_camellia256_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_cast5_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_saferk64_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_aes128_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_aes192_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_aes256_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_serpent_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_triple_des_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_triple_des_ede_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_tea_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_xtea_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_misty1_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_mars128_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_mars192_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_mars256_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_present80_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_present128_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_shacal1_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_shacal2_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_noekeon_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_noekeon_d_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_gost_ds_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_gost_poly1305_tests);
+#else
+    printf("WARN: This test runs only when libkryptos is compiled with C99 support. It will be skipped.\n");
+#endif // defined(KRYPTOS_C99)
+CUTE_TEST_CASE_SUITE_END
+
+CUTE_TEST_CASE(kryptos_poly1305_basic_tests)
     struct test_ctx {
         kryptos_u8_t *key;
         size_t key_size;
@@ -100,5 +188,119 @@ CUTE_TEST_CASE(kryptos_poly1305_tests)
     }
 CUTE_TEST_CASE_END
 
-// TODO(Rafael): Implement a test that uses poly1305 with all available ciphers (following the idea of HMAC tests).
-//               A function macro that automates the encryption,tag/verify,decryption must be implemented first.
+CUTE_TEST_CASE(kryptos_arc4_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_seal_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rabbit_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_salsa20_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_chacha20_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_des_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_idea_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blowfish_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_feal_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc2_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc5_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc6_128_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc6_192_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_rc6_256_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_camellia128_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_camellia192_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_camellia256_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_cast5_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_saferk64_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_aes128_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_aes192_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_aes256_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_serpent_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_triple_des_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_triple_des_ede_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_tea_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_xtea_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_misty1_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mars128_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mars192_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_mars256_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_present80_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_present128_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_shacal1_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_shacal2_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_noekeon_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_noekeon_d_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_gost_ds_poly1305_tests)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_gost_poly1305_tests)
+CUTE_TEST_CASE_END

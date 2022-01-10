@@ -17,6 +17,54 @@ static kryptos_u8_t *kryptos_poly1305_tag(const kryptos_u8_t *message, const siz
 
 static kryptos_u8_t *kryptos_poly1305_get_tag_from_num(const kryptos_poly1305_number_t a);
 
+void do_kryptos_poly1305(kryptos_task_ctx **ktask) {
+    kryptos_u8_t key[16];
+    size_t k = 0;
+    kryptos_u8_t *user_key = NULL, *up = NULL, *up_end = NULL;
+    size_t user_key_size = 0;
+
+    memset(key, 0, sizeof(key));
+
+    if (ktask == NULL || (*ktask) == NULL || (*ktask)->key == NULL || (*ktask)->key_size == 0) {
+        goto do_kryptos_poly1305_epilogue;
+    }
+
+    if ((*ktask)->key_size > 16) {
+        user_key = (*ktask)->key;
+        user_key_size = (*ktask)->key_size;
+
+        // INFO(Rafael): Copying the first 128-bits.
+        memcpy(key, user_key, sizeof(key));
+        up = user_key + sizeof(key);
+        up_end = user_key + user_key_size;
+
+        // INFO(Rafael): "Compressing" the remaining bytes by xoring them up
+        //               with the 128-bit most significant key slice.
+        while (up != up_end) {
+            key[k] ^= *up;
+            up++;
+            k = (k + 1) % sizeof(key);
+        }
+
+        (*ktask)->key = &key[0];
+        (*ktask)->key_size = sizeof(key);
+    }
+
+    kryptos_poly1305(ktask);
+
+do_kryptos_poly1305_epilogue:
+
+    if (user_key != NULL) {
+        (*ktask)->key = user_key;
+        (*ktask)->key_size = user_key_size;
+    }
+
+    up = up_end = user_key = NULL;
+    k = user_key_size = 0;
+
+    memset(key, 0, sizeof(key));
+}
+
 void kryptos_poly1305(kryptos_task_ctx **ktask) {
     kryptos_u8_t *key = NULL;
     kryptos_u8_t *nonce = NULL;
