@@ -113,7 +113,7 @@ void kryptos_poly1305(kryptos_task_ctx **ktask) {
                 nonce_size = 32 - (*ktask)->key_size;
             }
 
-            if ((*ktask)->in_size < nonce_size + 16) {
+            if ((*ktask)->in_size <= nonce_size + 16) {
                 (*ktask)->result = kKryptosPOLY1305Error;
                 (*ktask)->result_verbose = "Message buffer seems to be incomplete.";
                 goto kryptos_poly1305_epilogue;
