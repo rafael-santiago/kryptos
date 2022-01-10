@@ -87,7 +87,6 @@ CUTE_TEST_CASE(kryptos_poly1305_tests)
         ktask->key = test->key;
         ktask->key_size = test->key_size;
 
-
         kryptos_poly1305(&ktask);
         CUTE_ASSERT(ktask->result == kKryptosSuccess);
 

@@ -531,7 +531,7 @@ void kryptos_poly1305_le_bytes_to_num(kryptos_poly1305_number_t n, const kryptos
     memset(n, 0, sizeof(kryptos_poly1305_number_t));
 
     while (np != np_end && bp != bp_end) {
-        *np = (*np) | ((kryptos_poly1305_numfrac_t)*bp << (p * 8));
+        *np = (*np) | ((kryptos_poly1305_numfrac_t)*bp << (p << 3));
         bp += 1;
         p = (p + 1) % sizeof(kryptos_poly1305_numfrac_t);
         np += (p == 0);

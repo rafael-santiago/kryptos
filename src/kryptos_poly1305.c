@@ -122,7 +122,7 @@ void kryptos_poly1305(kryptos_task_ctx **ktask) {
             if (nonce_size > 0) {
                 if ((nonce = (kryptos_u8_t *)kryptos_newseg(nonce_size)) == NULL) {
                     (*ktask)->result = kKryptosPOLY1305Error;
-                    (*ktask)->result_verbose = "No enough memory to parse nonce.";
+                    (*ktask)->result_verbose = "Not enough memory to parse nonce.";
                     goto kryptos_poly1305_epilogue;
                 }
 
@@ -130,7 +130,7 @@ void kryptos_poly1305(kryptos_task_ctx **ktask) {
 
                 if ((key = (kryptos_u8_t *)kryptos_newseg(nonce_size + (*ktask)->key_size)) == NULL) {
                     (*ktask)->result = kKryptosPOLY1305Error;
-                    (*ktask)->result_verbose = "No enough memory to make the session key.";
+                    (*ktask)->result_verbose = "Not enough memory to make the session key.";
                     goto kryptos_poly1305_epilogue;
                 }
 
