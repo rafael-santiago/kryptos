@@ -812,6 +812,7 @@ static kryptos_u8_t *poly1305_test_data[] = {
 }
 
 #define kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, cname, ...) {\
+    tv_nr = sizeof(poly1305_test_data) / sizeof(poly1305_test_data[0]);\
     for (tv = 0; tv < tv_nr; tv++) {\
         /*INFO(Rafael): Normal flow, no authentication error.*/\
         kryptos_task_init_as_null(&t);\
@@ -841,7 +842,8 @@ static kryptos_u8_t *poly1305_test_data[] = {
         CUTE_ASSERT(t.result == kKryptosSuccess);\
         CUTE_ASSERT(t.out != NULL);\
         CUTE_ASSERT(t.out_size > data_size);\
-        kryptos_task_set_in(&t, t.out, t.out_size >> 1);\
+        kryptos_task_set_in(&t, t.out, t.out_size);\
+        t.out[t.out_size >> 1] += 1;\
         t.out = NULL;\
         t.out_size = 0;\
         kryptos_task_set_decrypt_action(&t);\
