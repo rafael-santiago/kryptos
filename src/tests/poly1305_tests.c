@@ -351,27 +351,104 @@ CUTE_TEST_CASE(kryptos_rc6_256_poly1305_tests)
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_camellia128_poly1305_tests)
+    kryptos_task_ctx t;
+    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *key = "Poly1305CamelliaTest";
+    size_t key_size = strlen(key);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia128, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia128, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia128, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia128, key, key_size, kKryptosCTR);
+    // INFO(Rafael): Overstated but possible so let's test.
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia128, key, key_size, kKryptosGCM);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_camellia192_poly1305_tests)
+    kryptos_task_ctx t;
+    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *key = "Poly1305CamelliaTest";
+    size_t key_size = strlen(key);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia192, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia192, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia192, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia192, key, key_size, kKryptosCTR);
+    // INFO(Rafael): Overstated but possible so let's test.
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia192, key, key_size, kKryptosGCM);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_camellia256_poly1305_tests)
+    kryptos_task_ctx t;
+    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *key = "Poly1305CamelliaTest";
+    size_t key_size = strlen(key);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia256, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia256, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia256, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia256, key, key_size, kKryptosCTR);
+    // INFO(Rafael): Overstated but possible so let's test.
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia256, key, key_size, kKryptosGCM);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_cast5_poly1305_tests)
+    kryptos_task_ctx t;
+    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *key = "Poly1305Cast5Test";
+    size_t key_size = strlen(key);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, cast5, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, cast5, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, cast5, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, cast5, key, key_size, kKryptosCTR);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_saferk64_poly1305_tests)
+    kryptos_task_ctx t;
+    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *key = "Poly1305SaferK64Test";
+    size_t key_size = strlen(key);
+    int rounds_nr = 32;
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, saferk64, key, key_size, kKryptosECB, &rounds_nr);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, saferk64, key, key_size, kKryptosCBC, &rounds_nr);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, saferk64, key, key_size, kKryptosOFB, &rounds_nr);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, saferk64, key, key_size, kKryptosCTR, &rounds_nr);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_aes128_poly1305_tests)
+    kryptos_task_ctx t;
+    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *key = "Poly1305AESTest";
+    size_t key_size = strlen(key);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes128, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes128, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes128, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes128, key, key_size, kKryptosCTR);
+    // INFO(Rafael): Overstated but possible so let's test.
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes128, key, key_size, kKryptosGCM);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_aes192_poly1305_tests)
+    kryptos_task_ctx t;
+    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *key = "Poly1305AESTest";
+    size_t key_size = strlen(key);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes192, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes192, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes192, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes192, key, key_size, kKryptosCTR);
+    // INFO(Rafael): Overstated but possible so let's test.
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes192, key, key_size, kKryptosGCM);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_aes256_poly1305_tests)
+    kryptos_task_ctx t;
+    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *key = "Poly1305AESTest";
+    size_t key_size = strlen(key);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes256, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes256, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes256, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes256, key, key_size, kKryptosCTR);
+    // INFO(Rafael): Overstated but possible so let's test.
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes256, key, key_size, kKryptosGCM);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_serpent_poly1305_tests)
