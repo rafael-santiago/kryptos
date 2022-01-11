@@ -16,7 +16,7 @@ extern "C" {
 
 void kryptos_poly1305(kryptos_task_ctx **ktask);
 
-void do_kryptos_poly1305(kryptos_task_ctx **ktask);
+void kryptos_do_poly1305(kryptos_task_ctx **ktask);
 
 #ifdef __cplusplus
 }

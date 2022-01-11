@@ -17,7 +17,7 @@ static kryptos_u8_t *kryptos_poly1305_tag(const kryptos_u8_t *message, const siz
 
 static kryptos_u8_t *kryptos_poly1305_get_tag_from_num(const kryptos_poly1305_number_t a);
 
-void do_kryptos_poly1305(kryptos_task_ctx **ktask) {
+void kryptos_do_poly1305(kryptos_task_ctx **ktask) {
     kryptos_u8_t key[16];
     size_t k = 0;
     kryptos_u8_t *user_key = NULL, *up = NULL, *up_end = NULL;
@@ -209,6 +209,9 @@ void kryptos_poly1305(kryptos_task_ctx **ktask) {
             (*ktask)->in_size -= (16 + nonce_size);
             (*ktask)->in = (kryptos_u8_t *)kryptos_newseg((*ktask)->in_size);
             if ((*ktask)->in == NULL) {
+                (*ktask)->in = tagged_message;
+                (*ktask)->in_size = tagged_message_size;
+                tagged_message = NULL;
                 (*ktask)->result = kKryptosPOLY1305Error;
                 (*ktask)->result_verbose = "No memory to extract original authenticated message.";
                 goto kryptos_poly1305_epilogue;

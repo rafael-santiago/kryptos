@@ -6,6 +6,7 @@
  *
  */
 #include "poly1305_tests.h"
+#include "test_vectors.h"
 #include <kryptos.h>
 
 #if defined(KRYPTOS_C99)
@@ -189,9 +190,28 @@ CUTE_TEST_CASE(kryptos_poly1305_basic_tests)
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_arc4_poly1305_tests)
+    kryptos_task_ctx t;
+    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *key = "Poly1305Arc4Test";
+    size_t key_size = strlen(key);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, arc4, key, key_size);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_seal_poly1305_tests)
+    kryptos_task_ctx t;
+    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *key = "Poly1305SealTest";
+    size_t key_size = strlen(key);
+    size_t seal_n = 0, seal_l = 1024;
+    kryptos_seal_version_t seal_version = kKryptosSEAL20;
+
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, seal, key, key_size, &seal_version, &seal_l, &seal_n);
+
+    seal_n = 0;
+    seal_l = 2048;
+    seal_version = kKryptosSEAL30;
+
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, seal, key, key_size, &seal_version, &seal_l, &seal_n);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_rabbit_poly1305_tests)

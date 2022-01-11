@@ -811,6 +811,47 @@ static kryptos_u8_t *poly1305_test_data[] = {
     }\
 }
 
+#define kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, cname, ...) {\
+    for (tv = 0; tv < tv_nr; tv++) {\
+        /*INFO(Rafael): Normal flow, no authentication error.*/\
+        kryptos_task_init_as_null(&t);\
+        data_size = strlen(poly1305_test_data[tv]);\
+        kryptos_task_set_in(&t, poly1305_test_data[tv], data_size);\
+        kryptos_task_set_encrypt_action(&t);\
+        kryptos_run_cipher_poly1305(cname, &t, __VA_ARGS__);\
+        CUTE_ASSERT(t.result == kKryptosSuccess);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size > data_size);\
+        kryptos_task_set_in(&t, t.out, t.out_size);\
+        t.out = NULL;\
+        t.out_size = 0;\
+        kryptos_task_set_decrypt_action(&t);\
+        kryptos_run_cipher_poly1305(cname, &t, __VA_ARGS__);\
+        CUTE_ASSERT(t.result == kKryptosSuccess);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size == data_size);\
+        CUTE_ASSERT(memcmp(t.out, poly1305_test_data[tv], t.out_size) == 0);\
+        kryptos_task_free(&t, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+        /*INFO(Rafael): Copputed message flow.*/\
+        kryptos_task_init_as_null(&t);\
+        data_size = strlen(poly1305_test_data[tv]);\
+        kryptos_task_set_in(&t, poly1305_test_data[tv], data_size);\
+        kryptos_task_set_encrypt_action(&t);\
+        kryptos_run_cipher_poly1305(cname, &t, __VA_ARGS__);\
+        CUTE_ASSERT(t.result == kKryptosSuccess);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size > data_size);\
+        kryptos_task_set_in(&t, t.out, t.out_size >> 1);\
+        t.out = NULL;\
+        t.out_size = 0;\
+        kryptos_task_set_decrypt_action(&t);\
+        kryptos_run_cipher_poly1305(cname, &t, __VA_ARGS__);\
+        CUTE_ASSERT(t.result == kKryptosPOLY1305Error);\
+        CUTE_ASSERT(strcmp(t.result_verbose, "Corrupted data.") == 0);\
+        kryptos_task_free(&t, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+    }\
+}
+
 #endif
 
 #define kryptos_bad_buf_run_block_cipher(cipher_name, ktask) {\

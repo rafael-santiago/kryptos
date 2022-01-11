@@ -612,7 +612,7 @@ kryptos_ ## label_name:\
     } else if ((ktask)->action == kKryptosDecrypt) {\
         (ktask)->mirror_p = (ktask);\
         kryptos_ ## cname ## _setup((ktask), __VA_ARGS__);\
-        kryptos_hmac(&(ktask)->mirror_p);\
+        kryptos_do_poly1305(&(ktask)->mirror_p);\
         if (kryptos_last_task_succeed(ktask)) {\
             kryptos_run_cipher(cname, ktask, __VA_ARGS__);\
         }\
