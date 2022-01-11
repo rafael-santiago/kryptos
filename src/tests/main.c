@@ -243,6 +243,10 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_poly1305_div_tests);
 
     CUTE_RUN_TEST(kryptos_poly1305_basic_tests);
+
+    //  -=-=-=-=-=-=- New block ciphers functions should be added to Poly1305 tests. -=-=-=-=-=-=-=-
+
+    // INFO(Rafael): This is the test that ensures the integration of all ciphers with Poly1305.
     CUTE_RUN_TEST(kryptos_poly1305_tests);
 
     // INFO(Rafael): KDF stuff.

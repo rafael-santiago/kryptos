@@ -268,7 +268,95 @@ static kryptos_u8_t *poly1305_test_data[] = {
     "o que o homem, de reserva,"
     "possa ter na intima poca.",
 
-    "O Relogio / Joao Cabral de Melo Neto"
+    "O Relogio / Joao Cabral de Melo Neto",
+
+    "Come gather 'round people, wherever you roam"
+    "And admit that the waters around you have grown"
+    "And accept it that soon you'll be drenched to the bone"
+    "If your time to you is worth saving"
+    "Then you better start swimmin' or you'll sink like a stone"
+    "For the times, they are a-changin'",
+
+    "Come writers and critics who prophesize with your pen"
+    "And keep your eyes wide, the chance won't come again"
+    "And don't speak too soon, for the wheel's still in spin"
+    "And there's no tellin' who that it's namin'"
+    "For the loser now will be later to win"
+    "For the times, they are a-changin'",
+
+    "Come senators, congressmen, please heed the call"
+    "Don't stand in the doorway, don't block up the hall"
+    "For he that gets hurt will be he who has stalled"
+    "The battle outside ragin'"
+    "Will soon shake your windows and rattle your walls"
+    "For the times, they are a-changin'",
+
+    "Come mothers and fathers throughout the land"
+    "And don't criticize what you can't understand"
+    "Your sons and your daughters are beyond your command"
+    "Your old road is rapidly aging"
+    "Please get out of the new one if you can't lend your hand"
+    "For the times, they are a-changin'"
+    "The line, it is drawn, the curse, it is cast"
+    "The slow one now will later be fast"
+    "As the present now will later be past"
+    "The order is rapidly fading"
+    "And the first one now will later be last"
+    "For the times, they are a-changin'",
+
+    "The Times They Are A-Changin' / Bob Dylan",
+
+    "Lay down your weary tune, lay down"
+    "Lay down the song you strum"
+    "And rest yourself 'neath the strength of strings"
+    "No voice can hope to hum",
+
+    "Struck by the sounds before the sun"
+    "I knew the night had gone"
+    "The morning breeze like a bugle blew"
+    "Against the drums of dawn",
+
+    "Lay down your weary tune, lay down"
+    "Lay down the song you strum"
+    "And rest yourself 'neath the strength of strings"
+    "No voice can hope to hum",
+
+    "The ocean wild like an organ played"
+    "The seaweed's wove its strands"
+    "The crashin' waves like cymbals clashed"
+    "Against the rocks and sands",
+
+    "Lay down your weary tune, lay down"
+    "Lay down the song you strum"
+    "And rest yourself 'neath the strength of strings"
+    "No voice can hope to hum",
+
+    "I stood unwound beneath the skies"
+    "And clouds unbound by laws"
+    "The cryin' rain like a trumpet sang"
+    "And asked for no applause",
+
+    "Lay down your weary tune, lay down"
+    "Lay down the song you strum"
+    "And rest yourself 'neath the strength of strings"
+    "No voice can hope to hum",
+
+    "The last of leaves fell from the trees"
+    "And clung to a new love's breast"
+    "The branches bare like a banjo played"
+    "To the winds that listened best",
+
+    "I gazed down in the river's mirror"
+    "And watched its winding strum"
+    "The water smooth ran like a hymn"
+    "And like a harp did hum",
+
+    "Lay down your weary tune, lay down"
+    "Lay down the song you strum"
+    "And rest yourself 'neath the strength of strings"
+    "No voice can hope to hum",
+
+    "Lay Down Your Weary Tune / Bob Dylan"
 };
 
 #define kryptos_run_block_cipher_tests(cipher_name, blocksize) {\
