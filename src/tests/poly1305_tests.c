@@ -227,7 +227,9 @@ CUTE_TEST_CASE(kryptos_salsa20_poly1305_tests)
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305Salsa20Test.............";
     size_t key_size = strlen(key);
+    kryptos_u8_t *nonce = "1234578";
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, salsa20, key, key_size, NULL);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, salsa20, key, key_size, nonce);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_chacha20_poly1305_tests)
@@ -235,7 +237,9 @@ CUTE_TEST_CASE(kryptos_chacha20_poly1305_tests)
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305ChaCha20Test............";
     size_t key_size = strlen(key);
+    kryptos_u8_t *nonce = "1234567890..";
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, chacha20, key, key_size, NULL, NULL);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, chacha20, key, key_size, nonce, NULL);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_des_poly1305_tests)

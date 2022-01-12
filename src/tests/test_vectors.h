@@ -185,7 +185,7 @@ static kryptos_u8_t *poly1305_test_data[] = {
 
     "desconhecem as variantes"
     "e o estilo numeroso"
-    "dos pasaros que sabemos,"
+    "dos passaros que sabemos,"
     "estejam presos ou soltos;",
 
     "tem sempre o mesmo compasso"
@@ -920,7 +920,11 @@ static kryptos_u8_t *poly1305_test_data[] = {
         CUTE_ASSERT(t.out != NULL);\
         CUTE_ASSERT(t.out_size == data_size);\
         CUTE_ASSERT(memcmp(t.out, poly1305_test_data[tv], t.out_size) == 0);\
-        kryptos_task_free(&t, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+        if (strcmp(#cname, "salsa20") != 0 && strcmp(#cname, "chacha20") != 0) {\
+            kryptos_task_free(&t, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+        } else {\
+            kryptos_task_free(&t, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+        }\
         /*INFO(Rafael): Copputed message flow.*/\
         kryptos_task_init_as_null(&t);\
         data_size = strlen(poly1305_test_data[tv]);\
@@ -938,7 +942,11 @@ static kryptos_u8_t *poly1305_test_data[] = {
         kryptos_run_cipher_poly1305(cname, &t, __VA_ARGS__);\
         CUTE_ASSERT(t.result == kKryptosPOLY1305Error);\
         CUTE_ASSERT(strcmp(t.result_verbose, "Corrupted data.") == 0);\
-        kryptos_task_free(&t, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+        if (strcmp(#cname, "salsa20") != 0 && strcmp(#cname, "chacha20") != 0) {\
+            kryptos_task_free(&t, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+        } else {\
+            kryptos_task_free(&t, KRYPTOS_TASK_IN);\
+        }\
     }\
 }
 
