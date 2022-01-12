@@ -3090,6 +3090,8 @@ KUTE_TEST_CASE_END
 
 #undef kryptos_run_hmac_tests
 
+#endif // defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_HMAC_TESTS)
+
 KUTE_TEST_CASE(kryptos_djb2_tests)
     struct test_vector_ctx {
         kryptos_u8_t *input;
@@ -3105,4 +3107,3 @@ KUTE_TEST_CASE(kryptos_djb2_tests)
     }
 KUTE_TEST_CASE_END
 
-#endif

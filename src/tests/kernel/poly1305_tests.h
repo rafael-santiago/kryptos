@@ -12,6 +12,6 @@
 
 KUTE_DECLARE_TEST_CASE(kryptos_poly1305_basic_tests);
 
-//KUTE_DECLARE_TEST_CASE_SUITE(kryptos_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_poly1305_tests);
 
 #endif

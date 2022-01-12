@@ -51,10 +51,11 @@ KUTE_DECLARE_TEST_CASE(kryptos_noekeon_d_poly1305_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_gost_ds_poly1305_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_gost_poly1305_tests);
 #endif // defined(KRYPTOS_C99)
+*/
 
-KUTE_TEST_CASE_SUITE(kryptos_poly1305_tests)
+KUTE_TEST_CASE(kryptos_poly1305_tests)
 #if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_POLY1305_TESTS)
-    KUTE_RUN_TEST(kryptos_arc4_poly1305_tests);
+    /*KUTE_RUN_TEST(kryptos_arc4_poly1305_tests);
     KUTE_RUN_TEST(kryptos_seal_poly1305_tests);
     KUTE_RUN_TEST(kryptos_rabbit_poly1305_tests);
     KUTE_RUN_TEST(kryptos_salsa20_poly1305_tests);
@@ -92,16 +93,23 @@ KUTE_TEST_CASE_SUITE(kryptos_poly1305_tests)
     KUTE_RUN_TEST(kryptos_noekeon_poly1305_tests);
     KUTE_RUN_TEST(kryptos_noekeon_d_poly1305_tests);
     KUTE_RUN_TEST(kryptos_gost_ds_poly1305_tests);
-    KUTE_RUN_TEST(kryptos_gost_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_gost_poly1305_tests);*/
 #else
 # if !defined(KRYPTOS_NO_POLY1305_TESTS)
-    printf("WARN: This test runs only when libkryptos is compiled with C99 support. It will be skipped.\n");
+#  if defined(__FreeBSD__) || defined(__NetBSD__)
+    uprintf("WARN: This test runs only when libkryptos is compiled with C99 support. It will be skipped.\n");
+#  elif defined(__linux__)
+    printk(KERN_INFO "WARN: This test runs only when libkryptos is compiled with C99 support. It will be skipped.\n");
+#endif
 # else
-    printf("WARN: You have requested build this binary without the Poly1305 tests.\n");
+#  if defined(__FreeBSD__) || defined(__NetBSD__)
+    uprintf("WARN: You have requested build this binary without the Poly1305 tests.\n");
+#  elsif defined(__linux__)
+    printk(KERN_INFO "WARN: You have requested build this binary without the Poly1305 tests.\n");
+#  endif
 # endif // !defined(KRYPTOS_NO_POLY1305_TESTS)
 #endif // defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_POLY1305_TESTS)
-KUTE_TEST_CASE_SUITE_END
-*/
+KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_poly1305_basic_tests)
     struct test_ctx {
@@ -112,15 +120,17 @@ KUTE_TEST_CASE(kryptos_poly1305_basic_tests)
         kryptos_u8_t *tag;
         size_t tag_size;
     } test_vector[] = {
-        (kryptos_u8_t *)"\x85\xD6\xBE\x78\x57\x55\x6D\x33\x7F\x44\x52\xFE\x42\xD5\x06\xA8"
-                        "\x01\x03\x80\x8A\xFB\x0D\xB2\xFD\x4A\xBF\xF6\xAF\x41\x49\xF5\x1B",
-        32,
-        (kryptos_u8_t *)"\x43\x72\x79\x70\x74\x6F\x67\x72\x61\x70\x68\x69\x63\x20\x46\x6F"
-                        "\x72\x75\x6D\x20\x52\x65\x73\x65\x61\x72\x63\x68\x20\x47\x72\x6F"
-                        "\x75\x70",
-        34,
-        (kryptos_u8_t *)"\xA8\x06\x1D\xC1\x30\x51\x36\xC6\xC2\x2B\x8B\xAF\x0C\x01\x27\xA9",
-        16
+        {
+            (kryptos_u8_t *)"\x85\xD6\xBE\x78\x57\x55\x6D\x33\x7F\x44\x52\xFE\x42\xD5\x06\xA8"
+                            "\x01\x03\x80\x8A\xFB\x0D\xB2\xFD\x4A\xBF\xF6\xAF\x41\x49\xF5\x1B",
+            32,
+            (kryptos_u8_t *)"\x43\x72\x79\x70\x74\x6F\x67\x72\x61\x70\x68\x69\x63\x20\x46\x6F"
+                            "\x72\x75\x6D\x20\x52\x65\x73\x65\x61\x72\x63\x68\x20\x47\x72\x6F"
+                            "\x75\x70",
+            34,
+            (kryptos_u8_t *)"\xA8\x06\x1D\xC1\x30\x51\x36\xC6\xC2\x2B\x8B\xAF\x0C\x01\x27\xA9",
+            16
+        },
     }, *test = &test_vector[0], *test_end = test + sizeof(test_vector) / sizeof(test_vector[0]);
     kryptos_task_ctx t, *ktask = &t;
 
