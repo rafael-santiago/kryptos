@@ -52,7 +52,7 @@ CUTE_DECLARE_TEST_CASE(kryptos_gost_poly1305_tests);
 #endif // defined(KRYPTOS_C99)
 
 CUTE_TEST_CASE_SUITE(kryptos_poly1305_tests)
-#if defined(KRYPTOS_C99)
+#if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_POLY1305_TESTS)
     CUTE_RUN_TEST(kryptos_arc4_poly1305_tests);
     CUTE_RUN_TEST(kryptos_seal_poly1305_tests);
     CUTE_RUN_TEST(kryptos_rabbit_poly1305_tests);
@@ -93,8 +93,12 @@ CUTE_TEST_CASE_SUITE(kryptos_poly1305_tests)
     CUTE_RUN_TEST(kryptos_gost_ds_poly1305_tests);
     CUTE_RUN_TEST(kryptos_gost_poly1305_tests);
 #else
+# if !defined(KRYPTOS_NO_POLY1305_TESTS)
     printf("WARN: This test runs only when libkryptos is compiled with C99 support. It will be skipped.\n");
-#endif // defined(KRYPTOS_C99)
+# else
+    printf("WARN: You have requested build this binary without the Poly1305 tests.\n");
+# endif // !defined(KRYPTOS_NO_POLY1305_TESTS)
+#endif // defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_POLY1305_TESTS)
 CUTE_TEST_CASE_SUITE_END
 
 CUTE_TEST_CASE(kryptos_poly1305_basic_tests)
