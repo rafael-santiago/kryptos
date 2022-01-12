@@ -22,6 +22,8 @@
 #include <dsl_tests.h>
 #include <encoding_tests.h>
 #include <hash_tests.h>
+#include <poly1305_mp_tests.h>
+#include <poly1305_tests.h>
 #include <kdf_tests.h>
 #include <mp_tests.h>
 #include <symmetric_ciphers_tests.h>
@@ -118,6 +120,33 @@ KUTE_TEST_CASE(ktest_monkey)
 
     KUTE_RUN_TEST(kryptos_hmac_basic_tests);
     KUTE_RUN_TEST(kryptos_hmac_tests);
+
+    // INFO(Rafael): Poly1305 suff.
+
+    KUTE_RUN_TEST(kryptos_poly1305_le_bytes_to_num_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_le_num_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_ld_raw_bytes_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_eq_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_get_gt_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_ne_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_gt_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_lt_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_ge_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_not_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_lsh_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_rsh_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_add_tests);
+    // TIP(Rafael): Kryptos multi-precision stuff uses 2's complement to express negative numbers
+    //              so it is important to ensure that it is working before testing subtraction.
+    KUTE_RUN_TEST(kryptos_poly1305_inv_cmplt_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_sub_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_mul_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_mul_digit_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_div_tests);
+
+    KUTE_RUN_TEST(kryptos_poly1305_basic_tests);
+
+    //KUTE_RUN_TEST(kryptos_poly1305_tests);
 
     KUTE_RUN_TEST(kryptos_do_hkdf_tests);
     KUTE_RUN_TEST(kryptos_hkdf_macro_tests);

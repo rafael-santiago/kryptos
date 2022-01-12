@@ -5,93 +5,94 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#include "poly1305_tests.h"
-#include "test_vectors.h"
+#include <poly1305_tests.h>
+//#include "test_vectors.h"
 #include <kryptos.h>
 
+/*
 #if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_POLY1305_TESTS)
-CUTE_DECLARE_TEST_CASE(kryptos_arc4_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_seal_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_rabbit_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_salsa20_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_chacha20_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_des_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_idea_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_blowfish_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_feal_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_rc2_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_rc5_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_rc6_128_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_rc6_192_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_rc6_256_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_camellia128_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_camellia192_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_camellia256_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_cast5_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_saferk64_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_aes128_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_aes192_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_aes256_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_serpent_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_triple_des_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_triple_des_ede_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_tea_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_xtea_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_misty1_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_mars128_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_mars192_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_mars256_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_present80_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_present128_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_shacal1_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_shacal2_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_noekeon_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_noekeon_d_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_gost_ds_poly1305_tests);
-CUTE_DECLARE_TEST_CASE(kryptos_gost_poly1305_tests);
-#endif // defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_POLY1305_TESTS)
+KUTE_DECLARE_TEST_CASE(kryptos_arc4_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_seal_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_rabbit_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_salsa20_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_chacha20_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_des_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_idea_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_blowfish_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_feal_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_rc2_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_rc5_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_rc6_128_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_rc6_192_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_rc6_256_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_camellia128_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_camellia192_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_camellia256_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_cast5_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_saferk64_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_aes128_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_aes192_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_aes256_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_serpent_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_triple_des_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_triple_des_ede_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_tea_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_xtea_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_misty1_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_mars128_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_mars192_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_mars256_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_present80_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_present128_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_shacal1_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_shacal2_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_noekeon_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_noekeon_d_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_gost_ds_poly1305_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_gost_poly1305_tests);
+#endif // defined(KRYPTOS_C99)
 
-CUTE_TEST_CASE_SUITE(kryptos_poly1305_tests)
+KUTE_TEST_CASE_SUITE(kryptos_poly1305_tests)
 #if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_POLY1305_TESTS)
-    CUTE_RUN_TEST(kryptos_arc4_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_seal_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_rabbit_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_salsa20_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_chacha20_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_des_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_idea_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_blowfish_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_feal_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_rc2_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_rc5_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_rc6_128_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_rc6_192_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_rc6_256_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_camellia128_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_camellia192_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_camellia256_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_cast5_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_saferk64_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_aes128_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_aes192_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_aes256_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_serpent_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_triple_des_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_triple_des_ede_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_tea_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_xtea_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_misty1_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_mars128_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_mars192_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_mars256_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_present80_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_present128_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_shacal1_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_shacal2_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_noekeon_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_noekeon_d_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_gost_ds_poly1305_tests);
-    CUTE_RUN_TEST(kryptos_gost_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_arc4_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_seal_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_rabbit_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_salsa20_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_chacha20_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_des_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_idea_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_blowfish_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_feal_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_rc2_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_rc5_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_rc6_128_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_rc6_192_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_rc6_256_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_camellia128_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_camellia192_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_camellia256_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_cast5_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_saferk64_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_aes128_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_aes192_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_aes256_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_serpent_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_triple_des_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_triple_des_ede_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_tea_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_xtea_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_misty1_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_mars128_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_mars192_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_mars256_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_present80_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_present128_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_shacal1_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_shacal2_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_noekeon_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_noekeon_d_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_gost_ds_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_gost_poly1305_tests);
 #else
 # if !defined(KRYPTOS_NO_POLY1305_TESTS)
     printf("WARN: This test runs only when libkryptos is compiled with C99 support. It will be skipped.\n");
@@ -99,9 +100,10 @@ CUTE_TEST_CASE_SUITE(kryptos_poly1305_tests)
     printf("WARN: You have requested build this binary without the Poly1305 tests.\n");
 # endif // !defined(KRYPTOS_NO_POLY1305_TESTS)
 #endif // defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_POLY1305_TESTS)
-CUTE_TEST_CASE_SUITE_END
+KUTE_TEST_CASE_SUITE_END
+*/
 
-CUTE_TEST_CASE(kryptos_poly1305_basic_tests)
+KUTE_TEST_CASE(kryptos_poly1305_basic_tests)
     struct test_ctx {
         kryptos_u8_t *key;
         size_t key_size;
@@ -127,45 +129,45 @@ CUTE_TEST_CASE(kryptos_poly1305_basic_tests)
         kryptos_task_set_encrypt_action(ktask);
 
         kryptos_poly1305(&ktask);
-        CUTE_ASSERT(ktask->result == kKryptosPOLY1305Error);
-        CUTE_ASSERT(ktask->result_verbose != NULL);
-        CUTE_ASSERT(strcmp(ktask->result_verbose, "No message to tag at output buffer.") == 0);
+        KUTE_ASSERT(ktask->result == kKryptosPOLY1305Error);
+        KUTE_ASSERT(ktask->result_verbose != NULL);
+        KUTE_ASSERT(strcmp(ktask->result_verbose, "No message to tag at output buffer.") == 0);
 
         ktask->out = (kryptos_u8_t *)kryptos_newseg(test->msg_size);
-        CUTE_ASSERT(ktask->out != NULL);
+        KUTE_ASSERT(ktask->out != NULL);
         memcpy(ktask->out, test->msg, test->msg_size);
         ktask->out_size = test->msg_size;
 
         kryptos_poly1305(&ktask);
-        CUTE_ASSERT(ktask->result == kKryptosPOLY1305Error);
-        CUTE_ASSERT(ktask->result_verbose != NULL);
-        CUTE_ASSERT(strcmp(ktask->result_verbose, "No key to authenticate.") == 0);
+        KUTE_ASSERT(ktask->result == kKryptosPOLY1305Error);
+        KUTE_ASSERT(ktask->result_verbose != NULL);
+        KUTE_ASSERT(strcmp(ktask->result_verbose, "No key to authenticate.") == 0);
 
         ktask->key = test->key;
         ktask->key_size = test->key_size;
 
         kryptos_poly1305(&ktask);
-        CUTE_ASSERT(ktask->result == kKryptosSuccess);
+        KUTE_ASSERT(ktask->result == kKryptosSuccess);
 
-        CUTE_ASSERT(ktask->out_size == test->tag_size + test->msg_size);
-        CUTE_ASSERT(ktask->out != NULL);
-        CUTE_ASSERT(memcmp(ktask->out, test->tag, test->tag_size) == 0);
+        KUTE_ASSERT(ktask->out_size == test->tag_size + test->msg_size);
+        KUTE_ASSERT(ktask->out != NULL);
+        KUTE_ASSERT(memcmp(ktask->out, test->tag, test->tag_size) == 0);
 
         kryptos_task_set_decrypt_action(ktask);
 
         ktask->in = NULL;
         ktask->in_size = 0;
         kryptos_poly1305(&ktask);
-        CUTE_ASSERT(ktask->result == kKryptosPOLY1305Error);
-        CUTE_ASSERT(ktask->result_verbose != NULL);
-        CUTE_ASSERT(strcmp(ktask->result_verbose, "No message to verify.") == 0);
+        KUTE_ASSERT(ktask->result == kKryptosPOLY1305Error);
+        KUTE_ASSERT(ktask->result_verbose != NULL);
+        KUTE_ASSERT(strcmp(ktask->result_verbose, "No message to verify.") == 0);
 
         ktask->in = ktask->out;
         ktask->in_size = 16;
         kryptos_poly1305(&ktask);
-        CUTE_ASSERT(ktask->result == kKryptosPOLY1305Error);
-        CUTE_ASSERT(ktask->result_verbose != NULL);
-        CUTE_ASSERT(strcmp(ktask->result_verbose, "Message buffer seems to be incomplete.") == 0);
+        KUTE_ASSERT(ktask->result == kKryptosPOLY1305Error);
+        KUTE_ASSERT(ktask->result_verbose != NULL);
+        KUTE_ASSERT(strcmp(ktask->result_verbose, "Message buffer seems to be incomplete.") == 0);
 
         ktask->in_size = ktask->out_size;
         ktask->out = NULL;
@@ -174,36 +176,37 @@ CUTE_TEST_CASE(kryptos_poly1305_basic_tests)
         ktask->key = NULL;
         ktask->key_size = 0;
         kryptos_poly1305(&ktask);
-        CUTE_ASSERT(ktask->result == kKryptosPOLY1305Error);
-        CUTE_ASSERT(ktask->result_verbose != NULL);
-        CUTE_ASSERT(strcmp(ktask->result_verbose, "No key to authenticate.") == 0);
+        KUTE_ASSERT(ktask->result == kKryptosPOLY1305Error);
+        KUTE_ASSERT(ktask->result_verbose != NULL);
+        KUTE_ASSERT(strcmp(ktask->result_verbose, "No key to authenticate.") == 0);
         ktask->key = test->key;
         ktask->key_size = test->key_size;
 
         kryptos_poly1305(&ktask);
-        CUTE_ASSERT(ktask->result == kKryptosSuccess);
+        KUTE_ASSERT(ktask->result == kKryptosSuccess);
 
-        CUTE_ASSERT(ktask->in_size == test->msg_size);
-        CUTE_ASSERT(ktask->in != NULL);
-        CUTE_ASSERT(memcmp(ktask->in, test->msg, ktask->in_size) == 0);
+        KUTE_ASSERT(ktask->in_size == test->msg_size);
+        KUTE_ASSERT(ktask->in != NULL);
+        KUTE_ASSERT(memcmp(ktask->in, test->msg, ktask->in_size) == 0);
 
         kryptos_task_free(ktask, KRYPTOS_TASK_IN);
 
         test++;
     }
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
+/*
 #if !defined(KRYPTOS_NO_POLY1305_TESTS)
 
-CUTE_TEST_CASE(kryptos_arc4_poly1305_tests)
+KUTE_TEST_CASE(kryptos_arc4_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305Arc4Test";
     size_t key_size = strlen(key);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, arc4, key, key_size);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_seal_poly1305_tests)
+KUTE_TEST_CASE(kryptos_seal_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305SealTest";
@@ -218,17 +221,17 @@ CUTE_TEST_CASE(kryptos_seal_poly1305_tests)
     seal_version = kKryptosSEAL30;
 
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, seal, key, key_size, &seal_version, &seal_l, &seal_n);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_rabbit_poly1305_tests)
+KUTE_TEST_CASE(kryptos_rabbit_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "QueHaVelho?!";
     size_t key_size = strlen(key);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rabbit, key, key_size, NULL);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_salsa20_poly1305_tests)
+KUTE_TEST_CASE(kryptos_salsa20_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305Salsa20Test.............";
@@ -236,9 +239,9 @@ CUTE_TEST_CASE(kryptos_salsa20_poly1305_tests)
     kryptos_u8_t *nonce = "1234578";
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, salsa20, key, key_size, NULL);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, salsa20, key, key_size, nonce);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_chacha20_poly1305_tests)
+KUTE_TEST_CASE(kryptos_chacha20_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305ChaCha20Test............";
@@ -246,9 +249,9 @@ CUTE_TEST_CASE(kryptos_chacha20_poly1305_tests)
     kryptos_u8_t *nonce = "1234567890..";
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, chacha20, key, key_size, NULL, NULL);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, chacha20, key, key_size, nonce, NULL);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_des_poly1305_tests)
+KUTE_TEST_CASE(kryptos_des_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305DesTest";
@@ -257,9 +260,9 @@ CUTE_TEST_CASE(kryptos_des_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, des, key, key_size, kKryptosCBC);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, des, key, key_size, kKryptosOFB);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, des, key, key_size, kKryptosCTR);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_idea_poly1305_tests)
+KUTE_TEST_CASE(kryptos_idea_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305IdeaTest";
@@ -268,9 +271,9 @@ CUTE_TEST_CASE(kryptos_idea_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, idea, key, key_size, kKryptosCBC);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, idea, key, key_size, kKryptosOFB);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, idea, key, key_size, kKryptosCTR);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_blowfish_poly1305_tests)
+KUTE_TEST_CASE(kryptos_blowfish_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305BlowfishTest";
@@ -279,9 +282,9 @@ CUTE_TEST_CASE(kryptos_blowfish_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, blowfish, key, key_size, kKryptosCBC);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, blowfish, key, key_size, kKryptosOFB);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, blowfish, key, key_size, kKryptosCTR);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_feal_poly1305_tests)
+KUTE_TEST_CASE(kryptos_feal_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305FealTest";
@@ -291,9 +294,9 @@ CUTE_TEST_CASE(kryptos_feal_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, feal, key, key_size, kKryptosCBC, &feal_rounds);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, feal, key, key_size, kKryptosOFB, &feal_rounds);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, feal, key, key_size, kKryptosCTR, &feal_rounds);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_rc2_poly1305_tests)
+KUTE_TEST_CASE(kryptos_rc2_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305RC2Test";
@@ -303,9 +306,9 @@ CUTE_TEST_CASE(kryptos_rc2_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc2, key, key_size, kKryptosCBC, &rc2_t1);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc2, key, key_size, kKryptosOFB, &rc2_t1);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc2, key, key_size, kKryptosCTR, &rc2_t1);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_rc5_poly1305_tests)
+KUTE_TEST_CASE(kryptos_rc5_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305RC5Test";
@@ -315,9 +318,9 @@ CUTE_TEST_CASE(kryptos_rc5_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc5, key, key_size, kKryptosCBC, &rc5_rounds);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc5, key, key_size, kKryptosOFB, &rc5_rounds);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc5, key, key_size, kKryptosCTR, &rc5_rounds);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_rc6_128_poly1305_tests)
+KUTE_TEST_CASE(kryptos_rc6_128_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305RC6Test";
@@ -329,9 +332,9 @@ CUTE_TEST_CASE(kryptos_rc6_128_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_128, key, key_size, kKryptosCTR, &rc6_rounds);
     // INFO(Rafael): Overstated but possible so let's test.
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_128, key, key_size, kKryptosGCM, &rc6_rounds);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_rc6_192_poly1305_tests)
+KUTE_TEST_CASE(kryptos_rc6_192_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305RC6Test";
@@ -344,9 +347,9 @@ CUTE_TEST_CASE(kryptos_rc6_192_poly1305_tests)
     // INFO(Rafael): Overstated but possible so let's test.
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_192, key, key_size, kKryptosGCM, &rc6_rounds);
 
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_rc6_256_poly1305_tests)
+KUTE_TEST_CASE(kryptos_rc6_256_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305RC6Test";
@@ -358,9 +361,9 @@ CUTE_TEST_CASE(kryptos_rc6_256_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_256, key, key_size, kKryptosCTR, &rc6_rounds);
     // INFO(Rafael): Overstated but possible so let's test.
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_256, key, key_size, kKryptosGCM, &rc6_rounds);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_camellia128_poly1305_tests)
+KUTE_TEST_CASE(kryptos_camellia128_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305CamelliaTest";
@@ -371,9 +374,9 @@ CUTE_TEST_CASE(kryptos_camellia128_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia128, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia128, key, key_size, kKryptosGCM);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_camellia192_poly1305_tests)
+KUTE_TEST_CASE(kryptos_camellia192_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305CamelliaTest";
@@ -384,9 +387,9 @@ CUTE_TEST_CASE(kryptos_camellia192_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia192, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia192, key, key_size, kKryptosGCM);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_camellia256_poly1305_tests)
+KUTE_TEST_CASE(kryptos_camellia256_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305CamelliaTest";
@@ -397,9 +400,9 @@ CUTE_TEST_CASE(kryptos_camellia256_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia256, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia256, key, key_size, kKryptosGCM);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_cast5_poly1305_tests)
+KUTE_TEST_CASE(kryptos_cast5_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305Cast5Test";
@@ -408,9 +411,9 @@ CUTE_TEST_CASE(kryptos_cast5_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, cast5, key, key_size, kKryptosCBC);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, cast5, key, key_size, kKryptosOFB);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, cast5, key, key_size, kKryptosCTR);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_saferk64_poly1305_tests)
+KUTE_TEST_CASE(kryptos_saferk64_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305SaferK64Test";
@@ -420,9 +423,9 @@ CUTE_TEST_CASE(kryptos_saferk64_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, saferk64, key, key_size, kKryptosCBC, &rounds_nr);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, saferk64, key, key_size, kKryptosOFB, &rounds_nr);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, saferk64, key, key_size, kKryptosCTR, &rounds_nr);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_aes128_poly1305_tests)
+KUTE_TEST_CASE(kryptos_aes128_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305AESTest";
@@ -433,9 +436,9 @@ CUTE_TEST_CASE(kryptos_aes128_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes128, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes128, key, key_size, kKryptosGCM);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_aes192_poly1305_tests)
+KUTE_TEST_CASE(kryptos_aes192_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305AESTest";
@@ -446,9 +449,9 @@ CUTE_TEST_CASE(kryptos_aes192_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes192, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes192, key, key_size, kKryptosGCM);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_aes256_poly1305_tests)
+KUTE_TEST_CASE(kryptos_aes256_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305AESTest";
@@ -459,9 +462,9 @@ CUTE_TEST_CASE(kryptos_aes256_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes256, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes256, key, key_size, kKryptosGCM);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_serpent_poly1305_tests)
+KUTE_TEST_CASE(kryptos_serpent_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305SerpentTest";
@@ -472,9 +475,9 @@ CUTE_TEST_CASE(kryptos_serpent_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, serpent, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, serpent, key, key_size, kKryptosGCM);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_triple_des_poly1305_tests)
+KUTE_TEST_CASE(kryptos_triple_des_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key[3] = {
@@ -495,9 +498,9 @@ CUTE_TEST_CASE(kryptos_triple_des_poly1305_tests)
                                kKryptosOFB, key[1], &key_size[1], key[2], &key_size[2]);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, triple_des, key[0], key_size[0],
                                kKryptosCTR, key[1], &key_size[1], key[2], &key_size[2]);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_triple_des_ede_poly1305_tests)
+KUTE_TEST_CASE(kryptos_triple_des_ede_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key[3] = {
@@ -518,9 +521,9 @@ CUTE_TEST_CASE(kryptos_triple_des_ede_poly1305_tests)
                                kKryptosOFB, key[1], &key_size[1], key[2], &key_size[2]);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, triple_des_ede, key[0], key_size[0],
                                kKryptosCTR, key[1], &key_size[1], key[2], &key_size[2]);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_tea_poly1305_tests)
+KUTE_TEST_CASE(kryptos_tea_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305TEATest.";
@@ -529,9 +532,9 @@ CUTE_TEST_CASE(kryptos_tea_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, tea, key, key_size, kKryptosCBC);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, tea, key, key_size, kKryptosOFB);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, tea, key, key_size, kKryptosCTR);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_xtea_poly1305_tests)
+KUTE_TEST_CASE(kryptos_xtea_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305XTEATest";
@@ -541,9 +544,9 @@ CUTE_TEST_CASE(kryptos_xtea_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, xtea, key, key_size, kKryptosCBC, &rounds_total);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, xtea, key, key_size, kKryptosOFB, &rounds_total);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, xtea, key, key_size, kKryptosCTR, &rounds_total);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_misty1_poly1305_tests)
+KUTE_TEST_CASE(kryptos_misty1_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305Misty1Test";
@@ -552,9 +555,9 @@ CUTE_TEST_CASE(kryptos_misty1_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, misty1, key, key_size, kKryptosCBC);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, misty1, key, key_size, kKryptosOFB);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, misty1, key, key_size, kKryptosCTR);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_mars128_poly1305_tests)
+KUTE_TEST_CASE(kryptos_mars128_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305MarsTest";
@@ -565,9 +568,9 @@ CUTE_TEST_CASE(kryptos_mars128_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars128, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars128, key, key_size, kKryptosGCM);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_mars192_poly1305_tests)
+KUTE_TEST_CASE(kryptos_mars192_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305MarsTest";
@@ -578,9 +581,9 @@ CUTE_TEST_CASE(kryptos_mars192_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars192, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars192, key, key_size, kKryptosGCM);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_mars256_poly1305_tests)
+KUTE_TEST_CASE(kryptos_mars256_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305MarsTest";
@@ -591,9 +594,9 @@ CUTE_TEST_CASE(kryptos_mars256_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars256, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars256, key, key_size, kKryptosGCM);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_present80_poly1305_tests)
+KUTE_TEST_CASE(kryptos_present80_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305Present80Test";
@@ -602,9 +605,9 @@ CUTE_TEST_CASE(kryptos_present80_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, present80, key, key_size, kKryptosCBC);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, present80, key, key_size, kKryptosOFB);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, present80, key, key_size, kKryptosCTR);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_present128_poly1305_tests)
+KUTE_TEST_CASE(kryptos_present128_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305Present128Test";
@@ -613,9 +616,9 @@ CUTE_TEST_CASE(kryptos_present128_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, present128, key, key_size, kKryptosCBC);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, present128, key, key_size, kKryptosOFB);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, present128, key, key_size, kKryptosCTR);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_shacal1_poly1305_tests)
+KUTE_TEST_CASE(kryptos_shacal1_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305Shacal-1Test";
@@ -624,9 +627,9 @@ CUTE_TEST_CASE(kryptos_shacal1_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, shacal1, key, key_size, kKryptosCBC);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, shacal1, key, key_size, kKryptosOFB);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, shacal1, key, key_size, kKryptosCTR);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_shacal2_poly1305_tests)
+KUTE_TEST_CASE(kryptos_shacal2_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305Shacal-2Test";
@@ -635,9 +638,9 @@ CUTE_TEST_CASE(kryptos_shacal2_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, shacal2, key, key_size, kKryptosCBC);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, shacal2, key, key_size, kKryptosOFB);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, shacal2, key, key_size, kKryptosCTR);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_noekeon_poly1305_tests)
+KUTE_TEST_CASE(kryptos_noekeon_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305NoekeonTest";
@@ -648,9 +651,9 @@ CUTE_TEST_CASE(kryptos_noekeon_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon, key, key_size, kKryptosGCM);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_noekeon_d_poly1305_tests)
+KUTE_TEST_CASE(kryptos_noekeon_d_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305Noekeon-DTest";
@@ -661,9 +664,9 @@ CUTE_TEST_CASE(kryptos_noekeon_d_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon_d, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon_d, key, key_size, kKryptosGCM);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_gost_ds_poly1305_tests)
+KUTE_TEST_CASE(kryptos_gost_ds_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305Gost-DsTest";
@@ -672,9 +675,9 @@ CUTE_TEST_CASE(kryptos_gost_ds_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost_ds, key, key_size, kKryptosCBC);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost_ds, key, key_size, kKryptosOFB);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost_ds, key, key_size, kKryptosCTR);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
-CUTE_TEST_CASE(kryptos_gost_poly1305_tests)
+KUTE_TEST_CASE(kryptos_gost_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
     kryptos_u8_t *key = "Poly1305GostTest";
@@ -707,6 +710,7 @@ CUTE_TEST_CASE(kryptos_gost_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost, key, key_size, kKryptosCBC, s1, s2, s3, s4, s5, s6, s7, s8);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost, key, key_size, kKryptosOFB, s1, s2, s3, s4, s5, s6, s7, s8);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost, key, key_size, kKryptosCTR, s1, s2, s3, s4, s5, s6, s7, s8);
-CUTE_TEST_CASE_END
+KUTE_TEST_CASE_END
 
 #endif // !defined(KRYPTOS_NO_POLY1305_TESTS)
+*/

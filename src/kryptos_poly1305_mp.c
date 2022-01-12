@@ -536,6 +536,8 @@ void kryptos_poly1305_le_bytes_to_num(kryptos_poly1305_number_t n, const kryptos
         p = (p + 1) % sizeof(kryptos_poly1305_numfrac_t);
         np += (p == 0);
     }
+
+    p = 0;
 }
 
 void kryptos_poly1305_ld_raw_bytes(kryptos_poly1305_number_t n, const kryptos_u8_t *bytes, const size_t bytes_nr) {
