@@ -6,11 +6,55 @@
  *
  */
 #include <poly1305_tests.h>
-//#include "test_vectors.h"
 #include <kryptos.h>
 
-/*
 #if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_POLY1305_TESTS)
+# define kryptos_run_poly1305_tests(t, plaintext, plaintext_size, data_size, cname, ...) {\
+    /*INFO(Rafael): Normal flow, no authentication error.*/\
+    kryptos_task_init_as_null(&t);\
+    kryptos_task_set_in(&t, plaintext, plaintext_size);\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_run_cipher_poly1305(cname, &t, __VA_ARGS__);\
+    KUTE_ASSERT(t.result == kKryptosSuccess);\
+    KUTE_ASSERT(t.out != NULL);\
+    KUTE_ASSERT(t.out_size > data_size);\
+    kryptos_task_set_in(&t, t.out, t.out_size);\
+    t.out = NULL;\
+    t.out_size = 0;\
+    kryptos_task_set_decrypt_action(&t);\
+    kryptos_run_cipher_poly1305(cname, &t, __VA_ARGS__);\
+    KUTE_ASSERT(t.result == kKryptosSuccess);\
+    KUTE_ASSERT(t.out != NULL);\
+    KUTE_ASSERT(t.out_size == plaintext_size);\
+    KUTE_ASSERT(memcmp(t.out, plaintext, t.out_size) == 0);\
+    if (strcmp(#cname, "salsa20") != 0 && strcmp(#cname, "chacha20") != 0) {\
+        kryptos_task_free(&t, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+    } else {\
+        kryptos_task_free(&t, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+    }\
+    /*INFO(Rafael): Copputed message flow.*/\
+    kryptos_task_init_as_null(&t);\
+    kryptos_task_set_in(&t, plaintext, plaintext_size);\
+    kryptos_task_set_encrypt_action(&t);\
+    kryptos_run_cipher_poly1305(cname, &t, __VA_ARGS__);\
+    KUTE_ASSERT(t.result == kKryptosSuccess);\
+    KUTE_ASSERT(t.out != NULL);\
+    KUTE_ASSERT(t.out_size > data_size);\
+    kryptos_task_set_in(&t, t.out, t.out_size);\
+    t.out[t.out_size >> 1] += 1;\
+    t.out = NULL;\
+    t.out_size = 0;\
+    kryptos_task_set_decrypt_action(&t);\
+    kryptos_run_cipher_poly1305(cname, &t, __VA_ARGS__);\
+    KUTE_ASSERT(t.result == kKryptosPOLY1305Error);\
+    KUTE_ASSERT(strcmp(t.result_verbose, "Corrupted data.") == 0);\
+    if (strcmp(#cname, "salsa20") != 0 && strcmp(#cname, "chacha20") != 0) {\
+        kryptos_task_free(&t, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+    } else {\
+        kryptos_task_free(&t, KRYPTOS_TASK_IN);\
+    }\
+}
+
 KUTE_DECLARE_TEST_CASE(kryptos_arc4_poly1305_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_seal_poly1305_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_rabbit_poly1305_tests);
@@ -51,11 +95,11 @@ KUTE_DECLARE_TEST_CASE(kryptos_noekeon_d_poly1305_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_gost_ds_poly1305_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_gost_poly1305_tests);
 #endif // defined(KRYPTOS_C99)
-*/
+
 
 KUTE_TEST_CASE(kryptos_poly1305_tests)
 #if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_POLY1305_TESTS)
-    /*KUTE_RUN_TEST(kryptos_arc4_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_arc4_poly1305_tests);
     KUTE_RUN_TEST(kryptos_seal_poly1305_tests);
     KUTE_RUN_TEST(kryptos_rabbit_poly1305_tests);
     KUTE_RUN_TEST(kryptos_salsa20_poly1305_tests);
@@ -93,7 +137,7 @@ KUTE_TEST_CASE(kryptos_poly1305_tests)
     KUTE_RUN_TEST(kryptos_noekeon_poly1305_tests);
     KUTE_RUN_TEST(kryptos_noekeon_d_poly1305_tests);
     KUTE_RUN_TEST(kryptos_gost_ds_poly1305_tests);
-    KUTE_RUN_TEST(kryptos_gost_poly1305_tests);*/
+    KUTE_RUN_TEST(kryptos_gost_poly1305_tests);
 #else
 # if !defined(KRYPTOS_NO_POLY1305_TESTS)
 #  if defined(__FreeBSD__) || defined(__NetBSD__)
@@ -205,32 +249,33 @@ KUTE_TEST_CASE(kryptos_poly1305_basic_tests)
     }
 KUTE_TEST_CASE_END
 
-/*
 #if !defined(KRYPTOS_NO_POLY1305_TESTS)
 
 KUTE_TEST_CASE(kryptos_arc4_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305Arc4Test";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, arc4, key, key_size);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, arc4, key, key_size);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_seal_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305SealTest";
     size_t key_size = strlen(key);
     size_t seal_n = 0, seal_l = 1024;
     kryptos_seal_version_t seal_version = kKryptosSEAL20;
 
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, seal, key, key_size, &seal_version, &seal_l, &seal_n);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, seal, key, key_size, &seal_version, &seal_l, &seal_n);
 
     seal_n = 0;
     seal_l = 2048;
     seal_version = kKryptosSEAL30;
 
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, seal, key, key_size, &seal_version, &seal_l, &seal_n);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, seal, key, key_size, &seal_version, &seal_l, &seal_n);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rabbit_poly1305_tests)
@@ -243,253 +288,274 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_salsa20_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305Salsa20Test.............";
     size_t key_size = strlen(key);
     kryptos_u8_t *nonce = "1234578";
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, salsa20, key, key_size, NULL);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, salsa20, key, key_size, nonce);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, salsa20, key, key_size, NULL);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, salsa20, key, key_size, nonce);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_chacha20_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305ChaCha20Test............";
     size_t key_size = strlen(key);
     kryptos_u8_t *nonce = "1234567890..";
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, chacha20, key, key_size, NULL, NULL);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, chacha20, key, key_size, nonce, NULL);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, chacha20, key, key_size, NULL, NULL);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, chacha20, key, key_size, nonce, NULL);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_des_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305DesTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, des, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, des, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, des, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, des, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, des, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, des, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, des, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, des, key, key_size, kKryptosCTR);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_idea_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305IdeaTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, idea, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, idea, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, idea, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, idea, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, idea, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, idea, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, idea, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, idea, key, key_size, kKryptosCTR);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_blowfish_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305BlowfishTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, blowfish, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, blowfish, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, blowfish, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, blowfish, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, blowfish, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, blowfish, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, blowfish, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, blowfish, key, key_size, kKryptosCTR);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_feal_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305FealTest";
     int feal_rounds = 16;
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, feal, key, key_size, kKryptosECB, &feal_rounds);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, feal, key, key_size, kKryptosCBC, &feal_rounds);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, feal, key, key_size, kKryptosOFB, &feal_rounds);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, feal, key, key_size, kKryptosCTR, &feal_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, feal, key, key_size, kKryptosECB, &feal_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, feal, key, key_size, kKryptosCBC, &feal_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, feal, key, key_size, kKryptosOFB, &feal_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, feal, key, key_size, kKryptosCTR, &feal_rounds);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc2_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305RC2Test";
     size_t key_size = strlen(key);
     int rc2_t1 = 128;
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc2, key, key_size, kKryptosECB, &rc2_t1);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc2, key, key_size, kKryptosCBC, &rc2_t1);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc2, key, key_size, kKryptosOFB, &rc2_t1);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc2, key, key_size, kKryptosCTR, &rc2_t1);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc2, key, key_size, kKryptosECB, &rc2_t1);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc2, key, key_size, kKryptosCBC, &rc2_t1);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc2, key, key_size, kKryptosOFB, &rc2_t1);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc2, key, key_size, kKryptosCTR, &rc2_t1);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc5_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305RC5Test";
     size_t key_size = strlen(key);
     int rc5_rounds = 32;
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc5, key, key_size, kKryptosECB, &rc5_rounds);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc5, key, key_size, kKryptosCBC, &rc5_rounds);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc5, key, key_size, kKryptosOFB, &rc5_rounds);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc5, key, key_size, kKryptosCTR, &rc5_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc5, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc5, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc5, key, key_size, kKryptosOFB, &rc5_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc5, key, key_size, kKryptosCTR, &rc5_rounds);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc6_128_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305RC6Test";
     size_t key_size = strlen(key);
     int rc6_rounds = 40;
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_128, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_128, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_128, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_128, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc6_128, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc6_128, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc6_128, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc6_128, key, key_size, kKryptosCTR, &rc6_rounds);
     // INFO(Rafael): Overstated but possible so let's test.
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_128, key, key_size, kKryptosGCM, &rc6_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc6_128, key, key_size, kKryptosGCM, &rc6_rounds);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc6_192_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305RC6Test";
     size_t key_size = strlen(key);
     int rc6_rounds = 40;
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_192, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_192, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_192, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_192, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc6_192, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc6_192, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc6_192, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc6_192, key, key_size, kKryptosCTR, &rc6_rounds);
     // INFO(Rafael): Overstated but possible so let's test.
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_192, key, key_size, kKryptosGCM, &rc6_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc6_192, key, key_size, kKryptosGCM, &rc6_rounds);
 
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc6_256_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305RC6Test";
     size_t key_size = strlen(key);
     int rc6_rounds = 40;
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_256, key, key_size, kKryptosECB, &rc6_rounds);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_256, key, key_size, kKryptosCBC, &rc6_rounds);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_256, key, key_size, kKryptosOFB, &rc6_rounds);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_256, key, key_size, kKryptosCTR, &rc6_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc6_256, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc6_256, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc6_256, key, key_size, kKryptosOFB, &rc6_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc6_256, key, key_size, kKryptosCTR, &rc6_rounds);
     // INFO(Rafael): Overstated but possible so let's test.
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rc6_256, key, key_size, kKryptosGCM, &rc6_rounds);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rc6_256, key, key_size, kKryptosGCM, &rc6_rounds);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_camellia128_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305CamelliaTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia128, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia128, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia128, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia128, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size camellia128, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia128, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia128, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia128, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia128, key, key_size, kKryptosGCM);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia128, key, key_size, kKryptosGCM);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_camellia192_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305CamelliaTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia192, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia192, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia192, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia192, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia192, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia192, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia192, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia192, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia192, key, key_size, kKryptosGCM);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia192, key, key_size, kKryptosGCM);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_camellia256_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305CamelliaTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia256, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia256, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia256, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia256, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia256, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia256, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia256, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia256, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, camellia256, key, key_size, kKryptosGCM);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia256, key, key_size, kKryptosGCM);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_cast5_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305Cast5Test";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, cast5, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, cast5, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, cast5, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, cast5, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, cast5, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, cast5, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, cast5, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, cast5, key, key_size, kKryptosCTR);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_saferk64_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305SaferK64Test";
     size_t key_size = strlen(key);
     int rounds_nr = 32;
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, saferk64, key, key_size, kKryptosECB, &rounds_nr);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, saferk64, key, key_size, kKryptosCBC, &rounds_nr);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, saferk64, key, key_size, kKryptosOFB, &rounds_nr);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, saferk64, key, key_size, kKryptosCTR, &rounds_nr);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, saferk64, key, key_size, kKryptosECB, &rounds_nr);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, saferk64, key, key_size, kKryptosCBC, &rounds_nr);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, saferk64, key, key_size, kKryptosOFB, &rounds_nr);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, saferk64, key, key_size, kKryptosCTR, &rounds_nr);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_aes128_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305AESTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes128, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes128, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes128, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes128, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, aes128, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, aes128, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, aes128, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, aes128, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes128, key, key_size, kKryptosGCM);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, aes128, key, key_size, kKryptosGCM);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_aes192_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305AESTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes192, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes192, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes192, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes192, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, aes192, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, aes192, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, aes192, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, aes192, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes192, key, key_size, kKryptosGCM);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, aes192, key, key_size, kKryptosGCM);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_aes256_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305AESTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes256, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes256, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes256, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes256, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, aes256, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, aes256, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, aes256, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, aes256, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, aes256, key, key_size, kKryptosGCM);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, aes256, key, key_size, kKryptosGCM);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_serpent_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305SerpentTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, serpent, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, serpent, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, serpent, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, serpent, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, serpent, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, serpent, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, serpent, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, serpent, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, serpent, key, key_size, kKryptosGCM);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, serpent, key, key_size, kKryptosGCM);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_triple_des_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key[3] = {
         "Poly1305DesITest",
         "Poly1305DesIITest",
@@ -500,19 +566,20 @@ KUTE_TEST_CASE(kryptos_triple_des_poly1305_tests)
         strlen(key[1]),
         strlen(key[2])
     };
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, triple_des, key[0], key_size[0],
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, triple_des, key[0], key_size[0],
                                kKryptosECB, key[1], &key_size[1], key[2], &key_size[2]);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, triple_des, key[0], key_size[0],
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, triple_des, key[0], key_size[0],
                                kKryptosCBC, key[1], &key_size[1], key[2], &key_size[2]);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, triple_des, key[0], key_size[0],
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, triple_des, key[0], key_size[0],
                                kKryptosOFB, key[1], &key_size[1], key[2], &key_size[2]);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, triple_des, key[0], key_size[0],
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, triple_des, key[0], key_size[0],
                                kKryptosCTR, key[1], &key_size[1], key[2], &key_size[2]);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_triple_des_ede_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key[3] = {
         "Poly1305DesEDEITest",
         "Poly1305DesEDEIITest",
@@ -523,173 +590,187 @@ KUTE_TEST_CASE(kryptos_triple_des_ede_poly1305_tests)
         strlen(key[1]),
         strlen(key[2])
     };
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, triple_des, key[0], key_size[0],
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, triple_des, key[0], key_size[0],
                                kKryptosECB, key[1], &key_size[1], key[2], &key_size[2]);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, triple_des_ede, key[0], key_size[0],
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, triple_des_ede, key[0], key_size[0],
                                kKryptosCBC, key[1], &key_size[1], key[2], &key_size[2]);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, triple_des_ede, key[0], key_size[0],
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, triple_des_ede, key[0], key_size[0],
                                kKryptosOFB, key[1], &key_size[1], key[2], &key_size[2]);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, triple_des_ede, key[0], key_size[0],
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, triple_des_ede, key[0], key_size[0],
                                kKryptosCTR, key[1], &key_size[1], key[2], &key_size[2]);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_tea_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305TEATest.";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, tea, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, tea, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, tea, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, tea, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, tea, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, tea, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, tea, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, tea, key, key_size, kKryptosCTR);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_xtea_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305XTEATest";
     size_t key_size = strlen(key);
     int rounds_total = 48;
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, xtea, key, key_size, kKryptosECB, &rounds_total);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, xtea, key, key_size, kKryptosCBC, &rounds_total);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, xtea, key, key_size, kKryptosOFB, &rounds_total);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, xtea, key, key_size, kKryptosCTR, &rounds_total);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, xtea, key, key_size, kKryptosECB, &rounds_total);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, xtea, key, key_size, kKryptosCBC, &rounds_total);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, xtea, key, key_size, kKryptosOFB, &rounds_total);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, xtea, key, key_size, kKryptosCTR, &rounds_total);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_misty1_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305Misty1Test";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, misty1, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, misty1, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, misty1, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, misty1, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, misty1, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, misty1, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, misty1, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, misty1, key, key_size, kKryptosCTR);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mars128_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305MarsTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars128, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars128, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars128, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars128, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, mars128, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, mars128, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, mars128, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, mars128, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars128, key, key_size, kKryptosGCM);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, mars128, key, key_size, kKryptosGCM);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mars192_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305MarsTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars192, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars192, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars192, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars192, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, mars192, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, mars192, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, mars192, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, mars192, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars192, key, key_size, kKryptosGCM);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, mars192, key, key_size, kKryptosGCM);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mars256_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305MarsTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars256, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars256, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars256, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars256, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, mars256, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, mars256, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, mars256, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, mars256, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, mars256, key, key_size, kKryptosGCM);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, mars256, key, key_size, kKryptosGCM);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_present80_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305Present80Test";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, present80, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, present80, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, present80, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, present80, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, present80, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, present80, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, present80, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, present80, key, key_size, kKryptosCTR);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_present128_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305Present128Test";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, present128, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, present128, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, present128, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, present128, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, present128, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, present128, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, present128, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, present128, key, key_size, kKryptosCTR);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_shacal1_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305Shacal-1Test";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, shacal1, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, shacal1, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, shacal1, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, shacal1, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, shacal1, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, shacal1, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, shacal1, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, shacal1, key, key_size, kKryptosCTR);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_shacal2_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305Shacal-2Test";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, shacal2, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, shacal2, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, shacal2, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, shacal2, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, shacal2, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, shacal2, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, shacal2, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, shacal2, key, key_size, kKryptosCTR);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_noekeon_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305NoekeonTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, noekeon, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, noekeon, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, noekeon, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, noekeon, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon, key, key_size, kKryptosGCM);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, noekeon, key, key_size, kKryptosGCM);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_noekeon_d_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305Noekeon-DTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon_d, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon_d, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon_d, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon_d, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, noekeon_d, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, noekeon_d, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, noekeon_d, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, noekeon_d, key, key_size, kKryptosCTR);
     // INFO(Rafael): Overstated but possible so let's test.
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon_d, key, key_size, kKryptosGCM);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, noekeon_d, key, key_size, kKryptosGCM);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_gost_ds_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305Gost-DsTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost_ds, key, key_size, kKryptosECB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost_ds, key, key_size, kKryptosCBC);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost_ds, key, key_size, kKryptosOFB);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost_ds, key, key_size, kKryptosCTR);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, gost_ds, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, gost_ds, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, gost_ds, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, gost_ds, key, key_size, kKryptosCTR);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_gost_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305GostTest";
     size_t key_size = strlen(key);
     kryptos_u8_t s1[16] = {
@@ -716,11 +797,10 @@ KUTE_TEST_CASE(kryptos_gost_poly1305_tests)
     kryptos_u8_t s8[16] = {
          1, 15, 13,  0,  5,  7, 10,  4,  9,  2,  3, 14,  6, 11,  8, 12
     };
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost, key, key_size, kKryptosECB, s1, s2, s3, s4, s5, s6, s7, s8);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost, key, key_size, kKryptosCBC, s1, s2, s3, s4, s5, s6, s7, s8);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost, key, key_size, kKryptosOFB, s1, s2, s3, s4, s5, s6, s7, s8);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost, key, key_size, kKryptosCTR, s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, gost, key, key_size, kKryptosECB, s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, gost, key, key_size, kKryptosCBC, s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, gost, key, key_size, kKryptosOFB, s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, gost, key, key_size, kKryptosCTR, s1, s2, s3, s4, s5, s6, s7, s8);
 KUTE_TEST_CASE_END
 
 #endif // !defined(KRYPTOS_NO_POLY1305_TESTS)
-*/
