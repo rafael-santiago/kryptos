@@ -9,7 +9,7 @@
 #include <kryptos.h>
 
 #if defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_POLY1305_TESTS)
-# define kryptos_run_poly1305_tests(t, plaintext, plaintext_size, data_size, cname, ...) {\
+# define kryptos_run_poly1305_tests(t, plaintext, plaintext_size, cname, ...) {\
     /*INFO(Rafael): Normal flow, no authentication error.*/\
     kryptos_task_init_as_null(&t);\
     kryptos_task_set_in(&t, plaintext, plaintext_size);\
@@ -17,7 +17,7 @@
     kryptos_run_cipher_poly1305(cname, &t, __VA_ARGS__);\
     KUTE_ASSERT(t.result == kKryptosSuccess);\
     KUTE_ASSERT(t.out != NULL);\
-    KUTE_ASSERT(t.out_size > data_size);\
+    KUTE_ASSERT(t.out_size > plaintext_size);\
     kryptos_task_set_in(&t, t.out, t.out_size);\
     t.out = NULL;\
     t.out_size = 0;\
@@ -39,7 +39,7 @@
     kryptos_run_cipher_poly1305(cname, &t, __VA_ARGS__);\
     KUTE_ASSERT(t.result == kKryptosSuccess);\
     KUTE_ASSERT(t.out != NULL);\
-    KUTE_ASSERT(t.out_size > data_size);\
+    KUTE_ASSERT(t.out_size > plaintext_size);\
     kryptos_task_set_in(&t, t.out, t.out_size);\
     t.out[t.out_size >> 1] += 1;\
     t.out = NULL;\
@@ -280,10 +280,11 @@ KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rabbit_poly1305_tests)
     kryptos_task_ctx t;
-    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *plaintext = "'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
+    size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "QueHaVelho?!";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, rabbit, key, key_size, NULL);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, rabbit, key, key_size, NULL);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_salsa20_poly1305_tests)
@@ -435,7 +436,7 @@ KUTE_TEST_CASE(kryptos_camellia128_poly1305_tests)
     size_t plaintext_size = strlen(plaintext);
     kryptos_u8_t *key = "Poly1305CamelliaTest";
     size_t key_size = strlen(key);
-    kryptos_run_poly1305_tests(t, plaintext, plaintext_size camellia128, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia128, key, key_size, kKryptosECB);
     kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia128, key, key_size, kKryptosCBC);
     kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia128, key, key_size, kKryptosOFB);
     kryptos_run_poly1305_tests(t, plaintext, plaintext_size, camellia128, key, key_size, kKryptosCTR);
