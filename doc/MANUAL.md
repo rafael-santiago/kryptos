@@ -1374,13 +1374,12 @@ Okay, I know: How can you could use Poly1305 with ChaCha20? Well, pretty easy, l
 
 ```c
     #include <kryptos.h>
-    #include <string.h>
 
     (...)
 
     kryptos_task_ctx t, *ktask = &t;
     kryptos_u8_t *user_key = "5h33p 54mpl3, m33333333!!!!!!!!!";
-    size_t user_key_size = strlen(user_key);
+    size_t user_key_size = 32;
 
     (...)
 
