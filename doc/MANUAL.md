@@ -1267,7 +1267,7 @@ If the necessity of a hash function for your requirements is a bit overkill or e
 by HMACs is not an option for your setup, an alternative can be Poly1305.
 
 This MAC is based only in mathematical operations over 130-bit (approximately) values. The idea is quite similar of you
-find in Galois Counter Mode from block cipher, for example (but Poly can be more intensive in terms of computation). Here on
+find in Galois Counter Mode from block ciphers, for example (but Poly can be more intensive in terms of computation). Here on
 ``kryptos`` Poly1305 was implemented by using a dedicated multiprecision support functions subset. Those functions do
 not use heap memory to make the things happen, in this way much overhead from all demanded multiprecision operations are
 eliminated or at least mitigated. Since kryptos has as requirement the possibility of working on kernel-side of some
