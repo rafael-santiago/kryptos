@@ -1270,7 +1270,7 @@ This MAC is based only in mathematical operations over 130-bit (approximately) v
 find in Galois Counter Mode from block ciphers, for example (but Poly can be more intensive in terms of computation). Here on
 ``kryptos`` Poly1305 was implemented by using a dedicated multiprecision support functions subset. Those functions do
 not use heap memory to make the things happen, in this way much overhead from all demanded multiprecision operations are
-eliminated or at least mitigated. Since kryptos has as requirement the possibility of working on kernel-side of some
+eliminated or at least mitigated. Since ``kryptos`` has as requirement the possibility of working on kernel-side of some
 operating systems, this care also makes easy the use of Poly1305 into the supported kernels in a very constant, clean and
 well-contained and portable way (I meant, from an OS to other and also from a compiler to other).
 
@@ -1347,12 +1347,12 @@ int main(int argc, char **argv) {
 
 The macro ``kryptos_run_cipher_poly1305`` is able to encrypt and tag or verify and decrypt. The parameters are:
 
-    - The cipher name;
-    - The task context;
-    - The key;
-    - The key size in bytes;
-    - The operation mode (if it is about a block cipher);
-    - Specific cipher argument(s) (if it has one(s));
+- The cipher name;
+- The task context;
+- The key;
+- The key size in bytes;
+- The operation mode (if it is about a block cipher);
+- Specific cipher argument(s) (if it has one(s));
 
 All you should do before calling ``kryptos_run_cipher_poly1305`` is to set up the input, the action (if it is about a
 encryption or decryption) and go.
@@ -1361,7 +1361,7 @@ If some error has occurred the ``result`` field of the passed ``kryptos_task_ctx
 It will be equals to ``kKryptosPoly1305Error`` if some error has occurred when doing some Poly1305 processing and in this
 case the details will be explained by the field ``result_verbose`` from the passed ``kryptos_task_ctx``.
 
-The ``kryptos_run_cipher_poly1305`` function macro when validates data it changes its allocation by adding or removing
+The ``kryptos_run_cipher_poly1305`` function macro when validating data, it changes its allocation by adding or removing
 the tag. So when encrypting it changes the output from the task context, when decrypting it changes the input from the
 task context. So depending on your task action you need to take care on freeing the related buffer.
 
@@ -1373,6 +1373,18 @@ thinking about 256-bit keys as its limit.
 Okay, I know: How can you could use Poly1305 with ChaCha20? Well, pretty easy, look:
 
 ```c
+    #include <kryptos.h>
+
+    (...)
+
+    kryptos_task_ctx t, *ktask = &t;
+
+    (...)
+
+    kryptos_task_init_as_null(ktask);
+
+    (...)
+
     // Passing null here it will ask a random nonce also in chacha20
     kryptos_run_cipher_poly1305(chacha20, ktask, user_key, user_key_size, NULL);
 ```
@@ -1380,7 +1392,7 @@ Okay, I know: How can you could use Poly1305 with ChaCha20? Well, pretty easy, l
 **Remembering that all key material passed to an encryption algorithm must come from a KDF processing not from a
 naïve hardcoded buffer (All code shown here is just about quick samples. Using modern crypto professionally into
 computer programs is a thing that goes much beyond from those flat examples. Do not grasp into those practices
-as correct, please.)**.
+as correct, please)**.
 
 ## Asymmetric stuff
 
