@@ -16,6 +16,7 @@ presented here can be built with the command ``hefesto --mk-samples``.
 - [The symmetric stuff](#the-symmetric-stuff)
     - [Hashes](#hashes)
     - [HMACs](#hmacs)
+    - [Poly1305](#poly1305)
 - [Asymmetric stuff](#asymmetric-stuff)
     - [The Diffie-Hellman-Merkle key exchange](#the-diffie-hellman-merkle-key-exchange)
     - [RSA](#rsa)
@@ -1259,6 +1260,127 @@ As you may have noticed the general form of using the ``kryptos_run_cipher_hmac`
                             [, <block cipher add. args, when the block cipher has some>)
 ```
 [Back](#contents)
+
+### Poly1305
+
+If the necessity of a hash function for your requirements is a bit overkill or even you find the overhead added
+by HMACs is not an option for your setup, an alternative can be Poly1305.
+
+This MAC is based only in mathematical operations over 130-bit (approximately) values. The idea is quite similar of you
+find in Galois Counter Mode from block cipher, for example (but Poly can be more intensive in terms of computation). Here on
+``kryptos`` Poly1305 was implemented by using a dedicated multiprecision support functions subset. Those functions do
+not use heap memory to make the things happen, in this way much overhead from all demanded multiprecision operations are
+eliminated or at least mitigated. Since kryptos has as requirement the possibility of working on kernel-side of some
+operating systems, this care also makes easy the use of Poly1305 into the supported kernels in a very constant, clean and
+well-contained and portable way (I meant, from an OS to other and also from a compiler to other).
+
+On ``kryptos`` you can use Poly1305 as a flat MAC. I meant it does not care if the data is about a plaintext or a
+ciphertext. Let's call it "bare bone Poly".
+
+```c
+// To be continued...
+```
+
+If you have ``C99`` capabilities on your environment you can use the convenience that ships Poly1305 and
+(encryption,tagging)/(verification,decryption) in an almost "automagic" way. Take a look:
+
+```c
+/*
+ *                                Copyright (C) 2022 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+#if defined(KRYPTOS_C99)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *plaintext = "Nao e possivel ser bom pela metade (Liev Tolstoi)";
+    size_t plaintext_size = strlen(plaintext);
+    kryptos_u8_t *weak_key = "1234n41v3";
+    size_t weak_key_size = strlen(weak_key);
+    kryptos_u8_t *p, *p_end;
+
+    printf("Plaintext: '%s'\n", plaintext);
+
+    kryptos_task_init_as_null(ktask);
+    kryptos_task_set_in(ktask, plaintext, plaintext_size);
+    kryptos_task_set_encrypt_action(ktask);
+    kryptos_run_cipher_poly1305(aes128, ktask, weak_key, weak_key_size, kKryptosCBC);
+
+    if (kryptos_last_task_succeed(ktask)) {
+        p = ktask->out;
+        p_end = p + ktask->out_size;
+        printf("Authenticated ciphertext: ");
+        while (p != p_end) {
+            printf("%c", isprint(*p) ? *p : '.');
+            p++;
+        }
+        printf("\n");
+        // INFO(Rafael): Try to uncomment the following line.
+        //ktask->out[ktask->out_size >> 1] += 1;
+        kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+        kryptos_task_set_decrypt_action(ktask);
+        // INFO(Rafael): Try to uncomment the following line and comment the next one.
+        //kryptos_run_cipher_poly1305(aes128, ktask, "wr0ngk3y", strlen("wr0ngk3y"), kKryptosCBC);
+        kryptos_run_cipher_poly1305(aes128, ktask, weak_key, weak_key_size, kKryptosCBC);
+        if (kryptos_last_task_succeed(ktask)) {
+            printf("Decrypted authenticated data: '");
+            fwrite(ktask->out, 1, ktask->out_size, stdout);
+            printf("'\n");
+            kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+        } else {
+            printf("Decryption error: %s\n", ktask->result_verbose);
+        }
+    }
+#else
+    printf("WARNING: libkryptos was compiled without C99 support.\n");
+    return EXIT_FAILURE;
+#endif
+}
+```
+
+The macro ``kryptos_run_cipher_poly1305`` is able to encrypt and tag or verify and decrypt. The parameters are:
+
+    - The cipher name;
+    - The task context;
+    - The key;
+    - The key size in bytes;
+    - The operation mode (if it is about a block cipher);
+    - Specific cipher argument(s) (if it has one(s));
+
+All you should do before calling ``kryptos_run_cipher_poly1305`` is to set up the input, the action (if it is about a
+encryption or decryption) and go.
+
+If some error has occurred the ``result`` field of the passed ``kryptos_task_ctx`` will be different from ``kKryptosSuccess``.
+It will be equals to ``kKryptosPoly1305Error`` if some error has occurred when doing some Poly1305 processing and in this
+case the details will be explained by the field ``result_verbose`` from the passed ``kryptos_task_ctx``.
+
+The ``kryptos_run_cipher_poly1305`` function macro when validates data it changes its allocation by adding or removing
+the tag. So when encrypting it changes the output from the task context, when decrypting it changes the input from the
+task context. So depending on your task action you need to take care on freeing the related buffer.
+
+You can pass 256-bit keys without minding about nonce re-use issues. We always make a random nonce at this macro.
+Keys greater than 256-bits are "compressed" by xoring what exceeds with the effective supported 32 bytes. Anyway,
+personally I would not use Poly1305 with algorithms that requires keys greater than 256-bit. It was designed
+thinking about 256-bit keys as its limit.
+
+Okay, I know: How can you could use Poly1305 with ChaCha20? Well, pretty easy, look:
+
+```c
+    // Passing null here it will ask a random nonce also in chacha20
+    kryptos_run_cipher_poly1305(chacha20, ktask, user_key, user_key_size, NULL);
+```
+
+**Remembering that all key material passed to an encryption algorithm must come from a KDF processing not from a
+naïve hardcoded buffer (All code shown here is just about quick samples. Using modern crypto professionally into
+computer programs is a thing that goes much beyond from those flat examples. Do not grasp into those practices
+as correct, please.)**.
 
 ## Asymmetric stuff
 
