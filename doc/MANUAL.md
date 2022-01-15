@@ -1278,8 +1278,111 @@ On ``kryptos`` you can use Poly1305 as a flat MAC. I meant it does not care if t
 ciphertext. Let's call it "bare bone Poly".
 
 ```c
-// To be continued...
+/*
+ *                                Copyright (C) 2022 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <ctype.h>
+#include <string.h>
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+    kryptos_u8_t *message = "\"I don't know why people are so keen to put the details of "
+                            "their private life in public; they forget that invisibility "
+                            "is a superpower.\" (Banksy)", *mp, *mp_end;
+    size_t message_size = strlen(message);
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "123mudar*";
+
+    kryptos_task_init_as_null(ktask);
+
+    ktask->key = key;
+    ktask->key_size = strlen(key);
+
+    printf("Original message: %s\n\n", message);
+
+    ktask->out = (kryptos_u8_t *)kryptos_newseg(message_size);
+    if (ktask->out == NULL) {
+        printf("Error: Not enough memory.\n");
+        return 1;
+    }
+
+    memcpy(ktask->out, message, message_size);
+    ktask->out_size = message_size;
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_poly1305(&ktask);
+
+    if (kryptos_last_task_succeed(ktask)) {
+        mp = ktask->out;
+        mp_end = mp + ktask->out_size;
+        printf("MAC + nonce + message: ");
+        while (mp != mp_end) {
+            printf("%c", isprint(*mp) ? *mp : '.');
+            mp++;
+        }
+        printf("\n\n");
+
+        // INFO(Rafael): Wrong key will not authenticate.
+        //ktask->key = "321mudei*";
+        //ktask->key_size = strlen(ktask->key);
+
+        // INFO(Rafael): Incomplete key will not authenticate.
+        //ktask->key_size -= 1;
+
+        kryptos_task_set_decrypt_action(ktask);
+        kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+        ktask->out = NULL;
+        ktask->out_size = 0;
+
+        // INFO(Rafael): Corrupted mac will not authenticate.
+        //ktask->in[0] += 1;
+
+        // INFO(Rafael): Corrupted message will not authenticate.
+        //ktask->in[ktask->in_size >> 1] += 1;
+
+        // INFO(Rafael): Incomplete message will not authenticate.
+        //ktask->in_size -= 1;
+
+        kryptos_poly1305(&ktask);
+
+        if (kryptos_last_task_succeed(ktask)) {
+            printf("Authenticated message: ");
+            fwrite(ktask->in, 1, ktask->in_size, stdout);
+            printf("\n");
+        } else {
+            printf("Error: %s\n", ktask->result_verbose);
+        }
+    } else {
+        printf("Unexpected error: '%s'\n", ktask->result_verbose);
+    }
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+
+    return 0;
+}
 ```
+
+Poly1305 primitive needs a message and a key. Here on ``kryptos`` you set those information in ``kryptos_task_ctx``
+passed to ``kryptos_poly1305()`` function.
+
+Since Poly1305 is about a MAC it is suitable to tag outputs produced by a prior task processing. Due to it, when you
+need to generate a mac (or tag a message), you need to set this data into output buffer of the ``kryptos_task_ctx``.
+Once it done, you just need to set task action to ``encrypt`` and call ``kryptos_poly1305()``.
+Your tag and nonce will be added to your previous output (**it will free the prior allocation and copy everything into
+a new memory segment**).
+
+In order to verify a tagged message you will need to set this data into ``kryptos_task_ctx`` input buffer, also set
+the key information and the task action to ``decrypt``. Once it done, call ``kryptos_poly1305()`` function and
+if the message was authenticated, the original message was extracted from the tagged buffer and reallocated into
+the input buffer of passed the ``kryptos_task_ctx``.
+
+Notice that here in this "bare-bone" sample the message buffer is not protected before being tagged but it is also
+possible to do that.
 
 If you have ``C99`` capabilities on your environment you can use the convenience that ships Poly1305 and
 (encryption,tagging)/(verification,decryption) in an almost "automagic" way. Take a look:
@@ -1345,7 +1448,7 @@ int main(int argc, char **argv) {
 }
 ```
 
-The macro ``kryptos_run_cipher_poly1305`` is able to encrypt and tag or verify and decrypt. The parameters are:
+The macro ``kryptos_run_cipher_poly1305`` is able to ``encrypt and tag`` or ``verify and decrypt``. The parameters are:
 
 - The cipher name;
 - The task context;
@@ -1362,15 +1465,15 @@ It will be equals to ``kKryptosPoly1305Error`` if some error has occurred when d
 case the details will be explained by the field ``result_verbose`` from the passed ``kryptos_task_ctx``.
 
 The ``kryptos_run_cipher_poly1305`` function macro when validating data, it changes its allocation by adding or removing
-the tag. So when encrypting it changes the output from the task context, when decrypting it changes the input from the
-task context. So depending on your task action you need to take care on freeing the related buffer.
+the tag. So, when encrypting it changes the output from the task context, when decrypting it changes the input from the
+task context. So, depending on your task action you need to take care on freeing the related buffer.
 
 You can pass 256-bit keys without minding about nonce re-use issues. We always make a random nonce at this macro.
 Keys greater than 256-bits are "compressed" by xoring what exceeds with the effective supported 32 bytes. Anyway,
-personally I would not use Poly1305 with algorithms that requires keys greater than 256-bit. It was designed
+personally I would not use Poly1305 with algorithms that require keys greater than 256-bit. It was designed
 thinking about 256-bit keys as its limit.
 
-Okay, I know: How can you could use Poly1305 with ChaCha20? Well, pretty easy, look:
+Okay, I know: how can you could use Poly1305 with ChaCha20? Well, pretty easy, look:
 
 ```c
     #include <kryptos.h>
