@@ -1499,6 +1499,8 @@ naïve hardcoded buffer (All code shown here is just about quick samples. Using m
 computer programs is a thing that goes much beyond from those flat examples. Do not grasp into those practices
 as correct, please)**.
 
+[Back](#contents)
+
 ## Asymmetric stuff
 
 Until now the ``Diffie-Hellman-Merkle`` key exchange scheme and the algorithms ``RSA`` and ``Elgamal`` are available.
