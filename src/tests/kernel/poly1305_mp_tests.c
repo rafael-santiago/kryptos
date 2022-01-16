@@ -688,7 +688,7 @@ KUTE_TEST_CASE(kryptos_poly1305_get_gt_tests)
                 break;
 
             default:
-                KYTE_ASSERT(gt == NULL);
+                KUTE_ASSERT(gt == NULL);
                 break;
         }
 #endif
