@@ -116,6 +116,13 @@ int kryptos_task_check(kryptos_task_ctx **ktask) {
         goto kryptos_task_check_error;
     }
 
+    if (((*ktask)->cipher == kKryptosCipherNOEKEON ||
+        (*ktask)->cipher == kKryptosCipherNOEKEOND) && (*ktask)->key_size > KRYPTOS_NOEKEON_BLOCKSIZE) {
+        (*ktask)->result = kKryptosKeyError;
+        (*ktask)->result_verbose = "NOEKEON requires a 128-bit key as its maximum key size.";
+        goto kryptos_task_check_error;
+    }
+
     // INFO(Rafael): When the used stream cipher is RABBIT we can check the iv (if supplied).
 
     if (( (*ktask)->cipher != kKryptosCipherARC4    &&

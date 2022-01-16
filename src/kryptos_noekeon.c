@@ -150,7 +150,7 @@ static void kryptos_noekeon_key_sched(const kryptos_u8_t *key, const size_t key_
         block[12] = block[13] = block[14] = block[15] = 0;
 
         // TODO(Rafael): Maybe save one call here too, it seems a kind of useless.
-        memcpy(block, key, key_size & 0x1F);
+        memcpy(block, key, key_size);
 
         sks->K[0] = sks->K[1] = sks->K[2] = sks->K[3] = 0;
 
