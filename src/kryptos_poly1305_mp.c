@@ -619,8 +619,8 @@ const kryptos_poly1305_numfrac_t *kryptos_poly1305_get_gt(const kryptos_poly1305
     kryptos_u8_t x_reg = 0, y_reg = 0;
 
 #define kryptos_poly1305_get_gt_bitcmp(xx, yy, b, xr, yr) {\
-    (xr) = (*(xx) & ((kryptos_poly1305_numfrac_t)1 << (b))) >> (b);\
-    (yr) = (*(yy) & ((kryptos_poly1305_numfrac_t)1 << (b))) >> (b);\
+    (xr) = (kryptos_u8_t)((*(xx) & ((kryptos_poly1305_numfrac_t)1 << (b))) >> (b));\
+    (yr) = (kryptos_u8_t)((*(yy) & ((kryptos_poly1305_numfrac_t)1 << (b))) >> (b));\
     if ((xr) && !(yr)) {\
         xp = xp_end = yp = yp_end = NULL;\
         x_reg = y_reg = 0;\
