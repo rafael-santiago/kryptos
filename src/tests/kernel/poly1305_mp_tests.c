@@ -680,7 +680,7 @@ KUTE_TEST_CASE(kryptos_poly1305_get_gt_tests)
 #else
         switch (test->expected) {
             case 0:
-                KUTE_ASSERT(gt == &test->x[0]
+                KUTE_ASSERT(gt == &test->x[0]);
                 break;
 
             case 1:

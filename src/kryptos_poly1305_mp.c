@@ -120,7 +120,8 @@ void kryptos_poly1305_sub(kryptos_poly1305_number_t x, const kryptos_poly1305_nu
     delta = delta_end = xp = xp_end = NULL;
     yp = yp_end = NULL;
     is_zero = 0;
-    c = bsub = 0;
+    c = 0;
+    bsub = 0;
 }
 
 void kryptos_poly1305_inv_cmplt(kryptos_poly1305_number_t x) {
