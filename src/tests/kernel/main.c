@@ -146,7 +146,7 @@ KUTE_TEST_CASE(ktest_monkey)
 
     KUTE_RUN_TEST(kryptos_poly1305_basic_tests);
 
-    //KUTE_RUN_TEST(kryptos_poly1305_tests);
+    KUTE_RUN_TEST(kryptos_poly1305_tests);
 
     KUTE_RUN_TEST(kryptos_do_hkdf_tests);
     KUTE_RUN_TEST(kryptos_hkdf_macro_tests);
