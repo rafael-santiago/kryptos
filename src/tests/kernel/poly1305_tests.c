@@ -732,7 +732,7 @@ KUTE_TEST_CASE(kryptos_noekeon_poly1305_tests)
     kryptos_task_ctx t;
     kryptos_u8_t *plaintext = (kryptos_u8_t *)"'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
     size_t plaintext_size = strlen((char *)plaintext);
-    kryptos_u8_t *key = (kryptos_u8_t *)"Poly1305NoekeonTest";
+    kryptos_u8_t *key = (kryptos_u8_t *)"Poly1305NoekeonT";
     size_t key_size = strlen((char *)key);
     kryptos_run_poly1305_tests(t, plaintext, plaintext_size, noekeon, key, key_size, kKryptosECB);
     kryptos_run_poly1305_tests(t, plaintext, plaintext_size, noekeon, key, key_size, kKryptosCBC);
@@ -746,7 +746,7 @@ KUTE_TEST_CASE(kryptos_noekeon_d_poly1305_tests)
     kryptos_task_ctx t;
     kryptos_u8_t *plaintext = (kryptos_u8_t *)"'Privacy is something you can sell, but you can't buy it back.' (Bob Dylan)";
     size_t plaintext_size = strlen((char *)plaintext);
-    kryptos_u8_t *key = (kryptos_u8_t *)"Poly1305Noekeon-DTest";
+    kryptos_u8_t *key = (kryptos_u8_t *)"Poly1305NoekeonD";
     size_t key_size = strlen((char *)key);
     kryptos_run_poly1305_tests(t, plaintext, plaintext_size, noekeon_d, key, key_size, kKryptosECB);
     kryptos_run_poly1305_tests(t, plaintext, plaintext_size, noekeon_d, key, key_size, kKryptosCBC);

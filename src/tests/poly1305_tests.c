@@ -642,7 +642,7 @@ CUTE_TEST_CASE_END
 CUTE_TEST_CASE(kryptos_noekeon_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
-    kryptos_u8_t *key = "Poly1305NoekeonTest";
+    kryptos_u8_t *key = "Poly1305NoekeonT";
     size_t key_size = strlen(key);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon, key, key_size, kKryptosECB);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon, key, key_size, kKryptosCBC);
@@ -655,7 +655,7 @@ CUTE_TEST_CASE_END
 CUTE_TEST_CASE(kryptos_noekeon_d_poly1305_tests)
     kryptos_task_ctx t;
     size_t tv, tv_nr, data_size;
-    kryptos_u8_t *key = "Poly1305Noekeon-DTest";
+    kryptos_u8_t *key = "Poly1305NoekeonD";
     size_t key_size = strlen(key);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon_d, key, key_size, kKryptosECB);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, noekeon_d, key, key_size, kKryptosCBC);
