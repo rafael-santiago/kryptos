@@ -487,7 +487,11 @@ KUTE_TEST_CASE_END
 KUTE_TEST_CASE(kryptos_poly1305_get_gt_tests)
     struct test_ctx {
         kryptos_poly1305_number_t x, y;
+#if !defined(_WIN32)
         kryptos_poly1305_numfrac_t *expected;
+#else
+        int expected;
+#endif
     } test_vector[] = {
 #if defined(KRYPTOS_MP_EXTENDED_RADIX)
         {
@@ -509,7 +513,11 @@ KUTE_TEST_CASE(kryptos_poly1305_get_gt_tests)
                 0x0000000000000000,
                 0x0000000000000000
             },
+#if !defined(_WIN32)
             &test_vector[0].x[0]
+#else
+            0
+#endif
         },
         {
             {
@@ -530,7 +538,11 @@ KUTE_TEST_CASE(kryptos_poly1305_get_gt_tests)
                 0x0000000000000000,
                 0x0000000000000000
             },
+#if !defiend(_WIN32)
             &test_vector[1].y[0]
+#else
+            1
+#endif
         },
         {
             {
@@ -551,7 +563,11 @@ KUTE_TEST_CASE(kryptos_poly1305_get_gt_tests)
                 0x0000000000000000,
                 0x0000000000000000
             },
+#if !defined(_WIN32)
             NULL
+#else
+            -1
+#endif
         },
 #else
         {
@@ -581,7 +597,11 @@ KUTE_TEST_CASE(kryptos_poly1305_get_gt_tests)
                 0x00000000,
                 0x00000000
             },
+#if !defined(_WIN32)
             &test_vector[0].x[0]
+#else
+            0
+#endif
         },
         {
             {
@@ -610,7 +630,11 @@ KUTE_TEST_CASE(kryptos_poly1305_get_gt_tests)
                 0x00000000,
                 0x00000000
             },
+#if !defined(_WIN32)
             &test_vector[1].y[0]
+#else
+            1
+#endif
         },
         {
             {
@@ -639,7 +663,11 @@ KUTE_TEST_CASE(kryptos_poly1305_get_gt_tests)
                 0x00000000,
                 0x00000000
             },
+#if !defined(_WIN32)
             NULL
+#else
+            -1
+#endif
         },
 #endif
     }, *test = &test_vector[0], *test_end = test + sizeof(test_vector) / sizeof(test_vector[0]);
@@ -647,7 +675,23 @@ KUTE_TEST_CASE(kryptos_poly1305_get_gt_tests)
 
     while (test != test_end) {
         gt = kryptos_poly1305_get_gt(test->x, test->y);
+#if !defined(_WIN32)
         KUTE_ASSERT(gt == test->expected);
+#else
+        switch (test->expected) {
+            case 0:
+                KUTE_ASSERT(gt == &test->x[0]
+                break;
+
+            case 1:
+                KUTE_ASSERT(gt == &test->y[0]);
+                break;
+
+            default:
+                KYTE_ASSERT(gt == NULL);
+                break;
+        }
+#endif
         test++;
     }
 KUTE_TEST_CASE_END
