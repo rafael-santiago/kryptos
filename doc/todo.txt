@@ -1,5 +1,6 @@
-(B) Implement some support for Poly1305. +NewFeature,+MACStuff
+(B) Implement support for SipHash. +NewFeature,+PRF,+MACStuff
 (A) Try to give support to GMP on multiprecision stuff when asked by the user. +Improvement
+x (B) Implement some support for Poly1305. +NewFeature,+MACStuff
 x (A) Implement ChaCha20. +CipherAddition,+NewFeature,+Improvement
 x (A) Implement Salsa20 stream cipher. +NewFeature,+CipherSupport
 x (A) Support kryptos kernel mode on Windows. +ScopeIncrease,+NewFeature,+Improvement,+Build
