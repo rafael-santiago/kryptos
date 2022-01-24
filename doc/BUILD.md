@@ -12,6 +12,7 @@ build commands intended for contributors.
 - [Advanced build commands for contributors](#advanced-build-commands-for-contributors)
     - [Skipping the HMAC tests](#skipping-the-hmac-tests)
     - [Skipping the Poly1305 tests](#skipping-the-poly1305-tests)
+    - [Skipping the SipHash tests](#skipping-the-siphash-tests)
     - [Skipping the Diffie-Hellman-Merkle exchange tests](#skipping-the-diffie-hellman-merkle-exchange-tests)
     - [Speeding up the Diffie-Hellman-Merkle exchange tests](#speeding-up-the-diffie-hellman-merkle-exchange-tests)
     - [Skipping the OAEP tests from some PK algorithms](#skipping-the-oaep-tests-from-some-pk-algorithms)
@@ -125,6 +126,17 @@ Similar to HMAC tests, Poly1305 tests can be time consuming, too. The build opti
 
 ```
 Sherlock@221B:~/src/kryptos/src# hefesto --no-poly1305-tests
+```
+
+[Back](#contents)
+
+### Skipping the SipHash tests
+
+Following the same idea of HMAC and Poly1305 tests, SipHash tests can slow down the things. The build option to skip them
+up is:
+
+```
+Sherlock@221B:~/src/kryptos/src# hefesto --no-siphash-tests
 ```
 
 [Back](#contents)

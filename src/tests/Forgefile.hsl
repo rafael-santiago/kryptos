@@ -48,6 +48,11 @@ kryptos-tests.prologue() {
         $cflags.add_item("-DKRYPTOS_NO_POLY1305_TESTS");
     }
 
+    $user_option = hefesto.sys.get_option("no-siphash-tests");
+    if ($user_option.count() > 0) {
+        $cflags.add_item("-DKRYPTOS_NO_SIPHASH_TESTS");
+    }
+
     $user_option = hefesto.sys.get_option("quick-ecdh-tests");
     if ($user_option.count() > 0) {
         $cflags.add_item("-DKRYPTOS_QUICK_ECDH_TESTS");

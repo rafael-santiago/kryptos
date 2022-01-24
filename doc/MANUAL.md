@@ -17,6 +17,7 @@ presented here can be built with the command ``hefesto --mk-samples``.
     - [Hashes](#hashes)
     - [HMACs](#hmacs)
     - [Poly1305](#poly1305)
+    - [SipHash](#siphash)
 - [Asymmetric stuff](#asymmetric-stuff)
     - [The Diffie-Hellman-Merkle key exchange](#the-diffie-hellman-merkle-key-exchange)
     - [RSA](#rsa)
@@ -1498,6 +1499,150 @@ Okay, I know: how can you could use Poly1305 with ChaCha20? Well, pretty easy, l
 naïve hardcoded buffer (All code shown here is just about quick samples. Using modern crypto professionally into
 computer programs is a thing that goes much beyond from those flat examples. Do not grasp into those practices
 as correct, please)**.
+
+[Back](#contents)
+
+### SipHash
+
+The ``PRF`` SipHash is available in ``libkryptos``, too. In order to use it with your hash table
+solution call the function ``kryptos_siphash_sum``. It takes:
+
+- The data to be hashed.
+- The size (in bytes) of this data.
+- A key.
+- The size (in bytes) of this key.
+- The rounds parameter required by Siphash, c and d respectively.
+
+The function ``kryptos_siphash_sum`` returns the a 64-bit value which stands for the hash of
+the passed data using the passed key and rounds parameters.
+
+```c
+/*
+ *                                Copyright (C) 2022 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#define SIPHASH_SAMPLE_KEY "Lazy-people-that-dislike-reading: it-s-not-crypto-hash. Be careful!!!"
+
+int main(int argc, char **argv) {
+    int exit_code = EXIT_FAILURE;
+    if (argc == 1) {
+        printf("use: %s <data>\n", argv[0]);
+    } else {
+        printf("%llx\n", kryptos_siphash_sum((kryptos_u8_t *)argv[1], strlen(argv[1]),
+                                             (kryptos_u8_t *)SIPHASH_SAMPLE_KEY,
+                                             strlen(SIPHASH_SAMPLE_KEY), 4, 2));
+        exit_code = EXIT_SUCCESS;
+    }
+    return exit_code;
+}
+
+#undef SIPHASH_SAMPLE_KEY
+```
+
+``SipHash`` can also be used as a ``MAC``. It is more suitable for short messages. In order
+to use this ``PRF`` as a ready-to-go ``MAC`` with ``libkryptos`` call the function macro
+``kryptos_run_cipher_siphash``.
+
+It will (encrypt,tag) or (verify,decrypt) depending on the passed action. The function
+macro requires the following parameters:
+
+- The name of the symmetric encryption primitive.
+- The ``SipHash`` round parameters, c and d, respectively.
+- The ``kryptos_task_ctx`` context which express/gather data for your intended task.
+- The remaining parameters required by the chosen encryption primitive.
+
+For more details, take a look at the example below:
+
+```c
+/*
+ *                                Copyright (C) 2022 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+#define MESSAGE "Two headed dog, two headed dog, "
+                "I've been working in the Kremlin with two-headed dog."
+
+int main(int argc, char **argv) {
+    int exit_code = EXIT_FAILURE;
+#if defined(KRYPTOS_C99)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *bad_hardcoded_key = (kryptos_u8_t *)"Red Temple Prayer";
+    size_t bad_hardcoded_key_size = strlen((char *)bad_hardcoded_key);
+    kryptos_u8_t *p = NULL, *p_end = NULL;
+
+    kryptos_task_init_as_null(ktask);
+    kryptos_task_set_in(ktask, (kryptos_u8_t *)MESSAGE, strlen(MESSAGE));
+    printf("Message to authenticate and send: '%s'\n", ktask->in);
+
+    kryptos_task_set_encrypt_action(ktask);
+    kryptos_run_cipher_siphash(aes256, 8, 4, ktask,
+                               bad_hardcoded_key, bad_hardcoded_key_size, kKryptosOFB);
+
+    if (kryptos_last_task_succeed(ktask)) {
+        p = ktask->out;
+        p_end = p + ktask->out_size;
+        printf("Message with authentication code: ");
+        while (p != p_end) {
+            printf("%c", isprint(*p) ? *p : '.');
+            p++;
+        }
+        printf("\n");
+        kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+        ktask->out = NULL;
+        ktask->out_size = 0;
+        kryptos_task_set_decrypt_action(ktask);
+        // INFO(Rafael): Try to comment one of the following lines or even both.
+        // bad_hardcoded_key_size <<= 1;
+        // ktask->in[ktask->in_size >> 1] += 1;
+        kryptos_run_cipher_siphash(aes256, 8, 4, ktask,
+                                   bad_hardcoded_key, bad_hardcoded_key_size, kKryptosOFB);
+        if (kryptos_last_task_succeed(ktask)) {
+            p = ktask->out;
+            p_end = p + ktask->out_size;
+            printf("Authenticated plaintext: ");
+            while (p != p_end) {
+                printf("%c", isprint(*p) ? *p : '.');
+                p++;
+            }
+            printf("\n");
+        } else {
+            printf("error: '%s'\n", (ktask->result_verbose != NULL) ?
+                                        ktask->result_verbose : "Unexpected.");
+        }
+    } else {
+        kryptos_task_set_in(ktask, NULL, 0);
+        printf("error: '%s'\n", (ktask->result_verbose != NULL) ?
+                                        ktask->result_verbose : "Unexpected.");
+    }
+
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+#else
+    printf("warning: libkryptos was compiled without c99 support.");
+#endif
+    return exit_code;
+}
+
+#undef MESSAGE
+```
+
+When verifying, ``kryptos_run_cipher_siphash`` will re-allocate memory passed as the input of
+your verification/decryption task, thus, in a well-succeeded context, the input address will
+change and you do not have to mind about free the old address (because it was freed already).
 
 [Back](#contents)
 

@@ -13,6 +13,7 @@
 #include "hash_tests.h"
 #include "poly1305_mp_tests.h"
 #include "poly1305_tests.h"
+#include "siphash_tests.h"
 #include "kdf_tests.h"
 #include "encoding_tests.h"
 #include "mp_tests.h"
@@ -244,10 +245,21 @@ CUTE_TEST_CASE(kryptos_test_monkey)
 
     CUTE_RUN_TEST(kryptos_poly1305_basic_tests);
 
-    //  -=-=-=-=-=-=- New block ciphers functions should be added to Poly1305 tests. -=-=-=-=-=-=-=-
+    //  -=-=-=-=-=-=- New ciphers functions should be added to Poly1305 tests. -=-=-=-=-=-=-=-
 
     // INFO(Rafael): This is the test that ensures the integration of all ciphers with Poly1305.
     CUTE_RUN_TEST(kryptos_poly1305_tests);
+
+    // INFO(Rafael): SipHash tests.
+    CUTE_RUN_TEST(kryptos_siphash_size_tests);
+    CUTE_RUN_TEST(kryptos_siphash_basic_tests);
+
+    CUTE_RUN_TEST(kryptos_siphash_sum_tests);
+
+    //  -=-=-=-=-=-=- New ciphers functions should be added to SipHash tests. -=-=-=-=-=-=-=-
+
+    // INFO(Rafael): This is the test that ensures the integration of all ciphers with SipHash.
+    CUTE_RUN_TEST(kryptos_siphash_tests);
 
     // INFO(Rafael): KDF stuff.
 

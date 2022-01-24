@@ -512,7 +512,7 @@ CUTE_TEST_CASE(kryptos_triple_des_ede_poly1305_tests)
         strlen(key[1]),
         strlen(key[2])
     };
-    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, triple_des, key[0], key_size[0],
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, triple_des_ede, key[0], key_size[0],
                                kKryptosECB, key[1], &key_size[1], key[2], &key_size[2]);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, triple_des_ede, key[0], key_size[0],
                                kKryptosCBC, key[1], &key_size[1], key[2], &key_size[2]);
