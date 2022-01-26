@@ -63,6 +63,7 @@
 
 #include <kryptos_hmac.h>
 #include <kryptos_poly1305.h>
+#include <kryptos_siphash.h>
 
 #include <kryptos_hkdf.h>
 #include <kryptos_pbkdf2.h>
@@ -613,6 +614,25 @@ kryptos_ ## label_name:\
         (ktask)->mirror_p = (ktask);\
         kryptos_ ## cname ## _setup((ktask), __VA_ARGS__);\
         kryptos_do_poly1305(&(ktask)->mirror_p);\
+        if (kryptos_last_task_succeed(ktask)) {\
+            kryptos_run_cipher(cname, ktask, __VA_ARGS__);\
+        }\
+        (ktask)->mirror_p = NULL;\
+    }\
+}
+
+#define kryptos_run_cipher_siphash(cname, c, d, ktask, ...) {\
+    if ((ktask)->action == kKryptosEncrypt) {\
+        kryptos_run_cipher(cname, ktask, __VA_ARGS__);\
+        if (kryptos_last_task_succeed(ktask)) {\
+            (ktask)->mirror_p = (ktask);\
+            kryptos_siphash(&(ktask)->mirror_p, c, d);\
+            (ktask)->mirror_p = NULL;\
+        }\
+    } else if ((ktask)->action == kKryptosDecrypt) {\
+        (ktask)->mirror_p = (ktask);\
+        kryptos_ ## cname ## _setup((ktask), __VA_ARGS__);\
+        kryptos_siphash(&(ktask)->mirror_p, c, d);\
         if (kryptos_last_task_succeed(ktask)) {\
             kryptos_run_cipher(cname, ktask, __VA_ARGS__);\
         }\

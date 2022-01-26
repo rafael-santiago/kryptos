@@ -32,7 +32,7 @@
     } else {\
         kryptos_task_free(&t, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
     }\
-    /*INFO(Rafael): Copputed message flow.*/\
+    /*INFO(Rafael): Corrupted message flow.*/\
     kryptos_task_init_as_null(&t);\
     kryptos_task_set_in(&t, plaintext, plaintext_size);\
     kryptos_task_set_encrypt_action(&t);\
@@ -591,7 +591,7 @@ KUTE_TEST_CASE(kryptos_triple_des_ede_poly1305_tests)
         strlen((char *)key[1]),
         strlen((char *)key[2])
     };
-    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, triple_des, key[0], key_size[0],
+    kryptos_run_poly1305_tests(t, plaintext, plaintext_size, triple_des_ede, key[0], key_size[0],
                                kKryptosECB, key[1], &key_size[1], key[2], &key_size[2]);
     kryptos_run_poly1305_tests(t, plaintext, plaintext_size, triple_des_ede, key[0], key_size[0],
                                kKryptosCBC, key[1], &key_size[1], key[2], &key_size[2]);

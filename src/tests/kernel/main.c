@@ -24,6 +24,7 @@
 #include <hash_tests.h>
 #include <poly1305_mp_tests.h>
 #include <poly1305_tests.h>
+#include <siphash_tests.h>
 #include <kdf_tests.h>
 #include <mp_tests.h>
 #include <symmetric_ciphers_tests.h>
@@ -147,6 +148,14 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_poly1305_basic_tests);
 
     KUTE_RUN_TEST(kryptos_poly1305_tests);
+
+    KUTE_RUN_TEST(kryptos_siphash_size_tests);
+    KUTE_RUN_TEST(kryptos_siphash_basic_tests);
+
+    KUTE_RUN_TEST(kryptos_siphash_sum_tests);
+
+    // TODO(Rafael): Once implemented enable it.
+    KUTE_RUN_TEST(kryptos_siphash_tests);
 
     KUTE_RUN_TEST(kryptos_do_hkdf_tests);
     KUTE_RUN_TEST(kryptos_hkdf_macro_tests);

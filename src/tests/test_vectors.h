@@ -359,6 +359,77 @@ static kryptos_u8_t *poly1305_test_data[] = {
     "Lay Down Your Weary Tune / Bob Dylan"
 };
 
+static kryptos_u8_t *siphash_test_data[] = {
+    "To be free is nothing, to become free is everything",
+    "If liberty means anything at all, it means the right to tell people what they do not want to hear",
+    "None are more hopelessly enslaved than those who falsely believe they are free",
+    "One lives but a little, shelter yourself from evil.",
+    "The ultimate wisdom of man is to consider things as good, and for the rest to be untroubled.",
+    "Autonomy is the only just pleasure.",
+    "God gave to man the desire for knowledge for the sake of tormenting him.",
+    "Happy is he who has fortunes and reason.",
+    "As the wind puffs out empty wineskins, so pride of opinion, foolish men.",
+    "Never say that marriage brings more joys than tears.",
+    "Everything under the sun follows the same law and the same destiny.",
+    "It is no more in this way than in that, or in neither.",
+    "It is hard!; but that which we are not permitted to correct is rendered lighter by patience.",
+    "The notion of everything, large and small, of all the innumerable creatures of God, is to be found within us.",
+    "For I see that we are but phantoms, "
+    "all we who live, or fleeting shadows.",
+    "O wretched minds of men! O blind hearts! in what darkness of life and in how great dangers is passed this term "
+    "of life whatever its duration.",
+    "To not think at all is the softest life, "
+    "Because not thinking is the most painless evil.",
+    "What man will account himself great, "
+    "Whom a chance occasion destroys utterly?",
+    "All things, together with heaven and earth and sea, are nothing to the sum of the universal sum.",
+    "The fool has more hope of wisdom than the man who calls himself wise.",
+    "No new delight may be forged by living on.",
+    "You who know nothing of how the soul marries the body, you therefore know nothing of God's works.",
+    "It is possible and it is not possible.",
+    "The good is admirable.",
+    "A man of clay.",
+    "Impiety follows pride like a dog.",
+    "Be not wise in your own conceits.",
+    "Neither fear nor desire [your] last day.",
+    "God permits no one but Himself to magnify Himself.",
+    "I shelter where the storm drives me.",
+    "You are unaware if your interest is here rather than there, or if they are alike in value.",
+    "I am a man and nothing human is foreign to me.",
+    "Be not overwise lest you become senseless. ",
+    "If any man thinks he knows anything, he knows nothing.",
+    "If any man thinks himself to be something, when he is nothing, he deceives himself.",
+    "Be no wiser than is necessary, but be wise in moderation.",
+    "No one has ever known the truth and no one will know it.",
+    "Who knows whether that which we call dying is living, "
+    "and living is dying?",
+    "Nothing is more beautiful than being just, but nothing is more pleasant than being healthy.",
+    "All things are too difficult for man to understand them.",
+    "Wide is the range of man's speech, this way and that.",
+    "The whole race of man has overgreedy ears.",
+    "How great is the worthlessness of things.",
+    "All is vanity.",
+    "To keep within due measure and hold fast the end and follow nature.",
+    "Earth and ashes, wherefrom your pride?",
+    "Woe unto them that are wise in their own eyes.",
+    "Character is fate.",
+    "Enjoy pleasantly present things, others are beyond thee.",
+    "To every opinion an opinion of equal weight is opposed.",
+    "Our mind wanders in darkness, and, blind, cannot discern the truth.",
+    "God has made man like a shadow, of which who shall judge after the setting of the sun?",
+    "The only certainty is that nothing is certain, and that nothing is less noble or more proud than man.",
+    "Of all the works of God nothing is more unknown to any man than the track of the wind.",
+    "Each has his own tastes, Gods and men alike.",
+    "That on which you so pride yourself will be your ruin, you who think yourself to be somebody.",
+    "That which worries men are not things"
+    "but that which they think about them.",
+    "It is fitting for a mortal to have thoughts appropriate to men.",
+    "Why with designs for the far future do you weary a mind that is unequal to them?",
+    "As you are ignorant of the way of the spirit, so you do not know the works of God.",
+    "The judgments of the Lord are as a great deep.",
+    "I determine in nothing."
+};
+
 #define kryptos_run_block_cipher_tests(cipher_name, blocksize) {\
     kryptos_task_ctx t, *ktask = &t;\
     size_t cbc_test_data_nr = sizeof(cbc_test_data) / sizeof(cbc_test_data[0]);\
@@ -925,7 +996,7 @@ static kryptos_u8_t *poly1305_test_data[] = {
         } else {\
             kryptos_task_free(&t, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
         }\
-        /*INFO(Rafael): Copputed message flow.*/\
+        /*INFO(Rafael): Corrupted message flow.*/\
         kryptos_task_init_as_null(&t);\
         data_size = strlen(poly1305_test_data[tv]);\
         kryptos_task_set_in(&t, poly1305_test_data[tv], data_size);\
@@ -941,6 +1012,57 @@ static kryptos_u8_t *poly1305_test_data[] = {
         kryptos_task_set_decrypt_action(&t);\
         kryptos_run_cipher_poly1305(cname, &t, __VA_ARGS__);\
         CUTE_ASSERT(t.result == kKryptosPOLY1305Error);\
+        CUTE_ASSERT(strcmp(t.result_verbose, "Corrupted data.") == 0);\
+        if (strcmp(#cname, "salsa20") != 0 && strcmp(#cname, "chacha20") != 0) {\
+            kryptos_task_free(&t, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+        } else {\
+            kryptos_task_free(&t, KRYPTOS_TASK_IN);\
+        }\
+    }\
+}
+
+#define kryptos_run_siphash_tests(t, tv, tv_nr, data_size, cname, c, d, ...) {\
+    tv_nr = sizeof(siphash_test_data) / sizeof(siphash_test_data[0]);\
+    for (tv = 0; tv < tv_nr; tv++) {\
+        /*INFO(Rafael): Normal flow, no authentication error.*/\
+        kryptos_task_init_as_null(&t);\
+        data_size = strlen(siphash_test_data[tv]);\
+        kryptos_task_set_in(&t, siphash_test_data[tv], data_size);\
+        kryptos_task_set_encrypt_action(&t);\
+        kryptos_run_cipher_siphash(cname, c, d, &t, __VA_ARGS__);\
+        CUTE_ASSERT(t.result == kKryptosSuccess);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size > data_size);\
+        kryptos_task_set_in(&t, t.out, t.out_size);\
+        t.out = NULL;\
+        t.out_size = 0;\
+        kryptos_task_set_decrypt_action(&t);\
+        kryptos_run_cipher_siphash(cname, c, d, &t, __VA_ARGS__);\
+        CUTE_ASSERT(t.result == kKryptosSuccess);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size == data_size);\
+        CUTE_ASSERT(memcmp(t.out, siphash_test_data[tv], t.out_size) == 0);\
+        if (strcmp(#cname, "salsa20") != 0 && strcmp(#cname, "chacha20") != 0) {\
+            kryptos_task_free(&t, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
+        } else {\
+            kryptos_task_free(&t, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);\
+        }\
+        /*INFO(Rafael): Corrupted message flow.*/\
+        kryptos_task_init_as_null(&t);\
+        data_size = strlen(siphash_test_data[tv]);\
+        kryptos_task_set_in(&t, siphash_test_data[tv], data_size);\
+        kryptos_task_set_encrypt_action(&t);\
+        kryptos_run_cipher_siphash(cname, c, d, &t, __VA_ARGS__);\
+        CUTE_ASSERT(t.result == kKryptosSuccess);\
+        CUTE_ASSERT(t.out != NULL);\
+        CUTE_ASSERT(t.out_size > data_size);\
+        kryptos_task_set_in(&t, t.out, t.out_size);\
+        t.out[t.out_size >> 1] += 1;\
+        t.out = NULL;\
+        t.out_size = 0;\
+        kryptos_task_set_decrypt_action(&t);\
+        kryptos_run_cipher_siphash(cname, c, d, &t, __VA_ARGS__);\
+        CUTE_ASSERT(t.result == kKryptosSipHashError);\
         CUTE_ASSERT(strcmp(t.result_verbose, "Corrupted data.") == 0);\
         if (strcmp(#cname, "salsa20") != 0 && strcmp(#cname, "chacha20") != 0) {\
             kryptos_task_free(&t, KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);\
