@@ -106,6 +106,9 @@ KUTE_DECLARE_TEST_CASE(kryptos_noekeon_hmac_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_noekeon_d_hmac_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_gost_ds_hmac_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_gost_hmac_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_twofish128_hmac_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_twofish192_hmac_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_twofish256_hmac_tests);
 
 #endif
 
@@ -145,6 +148,9 @@ KUTE_TEST_CASE(kryptos_hmac_tests)
     KUTE_RUN_TEST(kryptos_noekeon_d_hmac_tests);
     KUTE_RUN_TEST(kryptos_gost_ds_hmac_tests);
     KUTE_RUN_TEST(kryptos_gost_hmac_tests);
+    KUTE_RUN_TEST(kryptos_twofish128_hmac_tests);
+    KUTE_RUN_TEST(kryptos_twofish192_hmac_tests);
+    KUTE_RUN_TEST(kryptos_twofish256_hmac_tests);
 #else
 # if !defined(KRYPTOS_NO_HMAC_TESTS)
     // TODO(Rafael): When there is no C99 support add a simple bare bone test with at least one block cipher and all
@@ -3086,6 +3092,186 @@ KUTE_TEST_CASE(kryptos_gost_hmac_tests)
                            s1, s2, s3, s4, s5, s6, s7, s8);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, gost, blake2b512, key, key_size, kKryptosCBC,
                            s1, s2, s3, s4, s5, s6, s7, s8);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_twofish128_hmac_tests)
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
+    size_t key_size = 16;
+    kryptos_task_ctx t;
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
+                              "Friends and colleagues come to me,\n"
+                              "Speaking words of wisdom:\n"
+                              "Write in C.\n\n"
+                              " -- Write in C(\"Let it Be\")\n";
+    size_t plaintext_size = kstrlen((char *)plaintext);
+
+    // INFO(Rafael): TWOFISH-128/ECB.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha1, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha3_224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha3_256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha3_384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha3_512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, keccak224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, keccak256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, keccak384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, keccak512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, md4, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, md5, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, ripemd128, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, ripemd160, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, tiger, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, whirlpool, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, blake2s256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, blake2b512, key, key_size, kKryptosECB);
+
+    // INFO(Rafael): TWOFISH-128/CBC.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha1, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha3_224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha3_256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha3_384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, sha3_512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, keccak224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, keccak256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, keccak384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, keccak512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, md4, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, md5, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, ripemd128, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, ripemd160, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, tiger, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, whirlpool, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, blake2s256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, blake2b512, key, key_size, kKryptosCBC);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_twofish192_hmac_tests)
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
+    size_t key_size = 16;
+    kryptos_task_ctx t;
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
+                              "Friends and colleagues come to me,\n"
+                              "Speaking words of wisdom:\n"
+                              "Write in C.\n\n"
+                              " -- Write in C(\"Let it Be\")\n";
+    size_t plaintext_size = kstrlen((char *)plaintext);
+
+    // INFO(Rafael): TWOFISH-192/ECB.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha1, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha3_224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha3_256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha3_384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha3_512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, keccak224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, keccak256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, keccak384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, keccak512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, md4, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, md5, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, ripemd128, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, ripemd160, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, tiger, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, whirlpool, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, blake2s256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, blake2b512, key, key_size, kKryptosECB);
+
+    // INFO(Rafael): TWOFISH-192/CBC.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha1, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha3_224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha3_256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha3_384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, sha3_512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, keccak224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, keccak256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, keccak384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, keccak512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, md4, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, md5, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, ripemd128, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, ripemd160, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, tiger, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, whirlpool, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, blake2s256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, blake2b512, key, key_size, kKryptosCBC);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_twofish256_hmac_tests)
+    kryptos_u8_t *key = (kryptos_u8_t *)"nooneknows\x00\x00\x00\x00\x00\x00";
+    size_t key_size = 16;
+    kryptos_task_ctx t;
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"When I find my code in tons of trouble,\n"
+                              "Friends and colleagues come to me,\n"
+                              "Speaking words of wisdom:\n"
+                              "Write in C.\n\n"
+                              " -- Write in C(\"Let it Be\")\n";
+    size_t plaintext_size = kstrlen((char *)plaintext);
+
+    // INFO(Rafael): TWOFISH-256/ECB.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha1, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha3_224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha3_256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha3_384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha3_512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, keccak224, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, keccak256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, keccak384, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, keccak512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, md4, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, md5, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, ripemd128, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, ripemd160, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, tiger, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, whirlpool, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, blake2s256, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, blake2b512, key, key_size, kKryptosECB);
+
+    // INFO(Rafael): TWOFISH-256/CBC.
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha1, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha3_224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha3_256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha3_384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, sha3_512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, keccak224, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, keccak256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, keccak384, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, keccak512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, md4, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, md5, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, ripemd128, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, ripemd160, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, tiger, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, whirlpool, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, blake2s256, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, blake2b512, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 #undef kryptos_run_hmac_tests

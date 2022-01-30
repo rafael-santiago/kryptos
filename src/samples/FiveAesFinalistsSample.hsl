@@ -1,0 +1,58 @@
+#
+#                                Copyright (C) 2022 by Rafael Santiago
+#
+# This is a free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+#
+
+include ../Toolsets.hsl
+
+local var toolset_name type string;
+
+local var src type list;
+local var inc type list;
+local var cflags type list;
+local var lib type list;
+local var ldflags type list;
+local var appname type string;
+
+project 5-aes-finalists-sample : toolset $toolset_name : $src, $inc, $cflags, $lib, $ldflags, $appname;
+
+5-aes-finalists-sample.preloading() {
+    $toolset_name = get_app_toolset();
+}
+
+5-aes-finalists-sample.prologue() {
+    $appname = "five-aes-finalists-sample";
+    if (hefesto.sys.os_name() == "windows") {
+        $appname = $appname + ".exe";
+    }
+    $src.clear();
+    $inc.clear();
+    $cflags.clear();
+    $lib.clear();
+    $ldflags.clear();
+    $src.add_item("five-aes-finalists-sample.c");
+    $inc = hefesto.sys.get_option("includes");
+    $cflags = hefesto.sys.get_option("cflags");
+    if ((hefesto.sys.os_name() == "netbsd" || hefesto.sys.os_name() == "windows" || hefesto.sys.os_name() == "sunos") &&
+        $cflags.index_of("-DNO_KRYPTOS_C99_SUPPORT") == -1) {
+        # INFO(Rafael): Let's enable c99 capabilities by default.
+        $cflags.add_item("-std=c99");
+    }
+    $lib = hefesto.sys.get_option("libraries");
+    $ldflags = hefesto.sys.get_option("ldflags");
+    if ($toolset_name.match("^msvc")) {
+        setup_sample_msvc_flags($cflags, $ldflags);
+    } else if (hefesto.sys.os_name() == "windows") {
+        $ldflags.add_item("-lbcrypt");
+    }
+}
+
+5-aes-finalists-sample.epilogue() {
+    if (hefesto.sys.last_forge_result() != 0) {
+        hefesto.sys.echo("~~~ ERROR\n");
+        hefesto.project.abort(1);
+    }
+}

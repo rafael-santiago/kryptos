@@ -27,6 +27,7 @@
 #include <kryptos_shacal2.h>
 #include <kryptos_noekeon.h>
 #include <kryptos_gost.h>
+#include <kryptos_twofish.h>
 #include <kryptos_rabbit.h>
 #include <kryptos_salsa20.h>
 #include <kryptos_chacha20.h>
@@ -442,7 +443,12 @@ static int kryptos_task_check_iv_data(kryptos_task_ctx **ktask) {
             return (((*ktask)->iv == NULL && (*ktask)->iv_size == 0) ||
                     ((*ktask)->iv != NULL && (*ktask)->iv_size == KRYPTOS_CHACHA20_IVSIZE));
 
-        default: // WARN(Rafael): Only to shut up the cumbersome compiler warning.
+        case kKryptosCipherTwofish128:
+        case kKryptosCipherTwofish192:
+        case kKryptosCipherTwofish256:
+            return ((*ktask)->iv_size == KRYPTOS_TWOFISH_BLOCKSIZE);
+
+        default: // WARN(Rafael): Only silenting off the cumbersome compiler warning.
             break;
     }
 

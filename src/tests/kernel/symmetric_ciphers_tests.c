@@ -687,3 +687,15 @@ KUTE_TEST_CASE(kryptos_gost_gcm_tests)
     kryptos_run_gcm_tests_no_support_with_custom_setup(gost, ktask, kryptos_gost_setup(ktask, (kryptos_u8_t *)"gost", 4, kKryptosGCM,
                                                        s1, s2, s3, s4, s5, s6, s7, s8));
 KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_twofish128_gcm_tests)
+    kryptos_run_gcm_tests(twofish128);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_twofish192_gcm_tests)
+    kryptos_run_gcm_tests(twofish192);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_twofish256_gcm_tests)
+    kryptos_run_gcm_tests(twofish256);
+KUTE_TEST_CASE_END

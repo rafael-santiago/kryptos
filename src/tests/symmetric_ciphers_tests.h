@@ -88,6 +88,12 @@ CUTE_DECLARE_TEST_CASE(kryptos_gost_ds_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_gost_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_twofish128_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_twofish192_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_twofish256_tests);
+
 CUTE_DECLARE_TEST_CASE(kryptos_bcrypt_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_bcrypt_verify_tests);
@@ -159,6 +165,12 @@ CUTE_DECLARE_TEST_CASE(kryptos_noekeon_d_gcm_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_gost_ds_gcm_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_gost_gcm_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_twofish128_gcm_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_twofish192_gcm_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_twofish256_gcm_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_salsa20_tests);
 

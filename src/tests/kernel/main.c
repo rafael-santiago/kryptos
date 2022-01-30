@@ -104,6 +104,9 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_noekeon_d_gcm_tests);
     KUTE_RUN_TEST(kryptos_gost_ds_gcm_tests);
     KUTE_RUN_TEST(kryptos_gost_gcm_tests);
+    KUTE_RUN_TEST(kryptos_twofish128_gcm_tests);
+    KUTE_RUN_TEST(kryptos_twofish192_gcm_tests);
+    KUTE_RUN_TEST(kryptos_twofish256_gcm_tests);
 
     KUTE_RUN_TEST(kryptos_des_weak_keys_detection_tests);
 

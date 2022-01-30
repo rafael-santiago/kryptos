@@ -981,6 +981,17 @@ CUTE_TEST_CASE(kryptos_gost_tests)
                                                                         gost_sboxes[tv % gost_sboxes_nr].s8));
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_twofish128_tests)
+    kryptos_run_block_cipher_tests(twofish128, KRYPTOS_TWOFISH_BLOCKSIZE);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_twofish192_tests)
+    kryptos_run_block_cipher_tests(twofish192, KRYPTOS_TWOFISH_BLOCKSIZE);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_twofish256_tests)
+    kryptos_run_block_cipher_tests(twofish256, KRYPTOS_TWOFISH_BLOCKSIZE);
+CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_des_weak_keys_detection_tests)
 #define REGISTER_DES_WEAK_KEY(k) (k)
@@ -1349,6 +1360,18 @@ CUTE_TEST_CASE(kryptos_gost_gcm_tests)
     };
     kryptos_run_gcm_tests_no_support_with_custom_setup(gost, ktask, kryptos_gost_setup(ktask, "gost", 4, kKryptosGCM,
                                                        s1, s2, s3, s4, s5, s6, s7, s8));
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_twofish128_gcm_tests)
+    kryptos_run_gcm_tests(twofish128);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_twofish192_gcm_tests)
+    kryptos_run_gcm_tests(twofish192);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_twofish256_gcm_tests)
+    kryptos_run_gcm_tests(twofish256);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_salsa20_tests)

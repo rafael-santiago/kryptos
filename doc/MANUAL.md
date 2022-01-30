@@ -163,47 +163,50 @@ Until now, ``kryptos`` has the following symmetric ciphers:
 
 **Table 1**: The available symmetric ciphers.
 
-|    **Cipher**                   |**Type**|    **Internal constant ID**      |  **Internal Name** |
-|:-------------------------------:|:------:|:--------------------------------:|:------------------:|
-|   ``ARC4``                      | Stream |       ``kKryptosCipherARC4``     |      ``arc4``      |
-|   ``SEAL``                      | Stream |       ``kKryptosCipherSEAL``     |      ``seal``      |
-|  ``RABBIT``                     | Stream |       ``kKryptosCipherRABBIT``   |      ``rabbit``    |
-|  ``SALSA20``                    | Stream |       ``kKryptosCipherSALSA20``  |      ``salsa20``   |
-|  ``CHACHA20``                   | Stream |       ``kKryptosCipherCHACHA20`` |      ``chacha20``  |
-| ``AES-128``                     | Block  |       ``kKryptosCipherAES128``   |      ``aes128``    |
-| ``AES-192``                     | Block  |       ``kKryptosCipherAES192``   |      ``aes192``    |
-| ``AES-256``                     | Block  |       ``kKryptosCipherAES256``   |      ``aes256``    |
-|   ``DES``                       | Block  |       ``kKryptosCipherDES``      |       ``des``      |
-|   ``3DES``                      | Block  |       ``kKryptosCipher3DES``     |    ``triple_des``  |
-| ``3DES-EDE``                    | Block  |       ``kKryptosCipher3DESEDE``  |  ``triple_des_ede``|
-|   ``IDEA``                      | Block  |       ``kKryptosCipherIDEA``     |       ``idea``     |
-|    ``RC2``                      | Block  |       ``kKryptosCipherRC2``      |        ``rc2``     |
-|    ``RC5``                      | Block  |       ``kKryptosCipherRC5``      |        ``rc5``     |
-|   ``RC6-128``                   | Block  |       ``kKryptosCipherRC6128``   |      ``rc6_128``   |
-|   ``RC6-192``                   | Block  |       ``kKryptosCipherRC6192``   |      ``rc6_192``   |
-|   ``RC6-256``                   | Block  |       ``kKryptosCipherRC6256``   |      ``rc6_256``   |
-|   ``FEAL``                      | Block  |       ``kKryptosCipherFEAL``     |       ``feal``     |
-|  ``CAST5``                      | Block  |       ``kKryptosCipherCAST5``    |       ``cast5``    |
-| ``CAMELLIA-128``                | Block  |       ``kKryptosCipherCAMELLIA`` |    ``camellia128`` |
-| ``CAMELLIA-192``                | Block  |       ``kKryptosCipherCAMELLIA`` |    ``camellia192`` |
-| ``CAMELLIA-256``                | Block  |       ``kKryptosCipherCAMELLIA`` |    ``camellia256`` |
-| ``SAFER-K64``                   | Block  |       ``kKryptosCipherSAFERK64`` |     ``saferk64``   |
-| ``BLOWFISH``                    | Block  |       ``kKryptosCipherBLOWFISH`` |     ``blowfish``   |
-| ``SERPENT``                     | Block  |       ``kKryptosCipherSERPENT``  |      ``serpent``   |
-|   ``TEA``                       | Block  |       ``kKryptosCipherTEA``      |        ``tea``     |
-|   ``XTEA``                      | Block  |       ``kKryptosCipherXTEA``     |        ``xtea``    |
-|  ``MISTY1``                     | Block  |       ``kKryptosCipherMISTY1``   |        ``misty1``  |
-| ``MARS-128``                    | Block  |       ``kKryptosCipherMARS128``  |       ``mars128``  |
-| ``MARS-192``                    | Block  |       ``kKryptosCipherMARS192``  |       ``mars192``  |
-| ``MARS-256``                    | Block  |       ``kKryptosCipherMARS256``  |       ``mars256``  |
-| ``PRESENT-80``                  | Block  |       ``kKryptosCipherPRESENT``  |      ``present80`` |
-| ``PRESENT-128``                 | Block  |       ``kKryptosCipherPRESENT``  |      ``present128``|
-| ``SHACAL-1``                    | Block  |       ``kKryptosCipherSHACAL1``  |       ``shacal1``  |
-| ``SHACAL-2``                    | Block  |       ``kKryptosCipherSHACAL2``  |       ``shacal2``  |
-| ``NOEKEON`` (indirect key mode) | Block  |       ``kKryptosCipherNOEKEON``  |       ``noekeon``  |
-| ``NOEKEON`` (direct key mode)   | Block  |       ``kKryptosCipherNOEKEOND`` |       ``noekeon_d``|
-|  ``GOST`` (with DES s-boxes)    | Block  |       ``kKryptosCipherGOSTDS``   |       ``gost_ds``  |
-|  ``GOST``                       | Block  |       ``kKryptosCipherGOST``     |       ``gost``     |
+|    **Cipher**                   |**Type**|    **Internal constant ID**        |  **Internal Name** |
+|:-------------------------------:|:------:|:----------------------------------:|:------------------:|
+|   ``ARC4``                      | Stream |       ``kKryptosCipherARC4``       |      ``arc4``      |
+|   ``SEAL``                      | Stream |       ``kKryptosCipherSEAL``       |      ``seal``      |
+|  ``RABBIT``                     | Stream |       ``kKryptosCipherRABBIT``     |      ``rabbit``    |
+|  ``SALSA20``                    | Stream |       ``kKryptosCipherSALSA20``    |      ``salsa20``   |
+|  ``CHACHA20``                   | Stream |       ``kKryptosCipherCHACHA20``   |      ``chacha20``  |
+| ``AES-128``                     | Block  |       ``kKryptosCipherAES128``     |      ``aes128``    |
+| ``AES-192``                     | Block  |       ``kKryptosCipherAES192``     |      ``aes192``    |
+| ``AES-256``                     | Block  |       ``kKryptosCipherAES256``     |      ``aes256``    |
+|   ``DES``                       | Block  |       ``kKryptosCipherDES``        |       ``des``      |
+|   ``3DES``                      | Block  |       ``kKryptosCipher3DES``       |    ``triple_des``  |
+| ``3DES-EDE``                    | Block  |       ``kKryptosCipher3DESEDE``    |  ``triple_des_ede``|
+|   ``IDEA``                      | Block  |       ``kKryptosCipherIDEA``       |       ``idea``     |
+|    ``RC2``                      | Block  |       ``kKryptosCipherRC2``        |        ``rc2``     |
+|    ``RC5``                      | Block  |       ``kKryptosCipherRC5``        |        ``rc5``     |
+|   ``RC6-128``                   | Block  |       ``kKryptosCipherRC6128``     |      ``rc6_128``   |
+|   ``RC6-192``                   | Block  |       ``kKryptosCipherRC6192``     |      ``rc6_192``   |
+|   ``RC6-256``                   | Block  |       ``kKryptosCipherRC6256``     |      ``rc6_256``   |
+|   ``FEAL``                      | Block  |       ``kKryptosCipherFEAL``       |       ``feal``     |
+|  ``CAST5``                      | Block  |       ``kKryptosCipherCAST5``      |       ``cast5``    |
+| ``CAMELLIA-128``                | Block  |       ``kKryptosCipherCAMELLIA``   |    ``camellia128`` |
+| ``CAMELLIA-192``                | Block  |       ``kKryptosCipherCAMELLIA``   |    ``camellia192`` |
+| ``CAMELLIA-256``                | Block  |       ``kKryptosCipherCAMELLIA``   |    ``camellia256`` |
+| ``SAFER-K64``                   | Block  |       ``kKryptosCipherSAFERK64``   |     ``saferk64``   |
+| ``BLOWFISH``                    | Block  |       ``kKryptosCipherBLOWFISH``   |     ``blowfish``   |
+| ``SERPENT``                     | Block  |       ``kKryptosCipherSERPENT``    |      ``serpent``   |
+|   ``TEA``                       | Block  |       ``kKryptosCipherTEA``        |        ``tea``     |
+|   ``XTEA``                      | Block  |       ``kKryptosCipherXTEA``       |        ``xtea``    |
+|  ``MISTY1``                     | Block  |       ``kKryptosCipherMISTY1``     |        ``misty1``  |
+| ``MARS-128``                    | Block  |       ``kKryptosCipherMARS128``    |       ``mars128``  |
+| ``MARS-192``                    | Block  |       ``kKryptosCipherMARS192``    |       ``mars192``  |
+| ``MARS-256``                    | Block  |       ``kKryptosCipherMARS256``    |       ``mars256``  |
+| ``PRESENT-80``                  | Block  |       ``kKryptosCipherPRESENT``    |      ``present80`` |
+| ``PRESENT-128``                 | Block  |       ``kKryptosCipherPRESENT``    |      ``present128``|
+| ``SHACAL-1``                    | Block  |       ``kKryptosCipherSHACAL1``    |       ``shacal1``  |
+| ``SHACAL-2``                    | Block  |       ``kKryptosCipherSHACAL2``    |       ``shacal2``  |
+| ``NOEKEON`` (indirect key mode) | Block  |       ``kKryptosCipherNOEKEON``    |       ``noekeon``  |
+| ``NOEKEON`` (direct key mode)   | Block  |       ``kKryptosCipherNOEKEOND``   |       ``noekeon_d``|
+|  ``GOST`` (with DES s-boxes)    | Block  |       ``kKryptosCipherGOSTDS``     |       ``gost_ds``  |
+|  ``GOST``                       | Block  |       ``kKryptosCipherGOST``       |       ``gost``     |
+| ``TWOFISH-128``                 | Block  |       ``kKryptosCipherTwofish128`` |    ``twofish128``  |
+| ``TWOFISH-192``                 | Block  |       ``kKryptosCipherTwofish192`` |    ``twofish192``  |
+| ``TWOFISH-256``                 | Block  |       ``kKryptosCipherTwofish256`` |    ``twofish256``  |
 
 The available modes of operation for block ciphers are: ``ECB``, ``CBC``, ``CTR``, ``OFB`` and ``GCM``. So in practice,
 considering the ``OFB`` and ``CTR`` modes (also ``GCM`` indirectly), we have much more stream ciphers.
@@ -211,7 +214,7 @@ considering the ``OFB`` and ``CTR`` modes (also ``GCM`` indirectly), we have muc
 As you should know, originally, the GCM mode is only supported by block ciphers which work with 128-bit blocks. Currently
 these are the ciphers with support for GCM mode in kryptos: ``AES-128``, ``AES-192``, ``AES-256``, ``RC6-128``, ``RC6-192``,
 ``RC6-256``, ``CAMELLIA-128``, ``CAMELLIA-192``, ``CAMELLIA-256``, ``SERPENT``, ``MARS-128``, ``MARS-192``, ``MARS-256``,
-``NOEKEON`` (indirect key mode), ``NOEKEON`` (direct key mode).
+``NOEKEON`` (indirect key mode), ``NOEKEON`` (direct key mode), ``TWOFISH-128``, ``TWOFISH-192``, ``TWOFISH-256``.
 
 When you try to run a cipher whithout support for GCM mode an error will be returned (``kKryptosNoSupport``).
 More on cipher modes will be treated later. Similarly, more details about how to use GCM will be shown later, too.
