@@ -60,6 +60,9 @@ CUTE_DECLARE_TEST_CASE(kryptos_gost_ds_dsl_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_gost_dsl_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_salsa20_dsl_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_chacha20_dsl_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_twofish128_dsl_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_twofish192_dsl_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_twofish256_dsl_tests);
 #endif
 
 CUTE_TEST_CASE_SUITE(kryptos_dsl_tests)
@@ -109,6 +112,9 @@ CUTE_TEST_CASE_SUITE(kryptos_dsl_tests)
     CUTE_RUN_TEST(kryptos_noekeon_d_dsl_tests);
     CUTE_RUN_TEST(kryptos_gost_ds_dsl_tests);
     CUTE_RUN_TEST(kryptos_gost_dsl_tests);
+    CUTE_RUN_TEST(kryptos_twofish128_dsl_tests);
+    CUTE_RUN_TEST(kryptos_twofish192_dsl_tests);
+    CUTE_RUN_TEST(kryptos_twofish256_dsl_tests);
 #endif
 CUTE_TEST_CASE_SUITE_END
 
@@ -3606,6 +3612,294 @@ CUTE_TEST_CASE(kryptos_gost_dsl_tests)
     CUTE_ASSERT(ktask->result == kKryptosNoSupport);
 
     kryptos_task_free(ktask, KRYPTOS_TASK_IV);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_twofish128_dsl_tests)
+    kryptos_task_ctx t, *ktask = &t;
+
+    kryptos_task_init_as_null(ktask);
+
+    // TWOFISH-128 ECB
+
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_run_cipher(twofish128, ktask, "twofish128", 10, kKryptosECB);
+
+    CUTE_ASSERT(ktask->out != NULL);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_run_cipher(twofish128, ktask, "twofish128", 10, kKryptosECB);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+
+    // TWOFISH-128 CBC
+
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_run_cipher(twofish128, ktask, "twofish128", 10, kKryptosCBC);
+
+    CUTE_ASSERT(ktask->out != NULL);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_run_cipher(twofish128, ktask, "twofish128", 10, kKryptosCBC);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
+    // TWOFISH-128 OFB
+
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_run_cipher(twofish128, ktask, "twofish128", 10, kKryptosOFB);
+
+    CUTE_ASSERT(ktask->out != NULL);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_run_cipher(twofish128, ktask, "twofish128", 10, kKryptosOFB);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
+    // TWOFISH-128 CTR
+
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_run_cipher(twofish128, ktask, "twofish128", 10, kKryptosCTR);
+
+    CUTE_ASSERT(ktask->out != NULL);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_run_cipher(twofish128, ktask, "twofish128", 10, kKryptosCTR);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
+    // TWOFISH-128 GCM
+
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_run_cipher(twofish128, ktask, "twofish128", 10, kKryptosGCM);
+
+    CUTE_ASSERT(ktask->out != NULL);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_run_cipher(twofish128, ktask, "twofish128", 10, kKryptosGCM);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_twofish192_dsl_tests)
+    kryptos_task_ctx t, *ktask = &t;
+
+    kryptos_task_init_as_null(ktask);
+
+    // TWOFISH-192 ECB
+
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_run_cipher(twofish192, ktask, "twofish192", 10, kKryptosECB);
+
+    CUTE_ASSERT(ktask->out != NULL);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_run_cipher(twofish192, ktask, "twofish192", 10, kKryptosECB);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+
+    // TWOFISH-192 CBC
+
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_run_cipher(twofish192, ktask, "twofish192", 10, kKryptosCBC);
+
+    CUTE_ASSERT(ktask->out != NULL);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_run_cipher(twofish192, ktask, "twofish192", 10, kKryptosCBC);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
+    // TWOFISH-192 OFB
+
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_run_cipher(twofish192, ktask, "twofish192", 10, kKryptosOFB);
+
+    CUTE_ASSERT(ktask->out != NULL);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_run_cipher(twofish192, ktask, "twofish192", 10, kKryptosOFB);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
+    // TWOFISH-192 CTR
+
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_run_cipher(twofish192, ktask, "twofish192", 10, kKryptosCTR);
+
+    CUTE_ASSERT(ktask->out != NULL);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_run_cipher(twofish192, ktask, "twofish192", 10, kKryptosCTR);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
+    // TWOFISH-192 GCM
+
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_run_cipher(twofish192, ktask, "twofish192", 10, kKryptosGCM);
+
+    CUTE_ASSERT(ktask->out != NULL);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_run_cipher(twofish192, ktask, "twofish192", 10, kKryptosGCM);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_twofish256_dsl_tests)
+    kryptos_task_ctx t, *ktask = &t;
+
+    kryptos_task_init_as_null(ktask);
+
+    // TWOFISH-256 ECB
+
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_run_cipher(twofish256, ktask, "twofish256", 10, kKryptosECB);
+
+    CUTE_ASSERT(ktask->out != NULL);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_run_cipher(twofish256, ktask, "twofish256", 10, kKryptosECB);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+
+    // TWOFISH-256 CBC
+
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_run_cipher(twofish256, ktask, "twofish256", 10, kKryptosCBC);
+
+    CUTE_ASSERT(ktask->out != NULL);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_run_cipher(twofish256, ktask, "twofish256", 10, kKryptosCBC);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
+    // TWOFISH-256 OFB
+
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_run_cipher(twofish256, ktask, "twofish256", 10, kKryptosOFB);
+
+    CUTE_ASSERT(ktask->out != NULL);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_run_cipher(twofish256, ktask, "twofish256", 10, kKryptosOFB);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
+    // TWOFISH-256 CTR
+
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_run_cipher(twofish256, ktask, "twofish256", 10, kKryptosCTR);
+
+    CUTE_ASSERT(ktask->out != NULL);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_run_cipher(twofish256, ktask, "twofish256", 10, kKryptosCTR);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
+
+    // TWOFISH-256 GCM
+
+    kryptos_task_set_in(ktask, dsl_tests_data, dsl_tests_data_size);
+    kryptos_task_set_encrypt_action(ktask);
+
+    kryptos_run_cipher(twofish256, ktask, "twofish256", 10, kKryptosGCM);
+
+    CUTE_ASSERT(ktask->out != NULL);
+
+    kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
+    kryptos_task_set_decrypt_action(ktask);
+
+    kryptos_run_cipher(twofish256, ktask, "twofish256", 10, kKryptosGCM);
+
+    CUTE_ASSERT(ktask->out_size == dsl_tests_data_size);
+    CUTE_ASSERT(memcmp(ktask->out, dsl_tests_data, ktask->out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN | KRYPTOS_TASK_IV);
 CUTE_TEST_CASE_END
 
 #endif

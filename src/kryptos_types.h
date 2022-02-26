@@ -182,6 +182,9 @@ typedef enum {
     kKryptosCipherNOEKEOND,
     kKryptosCipherGOSTDS,
     kKryptosCipherGOST,
+    kKryptosCipherTwofish128,
+    kKryptosCipherTwofish192,
+    kKryptosCipherTwofish256,
     // INFO(Rafael): PK algorithms.
     kKryptosCipherRSA,
     kKryptosCipherRSAOAEP,
@@ -444,6 +447,11 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
 # define KRYPTOS_UNUSED(p) (p)
 #else
 # define KRYPTOS_UNUSED(p)
+#endif
+
+#if defined(KRYPTOS_KERNEL_MODE) && defined(__linux__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeclaration-after-statement"
 #endif
 
 #define KRYPTOS_IMPL_STANDARD_BLOCK_CIPHER_GCM_E(cipher_name)\

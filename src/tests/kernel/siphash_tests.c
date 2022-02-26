@@ -94,6 +94,9 @@ KUTE_DECLARE_TEST_CASE(kryptos_noekeon_siphash_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_noekeon_d_siphash_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_gost_ds_siphash_tests);
 KUTE_DECLARE_TEST_CASE(kryptos_gost_siphash_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_twofish128_siphash_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_twofish192_siphash_tests);
+KUTE_DECLARE_TEST_CASE(kryptos_twofish256_siphash_tests);
 #endif // defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_SIPHASH_TESTS)
 
 KUTE_TEST_CASE(kryptos_siphash_tests)
@@ -137,6 +140,9 @@ KUTE_TEST_CASE(kryptos_siphash_tests)
     KUTE_RUN_TEST(kryptos_noekeon_d_siphash_tests);
     KUTE_RUN_TEST(kryptos_gost_ds_siphash_tests);
     KUTE_RUN_TEST(kryptos_gost_siphash_tests);
+    KUTE_RUN_TEST(kryptos_twofish128_siphash_tests);
+    KUTE_RUN_TEST(kryptos_twofish192_siphash_tests);
+    KUTE_RUN_TEST(kryptos_twofish256_siphash_tests);
 #else
 # if !defined(KRYPTOS_NO_SIPHASH_TESTS)
 #  if defined(__FreeBSD__) || defined(__NetBSD__)
@@ -980,6 +986,69 @@ KUTE_TEST_CASE(kryptos_gost_siphash_tests)
     kryptos_run_siphash_tests(t, plaintext, plaintext_size, gost, 2, 4, key, key_size, kKryptosCBC, s1, s2, s3, s4, s5, s6, s7, s8);
     kryptos_run_siphash_tests(t, plaintext, plaintext_size, gost, 2, 4, key, key_size, kKryptosOFB, s1, s2, s3, s4, s5, s6, s7, s8);
     kryptos_run_siphash_tests(t, plaintext, plaintext_size, gost, 2, 4, key, key_size, kKryptosCTR, s1, s2, s3, s4, s5, s6, s7, s8);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_twofish128_siphash_tests)
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"'The most important thing to do in your life "
+                              "is not interfere with somebody else's life' "
+                              "\n"
+                              "'If you end up with a boring, miserable life "
+                              "because you listened to your mom, your dad, "
+                              "your teacher, your priest, or some guy on "
+                              "television telling you how to do your shit, "
+                              "then you deserve it.' (Frank Zappa)";
+    size_t plaintext_size = strlen((char *)plaintext);
+    kryptos_task_ctx t;
+    kryptos_u8_t *key = (kryptos_u8_t *)"SipHashTwofishTest";
+    size_t key_size = strlen((char *)key);
+    kryptos_run_siphash_tests(t, plaintext, plaintext_size, twofish128, 2, 4, key, key_size, kKryptosECB);
+    kryptos_run_siphash_tests(t, plaintext, plaintext_size, twofish128, 2, 4, key, key_size, kKryptosCBC);
+    kryptos_run_siphash_tests(t, plaintext, plaintext_size, twofish128, 2, 4, key, key_size, kKryptosOFB);
+    kryptos_run_siphash_tests(t, plaintext, plaintext_size, twofish128, 2, 4, key, key_size, kKryptosCTR);
+    // INFO(Rafael): An overkill but possible, let's test.
+    kryptos_run_siphash_tests(t, plaintext, plaintext_size, twofish128, 2, 4, key, key_size, kKryptosGCM);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_twofish192_siphash_tests)
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"'The most important thing to do in your life "
+                              "is not interfere with somebody else's life' "
+                              "\n"
+                              "'If you end up with a boring, miserable life "
+                              "because you listened to your mom, your dad, "
+                              "your teacher, your priest, or some guy on "
+                              "television telling you how to do your shit, "
+                              "then you deserve it.' (Frank Zappa)";
+    size_t plaintext_size = strlen((char *)plaintext);
+    kryptos_task_ctx t;
+    kryptos_u8_t *key = (kryptos_u8_t *)"SipHashTwofishTest";
+    size_t key_size = strlen((char *)key);
+    kryptos_run_siphash_tests(t, plaintext, plaintext_size, twofish192, 2, 4, key, key_size, kKryptosECB);
+    kryptos_run_siphash_tests(t, plaintext, plaintext_size, twofish192, 2, 4, key, key_size, kKryptosCBC);
+    kryptos_run_siphash_tests(t, plaintext, plaintext_size, twofish192, 2, 4, key, key_size, kKryptosOFB);
+    kryptos_run_siphash_tests(t, plaintext, plaintext_size, twofish192, 2, 4, key, key_size, kKryptosCTR);
+    // INFO(Rafael): An overkill but possible, let's test.
+    kryptos_run_siphash_tests(t, plaintext, plaintext_size, twofish192, 2, 4, key, key_size, kKryptosGCM);
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_twofish256_siphash_tests)
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"'The most important thing to do in your life "
+                              "is not interfere with somebody else's life' "
+                              "\n"
+                              "'If you end up with a boring, miserable life "
+                              "because you listened to your mom, your dad, "
+                              "your teacher, your priest, or some guy on "
+                              "television telling you how to do your shit, "
+                              "then you deserve it.' (Frank Zappa)";
+    size_t plaintext_size = strlen((char *)plaintext);
+    kryptos_task_ctx t;
+    kryptos_u8_t *key = (kryptos_u8_t *)"SipHashTwofishTest";
+    size_t key_size = strlen((char *)key);
+    kryptos_run_siphash_tests(t, plaintext, plaintext_size, twofish256, 2, 4, key, key_size, kKryptosECB);
+    kryptos_run_siphash_tests(t, plaintext, plaintext_size, twofish256, 2, 4, key, key_size, kKryptosCBC);
+    kryptos_run_siphash_tests(t, plaintext, plaintext_size, twofish256, 2, 4, key, key_size, kKryptosOFB);
+    kryptos_run_siphash_tests(t, plaintext, plaintext_size, twofish256, 2, 4, key, key_size, kKryptosCTR);
+    // INFO(Rafael): An overkill but possible, let's test.
+    kryptos_run_siphash_tests(t, plaintext, plaintext_size, twofish256, 2, 4, key, key_size, kKryptosGCM);
 KUTE_TEST_CASE_END
 
 #endif // !defined(KRYPTOS_NO_SIPHASH_TESTS)

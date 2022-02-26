@@ -45,6 +45,9 @@ CUTE_DECLARE_TEST_CASE(kryptos_saferk64_bad_hmac_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_triple_des_bad_hmac_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_triple_des_ede_bad_hmac_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_gost_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_twofish128_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_twofish192_bad_hmac_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_twofish256_bad_hmac_tests);
 
 #endif
 
@@ -193,6 +196,9 @@ CUTE_TEST_CASE(kryptos_bad_decryption_tests)
                                                        kryptos_gost_setup(ktask, "Boom!", 5, kKryptosCTR,
                                                        gost_s1, gost_s2, gost_s3, gost_s4, gost_s5, gost_s6, gost_s7, gost_s8),
                                                        ktask);
+    kryptos_bad_buf_run_block_cipher(twofish128, ktask);
+    kryptos_bad_buf_run_block_cipher(twofish192, ktask);
+    kryptos_bad_buf_run_block_cipher(twofish256, ktask);
 
     kryptos_task_init_as_null(ktask);
 
@@ -261,6 +267,9 @@ CUTE_TEST_CASE_SUITE(kryptos_bad_hmac_tests)
     CUTE_RUN_TEST(kryptos_triple_des_ede_bad_hmac_tests);
     CUTE_RUN_TEST(kryptos_xtea_bad_hmac_tests);
     CUTE_RUN_TEST(kryptos_gost_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_twofish128_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_twofish192_bad_hmac_tests);
+    CUTE_RUN_TEST(kryptos_twofish256_bad_hmac_tests);
 
 #else
 # if !defined(KRYPTOS_NO_HMAC_TESTS)
@@ -3315,6 +3324,253 @@ CUTE_TEST_CASE(kryptos_gost_bad_hmac_tests)
                              gost_s1, gost_s2, gost_s3, gost_s4, gost_s5, gost_s6, gost_s7, gost_s8);
     kryptos_bad_buf_run_hmac(gost, whirlpool, ktask, key, key_size, kKryptosCTR,
                              gost_s1, gost_s2, gost_s3, gost_s4, gost_s5, gost_s6, gost_s7, gost_s8);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_twofish128_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
+
+    kryptos_bad_buf_run_hmac(twofish128, sha1, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, sha256, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, sha384, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, sha512, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, sha3_224, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, sha3_256, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, sha3_384, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, sha3_512, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, keccak224, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, keccak256, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, keccak384, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, keccak512, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, md4, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, md5, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, ripemd128, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, ripemd160, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, tiger, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish128, whirlpool, ktask, key, key_size, kKryptosECB);
+
+    kryptos_bad_buf_run_hmac(twofish128, sha1, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, sha256, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, sha384, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, sha512, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, sha3_224, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, sha3_256, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, sha3_384, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, sha3_512, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, keccak224, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, keccak256, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, keccak384, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, keccak512, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, md4, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, md5, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, ripemd128, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, ripemd160, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, tiger, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish128, whirlpool, ktask, key, key_size, kKryptosCBC);
+
+    kryptos_bad_buf_run_hmac(twofish128, sha1, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, sha256, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, sha384, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, sha512, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, sha3_224, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, sha3_256, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, sha3_384, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, sha3_512, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, keccak224, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, keccak256, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, keccak384, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, keccak512, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, md4, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, md5, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, ripemd128, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, ripemd160, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, tiger, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish128, whirlpool, ktask, key, key_size, kKryptosOFB);
+
+    kryptos_bad_buf_run_hmac(twofish128, sha1, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, sha256, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, sha384, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, sha512, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, sha3_224, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, sha3_256, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, sha3_384, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, sha3_512, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, keccak224, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, keccak256, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, keccak384, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, keccak512, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, md4, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, md5, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, ripemd128, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, ripemd160, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, tiger, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish128, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+
+CUTE_TEST_CASE(kryptos_twofish192_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
+
+    kryptos_bad_buf_run_hmac(twofish192, sha1, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, sha256, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, sha384, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, sha512, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, sha3_224, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, sha3_256, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, sha3_384, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, sha3_512, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, keccak224, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, keccak256, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, keccak384, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, keccak512, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, md4, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, md5, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, ripemd128, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, ripemd160, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, tiger, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish192, whirlpool, ktask, key, key_size, kKryptosECB);
+
+    kryptos_bad_buf_run_hmac(twofish192, sha1, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, sha256, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, sha384, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, sha512, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, sha3_224, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, sha3_256, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, sha3_384, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, sha3_512, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, keccak224, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, keccak256, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, keccak384, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, keccak512, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, md4, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, md5, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, ripemd128, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, ripemd160, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, tiger, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish192, whirlpool, ktask, key, key_size, kKryptosCBC);
+
+    kryptos_bad_buf_run_hmac(twofish192, sha1, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, sha256, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, sha384, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, sha512, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, sha3_224, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, sha3_256, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, sha3_384, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, sha3_512, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, keccak224, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, keccak256, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, keccak384, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, keccak512, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, md4, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, md5, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, ripemd128, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, ripemd160, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, tiger, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish192, whirlpool, ktask, key, key_size, kKryptosOFB);
+
+    kryptos_bad_buf_run_hmac(twofish192, sha1, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, sha256, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, sha384, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, sha512, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, sha3_224, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, sha3_256, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, sha3_384, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, sha3_512, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, keccak224, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, keccak256, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, keccak384, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, keccak512, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, md4, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, md5, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, ripemd128, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, ripemd160, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, tiger, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish192, whirlpool, ktask, key, key_size, kKryptosCTR);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_twofish256_bad_hmac_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *key = "BoOmM!";
+    size_t key_size = 6;
+
+    kryptos_bad_buf_run_hmac(twofish256, sha1, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, sha256, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, sha384, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, sha512, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, sha3_224, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, sha3_256, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, sha3_384, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, sha3_512, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, keccak224, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, keccak256, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, keccak384, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, keccak512, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, md4, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, md5, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, ripemd128, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, ripemd160, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, tiger, ktask, key, key_size, kKryptosECB);
+    kryptos_bad_buf_run_hmac(twofish256, whirlpool, ktask, key, key_size, kKryptosECB);
+
+    kryptos_bad_buf_run_hmac(twofish256, sha1, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, sha256, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, sha384, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, sha512, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, sha3_224, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, sha3_256, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, sha3_384, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, sha3_512, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, keccak224, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, keccak256, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, keccak384, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, keccak512, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, md4, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, md5, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, ripemd128, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, ripemd160, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, tiger, ktask, key, key_size, kKryptosCBC);
+    kryptos_bad_buf_run_hmac(twofish256, whirlpool, ktask, key, key_size, kKryptosCBC);
+
+    kryptos_bad_buf_run_hmac(twofish256, sha1, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, sha256, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, sha384, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, sha512, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, sha3_224, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, sha3_256, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, sha3_384, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, sha3_512, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, keccak224, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, keccak256, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, keccak384, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, keccak512, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, md4, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, md5, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, ripemd128, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, ripemd160, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, tiger, ktask, key, key_size, kKryptosOFB);
+    kryptos_bad_buf_run_hmac(twofish256, whirlpool, ktask, key, key_size, kKryptosOFB);
+
+    kryptos_bad_buf_run_hmac(twofish256, sha1, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, sha256, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, sha384, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, sha512, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, sha3_224, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, sha3_256, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, sha3_384, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, sha3_512, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, keccak224, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, keccak256, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, keccak384, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, keccak512, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, md4, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, md5, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, ripemd128, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, ripemd160, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, tiger, ktask, key, key_size, kKryptosCTR);
+    kryptos_bad_buf_run_hmac(twofish256, whirlpool, ktask, key, key_size, kKryptosCTR);
 CUTE_TEST_CASE_END
 
 #endif

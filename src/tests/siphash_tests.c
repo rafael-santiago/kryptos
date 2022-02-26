@@ -49,6 +49,9 @@ CUTE_DECLARE_TEST_CASE(kryptos_noekeon_siphash_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_noekeon_d_siphash_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_gost_ds_siphash_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_gost_siphash_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_twofish128_siphash_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_twofish192_siphash_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_twofish256_siphash_tests);
 #endif // defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_SIPHASH_TESTS)
 
 CUTE_TEST_CASE(kryptos_siphash_basic_tests)
@@ -242,6 +245,9 @@ CUTE_TEST_CASE_SUITE(kryptos_siphash_tests)
     CUTE_RUN_TEST(kryptos_noekeon_d_siphash_tests);
     CUTE_RUN_TEST(kryptos_gost_ds_siphash_tests);
     CUTE_RUN_TEST(kryptos_gost_siphash_tests);
+    CUTE_RUN_TEST(kryptos_twofish128_siphash_tests);
+    CUTE_RUN_TEST(kryptos_twofish192_siphash_tests);
+    CUTE_RUN_TEST(kryptos_twofish256_siphash_tests);
 #else
 # if !defined(KRYPTOS_NO_SIPHASH_TESTS)
     printf("WARN: This test runs only when libkryptos is compiled with C99 support. It will be skipped.\n");
@@ -765,6 +771,45 @@ CUTE_TEST_CASE(kryptos_gost_siphash_tests)
     kryptos_run_siphash_tests(t, tv, tv_nr, data_size, gost, 2, 4, key, key_size, kKryptosCBC, s1, s2, s3, s4, s5, s6, s7, s8);
     kryptos_run_siphash_tests(t, tv, tv_nr, data_size, gost, 2, 4, key, key_size, kKryptosOFB, s1, s2, s3, s4, s5, s6, s7, s8);
     kryptos_run_siphash_tests(t, tv, tv_nr, data_size, gost, 2, 4, key, key_size, kKryptosCTR, s1, s2, s3, s4, s5, s6, s7, s8);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_twofish128_siphash_tests)
+    kryptos_task_ctx t;
+    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *key = "SipHashTwofish128Test";
+    size_t key_size = strlen(key);
+    kryptos_run_siphash_tests(t, tv, tv_nr, data_size, twofish128, 2, 4, key, key_size, kKryptosECB);
+    kryptos_run_siphash_tests(t, tv, tv_nr, data_size, twofish128, 2, 4, key, key_size, kKryptosCBC);
+    kryptos_run_siphash_tests(t, tv, tv_nr, data_size, twofish128, 2, 4, key, key_size, kKryptosOFB);
+    kryptos_run_siphash_tests(t, tv, tv_nr, data_size, twofish128, 2, 4, key, key_size, kKryptosCTR);
+    // INFO(Rafael): An overkill but possible, let's test.
+    kryptos_run_siphash_tests(t, tv, tv_nr, data_size, twofish128, 2, 4, key, key_size, kKryptosGCM);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_twofish192_siphash_tests)
+    kryptos_task_ctx t;
+    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *key = "SipHashTwofish192Test";
+    size_t key_size = strlen(key);
+    kryptos_run_siphash_tests(t, tv, tv_nr, data_size, twofish192, 2, 4, key, key_size, kKryptosECB);
+    kryptos_run_siphash_tests(t, tv, tv_nr, data_size, twofish192, 2, 4, key, key_size, kKryptosCBC);
+    kryptos_run_siphash_tests(t, tv, tv_nr, data_size, twofish192, 2, 4, key, key_size, kKryptosOFB);
+    kryptos_run_siphash_tests(t, tv, tv_nr, data_size, twofish192, 2, 4, key, key_size, kKryptosCTR);
+    // INFO(Rafael): An overkill but possible, let's test.
+    kryptos_run_siphash_tests(t, tv, tv_nr, data_size, twofish192, 2, 4, key, key_size, kKryptosGCM);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_twofish256_siphash_tests)
+    kryptos_task_ctx t;
+    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *key = "SipHashTwofish256Test";
+    size_t key_size = strlen(key);
+    kryptos_run_siphash_tests(t, tv, tv_nr, data_size, twofish256, 2, 4, key, key_size, kKryptosECB);
+    kryptos_run_siphash_tests(t, tv, tv_nr, data_size, twofish256, 2, 4, key, key_size, kKryptosCBC);
+    kryptos_run_siphash_tests(t, tv, tv_nr, data_size, twofish256, 2, 4, key, key_size, kKryptosOFB);
+    kryptos_run_siphash_tests(t, tv, tv_nr, data_size, twofish256, 2, 4, key, key_size, kKryptosCTR);
+    // INFO(Rafael): An overkill but possible, let's test.
+    kryptos_run_siphash_tests(t, tv, tv_nr, data_size, twofish256, 2, 4, key, key_size, kKryptosGCM);
 CUTE_TEST_CASE_END
 
 #endif // !defined(KRYPTOS_NO_SIPHASH_TESTS)

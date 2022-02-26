@@ -111,6 +111,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_noekeon_d_tests);
     CUTE_RUN_TEST(kryptos_gost_ds_tests);
     CUTE_RUN_TEST(kryptos_gost_tests);
+    CUTE_RUN_TEST(kryptos_twofish128_tests);
+    CUTE_RUN_TEST(kryptos_twofish192_tests);
+    CUTE_RUN_TEST(kryptos_twofish256_tests);
 
     // INFO(Rafael): Operation modes (complementary tests).
 
@@ -152,6 +155,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_noekeon_d_gcm_tests);
     CUTE_RUN_TEST(kryptos_gost_ds_gcm_tests);
     CUTE_RUN_TEST(kryptos_gost_gcm_tests);
+    CUTE_RUN_TEST(kryptos_twofish128_gcm_tests);
+    CUTE_RUN_TEST(kryptos_twofish192_gcm_tests);
+    CUTE_RUN_TEST(kryptos_twofish256_gcm_tests);
 
     CUTE_RUN_TEST(kryptos_bad_decryption_tests);
     CUTE_RUN_TEST(kryptos_bad_hmac_tests);

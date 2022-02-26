@@ -43,6 +43,7 @@
 #include <kryptos_shacal2.h>
 #include <kryptos_noekeon.h>
 #include <kryptos_gost.h>
+#include <kryptos_twofish.h>
 
 #include <kryptos_sha1.h>
 #include <kryptos_sha224_256.h>

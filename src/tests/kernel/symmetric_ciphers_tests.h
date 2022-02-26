@@ -86,4 +86,10 @@ KUTE_DECLARE_TEST_CASE(kryptos_gost_ds_gcm_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_gost_gcm_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_twofish128_gcm_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_twofish192_gcm_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_twofish256_gcm_tests);
+
 #endif

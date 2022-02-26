@@ -49,6 +49,9 @@ CUTE_DECLARE_TEST_CASE(kryptos_noekeon_poly1305_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_noekeon_d_poly1305_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_gost_ds_poly1305_tests);
 CUTE_DECLARE_TEST_CASE(kryptos_gost_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_twofish128_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_twofish192_poly1305_tests);
+CUTE_DECLARE_TEST_CASE(kryptos_twofish256_poly1305_tests);
 #endif // defined(KRYPTOS_C99) && !defined(KRYPTOS_NO_POLY1305_TESTS)
 
 CUTE_TEST_CASE_SUITE(kryptos_poly1305_tests)
@@ -92,6 +95,9 @@ CUTE_TEST_CASE_SUITE(kryptos_poly1305_tests)
     CUTE_RUN_TEST(kryptos_noekeon_d_poly1305_tests);
     CUTE_RUN_TEST(kryptos_gost_ds_poly1305_tests);
     CUTE_RUN_TEST(kryptos_gost_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_twofish128_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_twofish192_poly1305_tests);
+    CUTE_RUN_TEST(kryptos_twofish256_poly1305_tests);
 #else
 # if !defined(KRYPTOS_NO_POLY1305_TESTS)
     printf("WARN: This test runs only when libkryptos is compiled with C99 support. It will be skipped.\n");
@@ -709,6 +715,45 @@ CUTE_TEST_CASE(kryptos_gost_poly1305_tests)
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost, key, key_size, kKryptosCBC, s1, s2, s3, s4, s5, s6, s7, s8);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost, key, key_size, kKryptosOFB, s1, s2, s3, s4, s5, s6, s7, s8);
     kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, gost, key, key_size, kKryptosCTR, s1, s2, s3, s4, s5, s6, s7, s8);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_twofish128_poly1305_tests)
+    kryptos_task_ctx t;
+    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *key = "Poly1305TwofishTest";
+    size_t key_size = strlen(key);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, twofish128, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, twofish128, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, twofish128, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, twofish128, key, key_size, kKryptosCTR);
+    // INFO(Rafael): Overstated but possible so let's test.
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, twofish128, key, key_size, kKryptosGCM);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_twofish192_poly1305_tests)
+    kryptos_task_ctx t;
+    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *key = "Poly1305TwofishTest";
+    size_t key_size = strlen(key);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, twofish192, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, twofish192, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, twofish192, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, twofish192, key, key_size, kKryptosCTR);
+    // INFO(Rafael): Overstated but possible so let's test.
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, twofish192, key, key_size, kKryptosGCM);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_twofish256_poly1305_tests)
+    kryptos_task_ctx t;
+    size_t tv, tv_nr, data_size;
+    kryptos_u8_t *key = "Poly1305TwofishTest";
+    size_t key_size = strlen(key);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, twofish256, key, key_size, kKryptosECB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, twofish256, key, key_size, kKryptosCBC);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, twofish256, key, key_size, kKryptosOFB);
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, twofish256, key, key_size, kKryptosCTR);
+    // INFO(Rafael): Overstated but possible so let's test.
+    kryptos_run_poly1305_tests(t, tv, tv_nr, data_size, twofish256, key, key_size, kKryptosGCM);
 CUTE_TEST_CASE_END
 
 #endif // !defined(KRYPTOS_NO_POLY1305_TESTS)
