@@ -12,7 +12,7 @@
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // Máxima: 'Uhmm vou implementar o Twofish só de zoeira, perdeu o AES deve ser tranquilo, baba! Vou completar a         !!
-//              implementação dos cinco finalistas, meu "mini Everest" pessoal... Deixa eu ver a spec aqui...'          !!                                                                   !!
+//              implementação dos cinco finalistas, meu "mini Everest" pessoal... Deixa eu ver a spec aqui...'          !!
 //                                                                                                                      !!
 //         Três semanas depois, ainda preso nessa represa de castor chamada Twofish. [Thu 17 Feb 2022 01:34:12 AM BRST] !!
 //                                                                                                                      !!
