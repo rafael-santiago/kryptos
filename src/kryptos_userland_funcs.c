@@ -9,7 +9,7 @@
 
 #if defined(KRYPTOS_KERNEL_MODE) && !defined(__NetBSD__) && !defined(_WIN32)
 
-kryptos_u8_t toupper(const kryptos_u8_t c) {
+int toupper(const int c) {
     static kryptos_u8_t kryptos_toupper_lt[] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
                                                  'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 

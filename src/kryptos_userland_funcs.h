@@ -12,7 +12,7 @@
 
 #if defined(KRYPTOS_KERNEL_MODE) && !defined(__NetBSD__) && !defined(_WIN32)
 # define isdigit(d) ( (d) >= '0' && (d) <= '9' )
-  kryptos_u8_t toupper(const kryptos_u8_t c);
+  int toupper(const int c);
 #endif
 
 #if defined(KRYPTOS_KERNEL_MODE)
