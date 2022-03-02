@@ -5,6 +5,27 @@
     Rafael
 --
 
+vx20220000 [git-tag: 'vx20220000']
+
+    Increased library's support on ciphers, MAC and PRF besides some minor cosmetic
+    changes. Now kryptos offers full support for the five AES finalists.
+
+    Features:
+
+        - Added djb2 support.
+        - Added Salsa20 support.
+        - Added ChaCha20 support.
+        - Added MACs: Poly1305, SipHash (short messages).
+        - Added PRF: SipHash.
+        - Added Non-cryptographic hash: SipHash.
+        - Added Twofish (128, 192, 256) support.
+        - Build improvements: MSVC artifacts installing, kryptos-test.sys unloading problem,
+                              some remaining and minor GCC's compilation warnings solved.
+
+    Bugfixes:
+
+        - None.
+
 vx20210000 [git-tag: 'vx20210000']
 
     Well, this is my first formalization/gathering of codes that I have been implementing, maintaining
@@ -17,7 +38,7 @@ vx20210000 [git-tag: 'vx20210000']
                              camellia-192, camellia-256, safer-k64, blowfish, serpent, tea, xtea,
                              misty1, mars-128, mars-192, mars-256, present-80, present-128, shacal-1,
                              shacal-2, noekeon, noekeon (direct key), gost (with DES s-boxes), gost.
-        - Supported block ciphers mode: ecb, cbc, ofb, ctr, gcm.
+        - Supported block ciphers mode of operation: ecb, cbc, ofb, ctr, gcm.
         - Hashes: sha-1, sha-224, sha-256, sha-384, sha-512, sha3-224, sha3-256, sha3-384, sha3-512,
                   keccak-224, keccak-256, keccak-384, keccak-512, md4, md5, ripemd-128, ripemd-160,
                   tiger, whirlpool, blake2s256, blake2b512, blake2sN (variable output length),
