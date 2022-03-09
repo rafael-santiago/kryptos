@@ -14,18 +14,18 @@
 #define PBKDF2_DK_SIZE 16
 
 int main(int argc, char **argv) {
-    char password[4096];
+    kryptos_u8_t password[4096];
     kryptos_u8_t *dk, *d, *d_end;
     size_t dk_size, password_size;
 
     printf("Password: ");
-    fgets(password, sizeof(password) - 1, stdin);
+    fgets((char *)password, sizeof(password) - 1, stdin);
 
-    if ((password_size = strlen(password)) > 0) {
+    if ((password_size = strlen((char *)password)) > 0) {
         password[password_size--] = 0;
     }
 
-    dk = kryptos_pbkdf2(password, password_size, whirlpool, "Salt", 4, PBKDF2_COUNT, PBKDF2_DK_SIZE);
+    dk = kryptos_pbkdf2(password, password_size, whirlpool, (kryptos_u8_t *)"Salt", 4, PBKDF2_COUNT, PBKDF2_DK_SIZE);
 
     if (dk == NULL) {
         printf("ERROR: Unable to derive the user password.\n");

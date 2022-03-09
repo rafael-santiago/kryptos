@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 int main(int argc, char **argv) {
-    kryptos_u8_t *password = "1234";
+    kryptos_u8_t *password = (kryptos_u8_t *)"1234";
     size_t password_size = 4;
     kryptos_u8_t *hash;
     size_t hash_size;

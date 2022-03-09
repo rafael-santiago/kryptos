@@ -12,8 +12,8 @@
 
 int main(int argc, char **argv) {
     kryptos_task_ctx t, *ktask = &t;
-    kryptos_u8_t *plaintext = "Do not tamper with me!";
-    kryptos_u8_t *key = "the worst and common way of using a user key.";
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"Do not tamper with me!";
+    kryptos_u8_t *key = (kryptos_u8_t *)"the worst and common way of using a user key.";
     kryptos_u8_t *p, *p_end;
     int exit_code = 0;
 
@@ -34,9 +34,9 @@ int main(int argc, char **argv) {
     //                  kryptos_task_set_gcm_mode(ktask, &ctr_var, aad_buf, aad_buf_size)
     //
 
-    kryptos_task_set_in(ktask, plaintext, strlen(plaintext));
+    kryptos_task_set_in(ktask, plaintext, strlen((char *)plaintext));
     kryptos_task_set_encrypt_action(ktask);
-    kryptos_run_cipher(aes256, ktask, key, strlen(key), kKryptosGCM);
+    kryptos_run_cipher(aes256, ktask, key, strlen((char *)key), kKryptosGCM);
 
     ktask->in = NULL;
     ktask->in_size = 0;
@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
         //ktask->in[ktask->in_size >> 1] = ~ktask->in[ktask->in_size >> 1];
 
         kryptos_task_set_decrypt_action(ktask);
-        kryptos_run_cipher(aes256, ktask, key, strlen(key), kKryptosGCM);
+        kryptos_run_cipher(aes256, ktask, key, strlen((char *)key), kKryptosGCM);
 
         if (kryptos_last_task_succeed(ktask)) {
             printf("decrypted data: '");

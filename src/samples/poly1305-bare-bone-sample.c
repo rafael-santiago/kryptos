@@ -11,17 +11,17 @@
 #include <stdio.h>
 
 int main(int argc, char **argv) {
-    kryptos_u8_t *message = "\"I don't know why people are so keen to put the details of "
+    kryptos_u8_t *message = (kryptos_u8_t *)"\"I don't know why people are so keen to put the details of "
                             "their private life in public; they forget that invisibility "
                             "is a superpower.\" (Banksy)", *mp, *mp_end;
-    size_t message_size = strlen(message);
+    size_t message_size = strlen((char *)message);
     kryptos_task_ctx t, *ktask = &t;
-    kryptos_u8_t *key = "123mudar*";
+    kryptos_u8_t *key = (kryptos_u8_t *)"123mudar*";
 
     kryptos_task_init_as_null(ktask);
 
     ktask->key = key;
-    ktask->key_size = strlen(key);
+    ktask->key_size = strlen((char *)key);
 
     printf("Original message: %s\n\n", message);
 

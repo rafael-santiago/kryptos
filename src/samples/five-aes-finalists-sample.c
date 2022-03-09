@@ -82,12 +82,12 @@ static int twofish256_ctr(kryptos_task_ctx **ktask, const kryptos_u8_t *key, con
 static void print_buffer(const char *prefix, const char *buf, const size_t buf_size);
 
 int main(void) {
-    kryptos_u8_t *message = "Freedom is nothing else but the chance to do better. (Camus)";
-    size_t message_size = strlen(message);
+    kryptos_u8_t *message = (kryptos_u8_t *)"Freedom is nothing else but the chance to do better. (Camus)";
+    size_t message_size = strlen((char *)message);
     kryptos_task_ctx t, *ktask = &t;
     size_t f;
-    kryptos_u8_t *key = "F41r135W34rB00t5";
-    size_t key_size = strlen(key);
+    kryptos_u8_t *key = (kryptos_u8_t *)"F41r135W34rB00t5";
+    size_t key_size = strlen((char *)key);
     struct cipher_suite {
         const char *name;
         cipher_processor_func processor;
@@ -165,20 +165,20 @@ int main(void) {
     while (cipher != cipher_end) {
         printf(">>> Running %s...\n", cipher->name);
         kryptos_task_set_in(ktask, message, message_size);
-        print_buffer("\toriginal message: ", message, message_size);
+        print_buffer("\toriginal message: ", (char *)message, message_size);
         kryptos_task_set_encrypt_action(ktask);
         if (cipher->processor(&ktask, key, key_size) == EXIT_FAILURE) {
             printf("error: %s.\n", (ktask->result_verbose != NULL) ? ktask->result_verbose : "general failure.");
             goto epilogue;
         }
-        print_buffer("\tciphertext: ", ktask->out, ktask->out_size);
+        print_buffer("\tciphertext: ", (char *)ktask->out, ktask->out_size);
         kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
         kryptos_task_set_decrypt_action(ktask);
         if (cipher->processor(&ktask, key, key_size) == EXIT_FAILURE) {
             printf("error: %s.\n", (ktask->result_verbose != NULL) ? ktask->result_verbose : "general failure.");
             goto epilogue;
         }
-        print_buffer("\tplaintext: ", ktask->out, ktask->out_size);
+        print_buffer("\tplaintext: ", (char *)ktask->out, ktask->out_size);
         kryptos_task_free(ktask, KRYPTOS_TASK_IN | KRYPTOS_TASK_OUT | KRYPTOS_TASK_IV);
         cipher++;
         printf("<<< done.\n");

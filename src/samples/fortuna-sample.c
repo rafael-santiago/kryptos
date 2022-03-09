@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 
     if (fortuna != NULL) {
 
-        if (kryptos_fortuna_reseed(fortuna, "fortes fortuna adiuvat", 22)) {
+        if (kryptos_fortuna_reseed(fortuna, (kryptos_u8_t *)"fortes fortuna adiuvat", 22)) {
             block_size = 16;
             block = kryptos_fortuna_get_random_block(fortuna, block_size);
             if (block != NULL) {

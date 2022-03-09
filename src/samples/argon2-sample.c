@@ -15,14 +15,14 @@ int main(int argc, char **argv) {
     //               greater than 1.
     kryptos_u32_t parallelism = 1, tag_size = 32, memory_size_kb = 512, iterations = 50;
     int exit_code = 0;
-    kryptos_u8_t *variant[3] = { "argon2d", "argon2i", "argon2id" };
+    char *variant[3] = { "argon2d", "argon2i", "argon2id" };
     size_t i;
 
-    tag[0] = kryptos_argon2d("Tales of Brave Ulysses", 22,
-                             "salt", 4,
+    tag[0] = kryptos_argon2d((kryptos_u8_t *)"Tales of Brave Ulysses", 22,
+                             (kryptos_u8_t *)"salt", 4,
                              parallelism, tag_size, memory_size_kb, iterations,
-                             "key", 3,
-                             "associated data", 15);
+                             (kryptos_u8_t *)"key", 3,
+                             (kryptos_u8_t *)"associated data", 15);
 
     if (tag[0] == NULL) {
         printf("ERROR: when trying to expand the key by using argon2d.\n");
@@ -30,11 +30,11 @@ int main(int argc, char **argv) {
         goto epilogue;
     }
 
-    tag[1] = kryptos_argon2i("Tales of Brave Ulysses", 11,
-                             "salt", 4,
+    tag[1] = kryptos_argon2i((kryptos_u8_t *)"Tales of Brave Ulysses", 11,
+                             (kryptos_u8_t *)"salt", 4,
                              parallelism, tag_size, memory_size_kb, iterations,
-                             "key", 3,
-                             "associated data", 15);
+                             (kryptos_u8_t *)"key", 3,
+                             (kryptos_u8_t *)"associated data", 15);
 
     if (tag[1] == NULL) {
         printf("ERROR: when trying to expand the key by using argon2i.\n");
@@ -42,11 +42,11 @@ int main(int argc, char **argv) {
         goto epilogue;
     }
 
-    tag[2] = kryptos_argon2id("Tales of Brave Ulysses", 11,
-                              "salt", 4,
+    tag[2] = kryptos_argon2id((kryptos_u8_t *)"Tales of Brave Ulysses", 11,
+                              (kryptos_u8_t *)"salt", 4,
                               parallelism, tag_size, memory_size_kb, iterations,
-                              "key", 3,
-                              "associated data", 15);
+                              (kryptos_u8_t *)"key", 3,
+                              (kryptos_u8_t *)"associated data", 15);
 
     if (tag[2] == NULL) {
         printf("ERROR: when trying to expand the key by using argon2id.\n");
