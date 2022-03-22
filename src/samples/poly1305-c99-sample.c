@@ -13,10 +13,10 @@
 int main(int argc, char **argv) {
 #if defined(KRYPTOS_C99)
     kryptos_task_ctx t, *ktask = &t;
-    kryptos_u8_t *plaintext = "Nao e possivel ser bom pela metade (Liev Tolstoi)";
-    size_t plaintext_size = strlen(plaintext);
-    kryptos_u8_t *weak_key = "1234n41v3";
-    size_t weak_key_size = strlen(weak_key);
+    kryptos_u8_t *plaintext = (kryptos_u8_t *)"Nao e possivel ser bom pela metade (Liev Tolstoi)";
+    size_t plaintext_size = strlen((char *)plaintext);
+    kryptos_u8_t *weak_key = (kryptos_u8_t *)"1234n41v3";
+    size_t weak_key_size = strlen((char *)weak_key);
     kryptos_u8_t *p, *p_end;
 
     printf("Plaintext: '%s'\n", plaintext);
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
         kryptos_task_set_in(ktask, ktask->out, ktask->out_size);
         kryptos_task_set_decrypt_action(ktask);
         // INFO(Rafael): Try to uncomment the following line and comment the next one.
-        //kryptos_run_cipher_poly1305(aes128, ktask, "wr0ngk3y", strlen("wr0ngk3y"), kKryptosCBC);
+        //kryptos_run_cipher_poly1305(aes128, ktask, (kryptos_u8_t *)"wr0ngk3y", strlen("wr0ngk3y"), kKryptosCBC);
         kryptos_run_cipher_poly1305(aes128, ktask, weak_key, weak_key_size, kKryptosCBC);
         if (kryptos_last_task_succeed(ktask)) {
             printf("Decrypted authenticated data: '");

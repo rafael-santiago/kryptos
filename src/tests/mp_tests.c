@@ -2093,13 +2093,13 @@ CUTE_TEST_CASE(poke_bloody_poke)
 
     printf("a = ");
     for (d = a->data_size - 1; d >= 0; d--) {
-        printf("%.2X", a->data[d]);
+        printf("%.2llX", a->data[d]);
     }
     printf("\n");
 
     printf("b = ");
     for (d = b->data_size - 1; d >= 0; d--) {
-        printf("%.2X", b->data[d]);
+        printf("%.2llX", b->data[d]);
     }
     printf("\n");
 
@@ -2108,13 +2108,13 @@ CUTE_TEST_CASE(poke_bloody_poke)
 
     printf("d = ");
     for (d = dd->data_size - 1; d >= 0; d--) {
-        printf("%.2X", dd->data[d]);
+        printf("%.2llX", dd->data[d]);
     }
     printf("\n");
 
     printf("m = ");
     for (d = m->data_size - 1; d >= 0; d--) {
-        printf("%.2X", m->data[d]);
+        printf("%.2llX", m->data[d]);
     }
     printf("\n");
 
@@ -2127,13 +2127,13 @@ CUTE_TEST_CASE(poke_bloody_poke)
 
     printf("d' = ");
     for (d = dd->data_size - 1; d >= 0; d--) {
-        printf("%.2X", dd->data[d]);
+        printf("%.2llX", dd->data[d]);
     }
     printf("\n");
 
     printf("m' = ");
     for (d = m->data_size - 1; d >= 0; d--) {
-        printf("%.2X", m->data[d]);
+        printf("%.2llX", m->data[d]);
     }
     printf("\n");
 

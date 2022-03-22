@@ -208,6 +208,8 @@ typedef enum {
     kKryptosEncode,
     kKryptosDecode,
     kKryptosEncryptWithoutRandomPad,
+    kKryptosGenerateToken,
+    kKryptosValidateToken,
     kKryptosActionNr
 }kryptos_action_t;
 
@@ -223,6 +225,7 @@ typedef enum {
     kKryptosNoSupport,
     kKryptosPOLY1305Error,
     kKryptosSipHashError,
+    kKryptosInvalidToken,
     kKryptosTaskResultNr
 }kryptos_task_result_t;
 

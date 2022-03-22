@@ -26,6 +26,7 @@
 #include <poly1305_tests.h>
 #include <siphash_tests.h>
 #include <kdf_tests.h>
+#include <otp_tests.h>
 #include <mp_tests.h>
 #include <symmetric_ciphers_tests.h>
 #include <asymmetric_ciphers_tests.h>
@@ -172,6 +173,17 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_do_argon2_bounds_tests);
     KUTE_RUN_TEST(kryptos_argon2_macro_bounds_tests);
 #endif
+
+    // INFO(Rafael): OTP stuff.
+
+    KUTE_RUN_TEST(kryptos_hotp_tests);
+    KUTE_RUN_TEST(kryptos_hotp_init_bad_params_tests);
+    KUTE_RUN_TEST(kryptos_hotp_sequencing_tests);
+    KUTE_RUN_TEST(kryptos_hotp_client_server_syncd_interaction_tests);
+    KUTE_RUN_TEST(kryptos_hotp_client_server_unsyncd_interaction_tests);
+
+    KUTE_RUN_TEST(kryptos_otp_hash_macro_tests);
+    KUTE_RUN_TEST(kryptos_otp_macro_tests);
 
     KUTE_RUN_TEST(kryptos_mp_new_value_tests);
     KUTE_RUN_TEST(kryptos_mp_hex_value_as_mp_tests);

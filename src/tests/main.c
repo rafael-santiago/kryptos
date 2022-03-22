@@ -15,6 +15,7 @@
 #include "poly1305_tests.h"
 #include "siphash_tests.h"
 #include "kdf_tests.h"
+#include "otp_tests.h"
 #include "encoding_tests.h"
 #include "mp_tests.h"
 #include "asymmetric_ciphers_tests.h"
@@ -277,6 +278,17 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_argon2_macro_tests);
     CUTE_RUN_TEST(kryptos_do_argon2_bounds_tests);
     CUTE_RUN_TEST(kryptos_argon2_macro_bounds_tests);
+
+    // INFO(Rafael): OTP stuff.
+
+    CUTE_RUN_TEST(kryptos_hotp_tests);
+    CUTE_RUN_TEST(kryptos_hotp_init_bad_params_tests);
+    CUTE_RUN_TEST(kryptos_hotp_sequencing_tests);
+    CUTE_RUN_TEST(kryptos_hotp_client_server_syncd_interaction_tests);
+    CUTE_RUN_TEST(kryptos_hotp_client_server_unsyncd_interaction_tests);
+
+    CUTE_RUN_TEST(kryptos_otp_hash_macro_tests);
+    CUTE_RUN_TEST(kryptos_otp_macro_tests);
 
     // INFO(Rafael): Encoding stuff.
     CUTE_RUN_TEST(kryptos_base64_tests);

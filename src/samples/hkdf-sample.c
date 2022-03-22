@@ -17,13 +17,13 @@ int main(int argc, char **argv) {
 
     printf("User key: ");
 
-    fgets(temp, sizeof(temp) - 1, stdin);
+    fgets((char *)temp, sizeof(temp) - 1, stdin);
 
-    if ((temp_size = strlen(temp)) > 0) {
+    if ((temp_size = strlen((char *)temp)) > 0) {
         temp[temp_size--] = 0;
     }
 
-    key = kryptos_hkdf(temp, temp_size, sha3_256, "salt", 4, "info", 4, 16);
+    key = kryptos_hkdf(temp, temp_size, sha3_256, (kryptos_u8_t *)"salt", 4, (kryptos_u8_t *)"info", 4, 16);
 
     if (key != NULL) {
         kp = key;

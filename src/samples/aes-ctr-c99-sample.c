@@ -15,12 +15,12 @@ int main(int argc, char **argv) {
     int error = 0;
     kryptos_task_ctx t, *ktask = &t;
     kryptos_u32_t ctr = 9;
-    kryptos_u8_t *plain = "But why don't you take him with you into the light? "
+    kryptos_u8_t *plain = (kryptos_u8_t *)"But why don't you take him with you into the light? "
                           "He does not deserve the light, he deserves peace.";
     kryptos_u8_t *p, *p_end;
-    size_t plain_size = strlen(plain);
-    kryptos_u8_t *key = "Fly Me To The Moon";
-    size_t key_size = strlen(key);
+    size_t plain_size = strlen((char *)plain);
+    kryptos_u8_t *key = (kryptos_u8_t *)"Fly Me To The Moon";
+    size_t key_size = strlen((char *)key);
 
     kryptos_task_init_as_null(ktask);
 

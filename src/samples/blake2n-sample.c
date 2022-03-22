@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
     //               You must specify the hash size (in bytes) by using the out_size field from kryptos_task_ctx.
 
     ktask->out_size = 28;
-    kryptos_hash(blake2sN, ktask, "Lenny", 5, 1);
+    kryptos_hash(blake2sN, ktask, (kryptos_u8_t *)"Lenny", 5, 1);
 
     if (!kryptos_last_task_succeed(ktask)) {
         printf("ERROR: when trying to compute blake2s224.\n");
@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
     ktask->out_size = 48;
-    kryptos_hash(blake2bN, ktask, "Lenny", 5, 1);
+    kryptos_hash(blake2bN, ktask, (kryptos_u8_t *)"Lenny", 5, 1);
 
     if (!kryptos_last_task_succeed(ktask)) {
         printf("ERROR: when trying to compute blake2b384.\n");
@@ -41,10 +41,10 @@ int main(int argc, char **argv) {
 
     // INFO(Rafael): Keyed hash are the same of implementations of blake with fixed output size.
 
-    ktask->key = "Blake2s";
+    ktask->key = (kryptos_u8_t *)"Blake2s";
     ktask->key_size = 7;
     ktask->out_size = 28;
-    kryptos_hash(blake2sN, ktask, "Lenny", 5, 1);
+    kryptos_hash(blake2sN, ktask, (kryptos_u8_t *)"Lenny", 5, 1);
 
     if (!kryptos_last_task_succeed(ktask)) {
         printf("ERROR: when trying to compute blake2s224.\n");
@@ -54,10 +54,10 @@ int main(int argc, char **argv) {
     printf("Blake2s224 (Keyed): %s\n", ktask->out);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 
-    ktask->key = "Blake2b";
+    ktask->key = (kryptos_u8_t *)"Blake2b";
     ktask->key_size = 7;
     ktask->out_size = 48;
-    kryptos_hash(blake2bN, ktask, "Lenny", 5, 1);
+    kryptos_hash(blake2bN, ktask, (kryptos_u8_t *)"Lenny", 5, 1);
 
     if (!kryptos_last_task_succeed(ktask)) {
         printf("ERROR: when trying to compute blake2b384.\n");

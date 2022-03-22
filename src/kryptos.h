@@ -83,6 +83,8 @@
 #include <kryptos_ecdh.h>
 #include <kryptos_ecdsa.h>
 
+#include <kryptos_hotp.h>
+
 #ifndef KRYPTOS_KERNEL_MODE
 # include <string.h>
 #endif
@@ -641,7 +643,17 @@ kryptos_ ## label_name:\
     }\
 }
 
+#define kryptos_otp_init(otp_algo, ktask, ...) kryptos_## otp_algo ##_init(ktask, __VA_ARGS__)
+
+#define kryptos_otp(otp_algo, ktask) kryptos_## otp_algo(&ktask)
+
 #endif // KRYPTOS_C99
+
+#define kryptos_otp_hash(hname) kryptos_## hname ##_hash, kryptos_## hname ##_hash_input_size, kryptos_## hname ##_hash_size
+
+#define kryptos_otp_set_token(ktask, token, token_size) kryptos_task_set_in(ktask, token, token_size)
+
+#define kryptos_otp_free_token(ktask) kryptos_freeseg(ktask->out, ktask->out_size)
 
 #define kryptos_run_encoder(ename, ktask, data, data_size) {\
     kryptos_ ## ename ## _setup(ktask);\

@@ -10,7 +10,7 @@
 
 int main(void) {
     int exit_code = 0;
-    kryptos_u8_t *k_pub = "-----BEGIN ECDSA P-----\n"
+    kryptos_u8_t *k_pub = (kryptos_u8_t *)"-----BEGIN ECDSA P-----\n"
                           "D2IVlRPYs5Wtx99g3Flwc19KXuk=\n"
                           "-----END ECDSA P-----\n"
                           "-----BEGIN ECDSA A-----\n"
@@ -34,7 +34,7 @@ int main(void) {
                           "-----BEGIN ECDSA B Y-----\n"
                           "o2LrZwgxAjDmOYoV6d+BotCbuuE=\n"
                           "-----END ECDSA B Y-----\n";
-    kryptos_u8_t *k_priv = "-----BEGIN ECDSA D-----\n"
+    kryptos_u8_t *k_priv = (kryptos_u8_t *)"-----BEGIN ECDSA D-----\n"
                            "7DukDiEY0PFh2MuVORfJkudyJqE=\n"
                            "-----END ECDSA D-----\n"
                            "-----BEGIN ECDSA P-----\n"
@@ -56,7 +56,7 @@ int main(void) {
                            "IWPaFmOXnGZBR/k4w44aekfLZxY=\n"
                            "-----END ECDSA A Y-----\n";
     kryptos_task_ctx a_ctx, b_ctx, *alice = &a_ctx, *bob = &b_ctx;
-    kryptos_u8_t *message = "Never ever hardcode keys Bob!";
+    kryptos_u8_t *message = (kryptos_u8_t *)"Never ever hardcode keys Bob!";
 
     kryptos_task_init_as_null(alice);
     kryptos_task_init_as_null(bob);
@@ -65,7 +65,7 @@ int main(void) {
 
     // INFO(Rafael): Alice signs the message and sends it to Bob...
 
-    kryptos_sign(ecdsa, alice, message, strlen(message), k_priv, strlen(k_priv), kryptos_ecdsa_hash(sha3_512));
+    kryptos_sign(ecdsa, alice, message, strlen((char *)message), k_priv, strlen((char *)k_priv), kryptos_ecdsa_hash(sha3_512));
 
     if (!kryptos_last_task_succeed(alice)) {
         printf("ERROR: when signing the input.\n");
@@ -77,7 +77,7 @@ int main(void) {
 
     // INFO(Rafael): ... Now Bob verifies the authenticity of it...
 
-    kryptos_verify(ecdsa, bob, alice->out, alice->out_size, k_pub, strlen(k_pub), kryptos_ecdsa_hash(sha3_512));
+    kryptos_verify(ecdsa, bob, alice->out, alice->out_size, k_pub, strlen((char *)k_pub), kryptos_ecdsa_hash(sha3_512));
 
     if (!kryptos_last_task_succeed(bob)) {
         if (bob->result == kKryptosInvalidSignature) {
