@@ -45,7 +45,7 @@ Until now these are the supported platforms:
 **One-time passwords**: ``HOTP``.
 
 **Extras**: Common API between user space / kernel space (``Windows``, ``FreeBSD``, ``NetBSD`` and ``Linux``), ``RAM`` swapping
-cares, data wiping when freeing memory, ``PEM`` as its common input/output (for some algorithms), convenience functions macros
+cares, data wiping when freeing memory, ``PEM`` as its common input/output (for some algorithms), convenience function macros
 to make it easy to use all available cryptographic functions (``C99`` required).
 
 In order to know more you should start [here](https://github.com/rafael-santiago/kryptos/blob/main/doc/README.md).
