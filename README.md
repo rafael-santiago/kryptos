@@ -17,33 +17,34 @@ Until now these are the supported platforms:
 
 ## Features
 
-Stream cipher: ``ARC4``, ``SEAL``, ``RABBIT``, ``Salsa20``, ``ChaCha20``.
+**Stream cipher**: ``ARC4``, ``SEAL``, ``RABBIT``, ``Salsa20``, ``ChaCha20``.
 
-Block cipher: ``AES``, ``DES``, ``3DES``, ``3DES-EDE``, ``IDEA``, ``RC2``, ``RC5``, ``RC6``, ``FEAL``, ``CAST5``,
+**Block cipher**: ``AES``, ``DES``, ``3DES``, ``3DES-EDE``, ``IDEA``, ``RC2``, ``RC5``, ``RC6``, ``FEAL``, ``CAST5``,
 ``Camellia``, ``SAFER-K64``, ``Blowfish``, ``Serpent``, ``TEA``, ``XTEA``, ``MISTY1``, ``MARS``, ``PRESENT``, ``SHACAL-1``,
 ``SHACAL-2``, ``NOEKEON``, ``GOST``, ``TWOFISH``.
 
-Modes of operation: ``ECB``, ``CBC``, ``OFB``, ``CTR``, ``GCM``.
+**Modes of operation**: ``ECB``, ``CBC``, ``OFB``, ``CTR``, ``GCM``.
 
-Cryptographic hashes: ``SHA-1``, ``SHA-224``, ``SHA-256``, ``SHA-384``, ``SHA-512``, ``MD4``, ``MD5``, ``RIPEMD-128``,
+**Cryptographic hashes**: ``SHA-1``, ``SHA-224``, ``SHA-256``, ``SHA-384``, ``SHA-512``, ``MD4``, ``MD5``, ``RIPEMD-128``,
 ``RIPEMD-160``, ``SHA3-224``, ``SHA3-256``, ``SHA3-384``, ``SHA3-512``, ``KECCAK-224``, ``KECCAK-256``, ``KECCAK-384``,
 ``KECCAK-512``, ``BLAKE2s-256``, ``BLAKE2b-512``, ``BLAKE2s-N``, ``BLAKE2b-N``, ``Tiger``, ``Whirlpool``.
 
-Non cryptographic hashes: ``djb2`` (string hashing), ``SipHash``.
+**Non-cryptographic hashes**: ``djb2`` (string hashing), ``SipHash``.
 
-Message authentication code: ``HMAC``, ``Poly1305``, ``SipHash`` (recommended for short messages only), ``GCM`` (for all 128-bit block ciphers).
+**Message authentication code**: ``HMAC``, ``Poly1305``, ``SipHash`` (recommended for short messages only),
+``GCM`` (for all 128-bit block ciphers).
 
-Public crypto: ``RSA``, ``RSA-OAEP``, ``El Gamal``, ``RSA-EMSA/PSS``, ``DSA``, ``ECDSA``.
+**PK crypto**: ``RSA``, ``RSA-OAEP``, ``El Gamal``, ``RSA-EMSA/PSS``, ``DSA``, ``ECDSA``.
 
-CSPRNG: From the system (default one), ``Fortuna``.
+**CSPRNG**: From the system (default one), ``Fortuna``.
 
-Codification stuff: ``Base64``, ``UUEncode``.
+**Codification stuff**: ``Base64``, ``UUEncode``.
 
-Key derivation functions: ``HKDF``, ``PBKDF2``, ``Argon2``.
+**Key derivation functions**: ``HKDF``, ``PBKDF2``, ``Argon2``.
 
-One-time passwords: ``HOTP``.
+**One-time passwords**: ``HOTP``.
 
-Extras: Common API between user space / kernel space (``Windows``, ``FreeBSD``, ``NetBSD`` and ``Linux``), ``RAM`` swapping
+**Extras**: Common API between user space / kernel space (``Windows``, ``FreeBSD``, ``NetBSD`` and ``Linux``), ``RAM`` swapping
 cares, data wiping when freeing memory, ``PEM`` as its common input/output (for some algorithms), convenience functions macros
 to make it easy to use all available cryptographic functions (``C99`` required).
 
