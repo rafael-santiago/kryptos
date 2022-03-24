@@ -34,7 +34,7 @@ Until now these are the supported platforms:
 **Message authentication code**: ``HMAC``, ``Poly1305``, ``SipHash`` (recommended for short messages only),
 ``GCM`` (for all 128-bit block ciphers).
 
-**PK crypto**: ``RSA``, ``RSA-OAEP``, ``El Gamal``, ``RSA-EMSA/PSS``, ``DSA``, ``ECDSA``.
+**PK crypto**: ``RSA``, ``RSA-OAEP``, ``El Gamal``, ``RSA-EMSA/PSS``, ``DSA``, ``ECDSA``, ``DH``, ``ECDH``.
 
 **CSPRNG**: From the system (default one), ``Fortuna``.
 
