@@ -184,7 +184,7 @@ read_counter_data_epilogue:
 #if !defined(_MSC_VER)
         close(fd);
 #else
-    _close(fd);
+        _close(fd);
 #endif
     }
 

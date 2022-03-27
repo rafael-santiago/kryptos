@@ -84,6 +84,7 @@
 #include <kryptos_ecdsa.h>
 
 #include <kryptos_hotp.h>
+#include <kryptos_totp.h>
 
 #ifndef KRYPTOS_KERNEL_MODE
 # include <string.h>

@@ -1,4 +1,5 @@
 (A) Try to give support to GMP on multiprecision stuff when asked by the user. +Improvement
+x (B) Implement TOTP algorithm. +NewFeature,+AuthUtil
 x (B) Implement HOTP algorithm. +NewFeature,+AuthUtil
 x (B) Implement support for Twofish (128, 192, 256 and GCM). +NewFeature,+BlockCipher
 x (B) Implement support for SipHash. +NewFeature,+PRF,+MACStuff

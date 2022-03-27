@@ -17,6 +17,101 @@ static void otp_hash_validator(kryptos_hash_func h,
                                kryptos_hash_size_func *h_input_addr,
                                kryptos_hash_size_func *h_size_addr);
 
+KUTE_TEST_CASE(kryptos_totp_client_server_syncd_interaction_tests)
+    kryptos_task_ctx s, *server = &s, c, *client = &c;
+    kryptos_u64_t t0 = 10800;
+    kryptos_u64_t x = 30;
+    size_t d;
+    size_t t, t_nr = 100000;
+    kryptos_u8_t *shared_secret = (kryptos_u8_t *)"walden";
+    size_t shared_secret_size = 6;
+
+    for (d = 1; d <= 9; d++) {
+        KUTE_ASSERT(kryptos_totp_init(server,
+                                      kKryptosValidateToken,
+                                      shared_secret, shared_secret_size,
+                                      &t0, &x, &d,
+                                      kryptos_sha512_hash,
+                                      kryptos_sha512_hash_input_size,
+                                      kryptos_sha512_hash_size) == kKryptosSuccess);
+
+        KUTE_ASSERT(kryptos_totp_init(client,
+                                      kKryptosGenerateToken,
+                                      shared_secret, shared_secret_size,
+                                      &t0, &x, &d,
+                                      kryptos_sha512_hash,
+                                      kryptos_sha512_hash_input_size,
+                                      kryptos_sha512_hash_size) == kKryptosSuccess);
+
+        for (t = 1; t <= t_nr; t++) {
+            KUTE_ASSERT(kryptos_totp(&client) == kKryptosSuccess);
+            server->in = client->out;
+            server->in_size = client->out_size;
+            KUTE_ASSERT(kryptos_totp(&server) == kKryptosSuccess);
+            kryptos_freeseg(client->out, client->out_size);
+        }
+    }
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_totp_init_bad_params_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u64_t t0 = 10800;
+    kryptos_u64_t x = 2;
+    size_t d = 6;
+    kryptos_u8_t *shared_secret = (kryptos_u8_t *)"working day and night";
+    size_t shared_secret_size = 21;
+
+    KUTE_ASSERT(kryptos_totp_init(NULL,
+                                  kKryptosValidateToken,
+                                  shared_secret, shared_secret_size,
+                                  &t0, &x, &d,
+                                  kryptos_whirlpool_hash,
+                                  kryptos_whirlpool_hash_input_size,
+                                  kryptos_whirlpool_hash_size) == kKryptosInvalidParams);
+
+    KUTE_ASSERT(kryptos_totp_init(ktask,
+                                  kKryptosEncrypt,
+                                  shared_secret, shared_secret_size,
+                                  &t0, &x, &d,
+                                  kryptos_whirlpool_hash,
+                                  kryptos_whirlpool_hash_input_size,
+                                  kryptos_whirlpool_hash_size) == kKryptosInvalidParams);
+
+    KUTE_ASSERT(kryptos_totp_init(ktask,
+                                  kKryptosValidateToken,
+                                  shared_secret, shared_secret_size,
+                                  NULL, &x, &d,
+                                  kryptos_whirlpool_hash,
+                                  kryptos_whirlpool_hash_input_size,
+                                  kryptos_whirlpool_hash_size) == kKryptosInvalidParams);
+
+    KUTE_ASSERT(kryptos_totp_init(ktask,
+                                  kKryptosValidateToken,
+                                  shared_secret, shared_secret_size,
+                                  &t0, NULL, &d,
+                                  kryptos_whirlpool_hash,
+                                  kryptos_whirlpool_hash_input_size,
+                                  kryptos_whirlpool_hash_size) == kKryptosInvalidParams);
+
+
+    KUTE_ASSERT(kryptos_totp_init(ktask,
+                                  kKryptosValidateToken,
+                                  shared_secret, shared_secret_size,
+                                  &t0, &x, &d,
+                                  kryptos_whirlpool_hash,
+                                  kryptos_whirlpool_hash_input_size,
+                                  kryptos_whirlpool_hash_size) == kKryptosSuccess);
+
+    KUTE_ASSERT(kryptos_totp_init(ktask,
+                                  kKryptosGenerateToken,
+                                  shared_secret, shared_secret_size,
+                                  &t0, &x, &d,
+                                  kryptos_whirlpool_hash,
+                                  kryptos_whirlpool_hash_input_size,
+                                  kryptos_whirlpool_hash_size) == kKryptosSuccess);
+
+KUTE_TEST_CASE_END
+
 KUTE_TEST_CASE(kryptos_hotp_tests)
     struct test_ctx {
         kryptos_u8_t *secret;
@@ -547,6 +642,9 @@ KUTE_TEST_CASE(kryptos_otp_macro_tests)
     size_t throttling = 30;
     size_t resync = 7;
     size_t number_of_digits = 6;
+    kryptos_u64_t t0 = 10800;
+    kryptos_u64_t x = 30;
+
     // INFO(Rafael): For each available OTP algorithm put a successful generate/validation test by using related
     //               general OTP macro functions (that fits with the algorithm, of course).
 
@@ -581,6 +679,37 @@ KUTE_TEST_CASE(kryptos_otp_macro_tests)
     KUTE_ASSERT(kryptos_otp(hotp, server) == kKryptosSuccess);
 
     kryptos_otp_free_token(client);
+
+    // TOTP
+
+    KUTE_ASSERT(kryptos_otp_init(totp,
+                                 server,
+                                 kKryptosValidateToken,
+                                 shared_secret,
+                                 shared_secret_size,
+                                 &t0,
+                                 &x,
+                                 &number_of_digits,
+                                 kryptos_otp_hash(sha384)) == kKryptosSuccess);
+
+    KUTE_ASSERT(kryptos_otp_init(totp,
+                                 client,
+                                 kKryptosGenerateToken,
+                                 shared_secret,
+                                 shared_secret_size,
+                                 &t0,
+                                 &x,
+                                 &number_of_digits,
+                                 kryptos_otp_hash(sha384)) == kKryptosSuccess);
+
+    KUTE_ASSERT(kryptos_otp(totp, client) == kKryptosSuccess);
+
+    kryptos_otp_set_token(server, client->out, client->out_size);
+
+    KUTE_ASSERT(kryptos_otp(totp, server) == kKryptosSuccess);
+
+    kryptos_otp_free_token(client);
+
 #else
     fprintf(stdout, "   Test skipped. Compiled with no C99 support.\n");
 #endif

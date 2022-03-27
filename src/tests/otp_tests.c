@@ -7,9 +7,62 @@
  */
 #include "otp_tests.h"
 #include <kryptos.h>
-#include <stdio.h>
+#if defined(__unix__)
+# include <dlfcn.h>
+#elif defined(_WIN32)
+# include <windows.h>
+#endif
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// WARN(Rafael): Avoid including time.h on Windows, when compiling from MingGW. !!
+//               It will break TOTP validation tests.                           !!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+#if !defined(_WIN32) && !defined(RTLD_NEXT)
+# define RTLD_NEXT -1
+#endif
+
+
+// INFO(Rafael): On some nosy systems even not have been included the 'time.h'
+//               header they are linking local time reference with the original
+//               one instead of with our local hook. This will force them to
+//               not mess with our setup.
+extern time_t time(time_t *);
 
 static size_t bad_hash_size(void);
+
+static kryptos_u64_t g_totp_curr_systime = 10800;
+
+static time_t (*g_tru_time)(time_t *) = NULL;
+
+static int g_do_time_hook = 0;
+
+static void set_totp_current_systime(const kryptos_u64_t value);
+
+static int enable_time_hook(void);
+
+static void disable_time_hook(void);
+
+#if defined(__unix__) || (defined(_WIN32) && !defined(_MSC_VER))
+# if defined(_WIN32)
+#  define _time64 time
+# endif
+time_t time(time_t *t) {
+    if (!g_do_time_hook && g_tru_time != NULL) {
+        return g_tru_time(t);
+    }
+    return g_totp_curr_systime;
+}
+#elif defined(_WIN32) && defined(_MSC_VER)
+time_t _time64(time_t *t) {
+    if (!g_do_time_hook && g_tru_time != NULL) {
+        return g_tru_time(t);
+    }
+    return g_totp_curr_systime;
+}
+#else
+# error Some code wanted.
+#endif
 
 static void otp_hash_validator(kryptos_hash_func hash,
                                kryptos_hash_size_func hash_input_size,
@@ -17,6 +70,328 @@ static void otp_hash_validator(kryptos_hash_func hash,
                                kryptos_hash_func *hash_addr,
                                kryptos_hash_size_func *hash_input_addr,
                                kryptos_hash_size_func *hash_size_addr);
+
+CUTE_TEST_CASE(kryptos_totp_client_server_syncd_interaction_tests)
+    kryptos_task_ctx s, *server = &s, c, *client = &c;
+    kryptos_u64_t t0 = 10800;
+    kryptos_u64_t x = 30;
+    size_t d;
+    size_t t, t_nr = 100000;
+    kryptos_u8_t *shared_secret = (kryptos_u8_t *)"walden";
+    size_t shared_secret_size = 6;
+
+    for (d = 1; d <= 9; d++) {
+        CUTE_ASSERT(kryptos_totp_init(server,
+                                      kKryptosValidateToken,
+                                      shared_secret, shared_secret_size,
+                                      &t0, &x, &d,
+                                      kryptos_sha512_hash,
+                                      kryptos_sha512_hash_input_size,
+                                      kryptos_sha512_hash_size) == kKryptosSuccess);
+
+        CUTE_ASSERT(kryptos_totp_init(client,
+                                      kKryptosGenerateToken,
+                                      shared_secret, shared_secret_size,
+                                      &t0, &x, &d,
+                                      kryptos_sha512_hash,
+                                      kryptos_sha512_hash_input_size,
+                                      kryptos_sha512_hash_size) == kKryptosSuccess);
+
+        for (t = 1; t <= t_nr; t++) {
+            CUTE_ASSERT(kryptos_totp(&client) == kKryptosSuccess);
+            server->in = client->out;
+            server->in_size = client->out_size;
+            CUTE_ASSERT(kryptos_totp(&server) == kKryptosSuccess);
+            kryptos_freeseg(client->out, client->out_size);
+            fprintf(stdout, "       \r   %.0f%% complete (token with %zu digit(s)).", ((float)t / (float)t_nr) * 100, d);
+        }
+    }
+    fprintf(stdout, "       \r                                                       \r");
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_totp_client_server_unsyncd_interaction_tests)
+    kryptos_task_ctx s, *server = &s, c, *client = &c;
+    kryptos_u64_t t0 = 10800;
+    kryptos_u64_t x = 30;
+    size_t d;
+    size_t t, t_nr = 100000;
+    kryptos_u8_t *shared_secret = (kryptos_u8_t *)"rock and a hard place";
+    size_t shared_secret_size = 21;
+    kryptos_u64_t timelapse = 108000;
+
+    // INFO(Rafael): Here on this test we will simulate an unsynchronization
+    //               by making client generate sent token 30 secs before server.
+    //               It will force server to resynchronize.
+
+    CUTE_ASSERT(enable_time_hook() == 0);
+
+    for (d = 1; d <= 9; d++) {
+        CUTE_ASSERT(kryptos_totp_init(server,
+                                      kKryptosValidateToken,
+                                      shared_secret, shared_secret_size,
+                                      &t0, &x, &d,
+                                      kryptos_sha512_hash,
+                                      kryptos_sha512_hash_input_size,
+                                      kryptos_sha512_hash_size) == kKryptosSuccess);
+
+        CUTE_ASSERT(kryptos_totp_init(client,
+                                      kKryptosGenerateToken,
+                                      shared_secret, shared_secret_size,
+                                      &t0, &x, &d,
+                                      kryptos_sha512_hash,
+                                      kryptos_sha512_hash_input_size,
+                                      kryptos_sha512_hash_size) == kKryptosSuccess);
+
+        for (t = 1; t <= t_nr; t++) {
+            set_totp_current_systime(timelapse);
+
+            CUTE_ASSERT(kryptos_totp(&client) == kKryptosSuccess);
+
+            // INFO(Rafael): TOTP authors recommend 2 backward checks when
+            //               the current timestamp has failed. But here we
+            //               will do only one.
+
+            set_totp_current_systime(timelapse + 30);
+
+            server->in = client->out;
+            server->in_size = client->out_size;
+            CUTE_ASSERT(kryptos_totp(&server) == kKryptosSuccess);
+
+            set_totp_current_systime(timelapse + 60);
+
+            server->in = client->out;
+            server->in_size = client->out_size;
+            CUTE_ASSERT(kryptos_totp(&server) == kKryptosInvalidToken);
+
+            set_totp_current_systime(timelapse + 120);
+
+            server->in = client->out;
+            server->in_size = client->out_size;
+            CUTE_ASSERT(kryptos_totp(&server) == kKryptosInvalidToken);
+
+            kryptos_freeseg(client->out, client->out_size);
+
+            // INFO(Rafael): Seeking to mitigate device synchronization issues
+            //               we will do one check ahead.
+
+            set_totp_current_systime(timelapse + 15);
+
+            CUTE_ASSERT(kryptos_totp(&client) == kKryptosSuccess);
+
+            set_totp_current_systime(timelapse);
+
+            server->in = client->out;
+            server->in_size = client->out_size;
+            CUTE_ASSERT(kryptos_totp(&server) == kKryptosSuccess);
+
+            kryptos_freeseg(client->out, client->out_size);
+
+            fprintf(stdout, "       \r   %.0f%% complete (token with %zu digit(s)).", ((float)t / (float)t_nr) * 100, d);
+        }
+    }
+    fprintf(stdout, "       \r                                                       \r");
+    disable_time_hook();
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_totp_init_bad_params_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u64_t t0 = 10800;
+    kryptos_u64_t x = 2;
+    size_t d = 6;
+    kryptos_u8_t *shared_secret = (kryptos_u8_t *)"working day and night";
+    size_t shared_secret_size = 21;
+
+    CUTE_ASSERT(kryptos_totp_init(NULL,
+                                  kKryptosValidateToken,
+                                  shared_secret, shared_secret_size,
+                                  &t0, &x, &d,
+                                  kryptos_whirlpool_hash,
+                                  kryptos_whirlpool_hash_input_size,
+                                  kryptos_whirlpool_hash_size) == kKryptosInvalidParams);
+
+    CUTE_ASSERT(kryptos_totp_init(ktask,
+                                  kKryptosEncrypt,
+                                  shared_secret, shared_secret_size,
+                                  &t0, &x, &d,
+                                  kryptos_whirlpool_hash,
+                                  kryptos_whirlpool_hash_input_size,
+                                  kryptos_whirlpool_hash_size) == kKryptosInvalidParams);
+
+    CUTE_ASSERT(kryptos_totp_init(ktask,
+                                  kKryptosValidateToken,
+                                  shared_secret, shared_secret_size,
+                                  NULL, &x, &d,
+                                  kryptos_whirlpool_hash,
+                                  kryptos_whirlpool_hash_input_size,
+                                  kryptos_whirlpool_hash_size) == kKryptosInvalidParams);
+
+    CUTE_ASSERT(kryptos_totp_init(ktask,
+                                  kKryptosValidateToken,
+                                  shared_secret, shared_secret_size,
+                                  &t0, NULL, &d,
+                                  kryptos_whirlpool_hash,
+                                  kryptos_whirlpool_hash_input_size,
+                                  kryptos_whirlpool_hash_size) == kKryptosInvalidParams);
+
+
+    CUTE_ASSERT(kryptos_totp_init(ktask,
+                                  kKryptosValidateToken,
+                                  shared_secret, shared_secret_size,
+                                  &t0, &x, &d,
+                                  kryptos_whirlpool_hash,
+                                  kryptos_whirlpool_hash_input_size,
+                                  kryptos_whirlpool_hash_size) == kKryptosSuccess);
+
+    CUTE_ASSERT(kryptos_totp_init(ktask,
+                                  kKryptosGenerateToken,
+                                  shared_secret, shared_secret_size,
+                                  &t0, &x, &d,
+                                  kryptos_whirlpool_hash,
+                                  kryptos_whirlpool_hash_input_size,
+                                  kryptos_whirlpool_hash_size) == kKryptosSuccess);
+
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_totp_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u64_t t0 = 10800;
+    kryptos_u64_t x = 30;
+    size_t number_of_digits = 8;
+    struct test_ctx {
+        const kryptos_u64_t timelapse;
+        kryptos_u8_t *shared_secret;
+        size_t shared_secret_size;
+        kryptos_hash_func hash;
+        kryptos_hash_size_func hash_input_size;
+        kryptos_hash_size_func hash_size;
+        kryptos_u32_t expected;
+    } test_vector[] = {
+        // INFO(Rafael): Picked from RFC-6238.
+        //
+        //               TOTP validation is demanding since we need to have the same timestamp on the test machine.
+        //               I dislike messing with the environment when testing my stuff, due to it TOTP validation
+        //               have been done only in user space testing. Here we are hooking the time() call making
+        //               it spit the timelapse since Unix epoch that we need for each test step.
+        //               TOTP's test vector is pretty messy. It states 'The test token shared secret uses ASCII string
+        //               value "12345678901234567890"', but in fact it varies according to the hash algorithm by
+        //               making the shared secret has the same size of the output produced by the hash, you can see it
+        //               reading their Java code.
+        //
+        //               The provided time supplied on RFC's testing section here (timelapse field) were adjusted for
+        //               a real-world testing necessity, which re-uses a previous HOTP implementation and avoid messing
+        //               with testing environment date time.
+        {
+            10859,
+            (kryptos_u8_t *)"12345678901234567890", 20,
+            kryptos_sha1_hash, kryptos_sha1_hash_input_size, kryptos_sha1_hash_size,
+            94287082
+        },
+        {
+            10859,
+            (kryptos_u8_t *)"12345678901234567890123456789012", 32,
+            kryptos_sha256_hash, kryptos_sha256_hash_input_size, kryptos_sha256_hash_size,
+            46119246
+        },
+        {
+            10859,
+            (kryptos_u8_t *)"1234567890123456789012345678901234567890123456789012345678901234", 64,
+            kryptos_sha512_hash, kryptos_sha512_hash_input_size, kryptos_sha512_hash_size,
+            90693936
+        },
+        {
+            1111121899,
+            (kryptos_u8_t *)"12345678901234567890", 20,
+            kryptos_sha1_hash, kryptos_sha1_hash_input_size, kryptos_sha1_hash_size,
+            7081804
+        },
+        {
+            1111121899,
+            (kryptos_u8_t *)"12345678901234567890123456789012", 32,
+            kryptos_sha256_hash, kryptos_sha256_hash_input_size, kryptos_sha256_hash_size,
+            68084774
+        },
+        {
+            1111121899,
+            (kryptos_u8_t *)"1234567890123456789012345678901234567890123456789012345678901234", 64,
+            kryptos_sha512_hash, kryptos_sha512_hash_input_size, kryptos_sha512_hash_size,
+            25091201
+        },
+        {
+            1234578690,
+            (kryptos_u8_t *)"12345678901234567890", 20,
+            kryptos_sha1_hash, kryptos_sha1_hash_input_size, kryptos_sha1_hash_size,
+            89005924
+        },
+        {
+            1234578690,
+            (kryptos_u8_t *)"12345678901234567890123456789012", 32,
+            kryptos_sha256_hash, kryptos_sha256_hash_input_size, kryptos_sha256_hash_size,
+            91819424
+        },
+        {
+            1234578690,
+            (kryptos_u8_t *)"1234567890123456789012345678901234567890123456789012345678901234", 64,
+            kryptos_sha512_hash, kryptos_sha512_hash_input_size, kryptos_sha512_hash_size,
+            93441116
+        },
+        {
+            2000010800,
+            (kryptos_u8_t *)"12345678901234567890", 20,
+            kryptos_sha1_hash, kryptos_sha1_hash_input_size, kryptos_sha1_hash_size,
+            69279037
+        },
+        {
+            2000010800,
+            (kryptos_u8_t *)"12345678901234567890123456789012", 32,
+            kryptos_sha256_hash, kryptos_sha256_hash_input_size, kryptos_sha256_hash_size,
+            90698825
+        },
+        {
+            2000010800,
+            (kryptos_u8_t *)"1234567890123456789012345678901234567890123456789012345678901234", 64,
+            kryptos_sha512_hash, kryptos_sha512_hash_input_size, kryptos_sha512_hash_size,
+            38618901
+        },
+        {
+            20000010800,
+            (kryptos_u8_t *)"12345678901234567890", 20,
+            kryptos_sha1_hash, kryptos_sha1_hash_input_size, kryptos_sha1_hash_size,
+            65353130
+        },
+        {
+            20000010800,
+            (kryptos_u8_t *)"12345678901234567890123456789012", 32,
+            kryptos_sha256_hash, kryptos_sha256_hash_input_size, kryptos_sha256_hash_size,
+            77737706
+        },
+        {
+            20000010800,
+            (kryptos_u8_t *)"1234567890123456789012345678901234567890123456789012345678901234", 64,
+            kryptos_sha512_hash, kryptos_sha512_hash_input_size, kryptos_sha512_hash_size,
+            47863826
+        },
+    }, *test = &test_vector[0], *test_end = test + sizeof(test_vector) / sizeof(test_vector[0]);
+
+    CUTE_ASSERT(enable_time_hook() == 0);
+
+    while (test != test_end) {
+        set_totp_current_systime(test->timelapse); // INFO(Rafael): The time traveling routine our Y(), I meant our
+                                                   //               flux capacitor ;)
+        CUTE_ASSERT(kryptos_totp_init(ktask, kKryptosGenerateToken,
+                                      test->shared_secret, test->shared_secret_size,
+                                      &t0, &x,
+                                      &number_of_digits,
+                                      test->hash, test->hash_input_size, test->hash_size) == kKryptosSuccess);
+        CUTE_ASSERT(kryptos_totp(&ktask) == kKryptosSuccess);
+        CUTE_ASSERT(ktask->out_size == sizeof(kryptos_u32_t));
+        CUTE_ASSERT(ktask->out != NULL);
+        CUTE_ASSERT(*(kryptos_u32_t *)ktask->out == test->expected);
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+        test++;
+    }
+
+    disable_time_hook();
+CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_hotp_tests)
     struct test_ctx {
@@ -555,6 +930,8 @@ CUTE_TEST_CASE(kryptos_otp_macro_tests)
     size_t throttling = 30;
     size_t resync = 7;
     size_t number_of_digits = 6;
+    kryptos_u64_t t0 = 10800, x = 30;
+
     // INFO(Rafael): For each available OTP algorithm put a successful generate/validation test by using related
     //               general OTP macro functions (that fits with the algorithm, of course).
 
@@ -589,8 +966,39 @@ CUTE_TEST_CASE(kryptos_otp_macro_tests)
     CUTE_ASSERT(kryptos_otp(hotp, server) == kKryptosSuccess);
 
     kryptos_otp_free_token(client);
+
+    // TOTP
+
+    CUTE_ASSERT(kryptos_otp_init(totp,
+                                 server,
+                                 kKryptosValidateToken,
+                                 shared_secret,
+                                 shared_secret_size,
+                                 &t0,
+                                 &x,
+                                 &number_of_digits,
+                                 kryptos_otp_hash(sha384)) == kKryptosSuccess);
+
+    CUTE_ASSERT(kryptos_otp_init(totp,
+                                 client,
+                                 kKryptosGenerateToken,
+                                 shared_secret,
+                                 shared_secret_size,
+                                 &t0,
+                                 &x,
+                                 &number_of_digits,
+                                 kryptos_otp_hash(sha384)) == kKryptosSuccess);
+
+    CUTE_ASSERT(kryptos_otp(totp, client) == kKryptosSuccess);
+
+    kryptos_otp_set_token(server, client->out, client->out_size);
+
+    CUTE_ASSERT(kryptos_otp(totp, server) == kKryptosSuccess);
+
+    kryptos_otp_free_token(client);
+
 #else
-    fprintf(stdout, "   Test skipped. Compiled with no C99 support.\n");
+    fprintf(stdout, "   Test skipped. Compiled without C99 support.\n");
 #endif
 CUTE_TEST_CASE_END
 
@@ -607,4 +1015,39 @@ static void otp_hash_validator(kryptos_hash_func hash,
     *hash_addr = hash;
     *hash_input_addr = hash_input_size;
     *hash_size_addr = hash_size;
+}
+
+static void set_totp_current_systime(const kryptos_u64_t value) {
+    g_totp_curr_systime = value;
+}
+
+static int enable_time_hook(void) {
+    int err = 1;
+#if defined(_WIN32)
+    HMODULE handle = NULL;
+#elif defined(__unix__)
+    void *handle = NULL;
+#endif
+    if (g_tru_time == NULL) {
+#if defined(__unix__)
+        handle = (void *)RTLD_NEXT;
+        g_tru_time = (void *)dlsym(handle, "time");
+#elif defined(_WIN32)
+        handle = LoadLibrary("ucrtbase.dll");
+        if (handle != NULL) {
+            g_tru_time = (void *)GetProcAddress(handle, "_time64");
+        }
+#else
+# error Some code wanted.
+#endif
+    }
+    if (g_tru_time != NULL) {
+        g_do_time_hook = 1;
+        err = 0;
+    }
+    return err;
+}
+
+static void disable_time_hook(void) {
+    g_do_time_hook = 0;
 }

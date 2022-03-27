@@ -182,6 +182,9 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_hotp_client_server_syncd_interaction_tests);
     KUTE_RUN_TEST(kryptos_hotp_client_server_unsyncd_interaction_tests);
 
+    KUTE_RUN_TEST(kryptos_totp_init_bad_params_tests);
+    KUTE_RUN_TEST(kryptos_totp_client_server_syncd_interaction_tests);
+
     KUTE_RUN_TEST(kryptos_otp_hash_macro_tests);
     KUTE_RUN_TEST(kryptos_otp_macro_tests);
 

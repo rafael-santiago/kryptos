@@ -24,4 +24,8 @@ KUTE_DECLARE_TEST_CASE(kryptos_otp_hash_macro_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_otp_macro_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_totp_init_bad_params_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_totp_client_server_syncd_interaction_tests);
+
 #endif

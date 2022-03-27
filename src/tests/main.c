@@ -287,6 +287,11 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_hotp_client_server_syncd_interaction_tests);
     CUTE_RUN_TEST(kryptos_hotp_client_server_unsyncd_interaction_tests);
 
+    CUTE_RUN_TEST(kryptos_totp_tests);
+    CUTE_RUN_TEST(kryptos_totp_init_bad_params_tests);
+    CUTE_RUN_TEST(kryptos_totp_client_server_syncd_interaction_tests);
+    CUTE_RUN_TEST(kryptos_totp_client_server_unsyncd_interaction_tests);
+
     CUTE_RUN_TEST(kryptos_otp_hash_macro_tests);
     CUTE_RUN_TEST(kryptos_otp_macro_tests);
 

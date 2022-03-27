@@ -40,9 +40,11 @@ Until now these are the supported platforms:
 
 **Codification stuff**: ``Base64``, ``UUEncode``.
 
+**Compression stuff**: ``Huffman coding``.
+
 **Key derivation functions**: ``HKDF``, ``PBKDF2``, ``Argon2``.
 
-**One-time passwords**: ``HOTP``.
+**One-time passwords**: ``HOTP``, ``TOTP``.
 
 **Extras**: Common API between user space / kernel space (``Windows``, ``FreeBSD``, ``NetBSD`` and ``Linux``), ``RAM`` swapping
 cares, data wiping when freeing memory, ``PEM`` as its common input/output (for some algorithms), convenience function macros

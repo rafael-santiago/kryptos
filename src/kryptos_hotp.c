@@ -87,7 +87,6 @@ kryptos_task_result_t kryptos_hotp_init(kryptos_task_ctx *ktask,
 }
 
 kryptos_task_result_t kryptos_hotp(kryptos_task_ctx **ktask) {
-    kryptos_u64_t c = 0;
     size_t s;
 
     kryptos_do_hotp(ktask);
@@ -103,12 +102,8 @@ kryptos_task_result_t kryptos_hotp(kryptos_task_ctx **ktask) {
         }
         if (kryptos_last_task_succeed(*ktask)) {
             *(kryptos_u64_t *)(*ktask)->arg[KRYPTOS_HOTP_C_PARAM] += 1;
-        } else if (kryptos_last_task_succeed(*ktask)) {
-            *(kryptos_u64_t *)(*ktask)->arg[KRYPTOS_HOTP_C_PARAM] = c;
         }
     }
-
-    c = 0;
 
     return (*ktask)->result;
 }
@@ -145,6 +140,7 @@ static void kryptos_do_hotp(kryptos_task_ctx **ktask) {
     ktask_hmac->out[5] = ((c >> 16) & 0xFF);
     ktask_hmac->out[6] = ((c >>  8) & 0xFF);
     ktask_hmac->out[7] =   c        & 0xFF;
+    c = 0;
 
     ktask_hmac->key = (*ktask)->key;
     ktask_hmac->key_size = (*ktask)->key_size;
