@@ -1,4 +1,6 @@
 (A) Try to give support to GMP on multiprecision stuff when asked by the user. +Improvement
+(A) Implement `--no-hotp-sync-tests` and `--no-totp-sync-tests` build options. +Improvement,+Build
+(B) Implement support for Base32 and Base16 encoding algorithms. +NewFeature
 x (B) Implement TOTP algorithm. +NewFeature,+AuthUtil
 x (B) Implement HOTP algorithm. +NewFeature,+AuthUtil
 x (B) Implement support for Twofish (128, 192, 256 and GCM). +NewFeature,+BlockCipher
