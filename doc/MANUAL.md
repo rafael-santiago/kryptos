@@ -36,6 +36,7 @@ presented here can be built with the command ``hefesto --mk-samples``.
     - [Bcrypt](#bcrypt)
 - [OTPs](#otps)
     - [HOTP](#hotp)
+    - [TOTP](#totp)
 - [So it is enough](#so-it-is-enough)
 
 ## Link101
@@ -4964,7 +4965,7 @@ compatibility). Only "$2a$" is being considered here.
 
 ## OTPs
 
-Until now ``Kryptos`` features one one-time password algorithm: ``HOTP``.
+Until now ``Kryptos`` features two one-time password algorithms: ``HOTP`` and ``TOTP``.
 
 ### HOTP
 
@@ -5196,7 +5197,7 @@ read_counter_data_epilogue:
 #if !defined(_MSC_VER)
         close(fd);
 #else
-    _close(fd);
+        _close(fd);
 #endif
     }
 
@@ -5256,6 +5257,212 @@ When the throttling parameter has exceeded its limit all ``HOTP`` session will n
 calling ``kryptos_otp_init`` again. However, you will also need to reset the throttling variable to the wanted limit
 before calling init. In this way you will be able to apply your desired policy about brute force attack mitigations.
 It is up to you!
+
+[Back](#contents)
+
+### TOTP
+
+The idea behind ``TOTP`` is similar to ``HOTP`` but instead of using a defined counter it uses the system timestamp
+(``UNIX`` epoch) as its counter.
+
+The calls you must make in order to use it are also similar to ``HOTP`` but here you will not inform throttling nor
+resynchronization parameters.
+
+At server side you will do:
+
+```c
+    kryptos_u64_t t0 = (kryptos_u64_t)time(NULL); // Often configured to UNIX epoch.
+    kryptos_u64_t x = 30; // Window time which the token will be valid (more or less).
+    size_t d = 6; // Number of digits
+    kryptos_u8_t *shared_secret = (kryptos_u8_t *)"w-e-a-k-k-e-y";
+    size_t shared_secret_size = 13;
+    if (kryptos_otp_init(server,
+                         kKryptosValidateToken,
+                         shared_secret, shared_secret_size,
+                         &t0, &x, &d,
+                         kryptos_otp_hash(sha512)) == kKryptosSuccess) {
+        // Init done, go ahead with your auth stuff...
+    }
+```
+
+At client side you will do:
+
+```c
+    (...)
+    if (kryptos_otp_init(totp,
+                         client,
+                         kKryptosGenerateToken,
+                         shared_secret,
+                         shared_secret_size,
+                         &t0,
+                         &x,
+                         &d,
+                         kryptos_otp_hash(sha512)) == kKryptosSuccess) {
+        // Init done, go ahead with your auth stuff...
+    }
+```
+
+At both sides you will call:
+
+```c
+    // client
+    if (kryptos_otp(totp, client) == kKryptosSuccess) {
+        // Send out your token and wait for having your access granted.
+    }
+
+    // server
+    // wait for the client token...
+    kryptos_otp_set_token(server, client_token, client_token_size);
+    if (kryptos_otp(totp, server) == kKryptosSuccess) {
+        // Grant access to client.
+    } else {
+        // Deny access to client.
+    }
+```
+
+Follows a well-simple sample that you can play around with:
+
+```c
+/*
+ *                                Copyright (C) 2022 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <time.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+#define DIGITS_NR 6
+#define TIME_STEP 30
+// INFO(Rafael): If you want to test it with your smartphone
+//               by using "LastPass... Authenticator" or "Google
+//               Authenticator" and stuff just add the following
+//               base-32 encoded key:
+//
+//                      ONRWSZLOORUWCIDMNFRGK4TBOQ
+#define SHARED_SECRET (kryptos_u8_t *)"scientialiberat"
+#define SHARED_SECRET_SIZE 15
+#define T0 0
+
+static int server(void);
+
+static int client(void);
+
+int main(int argc, char **argv) {
+    int err = EXIT_FAILURE;
+#if defined(KRYPTOS_C99)
+    if (argc >= 2) {
+        if (strcmp(argv[1], "--client") == 0) {
+            err = client();
+        } else if (strcmp(argv[1], "--server") == 0) {
+            err = server();
+        } else {
+            goto usage;
+        }
+    } else {
+usage:
+        fprintf(stderr, "user: %s --client | --server\n", argv[0]);
+    }
+#else
+    fprintf(stderr, "error: your kryptos build has no support for c99 conveniences.\n");
+#endif
+
+    return err;
+}
+
+static int client(void) {
+    kryptos_task_ctx c, *client = &c;
+    kryptos_u64_t t0 = 0;
+    kryptos_u64_t x = TIME_STEP;
+    size_t d = DIGITS_NR;
+    kryptos_u8_t *shared_secret = SHARED_SECRET;
+    size_t shared_secret_size = SHARED_SECRET_SIZE;
+    int err = EXIT_FAILURE;
+
+    if (kryptos_otp_init(totp,
+                         client,
+                         kKryptosGenerateToken,
+                         shared_secret, shared_secret_size,
+                         &t0, &x, &d, kryptos_otp_hash(sha1)) != kKryptosSuccess) {
+        fprintf(stderr, "error: %s\n", (client->result_verbose != NULL) ? client->result_verbose
+                                                                        : "Generic failure.");
+        return EXIT_FAILURE;
+    }
+
+    if (kryptos_otp(totp, client) == kKryptosSuccess) {
+        fprintf(stdout, "Your current token is '%06u'\n", *(kryptos_u32_t *)client->out);
+        err = EXIT_SUCCESS;
+    } else {
+        fprintf(stderr, "error: %s\n", (client->result_verbose != NULL) ? client->result_verbose
+                                                                        : "Generic failure.");
+    }
+
+    kryptos_otp_free_token(client);
+
+    return err;
+}
+
+static int server(void) {
+    kryptos_task_ctx s, *server = &s;
+    kryptos_u64_t t0 = T0;
+    kryptos_u64_t x = TIME_STEP;
+    size_t d = DIGITS_NR;
+    kryptos_u8_t *shared_secret = SHARED_SECRET;
+    size_t shared_secret_size = SHARED_SECRET_SIZE;
+    int err = EXIT_FAILURE;
+    kryptos_u32_t token = 0;
+
+    if (kryptos_otp_init(totp,
+                         server,
+                         kKryptosValidateToken,
+                         shared_secret, shared_secret_size,
+                         &t0, &x, &d, kryptos_otp_hash(sha1)) != kKryptosSuccess) {
+        fprintf(stderr, "error: %s\n", (server->result_verbose != NULL) ? server->result_verbose
+                                                                        : "Generic failure.");
+        return EXIT_FAILURE;
+    }
+
+    fprintf(stderr, "Type the required token: ");
+#if !defined(_MSC_VER)
+    scanf("%d", &token);
+#else
+    scanf_s("%d", &token, sizeof(token));
+#endif
+
+    kryptos_otp_set_token(server, (kryptos_u8_t *)&token, sizeof(token));
+
+    if (kryptos_otp(totp, server) == kKryptosSuccess) {
+        fprintf(stdout, "Access granted.\n");
+        err = EXIT_SUCCESS;
+    } else {
+        printf("error: %s\n", (server->result_verbose != NULL) ? server->result_verbose
+                                                               : "Generic failure.");
+    }
+
+    return err;
+}
+
+#undef DIGITS_NR
+#undef TIME_STEP
+#undef SHARED_SECRET
+#undef SHARED_SECRET_SIZE
+#undef T0
+```
+
+Testing the code above it is straightforward. If you want to get a new token just run
+``./totp-c99-sample --client``. If you want to validate just run ``./totp-c99-sample --server``.
+
+**Tip**: If for some reason you add the key of this sample into your smartphone token app prefered
+one and after some rebooting it stop working. Try to run ``ntpdate time.nist.gov``. Maybe the
+clock of your machine is not well synchronized with the clock of your smartphone. When you start
+working with stuff well dependent of time you realize how it is relative and imprecise
+(especially within computers).
+
+
 
 [Back](#contents)
 
