@@ -284,13 +284,21 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_hotp_tests);
     CUTE_RUN_TEST(kryptos_hotp_init_bad_params_tests);
     CUTE_RUN_TEST(kryptos_hotp_sequencing_tests);
-    CUTE_RUN_TEST(kryptos_hotp_client_server_syncd_interaction_tests);
-    CUTE_RUN_TEST(kryptos_hotp_client_server_unsyncd_interaction_tests);
+    if (CUTE_GET_OPTION("no-hotp-sync-tests") == NULL) {
+        CUTE_RUN_TEST(kryptos_hotp_client_server_syncd_interaction_tests);
+        CUTE_RUN_TEST(kryptos_hotp_client_server_unsyncd_interaction_tests);
+    } else {
+        printf("WARN: The HOTP sync/unsync tests were skipped.\n");
+    }
 
     CUTE_RUN_TEST(kryptos_totp_tests);
     CUTE_RUN_TEST(kryptos_totp_init_bad_params_tests);
-    CUTE_RUN_TEST(kryptos_totp_client_server_syncd_interaction_tests);
-    CUTE_RUN_TEST(kryptos_totp_client_server_unsyncd_interaction_tests);
+    if (CUTE_GET_OPTION("no-totp-sync-tests") == NULL) {
+        CUTE_RUN_TEST(kryptos_totp_client_server_syncd_interaction_tests);
+        CUTE_RUN_TEST(kryptos_totp_client_server_unsyncd_interaction_tests);
+    } else {
+        printf("WARN: The TOTP sync/unsync tests were skipped.\n");
+    }
 
     CUTE_RUN_TEST(kryptos_otp_hash_macro_tests);
     CUTE_RUN_TEST(kryptos_otp_macro_tests);
