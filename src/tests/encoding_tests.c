@@ -13,6 +13,172 @@
 #include <kryptos.h>
 #include <string.h>
 
+CUTE_TEST_CASE(kryptos_base16_tests)
+    kryptos_task_ctx t, *ktask = &t;
+
+    struct base16_test {
+        kryptos_u8_t *in;
+        size_t in_size;
+        kryptos_u8_t *out;
+        size_t out_size;
+    };
+
+    struct base16_test test_vector[] = {
+        {      "f", 1,     "66", 2 },
+        {     "fo", 2,     "666F", 4 },
+        {    "foo", 3,     "666F6F", 6 },
+        {   "foob", 4, "666F6F62", 8 },
+        {  "fooba", 5, "666F6F6261", 10 },
+        { "foobar", 6, "666F6F626172", 12 }
+    }; // INFO(Rafael): Test data from RFC-4648.
+
+    size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+
+    t.encoder = kKryptosEncodingBASE16;
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        t.in = test_vector[tv].in;
+        t.in_size = test_vector[tv].in_size;
+        kryptos_task_set_encode_action(ktask);
+        kryptos_base16_processor(&ktask);
+        CUTE_ASSERT(t.out != NULL);
+        CUTE_ASSERT(t.out_size == test_vector[tv].out_size);
+        CUTE_ASSERT(memcmp(t.out, test_vector[tv].out, t.out_size) == 0);
+
+        t.in = t.out;
+        t.in_size = t.out_size;
+        kryptos_task_set_decode_action(ktask);
+        kryptos_base16_processor(&ktask);
+        CUTE_ASSERT(t.out != NULL);
+        CUTE_ASSERT(t.out_size == test_vector[tv].in_size);
+        CUTE_ASSERT(memcmp(t.out, test_vector[tv].in, t.out_size) == 0);
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_base16_dsl_tests)
+    kryptos_task_ctx t, *ktask = &t;
+
+    struct base16_test {
+        kryptos_u8_t *in;
+        size_t in_size;
+        kryptos_u8_t *out;
+        size_t out_size;
+    };
+
+    struct base16_test test_vector[] = {
+        {      "f", 1,     "66", 2 },
+        {     "fo", 2,     "666F", 4 },
+        {    "foo", 3,     "666F6F", 6 },
+        {   "foob", 4, "666F6F62", 8 },
+        {  "fooba", 5, "666F6F6261", 10 },
+        { "foobar", 6, "666F6F626172", 12 }
+    }; // INFO(Rafael): Test data from RFC-4648.
+
+    size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+
+    kryptos_task_init_as_null(ktask);
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        kryptos_task_set_encode_action(ktask);
+        kryptos_run_encoder(base16, ktask, test_vector[tv].in, test_vector[tv].in_size);
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        CUTE_ASSERT(t.out != NULL);
+        CUTE_ASSERT(t.out_size == test_vector[tv].out_size);
+        CUTE_ASSERT(memcmp(t.out, test_vector[tv].out, t.out_size) == 0);
+        kryptos_task_set_decode_action(ktask);
+        kryptos_run_encoder(base16, ktask, ktask->out, ktask->out_size);
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        CUTE_ASSERT(t.out != NULL);
+        CUTE_ASSERT(t.out_size == test_vector[tv].in_size);
+        CUTE_ASSERT(memcmp(t.out, test_vector[tv].in, t.out_size) == 0);
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_base32_tests)
+    kryptos_task_ctx t, *ktask = &t;
+
+    struct base32_test {
+        kryptos_u8_t *in;
+        size_t in_size;
+        kryptos_u8_t *out;
+        size_t out_size;
+    };
+
+    struct base32_test test_vector[] = {
+        {      "f", 1,     "MY======", 8 },
+        {     "fo", 2,     "MZXQ====", 8 },
+        {    "foo", 3,     "MZXW6===", 8 },
+        {   "foob", 4, "MZXW6YQ=", 8 },
+        {  "fooba", 5, "MZXW6YTB", 8 },
+        { "foobar", 6, "MZXW6YTBOI======", 16 }
+    }; // INFO(Rafael): Test data from RFC-4648.
+
+    size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+
+    t.encoder = kKryptosEncodingBASE32;
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        t.in = test_vector[tv].in;
+        t.in_size = test_vector[tv].in_size;
+        kryptos_task_set_encode_action(ktask);
+        kryptos_base32_processor(&ktask);
+        CUTE_ASSERT(t.out != NULL);
+        CUTE_ASSERT(t.out_size == test_vector[tv].out_size);
+        CUTE_ASSERT(memcmp(t.out, test_vector[tv].out, t.out_size) == 0);
+
+        t.in = t.out;
+        t.in_size = t.out_size;
+        kryptos_task_set_decode_action(ktask);
+        kryptos_base32_processor(&ktask);
+        CUTE_ASSERT(t.out != NULL);
+        CUTE_ASSERT(t.out_size == test_vector[tv].in_size);
+        CUTE_ASSERT(memcmp(t.out, test_vector[tv].in, t.out_size) == 0);
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+    }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_base32_dsl_tests)
+    kryptos_task_ctx t, *ktask = &t;
+
+    struct base32_test {
+        kryptos_u8_t *in;
+        size_t in_size;
+        kryptos_u8_t *out;
+        size_t out_size;
+    };
+
+    struct base32_test test_vector[] = {
+        {      "f", 1,     "MY======", 8 },
+        {     "fo", 2,     "MZXQ====", 8 },
+        {    "foo", 3,     "MZXW6===", 8 },
+        {   "foob", 4, "MZXW6YQ=", 8 },
+        {  "fooba", 5, "MZXW6YTB", 8 },
+        { "foobar", 6, "MZXW6YTBOI======", 16 }
+    }; // INFO(Rafael): Test data from RFC-4648.
+
+    size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+
+    kryptos_task_init_as_null(ktask);
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        kryptos_task_set_encode_action(ktask);
+        kryptos_run_encoder(base32, ktask, test_vector[tv].in, test_vector[tv].in_size);
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        CUTE_ASSERT(t.out != NULL);
+        CUTE_ASSERT(t.out_size == test_vector[tv].out_size);
+        CUTE_ASSERT(memcmp(t.out, test_vector[tv].out, t.out_size) == 0);
+        kryptos_task_set_decode_action(ktask);
+        kryptos_run_encoder(base32, ktask, ktask->out, ktask->out_size);
+        CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        CUTE_ASSERT(t.out != NULL);
+        CUTE_ASSERT(t.out_size == test_vector[tv].in_size);
+        CUTE_ASSERT(memcmp(t.out, test_vector[tv].in, t.out_size) == 0);
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+    }
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_base64_tests)
     kryptos_task_ctx t, *ktask = &t;
 

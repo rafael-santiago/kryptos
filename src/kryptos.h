@@ -59,6 +59,8 @@
 #include <kryptos_djb2.h>
 
 #include <kryptos_base64.h>
+#include <kryptos_base32.h>
+#include <kryptos_base16.h>
 #include <kryptos_uuencode.h>
 #include <kryptos_huffman.h>
 

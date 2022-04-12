@@ -59,6 +59,10 @@ KUTE_TEST_CASE(ktest_monkey)
 
     KUTE_RUN_TEST(kryptos_base64_tests);
     KUTE_RUN_TEST(kryptos_base64_dsl_tests);
+    KUTE_RUN_TEST(kryptos_base32_tests);
+    KUTE_RUN_TEST(kryptos_base32_dsl_tests);
+    KUTE_RUN_TEST(kryptos_base16_tests);
+    KUTE_RUN_TEST(kryptos_base16_dsl_tests);
     KUTE_RUN_TEST(kryptos_uuencode_tests);
     KUTE_RUN_TEST(kryptos_uuencode_dsl_tests);
     KUTE_RUN_TEST(kryptos_huffman_tests);

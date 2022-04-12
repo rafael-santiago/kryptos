@@ -18,7 +18,7 @@
 //               Authenticator" and stuff just add the following
 //               base-32 encoded key:
 //
-//                      ONRWSZLOORUWCIDMNFRGK4TBOQ
+//                      ONRWSZLOORUWC3DJMJSXEYLU
 #define SHARED_SECRET (kryptos_u8_t *)"scientialiberat"
 #define SHARED_SECRET_SIZE 15
 #define T0 0
@@ -43,6 +43,7 @@ usage:
         fprintf(stderr, "user: %s --client | --server\n", argv[0]);
     }
 #else
+
     fprintf(stderr, "error: your kryptos build has no support for c99 conveniences.\n");
 #endif
 
@@ -77,6 +78,16 @@ static int client(void) {
     }
 
     kryptos_otp_free_token(client);
+    if (err == EXIT_SUCCESS) {
+        kryptos_task_set_encode_action(client);
+        kryptos_run_encoder(base32, client, shared_secret, shared_secret_size);
+        if (kryptos_last_task_succeed(client)) {
+            fprintf(stdout, "Try to add the following key to your 2FA favorite app: '");
+            fwrite(client->out, 1, client->out_size, stdout);
+            fprintf(stdout, "'.\n");
+            kryptos_task_free(client, KRYPTOS_TASK_OUT);
+        }
+    }
 
     return err;
 }

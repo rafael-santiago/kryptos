@@ -4080,7 +4080,7 @@ functionalities. In the following section we will discuss them a little.
 
 ### Encoding algorithms
 
-Until now are available two encoding algorithms: ``Base64`` and ``UUEncode``.
+Until now are available two encoding algorithms: ``Base64``, ``Base32``, ``Base16`` and ``UUEncode``.
 
 Here follows the way of using ``Base64`` without taking advantage of any dsl convenience:
 
@@ -5343,7 +5343,7 @@ Follows a well-simple sample that you can play around with:
 //               Authenticator" and stuff just add the following
 //               base-32 encoded key:
 //
-//                      ONRWSZLOORUWCIDMNFRGK4TBOQ
+//                      ONRWSZLOORUWC3DJMJSXEYLU
 #define SHARED_SECRET (kryptos_u8_t *)"scientialiberat"
 #define SHARED_SECRET_SIZE 15
 #define T0 0
@@ -5402,6 +5402,16 @@ static int client(void) {
     }
 
     kryptos_otp_free_token(client);
+    if (err == EXIT_SUCCESS) {
+        kryptos_task_set_encode_action(client);
+        kryptos_run_encoder(base32, client, shared_secret, shared_secret_size);
+        if (kryptos_last_task_succeed(client)) {
+            fprintf(stdout, "Try to add the following key to your 2FA favorite app: '");
+            fwrite(client->out, 1, client->out_size, stdout);
+            fprintf(stdout, "'.\n");
+            kryptos_task_free(client, KRYPTOS_TASK_OUT);
+        }
+    }
 
     return err;
 }
