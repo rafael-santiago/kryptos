@@ -75,8 +75,13 @@ static kryptos_u8_t *kryptos_base64_encode_buffer(const kryptos_u8_t *buffer, co
     kryptos_u32_t block;
     size_t block_size, pad_size = 0;
 
+    if (out_size == NULL) {
+        return NULL;
+    }
+
+    *out_size = 0;
+
     if (buffer == NULL || buffer_size == 0) {
-        *out_size = 0;
         return NULL;
     }
 
@@ -90,6 +95,10 @@ static kryptos_u8_t *kryptos_base64_encode_buffer(const kryptos_u8_t *buffer, co
     }
 
     out = (kryptos_u8_t *) kryptos_newseg(*out_size);
+    if (out == NULL) {
+        *out_size = 0;
+        goto kryptos_base64_encode_buffer_epilogue;
+    }
     out_p = out;
 
     while (bp != bp_end) {
@@ -121,6 +130,8 @@ static kryptos_u8_t *kryptos_base64_encode_buffer(const kryptos_u8_t *buffer, co
         pad_size--;
     }
 
+kryptos_base64_encode_buffer_epilogue:
+
     bp = NULL;
     bp_end = NULL;
     block = 0;
@@ -134,8 +145,13 @@ static kryptos_u8_t *kryptos_base64_decode_buffer(const kryptos_u8_t *buffer, co
     kryptos_u32_t block;
     size_t pad_size = 0;
 
+    if (out_size == NULL) {
+        return NULL;
+    }
+
+    *out_size = 0;
+
     if (buffer == NULL || buffer_size == 0) {
-        *out_size = 0;
         return NULL;
     }
 
@@ -151,6 +167,10 @@ static kryptos_u8_t *kryptos_base64_decode_buffer(const kryptos_u8_t *buffer, co
 
     *out_size = ((buffer_size * 6) / 8) - pad_size;
     out = (kryptos_u8_t *) kryptos_newseg(*out_size + 1);
+    if (out == NULL) {
+        *out_size = 0;
+        goto kryptos_base64_decode_buffer_epilogue;
+    }
     memset(out, 0, *out_size + 1);
     out_p = out;
     out_end = out_p + *out_size;
@@ -180,6 +200,8 @@ static kryptos_u8_t *kryptos_base64_decode_buffer(const kryptos_u8_t *buffer, co
 
         bp += 4;
     }
+
+kryptos_base64_decode_buffer_epilogue:
 
     pad_size = 0;
     bp = NULL;

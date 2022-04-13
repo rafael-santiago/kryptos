@@ -26,4 +26,12 @@ KUTE_DECLARE_TEST_CASE(kryptos_pem_put_data_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_pem_get_mp_data_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_base32_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_base32_dsl_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_base16_tests);
+
+KUTE_DECLARE_TEST_CASE(kryptos_base16_dsl_tests);
+
 #endif

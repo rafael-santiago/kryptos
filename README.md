@@ -38,7 +38,7 @@ Until now these are the supported platforms:
 
 **CSPRNG**: From the system (default one), ``Fortuna``.
 
-**Codification stuff**: ``Base64``, ``UUEncode``.
+**Codification stuff**: ``Base64``, ``Base32``, ``Base16``, ``UUEncode``.
 
 **Compression stuff**: ``Huffman coding``.
 

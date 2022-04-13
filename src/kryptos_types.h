@@ -199,6 +199,8 @@ typedef enum {
 typedef enum {
     kKryptosEncodingBASE64 = 0,
     kKryptosEncodingUUENCODE,
+    kKryptosEncodingBASE32,
+    kKryptosEncodingBASE16,
     kKryptosEncodingNr
 }kryptos_encoding_t;
 

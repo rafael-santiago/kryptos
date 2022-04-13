@@ -14,6 +14,172 @@
 #include <kryptos.h>
 #include <kstring.h>
 
+KUTE_TEST_CASE(kryptos_base16_tests)
+    kryptos_task_ctx t, *ktask = &t;
+
+    struct base16_test {
+        kryptos_u8_t *in;
+        size_t in_size;
+        kryptos_u8_t *out;
+        size_t out_size;
+    };
+
+    struct base16_test test_vector[] = {
+        {      (kryptos_u8_t *)"f", 1,     (kryptos_u8_t *)"66", 2 },
+        {     (kryptos_u8_t *)"fo", 2,     (kryptos_u8_t *)"666F", 4 },
+        {    (kryptos_u8_t *)"foo", 3,     (kryptos_u8_t *)"666F6F", 6 },
+        {   (kryptos_u8_t *)"foob", 4, (kryptos_u8_t *)"666F6F62", 8 },
+        {  (kryptos_u8_t *)"fooba", 5, (kryptos_u8_t *)"666F6F6261", 10 },
+        { (kryptos_u8_t *)"foobar", 6, (kryptos_u8_t *)"666F6F626172", 12 }
+    }; // INFO(Rafael): Test data from RFC-4648.
+
+    size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+
+    t.encoder = kKryptosEncodingBASE16;
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        t.in = test_vector[tv].in;
+        t.in_size = test_vector[tv].in_size;
+        kryptos_task_set_encode_action(ktask);
+        kryptos_base16_processor(&ktask);
+        KUTE_ASSERT(t.out != NULL);
+        KUTE_ASSERT(t.out_size == test_vector[tv].out_size);
+        KUTE_ASSERT(memcmp(t.out, test_vector[tv].out, t.out_size) == 0);
+
+        t.in = t.out;
+        t.in_size = t.out_size;
+        kryptos_task_set_decode_action(ktask);
+        kryptos_base16_processor(&ktask);
+        KUTE_ASSERT(t.out != NULL);
+        KUTE_ASSERT(t.out_size == test_vector[tv].in_size);
+        KUTE_ASSERT(memcmp(t.out, test_vector[tv].in, t.out_size) == 0);
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+    }
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_base16_dsl_tests)
+    kryptos_task_ctx t, *ktask = &t;
+
+    struct base16_test {
+        kryptos_u8_t *in;
+        size_t in_size;
+        kryptos_u8_t *out;
+        size_t out_size;
+    };
+
+    struct base16_test test_vector[] = {
+        {      (kryptos_u8_t *)"f", 1,     (kryptos_u8_t *)"66", 2 },
+        {     (kryptos_u8_t *)"fo", 2,     (kryptos_u8_t *)"666F", 4 },
+        {    (kryptos_u8_t *)"foo", 3,     (kryptos_u8_t *)"666F6F", 6 },
+        {   (kryptos_u8_t *)"foob", 4, (kryptos_u8_t *)"666F6F62", 8 },
+        {  (kryptos_u8_t *)"fooba", 5, (kryptos_u8_t *)"666F6F6261", 10 },
+        { (kryptos_u8_t *)"foobar", 6, (kryptos_u8_t *)"666F6F626172", 12 }
+    }; // INFO(Rafael): Test data from RFC-4648.
+
+    size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+
+    kryptos_task_init_as_null(ktask);
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        kryptos_task_set_encode_action(ktask);
+        kryptos_run_encoder(base16, ktask, test_vector[tv].in, test_vector[tv].in_size);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        KUTE_ASSERT(t.out != NULL);
+        KUTE_ASSERT(t.out_size == test_vector[tv].out_size);
+        KUTE_ASSERT(memcmp(t.out, test_vector[tv].out, t.out_size) == 0);
+        kryptos_task_set_decode_action(ktask);
+        kryptos_run_encoder(base16, ktask, ktask->out, ktask->out_size);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        KUTE_ASSERT(t.out != NULL);
+        KUTE_ASSERT(t.out_size == test_vector[tv].in_size);
+        KUTE_ASSERT(memcmp(t.out, test_vector[tv].in, t.out_size) == 0);
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+    }
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_base32_tests)
+    kryptos_task_ctx t, *ktask = &t;
+
+    struct base32_test {
+        kryptos_u8_t *in;
+        size_t in_size;
+        kryptos_u8_t *out;
+        size_t out_size;
+    };
+
+    struct base32_test test_vector[] = {
+        {      (kryptos_u8_t *)"f", 1,     (kryptos_u8_t *)"MY======", 8 },
+        {     (kryptos_u8_t *)"fo", 2,     (kryptos_u8_t *)"MZXQ====", 8 },
+        {    (kryptos_u8_t *)"foo", 3,     (kryptos_u8_t *)"MZXW6===", 8 },
+        {   (kryptos_u8_t *)"foob", 4, (kryptos_u8_t *)"MZXW6YQ=", 8 },
+        {  (kryptos_u8_t *)"fooba", 5, (kryptos_u8_t *)"MZXW6YTB", 8 },
+        { (kryptos_u8_t *)"foobar", 6, (kryptos_u8_t *)"MZXW6YTBOI======", 16 }
+    }; // INFO(Rafael): Test data from RFC-4648.
+
+    size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+
+    t.encoder = kKryptosEncodingBASE32;
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        t.in = test_vector[tv].in;
+        t.in_size = test_vector[tv].in_size;
+        kryptos_task_set_encode_action(ktask);
+        kryptos_base32_processor(&ktask);
+        KUTE_ASSERT(t.out != NULL);
+        KUTE_ASSERT(t.out_size == test_vector[tv].out_size);
+        KUTE_ASSERT(memcmp(t.out, test_vector[tv].out, t.out_size) == 0);
+
+        t.in = t.out;
+        t.in_size = t.out_size;
+        kryptos_task_set_decode_action(ktask);
+        kryptos_base32_processor(&ktask);
+        KUTE_ASSERT(t.out != NULL);
+        KUTE_ASSERT(t.out_size == test_vector[tv].in_size);
+        KUTE_ASSERT(memcmp(t.out, test_vector[tv].in, t.out_size) == 0);
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+    }
+KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_base32_dsl_tests)
+    kryptos_task_ctx t, *ktask = &t;
+
+    struct base32_test {
+        kryptos_u8_t *in;
+        size_t in_size;
+        kryptos_u8_t *out;
+        size_t out_size;
+    };
+
+    struct base32_test test_vector[] = {
+        {      (kryptos_u8_t *)"f", 1,     (kryptos_u8_t *)"MY======", 8 },
+        {     (kryptos_u8_t *)"fo", 2,     (kryptos_u8_t *)"MZXQ====", 8 },
+        {    (kryptos_u8_t *)"foo", 3,     (kryptos_u8_t *)"MZXW6===", 8 },
+        {   (kryptos_u8_t *)"foob", 4, (kryptos_u8_t *)"MZXW6YQ=", 8 },
+        {  (kryptos_u8_t *)"fooba", 5, (kryptos_u8_t *)"MZXW6YTB", 8 },
+        { (kryptos_u8_t *)"foobar", 6, (kryptos_u8_t *)"MZXW6YTBOI======", 16 }
+    }; // INFO(Rafael): Test data from RFC-4648.
+
+    size_t tv, tv_nr = sizeof(test_vector) / sizeof(test_vector[0]);
+
+    kryptos_task_init_as_null(ktask);
+
+    for (tv = 0; tv < tv_nr; tv++) {
+        kryptos_task_set_encode_action(ktask);
+        kryptos_run_encoder(base32, ktask, test_vector[tv].in, test_vector[tv].in_size);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        KUTE_ASSERT(t.out != NULL);
+        KUTE_ASSERT(t.out_size == test_vector[tv].out_size);
+        KUTE_ASSERT(memcmp(t.out, test_vector[tv].out, t.out_size) == 0);
+        kryptos_task_set_decode_action(ktask);
+        kryptos_run_encoder(base32, ktask, ktask->out, ktask->out_size);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        KUTE_ASSERT(t.out != NULL);
+        KUTE_ASSERT(t.out_size == test_vector[tv].in_size);
+        KUTE_ASSERT(memcmp(t.out, test_vector[tv].in, t.out_size) == 0);
+        kryptos_task_free(ktask, KRYPTOS_TASK_OUT | KRYPTOS_TASK_IN);
+    }
+KUTE_TEST_CASE_END
+
 KUTE_TEST_CASE(kryptos_base64_tests)
     kryptos_task_ctx t, *ktask = &t;
 
