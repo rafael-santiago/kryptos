@@ -60,9 +60,8 @@ void kryptos_allow_ram_swap(void) {
 void *kryptos_newseg(const size_t ssize) {
     void *segment;
 #ifdef KRYPTOS_USER_MODE
-# if !defined(_WIN32) && !defined(__minix__)
     size_t offset = 0;
-# endif
+
     segment = malloc(ssize);
     /*if (segment == NULL) {
         fprintf(stderr, "kryptos panic: no memory!\n");
