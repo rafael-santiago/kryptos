@@ -1,4 +1,4 @@
-# Kryptos
+# Kryptos [![CircleCI](https://circleci.com/gh/rafael-santiago/kryptos/tree/main.svg?style=svg)](https://circleci.com/gh/rafael-santiago/kryptos/tree/main)
 
 I started the core of this project on about 2004 and since then it is being an attempt of building a tiny and straightforward
 crypto library which can be easily integrated with user and also kernel mode code.
