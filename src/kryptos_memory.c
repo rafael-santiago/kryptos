@@ -58,6 +58,10 @@ void kryptos_allow_ram_swap(void) {
 #endif
 
 void *kryptos_newseg(const size_t ssize) {
+#if (defined(__GNUC__) || defined(__clang__)) && defined(KRYPTOS_USER_MODE)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
     void *segment = NULL;
 #ifdef KRYPTOS_USER_MODE
     size_t offset = 0;
@@ -105,6 +109,9 @@ void *kryptos_newseg(const size_t ssize) {
 #endif
 
     return segment;
+#if (defined(__GNUC__) || defined(__clang__)) && defined(KRYPTOS_USER_MODE)
+# pragma GCC diagnostic pop
+#endif
 }
 
 void kryptos_freeseg(void *seg, const size_t ssize) {
