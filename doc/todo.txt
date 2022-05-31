@@ -1,5 +1,6 @@
-(A) Add basic CircleCI pipeline (Linux). +Build, +CI, +Improvement
+(A) Add basic CircleCI pipeline (Windows). +Build, +CI, +Improvement
 (A) Try to give support to GMP on multiprecision stuff when asked by the user. +Improvement
+x (A) Add basic CircleCI pipeline (Linux). +Build, +CI, +Improvement
 x (B) Implement support for Base32 and Base16 encoding algorithms. +NewFeature
 x (A) Implement `--no-hotp-sync-tests` and `--no-totp-sync-tests` build options. +Improvement,+Build
 x (B) Implement TOTP algorithm. +NewFeature,+AuthUtil

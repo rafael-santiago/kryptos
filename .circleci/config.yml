@@ -1,0 +1,29 @@
+version: 2.1
+executors:
+  linux-machine:
+    docker:
+      - image: cimg/base:stable
+jobs:
+  linux-build:
+
+    executor: linux-machine
+    steps:
+      - run: |
+          sudo apt-get install git
+          sudo apt-get install gcc-9
+          git clone https://github.com/rafael-santiago/hefesto --recursive
+          cd hefesto/src
+          printf "\n" > go.txt
+          sudo ./build.sh < go.txt
+          cd ../..
+          rm -rf hefesto
+      - checkout
+      - run: |
+          git submodule update --init --recursive
+          cd src
+          sudo -i sh -c "cd $(pwd) && hefesto --mk-samples"
+
+workflows:
+  kryptos-forges:
+    jobs:
+      - linux-build
