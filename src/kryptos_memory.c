@@ -58,7 +58,7 @@ void kryptos_allow_ram_swap(void) {
 #endif
 
 void *kryptos_newseg(const size_t ssize) {
-    void *segment;
+    void *segment = NULL;
 #ifdef KRYPTOS_USER_MODE
     size_t offset = 0;
 
