@@ -1,12 +1,12 @@
 version: 2.1
-executors:
-  linux-machine:
-    docker:
-      - image: cimg/base:stable
+
+orbs:
+  win: circleci/windows@2.2.0
+
 jobs:
   linux-build:
 
-    executor: linux-machine
+    machine: true
     steps:
       - run: |
           sudo apt-get install git
@@ -23,7 +23,23 @@ jobs:
           cd src
           sudo -i sh -c "cd $(pwd) && hefesto --mk-samples"
 
+  windows-build:
+    executor: win/default
+    steps:
+      - run: choco install mingw -y
+      - run:
+          command:  git clone https://github.com/rafael-santiago/hefesto --recursive && cd hefesto/src && printf "\n" > go.txt
+          shell: bash.exe
+      - run:
+          command: cd hefesto\src && build.bat < go.txt && cd ..\.. && rmdir /q/s hefesto
+          shell: cmd.exe
+      - run: refreshenv
+      - checkout
+      - run: git submodule update --init --recursive
+      - run: cd src;hefesto --mk-samples
+
 workflows:
   kryptos-forges:
     jobs:
       - linux-build
+      - windows-build

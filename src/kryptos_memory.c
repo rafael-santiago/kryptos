@@ -64,7 +64,9 @@ void *kryptos_newseg(const size_t ssize) {
 #endif
     void *segment = NULL;
 #ifdef KRYPTOS_USER_MODE
+# if !defined(_WIN32) && !defined(__minix__)
     size_t offset = 0;
+# endif
 
     segment = malloc(ssize);
     /*if (segment == NULL) {
