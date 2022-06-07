@@ -59,8 +59,10 @@ void kryptos_allow_ram_swap(void) {
 
 void *kryptos_newseg(const size_t ssize) {
 #if (defined(__GNUC__) || defined(__clang__)) && defined(KRYPTOS_USER_MODE)
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wunknown-warning-option"
+# if defined(__clang__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wunknown-warning-option"
+# endif
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
@@ -114,7 +116,9 @@ void *kryptos_newseg(const size_t ssize) {
 
     return segment;
 #if (defined(__GNUC__) || defined(__clang__)) && defined(KRYPTOS_USER_MODE)
-# pragma GCC diagnostic pop
+# if defined(__clang__)
+#  pragma GCC diagnostic pop
+# endif
 # pragma GCC diagnostic pop
 #endif
 }
