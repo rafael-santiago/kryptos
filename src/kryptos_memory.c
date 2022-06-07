@@ -58,7 +58,9 @@ void kryptos_allow_ram_swap(void) {
 #endif
 
 void *kryptos_newseg(const size_t ssize) {
-#if (defined(__GNUC__) || defined(__clang__)) && defined(KRYPTOS_USER_MODE)
+    // QUESTION(Rafael): Criadores de warnings inuteis e chatas: Ondem vivem? Do que se alimentam? Como se reproduzem?
+    //                   Espero sinceramente que nao se reproduzam...
+#if (defined(__GNUC__) || defined(__clang__)) && defined(KRYPTOS_USER_MODE) && !defined(__OpenBSD__)
 # if defined(__clang__)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wunknown-warning-option"
@@ -115,7 +117,7 @@ void *kryptos_newseg(const size_t ssize) {
 #endif
 
     return segment;
-#if (defined(__GNUC__) || defined(__clang__)) && defined(KRYPTOS_USER_MODE)
+#if (defined(__GNUC__) || defined(__clang__)) && defined(KRYPTOS_USER_MODE) && !defined(__OpenBSD__)
 # if defined(__clang__)
 #  pragma GCC diagnostic pop
 # endif
