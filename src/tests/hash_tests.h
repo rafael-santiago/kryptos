@@ -120,4 +120,12 @@ CUTE_DECLARE_TEST_CASE(kryptos_salsa20_H_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_chacha20_H_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_blake3_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_blake3_hash_macro_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_blake3N_tests);
+
+CUTE_DECLARE_TEST_CASE(kryptos_blake3N_hash_macro_tests);
+
 #endif

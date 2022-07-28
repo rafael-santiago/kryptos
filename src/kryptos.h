@@ -55,6 +55,7 @@
 #include <kryptos_tiger.h>
 #include <kryptos_whirlpool.h>
 #include <kryptos_blake2.h>
+#include <kryptos_blake3.h>
 
 #include <kryptos_djb2.h>
 

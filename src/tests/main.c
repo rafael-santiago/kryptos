@@ -23,7 +23,6 @@
 #include "ecc_tests.h"
 
 CUTE_TEST_CASE(kryptos_test_monkey)
-
     // CLUE(Rafael): Before adding a new test try to find out the best place that it fits.
     //               At first glance you should consider the utility that it implements into the library.
 
@@ -217,6 +216,10 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_blake2sN_hash_macro_tests);
     CUTE_RUN_TEST(kryptos_blake2bN_tests);
     CUTE_RUN_TEST(kryptos_blake2bN_hash_macro_tests);
+    CUTE_RUN_TEST(kryptos_blake3_tests);
+    CUTE_RUN_TEST(kryptos_blake3_hash_macro_tests);
+    CUTE_RUN_TEST(kryptos_blake3N_tests);
+    CUTE_RUN_TEST(kryptos_blake3N_hash_macro_tests);
 
     // INFO(Rafael): Non-cryptographic hashes.
     CUTE_RUN_TEST(kryptos_djb2_tests);
@@ -278,6 +281,9 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_argon2_macro_tests);
     CUTE_RUN_TEST(kryptos_do_argon2_bounds_tests);
     CUTE_RUN_TEST(kryptos_argon2_macro_bounds_tests);
+    // INFO(Rafael): BLAKE3 does not have macro convenience, its a simplified primitive by design,
+    //               at least from outside, happy people.... ;)
+    CUTE_RUN_TEST(kryptos_blake3_derive_key_mode_tests);
 
     // INFO(Rafael): OTP stuff.
 
@@ -455,7 +461,6 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     } else {
         printf("WARN: The ECDSA signature tests were skipped.\n");
     }
-
 //    CUTE_RUN_TEST(poke_bloody_poke);
 CUTE_TEST_CASE_END
 

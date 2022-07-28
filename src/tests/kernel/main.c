@@ -124,6 +124,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_hash_tests);
     KUTE_RUN_TEST(kryptos_blake2sN_tests);
     KUTE_RUN_TEST(kryptos_blake2bN_tests);
+    KUTE_RUN_TEST(kryptos_blake3N_tests);
 
     KUTE_RUN_TEST(kryptos_djb2_tests);
 
@@ -177,6 +178,7 @@ KUTE_TEST_CASE(ktest_monkey)
     KUTE_RUN_TEST(kryptos_do_argon2_bounds_tests);
     KUTE_RUN_TEST(kryptos_argon2_macro_bounds_tests);
 #endif
+    KUTE_RUN_TEST(kryptos_blake3_derive_key_mode_tests);
 
     // INFO(Rafael): OTP stuff.
 

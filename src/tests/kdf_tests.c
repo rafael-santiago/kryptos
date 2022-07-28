@@ -5,8 +5,39 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#include "kdf_tests.h"
 #include <kryptos.h>
+#include "kdf_tests.h"
+#include "blake3_test_vector.h"
+
+CUTE_TEST_CASE(kryptos_blake3_derive_key_mode_tests)
+    kryptos_u8_t *key = NULL;
+    size_t key_size = 0;
+    struct blake3_main_test_vector_ctx *test = &blake3_main_test_vector[0];
+    struct blake3_main_test_vector_ctx *test_end = test + sizeof(blake3_main_test_vector) / sizeof(blake3_main_test_vector[0]);
+    size_t okm_size = 0;
+    kryptos_u8_t *okm = NULL;
+    kryptos_u8_t *context_string = "BLAKE3 2019-12-27 16:29:52 test vectors context";
+    size_t context_string_size = 47;
+
+    while (test != test_end) {
+        key = (kryptos_u8_t *)kryptos_newseg(test->in_size);
+        CUTE_ASSERT(key != NULL);
+
+        for (key_size = 0; key_size < test->in_size; key_size++) {
+            key[key_size] = key_size % 251;
+        }
+
+        for (okm_size = 1; okm_size <= test->derived_key_size; okm_size++) {
+            okm = kryptos_blake3(context_string, context_string_size, key, key_size, okm_size);
+            CUTE_ASSERT(okm != NULL);
+            CUTE_ASSERT(memcmp(okm, test->derived_key, okm_size) == 0);
+            kryptos_freeseg(okm, okm_size);
+        }
+
+        kryptos_freeseg(key, test->in_size);
+        test++;
+    }
+CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_do_argon2_tests)
     struct test_step {

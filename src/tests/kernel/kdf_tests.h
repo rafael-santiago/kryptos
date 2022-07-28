@@ -30,4 +30,6 @@ KUTE_DECLARE_TEST_CASE(kryptos_argon2_macro_bounds_tests);
 
 #endif
 
+KUTE_DECLARE_TEST_CASE(kryptos_blake3_derive_key_mode_tests);
+
 #endif

@@ -502,6 +502,41 @@ KUTE_TEST_CASE(kryptos_hash_tests)
     kryptos_hash(blake2b512, ktask, message, message_size, 0);
     KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): BLAKE3.
+
+    KUTE_ASSERT(kryptos_blake3_hash_input_size() == 64);
+    KUTE_ASSERT(kryptos_blake3_hash_size() == 32);
+    kryptos_blake3_hash(&ktask, 0);
+    KUTE_ASSERT(t.out != NULL);
+    KUTE_ASSERT(t.out_size == kryptos_blake3_hash_size());
+    raw_hash = (kryptos_u8_t *)"\x64\x37\xB3\xAC\x38\x46\x51\x33\xFF\xB6\x3B\x75\x27\x3A\x8D\xB5"
+                               "\x48\xC5\x58\x46\x5D\x79\xDB\x03\xFD\x35\x9C\x6C\xD5\xBD\x9D\x85";
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    kryptos_hash(blake3, ktask, message, message_size, 0);
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): BLAKE3 (keyed-hash mode).
+
+    ktask->key = (kryptos_u8_t *)"DiogenesDeSinopeDiogenesDeSinope";
+    ktask->key_size = 32;
+
+    kryptos_blake3_hash(&ktask, 0);
+    KUTE_ASSERT(t.out != NULL);
+    KUTE_ASSERT(t.out_size == kryptos_blake3_hash_size());
+    raw_hash = (kryptos_u8_t *)"\xD4\xC0\x86\x42\x87\x35\x83\x41\x6D\x96\x38\x38\x0F\x86\xAF\x37"
+                               "\x2B\xCD\x88\xE4\xC4\xD8\x07\xFF\xCD\x51\xA7\x26\x58\x65\x03\xD0";
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    kryptos_hash(blake3, ktask, message, message_size, 0);
+    KUTE_ASSERT(memcmp(t.out, raw_hash, t.out_size) == 0);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+    ktask->key = NULL;
+    ktask->key_size = 0;
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_blake2sN_tests)
@@ -830,6 +865,7 @@ KUTE_TEST_CASE(kryptos_des_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): DES/CBC.
 
@@ -854,6 +890,7 @@ KUTE_TEST_CASE(kryptos_des_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, des, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_idea_hmac_tests)
@@ -890,6 +927,7 @@ KUTE_TEST_CASE(kryptos_idea_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, idea, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, idea, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, idea, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, idea, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): IDEA/CBC.
 
@@ -914,6 +952,7 @@ KUTE_TEST_CASE(kryptos_idea_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, idea, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, idea, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, idea, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, idea, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_blowfish_hmac_tests)
@@ -950,6 +989,7 @@ KUTE_TEST_CASE(kryptos_blowfish_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, blowfish, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, blowfish, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, blowfish, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, blowfish, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): BLOWFISH/CBC.
 
@@ -974,6 +1014,7 @@ KUTE_TEST_CASE(kryptos_blowfish_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, blowfish, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, blowfish, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, blowfish, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, blowfish, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_feal_hmac_tests)
@@ -1011,6 +1052,7 @@ KUTE_TEST_CASE(kryptos_feal_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, whirlpool, key, key_size, kKryptosECB, &feal_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, blake2s256, key, key_size, kKryptosECB, &feal_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, blake2b512, key, key_size, kKryptosECB, &feal_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, blake3, key, key_size, kKryptosECB, &feal_rounds);
 
     // INFO(Rafael): FEAL/CBC.
 
@@ -1035,6 +1077,7 @@ KUTE_TEST_CASE(kryptos_feal_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, whirlpool, key, key_size, kKryptosCBC, &feal_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, blake2s256, key, key_size, kKryptosCBC, &feal_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, blake2b512, key, key_size, kKryptosCBC, &feal_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, feal, blake3, key, key_size, kKryptosCBC, &feal_rounds);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc2_hmac_tests)
@@ -1072,6 +1115,7 @@ KUTE_TEST_CASE(kryptos_rc2_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, whirlpool, key, key_size, kKryptosECB, &rc2_T1);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, blake2s256, key, key_size, kKryptosECB, &rc2_T1);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, blake2b512, key, key_size, kKryptosECB, &rc2_T1);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, blake3, key, key_size, kKryptosECB, &rc2_T1);
 
     // INFO(Rafael): RC2/CBC.
 
@@ -1096,6 +1140,7 @@ KUTE_TEST_CASE(kryptos_rc2_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, whirlpool, key, key_size, kKryptosCBC, &rc2_T1);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, blake2s256, key, key_size, kKryptosCBC, &rc2_T1);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, blake2b512, key, key_size, kKryptosCBC, &rc2_T1);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc2, blake3, key, key_size, kKryptosCBC, &rc2_T1);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc5_hmac_tests)
@@ -1133,6 +1178,7 @@ KUTE_TEST_CASE(kryptos_rc5_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc5, whirlpool, key, key_size, kKryptosECB, &rc5_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc5, blake2s256, key, key_size, kKryptosECB, &rc5_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc5, blake2b512, key, key_size, kKryptosECB, &rc5_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc5, blake3, key, key_size, kKryptosECB, &rc5_rounds);
 
     // INFO(Rafael): RC5/CBC.
 
@@ -1157,6 +1203,7 @@ KUTE_TEST_CASE(kryptos_rc5_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc5, whirlpool, key, key_size, kKryptosCBC, &rc5_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc5, blake2s256, key, key_size, kKryptosCBC, &rc5_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc5, blake2b512, key, key_size, kKryptosCBC, &rc5_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc5, blake3, key, key_size, kKryptosCBC, &rc5_rounds);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc6_128_hmac_tests)
@@ -1194,6 +1241,7 @@ KUTE_TEST_CASE(kryptos_rc6_128_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, whirlpool, key, key_size, kKryptosECB, &rc6_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, blake2s256, key, key_size, kKryptosECB, &rc6_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, blake2b512, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, blake3, key, key_size, kKryptosECB, &rc6_rounds);
 
     // INFO(Rafael): RC6-128/CBC.
 
@@ -1218,6 +1266,7 @@ KUTE_TEST_CASE(kryptos_rc6_128_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, whirlpool, key, key_size, kKryptosCBC, &rc6_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, blake2s256, key, key_size, kKryptosCBC, &rc6_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, blake2b512, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_128, blake3, key, key_size, kKryptosCBC, &rc6_rounds);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc6_192_hmac_tests)
@@ -1255,6 +1304,7 @@ KUTE_TEST_CASE(kryptos_rc6_192_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, whirlpool, key, key_size, kKryptosECB, &rc6_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, blake2s256, key, key_size, kKryptosECB, &rc6_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, blake2b512, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, blake3, key, key_size, kKryptosECB, &rc6_rounds);
 
     // INFO(Rafael): RC6-192/CBC.
 
@@ -1279,6 +1329,7 @@ KUTE_TEST_CASE(kryptos_rc6_192_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, whirlpool, key, key_size, kKryptosCBC, &rc6_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, blake2s256, key, key_size, kKryptosCBC, &rc6_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, blake2b512, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_192, blake3, key, key_size, kKryptosCBC, &rc6_rounds);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_rc6_256_hmac_tests)
@@ -1316,6 +1367,7 @@ KUTE_TEST_CASE(kryptos_rc6_256_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, whirlpool, key, key_size, kKryptosECB, &rc6_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, blake2s256, key, key_size, kKryptosECB, &rc6_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, blake2b512, key, key_size, kKryptosECB, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, blake3, key, key_size, kKryptosECB, &rc6_rounds);
 
     // INFO(Rafael): RC6-256/CBC.
 
@@ -1340,6 +1392,7 @@ KUTE_TEST_CASE(kryptos_rc6_256_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, whirlpool, key, key_size, kKryptosCBC, &rc6_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, blake2s256, key, key_size, kKryptosCBC, &rc6_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, blake2b512, key, key_size, kKryptosCBC, &rc6_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, rc6_256, blake3, key, key_size, kKryptosCBC, &rc6_rounds);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_camellia128_hmac_tests)
@@ -1376,6 +1429,7 @@ KUTE_TEST_CASE(kryptos_camellia128_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): CAMELLIA-128/CBC.
 
@@ -1400,6 +1454,7 @@ KUTE_TEST_CASE(kryptos_camellia128_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia128, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_camellia192_hmac_tests)
@@ -1436,6 +1491,7 @@ KUTE_TEST_CASE(kryptos_camellia192_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): CAMELLIA-192/CBC.
 
@@ -1460,6 +1516,7 @@ KUTE_TEST_CASE(kryptos_camellia192_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia192, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_camellia256_hmac_tests)
@@ -1496,6 +1553,7 @@ KUTE_TEST_CASE(kryptos_camellia256_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): CAMELLIA-256/CBC.
 
@@ -1520,6 +1578,7 @@ KUTE_TEST_CASE(kryptos_camellia256_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, camellia256, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_cast5_hmac_tests)
@@ -1556,6 +1615,7 @@ KUTE_TEST_CASE(kryptos_cast5_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, cast5, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, cast5, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, cast5, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, cast5, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): CAST5/CBC.
 
@@ -1580,6 +1640,7 @@ KUTE_TEST_CASE(kryptos_cast5_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, cast5, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, cast5, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, cast5, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, cast5, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_saferk64_hmac_tests)
@@ -1617,6 +1678,7 @@ KUTE_TEST_CASE(kryptos_saferk64_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, whirlpool, key, key_size, kKryptosECB, &saferk64_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, blake2s256, key, key_size, kKryptosECB, &saferk64_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, blake2b512, key, key_size, kKryptosECB, &saferk64_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, blake3, key, key_size, kKryptosECB, &saferk64_rounds);
 
     // INFO(Rafael): SAFER-K64/CBC.
 
@@ -1641,6 +1703,7 @@ KUTE_TEST_CASE(kryptos_saferk64_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, whirlpool, key, key_size, kKryptosCBC, &saferk64_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, blake2s256, key, key_size, kKryptosCBC, &saferk64_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, blake2b512, key, key_size, kKryptosCBC, &saferk64_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, saferk64, blake3, key, key_size, kKryptosCBC, &saferk64_rounds);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_aes128_hmac_tests)
@@ -1677,6 +1740,7 @@ KUTE_TEST_CASE(kryptos_aes128_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes128, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes128, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes128, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes128, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): AES-128/CBC.
 
@@ -1701,6 +1765,7 @@ KUTE_TEST_CASE(kryptos_aes128_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes128, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes128, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes128, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes128, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_aes192_hmac_tests)
@@ -1737,6 +1802,7 @@ KUTE_TEST_CASE(kryptos_aes192_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes192, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes192, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes192, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes192, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): AES-192/CBC.
 
@@ -1761,6 +1827,7 @@ KUTE_TEST_CASE(kryptos_aes192_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes192, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes192, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes192, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes192, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_aes256_hmac_tests)
@@ -1797,6 +1864,7 @@ KUTE_TEST_CASE(kryptos_aes256_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): AES-256/CBC.
 
@@ -1821,6 +1889,7 @@ KUTE_TEST_CASE(kryptos_aes256_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, aes256, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_serpent_hmac_tests)
@@ -1857,6 +1926,7 @@ KUTE_TEST_CASE(kryptos_serpent_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, serpent, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, serpent, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, serpent, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, serpent, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): SERPENT/CBC.
 
@@ -1877,6 +1947,7 @@ KUTE_TEST_CASE(kryptos_serpent_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, serpent, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, serpent, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, serpent, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, serpent, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_triple_des_hmac_tests)
@@ -1962,6 +2033,10 @@ KUTE_TEST_CASE(kryptos_triple_des_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des, blake2b512, key, key_size, kKryptosECB,
                            triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des, blake3, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+
     // INFO(Rafael): TRIPLE-DES/CBC.
 
     triple_des_key2 = (kryptos_u8_t *)"riverintheroad";
@@ -2030,6 +2105,9 @@ KUTE_TEST_CASE(kryptos_triple_des_hmac_tests)
                            triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des, blake2b512, key, key_size, kKryptosCBC,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des, blake3, key, key_size, kKryptosCBC,
                            triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 KUTE_TEST_CASE_END
 
@@ -2116,6 +2194,9 @@ KUTE_TEST_CASE(kryptos_triple_des_ede_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des_ede, blake2b512, key, key_size, kKryptosECB,
                            triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des_ede, blake3, key, key_size, kKryptosECB,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
     // INFO(Rafael): TRIPLE-DES-EDE/CBC.
 
     triple_des_key2 = (kryptos_u8_t *)"riverintheroad";
@@ -2185,6 +2266,9 @@ KUTE_TEST_CASE(kryptos_triple_des_ede_hmac_tests)
 
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des_ede, blake2b512, key, key_size, kKryptosCBC,
                            triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
+
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, triple_des_ede, blake3, key, key_size, kKryptosCBC,
+                           triple_des_key2, &triple_des_key2_size, triple_des_key3, &triple_des_key3_size);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_tea_hmac_tests)
@@ -2221,6 +2305,7 @@ KUTE_TEST_CASE(kryptos_tea_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): TEA/CBC.
 
@@ -2245,6 +2330,7 @@ KUTE_TEST_CASE(kryptos_tea_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, tea, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_xtea_hmac_tests)
@@ -2282,6 +2368,7 @@ KUTE_TEST_CASE(kryptos_xtea_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, xtea, whirlpool, key, key_size, kKryptosECB, &xtea_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, xtea, blake2s256, key, key_size, kKryptosECB, &xtea_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, xtea, blake2b512, key, key_size, kKryptosECB, &xtea_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, xtea, blake3, key, key_size, kKryptosECB, &xtea_rounds);
 
     // INFO(Rafael): XTEA/CBC.
 
@@ -2306,6 +2393,7 @@ KUTE_TEST_CASE(kryptos_xtea_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, xtea, whirlpool, key, key_size, kKryptosCBC, &xtea_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, xtea, blake2s256, key, key_size, kKryptosCBC, &xtea_rounds);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, xtea, blake2b512, key, key_size, kKryptosCBC, &xtea_rounds);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, xtea, blake3, key, key_size, kKryptosCBC, &xtea_rounds);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_misty1_hmac_tests)
@@ -2342,6 +2430,7 @@ KUTE_TEST_CASE(kryptos_misty1_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): MISTY1/CBC.
 
@@ -2366,6 +2455,7 @@ KUTE_TEST_CASE(kryptos_misty1_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, misty1, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mars128_hmac_tests)
@@ -2402,6 +2492,7 @@ KUTE_TEST_CASE(kryptos_mars128_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars128, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars128, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars128, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars128, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): MARS-128/CBC.
 
@@ -2426,6 +2517,7 @@ KUTE_TEST_CASE(kryptos_mars128_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars128, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars128, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars128, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars128, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mars192_hmac_tests)
@@ -2462,6 +2554,7 @@ KUTE_TEST_CASE(kryptos_mars192_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars192, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars192, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars192, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars192, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): MARS-192/CBC.
 
@@ -2486,6 +2579,7 @@ KUTE_TEST_CASE(kryptos_mars192_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars192, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars192, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars192, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars192, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_mars256_hmac_tests)
@@ -2522,6 +2616,7 @@ KUTE_TEST_CASE(kryptos_mars256_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars256, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars256, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars256, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars256, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): MARS-256/CBC.
 
@@ -2546,6 +2641,7 @@ KUTE_TEST_CASE(kryptos_mars256_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars256, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars256, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars256, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, mars256, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_present80_hmac_tests)
@@ -2582,6 +2678,7 @@ KUTE_TEST_CASE(kryptos_present80_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, present80, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, present80, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, present80, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, present80, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): PRESENT-80/CBC.
 
@@ -2606,6 +2703,7 @@ KUTE_TEST_CASE(kryptos_present80_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, present80, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, present80, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, present80, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, present80, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_present128_hmac_tests)
@@ -2642,6 +2740,7 @@ KUTE_TEST_CASE(kryptos_present128_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, present128, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, present128, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, present128, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, present128, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): PRESENT-128/CBC.
 
@@ -2666,6 +2765,7 @@ KUTE_TEST_CASE(kryptos_present128_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, present128, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, present128, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, present128, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, present128, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_shacal1_hmac_tests)
@@ -2702,6 +2802,7 @@ KUTE_TEST_CASE(kryptos_shacal1_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, shacal1, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, shacal1, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, shacal1, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, shacal1, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): SHACAL-1/CBC.
 
@@ -2726,6 +2827,7 @@ KUTE_TEST_CASE(kryptos_shacal1_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, shacal1, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, shacal1, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, shacal1, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, shacal1, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_shacal2_hmac_tests)
@@ -2762,6 +2864,7 @@ KUTE_TEST_CASE(kryptos_shacal2_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, shacal2, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, shacal2, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, shacal2, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, shacal2, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): SHACAL-2/CBC.
 
@@ -2786,6 +2889,7 @@ KUTE_TEST_CASE(kryptos_shacal2_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, shacal2, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, shacal2, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, shacal2, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, shacal2, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_noekeon_hmac_tests)
@@ -2822,6 +2926,7 @@ KUTE_TEST_CASE(kryptos_noekeon_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, noekeon, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, noekeon, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, noekeon, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, noekeon, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): NOEKEON/CBC.
 
@@ -2846,6 +2951,7 @@ KUTE_TEST_CASE(kryptos_noekeon_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, noekeon, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, noekeon, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, noekeon, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, noekeon, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_noekeon_d_hmac_tests)
@@ -2882,6 +2988,7 @@ KUTE_TEST_CASE(kryptos_noekeon_d_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, noekeon_d, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, noekeon_d, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, noekeon_d, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, noekeon_d, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): NOEKEON/DIRECT/CBC.
 
@@ -2906,6 +3013,7 @@ KUTE_TEST_CASE(kryptos_noekeon_d_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, noekeon_d, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, noekeon_d, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, noekeon_d, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, noekeon_d, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_gost_ds_hmac_tests)
@@ -2942,6 +3050,7 @@ KUTE_TEST_CASE(kryptos_gost_ds_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, gost_ds, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, gost_ds, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, gost_ds, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, gost_ds, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): GOST-DS/CBC.
 
@@ -2966,6 +3075,7 @@ KUTE_TEST_CASE(kryptos_gost_ds_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, gost_ds, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, gost_ds, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, gost_ds, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, gost_ds, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_gost_hmac_tests)
@@ -3047,6 +3157,8 @@ KUTE_TEST_CASE(kryptos_gost_hmac_tests)
                            s1, s2, s3, s4, s5, s6, s7, s8);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, gost, blake2b512, key, key_size, kKryptosECB,
                            s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, gost, blake3, key, key_size, kKryptosECB,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
 
     // INFO(Rafael): GOST/CBC.
 
@@ -3092,6 +3204,8 @@ KUTE_TEST_CASE(kryptos_gost_hmac_tests)
                            s1, s2, s3, s4, s5, s6, s7, s8);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, gost, blake2b512, key, key_size, kKryptosCBC,
                            s1, s2, s3, s4, s5, s6, s7, s8);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, gost, blake3, key, key_size, kKryptosCBC,
+                           s1, s2, s3, s4, s5, s6, s7, s8);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_twofish128_hmac_tests)
@@ -3128,6 +3242,7 @@ KUTE_TEST_CASE(kryptos_twofish128_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): TWOFISH-128/CBC.
 
@@ -3152,6 +3267,7 @@ KUTE_TEST_CASE(kryptos_twofish128_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish128, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_twofish192_hmac_tests)
@@ -3188,6 +3304,7 @@ KUTE_TEST_CASE(kryptos_twofish192_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): TWOFISH-192/CBC.
 
@@ -3212,6 +3329,7 @@ KUTE_TEST_CASE(kryptos_twofish192_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish192, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 KUTE_TEST_CASE(kryptos_twofish256_hmac_tests)
@@ -3248,6 +3366,7 @@ KUTE_TEST_CASE(kryptos_twofish256_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, whirlpool, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, blake2s256, key, key_size, kKryptosECB);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, blake2b512, key, key_size, kKryptosECB);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, blake3, key, key_size, kKryptosECB);
 
     // INFO(Rafael): TWOFISH-256/CBC.
 
@@ -3272,6 +3391,7 @@ KUTE_TEST_CASE(kryptos_twofish256_hmac_tests)
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, whirlpool, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, blake2s256, key, key_size, kKryptosCBC);
     kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, blake2b512, key, key_size, kKryptosCBC);
+    kryptos_run_hmac_tests(t, plaintext, plaintext_size, twofish256, blake3, key, key_size, kKryptosCBC);
 KUTE_TEST_CASE_END
 
 #undef kryptos_run_hmac_tests
@@ -3293,3 +3413,25 @@ KUTE_TEST_CASE(kryptos_djb2_tests)
     }
 KUTE_TEST_CASE_END
 
+KUTE_TEST_CASE(kryptos_blake3N_tests)
+    kryptos_task_ctx t, *ktask = &t;
+
+    kryptos_task_init_as_null(ktask);
+
+    ktask->in = (kryptos_u8_t *)"abc";
+    ktask->in_size = 3;
+
+    ktask->out_size = 33; // INFO(Rafael): Greater than Blake3 hash size limit.
+    kryptos_blake3N_hash(&ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+
+    ktask->out_size = 96; // INFO(Rafael): Blaske2b384 raw output.
+    kryptos_blake3_hash(&ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    ktask->out_size = 96; // INFO(Rafael): Blaske2b384 hex output.
+    kryptos_blake3N_hash(&ktask, 1);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+KUTE_TEST_CASE_END
