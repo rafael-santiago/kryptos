@@ -57,6 +57,7 @@
 #include "blake2s256_test_vector.h"
 //#include "blake2b384_test_vector.h"
 #include "blake2b512_test_vector.h"
+#include "blake3_test_vector.h"
 #include <string.h>
 
 static kryptos_u8_t *cbc_test_data[] = {

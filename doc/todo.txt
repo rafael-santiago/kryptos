@@ -1,4 +1,14 @@
 (A) Try to give support to GMP on multiprecision stuff when asked by the user. +Improvement
+(A) Enable TWOFISH/128-192-256 HMAC, they were implemented but are not running [user and kernel]. +Tests,+Completeness
+(B) Implement a way of using incremental hashing without screwing up
+    the general straightforward, non-acrobatic current way of hashing data. +NewFeature,+HashFunction,+Improvement
+(B) Implement OCB mode of operation. +NewFeature,+BlockCipher,+AuthEnc
+x (A) Document BLAKE3 support features. +Documentation
+x (A) Enable BLAKE3 kernel tests. +Tests
+x (A) Implement some samples based on BLAKE3 added support.
+      E.g.: hash, keyed hash and key derivation stuff. +Improvement,+Documentation
+x (A) Add BLAKE3 to tests of primitives and schemes where it fits in. +Tests
+x (A) Implement BLAKE3 primitive support. +NewFeature,+HashFunction
 x (A) Add basic CircleCI pipeline (Windows). +Build, +CI, +Improvement
 x (A) Add basic CircleCI pipeline (Linux). +Build, +CI, +Improvement
 x (B) Implement support for Base32 and Base16 encoding algorithms. +NewFeature
