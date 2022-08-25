@@ -5,6 +5,23 @@
     Rafael
 --
 
+vx20220001 [git-tag: 'vx20220001']
+
+    Now library counts with two one-time password algorithms (HMAC based and time based).
+    Support for standard encoding algorithms was also shifted, now Base32 and Base16 are
+    also available besides the common one Base64.
+
+    Features:
+
+        - Added HOTP support.
+        - Added TOTP support.
+        - Added Base32 support.
+        - Added Base16 support.
+
+    Bugfixes:
+
+        - None.
+
 vx20220000 [git-tag: 'vx20220000']
 
     Increased library's support on ciphers, MAC and PRF besides some minor cosmetic
