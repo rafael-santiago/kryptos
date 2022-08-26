@@ -32,6 +32,9 @@ void kryptos_hash_ld_u8buf_as_u64_blocks(kryptos_u8_t *buffer, const size_t buff
                                          kryptos_u64_t *input, const size_t input_nr,
                                          const size_t *block_index_decision_table);
 
+void kryptos_hash_do_update(kryptos_task_ctx **ktask, const kryptos_u8_t *input, const size_t input_size);
+
+void kryptos_hash_do_finalize(kryptos_task_ctx **ktask, const int to_hex);
 
 #ifdef __cplusplus
 }

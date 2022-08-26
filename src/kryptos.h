@@ -57,6 +57,8 @@
 #include <kryptos_blake2.h>
 #include <kryptos_blake3.h>
 
+#include <kryptos_hash_common.h>
+
 #include <kryptos_djb2.h>
 
 #include <kryptos_base64.h>
@@ -667,5 +669,14 @@ kryptos_ ## label_name:\
     kryptos_ ## ename ## _processor(&(ktask)->mirror_p);\
     (ktask)->mirror_p = NULL;\
 }
+
+#define kryptos_hash_init(hname, ktask) {\
+    kryptos_task_init_as_null(ktask);\
+    (ktask)->arg[0] = (void *)kryptos_ ## hname ## _hash;\
+}
+
+#define kryptos_hash_update(ktask, in, in_size) kryptos_hash_do_update(&(ktask), (in), (in_size))
+
+#define kryptos_hash_finalize(ktask, hex) kryptos_hash_do_finalize(&(ktask), (hex))
 
 #endif // KRYPTOS_KRYPTOS_H

@@ -61,12 +61,20 @@ CUTE_TEST_CASE(kryptos_sha1_hash_macro_tests)
     kryptos_run_hash_macro_tests(sha1, 64, 20);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_sha1_inc_hash_tests)
+    kryptos_run_inc_hash_tests(sha1);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_sha224_tests)
     kryptos_run_hash_tests(sha224, 64, 28);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha224_hash_macro_tests)
     kryptos_run_hash_macro_tests(sha224, 64, 28);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_sha224_inc_hash_tests)
+    kryptos_run_inc_hash_tests(sha224);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha256_tests)
@@ -77,12 +85,20 @@ CUTE_TEST_CASE(kryptos_sha256_hash_macro_tests)
     kryptos_run_hash_macro_tests(sha256, 64, 32);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_sha256_inc_hash_tests)
+    kryptos_run_inc_hash_tests(sha256);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_sha384_tests)
     kryptos_run_hash_tests(sha384, 128, 48);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha384_hash_macro_tests)
     kryptos_run_hash_macro_tests(sha384, 128, 48);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_sha384_inc_hash_tests)
+    kryptos_run_inc_hash_tests(sha384);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha512_tests)
@@ -93,12 +109,20 @@ CUTE_TEST_CASE(kryptos_sha512_hash_macro_tests)
     kryptos_run_hash_macro_tests(sha512, 128, 64);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_sha512_inc_hash_tests)
+    kryptos_run_inc_hash_tests(sha512);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_md4_tests)
     kryptos_run_hash_tests(md4, 64, 16);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_md4_hash_macro_tests)
     kryptos_run_hash_macro_tests(md4, 64, 16);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_md4_inc_hash_tests)
+    kryptos_run_inc_hash_tests(md4);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_md5_tests)
@@ -109,12 +133,20 @@ CUTE_TEST_CASE(kryptos_md5_hash_macro_tests)
     kryptos_run_hash_macro_tests(md5, 64, 16);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_md5_inc_hash_tests)
+    kryptos_run_inc_hash_tests(md5);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_ripemd128_tests)
     kryptos_run_hash_tests(ripemd128, 64, 16);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_ripemd128_hash_macro_tests)
     kryptos_run_hash_macro_tests(ripemd128, 64, 16);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_ripemd128_inc_hash_tests)
+    kryptos_run_inc_hash_tests(ripemd128);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_ripemd160_tests)
@@ -125,12 +157,20 @@ CUTE_TEST_CASE(kryptos_ripemd160_hash_macro_tests)
     kryptos_run_hash_macro_tests(ripemd160, 64, 20);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_ripemd160_inc_hash_tests)
+    kryptos_run_inc_hash_tests(ripemd160);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_sha3_224_tests)
     kryptos_run_hash_tests(sha3_224, 144, 28);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha3_224_hash_macro_tests)
     kryptos_run_hash_macro_tests(sha3_224, 144, 28);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_sha3_224_inc_hash_tests)
+    kryptos_run_inc_hash_tests(sha3_224);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha3_256_tests)
@@ -141,12 +181,20 @@ CUTE_TEST_CASE(kryptos_sha3_256_hash_macro_tests)
     kryptos_run_hash_macro_tests(sha3_256, 136, 32);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_sha3_256_inc_hash_tests)
+    kryptos_run_inc_hash_tests(sha3_256);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_sha3_384_tests)
     kryptos_run_hash_tests(sha3_384, 104, 48);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha3_384_hash_macro_tests)
     kryptos_run_hash_macro_tests(sha3_384, 104, 48);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_sha3_384_inc_hash_tests)
+    kryptos_run_inc_hash_tests(sha3_384);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_sha3_512_tests)
@@ -157,12 +205,20 @@ CUTE_TEST_CASE(kryptos_sha3_512_hash_macro_tests)
     kryptos_run_hash_macro_tests(sha3_512, 72, 64);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_sha3_512_inc_hash_tests)
+    kryptos_run_inc_hash_tests(sha3_512);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_keccak224_tests)
     kryptos_run_hash_tests(keccak224, 144, 28);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_keccak224_hash_macro_tests)
     kryptos_run_hash_macro_tests(keccak224, 144, 28);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_keccak224_inc_hash_tests)
+    kryptos_run_inc_hash_tests(keccak224);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_keccak256_tests)
@@ -173,12 +229,20 @@ CUTE_TEST_CASE(kryptos_keccak256_hash_macro_tests)
     kryptos_run_hash_macro_tests(keccak256, 136, 32);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_keccak256_inc_hash_tests)
+    kryptos_run_inc_hash_tests(keccak256);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_keccak384_tests)
     kryptos_run_hash_tests(keccak384, 104, 48);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_keccak384_hash_macro_tests)
     kryptos_run_hash_macro_tests(keccak384, 104, 48);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_keccak384_inc_hash_tests)
+    kryptos_run_inc_hash_tests(keccak384);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_keccak512_tests)
@@ -189,12 +253,20 @@ CUTE_TEST_CASE(kryptos_keccak512_hash_macro_tests)
     kryptos_run_hash_macro_tests(keccak512, 72, 64);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_keccak512_inc_hash_tests)
+    kryptos_run_inc_hash_tests(keccak512);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_tiger_tests)
     kryptos_run_hash_tests(tiger, 64, 24);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_tiger_hash_macro_tests)
     kryptos_run_hash_macro_tests(tiger, 64, 24);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_tiger_inc_hash_tests)
+    kryptos_run_inc_hash_tests(tiger);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_whirlpool_tests)
@@ -205,6 +277,10 @@ CUTE_TEST_CASE(kryptos_whirlpool_hash_macro_tests)
     kryptos_run_hash_macro_tests(whirlpool, 64, 64);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_whirlpool_inc_hash_tests)
+    kryptos_run_inc_hash_tests(whirlpool);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_blake2s256_tests)
     kryptos_run_hash_tests(blake2s256, 64, 32)
 CUTE_TEST_CASE_END
@@ -213,12 +289,20 @@ CUTE_TEST_CASE(kryptos_blake2s256_hash_macro_tests)
     kryptos_run_hash_macro_tests(blake2s256, 64, 32)
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_blake2s256_inc_hash_tests)
+    kryptos_run_inc_hash_tests(blake2s256);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_blake2b512_tests)
     kryptos_run_hash_tests(blake2b512, 128, 64)
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_blake2b512_hash_macro_tests)
     kryptos_run_hash_macro_tests(blake2b512, 128, 64)
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blake2b512_inc_hash_tests)
+    kryptos_run_inc_hash_tests(blake2b512);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_blake2sN_tests)
@@ -270,6 +354,22 @@ CUTE_TEST_CASE(kryptos_blake2sN_hash_macro_tests)
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_blake2sN_inc_hash_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_task_init_as_null(ktask);
+    kryptos_hash_init(blake2sN, ktask);
+    kryptos_hash_update(ktask, "ab", 2);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    kryptos_hash_update(ktask, "c", 1);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    ktask->out_size = 20;
+    kryptos_hash_finalize(ktask, 0);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    CUTE_ASSERT(ktask->out != NULL);
+    CUTE_ASSERT(ktask->out_size == 20);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_blake2bN_tests)
     // INFO(Rafael): Tests for Blake2bN are simpler than Blake2b512 because all
     //               here depends on Blake2b512 parts (tested against official test vectors).
@@ -318,6 +418,22 @@ CUTE_TEST_CASE(kryptos_blake2bN_hash_macro_tests)
     ktask->out_size = 48; // INFO(Rafael): Blake2b384 hex output.
     kryptos_hash(blake2bN, ktask, "abc", 3, 1);
     CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blake2bN_inc_hash_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_task_init_as_null(ktask);
+    kryptos_hash_init(blake2bN, ktask);
+    kryptos_hash_update(ktask, "ab", 2);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    kryptos_hash_update(ktask, "c", 1);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    ktask->out_size = 36;
+    kryptos_hash_finalize(ktask, 0);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    CUTE_ASSERT(ktask->out != NULL);
+    CUTE_ASSERT(ktask->out_size == 36);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 CUTE_TEST_CASE_END
 
@@ -391,6 +507,22 @@ CUTE_TEST_CASE(kryptos_blake2s256_hash_macro_keyed_tests)
     }
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_blake2s256_inc_hash_keyed_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_task_init_as_null(ktask);
+    kryptos_hash_init(blake2s256, ktask);
+    kryptos_hash_update(ktask, "ab", 2);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    kryptos_hash_update(ktask, "c", 1);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    ktask->key = (kryptos_u8_t *)"xablablau";
+    ktask->key_size = 9;
+    kryptos_hash_finalize(ktask, 0);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    CUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_blake2b512_keyed_tests)
     size_t test_vector_nr = sizeof(blake2b512_keyed_test_vector) / sizeof(blake2b512_keyed_test_vector[0]), t;
     kryptos_task_ctx tsk, *ktask = &tsk;
@@ -459,6 +591,23 @@ CUTE_TEST_CASE(kryptos_blake2b512_hash_macro_keyed_tests)
         CUTE_ASSERT(memcmp(ktask->out, blake2b512_keyed_test_vector[t].xhash, ktask->out_size) == 0);
         kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
     }
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blake2b512_inc_hash_keyed_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_task_init_as_null(ktask);
+    kryptos_hash_init(blake2sN, ktask);
+    kryptos_hash_update(ktask, "ab", 2);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    kryptos_hash_update(ktask, "c", 1);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    ktask->key = (kryptos_u8_t *)"tchum!";
+    ktask->key_size = 6;
+    ktask->out_size = 16;
+    kryptos_hash_finalize(ktask, 0);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    CUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_hmac_basic_tests)
@@ -3500,6 +3649,10 @@ CUTE_TEST_CASE(kryptos_blake3_hash_macro_tests)
     kryptos_run_hash_macro_tests(blake3, 64, 32)
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_blake3_inc_hash_tests)
+    kryptos_run_inc_hash_tests(blake3);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_blake3N_hash_macro_tests)
     kryptos_task_ctx t, *ktask = &t;
 
@@ -3518,5 +3671,55 @@ CUTE_TEST_CASE(kryptos_blake3N_hash_macro_tests)
     ktask->out_size = 96; // INFO(Rafael): Blake3/768 hex output.
     kryptos_hash(blake3N, ktask, "abc", 3, 1);
     CUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blake3N_inc_hash_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_task_init_as_null(ktask);
+    kryptos_hash_init(blake3N, ktask);
+    kryptos_hash_update(ktask, "ab", 2);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    kryptos_hash_update(ktask, "c", 1);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    ktask->out_size = 192;
+    kryptos_hash_finalize(ktask, 0);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    CUTE_ASSERT(ktask->out != NULL);
+    CUTE_ASSERT(ktask->out_size == 192);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blake3_inc_hash_keyed_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_task_init_as_null(ktask);
+    kryptos_hash_init(blake3, ktask);
+    kryptos_hash_update(ktask, "ab", 2);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    kryptos_hash_update(ktask, "c", 1);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    ktask->key = (kryptos_u8_t *)"autopilot.......................";
+    ktask->key_size = 32;
+    kryptos_hash_finalize(ktask, 0);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    CUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+CUTE_TEST_CASE_END
+
+CUTE_TEST_CASE(kryptos_blake3N_inc_hash_keyed_tests)
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_task_init_as_null(ktask);
+    kryptos_hash_init(blake3N, ktask);
+    kryptos_hash_update(ktask, "ab", 2);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    kryptos_hash_update(ktask, "c", 1);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    ktask->out_size = 192;
+    ktask->key = (kryptos_u8_t *)"parangaricutirimirruaru*!@#$%&()";
+    ktask->key_size = 32;
+    kryptos_hash_finalize(ktask, 0);
+    CUTE_ASSERT(ktask->result == kKryptosSuccess);
+    CUTE_ASSERT(ktask->out != NULL);
+    CUTE_ASSERT(ktask->out_size == 192);
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 CUTE_TEST_CASE_END

@@ -874,6 +874,44 @@ static kryptos_u8_t *siphash_test_data[] = {
     }\
 }
 
+#define kryptos_run_inc_hash_tests(hash) {\
+    kryptos_task_ctx t, *ktask = &t;\
+    size_t tv, tv_nr = sizeof(hash ## _test_vector) / sizeof(hash ## _test_vector[0]);\
+    int hex = 0;\
+    kryptos_u8_t *mp = NULL, *mp_end = NULL;\
+    kryptos_u8_t *expected_out = NULL;\
+    size_t expected_size = 0;\
+    for (tv = 0; tv < tv_nr; tv++) {\
+        for (hex = 0; hex < 2; hex++) {\
+            kryptos_hash_init(hash, ktask);\
+            mp = hash ## _test_vector[tv].message;\
+            mp_end = mp + hash ## _test_vector[tv].message_size;\
+            while (mp != mp_end) {\
+                kryptos_hash_update(ktask, mp, 1);\
+                CUTE_ASSERT(ktask->result == kKryptosSuccess);\
+                mp++;\
+            }\
+            kryptos_hash_finalize(ktask, hex);\
+            CUTE_ASSERT(ktask->result == kKryptosSuccess);\
+            switch (hex) {\
+                case 0:\
+                    expected_size = hash ## _test_vector[tv].raw_hash_size;\
+                    expected_out = hash ## _test_vector[tv].raw_hash;\
+                    break;\
+                case 1:\
+                    expected_size = hash ## _test_vector[tv].hex_hash_size;\
+                    expected_out = hash ## _test_vector[tv].hex_hash;\
+                    break;\
+                default:\
+                    break;\
+            }\
+            CUTE_ASSERT(ktask->out_size == expected_size);\
+            CUTE_ASSERT(memcmp(ktask->out, expected_out, expected_size) == 0);\
+            kryptos_task_free(ktask, KRYPTOS_TASK_OUT);\
+        }\
+    }\
+}
+
 #ifdef KRYPTOS_C99
 
 #define kryptos_run_hmac_tests(t, tv, tv_nr, data_size, cname, hname, ...) {\

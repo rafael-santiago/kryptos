@@ -12,6 +12,8 @@
 
 KUTE_DECLARE_TEST_CASE(kryptos_hash_tests);
 
+KUTE_DECLARE_TEST_CASE(kryptos_inc_hash_tests);
+
 KUTE_DECLARE_TEST_CASE(kryptos_hmac_tests);
 
 KUTE_DECLARE_TEST_CASE(kryptos_hmac_basic_tests);

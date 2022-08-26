@@ -1648,3 +1648,20 @@ KUTE_TEST_CASE(kryptos_u8_ptr_to_hex_tests)
 
     kryptos_freeseg(result, result_size);
 KUTE_TEST_CASE_END
+
+KUTE_TEST_CASE(kryptos_realloc_tests)
+    char *data = NULL;
+    data = kryptos_newseg(3);
+    KUTE_ASSERT(data != NULL);
+    memcpy(data, "abc", 3);
+    KUTE_ASSERT(memcmp(data, "abc", 3) == 0);
+    data = kryptos_realloc(data, 4);
+    KUTE_ASSERT(data != NULL);
+    KUTE_ASSERT(memcmp(data, "abc", 3) == 0);
+    data[3] = 'd';
+    KUTE_ASSERT(memcmp(data, "abcd", 4) == 0);
+    data = kryptos_realloc(data, 2);
+    KUTE_ASSERT(data != NULL);
+    KUTE_ASSERT(memcmp(data, "ab", 2) == 0);
+    kryptos_freeseg(data, 2);
+KUTE_TEST_CASE_END
