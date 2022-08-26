@@ -735,6 +735,9 @@ CUTE_TEST_CASE_SUITE(kryptos_hmac_tests)
     CUTE_RUN_TEST(kryptos_noekeon_d_hmac_tests);
     CUTE_RUN_TEST(kryptos_gost_ds_hmac_tests);
     CUTE_RUN_TEST(kryptos_gost_hmac_tests);
+    CUTE_RUN_TEST(kryptos_twofish128_hmac_tests);
+    CUTE_RUN_TEST(kryptos_twofish192_hmac_tests);
+    CUTE_RUN_TEST(kryptos_twofish256_hmac_tests);
 #else
 # if !defined(KRYPTOS_NO_HMAC_TESTS)
     // TODO(Rafael): When there is no C99 support add a simple bare bone test with at least one block cipher and all
