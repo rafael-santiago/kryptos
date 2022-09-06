@@ -5,6 +5,34 @@
     Rafael
 --
 
+vx20220002 [git-tag: 'vx20220002']
+
+    Added one more cryptographic hash primitive and some support for incremental hash
+    emulation.
+
+    Features:
+
+        - Added BLAKE3 hash algorithm. The libary implementation supports the three
+          current available modes for this brand new hash algorithm: `hash`, `keyed_hash`
+          and `derive_key`. For the sake of simplicity, concurrency were not handled
+          by this implementation. Synchronization primitives would be out of library's
+          scope, its is an operating system business and very oriented to user's status
+          quo. I believe that an user facing this kind of requirement will be capable of
+          pick the implementation and shift it to concurrency if she/he wants to.
+        - Added `kryptos_hash_init`, `kryptos_hash_update` and `kryptos_hash_finalize`
+          conveniences. By default kryptos does not implement incremental hashing
+          since all its hash primitives have been implemented taking into consideration
+          that all data to be hashed will be in memory. Those three new primitives
+          are only for emulating the incremental hashing behavior. It could be useful
+          on some small/medium/large/huge but not HUGE buffered input reading and hashing
+          tasks. Variable sized and keyed hashes are also supported by these conveniences.
+
+    Bugfixes:
+
+        - TWOFISH HMAC tests were enabled during user-mode tests (it was lacking).
+          Anyway everything is fine, since it was running already on kernel-mode tests and
+          passing. So, no bugfixes.
+
 vx20220001 [git-tag: 'vx20220001']
 
     Now library counts with two one-time password algorithms (HMAC based and time based).
