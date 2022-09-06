@@ -565,6 +565,500 @@ KUTE_TEST_CASE(kryptos_blake2sN_tests)
     kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
 KUTE_TEST_CASE_END
 
+KUTE_TEST_CASE(kryptos_inc_hash_tests)
+    // INFO(Rafael): Since the hash function was previous validated with the official test vectors
+    //               at kernel side we will only poking it by trying to make it explode in front of
+    //               our faces to see if something bad could happen. If at the end of the test
+    //               the system is still alive, nice!
+    kryptos_u8_t *the_meaning_of_life = (kryptos_u8_t *)"A-well-a everybody's heard about the bird\n"
+                                                        "B-b-b-bird, b-birdd's the word\n"
+                                                        "A-well, a bird, bird, bird, bird is the word\n"
+                                                        "Ah, bap-a-pa-pa-pa-pa-pa-pa-pa-pa-pa-pa-pa-pa-pap\n"
+                                                        "Ma-ma-mow, pa-pa, ma-ma-mow, pa-pa\n"
+                                                        "Ma-ma-mow, pa-pa, ma-ma-mow, pa-pa\n"
+                                                        "Ma-ma-mow, pa-pa, ma-ma-mow, pa-pa\n"
+                                                        "Ma-ma-mow, pa-pa, ma-ma-mow, pa-pa\n"
+                                                        "Ma-ma-mow, pa-pa, ma-ma-mow, pa-pa\n"
+                                                        "Ma-ma-mow, pa-pa, ma-ma-mow, pa-pa\n"
+                                                        "Ma-ma-mow, pa-pa, ma-ma-mow, pa-pa\n"
+                                                        "Ma-ma-mow, pa-pa, ma-ma-mow, pa-pa\n"
+                                                        "Ma-ma-mow, pa-pa, ma-ma-mow, pa-pa\n"
+                                                        "Ma-ma-mow, pa-pa, ma-ma-mow, pa-pa\n"
+                                                        "Ma-ma-mow, pa-pa, ma-ma-mow, pa-pa\n"
+                                                        "Ma-ma-mow, pa-pa, ma-ma-mow, pa-pa\n"
+                                                        "Ma-ma-mow, pa-pa, ma-ma-mow, pa-pa\n"
+                                                        "Ma-ma-mow, pa-pa, ma-ma-mow, pa-pa\n"
+                                                        "No explosion... tests passed.\n"
+                                                        "Valeu cambada! Domingo eu venho passar a segunda-feira com vcs...Ah eh...\n"
+                                                        "Try to be nice to people, avoid eating fat, read good book every now and then, "
+                                                        "get some walking in, and try and live together in peace and harmony with people of "
+                                                        "all creeds and nations";
+    kryptos_u8_t *mp = NULL, *mp_end = NULL;
+    kryptos_task_ctx t, *ktask = &t;
+
+    mp_end = the_meaning_of_life + strlen((char *)the_meaning_of_life);
+
+    // INFO(Rafael): Poking SHA-1 (yeah, I know... wearing gloves ba-dum-tssss!)
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(sha1, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking SHA-224.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(sha224, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking SHA-256.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(sha256, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking SHA-384.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(sha384, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking SHA-512.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(sha512, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking MD4 (yeah, I know... wearing gloves ba-dum-tssss!)
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(md4, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking MD5 (yeah, I know... wearing gloves ba-dum-tssss!)
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(md5, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking RIPEMD-128 (yeah, I know... wearing gloves ba-dum-tssss!)
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(ripemd128, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking RIPEMD-160 (yeah, I know... ba-dum-tssss!)
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(ripemd160, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // Oh no! I will wash my hands!.... Ugh!
+
+    // INFO(Rafael): Poking SHA3-224.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(sha3_224, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking SHA3-256.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(sha3_256, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking SHA3-384.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(sha3_384, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking SHA3-512.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(sha3_512, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking KECCAK-224.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(keccak224, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking KECCAK-256.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(keccak256, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking KECCAK-384.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(keccak384, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking KECCAK-512.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(keccak512, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking BLAKE2s256.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(blake2s256, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking BLAKE2s256 (keyed)
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(blake2s256, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    ktask->key = (kryptos_u8_t *)"xabablau";
+    ktask->key_size = 9;
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking BLAKE2b512.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(blake2b512, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking BLAKE2b512 (keyed)
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(blake2b512, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    ktask->key = (kryptos_u8_t *)"Zzz";
+    ktask->key_size = 3;
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking BLAKE2sN
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(blake2sN, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    ktask->out_size = 28;
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    KUTE_ASSERT(ktask->out_size == 28);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking BLAKE2sN (keyed)
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(blake2sN, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    ktask->key = (kryptos_u8_t *)"xabablau";
+    ktask->key_size = 9;
+    ktask->out_size = 28;
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    KUTE_ASSERT(ktask->out_size == 28);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking BLAKE2bN.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(blake2bN, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    ktask->out_size = 48;
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    KUTE_ASSERT(ktask->out_size == 48);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking BLAKE2bN (keyed)
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(blake2bN, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    ktask->key = (kryptos_u8_t *)"Zzz";
+    ktask->key_size = 3;
+    ktask->out_size = 48;
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    KUTE_ASSERT(ktask->out_size == 48);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking TIGER.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(tiger, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking WHIRLPOOL.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(whirlpool, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking BLAKE3.
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(blake3, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking BLAKE3 (keyed)
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(blake3, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    ktask->key = (kryptos_u8_t *)"................................";
+    ktask->key_size = 32;
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking BLAKE3n
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(blake3N, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    ktask->out_size = 192;
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    KUTE_ASSERT(ktask->out_size == 192);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+
+    // INFO(Rafael): Poking BLAKE3n(keyed)
+
+    mp = the_meaning_of_life;
+    kryptos_hash_init(blake3N, ktask);
+    while (mp != mp_end) {
+        kryptos_hash_update(ktask, mp, 1);
+        KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+        mp++;
+    }
+    ktask->key = (kryptos_u8_t *)"................................";
+    ktask->key_size = 32;
+    ktask->out_size = 256;
+    kryptos_hash_finalize(ktask, 0);
+    KUTE_ASSERT(kryptos_last_task_succeed(ktask) == 1);
+    KUTE_ASSERT(ktask->out != NULL);
+    KUTE_ASSERT(ktask->out_size == 256);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+KUTE_TEST_CASE_END
+
 KUTE_TEST_CASE(kryptos_blake2bN_tests)
     // INFO(Rafael): Tests for Blake2bN are simpler than Blake2b512 because all
     //               here depends on Blake2b512 parts (tested against official test vectors).

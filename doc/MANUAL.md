@@ -18,6 +18,7 @@ presented here can be built with the command ``hefesto --mk-samples``.
     - [HMACs](#hmacs)
     - [Poly1305](#poly1305)
     - [SipHash](#siphash)
+    - [Incremental input reading](#incremental-input-reading)
 - [Asymmetric stuff](#asymmetric-stuff)
     - [The Diffie-Hellman-Merkle key exchange](#the-diffie-hellman-merkle-key-exchange)
     - [RSA](#rsa)
@@ -1747,6 +1748,53 @@ int main(int argc, char **argv) {
 When verifying, ``kryptos_run_cipher_siphash`` will re-allocate memory passed as the input of
 your verification/decryption task, thus, in a well-succeeded context, the input address will
 change and you do not have to mind about free the old address (because it was freed already).
+
+[Back](#contents)
+
+### Incremental input reading
+
+``Kryptos`` does not implement incremental hashing as another libraries. Now you need to have
+every bytes that you want to hash in memory. Anyway, it is possible to emulate the incremental
+idea. By combining ``kryptos_hash_init``, ``kryptos_hash_update`` and ``kryptos_hash_finalize``.
+Take a look:
+
+```c
+/*
+ *                                Copyright (C) 2022 by Rafael Santiago
+ *
+ * This is a free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include <kryptos.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+int main(void) {
+    kryptos_task_ctx t, *ktask = &t;
+    kryptos_u8_t *alpha = (kryptos_u8_t *)"abcdefghijklmnopqrstuvwxyz";
+    kryptos_hash_init(sha3_512, ktask);
+    while (*alpha != 0) {
+        kryptos_hash_update(ktask, alpha, 2);
+        alpha += 2;
+    }
+    kryptos_hash_finalize(ktask, 1);
+    printf("SHA3-512 hex result = %s\n", ktask->out);
+    kryptos_task_free(ktask, KRYPTOS_TASK_OUT);
+    return EXIT_SUCCESS;
+}
+```
+
+So it is just about informing ``kryptos`` what hash primitive you are intending to use through ``kryptos_hash_init``.
+After that to pass the incremental input bytes by specifying how many byte there are currently into this buffer by
+using ``kryptos_hash_update``. Once all bytes passed it is just about calling ``kryptos_hash_finalize``.
+
+The second parameter of macro ``kryptos_hash_finalize`` is about hexadecimal output requesting. When a binary output
+is wanted just pass zero on it.
+
+For hash primitives that support variable size hashes and/or keyed hashing, you must configure those parameters
+before calling the finalization macro. I meant set ``out_size`` and/or ``key`` and ``key_size`` fields from the
+related task context.
 
 [Back](#contents)
 

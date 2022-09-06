@@ -1,7 +1,13 @@
 (A) Try to give support to GMP on multiprecision stuff when asked by the user. +Improvement
-(B) Implement a way of using incremental hashing without screwing up
-    the general straightforward, non-acrobatic current way of hashing data. +NewFeature,+HashFunction,+Improvement
 (B) Implement OCB mode of operation. +NewFeature,+BlockCipher,+AuthEnc
+x (B) Implement samples for kryptos_hash_init, kryptos_hash_update and kryptos_hash_finalize. +NewFeature,+Sample101
+x (A) Document kryptos_hash_init, kryptos_hash_update and kryptos_hash_finalize macros. +NewFeature,+Documentation
+x (B) Implement a way of automating incremental hashing unit tests for all available hash functions by using its
+      standard test vectors. +Tests,+Completeness
+x (B) Implement realloc behavior checking test. +Tests,+Completeness
+x (B) Verifiy is the library is emulating the standard realloc behavior into Windows Kernel based code. +Question
+x (B) Implement a way of using incremental hashing without screwing up
+      the general straightforward, non-acrobatic current way of hashing data. +NewFeature,+HashFunction,+Improvement
 x (A) Enable TWOFISH/128-192-256 HMAC, they were implemented but are not running [user and kernel]. +Tests,+Completeness
 x (A) Document BLAKE3 support features. +Documentation
 x (A) Enable BLAKE3 kernel tests. +Tests

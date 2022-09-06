@@ -1540,6 +1540,23 @@ CUTE_TEST_CASE(kryptos_memory_tests)
     kryptos_allow_ram_swap();
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(kryptos_realloc_tests)
+    char *data = NULL;
+    data = kryptos_newseg(3);
+    CUTE_ASSERT(data != NULL);
+    memcpy(data, "abc", 3);
+    CUTE_ASSERT(memcmp(data, "abc", 3) == 0);
+    data = kryptos_realloc(data, 4);
+    CUTE_ASSERT(data != NULL);
+    CUTE_ASSERT(memcmp(data, "abc", 3) == 0);
+    data[3] = 'd';
+    CUTE_ASSERT(memcmp(data, "abcd", 4) == 0);
+    data = kryptos_realloc(data, 2);
+    CUTE_ASSERT(data != NULL);
+    CUTE_ASSERT(memcmp(data, "ab", 2) == 0);
+    kryptos_freeseg(data, 2);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(kryptos_gcm_gf_mul_tests)
     kryptos_u32_t  x[4] = { 0x66E94BD4, 0xEF8A2C3B, 0x884CFA59, 0xCA342B2E };
     kryptos_u32_t  y[4] = { 0x0388DACE, 0x60B6A392, 0xF328C2B9, 0x71B2FE78 };

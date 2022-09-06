@@ -6,6 +6,7 @@
  *
  */
 #include <kryptos_hash_common.h>
+#include <kryptos_memory.h>
 #ifndef KRYPTOS_KERNEL_MODE
 # include <string.h>
 #endif
@@ -85,4 +86,71 @@ void kryptos_hash_ld_u8buf_as_u64_blocks(kryptos_u8_t *buffer, const size_t buff
         i = block_index_decision_table[b];
         input[i] = input[i] << 8 | buffer[b];
     }
+}
+
+void kryptos_hash_do_update(kryptos_task_ctx **ktask, const kryptos_u8_t *input, const size_t input_size) {
+    kryptos_u8_t *in = NULL;
+    size_t in_size = 0;
+
+    if (ktask == NULL || input == NULL || (*ktask)->arg[0] == NULL) {
+        if (ktask != NULL) {
+            (*ktask)->result = kKryptosInvalidParams;
+            (*ktask)->result_verbose = "Invalid parameters.";
+        }
+        return;
+    }
+
+    in = (*ktask)->in;
+    in_size = (*ktask)->in_size + input_size;
+
+    if (in == NULL) {
+        in = (kryptos_u8_t *)kryptos_newseg(in_size);
+    } else {
+        in = (kryptos_u8_t *)kryptos_realloc(in, in_size);
+    }
+
+    if (in == NULL) {
+        (*ktask)->result = kKryptosProcessError;
+        (*ktask)->result_verbose = "No memory to (re)alloc task input buffer.";
+        return;
+    }
+
+    memcpy(in + (*ktask)->in_size, input, input_size);
+
+    (*ktask)->in = in;
+    (*ktask)->in_size = in_size;
+    (*ktask)->result = kKryptosSuccess;
+    in = NULL;
+    in_size = 0;
+}
+
+void kryptos_hash_do_finalize(kryptos_task_ctx **ktask, const int to_hex) {
+    kryptos_hash_func h = NULL;
+    int input_is_null = 0;
+
+    if (ktask == NULL || (*ktask)->arg[0] == NULL) {
+        if (ktask != NULL) {
+            (*ktask)->result = kKryptosInvalidParams;
+            (*ktask)->result_verbose = "Null hash function.";
+        }
+        return;
+    }
+
+    input_is_null = ((*ktask)->in == NULL && (*ktask)->in_size == 0);
+    if (input_is_null) {
+        (*ktask)->in = (kryptos_u8_t *)"";
+    }
+
+    h = (kryptos_hash_func)(*ktask)->arg[0];
+    h(ktask, to_hex);
+    (*ktask)->arg[0] = (void *)h;
+
+    if (!input_is_null && (*ktask)->result == kKryptosSuccess) {
+        kryptos_freeseg((*ktask)->in, (*ktask)->in_size);
+    }
+
+    (*ktask)->in = NULL;
+    (*ktask)->in_size = 0;
+
+    input_is_null = 0;
 }

@@ -64,4 +64,6 @@ CUTE_DECLARE_TEST_CASE(kryptos_u64_rev_tests);
 
 CUTE_DECLARE_TEST_CASE(kryptos_u8_ptr_to_hex_tests);
 
+CUTE_DECLARE_TEST_CASE(kryptos_realloc_tests);
+
 #endif
