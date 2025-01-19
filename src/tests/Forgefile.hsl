@@ -53,6 +53,11 @@ kryptos-tests.prologue() {
         $cflags.add_item("-DKRYPTOS_NO_SIPHASH_TESTS");
     }
 
+    $user_option = hefesto.sys.get_option("no-test-progress");
+    if ($user_option.count() > 0) {
+        $cflags.add_item("-DNO_TEST_PROGRESS");
+    }
+
     $user_option = hefesto.sys.get_option("quick-ecdh-tests");
     if ($user_option.count() > 0) {
         $cflags.add_item("-DKRYPTOS_QUICK_ECDH_TESTS");
