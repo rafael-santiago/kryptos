@@ -103,10 +103,14 @@ CUTE_TEST_CASE(kryptos_totp_client_server_syncd_interaction_tests)
             server->in_size = client->out_size;
             CUTE_ASSERT(kryptos_totp(&server) == kKryptosSuccess);
             kryptos_freeseg(client->out, client->out_size);
+#if !defined(NO_TEST_PROGRESS)
             fprintf(stdout, "       \r   %.0f%% complete (token with %zu digit(s)).", ((float)t / (float)t_nr) * 100, d);
+#endif
         }
     }
+#if !defined(NO_TEST_PROGRESS)
     fprintf(stdout, "       \r                                                       \r");
+#endif
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_totp_client_server_unsyncd_interaction_tests)
@@ -185,11 +189,14 @@ CUTE_TEST_CASE(kryptos_totp_client_server_unsyncd_interaction_tests)
             CUTE_ASSERT(kryptos_totp(&server) == kKryptosSuccess);
 
             kryptos_freeseg(client->out, client->out_size);
-
+#if !defined(NO_TEST_PROGRESS)
             fprintf(stdout, "       \r   %.0f%% complete (token with %zu digit(s)).", ((float)t / (float)t_nr) * 100, d);
+#endif
         }
     }
+#if !defined(NO_TEST_PROGESS)
     fprintf(stdout, "       \r                                                       \r");
+#endif
     disable_time_hook();
 CUTE_TEST_CASE_END
 
@@ -549,10 +556,14 @@ CUTE_TEST_CASE(kryptos_hotp_client_server_syncd_interaction_tests)
             server->in_size = client->out_size;
             CUTE_ASSERT(kryptos_hotp(&server) == kKryptosSuccess);
             kryptos_freeseg(client->out, client->out_size);
+#if !defined(NO_TEST_PROGRESS)
             fprintf(stdout, "       \r   %.0f%% complete (token with %zu digit(s)).", ((float)t / (float)test_nr) * 100, d);
+#endif
         }
     }
+#if !defined(NO_TEST_PROGRESS)
     fprintf(stdout, "       \r                                                       \r");
+#endif
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_hotp_client_server_unsyncd_interaction_tests)
@@ -565,8 +576,9 @@ CUTE_TEST_CASE(kryptos_hotp_client_server_unsyncd_interaction_tests)
     size_t d, d_nr = 9;
     size_t t;
     size_t test_nr = 100000;
-
+#if !defined(NO_TEST_PROGRESS)
     fprintf(stdout, "   Hold on. Do not fall asleep...");
+#endif
 
     // TIP(Rafael): Testing token with 1 digit size is pointless since it is collision prone.
     //              It is also a good proof that you should pick greater digit sizes to get rid off
@@ -665,10 +677,13 @@ CUTE_TEST_CASE(kryptos_hotp_client_server_unsyncd_interaction_tests)
             CUTE_ASSERT(kryptos_hotp(&poison) == kKryptosInvalidToken);
         }
         kryptos_freeseg(lux->out, lux->out_size);
-
+#if !defined(NO_TEST_PROGRESS)
         fprintf(stdout, "       \r   %.0f%% complete (token with %zu digit(s)).", ((float)d / (float)d_nr) * 100, d);
+#endif
     }
+#if !defined(NO_TEST_PROGRESS)
     fprintf(stdout, "       \r                                                       \r");
+#endif
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(kryptos_hotp_init_bad_params_tests)

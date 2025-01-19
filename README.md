@@ -1,4 +1,6 @@
-# Kryptos [![CircleCI](https://circleci.com/gh/rafael-santiago/kryptos/tree/main.svg?style=svg)](https://circleci.com/gh/rafael-santiago/kryptos/tree/main)
+# Kryptos
+
+![linux-ci](https://github.com/rafael-santiago/kryptos/actions/workflows/linux-forge.yml/badge.svg?branch=main) ![freebsd-ci](https://github.com/rafael-santiago/kryptos/actions/workflows/freebsd-forge.yml/badge.svg?branch=main) ![netbsd-ci](https://github.com/rafael-santiago/kryptos/actions/workflows/netbsd-forge.yml/badge.svg?branch=main) ![openbsd-ci](https://github.com/rafael-santiago/kryptos/actions/workflows/openbsd-forge.yml/badge.svg?branch=main) ![windows-ci](https://github.com/rafael-santiago/kryptos/actions/workflows/windows-forge.yml/badge.svg?branch=main)
 
 I started the core of this project on about 2004 and since then it is being an attempt of building a tiny and straightforward
 crypto library which can be easily integrated with user and also kernel mode code.

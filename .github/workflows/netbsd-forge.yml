@@ -1,0 +1,41 @@
+on: push
+name: Kryptos NetBSD CI
+jobs:
+  NetBSD-GCC:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: NetBSD Forge
+      uses: vmactions/netbsd-vm@v1
+      with:
+         sync: rsync
+         copyback: false
+         prepare: |
+            /usr/sbin/pkg_add sudo git gcc*
+         shell: bash
+         run: |
+            . src/build/ci/netbsd/install-hefesto.sh
+            cd src
+            sudo -E hefesto --mk-samples --toolset=gcc --no-test-progress
+            cd .. && sudo rm -rf kryptos
+  NetBSD-Clang:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: NetBSD Forge
+      uses: vmactions/netbsd-vm@v1
+      with:
+         sync: rsync
+         copyback: false
+         prepare: |
+            /usr/sbin/pkg_add sudo git clang*
+         shell: bash
+         run: |
+            . src/build/ci/netbsd/install-hefesto.sh
+            cd src
+            sudo -E hefesto --mk-samples --toolset=clang --no-test-progress
+            cd .. && sudo rm -rf kryptos

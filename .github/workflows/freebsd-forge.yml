@@ -1,0 +1,41 @@
+on: push
+name: Kryptos FreeBSD CI
+jobs:
+  FreeBSD-Clang:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: FreeBSD Forge
+      uses: vmactions/freebsd-vm@v1
+      with:
+         sync: rsync
+         copyback: false
+         prepare: |
+            pkg install -y sudo git llvm
+         usesh: true
+         run: |
+            . src/build/ci/freebsd/install-hefesto.sh
+            cd src
+            sudo -E hefesto --mk-samples --toolset=clang --no-test-progress
+            cd .. && sudo rm -rf kryptos
+  FreeBSD-GCC:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: FreeBSD Forge
+      uses: vmactions/freebsd-vm@v1
+      with:
+         sync: rsync
+         copyback: false
+         prepare: |
+            pkg install -y sudo git lang/gcc
+         usesh: true
+         run: |
+            . src/build/ci/freebsd/install-hefesto.sh
+            cd src
+            sudo -E hefesto --mk-samples --toolset=gcc --no-test-progress
+            cd .. && sudo rm -rf kryptos

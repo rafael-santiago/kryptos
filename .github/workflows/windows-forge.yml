@@ -1,0 +1,35 @@
+on: push
+name: Kryptos Windows CI
+jobs:
+  Windows-GCC:
+    runs-on: windows-latest
+    steps:
+    - name: Clone kryptos repo
+      uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: Install Hefesto
+      shell: cmd
+      run: |
+        src\build\ci\windows\install-hefesto.bat && RefreshEnv.cmd && hefesto --version
+    - name: Run kryptos forge
+      shell: cmd
+      run: |
+        RefreshEnv.cmd && cd src && hefesto --toolset=gcc --mk-samples --no-test-progress
+  Windows-MSVC:
+    runs-on: windows-latest
+    steps:
+    - name: Clone kryptos repo
+      uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: Install Hefesto
+      shell: cmd
+      run: |
+        src\build\ci\windows\install-hefesto.bat && RefreshEnv.cmd
+    - name: Run kryptos forge
+      shell: cmd
+      run: |
+        choco install -y visualstudio2022buildtools --package-parameters "--includeRecommended --includeOptional --add Microsoft.VisualStudio.Component.VC.14.38.17.8.x86.x64 --passive --locale en-US"
+        choco install -y visualstudio2022-workload-vctools --package-parameters "--includeRecommended --add Microsoft.VisualStudio.Component.VC.14.38.17.8.x86.x64 --passive"
+        RefreshEnv.cmd && cd src && hefesto --toolset=msvc --mk-samples --no-test-progress

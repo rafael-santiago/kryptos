@@ -448,7 +448,7 @@ void kryptos_ ## cipher_name ## _setup(kryptos_task_ctx *ktask,\
 
 #endif
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
 # define KRYPTOS_UNUSED(p) (p)
 #else
 # define KRYPTOS_UNUSED(p)

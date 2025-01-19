@@ -1,0 +1,39 @@
+on: push
+name: Kryptos Linux CI
+jobs:
+  Linux-GCC:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone kryptos repo
+      uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: Install basic tools
+      shell: bash
+      run: sh src/build/ci/linux/install-basic-tools.sh
+    - name: Install Hefesto
+      shell: bash
+      run: sh src/build/ci/linux/install-hefesto.sh
+    - name: Run kryptos forge (GCC)
+      shell: bash
+      run: |
+        cd src
+        sudo -E hefesto --mk-samples --toolset=gcc --no-test-progress
+  Linux-Clang:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone kryptos repo
+      uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: Install basic tools
+      shell: bash
+      run: sh src/build/ci/linux/install-basic-tools.sh
+    - name: Install Hefesto
+      shell: bash
+      run: sh src/build/ci/linux/install-hefesto.sh
+    - name: Run kryptos forge (Clang)
+      shell: bash
+      run: |
+        cd src
+        sudo -E hefesto --mk-samples --toolset=clang --no-test-progress

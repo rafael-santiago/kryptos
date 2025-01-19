@@ -1,0 +1,42 @@
+on: push
+name: Kryptos OpenBSD CI
+jobs:
+  OpenBSD-Clang:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: OpenBSD Forge
+      uses: vmactions/openbsd-vm@v1
+      with:
+         sync: rsync
+         copyback: false
+         prepare: |
+            pkg_add sudo-1.9.15.5p0 git-2.46.1 llvm-17.0.6p12
+         usesh: true
+         run: |
+            . src/build/ci/netbsd/install-hefesto.sh
+            cd src
+            sudo -E hefesto --mk-samples --toolset=clang --no-test-progress
+            cd .. && sudo rm -rf kryptos
+  OpenBSD-GCC:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: OpenBSD Forge
+      uses: vmactions/openbsd-vm@v1
+      with:
+         sync: rsync
+         copyback: false
+         prepare: |
+            pkg_add sudo-1.9.15.5p0 git-2.46.1 gcc-11.2.0p14 gcc-libs-11.2.0p14
+         usesh: true
+         run: |
+            . src/build/ci/netbsd/install-hefesto.sh
+            ln -sf `which egcc` /usr/bin/gcc
+            cd src
+            sudo -E hefesto --mk-samples --toolset=gcc --no-test-progress
+            cd .. && sudo rm -rf kryptos
