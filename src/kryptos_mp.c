@@ -72,6 +72,8 @@ static kryptos_u8_t nbxlt[] = {
 
 #define kryptos_mp_add_negative_signal(dest) ( (*(dest))->neg = 1 )
 
+#define kryptos_mp_min(a, b) ( (a) < (b) ? (a) : (b) )
+
 static char *g_kryptos_mp_small_primes[] = {
     "0003", "0005", "0007", "000B", "000D", "0011", "0013", "0017", "001D", "001F", "0025", "0029", "002B", "002F", "0035",
     "003B", "003D", "0043", "0047", "0049", "004F", "0053", "0059", "0061", "0065", "0067", "006B", "006D", "0071", "007F",
@@ -991,6 +993,226 @@ kryptos_mp_multibyte_mul_epilogue:
 
 #endif
 
+int kryptos_mp_split(kryptos_mp_value_t **hi,
+                     kryptos_mp_value_t **lo,
+                     const kryptos_mp_value_t *src,
+                     const size_t hi_digits_nr) {
+    ssize_t cut_offset;
+    int done = 1;
+    ssize_t d;
+    ssize_t s;
+
+    cut_offset = src->data_size - hi_digits_nr;
+
+    *hi = kryptos_new_mp_value((hi_digits_nr * sizeof(kryptos_mp_digit_t)) << 3);
+    if (*hi == NULL) {
+        done = 0;
+        goto kryptos_mp_split_epilogue;
+    }
+
+    *lo = kryptos_new_mp_value((cut_offset * sizeof(kryptos_mp_digit_t)) << 3);
+    if (*lo == NULL) {
+        done = 0;
+        goto kryptos_mp_split_epilogue;
+    }
+
+    s = (*hi)->data_size - 1;
+    for (d = (src->data_size - 1); d >= cut_offset; d--) {
+        (*hi)->data[s] = src->data[d];
+        s--;
+    }
+
+    s = (*lo)->data_size - 1;
+    for (d = cut_offset - 1; d >= 0; d--) {
+        (*lo)->data[s] = src->data[d];
+        s--;
+    }
+
+kryptos_mp_split_epilogue:
+/*
+    printf("cut_offset = %lu\n", cut_offset * sizeof(kryptos_mp_digit_t));
+    printf("SRC(%lu) = ", src->data_size);
+    kryptos_print_mp(src);
+    printf("HI(%lu)  = ", (*hi)->data_size);
+    kryptos_print_mp(*hi);
+    printf("LO(%lu)  = ", (*lo)->data_size);
+    kryptos_print_mp(*lo);
+    printf("--\n");
+*/
+    return done;
+}
+
+kryptos_mp_value_t *kryptos_mp_karatsuba(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
+    kryptos_mp_value_t *x0 = NULL;
+    kryptos_mp_value_t *x1 = NULL;
+    kryptos_mp_value_t *y0 = NULL;
+    kryptos_mp_value_t *y1 = NULL;
+    kryptos_mp_value_t *x0y0 = NULL;
+    kryptos_mp_value_t *x1y1 = NULL;
+    kryptos_mp_value_t *t1 = NULL;
+    kryptos_mp_value_t *t2 = NULL;
+    size_t hi_digits_nr = kryptos_mp_min((*dest)->data_size, src->data_size) >> 1;
+    int b = 0;
+    int done = 0;
+
+    done = kryptos_mp_split(&x0, &x1, *dest, hi_digits_nr);
+    if (!done) {
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+
+    done = kryptos_mp_split(&y0, &y1, src, hi_digits_nr);
+    if (!done) {
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+
+    // INFO(Rafael): 'x0y0 = x0 * y0'.
+    x0y0 = kryptos_assign_mp_value(&x0y0, x0);
+    if (x0y0 == NULL) {
+        done = 0;
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+    x0y0 = kryptos_mp_mul(&x0y0, y0);
+    if (x0y0 == NULL) {
+        done = 0;
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+
+    // INFO(Rafael): 'x1y1 = x1 * y1'.
+    x1y1 = kryptos_assign_mp_value(&x1y1, x1);
+    if (x1y1 == NULL) {
+        done = 0;
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+    x1y1 = kryptos_mp_mul(&x1y1, y1);
+    if (x1y1 == NULL) {
+        done = 0;
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+
+    // INFO(Rafael): 't1 = x1 + x0'.
+    t1 = kryptos_assign_mp_value(&t1, x1);
+    if (t1 == NULL) {
+        done = 0;
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+    t1 = kryptos_mp_add(&t1, x0);
+    if (t1 == NULL) {
+        done = 0;
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+
+    // INFO(Rafael): 't2 = y1 + y0'.
+    t2 = kryptos_assign_mp_value(&t2, y1);
+    if (t2 == NULL) {
+        done = 0;
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+    t2 = kryptos_mp_add(&t2, y0);
+    if (t2 == NULL) {
+        done = 0;
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+
+    // INFO(Rafael): 't1 = (x1 + x0) * (y1 + y0)
+    t1 = kryptos_mp_mul(&t1, t2);
+    if (t1 == NULL) {
+        done = 0;
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+
+    // INFO(Rafael): 't2 = x0y0 + x1y1'.
+    t2 = kryptos_assign_mp_value(&t2, x0y0);
+    if (t2 == NULL) {
+        done = 0;
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+    t2 = kryptos_mp_add(&t2, x1y1);
+    if (t2 == NULL) {
+        done = 0;
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+
+    // INFO(Rafael): 't1 = (x1 + x0) * (y1 + y0) - (x1y1 + x0y0)'.
+    t1 = kryptos_mp_sub(&t1, t2);
+    if (t1 == NULL) {
+        done = 0;
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+
+    b = (int)(hi_digits_nr * sizeof(kryptos_mp_digit_t)) << 3;
+
+    // INFO(Rafael): 't1 = t1 << B'.
+    t1 = kryptos_mp_lsh(&t1, b);
+    if (t1 == NULL) {
+        done = 0;
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+
+    // INFO(Rafael): 'x1y1 = x1y1 << B * 2'.
+    x1y1 = kryptos_mp_lsh(&x1y1, b << 1);
+    if (x1y1 == NULL) {
+        done = 0;
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+
+    // INFO(Rafael): 't1 = x0y0 + t1'.
+    t1 = kryptos_mp_add(&t1, x0y0);
+    if (t1 == NULL) {
+        done = 0;
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+
+    // INFO(Rafael): 't1 = x0y0 + t1 + x1y1'.
+    t1 = kryptos_mp_add(&t1, x1y1);
+    if (t1 == NULL) {
+        done = 0;
+        goto kryptos_mp_karatsuba_epilogue;
+    }
+
+kryptos_mp_karatsuba_epilogue:
+
+    kryptos_del_mp_value(*dest);
+    *dest = NULL;
+
+    if (done) {
+        kryptos_assign_mp_value(dest, t1);
+    }
+
+    if (x0 != NULL) {
+        kryptos_del_mp_value(x0);
+    }
+
+    if (x1 != NULL) {
+        kryptos_del_mp_value(x1);
+    }
+
+    if (y0 != NULL) {
+        kryptos_del_mp_value(y0);
+    }
+
+    if (y1 != NULL) {
+        kryptos_del_mp_value(y1);
+    }
+
+    if (x0y0 != NULL) {
+        kryptos_del_mp_value(x0y0);
+    }
+
+    if (x1y1 != NULL) {
+        kryptos_del_mp_value(x1y1);
+    }
+
+    if (t1 != NULL) {
+        kryptos_del_mp_value(t1);
+    }
+
+    if (t2 != NULL) {
+        kryptos_del_mp_value(t2);
+    }
+
+    return (*dest);
+}
+
 kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_value_t *src) {
     size_t r;
     kryptos_mp_value_t *m;
@@ -1006,6 +1228,7 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
     kryptos_mp_digit_t mc;
     kryptos_u8_t ac;
 #endif
+    size_t result_bitsize = 0;
 
     if (src == NULL || dest == NULL) {
         return NULL;
@@ -1015,6 +1238,12 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
         (*dest) = kryptos_new_mp_value(src->data_size << 3);
         memcpy((*dest)->data, src->data, src->data_size);
         return (*dest);
+    }
+
+    result_bitsize = kryptos_mp_byte2bit((*dest)->data_size + src->data_size + 1);
+
+    if (kryptos_mp_min((*dest)->data_size, src->data_size) >= 32) {
+        return kryptos_mp_karatsuba(dest, src);
     }
 
     kryptos_mp_max_min(x, y, (*dest), src);
@@ -1029,7 +1258,7 @@ kryptos_mp_value_t *kryptos_mp_mul(kryptos_mp_value_t **dest, const kryptos_mp_v
 
     // CLUE(Rafael): Encantamentos baseados em algumas propriedades que talvez a tia Tetéia não quis te contar.
 
-    m = kryptos_new_mp_value(kryptos_mp_byte2bit((*dest)->data_size + src->data_size + 1));
+    m = kryptos_new_mp_value(result_bitsize);
 
     if (m == NULL) {
         // WARN(Rafael): Better let a memory leak than return a wrong result.
@@ -4264,6 +4493,8 @@ int kryptos_mp_is_zero(const kryptos_mp_value_t *value) {
 #undef kryptos_mp_put_u32_into_mp
 
 #undef KRYPTOS_MP_ABORT_WHEN_NULL
+
+#undef kryptos_mp_min
 
 #if defined(KRYPTOS_KERNEL_MODE) && defined(_WIN32)
 # pragma warning(pop)

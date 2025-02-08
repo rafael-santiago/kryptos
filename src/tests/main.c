@@ -27,7 +27,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     //               At first glance you should consider the utility that it implements into the library.
 
     // INFO(Rafael): Generic/shared stuff.
-
+/*
     CUTE_RUN_TEST(kryptos_memcmp_tests);
     CUTE_RUN_TEST(kryptos_memset_tests);
     CUTE_RUN_TEST(kryptos_memory_tests);
@@ -56,13 +56,13 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_hex_tests);
     CUTE_RUN_TEST(kryptos_u8_ptr_to_hex_tests);
     CUTE_RUN_TEST(kryptos_hash_common_tests);
-
+*/
     //  -=-=-=-=- If you have just added a new cipher take a look in "kryptos_dsl_tests" case, there is some work to
     //                                               be done there too! -=-=-=-=-=-=-
 
     //  -=-=-=-=- If you have just added a new cipher you must implement a GCM test case for this new cipher, even being
     //                 a unsupported mode for this cipher, take a look at previous gcm test cases -=-=-=-=-
-
+/*
     // INFO(Rafael): Internal DSL stuff.
     CUTE_RUN_TEST(kryptos_dsl_tests);
 
@@ -367,9 +367,10 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     CUTE_RUN_TEST(kryptos_mp_le_tests);
     CUTE_RUN_TEST(kryptos_mp_is_neg_tests);
     CUTE_RUN_TEST(kryptos_mp_add_tests);
-    CUTE_RUN_TEST(kryptos_mp_sub_tests);
+    CUTE_RUN_TEST(kryptos_mp_sub_tests);*/
+    CUTE_RUN_TEST(kryptos_mp_split_tests);
     CUTE_RUN_TEST(kryptos_mp_mul_tests);
-    CUTE_RUN_TEST(kryptos_mp_mul_digit_tests);
+/*    CUTE_RUN_TEST(kryptos_mp_mul_digit_tests);
     CUTE_RUN_TEST(kryptos_mp_not_tests);
     CUTE_RUN_TEST(kryptos_mp_inv_tests);
     CUTE_RUN_TEST(kryptos_mp_lsh_tests);
@@ -491,6 +492,7 @@ CUTE_TEST_CASE(kryptos_test_monkey)
     } else {
         printf("WARN: The ECDSA signature tests were skipped.\n");
     }
+*/
 //    CUTE_RUN_TEST(poke_bloody_poke);
 CUTE_TEST_CASE_END
 

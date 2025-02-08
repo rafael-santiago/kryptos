@@ -99,6 +99,11 @@ int kryptos_mp_is_zero(const kryptos_mp_value_t *value);
 
 kryptos_u8_t *kryptos_mp_get_bitmap(const kryptos_mp_value_t *src, size_t *bitmap_size);
 
+int kryptos_mp_split(kryptos_mp_value_t **hi,
+                     kryptos_mp_value_t **lo,
+                     const kryptos_mp_value_t *src,
+                     const size_t hi_digits_nr);
+
 #ifdef __cplusplus
 }
 #endif
